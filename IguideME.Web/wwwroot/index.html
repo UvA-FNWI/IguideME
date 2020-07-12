@@ -8,9 +8,7 @@
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 </head>
 <body>
-    Hello!
-
-    <button id="btnLogin">Login</button>
+    Hello <span id="name"></span>!
 
     <button id="btnGet">Get data</button>
 
@@ -18,6 +16,7 @@
         document.getElementById("btnGet").addEventListener("click", () => {
             axios.get("data").then(resp => { alert(resp.data); });
         });
+        axios.get("account").then(resp => document.getElementById("name").innerText = resp.data);
     </script>
 </body>
 </html>

@@ -28,5 +28,13 @@ namespace IguideME.Web.Controllers
         [HttpGet]
         public IEnumerable<string> Get()
             => canvasTest.GetStudents(994);
+
+        [HttpGet]
+        [Route("/Account")]
+        public async Task<string> GetAccount()
+        {
+            var auth = await HttpContext.AuthenticateAsync();
+            return auth.Principal.Identity.Name;
+        }
     }
 }

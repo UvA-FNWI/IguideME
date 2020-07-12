@@ -34,7 +34,7 @@ namespace IguideME.Web.Controllers
 
             // Register user identity
             var claims = new List<Claim> { new Claim("user", formdata["custom_canvas_user_login_id"]) };
-            await HttpContext.SignInAsync(new ClaimsPrincipal(new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme)));
+            await HttpContext.SignInAsync(new ClaimsPrincipal(new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme, "user", null)));
             return Redirect("/");
         }
     }
