@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+﻿    <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
@@ -10,13 +10,27 @@
 <body>
     Hello <span id="name"></span>!
 
-    <button id="btnGet">Get data</button>
+    <button id="btnQuizzes">Fetch quizzes</button>
+    <button id="btnEnrollments">Fetch enrollments</button>
+
+    <br /><br />
+
+    <code id="dataPreview">
+        Awaiting action
+    </code>
 
     <script>
-        document.getElementById("btnGet").addEventListener("click", () => {
-            axios.get("data").then(resp => { alert(resp.data); });
+        document.getElementById("btnQuizzes").addEventListener("click", () => {
+            axios.get("quizzes").then(resp => {
+                document.getElementById("dataPreview").innerText = JSON.stringify(resp.data, null, 2);
+            });
         });
-        axios.get("account").then(resp => document.getElementById("name").innerText = resp.data);
-    </script>
+
+        document.getElementById("btnEnrollments").addEventListener("click", () => {
+            axios.get("enrollments").then(resp => {
+                document.getElementById("dataPreview").innerText = JSON.stringify(resp.data, null, 2);
+            });
+        });
+        axios.get("account").then(resp => document.getElementById("name").innerText = resp.data);</script>
 </body>
 </html>
