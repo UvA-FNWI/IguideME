@@ -1,0 +1,71 @@
+﻿    <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>IguideME.Web</title>
+
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    Hello <span id="name"></span>!
+
+    <button id="btnQuizzes">Fetch quizzes</button>
+    <button id="btnEnrollments">Fetch enrollments</button>
+    <button id="btnDiscussions">Fetch discussions</button>
+    <button id="btnGrades">Fetch grades</button>
+    <button id="btnPerusall">Fetch perusall</button>
+    <button id="btnPerusallUp">Upload perusall</button>
+    <button id="btnConsent">Fetch consent</button>
+
+    <br /><br />
+
+    <code id="dataPreview">
+        Awaiting action
+    </code>
+
+    <script>//Discussions
+        document.getElementById("btnDiscussions").addEventListener("click", () => {
+            axios.get("discussions").then(resp => {
+                document.getElementById("dataPreview").innerText = JSON.stringify(resp.data, null, 2);
+            });
+        });
+
+        document.getElementById("btnQuizzes").addEventListener("click", () => {
+            axios.get("quizzes").then(resp => {
+                document.getElementById("dataPreview").innerText = JSON.stringify(resp.data, null, 2);
+            });
+        });
+
+        document.getElementById("btnEnrollments").addEventListener("click", () => {
+            axios.get("enrollments").then(resp => {
+                document.getElementById("dataPreview").innerText = JSON.stringify(resp.data, null, 2);
+            });
+        });
+
+        document.getElementById("btnGrades").addEventListener("click", () => {
+            axios.get("Submissions").then(resp => {
+                document.getElementById("dataPreview").innerText = JSON.stringify(resp.data, null, 2);
+            });
+        });
+
+        document.getElementById("btnPerusall").addEventListener("click", () => {
+            axios.get("Perusall").then(resp => {
+                document.getElementById("dataPreview").innerText = JSON.stringify(resp.data, null, 2);
+            });
+        });
+
+        document.getElementById("btnPerusallUp").addEventListener("click", () => {
+            axios.post("Admin-perusall", { payload: { grade: 1 }, key: "test" }).then(resp => {
+                document.getElementById("dataPreview").innerText = JSON.stringify(resp.data, null, 2);
+            });
+        });
+
+        document.getElementById("btnConsent").addEventListener("click", () => {
+            axios.get("Consent").then(resp => {
+                document.getElementById("dataPreview").innerText = JSON.stringify(resp.data, null, 2);
+            });
+        });
+        axios.get("account").then(resp => document.getElementById("name").innerText = resp.data);</script>
+</body>
+</html>
