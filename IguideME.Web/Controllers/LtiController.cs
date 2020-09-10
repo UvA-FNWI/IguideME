@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -33,7 +32,12 @@ namespace IguideME.Web.Controllers
                 return Unauthorized();
 
             // Register user identity
-            var claims = new List<Claim> { new Claim("user", formdata["custom_canvas_user_login_id"]) };
+            var claims = new List<Claim> {
+                new Claim("user_name", formdata["lis_person_name_full"]),
+                new Claim("user_id", formdata["custom_canvas_user_id"]),
+                new Claim("user", formdata["custom_canvas_user_login_id"]),
+                new Claim("course", formdata["custom_canvas_course_id"])
+            };
             await HttpContext.SignInAsync(new ClaimsPrincipal(new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme, "user", null)));
             return Redirect("/");
         }
