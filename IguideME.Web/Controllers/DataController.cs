@@ -12,7 +12,7 @@ using System;
 using System.Security.Claims;
 using System.IO;
 using Newtonsoft.Json.Linq;
-
+using System.Globalization;
 
 namespace IguideME.Web.Controllers
 {
@@ -71,6 +71,15 @@ namespace IguideME.Web.Controllers
             }
         }
 
+        private String MakeResponse(object payload, object grades)
+        {
+            IDictionary<string, object> response = new Dictionary<string, object>();
+            response.Add("payload", payload);
+            response.Add("peer_comp", grades);
+
+            return (string)JsonConvert.SerializeObject(response);
+        }
+
         [HttpGet]
         public IEnumerable<string> Get()
             => canvasTest.GetStudents(GetCourseID());
@@ -110,9 +119,7 @@ namespace IguideME.Web.Controllers
         public string GetSubmissions()
         {
             // returns all obtained exam grades for the logged in user
-            return JsonConvert.SerializeObject(
-                canvasTest.GetSubmissions(GetCourseID(), GetUserID())
-            );
+            return MakeResponse(canvasTest.GetSubmissions(GetCourseID(), GetUserID()), canvasTest.GetAllSubmissionGrades(GetCourseID()));
         }
 
         [Authorize]
@@ -156,15 +163,30 @@ namespace IguideME.Web.Controllers
         {
             var data = ReadFile("store/attendance.json");
             List<object> registry = new List<object>();
+            IDictionary<string, int> peers = new Dictionary<string, int>();
 
             foreach (var entry in data)
             {
+                data[entry.Key].ToList().ForEach(x =>
+                {
+                    if (!peers.ContainsKey((string)x["studentnaam"]))
+                        peers.Add((string)x["studentnaam"], ((string)x["aanwezig"]).ToLower() == "ja" ? 1 : 0);
+                    else
+                    {
+                        if (((string)x["aanwezig"]).ToLower() == "ja")
+                        {
+                            peers[(string)x["studentnaam"]] += 1;
+                        }
+                    }
+                });
+
                 // add all attendance registries for the student
-                var attendance = data[entry.Key].First(x => (string) x["studentnaam"] == GetUserName());
-                registry.Add(attendance);
+                var attendance = data[entry.Key].FirstOrDefault(x => (string) x["studentnaam"] == GetUserName());
+
+                if (attendance != null) registry.Add(attendance);
             }
 
-            return (string)JsonConvert.SerializeObject(registry);
+            return MakeResponse(registry, peers.Values.ToList());
         }
 
         [Authorize]
@@ -174,15 +196,18 @@ namespace IguideME.Web.Controllers
         {
             var data = ReadFile("store/practice_sessions.json");
             List<object> registry = new List<object>();
+            List<float> grades = new List<float>();
 
             foreach (var entry in data)
             {
+                grades.AddRange(data[entry.Key].Select(x => float.Parse((string) x["grade"])));
+
                 // get the practice session for the logged in user
-                var attendance = data[entry.Key].First(x => (string)x["studentnaam"] == GetUserName());
+                var attendance = data[entry.Key].First(x => (string) x["studentnaam"] == GetUserName());
                 registry.Add(attendance);
             }
 
-            return (string)JsonConvert.SerializeObject(registry);
+            return MakeResponse(registry, grades);
         }
 
         [Authorize]
@@ -192,15 +217,26 @@ namespace IguideME.Web.Controllers
         {
             var data = ReadFile("store/perusall.json");
             List<object> assignments = new List<object>();
+            List<float> grades = new List<float>();
 
             foreach (var entry in data)
             {
+                grades.AddRange(data[entry.Key].Select(a => float.Parse((string)a["grade"], CultureInfo.InvariantCulture)).ToList());
+
                 // get the perusall assignment of the logged in user
                 var assignment = data[entry.Key].First(x => (string) x["studentnaam"] == GetUserName());
                 assignments.Add(assignment);
             }
 
-            return (string)JsonConvert.SerializeObject(assignments);
+            return MakeResponse(assignments, grades.ToArray());
+        }
+
+        [Authorize]
+        [HttpGet]
+        [Route("/Is-admin")]
+        public Boolean IsAdminView()
+        {
+            return administrators.Contains(GetUser());
         }
 
         [Authorize]
