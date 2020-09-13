@@ -13,6 +13,7 @@ using System.Security.Claims;
 using System.IO;
 using Newtonsoft.Json.Linq;
 using System.Globalization;
+using IguideME.Web.Models;
 
 namespace IguideME.Web.Controllers
 {
@@ -26,7 +27,7 @@ namespace IguideME.Web.Controllers
         private static readonly HttpClient client = new HttpClient();
 
         // TODO: add Erwin & Natasa's login code
-        private readonly string[] administrators = new string[1] { "testscience158-tst" };
+        private readonly string[] administrators = new string[3] { "testscience158-tst", "nzupanc1", "evvliet1" };
 
         public DataController(ILogger<DataController> logger, CanvasTest canvasTest)
         {
@@ -127,32 +128,14 @@ namespace IguideME.Web.Controllers
         [Route("/Consent")]
         public int ConsentView()
         {
-            var path = "store/consent.json";
-
             if (Request.Method == "POST")
             {
-                // register the consent of the user
-                var data = ReadFile(path);
-                using (var reader = new StreamReader(Request.Body))
-                {
-                    // get answer and write to file
-                    var body = new StreamReader(Request.Body).ReadToEnd();
-                    data[GetUser()] = JObject.Parse(body)["granted"];
-                    using (StreamWriter outputFile = new StreamWriter(path))
-                        outputFile.Write(data);
-                }
-                return (int) data[GetUser()];
+                var body = new StreamReader(Request.Body).ReadToEnd();
+                ConsentData consent = new ConsentData(GetCourseID(), GetUserID(), (int) JObject.Parse(body)["granted"]);
+                DatabaseManager.Instance.SetConsent(consent);
+                return consent.Granted;
             } else {
-                // get the consent of the logged in user
-                using (StreamReader r = new StreamReader(path))
-                {
-                    string json = r.ReadToEnd();
-                    var items = (JObject)JsonConvert.DeserializeObject(json);
-
-                    // format consent; -1 means no answer has yet been given
-                    if (!items.ContainsKey(GetUser())) return -1;
-                    return ((bool)items[GetUser()] == true ? 1 : 0);
-                }
+                return DatabaseManager.Instance.GetConsent(GetCourseID(), GetUserID());
             }
         }
 
@@ -161,32 +144,21 @@ namespace IguideME.Web.Controllers
         [Route("/Attendance")]
         public string AttendanceView()
         {
-            var data = ReadFile("store/attendance.json");
-            List<object> registry = new List<object>();
             IDictionary<string, int> peers = new Dictionary<string, int>();
+            var attendance = DatabaseManager.Instance.GetAttendance(GetCourseID(), null);
 
-            foreach (var entry in data)
+            foreach (var entry in attendance)
             {
-                data[entry.Key].ToList().ForEach(x =>
+                if (!peers.ContainsKey(entry.UserName))
                 {
-                    if (!peers.ContainsKey((string)x["studentnaam"]))
-                        peers.Add((string)x["studentnaam"], ((string)x["aanwezig"]).ToLower() == "ja" ? 1 : 0);
-                    else
-                    {
-                        if (((string)x["aanwezig"]).ToLower() == "ja")
-                        {
-                            peers[(string)x["studentnaam"]] += 1;
-                        }
-                    }
-                });
-
-                // add all attendance registries for the student
-                var attendance = data[entry.Key].FirstOrDefault(x => (string) x["studentnaam"] == GetUserName());
-
-                if (attendance != null) registry.Add(attendance);
+                    peers.Add(entry.UserName, (entry.Present.ToLower() == "ja" ? 1 : 0));
+                } else if (entry.Present.ToLower() == "ja")
+                {
+                    peers[entry.UserName] += 1;
+                }
             }
 
-            return MakeResponse(registry, peers.Values.ToList());
+            return MakeResponse(attendance.Where(x => x.UserName == GetUserName()), peers.Values.ToList());
         }
 
         [Authorize]
@@ -194,20 +166,9 @@ namespace IguideME.Web.Controllers
         [Route("/Practice-sessions")]
         public string PracticeSessionsView()
         {
-            var data = ReadFile("store/practice_sessions.json");
-            List<object> registry = new List<object>();
-            List<float> grades = new List<float>();
-
-            foreach (var entry in data)
-            {
-                grades.AddRange(data[entry.Key].Select(x => float.Parse((string) x["grade"])));
-
-                // get the practice session for the logged in user
-                var attendance = data[entry.Key].First(x => (string) x["studentnaam"] == GetUserName());
-                registry.Add(attendance);
-            }
-
-            return MakeResponse(registry, grades);
+            var sessions = DatabaseManager.Instance.GetPracticeSessions(GetCourseID(), null);
+            var grades = sessions.Select(x => x.Grade);
+            return MakeResponse(sessions.Where(x => x.UserName == GetUserName()), grades.ToArray());
         }
 
         [Authorize]
@@ -215,20 +176,9 @@ namespace IguideME.Web.Controllers
         [Route("/Perusall")]
         public string PerusallView()
         {
-            var data = ReadFile("store/perusall.json");
-            List<object> assignments = new List<object>();
-            List<float> grades = new List<float>();
-
-            foreach (var entry in data)
-            {
-                grades.AddRange(data[entry.Key].Select(a => float.Parse((string)a["grade"], CultureInfo.InvariantCulture)).ToList());
-
-                // get the perusall assignment of the logged in user
-                var assignment = data[entry.Key].First(x => (string) x["studentnaam"] == GetUserName());
-                assignments.Add(assignment);
-            }
-
-            return MakeResponse(assignments, grades.ToArray());
+            var assignments = DatabaseManager.Instance.GetPerusall(GetCourseID(), null);
+            var grades = assignments.Select(x => x.Grade);
+            return MakeResponse(assignments.Where(x => x.UserName == GetUserName()), grades.ToArray());
         }
 
         [Authorize]
@@ -242,11 +192,25 @@ namespace IguideME.Web.Controllers
         [Authorize]
         [HttpPost, HttpGet]
         [Route("/Admin-perusall")]
-        public string AdminPerusallView()
+        public PerusallData[] AdminPerusallView()
         {
             if (!administrators.Contains(GetUser()))
-                return "permission denied";
+                return null;
 
+            if (Request.Method == "POST")
+            {
+                using (var reader = new StreamReader(Request.Body))
+                {
+                    var body = JObject.Parse(new StreamReader(Request.Body).ReadToEnd());
+                    List<PerusallData> sessions = JsonConvert.DeserializeObject<List<PerusallData>>(body["payload"].ToString());
+                    DatabaseManager.Instance.AddPerusall(GetCourseID(), (string)body["key"], sessions.ToArray());
+                    return sessions.ToArray();
+                }
+            }
+
+            return DatabaseManager.Instance.GetPerusall(GetCourseID(), null);
+
+            /*
             if (Request.Method == "POST")
             {
                 // new Perusall assignment has been posted
@@ -266,60 +230,51 @@ namespace IguideME.Web.Controllers
             // return new Perusall state
             var data = ReadFile("store/perusall.json");
             return (string)JsonConvert.SerializeObject(data);
+            */
         }
 
         [Authorize]
         [HttpPost, HttpGet]
         [Route("/Admin-practice-sessions")]
-        public string AdminPracticeSessionsView()
+        public PracticeSessionData[] AdminPracticeSessionsView()
         {
-            var path = "store/practice_sessions.json";
             if (!administrators.Contains(GetUser()))
-                return "permission denied";
+                return null;
 
             if (Request.Method == "POST")
             {
-                var practice_sessions = ReadFile(path);
                 using (var reader = new StreamReader(Request.Body))
                 {
                     var body = JObject.Parse(new StreamReader(Request.Body).ReadToEnd());
-                    practice_sessions[(string)body["key"]] = body["payload"];
-
-                    using (StreamWriter outputFile = new StreamWriter(path))
-                        outputFile.Write(practice_sessions);
+                    List<PracticeSessionData> sessions = JsonConvert.DeserializeObject<List<PracticeSessionData>>(body["payload"].ToString());
+                    DatabaseManager.Instance.AddPracticeSession(GetCourseID(), (string) body["key"], sessions.ToArray());
+                    return sessions.ToArray();
                 }
-                return (string)JsonConvert.SerializeObject(practice_sessions);
             }
 
-            var data = ReadFile(path);
-            return (string)JsonConvert.SerializeObject(data);
+            return DatabaseManager.Instance.GetPracticeSessions(GetCourseID(), null);
         }
 
         [Authorize]
         [HttpPost, HttpGet]
         [Route("/Admin-attendance")]
-        public string AdminAttendanceView()
+        public AttendanceData[] AdminAttendanceView()
         {
-            var path = "store/attendance.json";
             if (!administrators.Contains(GetUser()))
-                return "permission denied";
+                return null;
 
             if (Request.Method == "POST")
             {
-                var attendance = ReadFile(path);
                 using (var reader = new StreamReader(Request.Body))
                 {
                     var body = JObject.Parse(new StreamReader(Request.Body).ReadToEnd());
-                    attendance[(string)body["key"]] = body["payload"];
-
-                    using (StreamWriter outputFile = new StreamWriter(path))
-                        outputFile.Write(attendance);
+                    List<AttendanceData> attendance = JsonConvert.DeserializeObject<List<AttendanceData>>(body["payload"].ToString());
+                    DatabaseManager.Instance.AddAttendance(GetCourseID(), (string) body["key"], attendance.ToArray());
+                    return attendance.ToArray();
                 }
-                return (string)JsonConvert.SerializeObject(attendance);
             }
 
-            var data = ReadFile(path);
-            return (string)JsonConvert.SerializeObject(data);
+            return DatabaseManager.Instance.GetAttendance(GetCourseID(), null);
         }
     }
 }
