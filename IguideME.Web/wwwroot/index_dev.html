@@ -17,6 +17,7 @@
     <button id="btnPerusall">Fetch perusall</button>
     <button id="btnPerusallUp">Upload perusall</button>
     <button id="btnConsent">Fetch consent</button>
+    <button id="btnConsentSet">Set consent</button>
 
     <br /><br />
 
@@ -63,6 +64,12 @@
 
         document.getElementById("btnConsent").addEventListener("click", () => {
             axios.get("Consent").then(resp => {
+                document.getElementById("dataPreview").innerText = JSON.stringify(resp.data, null, 2);
+            });
+        });
+
+        document.getElementById("btnConsentSet").addEventListener("click", () => {
+            axios.post("Consent", { granted: 0 }).then(resp => {
                 document.getElementById("dataPreview").innerText = JSON.stringify(resp.data, null, 2);
             });
         });
