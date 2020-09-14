@@ -1,0 +1,21 @@
+#componentsView {
+  .component {
+    margin: 10px;
+    padding: 10px;
+    border: 1px solid #424242;
+    border-radius: 5px;
+    overflow: hidden;
+
+    .progress {
+      float: right;
+    }
+
+    button {
+      margin-top: 20px;
+    }
+
+    p {
+      margin: 0;
+    }
+  }
+}

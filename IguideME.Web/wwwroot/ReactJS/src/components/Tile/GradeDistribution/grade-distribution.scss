@@ -1,0 +1,65 @@
+.grade-distribution {
+  width: 100%;
+  box-sizing: border-box;
+  z-index: 1;
+
+  .min, .max, .distribution {
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+  .min, .max {
+    width: 15%;
+
+    span, small {
+      display: block;
+    }
+
+    small {
+      line-height: 90%;
+    }
+  }
+
+  .distribution {
+    border: 1px solid #EAEAEA;
+    width: calc(70% - 10px);
+    min-height: 1rem;
+    background-color: white;
+    margin: 0 5px;
+    position: relative;
+
+    .sep {
+      z-index: 2;
+      position: absolute;
+      top: 0;
+      bottom: 0;
+
+      background-color: rgba(0, 100, 255, 0.4);
+      width: 4px;
+    }
+
+    .avg {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: -3px;
+      bottom: 0;
+      vertical-align: middle;
+      text-align: center;
+      z-index: 100;
+      color: black;
+      font-weight: bold;
+    }
+
+    small {
+      position: absolute;
+      top: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+  }
+
+  .min {
+    text-align: right;
+  }
+}
