@@ -1,0 +1,12 @@
+version: "3.0"
+services:
+  predictor:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:8000/"]
+
+# vim: sw=2:ts=2:ai:et
