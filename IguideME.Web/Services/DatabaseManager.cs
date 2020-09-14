@@ -38,6 +38,7 @@ namespace IguideME.Web.Services
                         id          INTEGER PRIMARY KEY AUTOINCREMENT,
                         course_id   INTEGER,
                         user_id     INTEGER,
+                        user_name   STRING,
                         granted     INTEGER
                     );"
                 )
@@ -101,12 +102,14 @@ namespace IguideME.Web.Services
 
         public void SetConsent(ConsentData data)
         {
+            Console.WriteLine("consent");
+            Console.WriteLine(GetConsent(data.CourseID, data.UserID));
             if (GetConsent(data.CourseID, data.UserID) == -1)
             {
                 command = connection.CreateCommand();
                 command.CommandText = String.Format(
-                    "INSERT INTO consent (course_id, user_id, granted) VALUES('{0}', '{1}', '{2}');",
-                    data.CourseID, data.UserID, data.Granted
+                    "INSERT INTO consent (course_id, user_id, user_name, granted) VALUES('{0}', '{1}', '{2}', '{3}');",
+                    data.CourseID, data.UserID, data.UserName, data.Granted
                 );
                 command.ExecuteNonQuery();
             } else
@@ -123,14 +126,49 @@ namespace IguideME.Web.Services
         public int GetConsent(int CourseID, int UserID)
         {
             string query = String.Format(
-                "SELECT `granted` from `consent` WHERE `course_id`={0} AND `user_id`={1}",
+                "SELECT `user_name`, `granted` from `consent` WHERE `course_id`={0} AND `user_id`={1}",
                 CourseID, UserID
             );
 
             SQLiteDataReader r = Query(query);
 
-            if (r.Read()) return r.GetInt32(0);
+            if (r.Read()) return Convert.ToInt32(r["granted"]);
             else return -1;
+        }
+
+        public int GetConsent(int CourseID, string UserName)
+        {
+            string query = String.Format(
+                "SELECT `user_name`, `granted` from `consent` WHERE `course_id`={0} AND `user_name`='{1}'",
+                CourseID, UserName
+            );
+
+            SQLiteDataReader r = Query(query);
+
+            if (r.Read())
+            {
+                Console.WriteLine(r["granted"]);
+                return Convert.ToInt32(r["granted"]);
+            }
+            else return -1;
+        }
+
+        public ConsentData[] GetGrantedConsents(int CourseID)
+        {
+            string query = String.Format(
+                "SELECT `user_id`, `user_name` from `consent` WHERE `course_id`={0} AND `granted`=1",
+                CourseID
+            );
+
+            SQLiteDataReader r = Query(query);
+            List<ConsentData> consents = new List<ConsentData>();
+
+            while (r.Read())
+            {
+                consents.Add(new ConsentData(CourseID, r.GetInt32(0), r.GetString(1), 1));
+            }
+
+            return consents.ToArray();
         }
 
         public void AddAttendance(int CourseID, string Lecture, AttendanceData[] sessions)

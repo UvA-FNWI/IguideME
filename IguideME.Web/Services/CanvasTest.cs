@@ -27,23 +27,29 @@ namespace IguideME.Web.Services
 
         public Submission[] GetSubmissions(int courseID, int userID)
         {
+            var whitelist = DatabaseManager.Instance.GetGrantedConsents(courseID).Select(x => x.UserID.ToString());
+
             // Returns all submissions of type 'on_paper' for a specified user.
             Submission[] submissions = connector
                 .FindCourseById(courseID)
                 .Assignments.Where(a => a.SubmissionTypes.ToList().Contains(SubmissionType.OnPaper))
                 .Select(a => a.Submissions.Where(s => s.UserID == userID.ToString()))
-                .SelectMany(i => i).ToArray();
+                .SelectMany(i => i).Where(x => whitelist.Contains(x.UserID)).ToArray();
 
             return submissions;
         }
 
         public float[] GetAllSubmissionGrades(int courseID)
         {
+            var whitelist = DatabaseManager.Instance.GetGrantedConsents(courseID).Select(x => x.UserID.ToString());
+
             // Returns all submissions of type 'on_paper' for a specified user.
             float[] grades = connector
                 .FindCourseById(courseID)
                 .Assignments.Where(a => a.SubmissionTypes.ToList().Contains(SubmissionType.OnPaper))
-                .Select(a => a.Submissions).SelectMany(i => i).Select(x => float.Parse(x.Grade)).ToArray();
+                .Select(a => a.Submissions).SelectMany(i => i)
+                .Where(x => whitelist.Contains(x.UserID))
+                .Select(x => float.Parse(x.Grade)).ToArray();
 
             return grades;
         }
@@ -60,6 +66,8 @@ namespace IguideME.Web.Services
              * }
              */
 
+            var whitelist = DatabaseManager.Instance.GetGrantedConsents(courseID).Select(x => x.UserID.ToString());
+
             IEnumerable<Assignment> assignments = connector
                 .FindCourseById(courseID)
                 .Assignments.Where(a => a.SubmissionTypes.ToList().Contains(SubmissionType.Quiz));
@@ -75,11 +83,15 @@ namespace IguideME.Web.Services
             return new Dictionary<string, object>
             {
                 { "peer_comp",  new PeerComparisonData(
-                    assignments.Select(a => a.Submissions.Where(x => x.Grade != null).Select(x => float.Parse(x.Grade))).SelectMany(i => i).ToArray()
+                    assignments.Select(a => a.Submissions.Where(x => x.Grade != null && whitelist.Contains(x.UserID))
+                        .Select(x => float.Parse(x.Grade))).SelectMany(i => i).ToArray()
                 )},
                 { "submissions", submissions },
                 { "quizzes", quizzes },
-                { "questions", quizzes.Select(quiz => quiz.Submissions.Select(submission => submission.Answers)).ToArray() }
+                { "questions", quizzes.Select(quiz => quiz.Submissions
+                    .Where(submission => whitelist.Contains(submission.UserID.ToString()))
+                    .Select(submission => submission.Answers))
+                    .ToArray() }
             };
         }
 
