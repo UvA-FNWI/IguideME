@@ -13,7 +13,6 @@ using System.Security.Claims;
 using System.IO;
 using Newtonsoft.Json.Linq;
 using IguideME.Web.Models;
-using UvA.DataNose.Connectors.Canvas;
 
 namespace IguideME.Web.Controllers
 {
@@ -131,7 +130,7 @@ namespace IguideME.Web.Controllers
             if (Request.Method == "POST")
             {
                 var body = new StreamReader(Request.Body).ReadToEnd();
-                ConsentData consent = new ConsentData(GetCourseID(), GetUserID(), (int) JObject.Parse(body)["granted"]);
+                ConsentData consent = new ConsentData(GetCourseID(), GetUserID(), GetUserName(), (int) JObject.Parse(body)["granted"]);
                 DatabaseManager.Instance.SetConsent(consent);
                 return consent.Granted;
             } else {
@@ -146,9 +145,12 @@ namespace IguideME.Web.Controllers
         {
             IDictionary<string, float> peers = new Dictionary<string, float>();
             var attendance = DatabaseManager.Instance.GetAttendance(GetCourseID(), null);
+            var whitelist = DatabaseManager.Instance.GetGrantedConsents(GetCourseID()).Select(x => x.UserName);
 
             foreach (var entry in attendance)
             {
+                if (!whitelist.Contains(entry.UserName)) continue;
+
                 if (!peers.ContainsKey(entry.UserName))
                 {
                     peers.Add(entry.UserName, (entry.Present.ToLower() == "ja" ? 1 : 0));
