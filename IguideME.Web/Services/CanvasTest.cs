@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using IguideME.Web.Models;
+using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -73,7 +74,9 @@ namespace IguideME.Web.Services
 
             return new Dictionary<string, object>
             {
-                { "peer_comp",  assignments.Select(a => a.Submissions.Where(x => x.Grade != null).Select(x => float.Parse(x.Grade))).SelectMany(i => i)},
+                { "peer_comp",  new PeerComparisonData(
+                    assignments.Select(a => a.Submissions.Where(x => x.Grade != null).Select(x => float.Parse(x.Grade))).SelectMany(i => i).ToArray()
+                )},
                 { "submissions", submissions },
                 { "quizzes", quizzes },
                 { "questions", quizzes.Select(quiz => quiz.Submissions.Select(submission => submission.Answers)).ToArray() }

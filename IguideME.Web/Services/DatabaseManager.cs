@@ -157,7 +157,6 @@ namespace IguideME.Web.Services
                     CourseID
                 );
 
-            Console.WriteLine(query);
             SQLiteDataReader r = Query(query);
             List<AttendanceData> attendances = new List<AttendanceData>();
 
