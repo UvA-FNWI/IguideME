@@ -13,6 +13,7 @@ using System.Security.Claims;
 using System.IO;
 using Newtonsoft.Json.Linq;
 using IguideME.Web.Models;
+using UvA.DataNose.Connectors.Canvas;
 
 namespace IguideME.Web.Controllers
 {

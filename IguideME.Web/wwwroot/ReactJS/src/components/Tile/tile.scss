@@ -1,0 +1,83 @@
+.tile {
+  box-sizing: border-box;
+  display: inline-block;
+  vertical-align: top;
+
+  .title {
+    font-family: 'Antic Slab', serif;
+    background-color: rgb(238, 238, 238);
+  }
+
+  .inner {
+    font-family: 'Maitree', serif;
+    box-shadow: 0 0 5px 5px rgba(240, 240, 240, 0.5);
+    border-radius: 5px;
+    margin: 15px;
+    padding: 10px;
+    border: 1px solid #424242;
+    transition: border ease-in-out 200ms;
+    overflow: hidden;
+    min-height: 175px;
+    position: relative;
+
+    .ant-divider-horizontal.ant-divider-with-text-center::before,
+    .ant-divider-horizontal.ant-divider-with-text-center::after {
+      border-top: 1px solid #424242;
+    }
+
+    &:hover {
+      border: 1px solid rgb(0, 100, 255);
+      cursor: pointer;
+    }
+
+    h2 {
+      font-size: 1rem;
+      padding: 5px 0;
+      color: rgb(0, 100, 255);
+    }
+
+    &.sufficient {
+      .ant-statistic-content-value {
+        color: rgb(82, 196, 27);
+        font-weight: bold;
+      }
+    }
+
+    &.insufficient {
+      .ant-statistic-content-value {
+        color: rgb(255, 78, 78);
+        font-weight: bold;
+      }
+    }
+
+    .statistic {
+      float: right;
+      margin: 10px 0;
+    }
+
+    .title {
+      margin: -10px;
+      padding: 0px 10px;
+      -webkit-box-shadow: 0px 4px 3px rgba(50, 50, 50, 0.05);
+      -moz-box-shadow: 0px 4px 3px rgba(50, 50, 50, 0.05);
+      box-shadow: 0px 4px 3px rgba(50, 50, 50, 0.05);
+      margin-bottom: 10px;
+    }
+
+    .peer {
+      margin: -10px;
+      padding: 5px 0;
+      text-align: center;
+      font-weight: bold;
+      position: absolute;
+      bottom: 5px;
+      left: 10px;
+      right: 10px;
+
+      .ant-divider {
+        margin: 0;
+        padding: 0;
+      }
+    }
+  }
+}
