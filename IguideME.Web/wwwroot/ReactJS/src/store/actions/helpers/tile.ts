@@ -49,13 +49,7 @@ export const constructQuizzesTile = (response: IBackendResponse) => {
     entries: quizzes.map((quiz: any, index: number) => ({
       name: quiz.title,
       grade: submissions[index] ? submissions[index].score : null,
-      items: (answers[index] || []).map((x: any, i: number) => ({
-          name: `Question #${i + 1}`,
-          status: (submissions[index] !== null) ?
-            (!x ? "failed" : "passed") :
-            "unstarted"
-        })
-      )
+      items: []
     }))
   }
   return tile;

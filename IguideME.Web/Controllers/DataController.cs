@@ -9,7 +9,10 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Net.Http;
 using System;
-using UvA.DataNose.Connectors.Canvas;
+using System.Security.Claims;
+using System.IO;
+using Newtonsoft.Json.Linq;
+using IguideME.Web.Models;
 
 namespace IguideME.Web.Controllers
 {
@@ -22,16 +25,66 @@ namespace IguideME.Web.Controllers
         private readonly CanvasTest canvasTest;
         private static readonly HttpClient client = new HttpClient();
 
+        // TODO: add Erwin & Natasa's login code
+        private readonly string[] administrators = new string[3] { "testscience158-tst", "nzupanc1", "evvliet1" };
+
         public DataController(ILogger<DataController> logger, CanvasTest canvasTest)
         {
             this.logger = logger;
             this.canvasTest = canvasTest;
         }
 
+        private string GetUser()
+        {
+            // returns the logged in user
+            return ((ClaimsIdentity)User.Identity).FindFirst("user").Value;
+        }
+
+        private string GetUserName()
+        {
+            // returns the name of the logged in user
+            return ((ClaimsIdentity)User.Identity).FindFirst("user_name").Value;
+        }
+
+        private Int32 GetUserID()
+        {
+            // returns the ID of the logged in user
+            return Int32.Parse(((ClaimsIdentity)User.Identity).FindFirst("user_id").Value);
+        }
+
+        private Int32 GetCourseID()
+        {
+            // returns the ID of course in which the IguideME instance is loaded
+            return Int32.Parse(((ClaimsIdentity)User.Identity).FindFirst("course").Value);
+        }
+
+        private JObject ReadFile(string filename)
+        {
+            /*
+             * Generic function to read local datastorage
+             */ 
+            using (StreamReader r = new StreamReader(filename))
+            {
+                string json = r.ReadToEnd();
+                var items = (JObject)JsonConvert.DeserializeObject(json);
+                return JObject.Parse(json);
+            }
+        }
+
+        private String MakeResponse(object payload, float[] grades)
+        {
+            IDictionary<string, object> response = new Dictionary<string, object>();
+            response.Add("payload", payload);
+            response.Add("peer_comp", new PeerComparisonData(grades));
+
+            return (string) JsonConvert.SerializeObject(response);
+        }
+
         [HttpGet]
         public IEnumerable<string> Get()
-            => canvasTest.GetStudents(994);
+            => canvasTest.GetStudents(GetCourseID());
 
+        [Authorize]
         [HttpGet]
         [Route("/Account")]
         public async Task<string> GetAccount()
@@ -40,52 +93,168 @@ namespace IguideME.Web.Controllers
             return auth.Principal.Identity.Name;
         }
 
+        [Authorize]
         [HttpGet]
-        [Route("/Quizzes")]
-        public async Task<string> GetQuizzes()
+        [Route("/Discussions")]
+        public string GetDiscussions()
         {
-            var quizzes = canvasTest.GetQuizzes(994);
-            var submissions = quizzes.Select(quiz => quiz.Submissions);
-            var questions = new List<object>();
-
-            // fetch questions per quiz submission
-            for (int i = 0; i < submissions.Count(); i++)
-            {
-                var url = canvasTest.baseUrl + canvasTest.apiVersioning +
-                    $"courses/{quizzes[i].CourseID}/quizzes/{quizzes[i].ID}" +
-                    $"/questions?access_token={canvasTest.accessToken}";
-
-                HttpResponseMessage response = await client.GetAsync(url);
-                response.EnsureSuccessStatusCode();
-
-                // refrain from QuizSubmission type because the answers field is required
-                object[] quiz_submission_data = JsonConvert.DeserializeObject<object[]>(
-                    await response.Content.ReadAsStringAsync()
-                );
-
-                // append quiz questions to the collection
-                questions = questions.Concat(quiz_submission_data).ToList();
-            }
-
-            return JsonConvert.SerializeObject(questions);
+            // returns all discussions posted by the logged in user
+            return JsonConvert.SerializeObject(
+                canvasTest.GetDiscussions(GetCourseID(), GetUserName())
+            );
         }
 
+        [Authorize]
         [HttpGet]
-        [Route("/Enrollments")]
-        public async Task<string> GetEnrollments()
+        [Route("/Quizzes")]
+        public string GetQuizzes()
         {
-            var url = canvasTest.baseUrl + canvasTest.apiVersioning +
-                    $"courses/994/enrollments?access_token={canvasTest.accessToken}";
+            // returns all quizzes available to the logged in user
+            return JsonConvert.SerializeObject(canvasTest.GetQuizzes(GetCourseID(), GetUserID()));
+        }
 
-            HttpResponseMessage response = await client.GetAsync(url);
-            response.EnsureSuccessStatusCode();
+        [Authorize]
+        [HttpGet]
+        [Route("/Submissions")]
+        public string GetSubmissions()
+        {
+            // returns all obtained exam grades for the logged in user
+            return MakeResponse(canvasTest.GetSubmissions(GetCourseID(), GetUserID()), canvasTest.GetAllSubmissionGrades(GetCourseID()));
+        }
 
-            // refrain from QuizSubmission type because the answers field is required
-            var enrollment = JsonConvert.DeserializeObject<Enrollment[]>(
-                await response.Content.ReadAsStringAsync()
-            ).Where(enrollment => enrollment.CourseID == 994).First();
+        [Authorize]
+        [HttpPost, HttpGet]
+        [Route("/Consent")]
+        public int ConsentView()
+        {
+            if (Request.Method == "POST")
+            {
+                var body = new StreamReader(Request.Body).ReadToEnd();
+                ConsentData consent = new ConsentData(GetCourseID(), GetUserID(), GetUserName(), (int) JObject.Parse(body)["granted"]);
+                DatabaseManager.Instance.SetConsent(consent);
+                return consent.Granted;
+            } else {
+                return DatabaseManager.Instance.GetConsent(GetCourseID(), GetUserID());
+            }
+        }
 
-            return JsonConvert.SerializeObject(enrollment);
+        [Authorize]
+        [HttpGet]
+        [Route("/Attendance")]
+        public string AttendanceView()
+        {
+            IDictionary<string, float> peers = new Dictionary<string, float>();
+            var attendance = DatabaseManager.Instance.GetAttendance(GetCourseID(), null);
+            var whitelist = DatabaseManager.Instance.GetGrantedConsents(GetCourseID()).Select(x => x.UserName);
+
+            foreach (var entry in attendance)
+            {
+                if (!whitelist.Contains(entry.UserName)) continue;
+
+                if (!peers.ContainsKey(entry.UserName))
+                {
+                    peers.Add(entry.UserName, (entry.Present.ToLower() == "ja" ? 1 : 0));
+                } else if (entry.Present.ToLower() == "ja")
+                {
+                    peers[entry.UserName] += 1;
+                }
+            }
+
+            return MakeResponse(attendance.Where(x => x.UserName == GetUserName()), peers.Values.ToArray());
+        }
+
+        [Authorize]
+        [HttpGet]
+        [Route("/Practice-sessions")]
+        public string PracticeSessionsView()
+        {
+            var sessions = DatabaseManager.Instance.GetPracticeSessions(GetCourseID(), null);
+            var grades = sessions.Select(x => x.Grade);
+            return MakeResponse(sessions.Where(x => x.UserName == GetUserName()), grades.ToArray());
+        }
+
+        [Authorize]
+        [HttpGet]
+        [Route("/Perusall")]
+        public string PerusallView()
+        {
+            var assignments = DatabaseManager.Instance.GetPerusall(GetCourseID(), null);
+            var grades = assignments.Select(x => x.Grade);
+            return MakeResponse(assignments.Where(x => x.UserName == GetUserName()), grades.ToArray());
+        }
+
+        [Authorize]
+        [HttpGet]
+        [Route("/Is-admin")]
+        public Boolean IsAdminView()
+        {
+            return administrators.Contains(GetUser());
+        }
+
+        [Authorize]
+        [HttpPost, HttpGet]
+        [Route("/Admin-perusall")]
+        public PerusallData[] AdminPerusallView()
+        {
+            if (!administrators.Contains(GetUser()))
+                return null;
+
+            if (Request.Method == "POST")
+            {
+                using (var reader = new StreamReader(Request.Body))
+                {
+                    var body = JObject.Parse(new StreamReader(Request.Body).ReadToEnd());
+                    List<PerusallData> sessions = JsonConvert.DeserializeObject<List<PerusallData>>(body["payload"].ToString());
+                    DatabaseManager.Instance.AddPerusall(GetCourseID(), (string)body["key"], sessions.ToArray());
+                    return sessions.ToArray();
+                }
+            }
+
+            return DatabaseManager.Instance.GetPerusall(GetCourseID(), null);
+        }
+
+        [Authorize]
+        [HttpPost, HttpGet]
+        [Route("/Admin-practice-sessions")]
+        public PracticeSessionData[] AdminPracticeSessionsView()
+        {
+            if (!administrators.Contains(GetUser()))
+                return null;
+
+            if (Request.Method == "POST")
+            {
+                using (var reader = new StreamReader(Request.Body))
+                {
+                    var body = JObject.Parse(new StreamReader(Request.Body).ReadToEnd());
+                    List<PracticeSessionData> sessions = JsonConvert.DeserializeObject<List<PracticeSessionData>>(body["payload"].ToString());
+                    DatabaseManager.Instance.AddPracticeSession(GetCourseID(), (string) body["key"], sessions.ToArray());
+                    return sessions.ToArray();
+                }
+            }
+
+            return DatabaseManager.Instance.GetPracticeSessions(GetCourseID(), null);
+        }
+
+        [Authorize]
+        [HttpPost, HttpGet]
+        [Route("/Admin-attendance")]
+        public AttendanceData[] AdminAttendanceView()
+        {
+            if (!administrators.Contains(GetUser()))
+                return null;
+
+            if (Request.Method == "POST")
+            {
+                using (var reader = new StreamReader(Request.Body))
+                {
+                    var body = JObject.Parse(new StreamReader(Request.Body).ReadToEnd());
+                    List<AttendanceData> attendance = JsonConvert.DeserializeObject<List<AttendanceData>>(body["payload"].ToString());
+                    DatabaseManager.Instance.AddAttendance(GetCourseID(), (string) body["key"], attendance.ToArray());
+                    return attendance.ToArray();
+                }
+            }
+
+            return DatabaseManager.Instance.GetAttendance(GetCourseID(), null);
         }
     }
 }

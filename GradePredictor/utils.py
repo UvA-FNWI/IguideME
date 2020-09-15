@@ -62,6 +62,7 @@ def get_expected_value(df: pd.DataFrame, key: str) -> float:
 
 def construct_data(df, request):
     data = json.loads(request.data.decode('utf8').replace("'", '"'))
+    data = { k: data[k] for k in data.keys() if data[k] is not None}
 
     quiz_1, quiz_1_exp = data.get("quiz_1"), get_expected_value(df, 'quiz 1')
     quiz_2, quiz_2_exp = data.get("quiz_2"), get_expected_value(df, 'quiz 2')
