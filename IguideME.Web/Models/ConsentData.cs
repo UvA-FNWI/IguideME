@@ -3,16 +3,18 @@
     public class ConsentData
     {
         public int CourseID { get; set; }
+        public string UserLoginID { get; set; }
         public int UserID { get; set; }
         public string UserName { get; set; }
 
         // 1 = accepted, 0 = declined, -1 = unspecified
         public int Granted { get; set; }
 
-        public ConsentData(int CourseID, int UserID, string UserName, int Granted)
+        public ConsentData(int CourseID, int UserID, string UserLoginID, string UserName, int Granted)
         {
             this.CourseID = CourseID;
             this.UserID = UserID;
+            this.UserLoginID = UserLoginID;
             this.UserName = UserName;
             this.Granted = Granted;
         }

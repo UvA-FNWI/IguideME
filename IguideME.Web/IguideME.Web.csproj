@@ -1,15 +1,197 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UserSecretsId>aspnet-IGuideMETest-76E69165-D027-4A90-BD59-7130FEDA840E</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="wwwroot\index.html" />
+    <None Update="app.db" CopyToOutputDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="UvA.Connectors.Canvas" Version="0.4.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="3.1.6" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.1.6" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="3.1.6" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="3.1.6" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.6" />
+    <PackageReference Include="UvA.Connectors.Canvas" Version="0.21.0" />
+    <PackageReference Include="StackExchange.Redis" Version="2.2.62" />
+    <PackageReference Include="System.Data.SQLite" Version="1.0.114.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.17" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Remove="wwwroot\build\favicon.ico" />
+    <Content Remove="wwwroot\build\index.html" />
+    <Content Remove="wwwroot\build\logo512.png" />
+    <Content Remove="wwwroot\build\asset-manifest.json" />
+    <Content Remove="wwwroot\build\IGuideMe.mp4" />
+    <Content Remove="wwwroot\build\manifest.json" />
+    <Content Remove="wwwroot\build\service-worker.js" />
+    <Content Remove="wwwroot\build\robots.txt" />
+    <Content Remove="wwwroot\build\logo192.png" />
+    <Content Remove="wwwroot\build\asset-manifest.json" />
+    <Content Remove="wwwroot\build\favicon.ico" />
+    <Content Remove="wwwroot\build\index.html" />
+    <Content Remove="wwwroot\build\logo192.png" />
+    <Content Remove="wwwroot\build\logo512.png" />
+    <Content Remove="wwwroot\build\manifest.json" />
+    <Content Remove="wwwroot\build\IGuideMe.mp4" />
+    <Content Remove="wwwroot\build\robots.txt" />
+    <Content Remove="wwwroot\build\service-worker.js" />
+    <Content Remove="wwwroot\build\asset-manifest.json" />
+    <Content Remove="wwwroot\build\favicon.ico" />
+    <Content Remove="wwwroot\build\IGuideMe.mp4" />
+    <Content Remove="wwwroot\build\index.html" />
+    <Content Remove="wwwroot\build\logo512.png" />
+    <Content Remove="wwwroot\build\logo192.png" />
+    <Content Remove="wwwroot\build\manifest.json" />
+    <Content Remove="wwwroot\build\robots.txt" />
+    <Content Remove="wwwroot\build\service-worker.js" />
+    <Content Remove="wwwroot\build\asset-manifest.json" />
+    <Content Remove="wwwroot\build\IGuideMe.mp4" />
+    <Content Remove="wwwroot\build\favicon.ico" />
+    <Content Remove="wwwroot\build\index.html" />
+    <Content Remove="wwwroot\build\logo192.png" />
+    <Content Remove="wwwroot\build\logo512.png" />
+    <Content Remove="wwwroot\build\manifest.json" />
+    <Content Remove="wwwroot\build\robots.txt" />
+    <Content Remove="wwwroot\build\service-worker.js" />
+    <Content Remove="wwwroot\build\asset-manifest.json" />
+    <Content Remove="wwwroot\build\favicon.ico" />
+    <Content Remove="wwwroot\build\index.html" />
+    <Content Remove="wwwroot\build\logo192.png" />
+    <Content Remove="wwwroot\build\IGuideMe.mp4" />
+    <Content Remove="wwwroot\build\logo512.png" />
+    <Content Remove="wwwroot\build\manifest.json" />
+    <Content Remove="wwwroot\build\robots.txt" />
+    <Content Remove="wwwroot\build\service-worker.js" />
+    <Content Remove="wwwroot\build\asset-manifest.json" />
+    <Content Remove="wwwroot\build\favicon.ico" />
+    <Content Remove="wwwroot\build\index.html" />
+    <Content Remove="wwwroot\build\logo192.png" />
+    <Content Remove="wwwroot\build\logo512.png" />
+    <Content Remove="wwwroot\build\IGuideMe.mp4" />
+    <Content Remove="wwwroot\build\robots.txt" />
+    <Content Remove="wwwroot\build\manifest.json" />
+    <Content Remove="wwwroot\build\service-worker.js" />
+    <Content Remove="wwwroot\build\favicon.ico" />
+    <Content Remove="wwwroot\build\IGuideMe.mp4" />
+    <Content Remove="wwwroot\build\index.html" />
+    <Content Remove="wwwroot\build\logo192.png" />
+    <Content Remove="wwwroot\build\logo512.png" />
+    <Content Remove="wwwroot\build\manifest.json" />
+    <Content Remove="wwwroot\build\robots.txt" />
+    <Content Remove="wwwroot\build\service-worker.js" />
+    <Content Remove="wwwroot\build\asset-manifest.json" />
+    <Content Remove="wwwroot\build\asset-manifest.json" />
+    <Content Remove="wwwroot\build\IGuideMe.mp4" />
+    <Content Remove="wwwroot\build\favicon.ico" />
+    <Content Remove="wwwroot\build\logo192.png" />
+    <Content Remove="wwwroot\build\index.html" />
+    <Content Remove="wwwroot\build\logo512.png" />
+    <Content Remove="wwwroot\build\manifest.json" />
+    <Content Remove="wwwroot\build\robots.txt" />
+    <Content Remove="wwwroot\build\service-worker.js" />
+    <Content Remove="wwwroot\build\asset-manifest.json" />
+    <Content Remove="wwwroot\build\IGuideMe.mp4" />
+    <Content Remove="wwwroot\build\logo512.png" />
+    <Content Remove="wwwroot\build\index.html" />
+    <Content Remove="wwwroot\build\logo192.png" />
+    <Content Remove="wwwroot\build\favicon.ico" />
+    <Content Remove="wwwroot\build\manifest.json" />
+    <Content Remove="wwwroot\build\robots.txt" />
+    <Content Remove="wwwroot\build\service-worker.js" />
+    <Content Remove="wwwroot\build\logo192.png" />
+    <Content Remove="wwwroot\build\favicon.ico" />
+    <Content Remove="wwwroot\build\index.html" />
+    <Content Remove="wwwroot\build\IGuideMe.mp4" />
+    <Content Remove="wwwroot\build\asset-manifest.json" />
+    <Content Remove="wwwroot\build\logo512.png" />
+    <Content Remove="wwwroot\build\robots.txt" />
+    <Content Remove="wwwroot\build\service-worker.js" />
+    <Content Remove="wwwroot\build\manifest.json" />
+    <Content Remove="wwwroot\build\asset-manifest.json" />
+    <Content Remove="wwwroot\build\favicon.ico" />
+    <Content Remove="wwwroot\build\IGuideMe.mp4" />
+    <Content Remove="wwwroot\build\logo512.png" />
+    <Content Remove="wwwroot\build\manifest.json" />
+    <Content Remove="wwwroot\build\index.html" />
+    <Content Remove="wwwroot\build\logo192.png" />
+    <Content Remove="wwwroot\build\robots.txt" />
+    <Content Remove="wwwroot\build\service-worker.js" />
+    <Content Remove="wwwroot\build\asset-manifest.json" />
+    <Content Remove="wwwroot\build\IGuideMe.mp4" />
+    <Content Remove="wwwroot\build\logo192.png" />
+    <Content Remove="wwwroot\build\robots.txt" />
+    <Content Remove="wwwroot\build\logo512.png" />
+    <Content Remove="wwwroot\build\service-worker.js" />
+    <Content Remove="wwwroot\build\index.html" />
+    <Content Remove="wwwroot\build\favicon.ico" />
+    <Content Remove="wwwroot\build\manifest.json" />
+    <Content Remove="wwwroot\build\asset-manifest.json" />
+    <Content Remove="wwwroot\build\favicon.ico" />
+    <Content Remove="wwwroot\build\IGuideMe.mp4" />
+    <Content Remove="wwwroot\build\logo192.png" />
+    <Content Remove="wwwroot\build\logo512.png" />
+    <Content Remove="wwwroot\build\index.html" />
+    <Content Remove="wwwroot\build\manifest.json" />
+    <Content Remove="wwwroot\build\robots.txt" />
+    <Content Remove="wwwroot\build\service-worker.js" />
+    <Content Remove="wwwroot\build\service-worker.js" />
+    <Content Remove="wwwroot\build\IGuideMe.mp4" />
+    <Content Remove="wwwroot\build\asset-manifest.json" />
+    <Content Remove="wwwroot\build\logo192.png" />
+    <Content Remove="wwwroot\build\robots.txt" />
+    <Content Remove="wwwroot\build\logo512.png" />
+    <Content Remove="wwwroot\build\favicon.ico" />
+    <Content Remove="wwwroot\build\index.html" />
+    <Content Remove="wwwroot\build\manifest.json" />
+    <Content Remove="wwwroot\build\asset-manifest.json" />
+    <Content Remove="wwwroot\build\manifest.json" />
+    <Content Remove="wwwroot\build\favicon.ico" />
+    <Content Remove="wwwroot\build\service-worker.js" />
+    <Content Remove="wwwroot\build\robots.txt" />
+    <Content Remove="wwwroot\build\logo512.png" />
+    <Content Remove="wwwroot\build\IGuideMe.mp4" />
+    <Content Remove="wwwroot\build\index.html" />
+    <Content Remove="wwwroot\build\logo192.png" />
+    <Content Remove="wwwroot\build\asset-manifest.json" />
+    <Content Remove="wwwroot\build\favicon.ico" />
+    <Content Remove="wwwroot\build\index.html" />
+    <Content Remove="wwwroot\build\IGuideMe.mp4" />
+    <Content Remove="wwwroot\build\logo192.png" />
+    <Content Remove="wwwroot\build\logo512.png" />
+    <Content Remove="wwwroot\build\manifest.json" />
+    <Content Remove="wwwroot\build\robots.txt" />
+    <Content Remove="wwwroot\build\service-worker.js" />
+    <Content Remove="wwwroot\build\IGuideMe.mp4" />
+    <Content Remove="wwwroot\build\index.html" />
+    <Content Remove="wwwroot\build\favicon.ico" />
+    <Content Remove="wwwroot\build\asset-manifest.json" />
+    <Content Remove="wwwroot\build\manifest.json" />
+    <Content Remove="wwwroot\build\logo512.png" />
+    <Content Remove="wwwroot\build\logo192.png" />
+    <Content Remove="wwwroot\build\robots.txt" />
+    <Content Remove="wwwroot\build\service-worker.js" />
+    <Content Remove="wwwroot\build\favicon.ico" />
+    <Content Remove="wwwroot\build\IGuideMe.mp4" />
+    <Content Remove="wwwroot\build\logo512.png" />
+    <Content Remove="wwwroot\build\index.html" />
+    <Content Remove="wwwroot\build\logo192.png" />
+    <Content Remove="wwwroot\build\service-worker.js" />
+    <Content Remove="wwwroot\build\asset-manifest.json" />
+    <Content Remove="wwwroot\build\robots.txt" />
+    <Content Remove="wwwroot\build\manifest.json" />
+    <Content Remove="wwwroot\build\manifest.json" />
+    <Content Remove="wwwroot\build\robots.txt" />
+    <Content Remove="wwwroot\build\logo512.png" />
+    <Content Remove="wwwroot\build\service-worker.js" />
+    <Content Remove="wwwroot\build\index.html" />
+    <Content Remove="wwwroot\build\favicon.ico" />
+    <Content Remove="wwwroot\build\IGuideMe.mp4" />
+    <Content Remove="wwwroot\build\logo192.png" />
+    <Content Remove="wwwroot\build\manifest.json" />
+  </ItemGroup>
 </Project>

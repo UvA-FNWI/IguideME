@@ -1,8 +1,11 @@
 ﻿using IguideME.Web.Models;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Text.Json;
 using UvA.DataNose.Connectors.Canvas;
 
 namespace IguideME.Web.Services
@@ -12,7 +15,6 @@ namespace IguideME.Web.Services
         CanvasApiConnector connector;
         public string baseUrl;
         public string accessToken;
-        public string apiVersioning = "api/v1/";
         private static readonly HttpClient client = new HttpClient();
 
         public CanvasTest(IConfiguration config)
@@ -22,8 +24,53 @@ namespace IguideME.Web.Services
             connector = new CanvasApiConnector(config["Canvas:Url"], config["Canvas:AccessToken"]);
         }
 
-        public string[] GetStudents(int courseId)
-            => connector.FindCourseById(courseId).GetUsersByType(EnrollmentType.Student).Select(s => s.Name).ToArray();
+        public User GetUser(int courseID, string sisLoginID)
+        {
+            var users = connector.FindCourseById(courseID).UserEnrollments.Select(x => x.User).ToArray();
+            return users.First(x => x.SISUserID == sisLoginID);
+        }
+
+        public User[] GetStudents(int courseID)
+        {
+            return connector.FindCourseById(courseID).GetUsersByType(EnrollmentType.Student).ToArray();
+        }
+
+        public User[] GetAdministrators(int courseID)
+        {
+            return connector.FindCourseById(courseID).GetUsersByType(EnrollmentType.Teacher).ToArray();
+        }
+
+        public Assignment[] GetCanvasAssignments(int courseID)
+        {
+            return connector
+                .FindCourseById(courseID)
+                .Assignments
+                .OrderBy(a => a.Position).ToArray();
+        }
+
+
+        public Discussion[] GetCanvasDiscussions(int courseID)
+        {
+            return connector
+                .FindCourseById(courseID)
+                .Discussions.ToArray();
+        }
+
+        public Assignment[] GetAssignments(int courseID)
+        {
+            return connector
+                .FindCourseById(courseID)
+                .Assignments
+                .OrderBy(a => a.Position).ToArray();
+        }
+
+        public Assignment[] GetAssignments(int courseID, params string[] titles)
+        {
+            return connector
+                .FindCourseById(courseID)
+                .Assignments.Where(a => titles.Contains(a.Name.ToLower()))
+                .OrderBy(a => a.Position).ToArray();
+        }
 
         public Submission[] GetSubmissions(int courseID, int userID)
         {
@@ -41,63 +88,49 @@ namespace IguideME.Web.Services
 
         public float[] GetAllSubmissionGrades(int courseID)
         {
-            var whitelist = DatabaseManager.Instance.GetGrantedConsents(courseID).Select(x => x.UserID.ToString());
-
-            // Returns all submissions of type 'on_paper' for a specified user.
             float[] grades = connector
                 .FindCourseById(courseID)
-                .Assignments.Where(a => a.SubmissionTypes.ToList().Contains(SubmissionType.OnPaper))
+                .Assignments
                 .Select(a => a.Submissions).SelectMany(i => i)
-                .Where(x => whitelist.Contains(x.UserID))
+                .Where(x => x.Grade != null)
                 .Select(x => float.Parse(x.Grade)).ToArray();
 
             return grades;
         }
 
-        public Dictionary<string, object> GetQuizzes(int courseID, int userID) {
-            /*
-             * Returns all quizzes available to a specified user.
-             * 
-             * Response format:
-             * {
-             *   "submissions": [List of submissions],
-             *   "quizzes": [Lis of quizzes],
-             *   "questions": [User answer per question]
-             * }
-             */
-
-            var whitelist = DatabaseManager.Instance.GetGrantedConsents(courseID).Select(x => x.UserID.ToString());
-
-            IEnumerable<Assignment> assignments = connector
+        public List<Quiz> GetQuizzes(int courseID)
+        {
+            return connector
                 .FindCourseById(courseID)
-                .Assignments.Where(a => a.SubmissionTypes.ToList().Contains(SubmissionType.Quiz));
-
-            // fetch all quiz submissions for specified user
-            Submission[] submissions = assignments
-                .Select(a => a.Submissions.Where(s => s.UserID == userID.ToString()))
-                .SelectMany(i => i).ToArray();
-
-            // fetch course quizzes
-            Quiz[] quizzes = connector.FindCourseById(courseID).Quizzes.ToArray();
-
-            return new Dictionary<string, object>
-            {
-                { "peer_comp",  new PeerComparisonData(
-                    assignments.Select(a => a.Submissions.Where(x => x.Grade != null && whitelist.Contains(x.UserID))
-                        .Select(x => float.Parse(x.Grade))).SelectMany(i => i).ToArray()
-                )},
-                { "submissions", submissions },
-                { "quizzes", quizzes },
-                { "questions", quizzes.Select(quiz => quiz.Submissions
-                    .Where(submission => whitelist.Contains(submission.UserID.ToString()))
-                    .Select(submission => submission.Answers))
-                    .ToArray() }
-            };
+                .Quizzes;
         }
 
-        public Discussion[] GetDiscussions(int courseId, string userName)
+        public List<Discussion> GetDiscussions(int courseID)
         {
-            return connector.FindCourseById(courseId).Discussions.Where(d => d.UserName == userName).ToArray();
+            return connector
+                .FindCourseById(courseID)
+                .Discussions;
+        }
+
+        public Submission[] GetAssignmentSubmissions(int courseID, string userLoginID, string name)
+        {
+            var assignment = connector
+                .FindCourseById(courseID)
+                .Assignments.Find(a => a.Name == name);
+
+            var userSubmissions = userLoginID != null ?
+                assignment.Submissions.Where(x => x.User.LoginID == userLoginID) :
+                assignment.Submissions;
+
+            var submissions = connector
+                .FindCourseById(courseID)
+                .Assignments
+                .Where(a => a.Name == name)
+                .Select(x => userSubmissions.Where(
+                    y => y.AssignmentID == x.ID
+                )).SelectMany(i => i);
+
+            return submissions.ToArray();
         }
     }
 }

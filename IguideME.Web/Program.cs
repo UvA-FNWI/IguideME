@@ -1,11 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 
 namespace IguideME.Web
 {
@@ -13,6 +7,7 @@ namespace IguideME.Web
     {
         public static void Main(string[] args)
         {
+
             CreateHostBuilder(args).Build().Run();
         }
 
@@ -20,7 +15,9 @@ namespace IguideME.Web
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseStartup<Startup>();
+                    //.UseSetting("https_port", "5001")
+                    webBuilder.UseStartup<Startup>()
+                        .UseWebRoot("wwwroot/build");
                 });
     }
 }
