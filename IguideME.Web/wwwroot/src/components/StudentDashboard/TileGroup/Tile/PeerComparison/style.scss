@@ -1,0 +1,43 @@
+@import "../../../../../scss/base";
+
+.tile {
+  .peerComparison {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 30%;
+    min-height: 70px;
+    border-top: 1px solid $primary-border-color;
+    z-index: 1;
+    text-align: center;
+    padding: 5px;
+
+    .title {
+      opacity: 0.6;
+      font-weight: 700;
+    }
+
+    .distribution {
+      position: relative;
+      width: 95%;
+      margin: 0 2.5%;
+      line-height: 20px;
+      height: 20px;
+
+      .min {
+        position: absolute;
+        left: 10px;
+        top: 0;
+        bottom: 0;
+      }
+
+      .max {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        right: 10px;
+      }
+    }
+  }
+}

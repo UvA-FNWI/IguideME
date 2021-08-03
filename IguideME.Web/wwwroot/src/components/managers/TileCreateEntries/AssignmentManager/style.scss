@@ -1,0 +1,28 @@
+@import "../../../../scss/base";
+
+#assignmentRegistry {
+  .binary {
+    vertical-align: middle;
+
+    svg, span {
+      vertical-align: middle;
+    }
+
+    svg {
+      font-size: 150%;
+      margin-right: 10px;
+    }
+
+    &.success {
+      svg {
+        color: $primary-green;
+      }
+    }
+
+    &.fail {
+      svg {
+        color: $primary-red;
+      }
+    }
+  }
+}

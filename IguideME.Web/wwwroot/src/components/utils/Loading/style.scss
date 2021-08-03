@@ -1,0 +1,43 @@
+.loading {
+  height: 100vh;
+
+  .header {
+    text-align: center;
+    position: relative;
+    box-sizing: border-box;
+    padding-top: 40vh;
+
+    h1 {
+      display: inline-block;
+      font-size: 4vmax;
+    }
+
+    > div {
+      position: absolute;
+      right: 0;
+      top: calc(40vh + 5vmax);
+      width: 15vmax;
+      transform: translateX(10vmax);
+      padding: 0;
+      justify-content: left;
+    }
+  }
+
+  &.small {
+    height: auto;
+
+    .header {
+      padding-top: 0;
+
+      > div {
+        position: absolute;
+        right: 0;
+        top: calc(5vmax);
+        width: 15vmax;
+        transform: translateX(10vmax);
+        padding: 0;
+        justify-content: left;
+      }
+    }
+  }
+}

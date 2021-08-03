@@ -1,0 +1,18 @@
+@import "../../scss/base.scss";
+
+#admin {
+  #adminMenu, #wrapper {
+    min-height: calc(100vh - 70px);
+  }
+
+  #wrapper {
+    padding: 20px;
+    background-color: $primary-gray;
+    border-left: 1px solid rgb(235, 235, 235);
+    position: relative;
+
+    &.noOverflow {
+      overflow: hidden;
+    }
+  }
+}

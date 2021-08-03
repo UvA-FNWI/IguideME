@@ -1,0 +1,11 @@
+@import "../../scss/base";
+
+.gradeStatistic {
+  .pass {
+    color: $primary-green;
+  }
+
+  .fail {
+    color: $primary-red;
+  }
+}

@@ -1,0 +1,53 @@
+@import "../../scss/base";
+
+#studentDashboard {
+  padding: 10px;
+  box-sizing: border-box;
+
+  .column {
+    display: inline-block;
+    vertical-align: top;
+    padding: 5px;
+    box-sizing: border-box;
+
+    &.small {
+      width: 40%;
+
+      .tile {
+        width: 50%;
+      }
+    }
+
+    &.large {
+      width: 60%;
+
+      .tile {
+        width: calc(100% / 3);
+      }
+    }
+
+    @media screen and (max-width: $screen-breakpoint-large) {
+      &.small {
+        width: calc(100% / 3);
+        .tile {
+          width: 100% !important;
+        }
+      }
+
+      &.large {
+        width: calc(calc(100% / 3) * 2);
+        .tile {
+          width: 50% !important;
+        }
+      }
+    }
+
+    @media screen and (max-width: $screen-breakpoint-small) {
+      width: 100% !important;
+
+      .tile {
+        width: 50% !important;
+      }
+    }
+  }
+}

@@ -1,0 +1,64 @@
+@import "../../../../../scss/base";
+
+.tileWrapper {
+  margin-bottom: 20px;
+  width: 100%;
+
+  .tileContainer {
+    background-color: rgba(255, 255, 255, 0.4);
+    border: 1px solid $primary-border-color;
+    min-height: 200px;
+  }
+
+  .updateOverlay {
+    text-align: center;
+    vertical-align: middle;
+
+    .overlayBackground, h1 {
+      z-index: 1000;
+    }
+
+    .overlayBackground {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      backdrop-filter: grayscale(0) blur(0px);
+      background-color: rgba(255, 255, 255, 0);
+      transition: background-color ease-in-out 200ms, backdrop-filter ease-in-out 200ms;
+      pointer-events: none;
+    }
+
+    h1 {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translateX(-50%) translateY(-50%);
+      color: $primary-purple;
+      font-weight: bold;
+      opacity: 0;
+      pointer-events: none;
+      stroke: black;
+      stroke-width: 2px;
+    }
+
+    &.active {
+      .overlayBackground {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        backdrop-filter: grayscale(0.3) blur(2px);
+        background-color: rgba(255, 255, 255, 0.4);
+        cursor: not-allowed;
+        pointer-events: all;
+      }
+
+      h1 {
+        opacity: 1;
+      }
+    }
+  }
+}

@@ -1,0 +1,17 @@
+.gradeDistribution {
+  margin: 10px 0;
+  overflow: hidden;
+
+  .item {
+    display: inline-block;
+
+    h3 {
+      font-weight: bold;
+      font-size: 150%;
+    }
+
+    &.avg {
+      padding: 0 20px;
+    }
+  }
+}
