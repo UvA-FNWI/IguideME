@@ -32,6 +32,8 @@ Obj/
 [Tt]est[Rr]esult*/
 [Bb]uild[Ll]og.*
 
+*.db
+
 # NUNIT
 *.VisualState.xml
 TestResult.xml
