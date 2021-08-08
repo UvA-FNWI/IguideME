@@ -6,7 +6,8 @@ export default {
   'ASSIGNMENTS': 'tasks.assignments',
   'SUBMISSIONS': 'tasks.submissions',
   'GRADE_PREDICTOR': 'tasks.grade-predictor',
-  'PEER_GROUPS': 'tasks.peer-groups'
+  'PEER_GROUPS': 'tasks.peer-groups',
+  'DONE': 'tasks.done'
 }
 
 export interface Synchronization {
