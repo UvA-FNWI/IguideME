@@ -4,10 +4,11 @@ import {Tile, TileEntry, TileEntrySubmission} from "../../../../models/app/Tile"
 import GradeBar from "../../../visuals/GradesOverviewBar/GradeBar";
 import {Button, Space} from "antd";
 import Swal from 'sweetalert2';
+import TileController from "../../../../api/controllers/tile";
 
 const compute = require( 'compute.io' );
 
-export const getColumns = (viewData: (obj: TileEntry) => any): ColumnsType<object> => {
+export const getColumns = (viewData: (obj: TileEntry) => any, reload: () => any): ColumnsType<object> => {
   return [
     {
       title: 'Source name',
@@ -69,11 +70,14 @@ export const getColumns = (viewData: (obj: TileEntry) => any): ColumnsType<objec
                       }
                     }).then((result) => {
                       if (result.value) {
-                        Swal.fire(
-                          'Entries deleted!',
-                          'Your imaginary file has been deleted.',
-                          'success',
-                        )
+                        TileController.deleteTileEntry(object._rawEntry.id).then(() => {
+                          reload();
+                          Swal.fire(
+                            'Entries deleted!',
+                            '',
+                            'success',
+                          );
+                        });
                       } else if (result.dismiss === Swal.DismissReason.cancel) {
                         Swal.fire(
                           'Cancelled',
@@ -94,11 +98,10 @@ export const getColumns = (viewData: (obj: TileEntry) => any): ColumnsType<objec
   ]
 }
 
-export const formatData = (tiles: Tile[], entries: TileEntry[], submissions: TileEntrySubmission[]): any => {
+export const formatData = (tile: Tile, entries: TileEntry[], submissions: TileEntrySubmission[]): any => {
 
   return entries.map(entry => {
     const s = submissions.filter(x => x.entry_id === entry.id);
-    const tile = tiles.find(t => t.id === entry.tile_id);
     const grades: number[] = s.map(x => parseFloat(x.grade));
 
     return {

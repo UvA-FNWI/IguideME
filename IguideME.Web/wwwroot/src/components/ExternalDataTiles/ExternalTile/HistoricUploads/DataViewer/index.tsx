@@ -17,6 +17,28 @@ export default class DataViewer extends Component<{
 
     if (!tileEntry) return null;
 
+    console.log(students);
+    console.log("submissiions", submissions);
+    console.log("data", submissions.filter(
+      s => {
+        const student = students.find(st => s.user_login_id === st.login_id);
+        return student ? (
+          student.name.toLowerCase().includes(query.toLowerCase()) ||
+          student.login_id.toLowerCase().includes(query.toLowerCase())
+        ) : false
+      }
+    ).sort(
+      (a, b) => parseFloat(b.grade) - parseFloat(a.grade)
+    ).map((s, i) => {
+      const student = students.find(st => s.user_login_id === st.login_id);
+      return {
+        key: i,
+        student_name: student ? student.name : "???",
+        student_id: student ? student.login_id : "???",
+        grade: s.grade
+      }
+    }));
+
     return (
       <div>
         <h1>{ tileEntry.title }</h1>

@@ -3,14 +3,13 @@ import {CanvasStudent} from "../../../../models/canvas/Student";
 
 export interface IProps {
   tile: Tile;
+  entries: TileEntry[],
+  submissions: TileEntrySubmission[],
+  students: CanvasStudent[],
+  reload: () => any
 }
 
 export interface IState {
-  loaded: boolean;
-  tiles: Tile[];
-  entries: TileEntry[];
-  submissions: TileEntrySubmission[];
   drawerOpen: boolean;
   openEntry: TileEntry | undefined;
-  students: CanvasStudent[];
 }
