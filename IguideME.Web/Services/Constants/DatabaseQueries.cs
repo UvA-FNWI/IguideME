@@ -11,7 +11,7 @@
             `start_date`          DATE NULL,
             `end_date`            DATE NULL,
             `accept_list`         BOOLEAN DEFAULT false,
-            `require_consent`     BOOLEAN DEFAULT false,
+            `require_consent`     BOOLEAN DEFAULT true,
             `informed_consent`    TEXT NULL,
             `personalized_peers`  BOOLEAN DEAULT true,
             `peer_group_size`     INTEGER DEFAULT 5
@@ -104,6 +104,16 @@
             `sync_hash`           STRING
         );";
 
+    public const string CREATE_TABLE_NOTIFICATIONS =
+        @"CREATE TABLE IF NOT EXISTS `notifications` (
+            `id`                  INTEGER PRIMARY KEY AUTOINCREMENT,
+            `course_id`           INTEGER,
+            `user_login_id`       INTEGER,
+            `tile_id`             INTEGER,
+            `status`              STRING,
+            `sync_hash`           STRING
+        );";
+
     public const string REGISTER_PREDICTED_GRADE =
         @"INSERT INTO   `predicted_grade` ( `course_id`,
                                             `user_login_id`,
@@ -151,6 +161,21 @@
                                         `target_login_id`,
                                         `sync_hash`)
           VALUES        ({0}, '{1}', '{2}', '{3}');";
+
+    public const string CREATE_USER_NOTIFICATIONS =
+        @"INSERT INTO   `notifications` (   `course_id`,
+                                            `user_login_id`,
+                                            `tile_id`,
+                                            `status`,
+                                            `sync_hash`)
+          VALUES        ({0}, '{1}', {2}, '{3}', '{4}');";
+
+    public const string QUERY_USER_NOTIFICATIONS =
+        @"SELECT        `tile_id`, `status`
+        FROM            `notifications`
+        WHERE           `course_id`={0}
+        AND             `user_login_id`='{1}'
+        AND             `sync_hash`='{2}';";
 
     // -------------------- Predictive models --------------------
 
@@ -877,6 +902,13 @@
                             `submitted`,
                             `sync_hash` ) 
         VALUES({0}, '{1}', '{2}', '{3}', '{4}');";
+
+    public const string CREATE_SUBMISSION_META =
+        @"INSERT INTO   `tile_entry_submission_meta`
+                        (   `submission_id`,
+                            `key`,
+                            `value`)
+        VALUES ({0},'{1}','{2}');";
 }
  
  
