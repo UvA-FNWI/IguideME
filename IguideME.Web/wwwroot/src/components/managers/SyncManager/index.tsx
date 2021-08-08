@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import {Badge, Col, Row} from "antd";
+import {Badge, Col, message, Row} from "antd";
 import SyncOverview from "./SyncOverview";
 import {elapsedTime, syncStates} from "./helpers";
 import {Alert, Caption, Card} from "ui-neumorphism";
@@ -18,20 +18,13 @@ export default class SyncManager extends Component<IProps, IState> {
     start: undefined,
     elapsedTime: undefined,
     datamartError: false,
+    currentTask: null,
     completedTasks: [],
     currentTasks: []
   }
 
   componentDidMount(): void {
-    DataMartController.getStatus().then(data => {
-      const keys = Object.keys(data);
-      if (keys.length > 0) {
-        this.setState({ start: moment.utc(data[keys[0]].startTime) });
-        this.pollSync();
-      }
-
-      this.setState({ loaded: true });
-    });
+    this.setState({ loaded: true });
   }
 
   componentWillUnmount(): void {
@@ -39,10 +32,13 @@ export default class SyncManager extends Component<IProps, IState> {
   }
 
   badgeStyle = (task: string): { color: "success" | "warning" | "error", text: string } => {
-    const { completedTasks, currentTasks }: IState = this.state;
-    if (completedTasks.includes(task)) {
+    const { currentTask } = this.state;
+    const idx = syncStates.findIndex(ss => ss.id === task);
+    const currentIdx = syncStates.findIndex(ss => ss.id === currentTask);
+
+    if (idx < currentIdx) {
       return { color: 'success', text: "Completed"}
-    } else if (currentTasks.includes(task)) {
+    } else if (idx === currentIdx) {
       return { color: 'warning', text: "In-progress"}
     } else return { color: 'error', text: "Unstarted"}
   }
@@ -52,27 +48,32 @@ export default class SyncManager extends Component<IProps, IState> {
     this.setState({ datamartError: false });
 
     DataMartController.startNewSync().then(success => {
-      // prompt error if unsuccessful
-      this.setState({ datamartError: !success });
       if (success) {
-        // if successful synchronization will commence
-        this.setState({
-          start: moment(),
-          completedTasks: [SyncProvider.BOOT_UP, SyncProvider.STUDENTS],
-          currentTasks: [SyncProvider.QUIZZES]
-        }, () => this.pollSync());
-      }
-    })
+        message.success("Sync started!");
+        this.setState({ start: moment.utc() })
+        this.pollSync();
+      } else this.setState({ datamartError: true });
+    });
   }
 
   pollSync = () => {
     // start interval updating the admin's UI every second
-    this.interval = setInterval(() => {
+    this.interval = setInterval(async () => {
       //export const MOCK_DATAMART_STATUS = MOCK_DATAMART_STATUS_BUSY;
-      DataMartController.getStatus().then(data => {
-        //console.log("STATUS", data);
+      await DataMartController.getStatus().then(data => {
+        const keys = Object.keys(data);
+        const current = keys.find(k => data[k].progressInformation != SyncProvider.DONE);
+
+        if (!current) {
+          this.setState({ start: undefined });
+          clearInterval(this.interval!);
+          return;
+        }
+
+        this.setState({
+          elapsedTime: elapsedTime(moment.utc(data[current].startTime)),
+          currentTask: data[current].progressInformation})
       });
-      this.setState({ elapsedTime: elapsedTime(this.state.start) })
     }, 1000);
   }
 

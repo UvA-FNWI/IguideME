@@ -9,6 +9,7 @@ export interface IState {
   start: moment.Moment | undefined,
   elapsedTime: string | undefined,
   datamartError: boolean,
+  currentTask: string | null,
 
   completedTasks: string[],
   currentTasks: string[]
