@@ -72,6 +72,16 @@ namespace IguideME.Web.Controllers
             return Ok();
         }
 
+        [Authorize(Policy = "IsInstructor")]
+        [HttpGet, Route("/datamart/synchronizations")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public JsonResult GetSynchronizations()
+        {
+            return Json(
+                DatabaseManager.Instance.GetSyncHashes(this.GetCourseID()));
+        }
+
         // -------------------- Synchronization registry --------------------
 
         [Authorize(Policy = "IsInstructor")]
@@ -118,6 +128,8 @@ namespace IguideME.Web.Controllers
         [Route("/datamart/consent")]
         public JsonResult GetConsent()
         {
+            if (this.IsAdministrator()) return Json(1);
+
             return Json(
                 DatabaseManager.Instance.GetConsent(
                     GetCourseID(), GetUserID()));
@@ -195,6 +207,22 @@ namespace IguideME.Web.Controllers
         {
             return Json(
                 DatabaseManager.Instance.GetDiscussions(GetCourseID())
+            );
+        }
+
+        // -------------------- User notifications --------------------
+
+        [Authorize]
+        [HttpGet]
+        [Route("/datamart/notifications/{userLoginID}")]
+        public ActionResult GetNotifications(string userLoginID)
+        {
+            if (!this.IsAdministrator() && userLoginID != GetUserLoginID())
+                return Unauthorized();
+
+            return Json(
+                DatabaseManager.Instance.GetNotifications(
+                    GetCourseID(), userLoginID)
             );
         }
     }

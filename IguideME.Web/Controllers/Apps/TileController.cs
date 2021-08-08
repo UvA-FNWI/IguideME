@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace IguideME.Web.Controllers
 {
@@ -370,13 +371,14 @@ namespace IguideME.Web.Controllers
         [Authorize(Policy = "IsInstructor")]
         [HttpPost]
         [Route("/entries")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public ActionResult CreateEntry([FromBody] TileEntry entry)
         {
-
-            DatabaseManager.Instance.CreateTileEntry(entry);
-            return NoContent();
+            int entryID = DatabaseManager.Instance.CreateTileEntry(entry);
+            return Json(DatabaseManager.Instance
+                .GetEntries(this.GetCourseID())
+                .Find(e => e.ID == entryID));
         }
 
         [Authorize(Policy = "IsInstructor")]
@@ -398,6 +400,45 @@ namespace IguideME.Web.Controllers
             }
 
             return BadRequest();
+        }
+
+        [Authorize(Policy = "IsInstructor")]
+        [HttpPost]
+        [Route("/entries/{entryID}/upload")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public ActionResult UploadTileData(string entryID, JArray input)
+        {
+            int id;
+            bool success = Int32.TryParse(entryID, out id);
+
+            if (!success) return BadRequest();
+
+            foreach (JObject row in input.Children())
+            {
+                // register submission
+                int submissionID = DatabaseManager.Instance.CreateUserSubmission(
+                    this.GetCourseID(),
+                    id,
+                    row.GetValue("studentloginid").ToString(),
+                    row.GetValue("grade").ToString(),
+                    DateTime.Now.ToShortDateString());
+
+                foreach (JProperty property in row.Properties())
+                {
+                    // don't register the id or grade as a meta attribute
+                    if (property.Name == "studentloginid" ||
+                        property.Name == "grade" ||
+                        property.Name == "entry_id")
+                        continue;
+
+                    // add meta attributes
+                    DatabaseManager.Instance.CreateSubmissionMeta(
+                        submissionID, property.Name, property.Value.ToString());
+                }
+            }
+            return NoContent();
         }
 
         [Authorize(Policy = "IsInstructor")]
