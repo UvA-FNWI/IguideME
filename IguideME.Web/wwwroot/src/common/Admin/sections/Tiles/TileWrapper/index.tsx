@@ -66,8 +66,6 @@ class TileWrapper extends Component<Props, IState> {
                            return (target.group_id !== t.group_id || target.position !== t.position);
                          }).some(x => x)) {
                            this.setState({ updating: [...updating, group.id] }, async () => {
-                             await updateTiles(group, newTiles);
-
                              const changedTiles = newTiles.filter(t => {
                                const target = historicTiles.find(ht => ht.id === t.id);
                                if (!target) return true;
@@ -79,7 +77,11 @@ class TileWrapper extends Component<Props, IState> {
                                await TileController.updateTile(tile);
                              }
 
-                             this.setState({ updating: updating.filter(x => x !== group.id)});
+                             TileController.getTiles().then(async fetchedTiles => {
+                               await updateTiles(group, fetchedTiles);
+
+                               this.setState({ updating: updating.filter(x => x !== group.id)});
+                             })
                            });
                          }
                        })
