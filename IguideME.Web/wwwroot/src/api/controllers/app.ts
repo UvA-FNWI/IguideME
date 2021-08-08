@@ -4,11 +4,12 @@ import {CanvasStudent} from "../../models/canvas/Student";
 import {MOCK_STUDENTS} from "../../mocks/students";
 import {delay} from "../../utils/mockRequest";
 import {Course} from "../../models/app/Course";
+import {standardConsent} from "../../components/settings/RequireConsent/ConsentEditor/template";
 
 export default class AppController extends Controller {
 
   static getCourse(): Promise<Course> {
-    if (debug()) return delay({ course_name: "Testcourse IGuideME", require_consent: false, text: null });
+    if (debug()) return delay({ course_name: "Testcourse IGuideME", require_consent: true, text: standardConsent });
 
     return this.client.get(
       `app/course`

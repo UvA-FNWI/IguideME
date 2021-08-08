@@ -1,6 +1,7 @@
 import {AxiosResponse} from "axios";
 import { debug } from "../../config/config";
 import Controller from "../controller";
+import {delay} from "../../utils/mockRequest";
 
 export default class ConsentController extends Controller {
 
@@ -13,6 +14,8 @@ export default class ConsentController extends Controller {
   }
 
   static setConsent(granted: boolean | null): Promise<AxiosResponse<boolean>> {
+    if (debug()) return delay(granted);
+
     return this.client.post(
       `datamart/consent`,
       { granted: granted === null ? -1 : (granted ? 1 : 0) }

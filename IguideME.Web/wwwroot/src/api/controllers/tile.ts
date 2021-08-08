@@ -90,6 +90,16 @@ export default class TileController extends Controller {
     ).then(response => response.data);
   }
 
+  static uploadData(entryID: number, data: any[]): Promise<any[]> {
+    if (debug()) return delay([], 2500);
+
+    return this.client.post(
+      `/entries/${entryID}/upload`,
+      data.map(x => ({...x, entry_id: entryID }))).then(
+      response => response.data
+    );
+  }
+
   static getEntries(): Promise<TileEntry[]> {
     if (debug()) return Promise.resolve(MOCK_TILE_ENTRIES);
 
@@ -178,7 +188,12 @@ export default class TileController extends Controller {
 
   static getPeerResults(studentLoginId: string): Promise<{ min: number, max: number, avg: number, tileID: number}[]> {
     if (debug()) {
-      return Promise.resolve([{ min: 5, max: 10, avg: 7, tileID: 1 }]);
+      return this.getTiles().then(tiles => {
+        return Promise.resolve(tiles.map(t =>
+          t.content === "BINARY" ?
+            ({min: 41, max: 100, avg: 78, tileID: t.id}) :
+            ({min: 5, max: 9, avg: 6.8, tileID: t.id})));
+      });
     }
 
     return this.client.get(

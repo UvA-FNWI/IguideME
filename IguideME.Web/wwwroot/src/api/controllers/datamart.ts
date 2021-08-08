@@ -1,6 +1,5 @@
 import Controller from "../controller";
 import {debug} from "../../config/config";
-import axios from "axios";
 import {delay} from "../../utils/mockRequest";
 import {
   MOCK_DATAMART_STATUS_EMPTY,
@@ -9,6 +8,7 @@ import {
 } from "../../mocks/app/datamart";
 import {Synchronization} from "../../models/app/SyncProvider";
 import {PredictedGrade, PredictiveModel} from "../../models/app/PredictiveModel";
+import {NotificationStatus, PerformanceNotification} from "../../models/app/Notification";
 
 export default class DataMartController extends Controller {
 
@@ -24,7 +24,7 @@ export default class DataMartController extends Controller {
     ).then(_ => true).catch(() => false);
   }
 
-  static getStatus() {
+  static getStatus(): Promise<{[key: string]: any}> {
     if (debug()) {
       // if handshake was made pretend it's busy making the synchronization
       return delay(
@@ -82,6 +82,17 @@ export default class DataMartController extends Controller {
 
     return this.client.get(
       `/datamart/predictions/${userLoginID}`
+    ).then(response => response.data);
+  }
+
+  static getNotifications(userLoginID: string): Promise<PerformanceNotification[]> {
+    if (debug()) return delay([
+      {tile_id: 2, status: "outperforming peers"},
+      {tile_id: 4, status: "closing the gap"}
+    ]);
+
+    return this.client.get(
+      `/datamart/notifications/${userLoginID}`
     ).then(response => response.data);
   }
 }
