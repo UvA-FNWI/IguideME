@@ -54,7 +54,8 @@ namespace IguideME.Web.Services
                 DatabaseQueries.CREATE_TABLE_MODEL_THETA,
                 DatabaseQueries.CREATE_TABLE_PREDICTED_GRADE,
                 DatabaseQueries.CREATE_TABLE_LEARNING_GOALS,
-                DatabaseQueries.CREATE_TABLE_GOAL_REQUREMENTS
+                DatabaseQueries.CREATE_TABLE_GOAL_REQUREMENTS,
+                DatabaseQueries.CREATE_TABLE_NOTIFICATIONS
             };
 
             // create tables if they do not exist
@@ -282,6 +283,9 @@ namespace IguideME.Web.Services
         public User GetUser(int courseID, string userLoginID, string hash = null)
         {
             string activeHash = hash ?? this.GetCurrentHash(courseID);
+            Console.WriteLine(String.Format(
+                    DatabaseQueries.QUERY_LATEST_SYNC_FOR_COURSE, courseID));
+            Console.WriteLine("hash " + activeHash);
             if (activeHash == null) return null;
 
             string query = String.Format(
@@ -505,21 +509,38 @@ namespace IguideME.Web.Services
             );
         }
 
-        public void CreateUserSubmission(
+        public int CreateUserSubmission(
+            int courseID,
             int entryID,
             string userLoginID,
             string grade,
             string submitted,
-            string syncHash)
+            string hash = null)
         {
-            NonQuery(
+            string activeHash = hash != null ? hash : this.GetCurrentHash(courseID);
+            if (activeHash == null) new List<User> { };
+
+            return NonQuery(
                 String.Format(
                     DatabaseQueries.CREATE_USER_SUBMISSION,
                     entryID,
                     userLoginID,
                     grade,
                     submitted,
-                    syncHash));
+                    activeHash));
+        }
+
+        public int CreateSubmissionMeta(
+            int submissionID,
+            string key,
+            string value)
+        {
+            return NonQuery(
+                String.Format(
+                    DatabaseQueries.CREATE_SUBMISSION_META,
+                    submissionID,
+                    key,
+                    value));
         }
 
         public List<TileEntrySubmission> GetTileEntrySubmissions(
@@ -998,6 +1019,53 @@ namespace IguideME.Web.Services
             return requirements;
         }
 
+        public void RegisterNotification(
+            int courseID,
+            string userLoginID,
+            int tileID,
+            string status,
+            string hash = null)
+        {
+            string activeHash = hash ?? this.GetCurrentHash(courseID);
+
+            string query = String.Format(
+                DatabaseQueries.CREATE_USER_NOTIFICATIONS,
+                courseID,
+                userLoginID,
+                tileID,
+                status,
+                activeHash);
+
+            NonQuery(query);
+        }
+
+        public List<Notification> GetNotifications(
+            int courseID,
+            string userLoginID,
+            string hash = null)
+        {
+            string activeHash = hash ?? this.GetCurrentHash(courseID);
+
+            string query = String.Format(
+                DatabaseQueries.QUERY_USER_NOTIFICATIONS,
+                courseID,
+                userLoginID,
+                activeHash);
+
+            SQLiteDataReader r = Query(query);
+            List<Notification> notifications = new List<Notification>();
+
+            while (r.Read())
+            {
+                notifications.Add(new Notification(
+                    r.GetInt32(0),
+                    r.GetValue(1).ToString()
+                ));
+            }
+
+            return notifications;
+        }
+
         public List<TileEntry> GetEntries(int courseID)
         {
             string query = String.Format(
@@ -1021,7 +1089,7 @@ namespace IguideME.Web.Services
             return entries;
         }
 
-        public void CreateTileEntry(TileEntry entry)
+        public int CreateTileEntry(TileEntry entry)
         {
             string query = String.Format(
                     DatabaseQueries.CREATE_TILE_ENTRY,
@@ -1029,7 +1097,7 @@ namespace IguideME.Web.Services
                     entry.Title,
                     entry.Type,
                     entry.Wildcard);
-            NonQuery(query);
+            return NonQuery(query);
         }
 
         public void DeleteTileEntry(int id)
@@ -1044,6 +1112,7 @@ namespace IguideME.Web.Services
             string query = String.Format(
                 DatabaseQueries.QUERY_TILE_ENTRY_META_KEYS,
                 entryID);
+
             SQLiteDataReader r = Query(query);
             List<string> keys = new List<string>();
 
@@ -1302,19 +1371,6 @@ namespace IguideME.Web.Services
             NonQuery(query2);
         }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
         public void AddTileGroup(string title, int columnID)
         {
             command = connection.CreateCommand();
@@ -1329,7 +1385,6 @@ namespace IguideME.Web.Services
 
         public Tile GetTile(int courseID, int tileID)
         {
-            // TODO: register tiles to course
             string query = String.Format(
                     @"SELECT `id`, `group_id`, `title`, `position`, `tile_type`, `content_type`, `visible`, `notifications`, `graph_view`, `wildcard`
                     FROM `tile` WHERE `id`={0}",
@@ -1513,100 +1568,6 @@ namespace IguideME.Web.Services
 
         }
 
-        public void AddAttendance(int CourseID, string Lecture, AttendanceData[] sessions)
-        {
-            foreach (var session in sessions)
-            {
-                command = connection.CreateCommand();
-                command.CommandText = String.Format(
-                    "INSERT INTO attendance (`course_id`, `user_login_id`, `present`, `group_id`) VALUES('{0}', '{1}', '{2}', '{3}');",
-                    CourseID, session.UserLoginID, session.Present, Lecture
-                );
-                command.ExecuteNonQuery();
-            }
-        }
-
-        public AttendanceData[] GetAttendance(int CourseID, string UserLoginID)
-        {
-            string query = UserLoginID != null ?
-                String.Format(
-                    "SELECT `user_login_id`, `present`, `group_id` from `attendance` WHERE `course_id`={0} AND `studentnaam`='{1}'",
-                    CourseID, UserLoginID
-                ) : String.Format(
-                    "SELECT `user_login_id`, `present`, `group_id` from `attendance` WHERE `course_id`={0}",
-                    CourseID
-                );
-
-            SQLiteDataReader r = Query(query);
-            List<AttendanceData> attendances = new List<AttendanceData>();
-
-            while (r.Read())
-            {
-                AttendanceData attendance = new AttendanceData(CourseID, r.GetValue(0).ToString(), r.GetValue(1).ToString(), r.GetValue(2).ToString());
-                attendances.Add(attendance);
-            }
-
-            return attendances.ToArray();
-        }
-
-        public void AddPracticeSession(int CourseID, String Session, PracticeSessionData[] Sessions)
-        {
-            foreach (var session in Sessions)
-            {
-                command = connection.CreateCommand();
-                command.CommandText = String.Format(
-                    "INSERT INTO practice_sessions (`course_id`, `user_login_id`, `grade`, `group_id`) VALUES('{0}', '{1}', '{2}', '{3}');",
-                    CourseID, session.UserLoginID, session.Grade, Session
-                );
-                command.ExecuteNonQuery();
-            }
-        }
-
-        public PracticeSessionData[] GetPracticeSessions(int CourseID, string UserLoginID)
-        {
-            string query = UserLoginID != null ?
-                String.Format(
-                    "SELECT `user_login_id`, `grade`, `group_id` from `practice_sessions` WHERE `course_id`={0} AND `user_login_id`='{1}'",
-                    CourseID, UserLoginID
-                ) : String.Format(
-                    "SELECT `user_login_id`, `grade`, `group_id` from `practice_sessions` WHERE `course_id`={0}",
-                    CourseID
-                );
-
-            SQLiteDataReader r = Query(query);
-            List<PracticeSessionData> sessions = new List<PracticeSessionData>();
-
-            while (r.Read())
-            {
-                try
-                {
-                    PracticeSessionData session = new PracticeSessionData(
-                        CourseID, r.GetValue(0).ToString(), r.GetFloat(1), r.GetValue(2).ToString()
-                    );
-                    sessions.Add(session);
-                } catch (Exception e) {
-                    Console.WriteLine(e.StackTrace);
-                    Console.WriteLine(e.Message);
-                }
-               
-            }
-
-            return sessions.ToArray();
-        }
-
-        public void AddPerusall(int CourseID, String Session, PerusallData[] Sessions)
-        {
-            foreach (var session in Sessions)
-            {
-                command = connection.CreateCommand();
-                command.CommandText = String.Format(
-                    "INSERT INTO perusall (`course_id`, `user_login_id`, `grade`, `group_id`, `entry`) VALUES('{0}', '{1}', '{2}', '{3}', '{4}');",
-                    CourseID, session.UserLoginID, session.Grade, Session, session.Entry
-                );
-                command.ExecuteNonQuery();
-            }
-        }
-
         public void AddExternalData(int courseID, ExternalData[] entries)
         {
             foreach (var entry in entries)
@@ -1657,27 +1618,5 @@ namespace IguideME.Web.Services
             return submissions.ToArray();
         }
 
-        public PerusallData[] GetPerusall(int CourseID, string UserLoginID)
-        {
-            string query = UserLoginID != null ?
-                String.Format(
-                    "SELECT `user_login_id`, `grade`, `entry`, `group_id` from `perusall` WHERE `course_id`={0} AND `user_login_id`='{1}'",
-                    CourseID, UserLoginID
-                ) : String.Format(
-                    "SELECT `user_login_id`, `grade`, `entry`, `group_id` from `perusall` WHERE `course_id`={0}",
-                    CourseID
-                );
-
-            SQLiteDataReader r = Query(query);
-            List<PerusallData> perusall = new List<PerusallData>();
-
-            while (r.Read())
-            {
-                PerusallData row = new PerusallData(CourseID, r.GetValue(0).ToString(), r.GetFloat(1), r.GetValue(2).ToString(), r.GetValue(3).ToString());
-                perusall.Add(row);
-            }
-
-            return perusall.ToArray();
-        }
     }
 }
