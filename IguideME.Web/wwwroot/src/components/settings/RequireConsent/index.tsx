@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import {Divider, Space, Switch} from "antd";
+import {Divider, Space, Switch, Tooltip} from "antd";
 import {CheckOutlined, CloseOutlined} from "@ant-design/icons";
 import ConsentEditor from "./ConsentEditor";
 import FadeIn from "react-fade-in";
@@ -50,13 +50,17 @@ class RequireConsent extends Component<PropsFromRedux, IState> {
         <h2>Informed Consent</h2>
         <div className={"primaryContainer"}>
           <span>
+            <Tooltip title={"Consent is mandatory!"}>
               <Switch
+                // consent is enforced
                 checkedChildren={<CheckOutlined />}
                 unCheckedChildren={<CloseOutlined />}
                 onClick={this.toggleConsentRequirement}
-                checked={course.require_consent}
+                checked={course.require_consent || true}
+                disabled={true}
                 loading={this.state.loading}
               />
+            </Tooltip>
             &nbsp;
             When checked students are required to explicitly accept the informed consent. Students that did not grant
               consent won't be able to use the application and their data will be excluded.
