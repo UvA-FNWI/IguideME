@@ -12,6 +12,7 @@ import {DataMartActions} from "./store/actions/datamart";
 import {AppActions} from "./store/actions/app";
 
 const App = React.lazy(() => import('./common/App'));
+const Consent = React.lazy(() => import('./common/Consent'));
 const AdminDataMart = React.lazy(() => import('./common/Admin/sections/DataMart'));
 const AdminTiles = React.lazy(() => import('./common/Admin/sections/Tiles'));
 const AdminDashboard = React.lazy(() => import('./common/Admin/sections/Dashboard'));
@@ -83,6 +84,7 @@ class IGuideME extends React.Component<Props> {
               <Route path="/admin/tiles" component={AdminTiles} />
               <Route path="/admin" component={AdminDataMart} />
               <Route path="/desired-grade" component={DesiredGrade} />
+              <Route path="/consent" component={Consent} />
               <Route path="/" component={App} />
             </Switch>
           </Router>
