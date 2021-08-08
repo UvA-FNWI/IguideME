@@ -15,6 +15,7 @@ import {RootState} from "../../store";
 import "./style.scss";
 import {DataMartActions} from "../../store/actions/datamart";
 import {PredictedGrade} from "../../models/app/PredictiveModel";
+import UserProfile from "./UserProfile";
 
 const compute = require('compute.io');
 
@@ -192,6 +193,8 @@ class StudentDashboard extends Component<Props, IState> {
                      peerGrades={peerGrades}
           />
         }
+
+        <UserProfile student={this.props.student} />
       </div>
     )
   }
