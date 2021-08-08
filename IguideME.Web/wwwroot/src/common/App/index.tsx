@@ -50,7 +50,9 @@ class App extends Component<Props, { student: CanvasStudent | null }> {
         /> }
         { isAdmin ?
           <AdminDashboard student={student} /> :
-          <StudentDashboard student={student || undefined} />
+          student === null ?
+            <h1>Your account has not yet been processed, try again tomorrow!</h1>:
+            <StudentDashboard student={student || undefined} />
         }
       </div>
     )
