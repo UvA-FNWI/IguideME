@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using IguideME.Web.Models.Service;
-using Newtonsoft.Json;
 using IguideME.Web.Services.Workers;
 
 namespace IguideME.Web.Services
@@ -50,24 +48,53 @@ namespace IguideME.Web.Services
 			var sw = new Stopwatch();
 			sw.Start();
 
-			//new UserWorker(courseID, hashCode, _canvasTest);
-			new AssignmentWorker(courseID, hashCode, _canvasTest).Register();
-			//new QuizWorker(courseID, hashCode, _canvasTest).Register();
-
+			new UserWorker(courseID, hashCode, _canvasTest);
 			await _computationJobStatus.UpdateJobProgressInformationAsync(
-				jobId, $"USERS", 0
-			).ConfigureAwait(false);			
-
-			//new DiscussionWorker(courseID, hashCode, this._canvasTest).Load();
-			//new PeerGroupWorker(courseID, hashCode).Create();
-			//new GradePredictorWorker(courseID, hashCode).MakePredictions();
-
-			await _computationJobStatus.UpdateJobProgressInformationAsync(
-				jobId, $"ASSIGNMENTS", 0
+				jobId, $"tasks.students", 0
 			).ConfigureAwait(false);
 
+
+			//System.Threading.Thread.Sleep(3000);
+
+
+			new QuizWorker(courseID, hashCode, _canvasTest).Register();
 			await _computationJobStatus.UpdateJobProgressInformationAsync(
-				jobId, $"DONE", 1.0).ConfigureAwait(false);
+				jobId, $"tasks.quizzes", 0
+			).ConfigureAwait(false);
+
+			//System.Threading.Thread.Sleep(3000);
+
+			new DiscussionWorker(courseID, hashCode, this._canvasTest).Load();
+			await _computationJobStatus.UpdateJobProgressInformationAsync(
+				jobId, $"tasks.discussions", 0
+			).ConfigureAwait(false);
+
+			//System.Threading.Thread.Sleep(3000);
+
+			new AssignmentWorker(courseID, hashCode, _canvasTest).Register();
+			await _computationJobStatus.UpdateJobProgressInformationAsync(
+				jobId, $"tasks.assignments", 0
+			).ConfigureAwait(false);
+
+			//System.Threading.Thread.Sleep(3000);
+
+			new GradePredictorWorker(courseID, hashCode).MakePredictions();
+			await _computationJobStatus.UpdateJobProgressInformationAsync(
+				jobId, $"tasks.grade-predictor", 0
+			).ConfigureAwait(false);
+
+			//System.Threading.Thread.Sleep(3000);
+
+			new PeerGroupWorker(courseID, hashCode).Create();
+			await _computationJobStatus.UpdateJobProgressInformationAsync(
+				jobId, $"tasks.peer-groups", 0
+			).ConfigureAwait(false);
+
+			//System.Threading.Thread.Sleep(3000);
+
+			await _computationJobStatus.UpdateJobProgressInformationAsync(
+				jobId, $"tasks.done", 0
+			).ConfigureAwait(false);
 
 			long duration = sw.ElapsedMilliseconds;
 			Console.WriteLine("Took: " + duration.ToString() + "ms");
