@@ -1,14 +1,13 @@
 import React, { Component } from "react";
-import { Divider, Button } from 'ui-neumorphism'
+import { Divider } from 'ui-neumorphism'
 import {Spin, Table} from "antd";
 import Admin from "../../index";
-import "./style.scss";
 import {IProps, IState} from "./types";
 import SyncManager from "../../../../components/managers/SyncManager";
-import {MOCK_DATAMART_SYNCHRONIZATIONS} from "../../../../mocks/app/datamart";
 import DataMartController from "../../../../api/controllers/datamart";
 import {Synchronization} from "../../../../models/app/SyncProvider";
 import moment from "moment";
+import "./style.scss";
 
 export default class DataMart extends Component<IProps, IState> {
 
@@ -32,8 +31,9 @@ export default class DataMart extends Component<IProps, IState> {
 
   render(): React.ReactNode {
     const { loaded, synchronizations }: IState = this.state;
+    const backendFormat = 'DD/MM/YYYY HH:mm:ss'
     const timeFormat = 'MMMM Do[,] YYYY [at] LT';
-    const successfulSyncs = loaded ? synchronizations.filter(a => a.status === "Success") : [];
+    const successfulSyncs = loaded ? synchronizations.filter(a => a.status === "COMPLETE") : [];
     const latestSuccessful = successfulSyncs.length > 0 ? successfulSyncs[0] : null;
 
     return (
@@ -44,8 +44,8 @@ export default class DataMart extends Component<IProps, IState> {
             (latestSuccessful ?
               <p>
                 The latest successful synchronization took place on
-                <b> {moment.utc(latestSuccessful.start, timeFormat).local().format(timeFormat)} </b>
-                <small>({moment.utc(latestSuccessful.start, timeFormat).fromNow()})</small>.
+                <b> {moment.utc(latestSuccessful.start, backendFormat).local().format(timeFormat)} </b>
+                <small>({moment.utc(latestSuccessful.start, backendFormat).fromNow()})</small>.
                 Synchronizations run automatically at 03:00AM (local university time).
               </p> :
               <p>No historic synchronizations available.</p>) :
@@ -61,16 +61,16 @@ export default class DataMart extends Component<IProps, IState> {
               <h1 style={{marginTop: 20}}>Historic versions</h1>
               <Divider dense style={{margin: '10px 0'}} />
 
-              <Table scroll={{x: 240}} dataSource={MOCK_DATAMART_SYNCHRONIZATIONS} columns={[
+              <Table scroll={{x: 240}} dataSource={synchronizations} columns={[
                 {
                   title: 'Start timestamp',
-                  dataIndex: 'start',
-                  key: 'start',
+                  dataIndex: 'start_timestamp',
+                  key: 'start_timestamp',
                 },
                 {
                   title: 'End timestamp',
-                  dataIndex: 'end',
-                  key: 'end',
+                  dataIndex: 'end_timestamp',
+                  key: 'end_timestamp',
                 },
                 {
                   title: 'Duration',
@@ -84,20 +84,9 @@ export default class DataMart extends Component<IProps, IState> {
                   render: (val, row) => <code>{val}</code>
                 },
                 {
-                  title: 'Invoked by',
-                  dataIndex: 'invoked',
-                  key: 'invoked',
-                },
-                {
                   title: 'Status',
                   dataIndex: 'status',
                   key: 'status',
-                },
-                {
-                  title: 'Action',
-                  dataIndex: 'action',
-                  key: 'action',
-                  render: (val, row) => <Button>Restore</Button>
                 },
               ]} />
             </React.Fragment>
