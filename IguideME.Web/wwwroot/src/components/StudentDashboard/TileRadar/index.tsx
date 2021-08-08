@@ -20,7 +20,7 @@ export default class TileRadar extends Component<IProps> {
     const { tilesGradeSummary, peerGrades } = this.props;
 
     const degrees = 360;
-    const margin = { top: 50, left: 100, right: 100, bottom: 50 }
+    const margin = { top: 50, left: 75, right: 75, bottom: 50 }
 
     return (
       <div id={"tileRadial"}>
@@ -119,12 +119,15 @@ export default class TileRadar extends Component<IProps> {
                               to={points[i]}
                               stroke={silver}
                         />
-                        <text x={point.x > 0 ? point.x + 10 : point.x - 10}
-                              y={point.y > 0 ? point.y + 10 : point.y - 10}
-                              text-anchor={getDescriptionAnchor(point.x, point.y)}
-                        >
-                          { tilesGradeSummary[i === 0 ? tilesGradeSummary.length - 1 : i - 1].tile.title }
-                        </text>
+                        { tilesGradeSummary[i === 0 ? tilesGradeSummary.length - 1 : i - 1].tile.title.split(" ").map((x, j) => (
+                          <text x={point.x > 0 ? point.x + 10 : point.x - 10}
+                                y={point.y > 0 ? point.y + 10 + (j * 12) : point.y - 10 - (j * 12)}
+                                text-anchor={getDescriptionAnchor(point.x, point.y)}
+                                style={{whiteSpace: 'pre-wrap'}}
+                          >
+                            { x }
+                          </text>
+                        ))}
                       </React.Fragment>
                     ))}
 
