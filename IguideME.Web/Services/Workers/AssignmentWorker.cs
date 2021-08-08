@@ -28,7 +28,6 @@ namespace IguideME.Web.Services.Workers
 			{
 				Console.WriteLine("\t" + assignment.Name);
 
-				/*
 				DatabaseManager.Instance.RegisterAssignment(
 					assignment.ID,
 					assignment.CourseID,
@@ -41,11 +40,14 @@ namespace IguideME.Web.Services.Workers
 					assignment.SubmissionType,
 					hashCode
 				);
-				*/
 
 				var submissions = assignment.Submissions;
 				foreach (var submission in submissions)
 				{
+					// don't register data from students that did not give consent
+					if (DatabaseManager.Instance.GetConsent(this.courseID, submission.User.LoginID) != 1)
+						continue;
+
 					Console.WriteLine("\t\t" + submission.User.Name);
 					// only register graded submissions
 					if (submission.Grade == null) continue;
@@ -55,6 +57,7 @@ namespace IguideME.Web.Services.Workers
 					if (entry != null)
                     {
 						DatabaseManager.Instance.CreateUserSubmission(
+							this.courseID,
 							entry.ID,
 							submission.User.LoginID,
 							submission.Grade,
