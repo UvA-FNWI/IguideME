@@ -36,7 +36,7 @@ export const MOCK_DATAMART_STATUS_BUSY = {
     jobResult: { calculatedResult: null, exception: null },
     lastUpdate: `${moment.utc().format("YYYY-MM-DD")}T21:48:59.619771Z`,
     progressPercentage: 1,
-    progressInformation: "DONE",
+    progressInformation: "tasks.assignments",
     startTime: `${moment.utc().format("YYYY-MM-DD")}T${moment.utc().format("HH:mm:ss")}.000000Z`,
     status: 2,
     workParameters: { iterations: 0, seedData: 0 }
