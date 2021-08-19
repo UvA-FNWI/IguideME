@@ -1,6 +1,9 @@
 ﻿FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS build-env
 WORKDIR /app
 
+RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash -
+RUN apt-get install -y nodejs
+
 # Copy csproj and restore as distinct layers
 COPY *.csproj ./
 RUN dotnet restore
