@@ -8,7 +8,7 @@ jobs:
     steps:
       - script: |
           set -euxo pipefail
-          docker build -f docker/Dockerfile -t "fnwicr.azurecr.io/iguideme:latest" .
+          docker build -f Dockerfile -t "fnwicr.azurecr.io/iguideme:latest" .
           docker push "fnwicr.azurecr.io/iguideme:latest"
         displayName: Build staging Docker container
         workingDirectory: ./IguideME.Web
