@@ -10,7 +10,7 @@ jobs:
           set -euxo pipefail
           docker build -f Dockerfile -t "fnwicr.azurecr.io/iguideme:latest" .
           docker push "fnwicr.azurecr.io/iguideme:latest"
-        displayName: Build staging Docker container
+        displayName: Build Docker container
         workingDirectory: ./IguideME.Web
         condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/deployment'))
 
