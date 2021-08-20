@@ -11,7 +11,7 @@ jobs:
           docker build -f docker/Dockerfile -t "fnwicr.azurecr.io/iguideme:latest" .
           docker push "fnwicr.azurecr.io/iguideme:latest"
         displayName: Build staging Docker container
-        condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+        condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/deployment'))
 
       - script: |
           set -euxo pipefail
@@ -20,6 +20,6 @@ jobs:
           helm chart save "iguideme-${VERSION}.tgz" "fnwicr.azurecr.io/helm/iguideme:${VERSION}"
           helm chart push "fnwicr.azurecr.io/helm/iguideme:${VERSION}"
         displayName: Build Helm chart and push to registry
-        condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+        condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/deployment'))
         env:
           HELM_EXPERIMENTAL_OCI: 1
