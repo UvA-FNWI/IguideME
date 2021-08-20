@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: iguideme
+  namespace: "{{ .Release.Namespace }}"
+spec:
+  selector:
+    matchLabels:
+      app: iguideme
+  replicas: 1
+  revisionHistoryLimit: 3
+  template:
+    metadata:
+      labels:
+        app: iguideme
+        {{- if .Values.azure }}
+        aadpodidbinding: iguideme-azure-kv
+        {{- end }}
+    spec:
+      containers:
+        - name: iguideme
+          image: "{{ .Values.image }}:{{ .Values.tag }}"
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+          env:
+            - name: IGUIDEME_VERSION
+              value: "{{ .Chart.AppVersion }}"
+            - name: Canvas__Url
+              value: "{{ .Values.canvasUrl }}"
+          envFrom:
+            - secretRef:
+                name: iguideme-secret
+          {{- if .Values.azure }}
+          volumeMounts:
+            - name: secrets-store-inline
+              mountPath: "/etc/secrets"
+              readOnly: true
+            - name: iguideme-data
+              mountPath: "/data"
+          {{- end }}
+
+      {{- if .Values.azure }}
+      volumes:
+        - name: secrets-store-inline
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: "iguideme-secretproviderclass"
+        - name: iguideme-data
+          persistentVolumeClaim:
+            claimName: iguideme-data
+      {{- end }}
