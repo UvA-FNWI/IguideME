@@ -1,0 +1,19 @@
+hostname: iguideme.local
+ingressClass: nginx
+image: fnwicr.azurecr.io/iguideme
+tag: latest
+
+canvasUrl: canvas.instructure.com
+
+azure:
+  keyvaultName: keyvaultName
+  resourceGroup: resourceGroupName
+  subscriptionId: subscriptionId
+  tenantId: tenantId
+  clientId: clientId
+  identityName: identityName
+  secrets:
+    - name: iguideme-lti-key
+      key: LtiKey
+    - name: iguideme-canvas-token-tst
+      key: Canvas__AccessToken
