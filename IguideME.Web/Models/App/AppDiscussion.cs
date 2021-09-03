@@ -22,13 +22,17 @@ namespace IguideME.Web.Models.App
         [JsonProperty("posted_at")]
         public string PostedAt { get; set; }
 
+        [JsonProperty("message")]
+        public string Message { get; set; }
+
         public AppDiscussion(
             int id,
             int discussionID,
             int courseID,
             string title,
             string postedBy,
-            string postedAt)
+            string postedAt,
+            string message)
         {
             this.ID = id;
             this.DiscussionID = discussionID;
@@ -36,6 +40,7 @@ namespace IguideME.Web.Models.App
             this.Title = title;
             this.PostedBy = postedBy;
             this.PostedAt = postedAt;
+            this.Message = message;
         }
 
     }

@@ -17,6 +17,14 @@
             `peer_group_size`     INTEGER DEFAULT 5
         );";
 
+    public const string CREATE_TABLE_ACCEPT_LIST =
+        @"CREATE TABLE IF NOT EXISTS `accept_list` (
+            `id`                  INTEGER PRIMARY KEY AUTOINCREMENT,
+            `course_id`           INTEGER,
+            `user_login_id`       STRING,
+            `accepted`            BOOLEAN
+        );";
+
     public const string CREATE_TABLE_PREDICTIVE_MODEL =
         @"CREATE TABLE IF NOT EXISTS `predictive_model` (
             `id`                  INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -161,6 +169,13 @@
                                         `target_login_id`,
                                         `sync_hash`)
           VALUES        ({0}, '{1}', '{2}', '{3}');";
+
+    public const string QUERY_USER_PEERS =
+        @"SELECT        `target_login_id`
+        FROM            `peer_group`
+        WHERE           `course_id`={0}
+        AND             `user_login_id`='{1}'
+        AND             `sync_hash`='{2}';";
 
     public const string CREATE_USER_NOTIFICATIONS =
         @"INSERT INTO   `notifications` (   `course_id`,
@@ -363,7 +378,7 @@
     // -------------------- Course settings --------------------
 
     public const string QUERY_CONSENT_FOR_COURSE =
-        @"SELECT    `course_name`, `require_consent`, `informed_consent`
+        @"SELECT    `course_name`, `require_consent`, `informed_consent`, `accept_list`
         FROM        `course_settings`
         WHERE       `course_id`={0}
         LIMIT       1";
@@ -386,6 +401,31 @@
                     `personalized_peers`={2}
         WHERE       `course_id`={0};";
 
+    public const string REGISTER_ACCEPTED_STUDENT =
+        @"INSERT INTO       `accept_list`
+                            (   `course_id`,
+                                `user_login_id`,
+                                `accepted`  )
+        VALUES({0}, '{1}', {2});";
+
+    public const string UPDATE_ACCEPT_LIST =
+        @"UPDATE    `accept_list`
+        SET         `accepted`={2}
+        WHERE       `course_id`={0} AND `user_login_id`='{1}';";
+
+    public const string REQUIRE_ACCEPT_LIST =
+        @"UPDATE    `course_settings`
+        SET         `accept_list`={1}
+        WHERE       `course_id`={0};";
+
+    public const string RESET_ACCEPT_LIST =
+        @"DELETE FROM   `accept_list`
+        WHERE           `course_id`={0};";
+
+    public const string QUERY_ACCEPT_LIST =
+        @"SELECT    `user_login_id`, `accepted`
+        FROM        `accept_list`
+        WHERE       `course_id`={0};";
 
     // -------------------- Tile logic --------------------
 
@@ -513,6 +553,14 @@
         WHERE       `tile_entry_submission`.`entry_id`={0}
         AND         `tile_entry_submission`.`id`=`tile_entry_submission_meta`.`submission_id`;";
 
+    public const string QUERY_TILE_ENTRY_SUBMISSION_META =
+        @"SELECT    `tile_entry_submission_meta`.`key`,
+                    `tile_entry_submission_meta`.`value`
+        FROM        `tile_entry_submission`,
+                    `tile_entry_submission_meta`
+        WHERE       `tile_entry_submission`.`id`={0}
+        AND         `tile_entry_submission`.`id`=`tile_entry_submission_meta`.`submission_id`;";
+
     public const string UPDATE_TILE =
         @"UPDATE    `tile`
         SET
@@ -574,9 +622,11 @@
             `id`              INTEGER PRIMARY KEY AUTOINCREMENT,
             `discussion_id`   INTEGER,
             `course_id`       INTEGER,
+            `tile_id`         INTEGER DEFAULT -1,
             `title`           STRING,
             `posted_by`       STRING,
             `posted_at`       STRING,
+            `message`         STRING NULL,
             `sync_hash`       STRING
         );";
 
@@ -622,10 +672,37 @@
                     `canvas_discussion`.`course_id`,
                     `canvas_discussion`.`title`,
                     `canvas_discussion`.`posted_by`,
-                    `canvas_discussion`.`posted_at`
+                    `canvas_discussion`.`posted_at`,
+                    `canvas_discussion`.`message`
         FROM        `canvas_discussion`
         WHERE       `canvas_discussion`.`course_id`={0}
+        AND         `canvas_discussion`.`sync_hash`='{1}'
+        AND         `canvas_discussion`.`tile_id`=-1;";
+
+    public const string QUERY_TILE_DISCUSSIONS =
+        @"SELECT    `canvas_discussion`.`id`,
+                    `canvas_discussion`.`discussion_id`,
+                    `canvas_discussion`.`course_id`,
+                    `canvas_discussion`.`title`,
+                    `canvas_discussion`.`posted_by`,
+                    `canvas_discussion`.`posted_at`,
+                    `canvas_discussion`.`message`
+        FROM        `canvas_discussion`
+        WHERE       `canvas_discussion`.`tile_id`={0}
         AND         `canvas_discussion`.`sync_hash`='{1}';";
+
+    public const string QUERY_TILE_DISCUSSIONS_FOR_USER =
+        @"SELECT    `canvas_discussion`.`id`,
+                    `canvas_discussion`.`discussion_id`,
+                    `canvas_discussion`.`course_id`,
+                    `canvas_discussion`.`title`,
+                    `canvas_discussion`.`posted_by`,
+                    `canvas_discussion`.`posted_at`,
+                    `canvas_discussion`.`message`
+        FROM        `canvas_discussion`
+        WHERE       `canvas_discussion`.`tile_id`={0}
+        AND         `canvas_discussion`.`posted_by`='{1}'
+        AND         `canvas_discussion`.`sync_hash`='{2}';";
 
     public const string REGISTER_CANVAS_ASSIGNMENT =
         @"INSERT INTO   `canvas_assignment` 
@@ -645,11 +722,13 @@
         @"INSERT INTO   `canvas_discussion` 
                         (   `discussion_id`,
                             `course_id`,
+                            `tile_id`,
                             `title`,
                             `posted_by`,
                             `posted_at`,
+                            `message`,
                             `sync_hash` ) 
-        VALUES({0}, {1}, '{2}', '{3}', '{4}', '{5}');";
+        VALUES({0}, {1}, '{2}', {3}, '{4}', '{5}', '{6}', '{7}');";
 
     // -------------------- Data retrieval --------------------
 
@@ -835,6 +914,7 @@
         WHERE       `tile_entry_submission`.`entry_id`=`tile_entry`.`id`
 	    AND	        `tile`.`content_type` != 'LEARNING_OUTCOMES'
 	    AND	        `tile`.`content_type` != 'PREDICTION'
+        AND	        `tile`.`tile_type` != 'DISCUSSIONS'
 	    AND	        `tile`.`id`=`tile_entry`.`id`
         AND         `layout_column`.`course_id`={0}
         AND         `layout_tile_group`.`column_id`=`layout_column`.`id`

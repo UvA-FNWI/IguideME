@@ -368,6 +368,103 @@ namespace IguideME.Web.Controllers
             return BadRequest();
         }
 
+        [Authorize]
+        [HttpGet]
+        [Route("/tiles/{tileID}/discussions/{userLoginID}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public ActionResult GetDiscussions(string tileID, string userLoginID)
+        {
+            // Only instructors may view submissions of other students
+            if (this.GetUserLoginID() != userLoginID &&
+                !this.IsAdministrator())
+                return Unauthorized();
+
+            int id;
+            bool success = Int32.TryParse(tileID, out id);
+
+            if (success)
+                return Json(
+                    DatabaseManager.Instance.GetDiscussions(
+                        this.GetCourseID(), id, userLoginID));
+
+            return BadRequest();
+        }
+
+        [Authorize]
+        [HttpGet]
+        [Route("/tiles/{tileID}/learning-outcomes/{userLoginID}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public ActionResult GetLearningOutcomes(string tileID, string userLoginID)
+        {
+            // Only instructors may view submissions of other students
+            if (this.GetUserLoginID() != userLoginID &&
+                !this.IsAdministrator())
+                return Unauthorized();
+
+            int id;
+            bool success = Int32.TryParse(tileID, out id);
+
+            if (success)
+            {
+                List<LearningGoal> goals = DatabaseManager.Instance.GetGoals(GetCourseID())
+                    .Where(g => g.TileID == id)
+                    .ToList();
+
+                List<TileEntrySubmission> submissions =
+                    DatabaseManager.Instance.GetTileSubmissionsForUser(
+                        this.GetCourseID(),
+                        userLoginID);
+
+                var response = goals.Select(g =>
+                {
+                    bool success = true;
+                    g.FetchRequirements();
+                    foreach (GoalRequirement req in g.Requirements)
+                    {
+                        TileEntrySubmission submission = submissions.Find(
+                            s => s.EntryID == req.EntryID);
+
+
+                        if (submission == null)
+                        {
+                            success = false;
+                        } else
+                        {
+                            switch (req.Expression)
+                            {
+                                case "lte":
+                                    if (float.Parse(submission.Grade) > req.Value)
+                                        success = false;
+                                    break;
+                                case "gte":
+                                    if (float.Parse(submission.Grade) < req.Value)
+                                        success = false;
+                                    break;
+                                default:
+                                    if (float.Parse(submission.Grade) != req.Value)
+                                        success = false;
+                                    break;
+                            }
+                        }
+                    }
+
+                    return new Dictionary<string, object>
+                    {
+                        { "goal", g },
+                        { "success", success }
+                    };
+                });
+
+                return Json(response);
+            }
+
+            return BadRequest();
+        }
+
         [Authorize(Policy = "IsInstructor")]
         [HttpPost]
         [Route("/entries")]

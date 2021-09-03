@@ -12,7 +12,7 @@ namespace IguideME.Web.Services
     {
         private static readonly DatabaseManager instance = new DatabaseManager();
         private readonly SQLiteConnection connection = new SQLiteConnection(
-            "Data Source=/data/IguideME.db;Version=3;New=False;Compress=True;"
+            "Data Source=data/IguideME.db;Version=3;New=False;Compress=True;"
         );
         private static SQLiteCommand command;
 
@@ -55,7 +55,8 @@ namespace IguideME.Web.Services
                 DatabaseQueries.CREATE_TABLE_PREDICTED_GRADE,
                 DatabaseQueries.CREATE_TABLE_LEARNING_GOALS,
                 DatabaseQueries.CREATE_TABLE_GOAL_REQUREMENTS,
-                DatabaseQueries.CREATE_TABLE_NOTIFICATIONS
+                DatabaseQueries.CREATE_TABLE_NOTIFICATIONS,
+                DatabaseQueries.CREATE_TABLE_ACCEPT_LIST
             };
 
             // create tables if they do not exist
@@ -228,9 +229,11 @@ namespace IguideME.Web.Services
         public void RegisterDiscussion(
             int? discussionID,
             int courseID,
+            int tileID,
             string title,
             string postedBy,
             string postedAt,
+            string message,
             string syncHash)
         {
             NonQuery(
@@ -238,9 +241,11 @@ namespace IguideME.Web.Services
                     DatabaseQueries.REGISTER_CANVAS_DISCUSSION,
                     discussionID,
                     courseID,
+                    tileID,
                     title,
                     postedBy,
                     postedAt,
+                    message,
                     syncHash));
         }
 
@@ -283,9 +288,6 @@ namespace IguideME.Web.Services
         public User GetUser(int courseID, string userLoginID, string hash = null)
         {
             string activeHash = hash ?? this.GetCurrentHash(courseID);
-            Console.WriteLine(String.Format(
-                    DatabaseQueries.QUERY_LATEST_SYNC_FOR_COURSE, courseID));
-            Console.WriteLine("hash " + activeHash);
             if (activeHash == null) return null;
 
             string query = String.Format(
@@ -480,7 +482,7 @@ namespace IguideME.Web.Services
                     loginID));
         }
 
-        public int? GetUserGoalGrade(int courseID, string loginID)
+        public int GetUserGoalGrade(int courseID, string loginID)
         {
             string query = String.Format(
                 DatabaseQueries.QUERY_USER_GOAL_GRADE,
@@ -507,6 +509,30 @@ namespace IguideME.Web.Services
                     syncHash
                 )
             );
+        }
+
+        public List<string> GetUserPeers(
+            int courseID,
+            string userLoginID,
+            string hash = null)
+        {
+            string activeHash = hash != null ? hash : this.GetCurrentHash(courseID);
+            if (activeHash == null) new List<string> { };
+
+            SQLiteDataReader r = Query(String.Format(
+                    DatabaseQueries.QUERY_USER_PEERS,
+                    courseID,
+                    userLoginID,
+                    activeHash
+                ));
+
+            List<string> peers = new List<string>();
+            while (r.Read())
+            {
+                peers.Add(r.GetValue(0).ToString());
+            }
+
+            return peers;
         }
 
         public int CreateUserSubmission(
@@ -701,7 +727,8 @@ namespace IguideME.Web.Services
                 return new PublicInformedConsent(
                     r.GetValue(0).ToString(),
                     r.GetBoolean(1),
-                    r.GetValue(2).ToString()
+                    r.GetValue(2).ToString(),
+                    r.GetBoolean(3)
                 );
             }
 
@@ -778,7 +805,14 @@ namespace IguideME.Web.Services
 
             while (r2.Read())
             {
-                if (tileID < 0) tileID = r2.GetInt32(1);
+                if (tileID < 0)
+                {
+                    try
+                    {
+                        tileID = r2.GetInt32(1);
+                    }
+                    catch { }
+                }
                 predictedGrades.Add(r2.GetFloat(2));
             }
 
@@ -792,6 +826,71 @@ namespace IguideME.Web.Services
                 );
 
                 submissions.Add(predictedGrade);
+            }
+
+            var tiles = GetTiles(courseID);
+            var tile = tiles.Find(t => t.ContentType == Tile.CONTENT_TYPE_LEARNING_OUTCOMES);
+            if (tile != null)
+            {
+                List<LearningGoal> goals = GetGoals(courseID)
+                    .ToList();
+                List<int> completed = new List<int>();
+
+                foreach (string peer in this.GetUserPeers(courseID, userLoginID))
+                {
+
+                    List<TileEntrySubmission> submissions1 =
+                        GetTileSubmissionsForUser(
+                            courseID,
+                            peer);
+
+                    int current = 0;
+
+                    goals.ForEach(g =>
+                    {
+                        bool success = true;
+                        g.FetchRequirements();
+                        foreach (GoalRequirement req in g.Requirements)
+                        {
+                            TileEntrySubmission submission = submissions1.Find(
+                                s => s.EntryID == req.EntryID);
+
+
+                            if (submission == null)
+                            {
+                                success = false;
+                            }
+                            else
+                            {
+                                switch (req.Expression)
+                                {
+                                    case "lte":
+                                        if (float.Parse(submission.Grade) > req.Value)
+                                            success = false;
+                                        break;
+                                    case "gte":
+                                        if (float.Parse(submission.Grade) < req.Value)
+                                            success = false;
+                                        break;
+                                    default:
+                                        if (float.Parse(submission.Grade) != req.Value)
+                                            success = false;
+                                        break;
+                                }
+                            }
+                        }
+
+                        if (success) current += 1;
+                    });
+                    completed.Add(current);
+                }
+                PeerComparisonData learningOutcomes = new PeerComparisonData(
+                    tile.ID,
+                    (float)completed.Average(),
+                    completed.Min(),
+                    completed.Max()
+                );
+                submissions.Add(learningOutcomes);
             }
 
             return submissions.ToArray();
@@ -1107,6 +1206,57 @@ namespace IguideME.Web.Services
             NonQuery(query);
         }
 
+        public void RegisterAcceptedStudent(
+            int courseID,
+            string studentLoginID,
+            bool accepted)
+        {
+            string query = String.Format(
+                    DatabaseQueries.REGISTER_ACCEPTED_STUDENT,
+                    courseID,
+                    studentLoginID,
+                    accepted);
+
+            NonQuery(query);
+        }
+
+        public void ResetAcceptList(int courseID)
+        {
+            NonQuery(String.Format(
+                    DatabaseQueries.RESET_ACCEPT_LIST,
+                    courseID));
+        }
+
+        public void SetAcceptListRequired(int courseID, bool enabled)
+        {
+            string query = String.Format(
+                DatabaseQueries.REQUIRE_ACCEPT_LIST,
+                courseID, enabled);
+
+            NonQuery(query);
+        }
+
+        public List<AcceptList> GetAcceptList(int courseID)
+        {
+            string query = String.Format(
+                DatabaseQueries.QUERY_ACCEPT_LIST,
+                courseID);
+
+            SQLiteDataReader r = Query(query);
+            List<AcceptList> keys = new List<AcceptList>();
+
+            while (r.Read())
+            {
+                keys.Add(
+                    new AcceptList(
+                        r.GetValue(0).ToString(),
+                        r.GetBoolean(1)
+                    ));
+            }
+
+            return keys;
+        }
+
         public List<string> GetEntryMetaKeys(int entryID)
         {
             string query = String.Format(
@@ -1122,6 +1272,23 @@ namespace IguideME.Web.Services
             }
 
             return keys;
+        }
+
+        public Dictionary<string, string> GetEntryMeta(int entryID)
+        {
+            string query = String.Format(
+                DatabaseQueries.QUERY_TILE_ENTRY_SUBMISSION_META,
+                entryID);
+
+            SQLiteDataReader r = Query(query);
+            Dictionary<string, string> meta = new Dictionary<string, string>();
+
+            while (r.Read())
+            {
+                meta.Add(r.GetValue(0).ToString(), r.GetValue(1).ToString());
+            }
+
+            return meta;
         }
 
         public Tile UpdateTile(int courseID, Tile newTile)
@@ -1298,7 +1465,59 @@ namespace IguideME.Web.Services
                     r.GetInt32(2),
                     r.GetValue(3).ToString(),
                     r.GetValue(4).ToString(),
-                    r.GetValue(5).ToString()
+                    r.GetValue(5).ToString(),
+                    r.GetValue(6).ToString()
+                );
+                discussions.Add(row);
+            }
+
+            return discussions;
+        }
+
+        public List<AppDiscussion> GetDiscussions(
+            int courseID,
+            int tileID,
+            string userLoginID = null,
+            string hash = null)
+        {
+            string activeHash = hash ?? this.GetCurrentHash(courseID);
+            if (activeHash == null) return new List<AppDiscussion>() { };
+
+            string query = null;
+
+            if (userLoginID == null)
+            {
+                query = String.Format(
+                    DatabaseQueries.QUERY_TILE_DISCUSSIONS,
+                    tileID,
+                    activeHash
+                );
+            } else
+            {
+                User user = GetUser(courseID, userLoginID, activeHash);
+                if (user == null) return new List<AppDiscussion>() { };
+
+                query = String.Format(
+                    DatabaseQueries.QUERY_TILE_DISCUSSIONS_FOR_USER,
+                    tileID,
+                    user.Name,
+                    activeHash
+                );
+            }
+
+            SQLiteDataReader r = Query(query);
+            List<AppDiscussion> discussions = new List<AppDiscussion>();
+
+            while (r.Read())
+            {
+                AppDiscussion row = new AppDiscussion(
+                    r.GetInt32(0),
+                    r.GetInt32(1),
+                    r.GetInt32(2),
+                    r.GetValue(3).ToString(),
+                    r.GetValue(4).ToString(),
+                    r.GetValue(5).ToString(),
+                    r.GetValue(6).ToString()
                 );
                 discussions.Add(row);
             }

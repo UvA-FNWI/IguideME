@@ -13,15 +13,19 @@ namespace IguideME.Web.Models.App
         [JsonProperty("text")]
         public string? Text { get; set; }
 
+        [JsonProperty("accept_list")]
+        public bool AcceptList { get; set; }
 
         public PublicInformedConsent(
             string courseName,
             bool requireConsent,
-            string text = null)
+            string text = null,
+            bool acceptList = false)
         {
             this.CourseName = courseName;
             this.RequireConsent = requireConsent;
             this.Text = text;
+            this.AcceptList = acceptList;
         }
     }
 }

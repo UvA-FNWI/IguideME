@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using IguideME.Web.Services;
+using Newtonsoft.Json;
 
 namespace IguideME.Web.Models.App
 {
@@ -28,7 +29,8 @@ namespace IguideME.Web.Models.App
             string userLoginID,
             string grade,
             string submitted,
-            string meta = null)
+            string meta = null,
+            bool autoLoadMeta = true)
         {
             this.ID = id;
             this.UserLoginID = userLoginID;
@@ -36,6 +38,12 @@ namespace IguideME.Web.Models.App
             this.Grade = grade;
             this.Submitted = submitted;
             this.Meta = meta;
+
+            if (autoLoadMeta && meta == null)
+            {
+                this.Meta = JsonConvert.SerializeObject(
+                    DatabaseManager.Instance.GetEntryMeta(this.ID));
+            }
         }
     }
 }
