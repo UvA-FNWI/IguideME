@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using IguideME.Web.Models;
+using IguideME.Web.Models.App;
 using IguideME.Web.Models.Service;
 using IguideME.Web.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -188,6 +189,40 @@ namespace IguideME.Web.Controllers
                 DatabaseManager.Instance.GetCourseSubmissions(GetCourseID()));
         }
 
+        [Authorize]
+        [HttpGet]
+        [Route("/goal-grade")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public ActionResult GetGoalGrade()
+        {
+            // returns all obtained exam grades for the logged in user
+            return Json(
+                DatabaseManager.Instance.GetUserGoalGrade(
+                    this.GetCourseID(),
+                    this.GetUserLoginID()));
+        }
+
+        [Authorize]
+        [HttpPost]
+        [Route("/goal-grade")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public ActionResult UpdateGoalGrade()
+        {
+            var body = new StreamReader(Request.Body).ReadToEnd();
+            DatabaseManager.Instance.UpdateUserGoalGrade(
+                    this.GetCourseID(),
+                    this.GetUserLoginID(),
+                    (int)JObject.Parse(body)["goal_grade"]);
+
+            // returns all obtained exam grades for the logged in user
+            return Json(
+                DatabaseManager.Instance.GetUserGoalGrade(
+                    this.GetCourseID(),
+                    this.GetUserLoginID()));
+        }
+
         // -------------------- Canvas registry --------------------
 
         [Authorize(Policy = "IsInstructor")]
@@ -223,6 +258,69 @@ namespace IguideME.Web.Controllers
             return Json(
                 DatabaseManager.Instance.GetNotifications(
                     GetCourseID(), userLoginID)
+            );
+        }
+
+        // -------------------- Accept List --------------------
+
+        [Authorize(Policy = "IsInstructor")]
+        [HttpPost]
+        [Route("/datamart/accept-list")]
+        public ActionResult CreateAcceptList([FromBody] AcceptList[] acceptList)
+        {
+            DatabaseManager.Instance.ResetAcceptList(GetCourseID());
+
+            foreach (AcceptList list in acceptList)
+            {
+                DatabaseManager.Instance.RegisterAcceptedStudent(
+                    GetCourseID(),
+                    list.StudentLoginID,
+                    list.Accepted);
+            }
+
+            return Json(
+                DatabaseManager.Instance.GetAcceptList(GetCourseID())
+            );
+        }
+
+        [Authorize(Policy = "IsInstructor")]
+        [HttpPatch]
+        [Route("/datamart/accept-list")]
+        public ActionResult UpdateAcceptList()
+        {
+            var body = new StreamReader(Request.Body).ReadToEnd();
+            DatabaseManager.Instance.SetAcceptListRequired(
+                GetCourseID(),
+                (bool)JObject.Parse(body)["enabled"]);
+            return Json((bool)JObject.Parse(body)["enabled"]);
+        }
+
+        [Authorize(Policy = "IsInstructor")]
+        [HttpGet]
+        [Route("/datamart/accept-list")]
+        public ActionResult GetAcceptList()
+        {
+            return Json(
+                DatabaseManager.Instance.GetAcceptList(GetCourseID())
+            );
+        }
+
+        [Authorize]
+        [HttpGet]
+        [Route("/datamart/accept-list/{studentLoginID}")]
+        public ActionResult GetAcceptList(string studentLoginID)
+        {
+            var course = DatabaseManager.Instance.GetPublicInformedConsent(GetCourseID());
+
+            if (!course.AcceptList || IsAdministrator()) return Json(true);
+
+            AcceptList student = DatabaseManager.Instance
+                .GetAcceptList(GetCourseID())
+                .Find(x => x.StudentLoginID == (studentLoginID == "self" ? GetUserLoginID() : studentLoginID));
+
+            Console.WriteLine(student.Accepted);
+            return Json(
+                student != null ? student.Accepted : false
             );
         }
     }
