@@ -48,49 +48,35 @@ namespace IguideME.Web.Services
 			var sw = new Stopwatch();
 			sw.Start();
 
-			new UserWorker(courseID, hashCode, _canvasTest);
+			new UserWorker(courseID, hashCode, _canvasTest).Register();
 			await _computationJobStatus.UpdateJobProgressInformationAsync(
 				jobId, $"tasks.students", 0
 			).ConfigureAwait(false);
-
-
-			//System.Threading.Thread.Sleep(3000);
-
 
 			new QuizWorker(courseID, hashCode, _canvasTest).Register();
 			await _computationJobStatus.UpdateJobProgressInformationAsync(
 				jobId, $"tasks.quizzes", 0
 			).ConfigureAwait(false);
 
-			//System.Threading.Thread.Sleep(3000);
-
 			new DiscussionWorker(courseID, hashCode, this._canvasTest).Load();
 			await _computationJobStatus.UpdateJobProgressInformationAsync(
 				jobId, $"tasks.discussions", 0
 			).ConfigureAwait(false);
-
-			//System.Threading.Thread.Sleep(3000);
 
 			new AssignmentWorker(courseID, hashCode, _canvasTest).Register();
 			await _computationJobStatus.UpdateJobProgressInformationAsync(
 				jobId, $"tasks.assignments", 0
 			).ConfigureAwait(false);
 
-			//System.Threading.Thread.Sleep(3000);
-
 			new GradePredictorWorker(courseID, hashCode).MakePredictions();
 			await _computationJobStatus.UpdateJobProgressInformationAsync(
 				jobId, $"tasks.grade-predictor", 0
 			).ConfigureAwait(false);
 
-			//System.Threading.Thread.Sleep(3000);
-
 			new PeerGroupWorker(courseID, hashCode).Create();
 			await _computationJobStatus.UpdateJobProgressInformationAsync(
 				jobId, $"tasks.peer-groups", 0
 			).ConfigureAwait(false);
-
-			//System.Threading.Thread.Sleep(3000);
 
 			await _computationJobStatus.UpdateJobProgressInformationAsync(
 				jobId, $"tasks.done", 0
