@@ -15,5 +15,5 @@ azure:
   secrets:
     - name: iguideme-lti-key
       key: LtiKey
-    - name: iguideme-canvas-token-tst
+    - name: iguideme-canvas-token
       key: Canvas__AccessToken
