@@ -596,6 +596,27 @@ namespace IguideME.Web.Controllers
 
         [Authorize]
         [HttpGet]
+        [Route("/peer-comparisons/{userLoginID}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public ActionResult GetPeerComparisonB(int userLoginID)
+        {
+            // Only instructors may view peer comparisons of other students
+            if (this.GetUserLoginID() != userLoginID.ToString() && !this.IsAdministrator())
+                return Unauthorized();
+
+            User user = DatabaseManager.Instance.GetUser(
+                this.GetCourseID(), userLoginID.ToString());
+
+            if (user == null) return BadRequest();
+
+            return Json(
+                DatabaseManager.Instance.GetUserPeerComparison(
+                GetCourseID(), user.LoginID));
+        }
+
+        [Authorize]
+        [HttpGet]
         [Route("/results/{userLoginID}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
