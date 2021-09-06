@@ -28,10 +28,10 @@ namespace IguideME.Web.Services.Workers
 			{
 				Console.WriteLine("\t" + student.Name + ", " + student.ID);
 
-				if (DatabaseManager.Instance.GetUserGoalGrade(courseID, student.LoginID) < 0)
+				if (DatabaseManager.Instance.GetUserGoalGrade(courseID, student.SISUserID) < 0)
 				{
-					DatabaseManager.Instance.CreateEmptyUserGoalGrade(courseID, student.LoginID);
-					DatabaseManager.Instance.UpdateUserGoalGrade(courseID, student.LoginID, 7);
+					DatabaseManager.Instance.CreateEmptyUserGoalGrade(courseID, student.SISUserID);
+					//DatabaseManager.Instance.UpdateUserGoalGrade(courseID, student.SISUserID, 7);
 				}
 
 				DatabaseManager.Instance.RegisterUser(
