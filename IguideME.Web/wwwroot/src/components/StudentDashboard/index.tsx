@@ -146,7 +146,7 @@ class StudentDashboard extends Component<Props, IState> {
       }, () => {
         TileController.getPeerResults(student.login_id).then(peerGrades =>
           this.setState({ peerGrades, loaded: true })
-        );
+        ).catch(() => this.setState({ loaded: true }));
       });
     });
   }

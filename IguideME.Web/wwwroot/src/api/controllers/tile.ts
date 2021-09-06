@@ -218,7 +218,7 @@ export default class TileController extends Controller {
     }
 
     return this.client.get(
-      `peer-comparisons/${studentLoginId}`
+      `peer-comparison/${studentLoginId}`
     ).then(response => response.data);
   }
 

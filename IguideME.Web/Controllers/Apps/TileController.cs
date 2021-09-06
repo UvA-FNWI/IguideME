@@ -575,7 +575,7 @@ namespace IguideME.Web.Controllers
 
         [Authorize]
         [HttpGet]
-        [Route("/peer-comparisons/{userLoginID}")]
+        [Route("/peer-comparison/{userLoginID}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public ActionResult GetPeerComparison(string userLoginID)
