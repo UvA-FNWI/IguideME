@@ -99,7 +99,7 @@ class EditTileDragger extends Component<Props, IState> {
         await this.createGoals(goals.map(e => {
           e.tile_id = tile.id;
           return e;
-        }))
+        }));
       }
 
       this.props.loadTiles().then(() => {
@@ -138,7 +138,7 @@ class EditTileDragger extends Component<Props, IState> {
             g => g.tile_id === patchedTile.id
           ).filter(
             g => !goals.map(_g => _g.title).includes(g.title));
-          const newGoals = goals.filter(g => g.id === -1);
+          const newGoals = goals.filter(g => g.new === true);
 
           await this.deleteGoals(removedGoals);
           await this.createGoals(newGoals);

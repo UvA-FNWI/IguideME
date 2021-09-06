@@ -9,6 +9,7 @@ import {
 import {Synchronization} from "../../models/app/SyncProvider";
 import {PredictedGrade, PredictiveModel} from "../../models/app/PredictiveModel";
 import {NotificationStatus, PerformanceNotification} from "../../models/app/Notification";
+import {AppAcceptList} from "../../models/app/AcceptList";
 
 export default class DataMartController extends Controller {
 
@@ -93,6 +94,22 @@ export default class DataMartController extends Controller {
 
     return this.client.get(
       `/datamart/notifications/${userLoginID}`
+    ).then(response => response.data);
+  }
+
+  static getAcceptList(): Promise<AppAcceptList[]> {
+    if (debug()) return delay([]);
+
+    return this.client.get(
+      `/datamart/accept-list`
+    ).then(response => response.data);
+  }
+
+  static createAcceptList(list: AppAcceptList[]): Promise<AppAcceptList[]> {
+    if (debug()) return delay([]);
+
+    return this.client.post(
+      `/datamart/accept-list`, list
     ).then(response => response.data);
   }
 }

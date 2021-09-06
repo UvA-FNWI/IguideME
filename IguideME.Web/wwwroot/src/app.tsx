@@ -83,7 +83,7 @@ class IGuideME extends React.Component<Props> {
               <Route path="/admin/settings" component={AdminSettings} />
               <Route path="/admin/tiles" component={AdminTiles} />
               <Route path="/admin" component={AdminDataMart} />
-              <Route path="/desired-grade" component={DesiredGrade} />
+              <Route path="/goal-grade" component={DesiredGrade} />
               <Route path="/consent" component={Consent} />
               <Route path="/" component={App} />
             </Switch>

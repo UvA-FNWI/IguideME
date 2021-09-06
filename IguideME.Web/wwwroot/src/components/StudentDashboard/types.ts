@@ -1,5 +1,7 @@
 import { CanvasStudent } from "../../models/canvas/Student";
 import {Tile, TileEntrySubmission} from "../../models/app/Tile";
+import {CanvasDiscussion} from "../../models/canvas/Discussion";
+import {LearningOutcome} from "../../models/app/LearningGoal";
 
 export interface IProps {
   student: CanvasStudent | undefined;
@@ -13,6 +15,8 @@ export interface IState {
   loaded: boolean;
   displayTile: Tile | undefined;
   viewType: ViewTypes;
+  learningOutcomes: LearningOutcome[];
+  discussions: CanvasDiscussion[];
   userSubmissions: TileEntrySubmission[];
 }
 

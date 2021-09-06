@@ -45,11 +45,35 @@ export default class AppController extends Controller {
     ).then(response => response.data);
   }
 
+  static updateAcceptList(enabled: boolean): Promise<boolean> {
+    if (debug()) return delay(enabled);
+
+    return this.client.patch(
+      `datamart/accept-list`, { enabled }
+    ).then(response => response.data);
+  }
+
   static getUser(): Promise<CanvasStudent> {
     if (debug()) return delay(MOCK_STUDENTS[0]);
 
     return this.client.get(
       `app/self`
+    ).then(response => response.data);
+  }
+
+  static getGoalGrade(): Promise<number> {
+    if (debug()) return Promise.resolve(8);
+
+    return this.client.get(
+      `goal-grade`
+    ).then(response => response.data);
+  }
+
+  static setGoalGrade(goalGrade: number): Promise<number> {
+    if (debug()) return Promise.resolve(goalGrade);
+
+    return this.client.post(
+      `goal-grade`, { goal_grade: goalGrade }
     ).then(response => response.data);
   }
 }

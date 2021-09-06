@@ -21,4 +21,12 @@ export default class ConsentController extends Controller {
       { granted: granted === null ? -1 : (granted ? 1 : 0) }
     );
   }
+
+  static isAccepted(): Promise<boolean> {
+    if (debug()) return Promise.resolve(true);
+
+    return this.client.get(
+      `/datamart/accept-list/self`
+    ).then(response => response.data);
+  }
 }

@@ -5,6 +5,7 @@ import Consent from "../common/Consent";
 import {store} from "../utils/configureStore";
 
 type IState = {
+  accepted: boolean;
   consentLoaded: boolean;
   consentGranted: boolean | null;
 }
@@ -13,21 +14,25 @@ export const withConsent = <P extends object>(Component: React.ComponentType<P>)
   class WithLoading extends React.Component<P, IState> {
 
     state = {
+      accepted: false,
       consentLoaded: false,
       consentGranted: false
     }
 
     componentDidMount(): void {
       ConsentController.fetchConsent().then(result => {
-        this.setState({
-          consentLoaded: true,
-          consentGranted: result === 1
+        ConsentController.isAccepted().then(accepted => {
+          this.setState({
+            accepted,
+            consentLoaded: true,
+            consentGranted: result === 1
+          });
         });
       });
     }
 
     render() {
-      const { consentLoaded, consentGranted } = this.state;
+      const { consentLoaded, consentGranted, accepted } = this.state;
 
       const { course } = store.getState();
 
@@ -35,6 +40,14 @@ export const withConsent = <P extends object>(Component: React.ComponentType<P>)
 
       if (!consentGranted && course.require_consent) {
         return <Consent text={course.text} />;
+      }
+
+      if (!accepted) {
+        return (
+          <div>
+            <h2>You are not authorized to use this application.</h2>
+          </div>
+        )
       }
 
       return <Component {...this.props as P} />;

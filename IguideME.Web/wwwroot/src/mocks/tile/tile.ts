@@ -51,5 +51,15 @@ export const MOCK_TILES: Tile[] = [
     "visible": true,
     "wildcard": false,
     "graph_view": false
+  }, {
+    "id": 6,
+    "group_id": 1,
+    "title": "Send in Questions",
+    "position": 5,
+    "content": "ENTRIES",
+    "type": "DISCUSSIONS",
+    "visible": true,
+    "wildcard": true,
+    "graph_view": false
   }
 ]

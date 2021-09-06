@@ -7,8 +7,24 @@ import Loading from "../../utils/Loading";
 import {CanvasStudent} from "../../../models/canvas/Student";
 import "./style.scss";
 import Swal from "sweetalert2";
+import {RootState} from "../../../store";
+import {CourseActions} from "../../../store/actions/course";
+import {connect, ConnectedProps} from "react-redux";
+import DataMartController from "../../../api/controllers/datamart";
+import AppController from "../../../api/controllers/app";
 
-export default class AcceptList extends Component<IProps, IState> {
+const mapState = (state: RootState) => ({
+  course: state.course,
+});
+
+const mapDispatch = {
+  loadCourse: () => CourseActions.loadCourse()
+}
+
+const connector = connect(mapState, mapDispatch)
+type PropsFromRedux = ConnectedProps<typeof connector>
+
+class AcceptList extends Component<PropsFromRedux & IProps, IState> {
 
   state = {
     loaded: false,
@@ -19,6 +35,15 @@ export default class AcceptList extends Component<IProps, IState> {
 
   componentDidMount(): void {
     StudentController.getStudents().then(students => this.setState({ students, loaded: true }));
+
+    DataMartController.getAcceptList().then(acceptList => {
+      this.setState({ accepted: acceptList.filter(x => x.accepted).map(x => x.student_login_id) });
+    });
+
+    const { course } = this.props;
+    if (course) {
+      this.setState({ enabled: course.accept_list });
+    }
   }
 
   isAccepted = (loginId: string) => {
@@ -49,7 +74,10 @@ export default class AcceptList extends Component<IProps, IState> {
               checkedChildren={<CheckOutlined />}
               unCheckedChildren={<CloseOutlined />}
               checked={enabled}
-              onChange={val => this.setState({ enabled: val })}
+              onChange={val => {
+                AppController.updateAcceptList(val).then(e =>
+                  this.setState({ enabled: e }, () => this.props.loadCourse()));
+              }}
             />
             &nbsp;
             If enabled only the students with explicit access may use the application. When disabled all enrolled students are able to use the application.
@@ -109,6 +137,19 @@ export default class AcceptList extends Component<IProps, IState> {
             </Button>
             <Button className={"successButtonStyle"}
                     disabled={!enabled}
+                    onClick={() => {
+                      DataMartController.createAcceptList(students.map(s => {
+                        return {
+                          student_login_id: s.login_id,
+                          accepted: accepted.includes(s.login_id)
+                        }
+                      })).then(list => {
+                        this.setState({
+                          accepted: list.filter(x => x.accepted).map(x => x.student_login_id)
+                        });
+                        Swal.fire('Configuration saved!', '', 'success')
+                      })
+                    }}
             >
               Save
             </Button>
@@ -140,3 +181,5 @@ export default class AcceptList extends Component<IProps, IState> {
     )
   }
 }
+
+export default connector(AcceptList);

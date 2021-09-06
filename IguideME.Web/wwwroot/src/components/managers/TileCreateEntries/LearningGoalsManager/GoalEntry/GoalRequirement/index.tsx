@@ -6,8 +6,8 @@ import {IProps} from "./types";
 import Swal from "sweetalert2";
 import {RootState} from "../../../../../../store";
 import {connect, ConnectedProps} from "react-redux";
-import "./style.scss";
 import TileController from "../../../../../../api/controllers/tile";
+import "./style.scss";
 
 const mapState = (state: RootState) => ({
   tiles: state.tiles,
@@ -28,14 +28,15 @@ class GoalRequirement extends Component<Props> {
   componentDidMount(): void {
     const { requirement } = this.props;
 
-    if (requirement.entry_id !== -1) {
-      this.loadMetaKeys(requirement.entry_id);
+    if (requirement.entry_id !== -1 && requirement.entry_id !== null) {
+      this.loadMetaKeys(requirement.entry_id as number);
     }
   }
 
   componentWillReceiveProps(nextProps: Readonly<Props>, nextContext: any): void {
-    if (nextProps.requirement.entry_id !== this.props.requirement.entry_id) {
-      this.loadMetaKeys(nextProps.requirement.entry_id);
+    if (nextProps.requirement.entry_id !== this.props.requirement.entry_id &&
+        !isNaN(nextProps.requirement.entry_id as number)) {
+      this.loadMetaKeys(nextProps.requirement.entry_id as number);
     }
 
     if (nextProps.requirement.entry_id === -1) {
@@ -57,9 +58,9 @@ class GoalRequirement extends Component<Props> {
 
   getExpressionLabel = (expression: "lte" | "gte" | "e" | null) => {
     switch (expression) {
-      case "lte": return "≤";
-      case "gte": return "≥";
-      case "e": return "=";
+      case "lte": return "≤ (less than)";
+      case "gte": return "≥ (greater than)";
+      case "e": return "= (equal to)";
       default: return "";
     }
   }
@@ -73,6 +74,18 @@ class GoalRequirement extends Component<Props> {
 
   render(): React.ReactNode {
     let { requirement, tiles, tileEntries } = this.props;
+
+    let entryOptions: {label: string, value: number | string }[] = tileEntries
+      .filter(e => e.tile_id === requirement.tile_id)
+      .map(e => ({ label: e.title, value: e.id }));
+
+    const targetTile = tiles.find(t => t.id === requirement.tile_id);
+    if (targetTile && targetTile.content === "BINARY") {
+      entryOptions = [
+        { value: 'count', label: 'COUNT (success)' },
+        ...entryOptions
+      ];
+    }
 
     return (
       <div className={"goalRequirement"}>
@@ -117,7 +130,9 @@ class GoalRequirement extends Component<Props> {
             Entry
             <Select value={{
                       value: requirement.entry_id,
-                      label: tileEntries.find(e => e.id === requirement.entry_id)?.title || "Choose entry"
+                      label: requirement.entry_id === "count" ?
+                        "COUNT (success)" :
+                        (tileEntries.find(e => e.id === requirement.entry_id)?.title || "Choose entry")
                     }}
                     isDisabled={requirement.tile_id === -1}
                     onChange={(e) => {
@@ -125,22 +140,21 @@ class GoalRequirement extends Component<Props> {
 
                       let r = JSON.parse(JSON.stringify(requirement));
                       r.entry_id = e.value;
+                      console.log("NEW R", r);
                       this.props.updateRequirement(r);
                     }}
-                    options={tileEntries
-                      .filter(e => e.tile_id === requirement.tile_id)
-                      .map(e => ({ label: e.title, value: e.id }))} />
+                    options={entryOptions} />
             <br />
             Meta
             <Select isLoading={this.state.loading}
-                    value={{ value: requirement.meta_key, label: this.getMetaKeyLabel(requirement.meta_key) }}
+                    value={{ value: requirement.meta_key || "", label: this.getMetaKeyLabel(requirement.meta_key || "") }}
                     onChange={e => {
                       if (!e) return;
                       let r = JSON.parse(JSON.stringify(requirement));
                       r.meta_key = e.value;
                       this.props.updateRequirement(r);
                     }}
-                    isDisabled={requirement.entry_id === -1}
+                    isDisabled={requirement.entry_id === -1 || requirement.entry_id === "count"}
                     options={[
                       { value: 'grade', label: 'Grade (default)' },
                       ...this.state.metaKeys.map(k => ({
@@ -160,9 +174,9 @@ class GoalRequirement extends Component<Props> {
                       this.props.updateRequirement(r);
                     }}
                     options={[
-                      { value: 'lte', label: '≤' },
-                      { value: 'e', label: '=' },
-                      { value: 'gte', label: '≥' }
+                      { value: 'lte', label: '≤ (less than)' },
+                      { value: 'e', label: '= (equal to)' },
+                      { value: 'gte', label: '≥ (greater than)' }
                     ]}
             />
           </Col>

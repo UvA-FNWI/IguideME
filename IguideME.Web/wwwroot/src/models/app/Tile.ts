@@ -34,5 +34,5 @@ export interface TileEntrySubmission {
   entry_id: number,
   grade: string,
   submitted?: string | null,
-  meta?: string | null | object
+  meta?: string | null | any
 }

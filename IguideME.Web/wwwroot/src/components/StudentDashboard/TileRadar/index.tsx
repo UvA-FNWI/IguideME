@@ -6,9 +6,8 @@ import { scaleLinear } from '@visx/scale';
 import { Group } from '@visx/group';
 import { Point } from '@visx/point';
 import { Line } from '@visx/shape';
-import "./style.scss";
-import tile from "../../../api/controllers/tile";
 import {Tile} from "../../../models/app/Tile";
+import "./style.scss";
 
 const silver = '#d9d9d9';
 const orange = '#ff9933';
@@ -72,7 +71,6 @@ export default class TileRadar extends Component<IProps> {
 
               return (
                 <svg width={`${100}%`} height={`${size.width || 0}px`}>
-
                   <rect width={`${size.width || 0}px`}
                         height={`${size.width || 0}px`}
                         fill={"#FAF7E9"}
@@ -107,7 +105,8 @@ export default class TileRadar extends Component<IProps> {
                               fill={'red'}
                               style={{ transition: 'opacity .4s ease-in-out', zIndex: 90 }}
                               onClick={() => {
-                                alert(point.tile!.title)
+                                window.dispatchEvent(new CustomEvent("selectTile", { detail: { tile: point.tile! } }))
+                                //alert(point.tile!.title)
                               }}
                       />
                     ))}
@@ -148,7 +147,8 @@ export default class TileRadar extends Component<IProps> {
                               fill={pumpkin}
                               style={{ zIndex: 100 }}
                               onClick={() => {
-                                alert(point.tile!.title)
+                                window.dispatchEvent(new CustomEvent("selectTile", { detail: { tile: point.tile! } }))
+                                //alert(point.tile!.title)
                               }}
                       />
                     ))}

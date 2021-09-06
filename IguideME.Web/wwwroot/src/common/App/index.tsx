@@ -9,6 +9,8 @@ import {CanvasStudent} from "../../models/canvas/Student";
 import UserController from "../../api/controllers/app";
 import {RootState} from "../../store";
 import {connect, ConnectedProps} from "react-redux";
+import Loading from "../../components/utils/Loading";
+import { Redirect } from "react-router-dom";
 
 const mapState = (state: RootState) => ({
   user: state.user,
@@ -20,20 +22,26 @@ type PropsFromRedux = ConnectedProps<typeof connector>;
 
 type Props = PropsFromRedux & UserDataProps;
 
-class App extends Component<Props, { student: CanvasStudent | null }> {
+class App extends Component<Props, { student: CanvasStudent | null, goalGrade: number | undefined }> {
 
-  state = { student: null }
+  state = { student: null, goalGrade: undefined }
 
   componentDidMount(): void {
     const { isAdmin } = this.props;
     if (!isAdmin) {
       UserController.getUser().then(student => this.setState({ student }));
+      UserController.getGoalGrade().then(goalGrade => this.setState({ goalGrade }));
+    } else {
+      this.setState({ goalGrade: 10 });
     }
   }
 
   render(): React.ReactNode {
     const { isAdmin } = this.props;
-    const { student } = this.state;
+    const { student, goalGrade } = this.state;
+
+    if (goalGrade === undefined) return <Loading />;
+    if (goalGrade === -1) return <Redirect to={'goal-grade'} />;
 
     return (
       <div id={"app"}>

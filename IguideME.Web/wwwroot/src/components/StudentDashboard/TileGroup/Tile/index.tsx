@@ -11,10 +11,39 @@ export default class Tile extends Component<IProps, IState> {
 
   state = { loaded: false }
 
-  render(): React.ReactNode {
-    const { tile, tileEntries, peerGrades, submissions, userGrades } = this.props;
-
+  getHeader = () => {
+    const { tile, tileEntries, submissions, userGrades, discussions, learningOutcomes } = this.props;
     const avg: number | null = getAverageGrade(userGrades);
+
+    if (tile.type === "DISCUSSIONS") {
+      return (
+        <span style={{textAlign: 'center'}}>
+          <strong>{ discussions.length }</strong> discussion{discussions.length != 1 && "s"}
+        </span>
+      );
+    } else if (tile.content === 'LEARNING_OUTCOMES') {
+      const success = learningOutcomes.filter(lo => lo.success).length;
+      return (
+        <span style={{textAlign: 'center'}}>
+          <strong>{ success }<small>/{ learningOutcomes.length }</small></strong> completed
+        </span>
+      );
+    } else if (tile.content !== 'PREDICTION') {
+      return (
+        <>
+          <Progress percent={getProgression(tile, tileEntries, submissions)} />
+          { avg && <GradeStatistic grade={avg!.toString()} /> }
+        </>
+      );
+    } else if (tile.content === "PREDICTION") {
+      return <GradeStatistic grade={avg ? avg!.toString() : "-"} />;
+    } else {
+      return null;
+    }
+  }
+
+  render(): React.ReactNode {
+    const { tile, peerGrades, userGrades } = this.props;
     return (
       <div className={"tile"}
            onClick={() => {
@@ -25,12 +54,7 @@ export default class Tile extends Component<IProps, IState> {
           <div className={"content"}>
             <h2>{ tile.title }</h2>
             <Space direction={"vertical"} style={{ width: '100%' }}>
-              { (tile.content !== 'PREDICTION') &&
-                <Progress percent={getProgression(tile, tileEntries, submissions)} />
-              }
-              { (tile.content !== 'BINARY') &&
-                avg ? <GradeStatistic grade={avg!.toString()} /> : null
-              }
+              { this.getHeader() }
             </Space>
           </div>
 

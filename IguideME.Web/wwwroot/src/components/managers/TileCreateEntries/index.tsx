@@ -10,8 +10,8 @@ import {connect, ConnectedProps} from "react-redux";
 import Loading from "../../utils/Loading";
 import DiscussionManager from "./DiscussionManager";
 import {message} from "antd";
-import "./style.scss";
 import LearningGoalsManager from "./LearningGoalsManager";
+import "./style.scss";
 
 const mapState = (state: RootState) => ({
   assignments: state.assignments,

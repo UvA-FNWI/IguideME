@@ -5,10 +5,12 @@ import EntryItem from "./EntryItem";
 import { ParentSize } from '@visx/responsive';
 import {Line} from "react-chartjs-2";
 import "./style.scss";
+import {CanvasDiscussion} from "../../../../models/canvas/Discussion";
 
 export default class EntriesList extends Component<{
   submissions: TileEntrySubmission[],
   tileEntries: TileEntry[],
+  discussions: CanvasDiscussion[],
   tile: Tile
 }> {
   render(): React.ReactNode {

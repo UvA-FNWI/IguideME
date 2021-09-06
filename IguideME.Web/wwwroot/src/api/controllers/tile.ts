@@ -6,7 +6,8 @@ import {MOCK_TILES} from "../../mocks/tile/tile";
 import {MOCK_TILE_GROUPS} from "../../mocks/tile/tileGroup";
 import {MOCK_TILE_ENTRIES} from "../../mocks/tile/tileEntry";
 import {delay} from "../../utils/mockRequest";
-import {LearningGoal} from "../../models/app/LearningGoal";
+import {LearningGoal, LearningOutcome} from "../../models/app/LearningGoal";
+import {CanvasDiscussion} from "../../models/canvas/Discussion";
 
 export default class TileController extends Controller {
 
@@ -15,6 +16,26 @@ export default class TileController extends Controller {
 
     return this.client.get(
       `submissions`
+    ).then(response => response.data);
+  }
+
+  static getDiscussions(tileId: number, studentLoginId: string): Promise<CanvasDiscussion[]> {
+    if (debug()) {
+        return Promise.resolve([]);
+    }
+
+    return this.client.get(
+      `tiles/${tileId}/discussions/${studentLoginId}`
+    ).then(response => response.data);
+  }
+
+  static getUserGoals(tileId: number, studentLoginId: string): Promise<LearningOutcome[]> {
+    if (debug()) {
+      return Promise.resolve([]);
+    }
+
+    return this.client.get(
+      `tiles/${tileId}/learning-outcomes/${studentLoginId}`
     ).then(response => response.data);
   }
 

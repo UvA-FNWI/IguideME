@@ -6,7 +6,18 @@ import "./style.scss";
 export default class TileGroup extends Component<IProps> {
 
   render(): React.ReactNode {
-    const { tileGroup, tileEntries, tiles, student, tilesGradeSummary, peerGrades, submissions } = this.props;
+    const {
+      tileGroup,
+      tileEntries,
+      tiles,
+      student,
+      tilesGradeSummary,
+      peerGrades,
+      submissions,
+      discussions,
+      learningOutcomes
+    } = this.props;
+
     return (
       <div className={`tileGroup`}>
         <h2>{ tileGroup.title }</h2>
@@ -16,12 +27,14 @@ export default class TileGroup extends Component<IProps> {
             return (
               <Tile tile={t}
                     tileEntries={tileEntries.filter(e => e.tile_id === t.id)}
+                    discussions={discussions}
                     student={student}
                     submissions={submissions.filter(
                       s => tileEntries.filter(e => e.tile_id === t.id).map(x => x.id)
                         .includes(s.entry_id))}
                     userGrades={tilesGradeSummary.filter(tgs => tgs.tile.id === t.id)}
-                    peerGrades={peerGrades.filter(pg => pg.tileID === t.id)} />
+                    peerGrades={peerGrades.filter(pg => pg.tileID === t.id)}
+                    learningOutcomes={learningOutcomes} />
             );
           })}
         </div>

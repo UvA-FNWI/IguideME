@@ -13,6 +13,7 @@ export default class LearningGoalsManager extends Component<IProps, IState> {
 
     this.props.setGoals([
       { id: generateUniqueID(goals.map(g => g.id)),
+        new: true,
         tile_id: tile ? tile.id : -1,
         title: "",
         requirements: []

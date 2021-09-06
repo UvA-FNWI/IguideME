@@ -16,6 +16,8 @@ import "./style.scss";
 import {DataMartActions} from "../../store/actions/datamart";
 import {PredictedGrade} from "../../models/app/PredictiveModel";
 import UserProfile from "./UserProfile";
+import {CanvasDiscussion} from "../../models/canvas/Discussion";
+import {LearningGoal, LearningOutcome} from "../../models/app/LearningGoal";
 
 const compute = require('compute.io');
 
@@ -43,6 +45,8 @@ class StudentDashboard extends Component<Props, IState> {
     userSubmissions: [],
     loaded: true,
     displayTile: undefined,
+    discussions: [],
+    learningOutcomes: [],
     viewType: "radar" as ViewTypes
   }
 
@@ -69,15 +73,32 @@ class StudentDashboard extends Component<Props, IState> {
     }
   }
 
-  setup = (props: Props, propPredictions: PredictedGrade[] = []) => {
+  setup = async (props: Props, propPredictions: PredictedGrade[] = []) => {
     const { tiles, student, tileEntries, predictions } = props;
     if (!student) return;
 
     this.setState({ loaded: false });
 
+    let discussions: CanvasDiscussion[] = [];
+    let goals: LearningOutcome[] = [];
+
+    for (const tile of tiles.filter(t => t.type === "DISCUSSIONS")) {
+      const discussion_result: CanvasDiscussion[] =
+        await TileController.getDiscussions(tile.id, student.login_id).then(d => d);
+      discussions.push(...discussion_result);
+    }
+
+    for (const tile of tiles.filter(t => t.content === "LEARNING_OUTCOMES")) {
+      const goal_result: any =
+        await TileController.getUserGoals(tile.id, student.login_id).then(g => g);
+
+      goals.push(...goal_result);
+    }
+
     TileController.getSubmissions(student.login_id).then(userSubmissions => {
       let data = tiles.filter(
-        t => t.content !== "PREDICTION" && t.content !== "LEARNING_OUTCOMES"
+        t => t.content !== "PREDICTION" && t.content !== "LEARNING_OUTCOMES" &&
+          t.type !== "DISCUSSIONS"
       ).map(t => {
         return {
           tile: t,
@@ -118,6 +139,8 @@ class StudentDashboard extends Component<Props, IState> {
       }
 
       this.setState({
+        discussions,
+        learningOutcomes: goals,
         tilesGradeSummary: data,
         userSubmissions
       }, () => {
@@ -135,7 +158,9 @@ class StudentDashboard extends Component<Props, IState> {
       viewType,
       tilesGradeSummary,
       peerGrades,
-      userSubmissions
+      userSubmissions,
+      discussions,
+      learningOutcomes
     } = this.state;
 
     const { tiles, tileGroups, dashboardColumns, tileEntries, student, predictions } = this.props;
@@ -144,8 +169,10 @@ class StudentDashboard extends Component<Props, IState> {
     if (displayTile) {
       return <TileDetail tile={(displayTile as any).tile}
                          tileEntries={tileEntries}
+                         discussions={discussions}
                          predictions={predictions}
                          submissions={userSubmissions}
+                         learningOutcomes={learningOutcomes}
       />
     }
 
@@ -171,6 +198,7 @@ class StudentDashboard extends Component<Props, IState> {
                       .map((tg: TileGroupModel) =>
                         <TileGroup tileGroup={tg}
                                    tiles={tiles.filter((t: Tile) => t.group_id === tg.id)}
+                                   discussions={discussions}
                                    tileEntries={tileEntries.filter(e => tiles.filter(
                                      (t: Tile) => t.group_id === tg.id).map(x => x.id).includes(e.tile_id))}
                                    student={student}
@@ -178,6 +206,7 @@ class StudentDashboard extends Component<Props, IState> {
                                      (tgs: TilesGradeSummary) => tgs.tile.group_id === tg.id)}
                                    peerGrades={peerGrades}
                                    submissions={userSubmissions}
+                                   learningOutcomes={learningOutcomes}
                         />
                       )
                     }

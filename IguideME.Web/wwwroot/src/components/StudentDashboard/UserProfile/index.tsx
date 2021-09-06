@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import {Link} from "react-router-dom";
-import {Col, Divider, Row} from "antd";
+import {Button, Col, Divider, Row} from "antd";
 import {TrophyOutlined, RiseOutlined, WarningOutlined} from "@ant-design/icons";
 import {RootState} from "../../../store";
 import {connect, ConnectedProps} from "react-redux";
@@ -74,6 +74,14 @@ class UserProfile extends Component<Props, IState> {
     return (
       <div id={"userProfile"}>
         <Row>
+          <Col xs={24} style={{textAlign: 'center'}}>
+            <Link to={'/goal-grade'}>
+              <Button size={"large"} color={"primary"}>
+                Goal Grade
+              </Button>
+            </Link>
+          </Col>
+
           <Col xs={24} md={8} lg={6}>
             <h3>{ student && student.name }</h3>
             <strong>{ course && course.course_name }</strong>
@@ -116,8 +124,6 @@ class UserProfile extends Component<Props, IState> {
 
             <div style={{textAlign: 'right'}}>
               <Link to={'/consent'}>Informed Consent</Link>
-              {' '}&middot;{' '}
-              <Link to={'/goal-grade'}>Goal Grade</Link>
             </div>
           </Col>
         </Row>

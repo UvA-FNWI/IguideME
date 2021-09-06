@@ -37,46 +37,57 @@ export default class GradePrediction extends Component<{
     const sortedPredictions = predictions.sort(
       (a, b) => a.graded_components - b.graded_components);
 
-    const data = {
-      labels: sortedPredictions.map((pg) => pg.graded_components + " graded components"),
-      datasets: [
-        {
-          label: "Predicted grade",
-          type: "line",
-          backgroundColor: "rgb(90, 50, 255)",
-          borderColor: "rgb(90, 50, 255)",
-          hoverBorderColor: "rgb(90, 50, 255)",
-          fill: false,
-          tension: 0,
-          data: sortedPredictions.map(sp => round(sp.grade)),
-          yAxisID: 'y',
-          xAxisID: 'x'
-        },
-        {
-          label: "UpperConfidence",
-          type: "line",
-          backgroundColor: "rgb(90, 50, 255, 0.4)",
-          borderColor: "transparent",
-          pointRadius: 0,
-          fill: 0,
-          tension: 0,
-          data: sortedPredictions.map((sp, i) => sp.grade + errors[i + 3]),
-          yAxisID: 'y',
-          xAxisID: 'x'
-        },
-        {
-          label: "LowerConfidence",
-          type: "line",
-          backgroundColor: "rgb(90, 50, 255, 0.4)",
-          borderColor: "transparent",
-          pointRadius: 0,
-          fill: 0,
-          tension: 0,
-          data: sortedPredictions.map((sp, i) => sp.grade - errors[i + 3]),
-          yAxisID: 'y',
-          xAxisID: 'x'
-        }
-      ]
+    const data = (canvas: any) => {
+      const ctx = canvas.getContext("2d")
+      const gradient1 = ctx.createLinearGradient(0,0,0,350);
+      gradient1.addColorStop(0, "#FFF");
+      gradient1.addColorStop(1, "rgb(90, 50, 255)");
+
+      const gradient2 = ctx.createLinearGradient(0,0,0,350);
+      gradient2.addColorStop(1, "#FFF");
+      gradient2.addColorStop(0, "rgb(90, 50, 255)");
+
+      return {
+        labels: sortedPredictions.map((pg) => pg.graded_components + " graded components"),
+        datasets: [
+          {
+            label: "Predicted grade",
+            type: "line",
+            backgroundColor: "rgb(90, 50, 255)",
+            borderColor: "rgb(90, 50, 255)",
+            hoverBorderColor: "rgb(90, 50, 255)",
+            fill: false,
+            tension: 0,
+            data: sortedPredictions.map(sp => round(sp.grade)),
+            yAxisID: 'y',
+            xAxisID: 'x'
+          },
+          {
+            label: "UpperConfidence",
+            type: "line",
+            backgroundColor: gradient1,
+            borderColor: "transparent",
+            pointRadius: 0,
+            fill: 0,
+            tension: 0,
+            data: sortedPredictions.map((sp, i) => sp.grade + errors[i + 3]),
+            yAxisID: 'y',
+            xAxisID: 'x'
+          },
+          {
+            label: "LowerConfidence",
+            type: "line",
+            backgroundColor: gradient2,
+            borderColor: "transparent",
+            pointRadius: 0,
+            fill: 0,
+            tension: 0,
+            data: sortedPredictions.map((sp, i) => sp.grade - errors[i + 3]),
+            yAxisID: 'y',
+            xAxisID: 'x'
+          }
+        ]
+      }
     };
 
     return (
