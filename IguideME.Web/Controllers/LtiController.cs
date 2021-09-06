@@ -38,7 +38,7 @@ namespace IguideME.Web.Controllers
             var claims = new List<Claim> {
                 new Claim("user_name", formdata["lis_person_name_full"]),
                 new Claim("user_id", formdata["custom_canvas_user_id"]),
-                new Claim("user", formdata["custom_canvas_user_login_id"]),
+                new Claim("user", formdata["lis_person_sourcedid"]),
                 new Claim("course", formdata["custom_canvas_course_id"]),
                 new Claim("roles", formdata["roles"]),
                 new Claim(ClaimTypes.Role, formdata["roles"].ToString().ToLower().Contains("instructor") ? "instructor" : "student")

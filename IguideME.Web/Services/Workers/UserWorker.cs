@@ -19,6 +19,8 @@ namespace IguideME.Web.Services.Workers
 
         public void Register()
         {
+			Console.WriteLine("Start user sync");
+
 			var students = this.canvasTest.GetStudents(this.courseID);
 
 			Console.WriteLine("Starting student registry...");
@@ -35,7 +37,7 @@ namespace IguideME.Web.Services.Workers
 				DatabaseManager.Instance.RegisterUser(
 					courseID,
 					student.ID,
-					student.LoginID,
+					student.SISUserID,
 					student.SISUserID,
 					student.Name,
 					student.SortableName,
@@ -54,7 +56,7 @@ namespace IguideME.Web.Services.Workers
 				DatabaseManager.Instance.RegisterUser(
 					courseID,
 					instructor.ID,
-					instructor.LoginID,
+					instructor.SISUserID,
 					instructor.SISUserID,
 					instructor.Name,
 					instructor.SortableName,
