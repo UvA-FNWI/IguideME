@@ -825,6 +825,7 @@
         FROM        `goal_grade`
         WHERE       `course_id`={0}
         AND         `user_login_id`='{1}'
+        AND         `grade` IS NOT NULL
         LIMIT       1;";
 
     public const string QUERY_USER_SUBMISSIONS_FOR_ENTRY =

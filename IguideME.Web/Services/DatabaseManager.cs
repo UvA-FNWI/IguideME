@@ -491,7 +491,10 @@ namespace IguideME.Web.Services
 
             SQLiteDataReader r = Query(query);
             if (!r.Read()) return -1;
-            return r.GetInt32(0);
+            else
+            {
+                return Convert.ToInt32(r.GetValue(0).ToString());
+            }
         }
 
         public void CreateUserPeer(
@@ -884,11 +887,13 @@ namespace IguideME.Web.Services
                     });
                     completed.Add(current);
                 }
+
+
                 PeerComparisonData learningOutcomes = new PeerComparisonData(
                     tile.ID,
-                    (float)completed.Average(),
-                    completed.Min(),
-                    completed.Max()
+                    completed.Count() > 0 ? (float)completed.Average() : 0,
+                    completed.Count() > 0 ? completed.Min() : 0,
+                    completed.Count() > 0 ? completed.Max() : 0
                 );
                 submissions.Add(learningOutcomes);
             }
