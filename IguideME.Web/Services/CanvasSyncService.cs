@@ -31,7 +31,6 @@ namespace IguideME.Web.Services
 			CancellationToken cancellationToken)
 		{
 			var result = new JobResultModel();
-			Console.WriteLine(work.CourseID);
 			var courseID = 25503;
 
 			string characters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
