@@ -916,7 +916,7 @@
 	    AND	        `tile`.`content_type` != 'LEARNING_OUTCOMES'
 	    AND	        `tile`.`content_type` != 'PREDICTION'
         AND	        `tile`.`tile_type` != 'DISCUSSIONS'
-	    AND	        `tile`.`id`=`tile_entry`.`id`
+	    AND	        `tile`.`id`=`tile_entry`.`tile_id`
         AND         `layout_column`.`course_id`={0}
         AND         `layout_tile_group`.`column_id`=`layout_column`.`id`
         AND         `layout_tile_group`.`id`=`tile`.`group_id`

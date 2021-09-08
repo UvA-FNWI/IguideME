@@ -38,7 +38,7 @@ namespace IguideME.Web.Services.Workers
 										0,
 										this.CourseID,
 										(int)student.ID,
-										student.LoginID,
+										student.SisID,
 										student.SisID,
 										student.Name,
 										student.SortableName,
