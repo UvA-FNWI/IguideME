@@ -1,4 +1,5 @@
 ﻿using System;
+using Newtonsoft.Json;
 
 namespace IguideME.Web.Services.Workers
 {
@@ -26,17 +27,18 @@ namespace IguideME.Web.Services.Workers
 			Console.WriteLine("Starting assignment registry...");
 			foreach (var assignment in assignments)
 			{
+				if (assignment == null) continue;
 				Console.WriteLine("\t" + assignment.Name);
 
 				DatabaseManager.Instance.RegisterAssignment(
 					assignment.ID,
 					assignment.CourseID,
-					assignment.Name,
+					assignment.Name ??= "?",
 					assignment.IsPublished,
 					assignment.IsMuted,
 					assignment.DueDate.HasValue ? assignment.DueDate.Value.ToShortDateString() : "",
-					assignment.PointsPossible,
-					assignment.Position,
+					assignment.PointsPossible ??= 0,
+					assignment.Position ??= 0,
 					assignment.SubmissionType,
 					hashCode
 				);
@@ -45,10 +47,9 @@ namespace IguideME.Web.Services.Workers
 				foreach (var submission in submissions)
 				{
 					// don't register data from students that did not give consent
-					if (DatabaseManager.Instance.GetConsent(this.courseID, submission.User.LoginID) != 1)
+					if (DatabaseManager.Instance.GetConsent(this.courseID, submission.User.SISUserID) != 1)
 						continue;
 
-					Console.WriteLine("\t\t" + submission.User.Name);
 					// only register graded submissions
 					if (submission.Grade == null) continue;
 
@@ -56,13 +57,13 @@ namespace IguideME.Web.Services.Workers
 					var entry = entries.Find(e => e.Title == assignment.Name);
 					if (entry != null)
                     {
-						DatabaseManager.Instance.CreateUserSubmission(
-							this.courseID,
-							entry.ID,
-							submission.User.LoginID,
-							submission.Grade,
-							submission.SubmittedAt.Value.ToShortDateString(),
-							this.hashCode);
+							DatabaseManager.Instance.CreateUserSubmission(
+								this.courseID,
+								entry.ID,
+								submission.User.SISUserID,
+								submission.Grade,
+								"",//submission.SubmittedAt.Value.ToShortDateString(),
+								this.hashCode);
 					}
 				}
 
