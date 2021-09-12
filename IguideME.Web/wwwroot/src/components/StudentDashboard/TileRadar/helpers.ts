@@ -49,7 +49,7 @@ export const genPolygonPoints = (
     const xVal = getScale(getValue(tilesGradeSummary[i - 1]), tilesGradeSummary[i - 1].tile) * Math.sin(i * step);
     const yVal = getScale(getValue(tilesGradeSummary[i - 1]), tilesGradeSummary[i - 1].tile) * Math.cos(i * step);
     points[i - 1] = { x: xVal, y: yVal, tile: tilesGradeSummary[i - 1].tile };
-    res += `${xVal},${yVal} `;
+    res += `${xVal || 0},${yVal || 0} `;
     return res;
   });
 

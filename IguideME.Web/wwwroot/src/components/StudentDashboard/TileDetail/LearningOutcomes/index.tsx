@@ -23,11 +23,15 @@ export default class LearningOutcomes extends Component<{
     return (
       <div id={"learningOutcomes"}>
         <div style={{margin: "0 auto", maxWidth: '400px', width: '100%'}}>
-          { learningOutcomes.map(lo => {
+          { learningOutcomes.map((lo, i) => {
             return (
               <div style={{margin: "5px 0"}}>
                 <Badge.Ribbon text={lo.success ? "Completed" : "Not completed"} color={lo.success ? "green" : "red"}>
-                  <Card title={lo.goal.title} size="small">
+                  <Card title={`Goal ${i}`} size="small">
+                    <strong>
+                      {lo.goal.title}
+                    </strong>
+                    <br />
                     {lo.goal.requirements.map(r => {
                       const entry = tileEntries.find(e => e.id === r.entry_id);
 
