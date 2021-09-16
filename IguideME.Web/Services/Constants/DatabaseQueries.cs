@@ -895,15 +895,15 @@
     public const string QUERY_USER_PEER_GRADES =
         @"SELECT   `tile`.`id`,
 	    CASE `tile`.`content_type` 
-            WHEN 'BINARY' THEN  AVG(`grade`) * 10
+            WHEN 'BINARY' THEN  AVG(`grade`) * 100
             ELSE                AVG(`grade`)
        	END average,
 	    CASE `tile`.`content_type` 
-            WHEN 'BINARY' THEN  MIN(`grade`) * 10
+            WHEN 'BINARY' THEN  MIN(`grade`) * 100
             ELSE                MIN(`grade`)
        	END minimum,
 	    CASE `tile`.`content_type` 
-            WHEN 'BINARY' THEN  MAX(`grade`) * 10
+            WHEN 'BINARY' THEN  MAX(`grade`) * 100
             ELSE                MAX(`grade`)
        	END maximum
         FROM        `tile_entry_submission`,
@@ -983,6 +983,18 @@
                             `submitted`,
                             `sync_hash` ) 
         VALUES({0}, '{1}', '{2}', '{3}', '{4}');";
+
+    public const string RECYCLE_EXTERNAL_DATA =
+        @"UPDATE   `tile_entry_submission` 
+          SET      `sync_hash`='{1}'
+          WHERE    `entry_id` IN (
+            SELECT  `tile_entry`.`id`
+            FROM    `tile`, `tile_entry`, `layout_tile_group`
+            WHERE   `layout_tile_group`.`course_id`={0}
+            AND     `layout_tile_group`.`id`=`tile`.`group_id`
+            AND     `tile`.`id`=`tile_entry`.`tile_id`
+            AND     `tile`.`tile_type`='EXTERNAL_DATA'
+          );";
 
     public const string CREATE_SUBMISSION_META =
         @"INSERT INTO   `tile_entry_submission_meta`

@@ -751,6 +751,12 @@ namespace IguideME.Web.Services
                     text));
         }
 
+        public void RecycleExternalData(int courseID, string hash)
+        {
+            NonQuery(String.Format(
+                DatabaseQueries.RECYCLE_EXTERNAL_DATA, courseID, hash));
+        }
+
         public void UpdateCoursePeerGroups(
             int courseID,
             int groupSize,

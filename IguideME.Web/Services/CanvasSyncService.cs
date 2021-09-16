@@ -81,6 +81,8 @@ namespace IguideME.Web.Services
 				jobId, $"tasks.done", 0
 			).ConfigureAwait(false);
 
+			DatabaseManager.Instance.RecycleExternalData(courseID, hashCode);
+
 			long duration = sw.ElapsedMilliseconds;
 			Console.WriteLine("Took: " + duration.ToString() + "ms");
 			DatabaseManager.Instance.CompleteSync(hashCode);
