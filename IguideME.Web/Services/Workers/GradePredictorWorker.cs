@@ -63,149 +63,150 @@ namespace IguideME.Web.Services.Workers
                 .GetEntries(this.CourseID);
 
             foreach (User student in students)
-            {
-                try
+            {    
+                List<TileEntrySubmission> userSubmissions =
+                    submissions.Where(s => s.UserLoginID == student.LoginID)
+                    .ToList();
+
+                HashSet<string> registry = new HashSet<string>();
+
+                /*
+                if (userSubmissions.All(s => s.Submitted != null))
                 {
-                    Console.WriteLine(student.Name);
-                    List<TileEntrySubmission> userSubmissions =
-                        submissions.Where(s => s.UserLoginID == student.LoginID)
+                    userSubmissions = userSubmissions
+                        .OrderBy(s => s.Submitted)
                         .ToList();
+                }
+                */
 
-                    HashSet<string> registry = new HashSet<string>();
-
-                    if (userSubmissions.All(s => s.Submitted != null))
+                userSubmissions.ForEach(s =>
+                {
+                    TileEntry entry = tileEntries.Find(e => e.ID == s.EntryID);
+                    if (entry != null)
                     {
-                        userSubmissions = userSubmissions
-                            .OrderBy(s => s.Submitted)
-                            .ToList();
-                    }
-
-                    userSubmissions.ForEach(s =>
-                    {
-                        TileEntry entry = tileEntries.Find(e => e.ID == s.EntryID);
                         Tile tile = tiles.Find(t => t.ID == entry.TileID);
 
-                        if (tile.ContentType == "BINARY")
+                        if (tile != null)
                         {
-                            registry.Add(tile.ID.ToString());
+                            if (tile.ContentType == "BINARY")
+                                registry.Add(tile.ID.ToString());
+                            else
+                                registry.Add(tile.ID.ToString(tile.ID.ToString() + "-" + entry.ID.ToString()));
                         }
-                        else
-                        {
-                            registry.Add(tile.ID.ToString(tile.ID.ToString() + "-" + entry.ID.ToString()));
-                        }
-                    });
+                    }
+                });
 
-                    // todo: add discussions
+                // todo: add discussions
 
-                    string modelKey = String.Join('#', registry.OrderBy(r => r));
+                string modelKey = String.Join('#', registry.OrderBy(r => r));
 
-                    for (int i = registry.Count; i > 2; i--)
+                for (int i = registry.Count; i > 2; i--)
+                {
+                    PredictiveModel bestModel =
+                        this.FindBestModel(registry.Take(i).ToHashSet());
+
+                    bool okModel = true;
+
+                    // If no model was found the instructor is probably at fault
+                    if (bestModel != null)
                     {
-                        PredictiveModel bestModel =
-                            this.FindBestModel(registry.Take(i).ToHashSet());
+                        bestModel.LoadThetas();
 
-                        bool okModel = true;
+                        if (bestModel.Theta.Count() != i + 1) continue;
 
-                        // If no model was found the instructor is probably at fault
-                        if (bestModel != null)
+                        float intercept = bestModel.Theta
+                            .ToList().Find(t => t.Intercept).Value;
+
+                        List<float> factors = new List<float>();
+
+                        foreach (ModelTheta theta in bestModel.Theta)
                         {
-                            bestModel.LoadThetas();
+                            Tile tile = tiles.Find(t => t.ID == theta.TileID);
+                            if (tile == null) continue;
 
-                            if (bestModel.Theta.Count() != i + 1) continue;
-
-                            float intercept = bestModel.Theta
-                                .ToList().Find(t => t.Intercept).Value;
-
-                            List<float> factors = new List<float>();
-
-                            foreach (ModelTheta theta in bestModel.Theta)
+                            switch (tile.ContentType)
                             {
-                                Tile tile = tiles.Find(t => t.ID == theta.TileID);
-                                if (tile == null) continue;
-
-                                switch (tile.ContentType)
-                                {
-                                    case Tile.CONTENT_TYPE_BINARY:
-                                        /**
-                                         * Binary tiles
-                                         * 
-                                         * Binary prediction components require the
-                                         * sum of the successes for all entries in 
-                                         * the tile
-                                         **/
-                                        List<TileEntrySubmission> binarySubmissions =
-                                            userSubmissions.Where(s =>
-                                            {
-                                                List<TileEntry> entries = tileEntries.Where(
-                                                    e => e.TileID == tile.ID).ToList();
-
-                                                return entries.Any(e => s.EntryID == e.ID);
-                                            }).ToList();
-
-                                        int success = (binarySubmissions.Where(
-                                            s =>
-                                            {
-                                                float parsedGrade;
-                                                if (float.TryParse(s.Grade, out parsedGrade))
-                                                {
-                                                    return parsedGrade > .8;
-
-                                                }
-
-                                                return false;
-                                            }).Count() / binarySubmissions.Count()) * 100;
-
-                                        float binaryResult = success * theta.Value;
-                                        factors.Add(binaryResult);
-                                        break;
-                                    case Tile.CONTENT_TYPE_ENTRIES:
-                                        /**
-                                         * Entry tiles
-                                         * 
-                                         * Tiles with the entries content type simply
-                                         * use the grade of the submission
-                                         **/
-
-                                        if (tile.TileType == Tile.TYPE_DISCUSSIONS)
+                                case Tile.CONTENT_TYPE_BINARY:
+                                    /**
+                                        * Binary tiles
+                                        * 
+                                        * Binary prediction components require the
+                                        * sum of the successes for all entries in 
+                                        * the tile
+                                        **/
+                                    List<TileEntrySubmission> binarySubmissions =
+                                        userSubmissions.Where(s =>
                                         {
-                                            continue;
-                                        }
-                                        else
-                                        {
-                                            TileEntrySubmission submission =
-                                                userSubmissions.Find(
-                                                    s => s.EntryID == theta.EntryID);
+                                            List<TileEntry> entries = tileEntries.Where(
+                                                e => e.TileID == tile.ID).ToList();
 
+                                            return entries.Any(e => s.EntryID == e.ID);
+                                        }).ToList();
+
+                                    int success = (binarySubmissions.Where(
+                                        s =>
+                                        {
                                             float parsedGrade;
-                                            if (float.TryParse(submission.Grade, out parsedGrade))
+                                            if (float.TryParse(s.Grade, out parsedGrade))
                                             {
-                                                float assignmentEntryResult = parsedGrade * theta.Value;
-                                                factors.Add(assignmentEntryResult);
-                                            }
-                                            else { okModel = false; }
-                                        }
-                                        break;
-                                    default:
-                                        break;
-                                }
-                            }
+                                                return parsedGrade > .8;
 
-                            if (okModel)
-                            {
-                                // todo: register predicted grade
-                                float predictedGrade = intercept + factors.Sum();
-                                Console.WriteLine(i.ToString() + ": " + predictedGrade.ToString() + " -> " + factors.Count().ToString());
-                                DatabaseManager.Instance.CreatePredictedGrade(
-                                    this.CourseID,
-                                    student.LoginID,
-                                    predictedGrade,
-                                    factors.Count(),
-                                    this.SyncHash);
+                                            }
+
+                                            return false;
+                                        }).Count() / binarySubmissions.Count()) * 100;
+
+                                    float binaryResult = success * theta.Value;
+                                    factors.Add(binaryResult);
+                                    break;
+                                case Tile.CONTENT_TYPE_ENTRIES:
+                                    /**
+                                        * Entry tiles
+                                        * 
+                                        * Tiles with the entries content type simply
+                                        * use the grade of the submission
+                                        **/
+
+                                    if (tile.TileType == Tile.TYPE_DISCUSSIONS)
+                                    {
+                                        continue;
+                                    }
+                                    else
+                                    {
+                                        TileEntrySubmission submission =
+                                            userSubmissions.Find(
+                                                s => s.EntryID == theta.EntryID);
+
+                                        float parsedGrade;
+                                        if (float.TryParse(submission.Grade, out parsedGrade))
+                                        {
+                                            float assignmentEntryResult = parsedGrade * theta.Value;
+                                            factors.Add(assignmentEntryResult);
+                                        }
+                                        else { okModel = false; }
+                                    }
+                                    break;
+                                default:
+                                    break;
                             }
+                        }
+
+                        if (okModel)
+                        {
+                            // todo: register predicted grade
+                            float predictedGrade = intercept + factors.Sum();
+                            Console.WriteLine(i.ToString() + ": " + predictedGrade.ToString() + " -> " + factors.Count().ToString());
+                            DatabaseManager.Instance.CreatePredictedGrade(
+                                this.CourseID,
+                                student.LoginID,
+                                predictedGrade,
+                                factors.Count(),
+                                this.SyncHash);
                         }
                     }
                 }
-                catch (Exception e) { }
+                
+                
             }
         }
     }
