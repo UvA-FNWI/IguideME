@@ -30,6 +30,8 @@ export default class EntryItem extends Component<{
                 title: 'Key',
                 dataIndex: 'label',
                 key: 'label',
+                width: '40%',
+                ellipsis: true
               },
               {
                 title: 'Value',

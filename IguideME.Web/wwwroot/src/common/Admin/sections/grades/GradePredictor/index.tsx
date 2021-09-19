@@ -12,7 +12,8 @@ export default class GradePredictor extends Component<IProps, IState> {
 
   state = {
     loaded: false,
-    models: []
+    models: [],
+    openConfigure: false
   }
 
   componentDidMount(): void {
@@ -22,23 +23,23 @@ export default class GradePredictor extends Component<IProps, IState> {
   }
 
   render(): React.ReactNode {
-    const { models, loaded } = this.state;
+    const { models, loaded, openConfigure } = this.state;
 
     if (!loaded) return <Loading small={false} />;
 
     return (
       <Admin menuKey={"gradePredictor"}>
         <h1>Grade Predictor</h1>
-        <span>Configure a predictive model</span>
+        <span onClick={() => this.setState({ openConfigure: true })}>Configure a predictive model</span>
         <Divider />
 
-        { models.length > 0 ?
+        { (models.length > 0 || openConfigure) ?
           <ParentSize>
             { parent => (
               <ModelResults models={models} width={parent.width} height={500} />
             )}
           </ParentSize> :
-          <ConfigureModel setModels={(models) => this.setState({ models })} />
+          <ConfigureModel setModels={(models) => this.setState({ models, openConfigure: false })} />
         }
       </Admin>
     )
