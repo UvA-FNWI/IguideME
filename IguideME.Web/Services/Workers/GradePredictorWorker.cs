@@ -197,15 +197,18 @@ namespace IguideME.Web.Services.Workers
 
                         if (okModel)
                         {
-                            // todo: register predicted grade
                             float predictedGrade = intercept + factors.Sum();
-                            Console.WriteLine(i.ToString() + ": " + predictedGrade.ToString() + " -> " + factors.Count().ToString());
-                            DatabaseManager.Instance.CreatePredictedGrade(
-                                this.CourseID,
-                                student.LoginID,
-                                predictedGrade,
-                                factors.Count(),
-                                this.SyncHash);
+
+                            if (predictedGrade > 3)
+                            {
+                                DatabaseManager.Instance.CreatePredictedGrade(
+                                    this.CourseID,
+                                    student.LoginID,
+                                    predictedGrade,
+                                    factors.Count(),
+                                    this.SyncHash);
+                            }
+                           
                         }
                     }
                 }
