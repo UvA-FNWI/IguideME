@@ -105,6 +105,8 @@ namespace IguideME.Web.Services.Workers
                     PredictiveModel bestModel =
                         this.FindBestModel(registry.Take(i).ToHashSet());
 
+                    if (bestModel == null) continue;
+
                     bool okModel = true;
 
                     // If no model was found the instructor is probably at fault
@@ -176,6 +178,8 @@ namespace IguideME.Web.Services.Workers
                                         TileEntrySubmission submission =
                                             userSubmissions.Find(
                                                 s => s.EntryID == theta.EntryID);
+
+                                        if (submission == null) continue;
 
                                         float parsedGrade;
                                         if (float.TryParse(submission.Grade, out parsedGrade))
