@@ -39,6 +39,8 @@ namespace IguideME.Web.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult UploadModel([FromBody] PredictiveModel[] models)
         {
+            DatabaseManager.Instance.DeletePredictiveModels(GetCourseID());
+
             foreach (PredictiveModel model in models)
             {
                 int modelID = DatabaseManager.Instance.CreatePredictiveModel(

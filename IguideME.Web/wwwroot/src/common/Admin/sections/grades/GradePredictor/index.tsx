@@ -33,7 +33,7 @@ export default class GradePredictor extends Component<IProps, IState> {
         <span onClick={() => this.setState({ openConfigure: true })}>Configure a predictive model</span>
         <Divider />
 
-        { (models.length > 0 || openConfigure) ?
+        { (openConfigure ? false : models.length > 0) ?
           <ParentSize>
             { parent => (
               <ModelResults models={models} width={parent.width} height={500} />
