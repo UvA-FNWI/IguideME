@@ -69,6 +69,11 @@ namespace IguideME.Web.Services.Workers
 
 						var peerIDs = peers.Select(p => p.LoginID);
 
+						var peerGrades1 = DatabaseManager.Instance.GetUserPeerComparison(
+									this.CourseID, user.LoginID);
+						var userGrades1 = DatabaseManager.Instance.GetUserResults(
+							this.CourseID, user.LoginID);
+
 						foreach (var tile in tiles)
 						{
 							// only create notifications for appropiate tiles
@@ -78,6 +83,24 @@ namespace IguideME.Web.Services.Workers
 							List<float> peerGradeList = new List<float>();
 							var entries = tile.GetEntries();
 
+							var peerGrade = peerGrades1.First(
+								x => x.TileID == tile.ID);
+							var userGrade = userGrades1.First(
+								x => x.TileID == tile.ID);
+
+							if (peerGrade != null && userGrade != null)
+                            {
+								if (userGrade.Average > peerGrade.Average)
+                                {
+									DatabaseManager.Instance.RegisterNotification(
+										CourseID,
+										student.LoginID,
+										tile.ID,
+										"outperforming peers",
+										this.Hash);
+								}
+                            }
+
 							// Iterate over all entries within the tile
 							foreach (var entry in entries)
 							{
@@ -85,6 +108,7 @@ namespace IguideME.Web.Services.Workers
 								 * Fetch all grades given to the current user and 
 								 * its peers that belong to the current tile entry. 
 								 */
+
 								var userGrades = DatabaseManager.Instance
 									.GetTileEntrySubmissionsForUser(
 										this.CourseID,
@@ -151,6 +175,7 @@ namespace IguideME.Web.Services.Workers
 								float historicUserGradesAverage =
 									historicUserGrades.Count > 0 ?
 										historicUserGrades.Average() : -1;
+
 								float historicPeerGradesAverage =
 									historicPeerGrades.Count > 0 ?
 										historicPeerGrades.Average() : -1;
