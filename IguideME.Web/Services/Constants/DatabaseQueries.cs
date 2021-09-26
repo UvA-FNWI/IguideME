@@ -949,7 +949,7 @@
         AND         `layout_column`.`course_id`={0}
         AND         `layout_tile_group`.`column_id`=`layout_column`.`id`
         AND         `layout_tile_group`.`id`=`tile`.`group_id`
-	    AND	        `tile`.`id`=`tile_entry`.`id`
+	    AND	        `tile`.`id`=`tile_entry`.`tile_id`
         AND         `tile_entry_submission`.`user_login_id`='{1}'
         AND         `tile_entry_submission`.`sync_hash`='{2}'
 	    GROUP BY `tile`.`id`;";
