@@ -90,7 +90,7 @@ namespace IguideME.Web.Services.Workers
 
 							if (peerGrade != null && userGrade != null)
                             {
-								if (userGrade.Average > peerGrade.Average)
+								if (userGrade.Average - peerGrade.Average > 0.8)
                                 {
 									DatabaseManager.Instance.RegisterNotification(
 										CourseID,
@@ -138,82 +138,65 @@ namespace IguideME.Web.Services.Workers
 							// Validate the presence of grades, otherwise skip tile
 							if (userGradesAverage == -1 || peerGradesAverage == -1)
 								continue;
+						
+							// Collect the grades excluding the last grade
+							var historicUserGrades = userGradeList.Count > 1 ?
+								userGradeList
+									.GetRange(0, userGradeList.Count - 2) :
+								null;
 
-							// Check if student is outperforming its peers
-							if (userGradesAverage > peerGradesAverage /*&&
-							Math.Abs(userGradesAverage - peerGradesAverage) >=
-							(userGradesAverage * 0.07)*/)
+							var historicPeerGrades = peerGradeList.Count > 1 ?
+								peerGradeList
+									.GetRange(0, peerGradeList.Count - 2) :
+								null;
+
+							// If no historic scenario is possible do not
+							// send any notifications
+							if (historicUserGrades == null ||
+								historicPeerGrades == null) continue;
+
+							// Compute historic average
+							float historicUserGradesAverage =
+								historicUserGrades.Count > 0 ?
+									historicUserGrades.Average() : -1;
+
+							float historicPeerGradesAverage =
+								historicPeerGrades.Count > 0 ?
+									historicPeerGrades.Average() : -1;
+
+							// Compute point change 
+							var historicDiff = historicUserGradesAverage -
+								historicPeerGradesAverage;
+							var currentDiff = userGradesAverage -
+								peerGradesAverage;
+
+							// Check if student is closing the gap to its peers
+							if ((historicDiff < currentDiff) &&
+								(historicDiff < 0) && (currentDiff < 0))
 							{
-								Console.WriteLine("\tOutperforming peers: " + tile.Title + " (" + userGradesAverage.ToString() + " > " + peerGradesAverage.ToString() + ")");
+								Console.WriteLine("\tClosing the gap: " + tile.Title + " (" + currentDiff.ToString() + " > " + historicDiff.ToString() + ")");
 
 								DatabaseManager.Instance.RegisterNotification(
-										CourseID,
-										student.LoginID,
-										tile.ID,
-										"outperforming peers",
-										this.Hash);
+									CourseID,
+									student.LoginID,
+									tile.ID,
+									"closing the gap",
+									this.Hash);
 							}
-							else
+
+							// Check if the gap between the student and peers
+							// is growing.
+							if ((historicDiff > currentDiff) &&
+								(historicDiff < 0) && (currentDiff < 0))
 							{
-								// Collect the grades excluding the last grade
-								var historicUserGrades = userGradeList.Count > 1 ?
-									userGradeList
-										.GetRange(0, userGradeList.Count - 2) :
-									null;
+								Console.WriteLine("\tYou have put more effort in: " + tile.Title + " (" + currentDiff.ToString() + " > " + historicDiff.ToString() + ")");
 
-								var historicPeerGrades = peerGradeList.Count > 1 ?
-									peerGradeList
-										.GetRange(0, peerGradeList.Count - 2) :
-									null;
-
-								// If no historic scenario is possible do not
-								// send any notifications
-								if (historicUserGrades == null ||
-									historicPeerGrades == null) continue;
-
-								// Compute historic average
-								float historicUserGradesAverage =
-									historicUserGrades.Count > 0 ?
-										historicUserGrades.Average() : -1;
-
-								float historicPeerGradesAverage =
-									historicPeerGrades.Count > 0 ?
-										historicPeerGrades.Average() : -1;
-
-								// Compute point change 
-								var historicDiff = historicUserGradesAverage -
-									historicPeerGradesAverage;
-								var currentDiff = userGradesAverage -
-									peerGradesAverage;
-
-								// Check if student is closing the gap to its peers
-								if ((historicDiff < currentDiff) &&
-									(historicDiff < 0) && (currentDiff < 0))
-								{
-									Console.WriteLine("\tClosing the gap: " + tile.Title + " (" + currentDiff.ToString() + " > " + historicDiff.ToString() + ")");
-
-									DatabaseManager.Instance.RegisterNotification(
-										CourseID,
-										student.LoginID,
-										tile.ID,
-										"closing the gap",
-										this.Hash);
-								}
-
-								// Check if the gap between the student and peers
-								// is growing.
-								if ((historicDiff > currentDiff) &&
-									(historicDiff < 0) && (currentDiff < 0))
-								{
-									Console.WriteLine("\tYou have put more effort in: " + tile.Title + " (" + currentDiff.ToString() + " > " + historicDiff.ToString() + ")");
-
-									DatabaseManager.Instance.RegisterNotification(
-										CourseID,
-										student.LoginID,
-										tile.ID,
-										"more effort required",
-										this.Hash);
-								}
+								DatabaseManager.Instance.RegisterNotification(
+									CourseID,
+									student.LoginID,
+									tile.ID,
+									"more effort required",
+									this.Hash);
 							}
 						}
 					}
