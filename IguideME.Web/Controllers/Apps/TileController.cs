@@ -151,11 +151,6 @@ namespace IguideME.Web.Controllers
 
             if (success)
             {
-                Console.WriteLine(
-                    JsonConvert.SerializeObject(
-                    DatabaseManager.Instance
-                        .GetGoals(GetCourseID())
-                        .Where(g => g.TileID == id)));
                 return Json(
                     DatabaseManager.Instance
                         .GetGoals(GetCourseID())
