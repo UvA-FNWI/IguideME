@@ -132,7 +132,7 @@
 
     public const string QUERY_PREDICTED_GRADES =
         @"SELECT    `user_login_id`,
-                    (SELECT `id` FROM `tile` WHERE `content_type`='PREDICTION' LIMIT 1) as tile_id,
+                    (SELECT `id` FROM `tile` WHERE `content_type`='PREDICTION' LIMIT 1) as `tile_id`,
                     `grade`
         FROM        `predicted_grade`
         WHERE       `course_id`={0}
