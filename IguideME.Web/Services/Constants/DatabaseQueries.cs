@@ -133,15 +133,10 @@
     public const string QUERY_PREDICTED_GRADES =
         @"SELECT    `user_login_id`,
                     (SELECT `id` FROM `tile` WHERE `content_type`='PREDICTION' LIMIT 1) as tile_id,
-                    `grade`
+                    GROUP_CONCAT(`grade` ORDER BY `graded_components` DESC LIMIT 1) grade
         FROM        `predicted_grade`
         WHERE       `course_id`={0}
-        AND         `sync_hash`='{1}'
-        AND         (`id`, `graded_components`) IN 
-        (   SELECT      `id`, MAX(`graded_components`)
-            FROM        `predicted_grade`
-            GROUP BY    `user_login_id`
-        );";
+        AND         `sync_hash`='{1}';";
 
     public const string QUERY_PREDICTED_GRADES_FOR_USER =
         @"SELECT    `user_login_id`,
