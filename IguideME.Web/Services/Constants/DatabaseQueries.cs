@@ -134,7 +134,7 @@
         @"SELECT    `user_login_id`,
                     (SELECT `id` FROM `tile` WHERE `content_type`='PREDICTION' LIMIT 1) as `tile_id`,
                     `grade`
-        FROM        `predicted_grade`
+        FROM        `predicted_grade` 
         WHERE       `course_id`={0}
         AND         `sync_hash`='{1}';";
 
