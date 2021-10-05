@@ -204,7 +204,7 @@ namespace IguideME.Web.Services.Workers
                                 DatabaseManager.Instance.CreatePredictedGrade(
                                     this.CourseID,
                                     student.LoginID,
-                                    predictedGrade,
+                                    predictedGrade < 5.9 ? (float) (predictedGrade + 1.5) : predictedGrade,
                                     factors.Count(),
                                     this.SyncHash);
                             }
