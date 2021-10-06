@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using IguideME.Web.Models.Service;
 using IguideME.Web.Services.Workers;
+using UvA.DataNose.Connectors.Canvas;
 
 namespace IguideME.Web.Services
 {
@@ -32,6 +33,8 @@ namespace IguideME.Web.Services
 		{
 			var result = new JobResultModel();
 			var courseID = 25503;
+
+			this._canvasTest.sendMessage();
 
 			string characters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 			StringBuilder _result = new StringBuilder(10);

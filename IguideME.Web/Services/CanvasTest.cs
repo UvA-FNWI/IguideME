@@ -21,7 +21,18 @@ namespace IguideME.Web.Services
         {
             this.accessToken = config["Canvas:AccessToken"];
             this.baseUrl = config["Canvas:Url"];
-            connector = new CanvasApiConnector(config["Canvas:Url"], config["Canvas:AccessToken"]);
+            this.connector = new CanvasApiConnector(config["Canvas:Url"], config["Canvas:AccessToken"]);
+        }
+
+        public void sendMessage()
+        {
+            var conv = new Conversation(this.connector)
+            {
+                Subject = "IGuideME Sync",
+                Body = "Synchronisation has been made!",
+                Recipients = new[] { "11842342", "evvliet1" }
+            };
+            conv.Save();
         }
 
         public User GetUser(int courseID, string sisLoginID)
