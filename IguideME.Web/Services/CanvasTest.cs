@@ -24,13 +24,13 @@ namespace IguideME.Web.Services
             this.connector = new CanvasApiConnector(config["Canvas:Url"], config["Canvas:AccessToken"]);
         }
 
-        public void sendMessage()
+        public void sendMessage(int id)
         {
             var conv = new Conversation(this.connector)
             {
                 Subject = "IGuideME Sync",
                 Body = "Synchronisation has been made!",
-                Recipients = new[] { "11842342", "evvliet1" }
+                Recipients = new[] { id.ToString() }
             };
             conv.Save();
         }

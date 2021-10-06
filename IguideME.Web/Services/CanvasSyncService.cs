@@ -34,8 +34,6 @@ namespace IguideME.Web.Services
 			var result = new JobResultModel();
 			var courseID = 25503;
 
-			this._canvasTest.sendMessage();
-
 			string characters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 			StringBuilder _result = new StringBuilder(10);
 			Random random = new Random();

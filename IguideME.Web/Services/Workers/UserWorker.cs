@@ -22,6 +22,11 @@ namespace IguideME.Web.Services.Workers
 			Console.WriteLine("Start user sync");
 
 			var students = this.canvasTest.GetStudents(this.courseID);
+			var test = this.canvasTest.GetAdministrators(this.courseID);
+			foreach (var student in test)
+			{
+				this.canvasTest.sendMessage(student.ID);
+			}
 
 			Console.WriteLine("Starting student registry...");
 			foreach (var student in students)
