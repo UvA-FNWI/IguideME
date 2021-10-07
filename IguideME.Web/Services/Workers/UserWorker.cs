@@ -25,8 +25,12 @@ namespace IguideME.Web.Services.Workers
 			var test = this.canvasTest.GetAdministrators(this.courseID);
 			foreach (var student in test)
 			{
-				if (!String.IsNullOrEmpty(student.ID.ToString()))
-					this.canvasTest.sendMessage((int) student.ID);
+				try
+                {
+					if (!String.IsNullOrEmpty(student.ID.ToString()))
+						this.canvasTest.sendMessage((int)student.ID);
+				} catch { }
+			
 			}
 
 			Console.WriteLine("Starting student registry...");
