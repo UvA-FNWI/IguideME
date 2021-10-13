@@ -276,6 +276,9 @@ namespace IguideME.Web.Controllers
 
             [JsonProperty(PropertyName = "graph_view")]
             public bool? GraphView { get; set; }
+
+            [JsonProperty(PropertyName = "wildcard")]
+            public bool? Wildcard { get; set; }
         }
 
         [Authorize(Policy = "IsInstructor")]
@@ -309,6 +312,9 @@ namespace IguideME.Web.Controllers
 
                 if (obj.GraphView != null)
                     tile.GraphView = (bool) obj.GraphView;
+
+                if (obj.Wildcard != null)
+                    tile.Wildcard = (bool) obj.Wildcard;
 
                 DatabaseManager.Instance.UpdateTile(GetCourseID(), tile);
 

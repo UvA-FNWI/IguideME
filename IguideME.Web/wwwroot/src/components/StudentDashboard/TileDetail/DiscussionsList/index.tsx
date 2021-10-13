@@ -20,7 +20,7 @@ export default class DiscussionsList extends Component<{
                   <h2>{ d.title }</h2>
                   <small>{ d.posted_at }</small>
                   <Divider />
-                  <small>{ d.message }</small>
+                  <p dangerouslySetInnerHTML={{ __html: d.message }} />
                 </div>
               </Col>
             )

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using IguideME.Web.Models;
 using UvA.DataNose.Connectors.Canvas;
@@ -27,7 +28,20 @@ namespace IguideME.Web.Services.Workers
 			List<Discussion> discussions = this.CanvasTest
 				.GetDiscussions(this.CourseID);
 
-			foreach (Tile tile in tiles.Where(t => t.TileType == "DISCUSSION"))
+			foreach (Discussion d in discussions)
+            {
+				DatabaseManager.Instance.RegisterDiscussion(
+					d.ID,
+					this.CourseID,
+					-1,
+					d.Title,
+					d.UserName,
+					d.PostedAt.ToString(),
+					d.Message,
+					this.Hash);
+			}
+
+			foreach (Tile tile in tiles.Where(t => t.TileType == "DISCUSSIONS"))
 			{
 				if (tile.Wildcard)
 				{
@@ -36,7 +50,7 @@ namespace IguideME.Web.Services.Workers
 					{
 						var student = students.Find(s => s.Name == d.UserName);
 						if (student == null) return false;
-						return DatabaseManager.Instance.GetConsent(this.CourseID, student.LoginID) != 1;
+						return DatabaseManager.Instance.GetConsent(this.CourseID, student.LoginID) == 1;
 
 					});
 
