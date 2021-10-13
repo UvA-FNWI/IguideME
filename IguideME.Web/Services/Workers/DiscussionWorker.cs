@@ -79,21 +79,18 @@ namespace IguideME.Web.Services.Workers
 					{
 						foreach (var entry in d.Entries)
 						{
-							foreach (var reply in entry.Replies)
-							{
-								var student = students.Find(s => s.ID == reply.UserID);
-								if (student == null) continue;
+							var student = students.Find(s => s.UserID == entry.UserID);
+							if (student == null) continue;
 
-								DatabaseManager.Instance.RegisterDiscussion(
-									d.ID,
-									this.CourseID,
-									tile.ID,
-									d.Title,
-									student.Name,
-									reply.CreatedAt.ToString(),
-									reply.Message,
-									this.Hash);
-							}
+							DatabaseManager.Instance.RegisterDiscussion(
+								d.ID,
+								this.CourseID,
+								tile.ID,
+								d.Title,
+								student.Name,
+								entry.CreatedAt.ToString(),
+								entry.Message,
+								this.Hash);
 						}
 					}
 				}
