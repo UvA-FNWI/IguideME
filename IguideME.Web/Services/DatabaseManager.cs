@@ -60,6 +60,7 @@ namespace IguideME.Web.Services
             };
 
             NonQuery("ALTER TABLE canvas_discussion ADD tile_id int NULL DEFAULT(1); ");
+            NonQuery("ALTER TABLE canvas_discussion ADD message text;");
 
             // create tables if they do not exist
             foreach (var query in queries)
