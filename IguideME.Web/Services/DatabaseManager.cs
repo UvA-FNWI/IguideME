@@ -59,6 +59,8 @@ namespace IguideME.Web.Services
                 DatabaseQueries.CREATE_TABLE_ACCEPT_LIST
             };
 
+            NonQuery("ALTER TABLE canvas_discussion ADD tile_id int NULL DEFAULT(1); ");
+
             // create tables if they do not exist
             foreach (var query in queries)
             {
@@ -236,6 +238,7 @@ namespace IguideME.Web.Services
             string message,
             string syncHash)
         {
+
             NonQuery(
                 String.Format(
                     DatabaseQueries.REGISTER_CANVAS_DISCUSSION,
