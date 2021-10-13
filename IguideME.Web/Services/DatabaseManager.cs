@@ -59,7 +59,7 @@ namespace IguideME.Web.Services
                 DatabaseQueries.CREATE_TABLE_ACCEPT_LIST
             };
 
-            NonQuery("ALTER TABLE canvas_discussion ADD tile_id int NULL DEFAULT(1); ");
+            //NonQuery("ALTER TABLE canvas_discussion ADD tile_id int NULL DEFAULT(1); ");
             NonQuery("ALTER TABLE canvas_discussion ADD message text;");
 
             // create tables if they do not exist
