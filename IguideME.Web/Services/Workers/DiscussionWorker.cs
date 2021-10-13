@@ -37,7 +37,7 @@ namespace IguideME.Web.Services.Workers
 					d.Title,
 					d.UserName,
 					d.PostedAt.ToString(),
-					d.Message,
+					d.Message.Replace("'", "''"),
 					this.Hash);
 			}
 
@@ -63,7 +63,7 @@ namespace IguideME.Web.Services.Workers
 								d.Title,
 								d.UserName,
 								d.PostedAt.ToString(),
-								d.Message,
+								d.Message.Replace("'", "''"),
 								this.Hash);
 
 					}
@@ -89,7 +89,7 @@ namespace IguideME.Web.Services.Workers
 								d.Title,
 								student.Name,
 								entry.CreatedAt.ToString(),
-								entry.Message,
+								entry.Message.Replace("'", "''"),
 								this.Hash);
 						}
 					}
