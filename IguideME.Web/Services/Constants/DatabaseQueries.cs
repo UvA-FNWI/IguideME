@@ -226,6 +226,10 @@
         @"DELETE FROM       `predictive_model`
           WHERE             `course_id`={0};";
 
+    public const string DELETE_MODEL_THETAS =
+        @"DELETE FROM `model_theta`
+        WHERE         `model_theta`.`model_id` IN (SELECT `id` FROM `predictive_model` WHERE `course_id`={0});";
+
     // -------------------- Learning goals --------------------
 
     public const string CREATE_TABLE_LEARNING_GOALS =

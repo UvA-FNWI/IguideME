@@ -67,9 +67,9 @@ namespace IguideME.Web.Services
                 command.ExecuteNonQuery();
             }
 
-            NonQuery("DELETE FROM tile WHERE id=6;");
-            NonQuery("DELETE FROM learning_goal;");
-            NonQuery("DELETE FROM goal_requirement;");
+            //NonQuery("DELETE FROM tile WHERE id=6;");
+            //NonQuery("DELETE FROM learning_goal;");
+            //NonQuery("DELETE FROM goal_requirement;");
         }
 
         private int NonQuery(string query)
@@ -399,6 +399,11 @@ namespace IguideME.Web.Services
 
         public void DeletePredictiveModels(int courseID)
         {
+            NonQuery(
+                String.Format(
+                    DatabaseQueries.DELETE_MODEL_THETAS,
+                    courseID));
+
             NonQuery(
                 String.Format(
                     DatabaseQueries.DELETE_PREDICTIVE_MODELS_FOR_COURSE,
