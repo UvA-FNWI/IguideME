@@ -67,9 +67,11 @@ namespace IguideME.Web.Services
                 command.ExecuteNonQuery();
             }
 
-            //NonQuery("DELETE FROM tile WHERE id=6;");
-            //NonQuery("DELETE FROM learning_goal;");
-            //NonQuery("DELETE FROM goal_requirement;");
+            NonQuery("DELETE FROM tile WHERE id=10;");
+            NonQuery("DELETE FROM learning_goal;");
+            NonQuery("DELETE FROM goal_requirement;");
+            NonQuery("DELETE FROM predictive_model;");
+            NonQuery("DELETE FROM model_theta;");
         }
 
         private int NonQuery(string query)
