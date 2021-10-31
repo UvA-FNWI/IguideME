@@ -68,12 +68,8 @@ namespace IguideME.Web.Services
             }
 
             //NonQuery("DELETE FROM tile WHERE id=10;");
-            NonQuery("DELETE FROM predicted_grade;");
-            NonQuery("DELETE FROM goal_requirement;");
-            NonQuery("DELETE FROM predictive_model;");
-            NonQuery("DELETE FROM model_theta;");
-            String hash = GetCurrentHash(25503);
-            NonQuery("DELETE FROM tile_entry_submission WHERE sync_hash != '"+hash+"';");
+            NonQuery("DELETE FROM peer_group;");
+            NonQuery("DELETE FROM tile WHERE id=11;");
         }
 
         private int NonQuery(string query)
