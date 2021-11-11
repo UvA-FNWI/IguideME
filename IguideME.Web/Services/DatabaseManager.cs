@@ -68,8 +68,12 @@ namespace IguideME.Web.Services
             }
 
             //NonQuery("DELETE FROM tile WHERE id=10;");
-            NonQuery("DELETE FROM peer_group;");
-            NonQuery("DELETE FROM tile WHERE id=11;");
+            NonQuery("DELETE FROM learning_goal;");
+            NonQuery("DELETE FROM predictive_model;");
+            NonQuery("DELETE FROM predicted_grade;");
+            NonQuery("DELETE FROM model_theta;");
+            NonQuery("DELETE FROM goal_requirement;");
+            NonQuery("DELETE FROM tile WHERE id=12;");
         }
 
         private int NonQuery(string query)
