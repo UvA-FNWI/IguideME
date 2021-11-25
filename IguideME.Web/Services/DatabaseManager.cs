@@ -853,6 +853,8 @@ namespace IguideME.Web.Services
 
             var tiles = GetTiles(courseID);
             var tile = tiles.Find(t => t.ContentType == Tile.CONTENT_TYPE_LEARNING_OUTCOMES);
+
+            /*
             if (tile != null)
             {
                 List<LearningGoal> goals = GetGoals(courseID)
@@ -917,6 +919,7 @@ namespace IguideME.Web.Services
                 );
                 submissions.Add(learningOutcomes);
             }
+            */
 
             return submissions.ToArray();
         }
