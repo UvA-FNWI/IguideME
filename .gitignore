@@ -238,3 +238,8 @@ IguideME.Web/wwwroot/build/
 node_modules
 out
 .vscode
+
+**/.idea
+**/._.DS_Store
+
+**/._*
