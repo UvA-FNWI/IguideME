@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: iguideme-demo
+  namespace: "{{ .Release.Namespace }}"
+spec:
+  selector:
+    matchLabels:
+      app: iguideme-demo
+  replicas: 1
+  revisionHistoryLimit: 3
+  template:
+    metadata:
+      labels:
+        app: iguideme-demo
+    spec:
+      containers:
+        - name: iguideme-demo
+          image: "{{ .Values.image }}:{{ .Values.tag }}"
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+          env:
+            - name: IGUIDEME_VERSION
+              value: "{{ .Chart.AppVersion }}"

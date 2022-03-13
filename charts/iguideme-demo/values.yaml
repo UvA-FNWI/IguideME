@@ -1,0 +1,4 @@
+hostname: iguideme-demo.local
+ingressClass: nginx
+image: fnwicr.azurecr.io/iguideme-demo
+tag: latest
