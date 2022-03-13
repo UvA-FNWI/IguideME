@@ -26,6 +26,9 @@ jobs:
           displayName: Build Docker container for demo app
           workingDirectory: ./IguideME.Web/wwwroot
           condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+        displayName: Build Docker container
+        workingDirectory: ./IguideME.Web/wwwroot
+        condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
 
       - script: |
           set -euxo pipefail
