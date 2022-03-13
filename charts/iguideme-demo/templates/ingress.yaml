@@ -13,7 +13,7 @@ spec:
     - host: "{{ .Values.hostname }}"
       http:
         paths:
-          - path: /iguideme-demo
+          - path: /
             pathType: Prefix
             backend:
               service:
