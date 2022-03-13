@@ -23,10 +23,7 @@ jobs:
           npm run build
           docker build -f Dockerfile -t "fnwicr.azurecr.io/iguideme-demo:latest" .
           docker push "fnwicr.azurecr.io/iguideme-demo:latest"
-          displayName: Build Docker container for demo app
-          workingDirectory: ./IguideME.Web/wwwroot
-          condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-        displayName: Build Docker container
+        displayName: Build Docker container for demo app
         workingDirectory: ./IguideME.Web/wwwroot
         condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
 
