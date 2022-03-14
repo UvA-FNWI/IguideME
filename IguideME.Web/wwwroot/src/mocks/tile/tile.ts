@@ -54,8 +54,38 @@ export const MOCK_TILES: Tile[] = [
   }, {
     "id": 6,
     "group_id": 1,
-    "title": "Send in Questions",
+    "title": "Preparation Time",
     "position": 5,
+    "content": "BINARY",
+    "type": "EXTERNAL_DATA",
+    "visible": true,
+    "wildcard": false,
+    "graph_view": false
+  }, {
+    "id": 7,
+    "group_id": 1,
+    "title": "Send in Questions",
+    "position": 6,
+    "content": "ENTRIES",
+    "type": "DISCUSSIONS",
+    "visible": true,
+    "wildcard": true,
+    "graph_view": false
+  }, {
+    "id": 8,
+    "group_id": 3,
+    "title": "Predicted Grade",
+    "position": 1,
+    "content": "ENTRIES",
+    "type": "ASSIGNMENTS",
+    "visible": true,
+    "wildcard": false,
+    "graph_view": false
+  }, {
+    "id": 9,
+    "group_id": 3,
+    "title": "Learning Outcomes",
+    "position": 2,
     "content": "ENTRIES",
     "type": "DISCUSSIONS",
     "visible": true,
