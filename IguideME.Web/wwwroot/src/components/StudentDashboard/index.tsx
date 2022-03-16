@@ -191,7 +191,8 @@ class StudentDashboard extends Component<Props, IState> {
             <div>
               { dashboardColumns.map((c: DashboardColumn) => {
                 return (
-                  <div className={`column ${c.container_width}`}>
+                  <div className={`column ${c.container_width}`}
+                       key={c.id}>
                     { tileGroups
                       .filter((tg: TileGroupModel) => tg.column_id === c.id)
                       .sort((a: TileGroupModel, b: TileGroupModel) => a.position - b.position)
@@ -207,6 +208,7 @@ class StudentDashboard extends Component<Props, IState> {
                                    peerGrades={peerGrades}
                                    submissions={userSubmissions}
                                    learningOutcomes={learningOutcomes}
+                        key={tg.id}
                         />
                       )
                     }

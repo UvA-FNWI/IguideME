@@ -34,7 +34,8 @@ export default class TileGroup extends Component<IProps> {
                         .includes(s.entry_id))}
                     userGrades={tilesGradeSummary.filter(tgs => tgs.tile.id === t.id)}
                     peerGrades={peerGrades.filter(pg => pg.tileID === t.id)}
-                    learningOutcomes={learningOutcomes} />
+                    learningOutcomes={learningOutcomes}
+              key={t.id}/>
             );
           })}
         </div>

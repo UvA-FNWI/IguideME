@@ -172,5 +172,9 @@ export const MOCK_QUIZ_SUBMISSIONS: TileEntrySubmission[] = [
   {"entry_id": 4,"grade":"5.63","user_login_id":"41393783"},
   {"entry_id": 4,"grade":"6.24","user_login_id":"74114284"},
   {"entry_id": 4,"grade":"4.44","user_login_id":"52682411"},
-  {"entry_id": 4,"grade":"4.59","user_login_id":"29376337"}
+  {"entry_id": 4,"grade":"4.59","user_login_id":"29376337"},
+
+  // Quiz 6
+  {"entry_id": 6,"grade":"4.28","user_login_id":"55571292"},
+  {"entry_id": 6,"grade":"5.96","user_login_id":"55249485"}
 ]

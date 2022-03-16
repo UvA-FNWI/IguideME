@@ -20,11 +20,14 @@ type IState = { notifications: PerformanceNotification[] };
 
 class UserProfile extends Component<Props, IState> {
 
+  _isMounted = false;
+
   state = {
     notifications: []
   }
   
   componentDidMount(): void {
+    this._isMounted = true;
     this.loadNotifications(this.props);
   }
 
@@ -34,12 +37,17 @@ class UserProfile extends Component<Props, IState> {
     }
   }
 
+  componentWillUnmount() {
+    this._isMounted = false;
+  }
+
   loadNotifications = (props: Props) => {
     const { student } = props;
     if (!student) return;
 
     DataMartController.getNotifications(student.login_id).then(notifications => {
-      this.setState({ notifications });
+      // TODO: I think this may be a race condition, try to do away with the isMounted flag and resolve the console error. If noone complains about missing functionality by 2023, remove this todo.
+      this._isMounted && this.setState({ notifications });
     });
   }
 
@@ -98,7 +106,7 @@ class UserProfile extends Component<Props, IState> {
                 {' '}
                 You are outperforming your peers in:
                 <ul style={{boxSizing: 'border-box', paddingLeft: 30}}>
-                  { outperforming.map(n => <li>{this._getTileTitle(n.tile_id)}</li>)}
+                  { outperforming.map((n, i) => <li key={i}>{this._getTileTitle(n.tile_id)}</li>)}
                 </ul>
               </div> }
 
@@ -108,7 +116,7 @@ class UserProfile extends Component<Props, IState> {
                 {' '}
                 You are closing the gap to your peers in:
                 <ul style={{boxSizing: 'border-box', paddingLeft: 30}}>
-                  { closing.map(n => <li>{this._getTileTitle(n.tile_id)}</li>)}
+                  { closing.map((n, i) => <li key={i}>{this._getTileTitle(n.tile_id)}</li>)}
                 </ul>
               </div> }
 

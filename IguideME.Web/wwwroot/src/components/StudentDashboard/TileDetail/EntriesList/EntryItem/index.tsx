@@ -10,7 +10,9 @@ export default class EntryItem extends Component<{
   render(): React.ReactNode {
     const { tileEntry, submission } = this.props;
 
-    const meta = JSON.parse(submission.meta);
+    // TODO: I suspect that in the demo, meta is a json object. But in production, it is an object. Investigate.
+    /*     const meta = JSON.parse(submission.meta || "{}"); */
+    const meta = submission.meta || {};
 
     return (
       <div className={"tileEntry"}>

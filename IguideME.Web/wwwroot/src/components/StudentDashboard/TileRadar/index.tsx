@@ -112,7 +112,7 @@ export default class TileRadar extends Component<IProps> {
                     ))}
 
                     { points.map((point, i) => (
-                      <React.Fragment>
+                      <React.Fragment key={i}>
                         <Line key={`radar-line-${i}`}
                               from={i === 0 ? points[points.length - 1] : points[i - 1]}
                               to={points[i]}
@@ -121,8 +121,9 @@ export default class TileRadar extends Component<IProps> {
                         { tilesGradeSummary[i === 0 ? tilesGradeSummary.length - 1 : i - 1].tile.title.split(" ").map((x, j) => (
                           <text x={point.x > 0 ? point.x + 10 : point.x - 10}
                                 y={point.y > 0 ? point.y + 10 + (j * 12) : point.y - 10 - (j * 12)}
-                                text-anchor={getDescriptionAnchor(point.x, point.y)}
+                                textAnchor={getDescriptionAnchor(point.x, point.y)}
                                 style={{whiteSpace: 'pre-wrap'}}
+                            key={`$x:{x};j:${j}`}
                           >
                             { x }
                           </text>

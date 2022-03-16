@@ -51,7 +51,7 @@ export default class EntriesList extends Component<{
             if (!submission) return null;
 
             return (
-              <Col xs={24} sm={12} md={8} lg={6} className={"entryCol"}>
+              <Col key={entry.id} xs={24} sm={12} md={8} lg={6} className={"entryCol"}>
                 <EntryItem submission={submission} tileEntry={entry} />
               </Col>
             )

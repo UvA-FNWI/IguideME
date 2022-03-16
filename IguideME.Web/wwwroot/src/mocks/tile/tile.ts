@@ -86,8 +86,8 @@ export const MOCK_TILES: Tile[] = [
     "group_id": 3,
     "title": "Learning Outcomes",
     "position": 2,
-    "content": "ENTRIES",
-    "type": "DISCUSSIONS",
+    "content": "LEARNING_OUTCOMES",
+    "type": "ASSIGNMENTS",
     "visible": true,
     "wildcard": true,
     "graph_view": false
