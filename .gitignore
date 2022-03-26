@@ -234,7 +234,7 @@ _Pvt_Extensions
 .fake/
 
 *.tgz
-IguideME.Web/wwwroot/build/
+# IguideME.Web/wwwroot/build/
 node_modules
 out
 .vscode
