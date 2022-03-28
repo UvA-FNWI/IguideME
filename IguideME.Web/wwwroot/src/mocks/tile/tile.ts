@@ -18,7 +18,7 @@ export const MOCK_TILES: Tile[] = [
         "position": 2,
         "content": "ENTRIES",
         "type": "EXTERNAL_DATA",
-        "visible": false,
+        "visible": true,
         "wildcard": false,
         "graph_view": false
     }, {
