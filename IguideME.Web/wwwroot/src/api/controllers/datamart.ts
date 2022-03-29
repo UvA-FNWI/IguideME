@@ -1,15 +1,15 @@
 import Controller from "../controller";
-import {debug} from "../../config/config";
-import {delay} from "../../utils/mockRequest";
+import { debug } from "../../config/config";
+import { delay } from "../../utils/mockRequest";
 import {
   MOCK_DATAMART_STATUS_EMPTY,
   MOCK_DATAMART_STATUS_BUSY,
   MOCK_DATAMART_SYNCHRONIZATIONS
 } from "../../mocks/app/datamart";
-import {Synchronization} from "../../models/app/SyncProvider";
-import {PredictedGrade, PredictiveModel} from "../../models/app/PredictiveModel";
-import {NotificationStatus, PerformanceNotification} from "../../models/app/Notification";
-import {AppAcceptList} from "../../models/app/AcceptList";
+import { Synchronization } from "../../models/app/SyncProvider";
+import { PredictedGrade, PredictiveModel } from "../../models/app/PredictiveModel";
+import { NotificationStatus, PerformanceNotification } from "../../models/app/Notification";
+import { AppAcceptList } from "../../models/app/AcceptList";
 
 export default class DataMartController extends Controller {
 
@@ -25,7 +25,7 @@ export default class DataMartController extends Controller {
     ).then(_ => true).catch(() => false);
   }
 
-  static getStatus(): Promise<{[key: string]: any}> {
+  static getStatus(): Promise<{ [key: string]: any }> {
     if (debug()) {
       // if handshake was made pretend it's busy making the synchronization
       return delay(
@@ -70,7 +70,7 @@ export default class DataMartController extends Controller {
 
   static deleteModels(): Promise<void> {
     if (debug()) {
-      return delay(() => {}, 1000);
+      return delay(() => { }, 1000);
     }
 
     return this.client.delete(
@@ -79,7 +79,15 @@ export default class DataMartController extends Controller {
   }
 
   static getPredictions(userLoginID: string): Promise<PredictedGrade[]> {
-    if (debug()) return delay([]);
+    if (debug()) return delay([
+      { graded_components: 1, grade: 5 } as PredictedGrade,
+      { graded_components: 3, grade: 7 } as PredictedGrade,
+      { graded_components: 2, grade: 7.6 } as PredictedGrade,
+      { graded_components: 1, grade: 6.6 } as PredictedGrade,
+      { graded_components: 2, grade: 8.2 } as PredictedGrade,
+      { graded_components: 1, grade: 8.5 } as PredictedGrade,
+      { graded_components: 2, grade: 7.8 } as PredictedGrade,
+    ]);
 
     return this.client.get(
       `/datamart/predictions/${userLoginID}`
@@ -88,8 +96,8 @@ export default class DataMartController extends Controller {
 
   static getNotifications(userLoginID: string): Promise<PerformanceNotification[]> {
     if (debug()) return delay([
-      {tile_id: 2, status: "outperforming peers"},
-      {tile_id: 4, status: "closing the gap"}
+      { tile_id: 2, status: "outperforming peers" },
+      { tile_id: 4, status: "closing the gap" }
     ]);
 
     return this.client.get(
