@@ -1,15 +1,15 @@
 import Controller from "../controller";
 import { debug } from "../../config/config";
-import {Tile, TileEntry, TileEntrySubmission, TileGroup} from "../../models/app/Tile";
+import { Tile, TileEntry, TileEntrySubmission, TileGroup } from "../../models/app/Tile";
 import { MOCK_SUBMISSIONS } from "../../mocks/submissions";
 import { MOCK_LEARNING_OUTCOMES } from "../../mocks/learningOutcomes";
 import { MOCK_CANVAS_DISCUSSION } from "../../mocks/canvas/discussion";
-import {MOCK_TILES} from "../../mocks/tile/tile";
-import {MOCK_TILE_GROUPS} from "../../mocks/tile/tileGroup";
-import {MOCK_TILE_ENTRIES} from "../../mocks/tile/tileEntry";
-import {delay} from "../../utils/mockRequest";
-import {LearningGoal, LearningOutcome} from "../../models/app/LearningGoal";
-import {CanvasDiscussion} from "../../models/canvas/Discussion";
+import { MOCK_TILES } from "../../mocks/tile/tile";
+import { MOCK_TILE_GROUPS } from "../../mocks/tile/tileGroup";
+import { MOCK_TILE_ENTRIES } from "../../mocks/tile/tileEntry";
+import { delay } from "../../utils/mockRequest";
+import { LearningGoal, LearningOutcome } from "../../models/app/LearningGoal";
+import { CanvasDiscussion } from "../../models/canvas/Discussion";
 
 export default class TileController extends Controller {
 
@@ -23,7 +23,7 @@ export default class TileController extends Controller {
 
   static getDiscussions(tileId: number, studentLoginId: string): Promise<CanvasDiscussion[]> {
     if (debug()) {
-        return Promise.resolve(MOCK_CANVAS_DISCUSSION);
+      return Promise.resolve(MOCK_CANVAS_DISCUSSION);
     }
 
     return this.client.get(
@@ -91,7 +91,7 @@ export default class TileController extends Controller {
 
     return this.client.delete(
       `tiles/groups/${id}`
-    ).then(_ => {});
+    ).then(_ => { });
   }
 
   static getTiles(): Promise<Tile[]> {
@@ -118,9 +118,9 @@ export default class TileController extends Controller {
 
     return this.client.post(
       `/entries/${entryID}/upload`,
-      data.map(x => ({...x, entry_id: entryID }))).then(
-      response => response.data
-    );
+      data.map(x => ({ ...x, entry_id: entryID }))).then(
+        response => response.data
+      );
   }
 
   static getEntries(): Promise<TileEntry[]> {
@@ -161,7 +161,7 @@ export default class TileController extends Controller {
 
   static deleteTileGoal(id: number): Promise<void> {
     if (debug()) {
-      return delay(() => {});
+      return delay(() => { });
     }
 
     return this.client.delete(
@@ -191,7 +191,7 @@ export default class TileController extends Controller {
 
   static deleteTileEntry(id: number): Promise<void> {
     if (debug()) {
-      return delay(() => {});
+      return delay(() => { });
     }
 
     return this.client.delete(
@@ -209,13 +209,32 @@ export default class TileController extends Controller {
     ).then(response => response.data);
   }
 
-  static getPeerResults(studentLoginId: string): Promise<{ min: number, max: number, avg: number, tileID: number}[]> {
+  static getPeerResults(studentLoginId: string): Promise<{ min: number, max: number, avg: number, tileID: number }[]> {
     if (debug()) {
       return this.getTiles().then(tiles => {
-        return Promise.resolve(tiles.map(t =>
-          t.content === "BINARY" ?
-            ({min: 41, max: 100, avg: 78, tileID: t.id}) :
-            ({min: 5, max: 9, avg: 6.8, tileID: t.id})));
+        return Promise.resolve(tiles.map(t => {
+          switch (t.id) {
+            default:
+            case 1:
+              return ({ min: 6.5, max: 8.1, avg: 6.6, tileID: t.id });
+            case 2:
+              return ({ min: 4.2, max: 9.0, avg: 5.9, tileID: t.id });
+            case 9:
+              return ({ min: 5.1, max: 9.8, avg: 7.3, tileID: t.id });
+            case 4:
+              return ({ min: 4.2, max: 8.2, avg: 6.3, tileID: t.id });
+            case 5:
+              return ({ min: 5.8, max: 8.9, avg: 7.2, tileID: t.id });
+            case 6:
+              return ({ min: 2.1, max: 9.1, avg: 6.4, tileID: t.id });
+            case 7:
+              return ({ min: 5.4, max: 8.6, avg: 5.9, tileID: t.id });
+            case 8:
+              return ({ min: 5.0, max: 8.7, avg: 6.1, tileID: t.id });
+            case 3:
+              return ({ min: 41, max: 100, avg: 78, tileID: t.id });
+          }
+        }))
       });
     }
 
