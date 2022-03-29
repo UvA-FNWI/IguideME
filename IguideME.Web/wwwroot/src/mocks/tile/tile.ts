@@ -52,15 +52,15 @@ export const MOCK_TILES: Tile[] = [
         "wildcard": false,
         "graph_view": false
     }, {
-        "id": 6,
+        "id": 2,
         "group_id": 1,
         "title": "Preparation Time",
         "position": 5,
-        "content": "BINARY",
+        "content": "ENTRIES",
         "type": "EXTERNAL_DATA",
         "visible": true,
         "wildcard": false,
-        "graph_view": false
+        "graph_view": true
     }, {
         "id": 7,
         "group_id": 1,
@@ -76,7 +76,7 @@ export const MOCK_TILES: Tile[] = [
         "group_id": 3,
         "title": "Predicted Grade",
         "position": 1,
-        "content": "ENTRIES",
+        "content": "PREDICTION",
         "type": "ASSIGNMENTS",
         "visible": true,
         "wildcard": false,

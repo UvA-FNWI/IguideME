@@ -1,3 +1,4 @@
+// FIXME this has to be very, very slow
 export const generateUniqueID = (ids: number[]) => {
 
   let id = Math.floor((Math.random() * 1000000) + 1);
