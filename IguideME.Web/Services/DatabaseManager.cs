@@ -12,13 +12,14 @@ namespace IguideME.Web.Services
     {
         private static readonly DatabaseManager instance = new DatabaseManager();
         private readonly SQLiteConnection connection = new SQLiteConnection(
-            "Data Source=/data/IguideME.db;Version=3;New=False;Compress=True;"
+            "Data Source=/Users/max/Projects/IguideME/secret/dev.db;Version=3;New=False;Compress=True;"
         );
         private static SQLiteCommand command;
 
-        static DatabaseManager() {}
+        static DatabaseManager() { }
 
-        private DatabaseManager() {
+        private DatabaseManager()
+        {
             connection.Open();
             CreateTables();
         }
@@ -123,7 +124,7 @@ namespace IguideME.Web.Services
                 String.Format(
                     DatabaseQueries.QUERY_DOES_COURSE_EXIST, courseID));
 
-            return (bool) r.Read();
+            return (bool)r.Read();
         }
 
         public void RegisterCourse(int courseID, string courseName)
@@ -261,7 +262,11 @@ namespace IguideME.Web.Services
         public List<User> GetUsers(int courseID, string role = null, string hash = null)
         {
             string activeHash = hash ?? this.GetCurrentHash(courseID);
-            if (activeHash == null) return new List<User>() { };
+            if (activeHash == null)
+            {
+                Console.WriteLine("Hash is null, returning empty user list.");
+                return new List<User>() { };
+            }
 
             string query = role == null ?
                 String.Format(DatabaseQueries.QUERY_USERS_FOR_COURSE,
@@ -271,10 +276,10 @@ namespace IguideME.Web.Services
                     courseID,
                     role,
                     activeHash);
-
             SQLiteDataReader r = Query(query);
-            List<User> users = new List<User>();
+            Console.WriteLine(query);
 
+            List<User> users = new List<User>();
             // collect all users
             while (r.Read())
             {
@@ -448,7 +453,7 @@ namespace IguideME.Web.Services
             {
                 ModelTheta theta = new ModelTheta(
                     r.GetInt32(0),
-                    r.IsDBNull(1) ? (int?) null : r.GetInt32(1),
+                    r.IsDBNull(1) ? (int?)null : r.GetInt32(1),
                     r.IsDBNull(2) ? (int?)null : r.GetInt32(2),
                     r.GetBoolean(3),
                     r.GetValue(4).ToString(),
@@ -807,7 +812,7 @@ namespace IguideME.Web.Services
                 activeHash);
 
             SQLiteDataReader r1 = Query(query1);
-         
+
             List<PeerComparisonData> submissions = new List<PeerComparisonData>();
 
             while (r1.Read())
@@ -1115,7 +1120,7 @@ namespace IguideME.Web.Services
         {
             string query = String.Format(
                 DatabaseQueries.CREATE_GOAL_REQUIREMENT,
-                goalID, tileID, entryID, metaKey, value, expresson 
+                goalID, tileID, entryID, metaKey, value, expresson
             );
 
             NonQuery(query);
@@ -1153,6 +1158,8 @@ namespace IguideME.Web.Services
             string status,
             string hash = null)
         {
+            Console.WriteLine("Registering notification to " + userLoginID + ": " + status);
+
             string activeHash = hash ?? this.GetCurrentHash(courseID);
 
             string query = String.Format(
@@ -1346,7 +1353,7 @@ namespace IguideME.Web.Services
                     DatabaseQueries.QUERY_TILES,
                     courseID
             );
-            
+
 
             SQLiteDataReader r = Query(query);
             List<Tile> tiles = new List<Tile>();
@@ -1520,7 +1527,8 @@ namespace IguideME.Web.Services
                     tileID,
                     activeHash
                 );
-            } else
+            }
+            else
             {
                 User user = GetUser(courseID, userLoginID, activeHash);
                 if (user == null) return new List<AppDiscussion>() { };
@@ -1628,7 +1636,7 @@ namespace IguideME.Web.Services
             command.ExecuteNonQuery();
         }
 
-     
+
 
         public Tile GetTile(int courseID, int tileID)
         {
@@ -1740,7 +1748,7 @@ namespace IguideME.Web.Services
 
         public void SetConsent(ConsentData data)
         {
-          
+
             if (GetConsent(data.CourseID, data.UserLoginID) == -1)
             {
                 command = connection.CreateCommand();
@@ -1749,7 +1757,8 @@ namespace IguideME.Web.Services
                     data.CourseID, data.UserID, data.UserLoginID, data.UserName.Replace("'", ""), data.Granted
                 );
                 command.ExecuteNonQuery();
-            } else
+            }
+            else
             {
                 command = connection.CreateCommand();
                 command.CommandText = String.Format(
@@ -1758,7 +1767,7 @@ namespace IguideME.Web.Services
                 );
                 command.ExecuteNonQuery();
             }
-           
+
         }
 
         public int GetConsent(int CourseID, int UserID)
@@ -1809,7 +1818,8 @@ namespace IguideME.Web.Services
 
                 return consents.ToArray();
             }
-            catch (Exception _) {
+            catch (Exception _)
+            {
                 return new ConsentData[0] { };
             }
 
@@ -1840,7 +1850,8 @@ namespace IguideME.Web.Services
                         "SELECT `user_login_id`, `title`, `grade` from `external_data` WHERE `course_id`={0} AND `user_login_id`='{1}'",
                         courseID, userLoginID
                     );
-            } else
+            }
+            else
             {
                 query = userLoginID != null ?
                     String.Format(

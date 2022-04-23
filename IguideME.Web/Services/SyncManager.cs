@@ -50,7 +50,8 @@ namespace IguideME.Web.Services
             {
                 var sync = new CanvasSyncService(
                     this.computationJobStatus,
-                    this.canvasTest);
+                    this.canvasTest,
+                _logger);
 
 
                 await this.queuedBackgroundService.PostWorkItemAsync(null).ConfigureAwait(false);
