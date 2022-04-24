@@ -36,8 +36,8 @@ namespace IguideME.Web.Services
             CancellationToken cancellationToken)
         {
             var result = new JobResultModel();
-            var courseID = 25503;
-            // var courseID = 994;
+            // var courseID = 25503;
+            var courseID = 994;
 
             string characters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
             StringBuilder _result = new StringBuilder(10);
@@ -81,6 +81,11 @@ namespace IguideME.Web.Services
             new PeerGroupWorker(courseID, hashCode, _logger).Create();
             await _computationJobStatus.UpdateJobProgressInformationAsync(
                 jobId, $"tasks.peer-groups", 0
+            ).ConfigureAwait(false);
+
+            new NotificationsWorker(courseID, hashCode, _canvasTest, _logger).Register();
+            await _computationJobStatus.UpdateJobProgressInformationAsync(
+                jobId, $"tasks.notifications", 0
             ).ConfigureAwait(false);
 
             await _computationJobStatus.UpdateJobProgressInformationAsync(

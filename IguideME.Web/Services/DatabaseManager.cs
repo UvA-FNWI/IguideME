@@ -277,7 +277,6 @@ namespace IguideME.Web.Services
                     role,
                     activeHash);
             SQLiteDataReader r = Query(query);
-            Console.WriteLine(query);
 
             List<User> users = new List<User>();
             // collect all users
@@ -942,8 +941,6 @@ namespace IguideME.Web.Services
                 activeHash);
 
             SQLiteDataReader r = Query(query);
-
-            Console.WriteLine(query);
 
             List<PredictedGrade> predictions = new List<PredictedGrade>();
 

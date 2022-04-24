@@ -35,9 +35,11 @@ namespace IguideME.Web.Services.Workers
                 // don't register data from students that did not give consent
                 if (DatabaseManager.Instance.GetConsent(this.CourseID, student.LoginID) != 1)
                 {
-                    _logger.LogInformation("Skipping user with id " + student.LoginID.ToString() + " as they did not give consent.");
+                    _logger.LogInformation("Skipping user with loginID " + student.LoginID.ToString() + " as they did not give consent.");
                     continue;
                 }
+
+                _logger.LogInformation("Processing student with loginID " + student.LoginID);
 
                 var user = new UserWithPeerGroup(
                                     0,
@@ -80,11 +82,15 @@ namespace IguideME.Web.Services.Workers
                 var userGrades1 = DatabaseManager.Instance.GetUserResults(
                     this.CourseID, user.LoginID);
 
-                foreach (var tile in tiles.Where(t => t.Notifications))
+                var tilesWithNotifications = tiles.Where(t => t.Notifications);
+
+                _logger.LogInformation("About to process " + tilesWithNotifications.Count() + " tiles...");
+
+                foreach (var tile in tilesWithNotifications)
                 {
-                    var peerGrade = peerGrades1.First(
+                    var peerGrade = peerGrades1.FirstOrDefault(
                         x => x.TileID == tile.ID);
-                    var userGrade = userGrades1.First(
+                    var userGrade = userGrades1.FirstOrDefault(
                         x => x.TileID == tile.ID);
                     if (peerGrade != null && userGrade != null)
                     {
@@ -98,6 +104,8 @@ namespace IguideME.Web.Services.Workers
                                 this.Hash);
                         }
                     }
+
+                    _logger.LogInformation("About to process " + tile.GetEntries().Count + " tile entries...");
 
                     List<float> userGradeList = new List<float>();
                     List<float> peerGradeList = new List<float>();

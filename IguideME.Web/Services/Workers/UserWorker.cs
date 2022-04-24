@@ -30,19 +30,14 @@ namespace IguideME.Web.Services.Workers
             var test = this.canvasTest.GetAdministrators(this.courseID);
             foreach (var student in test)
             {
-                try
-                {
-                    if (!String.IsNullOrEmpty(student.ID.ToString()))
-                        this.canvasTest.sendMessage((int)student.ID);
-                }
-                catch { }
-
+                if (!String.IsNullOrEmpty(student.ID.ToString()))
+                    this.canvasTest.sendMessage((int)student.ID);
             }
 
             _logger.LogInformation("Starting student registry, about to process " + students.Length.ToString() + " students...");
             foreach (var student in students)
             {
-                _logger.LogInformation("Processing " + student.ID.ToString() + "...");
+                _logger.LogInformation("Processing student " + student.ID.ToString() + "...");
 
                 if (DatabaseManager.Instance.GetUserGoalGrade(courseID, student.SISUserID) < 0)
                 {
@@ -68,7 +63,7 @@ namespace IguideME.Web.Services.Workers
 
             foreach (var instructor in instructors)
             {
-                _logger.LogInformation("Processing " + instructor.ID.ToString() + "...");
+                _logger.LogInformation("Processing instructor " + instructor.ID.ToString() + "...");
 
                 DatabaseManager.Instance.RegisterUser(
                     courseID,

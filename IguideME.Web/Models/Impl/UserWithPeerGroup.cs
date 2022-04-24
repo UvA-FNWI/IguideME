@@ -47,12 +47,15 @@ namespace IguideME.Web.Models.Impl
             var courseStudents =
                 DatabaseManager.Instance.GetUsers(this.CourseID, "student", this.Hash);
 
-            // Peer group size cannot exceed minimum treshold, no comparison
-            // possible.
-            if (courseStudents.Count < minPeerGroupSize) return;
+            if (courseStudents.Count - 1 < minPeerGroupSize)
+            {
+                Console.WriteLine("Course has less than the minimum amount of students for peer comparison, aborting. (" + courseStudents.Count + " < " + minPeerGroupSize + ")");
+                return;
+            }
 
             if (!DatabaseManager.Instance.HasPersonalizedPeers(this.CourseID))
             {
+                Console.WriteLine("Course " + this.CourseID + " has no personalized peers, considering every stydent enrolled a peer.");
                 // If the course does not have personalized peers consider
                 // every other enrolled student a peer.
                 courseStudents
@@ -67,7 +70,11 @@ namespace IguideME.Web.Models.Impl
             var _grade = DatabaseManager.Instance.GetUserGoalGrade(
                 this.CourseID, this.LoginID);
 
-            if (_grade == null) return;
+            if (_grade < 0)
+            {
+                Console.WriteLine("Student with loginID " + this.LoginID + " has no goal grade set, thus no peers will be considered.");
+                return;
+            }
 
             /**
              * When identifying peers we adhere to the simple principle that
@@ -93,33 +100,39 @@ namespace IguideME.Web.Models.Impl
 
             while (peers.Count < minPeerGroupSize)
             {
-                if (offset > 9) break;
+                if (offset > 9 || (int)grade + offset > 10) break;
 
                 // Keep filling the peer group with more distant peers 
                 var requiredPeers = minPeerGroupSize - peers.Count;
 
                 // Check upwards peers
-                DatabaseManager.Instance
-                    .GetUsersWithGoalGrade(this.CourseID, (int)grade + offset, this.Hash)
-                    .GetRange(0, requiredPeers)
-                    .ForEach(x => peers.Add(x));
+                var usersWithGoalGrade = DatabaseManager.Instance
+                    .GetUsersWithGoalGrade(this.CourseID, (int)grade + offset, this.Hash);
+                if (usersWithGoalGrade.Count > 0)
+                    usersWithGoalGrade
+                        .GetRange(0, requiredPeers)
+                        .ForEach(x => peers.Add(x));
+
                 // Check if more peers are required
                 requiredPeers = minPeerGroupSize - peers.Count;
-                if (requiredPeers == 0) break;
+                if (requiredPeers <= 0) break;
 
                 // Check downward peers
-                DatabaseManager.Instance
-                    .GetUsersWithGoalGrade(this.CourseID, (int)grade - offset, this.Hash)
+                usersWithGoalGrade = DatabaseManager.Instance
+                    .GetUsersWithGoalGrade(this.CourseID, (int)grade - offset, this.Hash);
+                if (usersWithGoalGrade.Count > 0)
+                    usersWithGoalGrade
                     .GetRange(0, requiredPeers)
                     .ForEach(x => peers.Add(x));
 
                 // Try to find peers more distant to the current student
                 offset += 1;
-
             }
 
             this.Peers = peers;
             this.LoadedPeers = true;
+
+            Console.WriteLine("Loaded " + peers.Count + " peers for student with loginID " + this.LoginID + ".");
         }
 
         public List<User> GetPeers()
