@@ -10,10 +10,14 @@ namespace IguideME.Web.Models.App
         [JsonProperty("status")]
         public string Status { get; set; }
 
-        public Notification(int tileID, string status)
+        [JsonProperty("sent")]
+        public bool Sent { get; set; }
+
+        public Notification(int tileID, string status, bool sent)
         {
             this.TileID = tileID;
             this.Status = status;
+            this.Sent = sent;
         }
     }
 }

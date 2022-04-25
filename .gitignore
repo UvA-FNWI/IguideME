@@ -243,3 +243,5 @@ out
 **/._.DS_Store
 
 **/._*
+
+/.cache

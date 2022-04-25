@@ -1,4 +1,6 @@
-﻿public static class DatabaseQueries
+﻿using System.Collections.Generic;
+
+public static class DatabaseQueries
 {
 
     // -------------------- Course preferences --------------------
@@ -122,6 +124,12 @@
             `sync_hash`           STRING
         );";
 
+    public const string CREATE_TABLE_MIGRATIONS =
+        @"CREATE TABLE IF NOT EXISTS `migrations` (
+            `id`                  INTEGER PRIMARY KEY AUTOINCREMENT,
+            `migration_id`        STRING
+        );";
+
     public const string REGISTER_PREDICTED_GRADE =
         @"INSERT INTO   `predicted_grade` ( `course_id`,
                                             `user_login_id`,
@@ -177,12 +185,28 @@
                                             `user_login_id`,
                                             `tile_id`,
                                             `status`,
+                                            `sent`,
                                             `sync_hash`)
-          VALUES        ({0}, '{1}', {2}, '{3}', '{4}');";
+          VALUES        ({0}, '{1}', {2}, '{3}', false, '{4}');";
 
-    public const string QUERY_USER_NOTIFICATIONS =
+    public const string QUERY_ALL_USER_NOTIFICATIONS =
+        @"SELECT        `tile_id`, `status`, `sent`
+        FROM            `notifications`
+        WHERE           `course_id`={0}
+        AND             `user_login_id`='{1}'
+        AND             `sync_hash`='{2}';";
+
+    public const string QUERY_PENDING_USER_NOTIFICATIONS =
         @"SELECT        `tile_id`, `status`
         FROM            `notifications`
+        WHERE           `course_id`={0}
+        AND             `user_login_id`='{1}'
+        AND             `sync_hash`='{2}'
+        AND             `sent`=false;";
+
+    public const string QUERY_MARK_NOTIFICATIONS_SENT =
+        @"UPDATE        `notifications`
+        SET             `sent` = true
         WHERE           `course_id`={0}
         AND             `user_login_id`='{1}'
         AND             `sync_hash`='{2}';";
@@ -1001,14 +1025,20 @@
                             `key`,
                             `value`)
         VALUES ({0},'{1}','{2}');";
+
+    public const string CREATE_MIGRATION =
+        @"INSERT INTO   `migrations`
+                        (`migration_id`)
+          VALUES ('{0}');";
+
+    public const string QUERY_MIGRATIONS =
+        @"SELECT    `migration_id`
+          FROM      `migrations`
+          WHERE     `migration_id`='{0}';";
+
+    public static readonly Dictionary<string, string> MIGRATIONS = new Dictionary<string, string>()
+    {
+        {"0001_add_sent_to_notifications",
+        @"ALTER TABLE notifications ADD sent BOOLEAN;"}
+    };
 }
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 

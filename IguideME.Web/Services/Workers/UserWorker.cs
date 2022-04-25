@@ -27,14 +27,9 @@ namespace IguideME.Web.Services.Workers
             _logger.LogInformation("Starting user sync...");
 
             var students = this.canvasTest.GetStudents(this.courseID);
-            var test = this.canvasTest.GetAdministrators(this.courseID);
-            foreach (var student in test)
-            {
-                if (!String.IsNullOrEmpty(student.ID.ToString()))
-                    this.canvasTest.sendMessage((int)student.ID);
-            }
 
             _logger.LogInformation("Starting student registry, about to process " + students.Length.ToString() + " students...");
+
             foreach (var student in students)
             {
                 _logger.LogInformation("Processing student " + student.ID.ToString() + "...");

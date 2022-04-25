@@ -22,6 +22,7 @@ namespace IguideME.Web.Services
         {
             connection.Open();
             CreateTables();
+            RunMigrations();
         }
 
         public static DatabaseManager Instance
@@ -57,7 +58,8 @@ namespace IguideME.Web.Services
                 DatabaseQueries.CREATE_TABLE_LEARNING_GOALS,
                 DatabaseQueries.CREATE_TABLE_GOAL_REQUREMENTS,
                 DatabaseQueries.CREATE_TABLE_NOTIFICATIONS,
-                DatabaseQueries.CREATE_TABLE_ACCEPT_LIST
+                DatabaseQueries.CREATE_TABLE_ACCEPT_LIST,
+                DatabaseQueries.CREATE_TABLE_MIGRATIONS,
             };
 
             // create tables if they do not exist
@@ -75,6 +77,22 @@ namespace IguideME.Web.Services
             NonQuery("DELETE FROM model_theta;");
             NonQuery("DELETE FROM goal_requirement;");
             NonQuery("DELETE FROM tile WHERE id=12;");
+        }
+
+        private void RunMigrations()
+        {
+            foreach (KeyValuePair<string, string> entry in DatabaseQueries.MIGRATIONS)
+            {
+                var migration_id = entry.Key;
+                if (Query(String.Format(DatabaseQueries.QUERY_MIGRATIONS, migration_id)).HasRows)
+                    continue;
+
+                Console.WriteLine("Migration " + migration_id + " not yet applied, proceeding to apply...");
+
+                var migration_sql = entry.Value;
+                NonQuery(migration_sql);
+                NonQuery(String.Format(DatabaseQueries.CREATE_MIGRATION, migration_id));
+            }
         }
 
         private int NonQuery(string query)
@@ -1170,7 +1188,7 @@ namespace IguideME.Web.Services
             NonQuery(query);
         }
 
-        public List<Notification> GetNotifications(
+        public List<Notification> GetAllNotifications(
             int courseID,
             string userLoginID,
             string hash = null)
@@ -1178,7 +1196,7 @@ namespace IguideME.Web.Services
             string activeHash = hash ?? this.GetCurrentHash(courseID);
 
             string query = String.Format(
-                DatabaseQueries.QUERY_USER_NOTIFICATIONS,
+                DatabaseQueries.QUERY_ALL_USER_NOTIFICATIONS,
                 courseID,
                 userLoginID,
                 activeHash);
@@ -1190,11 +1208,53 @@ namespace IguideME.Web.Services
             {
                 notifications.Add(new Notification(
                     r.GetInt32(0),
-                    r.GetValue(1).ToString()
+                    r.GetValue(1).ToString(),
+                    r.GetBoolean(2)
                 ));
             }
 
             return notifications;
+        }
+
+        public List<Notification> GetPendingNotifications(
+            int courseID,
+            string userLoginID,
+            string hash = null)
+        {
+            string activeHash = hash ?? this.GetCurrentHash(courseID);
+
+            string query = String.Format(
+                DatabaseQueries.QUERY_PENDING_USER_NOTIFICATIONS,
+                courseID,
+                userLoginID,
+                activeHash);
+
+            SQLiteDataReader r = Query(query);
+            List<Notification> notifications = new List<Notification>();
+
+            while (r.Read())
+            {
+                notifications.Add(new Notification(
+                    r.GetInt32(0),
+                    r.GetValue(1).ToString(),
+                    false
+                ));
+            }
+
+            return notifications;
+        }
+
+        public void MarkNotificationsSent(int courseID, string userLoginID, string hash = null)
+        {
+            string activeHash = hash ?? this.GetCurrentHash(courseID);
+
+            string query = String.Format(
+                DatabaseQueries.QUERY_MARK_NOTIFICATIONS_SENT,
+                courseID,
+                userLoginID,
+                activeHash);
+
+            NonQuery(query);
         }
 
         public List<TileEntry> GetEntries(int courseID)

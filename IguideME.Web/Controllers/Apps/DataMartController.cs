@@ -256,7 +256,7 @@ namespace IguideME.Web.Controllers
                 return Unauthorized();
 
             return Json(
-                DatabaseManager.Instance.GetNotifications(
+                DatabaseManager.Instance.GetPendingNotifications(
                     GetCourseID(), userLoginID)
             );
         }
