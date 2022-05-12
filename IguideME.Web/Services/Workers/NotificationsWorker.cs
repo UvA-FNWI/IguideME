@@ -14,7 +14,7 @@ namespace IguideME.Web.Services.Workers
             int courseID,
             string hashCode,
             CanvasTest canvasTest,
-        ILogger<SyncManager> logger)
+            ILogger<SyncManager> logger)
         {
             _logger = logger;
             this.courseID = courseID;
@@ -25,6 +25,28 @@ namespace IguideME.Web.Services.Workers
         public void Register()
         {
             _logger.LogInformation("Starting notifications sync...");
+
+            foreach (var user in DatabaseManager.Instance.GetUsers(this.courseID))
+            {
+                var notifications = DatabaseManager.Instance.GetPendingNotifications(this.courseID, user.LoginID);
+
+                _logger.LogInformation("Student " + user.LoginID + " has " + notifications.Count + " notifications queued up.");
+
+                foreach (var notification in notifications)
+                {
+                    _logger.LogInformation("Sending message to " + user.LoginID + ": " + notification.Status);
+
+                    canvasTest.sendMessage(user.UserID,
+                    "IGuideME",
+                    notification.Status);
+                }
+
+                _logger.LogInformation("Marking notifications as sent...");
+
+                DatabaseManager.Instance.MarkNotificationsSent(this.courseID, user.LoginID);
+            }
+
+            _logger.LogInformation("All notifications processed.");
         }
     }
 }

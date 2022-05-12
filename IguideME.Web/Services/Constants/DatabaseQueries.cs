@@ -206,7 +206,7 @@ public static class DatabaseQueries
 
     public const string QUERY_MARK_NOTIFICATIONS_SENT =
         @"UPDATE        `notifications`
-        SET             `sent` = true
+        SET             `sent`=true
         WHERE           `course_id`={0}
         AND             `user_login_id`='{1}'
         AND             `sync_hash`='{2}';";
