@@ -10,38 +10,44 @@ import DataMartController from "../../../../../api/controllers/datamart";
 
 export default class GradePredictor extends Component<IProps, IState> {
 
-  state = {
-    loaded: false,
-    models: [],
-    openConfigure: false
-  }
+    state = {
+        loaded: false,
+        models: [],
+        isConfiguringModel: false
+    }
 
-  componentDidMount(): void {
-    DataMartController.getModels().then(models => {
-      this.setState({ models, loaded: true });
-    });
-  }
+    componentDidMount(): void {
+        DataMartController.getModels().then(models => {
+            this.setState({ models, loaded: true });
+        });
+    }
 
-  render(): React.ReactNode {
-    const { models, loaded, openConfigure } = this.state;
+    render(): React.ReactNode {
+        const { models, loaded, isConfiguringModel } = this.state;
 
-    if (!loaded) return <Loading small={false} />;
+        if (!loaded)
+            return <Loading small={false} />;
 
-    return (
-      <Admin menuKey={"gradePredictor"}>
-        <h1>Grade Predictor</h1>
-        <span onClick={() => this.setState({ openConfigure: true })}>Configure a predictive model</span>
-        <Divider />
+        return <Admin menuKey={"gradePredictor"}>
+            <h1>Grade Predictor</h1>
+            <span onClick={() => this.setState({ isConfiguringModel: true })}>
+                Configure a predictive model
+            </span>
 
-        { (openConfigure ? false : models.length > 0) ?
-          <ParentSize>
-            { parent => (
-              <ModelResults models={models} width={parent.width} height={500} />
-            )}
-          </ParentSize> :
-          <ConfigureModel setModels={(models) => this.setState({ models, openConfigure: false })} />
-        }
-      </Admin>
-    )
-  }
+            <Divider />
+
+            {(!isConfiguringModel && models.length > 0) &&
+                <ParentSize>
+                    {parent =>
+                        <ModelResults
+                            models={models}
+                            width={parent.width}
+                            height={500} />}
+                </ParentSize>
+            }
+            {(isConfiguringModel || models.length == 0) &&
+                <ConfigureModel setModels={(models) => this.setState({ models, isConfiguringModel: false })} />
+            }
+        </Admin>
+    }
 }
