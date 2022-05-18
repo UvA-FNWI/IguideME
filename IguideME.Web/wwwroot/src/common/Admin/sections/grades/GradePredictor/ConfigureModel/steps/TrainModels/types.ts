@@ -1,8 +1,8 @@
-import {RelationshipRegistry} from "../../../../../../../../models/app/GradePredictor";
-import {PredictiveModel} from "../../../../../../../../models/app/PredictiveModel";
+import { RelationshipRegistry } from "../../../../../../../../models/app/GradePredictor";
+import { PredictiveModel } from "../../../../../../../../models/app/PredictiveModel";
 
 export interface IProps {
-  data: any[];
+  rows: any[];
   setModels: (models: PredictiveModel[]) => any;
   registry: RelationshipRegistry[];
 }

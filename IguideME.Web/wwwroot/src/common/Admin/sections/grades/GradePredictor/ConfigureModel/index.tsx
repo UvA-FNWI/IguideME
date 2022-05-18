@@ -14,7 +14,7 @@ export default class ConfigureModel extends Component<{ setModels: (models: Pred
 
     state = {
         currentStep: 0,
-        data: [],
+        rows: [],
         registry: [],
         models: [],
         loaded: false
@@ -26,8 +26,9 @@ export default class ConfigureModel extends Component<{ setModels: (models: Pred
         });
     }
 
-    setData = (data: any[]) => {
-        this.setState({ data, currentStep: 1 });
+    /* a data row is (studentloginid, grade) */
+    dataSourceUploadFinished = (rows: any[]) => {
+        this.setState({ rows, currentStep: 1 });
     }
 
     setModels = (models: PredictiveModel[]) => {
@@ -49,26 +50,23 @@ export default class ConfigureModel extends Component<{ setModels: (models: Pred
     }
 
     renderStep = () => {
-        const { currentStep, data, registry, models } = this.state;
+        const { currentStep, rows, registry, models } = this.state;
         switch (currentStep) {
             default:
             case 0:
                 return <DataSourceUpload
-                    setData={this.setData} />;
+                    dataSourceUploadFinished={this.dataSourceUploadFinished} />;
             case 1:
                 return <Relationships
                     setRegistry={registry => {
-                        // TODO: remove
-                        //localStorage.setItem("data", JSON.stringify(data));
-                        //localStorage.setItem("registry", JSON.stringify(registry));
                         this.setState({ registry })
                     }}
                     registry={registry}
-                    data={data}
+                    rows={rows}
                     nextStep={this.nextStep} />;
             case 2:
                 return <TrainModels
-                    data={data}
+                    rows={rows}
                     registry={registry}
                     setModels={this.setModels} />;
             case 3:
@@ -97,14 +95,14 @@ export default class ConfigureModel extends Component<{ setModels: (models: Pred
 
         return (
             <div id={"configureModel"}>
-                <Alert
+                {/* <Alert
                     message="Notice"
                     description="Do not close this view whilst configuring or training models!"
                     type="warning"
                     showIcon closable
                     style={{ marginBottom: 10 }}
                 />
-
+ */}
                 <Steps current={currentStep}>
                     {steps.map(s => <Steps.Step key={s.title} title={s.title} />)}
                 </Steps>
@@ -112,27 +110,29 @@ export default class ConfigureModel extends Component<{ setModels: (models: Pred
                     {this.renderStep()}
                 </div>
                 <div className="stepsAction">
-                    {currentStep < steps.length - 1 && (
-                        <Button
-                            type="primary"
-                            onClick={this.nextStep}>
-                            Next
-                        </Button>
-                    )}
-                    {currentStep === steps.length - 1 && (
-                        <Button
-                            type="primary"
-                            onClick={() => message.success('Processing complete!')}>
-                            Done
-                        </Button>
-                    )}
-                    {currentStep > 0 && (
-                        <Button
-                            style={{ margin: '0 8px' }}
-                            onClick={this.previousStep}>
-                            Previous
-                        </Button>
-                    )}
+                    <div className="stepsActionInner">
+                        {currentStep > 0 && (
+                            <Button
+                                style={{ margin: '0 8px' }}
+                                onClick={this.previousStep}>
+                                Previous
+                            </Button>
+                        )}
+                        {currentStep === steps.length - 1 && (
+                            <Button
+                                type="primary"
+                                onClick={() => message.success('Processing complete!')}>
+                                Done
+                            </Button>
+                        )}
+                        {currentStep < steps.length - 1 && (
+                            <Button
+                                type="primary"
+                                onClick={this.nextStep}>
+                                Next
+                            </Button>
+                        )}
+                    </div>
                 </div>
             </div>
         )

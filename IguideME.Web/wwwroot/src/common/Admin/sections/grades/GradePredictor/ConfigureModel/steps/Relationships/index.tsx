@@ -4,21 +4,13 @@ import { RelationshipRegistry } from "../../../../../../../../models/app/GradePr
 import { Button, Divider } from "antd";
 
 type IProps = {
-    data: any[];
+    rows: any[];
     registry: RelationshipRegistry[];
     setRegistry: (data: RelationshipRegistry[]) => any;
     nextStep: () => any;
 }
 
 export default class Relationships extends Component<IProps> {
-
-    getKeysFromSource = () => {
-        const { data } = this.props;
-        let keys = new Set(...data.map(x => Object.keys(x)));
-        keys.delete("final_grade");
-
-        return Array.from(keys).filter(k => k.length > 0);
-    }
 
     setEntry = (source_key: string, tile_id: number, entry_id: number) => {
         let registry: RelationshipRegistry[] = JSON.parse(JSON.stringify(this.props.registry));
@@ -48,31 +40,23 @@ export default class Relationships extends Component<IProps> {
     }
 
     render(): React.ReactNode {
-        const { registry, data } = this.props;
+        const { registry, rows } = this.props;
         return (
             <div id={"relationships"}>
                 <h2>Step 2. Establish relationships</h2>
-                { this.getKeysFromSource().sort().map(k =>
-                    <div>
-                        <RelationMapper registry={registry.find(r => r.source_key === k)}
-                            setEntry={this.setEntry}
-                            setMetaKey={this.setMetaKey}
-                            _key={k}
-                            data={data}
-                        />
-                    </div>
-                )}
+                <div>
+                    <RelationMapper
+                        setEntry={this.setEntry}
+                        setMetaKey={this.setMetaKey}
+                        rows={rows}
+                    />
+                </div>
+
                 <Divider />
 
-                { registry.length < 4 &&
-                    <div style={{ padding: '10px 0' }}>
-                        <strong>You must provide at least four components!</strong>
-                    </div>
-                }
-
-                <Button onClick={this.props.nextStep} disabled={registry.length < 4}>
+                <Button onClick={this.props.nextStep}>
                     Train models
-        </Button>
+                </Button>
             </div>
         )
     }
