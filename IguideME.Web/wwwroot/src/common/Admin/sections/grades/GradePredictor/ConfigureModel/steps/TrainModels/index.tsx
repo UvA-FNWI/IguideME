@@ -24,7 +24,7 @@ export default class TrainModels extends Component<IProps> {
     trainModels = () => {
         this.setState({ isTraining: true }, async () => {
             setTimeout(async () => {
-                const { registry, rows } = this.props;
+                const { registry, data } = this.props;
                 let combinations = getRegistryCombinations(registry);
                 console.log("COMBINATIONS", combinations);
                 console.log("registry", registry);
@@ -32,7 +32,7 @@ export default class TrainModels extends Component<IProps> {
 
                 for (const combination of combinations) {
                     // last column is the y output....
-                    const trainData = rows.map(row =>
+                    const trainData = data.map(row =>
                         [...combination.map(c => this._getValueFromData(c.source_key, row)),
                         this._getValueFromData('final_grade', row)
                         ]

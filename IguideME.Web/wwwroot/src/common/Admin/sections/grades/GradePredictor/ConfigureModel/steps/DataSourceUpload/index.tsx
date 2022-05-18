@@ -6,8 +6,7 @@ import { validateExternalUploadSchema } from "../../../../../../../../utils/vali
 import DemoAnimation from "./DemoAnimation";
 
 type IProps = {
-    /* a data row is (studentloginid, grade) */
-    dataSourceUploadFinished: (rows: any[]) => any;
+    setData: (data: any[]) => any;
 }
 
 export default class DataSourceUpload extends Component<IProps> {
@@ -32,14 +31,17 @@ export default class DataSourceUpload extends Component<IProps> {
                                         if (!validateExternalUploadSchema(records))
                                             return message.error("Invalid data schema!");
 
-                                        this.props.dataSourceUploadFinished(records);
+                                        this.props.setData(records);
                                     }}
                                     onError={() => message.error("Invalid data source!")}
                                     parserOptions={{
                                         header: true,
                                         dynamicTyping: true,
                                         skipEmptyLines: true,
-                                        transformHeader: h => h.toLowerCase()
+                                        transformHeader: header =>
+                                            header
+                                                .toLowerCase()
+                                                .replace(/\W/g, '_')
                                     }}
                                 />
                             </label>
