@@ -1,79 +1,71 @@
-import React, { Component } from "react";
-import Admin from "../../../index";
-import Loading from "../../../../../components/utils/Loading";
+import React, { Component } from "react"
+import Admin from "../../../index"
+import Loading from "../../../../../components/utils/Loading"
+import { filenameForFile, headerForCsvFile, rowsForCsvFile } from "ztypescript"
+import { Button } from "antd"
+
+type StudentGradePair = [Number, Number]
 
 interface IProps {
 
 }
 
 interface IState {
-    loaded: boolean;
+    loaded: boolean
+    gradesDatasets: { [name: string]: Array<StudentGradePair> }
+    finalGradesDatasetName: string
 }
 
 export default class GradePredictor extends Component<IProps, IState> {
 
     state = {
         loaded: false,
+        gradesDatasets: {},
+        finalGradesDatasetName: ""
     }
 
     componentDidMount(): void {
-        this.setState({ loaded: true });
+        this.setState({ loaded: true })
     }
 
-    async csvFileChosen(event: React.ChangeEvent<HTMLInputElement>) {
-        const files = event.target.files;
+    async csvFilesChosen(event: React.ChangeEvent<HTMLInputElement>) {
+        const files = event.target.files
         if (!files)
             return
 
-        // examResults :: [(examName, [(studentID, grade)])]
-        let examResults: Array<[String, Array<[Number, Number]>]> = [];
+        let gradesDatasets: { [name: string]: Array<StudentGradePair> } = {}
 
         for (let i = 0; i < files.length; i++) {
-            let rows = await this.rowsForFile(files[i]);
-
-            let [colA, colB] = rows[0] as [String, String];
-            colA = colA.toLowerCase();
-            colB = colB.toLowerCase();
-
-            if (colA !== "studentid" || colB !== "grade")
+            let header = await headerForCsvFile(files[i])
+            if (!header)
                 continue
 
-            let name = this.filenameForFile(files[i]);
+            let [colA, colB] = header.map(c => c.toLowerCase())
+            if (colA !== "studentloginid" || colB !== "grade")
+                continue
 
-            examResults.push([name, rows.slice(1) as Array<[Number, Number]>])
+            let datesetName = filenameForFile(files[i]);
+            let studentGradePairs = await this.readStudentGradePairsFromFile(files[i]);
+            gradesDatasets[datesetName] = studentGradePairs;
         }
 
-        console.log(examResults);
+        this.setState({ gradesDatasets })
     }
 
-    rowsForFile(file: File): Promise<Array<[String, String] | [Number, Number]>> {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = function (e: any) {
-                let content: string = e.target.result;
-                const textRows = content.split(/\r\n|\n/);
-                resolve(textRows.map(tr => {
-                    let [rawStudentID, rawGrade] = tr.split(tr.includes(';') ? ';' : ',');
-
-                    let studentID = Number(rawStudentID);
-                    let grade = Number(rawGrade.replace(',', '.'));
-
-                    if (isNaN(studentID) || isNaN(grade))
-                        return [rawStudentID, rawGrade];
-                    else
-                        return [studentID, grade];
-                }))
-            };
-            reader.onerror = reject;
-            reader.readAsText(file);
-        });
+    async readStudentGradePairsFromFile(file: File): Promise<Array<StudentGradePair>> {
+        const rows = await rowsForCsvFile(file);
+        return rows.map(r => {
+            let [studentID, grade] = r.map(c => Number(c.replace(',', '.')));
+            return [studentID, grade];
+        })
     }
 
-    filenameForFile(file: File, stripExtension = true): String {
-        if (stripExtension)
-            return file.name.split('.').pop()!;
-        else
-            return file.name;
+    finalGradesDatasetChosen(event: React.ChangeEvent<HTMLSelectElement>) {
+        this.setState({ finalGradesDatasetName: event.target.value })
+    }
+
+    trainModels() {
+
     }
 
     render(): React.ReactNode {
@@ -84,12 +76,24 @@ export default class GradePredictor extends Component<IProps, IState> {
 
         return <Admin menuKey={"gradePredictor"}>
             <h1>Grade Predictor</h1>
-            <input id="csv_files_input"
-                type="file"
+
+            <input type="file"
                 accept=".csv"
-                onChange={this.csvFileChosen.bind(this)}
+                onChange={this.csvFilesChosen.bind(this)}
                 required
                 multiple />
+
+            <select onChange={this.finalGradesDatasetChosen.bind(this)}>
+                {Object.keys(this.state.gradesDatasets).map(datasetName =>
+                    <option key={datasetName} value={datasetName}>{datasetName}</option>
+                )}
+            </select>
+
+            <Button type={"primary"}
+                size={"large"}
+                onClick={this.trainModels}>
+                Train models
+        </Button>
         </Admin>
     }
 }
