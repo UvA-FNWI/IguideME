@@ -9870,7 +9870,7 @@ ml-matrix@^6.4.1:
 
 ml-regression-multivariate-linear@^2.0.3:
   version "2.0.3"
-  resolved "https://registry.npmjs.org/ml-regression-multivariate-linear/-/ml-regression-multivariate-linear-2.0.3.tgz"
+  resolved "https://registry.yarnpkg.com/ml-regression-multivariate-linear/-/ml-regression-multivariate-linear-2.0.3.tgz#e1d660ccea46c812a2749af494e2a8d4ac1d68cf"
   integrity sha512-G8tBqf8bEhowiVP9rUeYjoc6mCSsA7yxo3fCr8hjaVVmLBAZEXoyeHj5zQZJh/eAp6423kSaabP3emWMwRcnbw==
   dependencies:
     ml-matrix "^6.4.1"
