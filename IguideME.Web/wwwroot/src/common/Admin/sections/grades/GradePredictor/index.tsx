@@ -130,40 +130,43 @@ export default class GradePredictor extends Component<IProps, IState> {
     }
 
     trainModels() {
+        // housekeeping on the datasets to ensure clean data
         this.ensureFinalGradeExists()
         this.ensureGradeDatasetsAreComplete()
         this.enforceMinimumMaximumGrade()
 
         const gradesDatasets = this.state.gradesDatasets as { [name: string]: StudentGrades }
 
-        let wOutputs = Object.keys(gradesDatasets[this.state.finalGradesDatasetName])
+        // wOutputs :: [[sID, finalGrade]] (per student)
+        const wOutputs = Object.keys(gradesDatasets[this.state.finalGradesDatasetName])
             .map(sID => parseInt(sID))
             .map(sID => [sID, gradesDatasets[this.state.finalGradesDatasetName][sID]])
 
+        // dsNames :: ["quizA", "quizB", ..., "quizN"]
         let dsNames = Object.keys(gradesDatasets)
             .filter(dsName => dsName !== this.state.finalGradesDatasetName)
 
-        let wInputs: Array<Array<number>> = []
-        for (let i = 0; i < wOutputs.length; i++) {
-            let sID = wOutputs[i][0]
+        // wInputs :: [[sID, quizAGrade, quizBGrade, ..., quizNGrade]] (per student)
+        const wInputs = Object.values(wOutputs)
+            .map(wOutput => wOutput[0])
+            .map(sID => [sID, ...Object.values(dsNames)
+                .map(dsName => gradesDatasets[dsName][sID])])
 
-            let row = [sID]
-            for (let j = 0; j < dsNames.length; j++) {
-                row[j + 1] = gradesDatasets[dsNames[j]][sID]
-            }
+        // outputs :: [finalGrade] (per student)
+        // outputs is sorted by studentID
+        const outputs = wOutputs
+            .sort((a, b) => a[0] - b[0]) // sort by sID (first element)
+            .map(r => r.slice(1)) // drop sID
 
-            wInputs.push(row)
-        }
+        // inputs :: [[quizAGrade, quizBGrade, ..., quizNGrade]] (per student)
+        // inputs is sorted by studentID
+        const inputs = wInputs
+            .sort((a, b) => a[0] - b[0]) // sort by sID (first element)
+            .map(r => r.slice(1)) // drop sID
 
-        wOutputs = wOutputs
-            .sort((a, b) => a[0] - b[0])
-            .map(r => r.slice(1))
-
-        wInputs = wInputs
-            .sort((a, b) => a[0] - b[0])
-            .map(r => r.slice(1))
-
-        const mlr = new MLR(wInputs, wOutputs, { intercept: false })
+        // use inputs to predict outputs (quiz grades -> final grade)
+        // each student is a datapoint
+        const mlr = new MLR(inputs, outputs, { intercept: false })
 
         this.setState({
             model: JSON.stringify(mlr),
