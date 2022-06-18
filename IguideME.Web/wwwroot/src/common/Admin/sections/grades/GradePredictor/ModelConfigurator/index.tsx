@@ -2,6 +2,13 @@ import React, { Component } from "react"
 import { Alert, Button, message, Steps } from "antd";
 import Loading from "../../../../../../components/utils/Loading"
 import "./style.scss"
+import UploadData from "./UploadData"
+import LinkLiveData from "./LinkLiveData"
+import TrainModel from "./TrainModel"
+import Finish from "./Finish"
+
+type StudentGrades = { [studentID: number]: number }
+type GradesDatasets = { [name: string]: StudentGrades }
 
 interface IProps {
 
@@ -9,7 +16,8 @@ interface IProps {
 
 interface IState {
     loaded: boolean
-    currentStep: number
+    currentStep: number,
+    gradesDatasets: GradesDatasets,
 }
 
 export default class ModelConfigurator extends Component<IProps, IState> {
@@ -18,7 +26,8 @@ export default class ModelConfigurator extends Component<IProps, IState> {
 
     state = {
         loaded: false,
-        currentStep: 1
+        currentStep: 1,
+        gradesDatasets: {},
     }
 
     componentDidMount() {
@@ -26,13 +35,15 @@ export default class ModelConfigurator extends Component<IProps, IState> {
     }
 
     renderStep() {
-        const { currentStep } = this.state
+        const { currentStep, gradesDatasets } = this.state
         switch (currentStep) {
             default:
-            case 1:
-                return "1"
-            case 2:
-                return "2"
+            case 1: return <UploadData
+                parentSetGradesDatasets={(gds: GradesDatasets) =>
+                    this.setState({ gradesDatasets: gds })} />
+            case 2: return <LinkLiveData gradesDatasets={gradesDatasets} />
+            case 3: return <TrainModel />
+            case 4: return <Finish />
         }
     }
 
@@ -56,7 +67,7 @@ export default class ModelConfigurator extends Component<IProps, IState> {
         if (!loaded) return <Loading small={true} />
 
         return (
-            <div id={"configureModel"}>
+            <div>
                 <Steps current={currentStep - 1}>
                     {this.steps.map(s => <Steps.Step key={s} title={s} />)}
                 </Steps>
@@ -64,12 +75,11 @@ export default class ModelConfigurator extends Component<IProps, IState> {
                     {this.renderStep()}
                 </div>
                 <div className="stepsAction">
-                    {currentStep < this.steps.length && (
+                    {currentStep > 1 && (
                         <Button
-                            className="nextBtn"
-                            type="primary"
-                            onClick={this.nextStep}>
-                            Next
+                            className="previousBtn"
+                            onClick={this.previousStep}>
+                            Previous
                         </Button>
                     )}
                     {currentStep === this.steps.length && (
@@ -79,11 +89,12 @@ export default class ModelConfigurator extends Component<IProps, IState> {
                             Done
                         </Button>
                     )}
-                    {currentStep > 1 && (
+                    {currentStep < this.steps.length && (
                         <Button
-                            className="previousBtn"
-                            onClick={this.previousStep}>
-                            Previous
+                            className="nextBtn"
+                            type="primary"
+                            onClick={this.nextStep}>
+                            Next
                         </Button>
                     )}
                 </div>
