@@ -1,9 +1,11 @@
-import React, { Component } from "react"
-import { Button } from "antd";
-import { filenameForFile, headerForCsvFile, rowsForCsvFile } from "ztypescript"
+import "./style.scss"
 
-type StudentGrades = { [studentID: number]: number }
-type GradesDatasets = { [name: string]: StudentGrades }
+import React, { Component } from "react"
+import { Alert, Col, Divider, message, Row, Button } from "antd";
+import { filenameForFile, headerForCsvFile, rowsForCsvFile } from "ztypescript"
+import BlackBoardAnimation from "./BlackBoardAnimation";
+
+import { StudentGrades, GradesDatasets } from "../../types"
 
 interface IProps {
     parentSetGradesDatasets: Function
@@ -13,7 +15,7 @@ interface IState {
     gradesDatasets: GradesDatasets
 }
 
-export default class ModelConfigurator extends Component<IProps, IState> {
+export default class UploadData extends Component<IProps, IState> {
 
     _mock = true
     _mockGradesDatasets = true
@@ -29,6 +31,16 @@ export default class ModelConfigurator extends Component<IProps, IState> {
             if (this._mockGradesDatasets)
                 this.onGradesDatasetsLoaded()
         }
+    }
+
+    onGradesDatasetsLoaded() {
+        const { parentSetGradesDatasets } = this.props
+        const { gradesDatasets } = this.state
+
+        this.ensureGradeDatasetsAreComplete()
+        this.enforceMinimumMaximumGrade()
+
+        parentSetGradesDatasets(gradesDatasets)
     }
 
     async csvFilesChosen(event: React.ChangeEvent<HTMLInputElement>) {
@@ -65,15 +77,6 @@ export default class ModelConfigurator extends Component<IProps, IState> {
             studentGrades[studentID] = grade
         })
         return studentGrades
-    }
-
-    onGradesDatasetsLoaded() {
-        this.ensureGradeDatasetsAreComplete()
-        this.enforceMinimumMaximumGrade()
-
-        const { gradesDatasets } = this.state
-
-        this.props.parentSetGradesDatasets(gradesDatasets)
     }
 
     ensureGradeDatasetsAreComplete() {
@@ -117,15 +120,64 @@ export default class ModelConfigurator extends Component<IProps, IState> {
 
     render(): React.ReactNode {
         return (
-            <div>
-                Upload data
-                <input type="file"
-                    accept=".csv"
-                    onChange={this.csvFilesChosen.bind(this)}
-                    required
-                    multiple />
-            </div>
+            <Row>
+                <Col xs={24} md={14}>
+                    <h2>Provide student grades from a past school year</h2>
+
+                    <Divider />
+
+                    <p>This configuration screen lets you train a model that once trained, will be able to roughly predict a student's final grade. The model should be trained on the results of a past academic year.
+                    </p>
+                    <p>Please provide this data through one .csv file per graded assignment (e.g. mini-test, quiz, etc.); The files must contain the following two columns: "studentID" and "grade". Furthermore, please take note of which file contains the final grades.</p>
+                    <p>You can select multiple files at once.</p>
+
+                    <Alert message="Student data is only ever kept on your local device, and never uploaded to IGuideME. Once the model is trained, all identifying information is erased." />
+
+                    <div id="filePickerInputContainer">
+                        <input id="filePickerInput"
+                            type="file"
+                            accept=".csv"
+                            multiple
+                            onChange={this.csvFilesChosen.bind(this)} />
+                    </div>
+
+                    <ul id="uploadedFilesUl">
+                        {Object.keys(this.state.gradesDatasets)
+                            .map(datasetName =>
+                                <li>
+                                    <Button
+                                        className="liDeleteBtn"
+                                        size="small"
+                                        onClick={() => {
+                                            const { gradesDatasets } = this.state
+                                            delete gradesDatasets[datasetName]
+                                            this.setState({
+                                                gradesDatasets: gradesDatasets
+                                            })
+                                        }}>
+                                        x
+                                    </Button>
+                                    {datasetName}
+                                </li>
+                            )}
+                    </ul>
+
+                    <Button id="uploadButton"
+                        type="primary"
+                        size="large"
+                        onClick={() =>
+                            document
+                                .getElementById("filePickerInput")
+                                ?.click()
+                        }>
+                        Upload Data
+                        </Button>
+
+                </Col>
+                <Col xs={0} md={10}>
+                    <BlackBoardAnimation />
+                </Col>
+            </Row>
         )
     }
-
 }

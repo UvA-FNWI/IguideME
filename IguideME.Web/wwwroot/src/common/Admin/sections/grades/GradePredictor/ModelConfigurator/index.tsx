@@ -1,14 +1,13 @@
+import "./style.scss"
+
 import React, { Component } from "react"
 import { Alert, Button, message, Steps } from "antd";
 import Loading from "../../../../../../components/utils/Loading"
-import "./style.scss"
 import UploadData from "./UploadData"
 import LinkLiveData from "./LinkLiveData"
 import TrainModel from "./TrainModel"
 import Finish from "./Finish"
-
-type StudentGrades = { [studentID: number]: number }
-type GradesDatasets = { [name: string]: StudentGrades }
+import { GradesDatasets } from "../types"
 
 interface IProps {
 
@@ -18,6 +17,8 @@ interface IState {
     loaded: boolean
     currentStep: number,
     gradesDatasets: GradesDatasets,
+    finalGradesDatasetName: string,
+    model: string,
 }
 
 export default class ModelConfigurator extends Component<IProps, IState> {
@@ -28,6 +29,8 @@ export default class ModelConfigurator extends Component<IProps, IState> {
         loaded: false,
         currentStep: 1,
         gradesDatasets: {},
+        finalGradesDatasetName: "",
+        model: "",
     }
 
     componentDidMount() {
@@ -35,15 +38,26 @@ export default class ModelConfigurator extends Component<IProps, IState> {
     }
 
     renderStep() {
-        const { currentStep, gradesDatasets } = this.state
+        const { currentStep, gradesDatasets, finalGradesDatasetName, model } = this.state
         switch (currentStep) {
             default:
             case 1: return <UploadData
                 parentSetGradesDatasets={(gds: GradesDatasets) =>
                     this.setState({ gradesDatasets: gds })} />
-            case 2: return <LinkLiveData gradesDatasets={gradesDatasets} />
-            case 3: return <TrainModel />
-            case 4: return <Finish />
+
+            case 2: return <LinkLiveData
+                gradesDatasets={gradesDatasets}
+                parentSetFinalGradesDatasetName={(name: string) =>
+                    this.setState({ finalGradesDatasetName: name })} />
+
+            case 3: return <TrainModel
+                gradesDatasets={gradesDatasets}
+                finalGradesDatasetName={finalGradesDatasetName}
+                parentSetModel={(model: string) =>
+                    this.setState({ model: model })} />
+
+            case 4: return <Finish
+                model={model} />
         }
     }
 
