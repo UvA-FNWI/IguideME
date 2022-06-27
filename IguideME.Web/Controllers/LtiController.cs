@@ -32,7 +32,7 @@ namespace IguideME.Web.Controllers
             // Check the OAuth signature
             var formdata = await HttpContext.Request.ReadFormAsync();
             if (!signatureChecker.CheckSignature(HttpContext.Request.Method, HttpContext.Request.GetDisplayUrl(), formdata.ToDictionary(k => k.Key, k => (string)k.Value), formdata["oauth_signature"]))
-                return Unauthorized();
+                return Unauthorized($"Signature check failed. Request url: {HttpContext.Request.GetDisplayUrl()}");
 
             // Register user identity
             var claims = new List<Claim> {
