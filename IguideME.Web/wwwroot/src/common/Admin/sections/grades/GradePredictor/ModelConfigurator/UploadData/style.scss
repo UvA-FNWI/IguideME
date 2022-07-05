@@ -25,3 +25,18 @@
     }
   }
 }
+
+.finalGradesDSSelect {
+  margin-top: 20px;
+  width: 100%;
+
+  &.error {
+    .ant-select-selector {
+      border-color: red;
+    }
+
+    * {
+      color: red;
+    }
+  }
+}

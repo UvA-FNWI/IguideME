@@ -3,6 +3,7 @@ import { Button } from "antd";
 import MLR from "ml-regression-multivariate-linear"
 
 import { StudentGrades, GradesDatasets } from "../../types"
+import { IStep } from "../interfaces"
 
 interface IProps {
     gradesDatasets: GradesDatasets,
@@ -16,7 +17,7 @@ interface IState {
     model: string,
 }
 
-export default class TrainModel extends Component<IProps, IState> {
+export default class TrainModel extends Component<IProps, IState> implements IStep {
 
     _mock = false
     _mockModel = true
@@ -115,6 +116,12 @@ export default class TrainModel extends Component<IProps, IState> {
         console.log(mlr.predict([1, 1, 1, 1]))
         console.log(dsNames)
     }
+
+    validate(): boolean {
+        return true
+    }
+
+    isStepCompleted: () => boolean = this.validate;
 
     render(): React.ReactNode {
         return (
