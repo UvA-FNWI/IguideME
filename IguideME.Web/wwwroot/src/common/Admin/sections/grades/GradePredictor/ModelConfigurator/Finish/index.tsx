@@ -1,7 +1,5 @@
 import React, { Component } from "react"
-import { Button } from "antd";
 
-import { StudentGrades, GradesDatasets } from "../../types"
 import { IStep } from "../interfaces";
 
 interface IProps {
@@ -23,7 +21,7 @@ export default class Finish extends Component<IProps, IState> implements IStep {
         return true
     }
 
-    isStepCompleted: () => boolean = this.validate;
+    isStepCompleted = this.validate
 
     render(): React.ReactNode {
         return (

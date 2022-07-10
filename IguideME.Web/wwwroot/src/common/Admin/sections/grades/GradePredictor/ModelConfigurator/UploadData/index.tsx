@@ -141,7 +141,7 @@ export default class UploadData extends Component<IProps, IState> implements ISt
         return wValid
     }
 
-    isStepCompleted: () => boolean = this.validate;
+    isStepCompleted = this.validate
 
     render(): React.ReactNode {
         return (
@@ -237,7 +237,7 @@ export default class UploadData extends Component<IProps, IState> implements ISt
     }
 }
 
-class UploadDataMock extends Mock {
+export class UploadDataMock extends Mock {
     mockGradesDatasets = true
     mockFinalGradesDatasetName = true
 

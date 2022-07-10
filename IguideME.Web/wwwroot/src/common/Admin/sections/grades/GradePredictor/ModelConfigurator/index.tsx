@@ -3,12 +3,15 @@ import "./style.scss"
 import React, { Component, RefObject } from "react"
 import { Alert, Button, message, Steps } from "antd";
 import Loading from "../../../../../../components/utils/Loading"
-import UploadData from "./UploadData"
-import LinkLiveData from "./LinkLiveData"
-import TrainModel from "./TrainModel"
+
+import UploadData, { UploadDataMock } from "./UploadData"
+import LinkLiveData, { LinkLiveDataMock } from "./LinkLiveData"
+import TrainModel, { TrainModelMock } from "./TrainModel"
 import Finish from "./Finish"
+
 import { GradesDatasets } from "../types"
 import { IStep } from "./interfaces"
+import { Mock } from "../../../../../../mock"
 
 const { forwardRef, useRef, createRef, useImperativeHandle } = React
 
@@ -26,12 +29,13 @@ interface IState {
 }
 
 export default class ModelConfigurator extends Component<IProps, IState> {
+    mock = new ModelConfiguratorMock(/* enable? */ true)
 
     steps = ["Upload historic data", "Link to live data", "Train model", "Done!"]
 
     state = {
         loaded: false,
-        currentStep: 2,
+        currentStep: 1,
         gradesDatasets: {},
         finalGradesDatasetName: "",
         model: "",
@@ -39,6 +43,14 @@ export default class ModelConfigurator extends Component<IProps, IState> {
     }
 
     componentDidMount() {
+        if (this.mock.enabled)
+            this.setState({
+                currentStep: this.mock.currentStep,
+                gradesDatasets: this.mock.gradesDatasets,
+                finalGradesDatasetName: this.mock.finalGradesDatasetName,
+                model: this.mock.model,
+            })
+
         this.setState({
             loaded: true,
         })
@@ -128,4 +140,14 @@ export default class ModelConfigurator extends Component<IProps, IState> {
             </div>
         )
     }
+}
+
+class ModelConfiguratorMock extends Mock {
+    mockCurrentStep = true
+
+    currentStep = (this.enabled && this.mockCurrentStep) ? 2 : 1
+
+    gradesDatasets = (new UploadDataMock(this.enabled)).gradesDatasets
+    finalGradesDatasetName = (new UploadDataMock(this.enabled)).finalGradesDatasetName
+    model = (new TrainModelMock(this.enabled)).model
 }

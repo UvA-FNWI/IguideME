@@ -117,7 +117,7 @@ export default class TrainModel extends Component<IProps, IState> implements ISt
         return true
     }
 
-    isStepCompleted: () => boolean = this.validate;
+    isStepCompleted = this.validate
 
     render(): React.ReactNode {
         return (
@@ -128,7 +128,7 @@ export default class TrainModel extends Component<IProps, IState> implements ISt
     }
 }
 
-class TrainModelMock extends Mock {
+export class TrainModelMock extends Mock {
     mockModel = true
 
     model = (this.enabled && this.mockModel) ? "" : ""
