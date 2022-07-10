@@ -1,5 +1,4 @@
 import React, { Component } from "react"
-import { Button } from "antd";
 import MLR from "ml-regression-multivariate-linear"
 
 import { StudentGrades, GradesDatasets } from "../../types"
@@ -18,20 +17,16 @@ interface IState {
 }
 
 export default class TrainModel extends Component<IProps, IState> implements IStep {
-
-    _mock = false
-    _mockModel = true
-
-    _modelMock = ""
+    mock = new Mock(/* enable? */ true)
 
     state = {
         gradesDatasets: {},
-        model: (this._mock && this._mockModel) ? this._modelMock : "",
+        model: this.mock.model,
     }
 
     componentDidMount() {
-        if (this._mock) {
-            if (this._mockModel)
+        if (this.mock.enabled) {
+            if (this.mock.mockModel)
                 this.onModelTrained()
         }
     }
@@ -130,4 +125,15 @@ export default class TrainModel extends Component<IProps, IState> implements ISt
             </div>
         )
     }
+}
+
+class Mock {
+    enabled = false
+    mockModel = true
+
+    constructor(enabled: boolean) {
+        this.enabled = enabled
+    }
+
+    model = (this.enabled && this.mockModel) ? "" : ""
 }

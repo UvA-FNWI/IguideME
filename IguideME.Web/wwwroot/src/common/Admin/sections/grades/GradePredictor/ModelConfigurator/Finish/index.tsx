@@ -13,17 +13,17 @@ interface IState {
 
 export default class Finish extends Component<IProps, IState> implements IStep {
 
-    validate(): boolean {
-        return true
-    }
-
-    isStepCompleted: () => boolean = this.validate;
-
     state = {
     }
 
     componentDidMount() {
     }
+
+    validate(): boolean {
+        return true
+    }
+
+    isStepCompleted: () => boolean = this.validate;
 
     render(): React.ReactNode {
         return (

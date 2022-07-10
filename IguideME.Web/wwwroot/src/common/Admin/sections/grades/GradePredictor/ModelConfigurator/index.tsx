@@ -51,13 +51,13 @@ export default class ModelConfigurator extends Component<IProps, IState> {
             case 1: return <UploadData
                 ref={childRef}
                 parentSetGradesDatasets={(gds: GradesDatasets) =>
-                    this.setState({ gradesDatasets: gds })} />
+                    this.setState({ gradesDatasets: gds })}
+                parentSetFinalGradesDatasetName={(name: string) =>
+                    this.setState({ finalGradesDatasetName: name })} />
 
             case 2: return <LinkLiveData
                 ref={childRef}
-                gradesDatasets={gradesDatasets}
-                parentSetFinalGradesDatasetName={(name: string) =>
-                    this.setState({ finalGradesDatasetName: name })} />
+                gradesDatasets={gradesDatasets} />
 
             case 3: return <TrainModel
                 ref={childRef}
