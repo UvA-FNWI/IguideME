@@ -3,6 +3,7 @@ import MLR from "ml-regression-multivariate-linear"
 
 import { StudentGrades, GradesDatasets } from "../../types"
 import { IStep } from "../interfaces"
+import { Mock } from "../../../../../../../mock"
 
 interface IProps {
     gradesDatasets: GradesDatasets,
@@ -17,7 +18,7 @@ interface IState {
 }
 
 export default class TrainModel extends Component<IProps, IState> implements IStep {
-    mock = new Mock(/* enable? */ true)
+    mock = new TrainModelMock(/* enable? */ true)
 
     state = {
         gradesDatasets: {},
@@ -127,13 +128,8 @@ export default class TrainModel extends Component<IProps, IState> implements ISt
     }
 }
 
-class Mock {
-    enabled = false
+class TrainModelMock extends Mock {
     mockModel = true
-
-    constructor(enabled: boolean) {
-        this.enabled = enabled
-    }
 
     model = (this.enabled && this.mockModel) ? "" : ""
 }

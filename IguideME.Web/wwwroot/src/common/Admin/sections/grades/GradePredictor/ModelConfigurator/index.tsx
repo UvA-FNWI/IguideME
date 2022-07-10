@@ -31,7 +31,7 @@ export default class ModelConfigurator extends Component<IProps, IState> {
 
     state = {
         loaded: false,
-        currentStep: 1,
+        currentStep: 2,
         gradesDatasets: {},
         finalGradesDatasetName: "",
         model: "",

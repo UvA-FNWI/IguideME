@@ -2,6 +2,7 @@ import React, { Component } from "react"
 
 import { GradesDatasets } from "../../types"
 import { IStep } from "../interfaces"
+import { Mock } from "../../../../../../../mock"
 
 interface IProps {
     gradesDatasets: GradesDatasets,
@@ -12,7 +13,7 @@ interface IState {
 }
 
 export default class LinkLiveData extends Component<IProps, IState> implements IStep {
-    mock = new Mock(/* enable? */ true)
+    mock = new LinkLiveDataMock(/* enable? */ true)
 
     state = {
     }
@@ -35,10 +36,5 @@ export default class LinkLiveData extends Component<IProps, IState> implements I
     }
 }
 
-class Mock {
-    enabled = true
-
-    constructor(enabled: boolean) {
-        this.enabled = enabled
-    }
+class LinkLiveDataMock extends Mock {
 }
