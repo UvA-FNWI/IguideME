@@ -3,7 +3,7 @@ import {Tile, TileEntry, TileEntrySubmission} from "../../../../models/app/Tile"
 import {Col, Row} from "antd";
 import EntryItem from "./EntryItem";
 import { ParentSize } from '@visx/responsive';
-import {Line} from "react-chartjs-2";
+import {Bar} from "react-chartjs-2";
 import "./style.scss";
 import {CanvasDiscussion} from "../../../../models/canvas/Discussion";
 
@@ -27,7 +27,7 @@ export default class EntriesList extends Component<{
             label: tile.title + " grades",
             data: submissions.map(s => s.grade),
             fill: false,
-            borderColor: "rgba(75,192,192,1)"
+            backgroundColor: "rgba(75,192,192,1)"
           }
         ]
       };
@@ -35,7 +35,7 @@ export default class EntriesList extends Component<{
       return (
         <div id={"tileEntriesGraph"} style={{minHeight: '60vh'}}>
           <div>
-            <Line options={{ legend: { display: false }}}
+            <Bar options={{ legend: { display: false }}}
                   width={500}
                   data={data} />
           </div>
