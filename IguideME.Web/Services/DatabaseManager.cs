@@ -12,7 +12,7 @@ namespace IguideME.Web.Services
     {
         private static readonly DatabaseManager instance = new DatabaseManager();
         private readonly SQLiteConnection connection = new SQLiteConnection(
-            "Data Source=/data/IguideME.db;Version=3;New=False;Compress=True;"
+            "Data Source=data/IguideME.db;Version=3;New=False;Compress=True;"
         );
         private static SQLiteCommand command;
 
