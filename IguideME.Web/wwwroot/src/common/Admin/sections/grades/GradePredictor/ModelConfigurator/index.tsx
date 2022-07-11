@@ -24,6 +24,7 @@ interface IState {
     currentStep: number,
     gradesDatasets: GradesDatasets,
     finalGradesDatasetName: string,
+    gradesDatasetTilePairs: { [name: string]: number },
     model: string,
     childRef: RefObject<any>,
 }
@@ -38,6 +39,7 @@ export default class ModelConfigurator extends Component<IProps, IState> {
         currentStep: 1,
         gradesDatasets: {},
         finalGradesDatasetName: "",
+        gradesDatasetTilePairs: {},
         model: "",
         childRef: createRef<any>(),
     }
@@ -69,7 +71,9 @@ export default class ModelConfigurator extends Component<IProps, IState> {
 
             case 2: return <LinkLiveData
                 ref={childRef}
-                gradesDatasets={gradesDatasets} />
+                gradesDatasets={gradesDatasets}
+                parentSetGradesDatasetTilePairs={(pairs: { [name: string]: number }) =>
+                    this.setState({ gradesDatasetTilePairs: pairs })} />
 
             case 3: return <TrainModel
                 ref={childRef}

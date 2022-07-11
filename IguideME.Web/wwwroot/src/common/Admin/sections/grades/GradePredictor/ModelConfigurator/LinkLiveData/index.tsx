@@ -1,3 +1,5 @@
+import "./style.scss"
+
 import React, { Component } from "react"
 import { Row, Col, Select, Divider } from "antd"
 
@@ -12,17 +14,21 @@ const { Option } = Select
 
 interface IProps {
     gradesDatasets: GradesDatasets,
+
+    parentSetGradesDatasetTilePairs: Function,
 }
 
 interface IState {
-    tiles: Tile[]
+    tiles: Tile[],
+    gradesDatasetTilePairs: { [name: string]: number },
 }
 
 export default class LinkLiveData extends Component<IProps, IState> implements IStep {
     mock = new LinkLiveDataMock(/* enable? */ true)
 
     state = {
-        tiles: []
+        tiles: [],
+        gradesDatasetTilePairs: {},
     }
 
     componentDidMount() {
@@ -48,14 +54,24 @@ export default class LinkLiveData extends Component<IProps, IState> implements I
                     <Divider />
 
                     {Object.keys(this.props.gradesDatasets).map(datasetName =>
-                        <Row>
+                        <Row className="select-container">
                             <Col xs={24} md={24}>
-                                <h3>{datasetName}</h3>
+                                <h3 className="select-title">{datasetName}</h3>
                             </Col>
                             <Col xs={24} md={24}>
                                 <Select
                                     size="middle"
-                                    placeholder="Choose a data source">
+                                    placeholder="Choose a data source"
+                                    onChange={(v: number) => {
+                                        let { gradesDatasetTilePairs }: IState = this.state
+                                        gradesDatasetTilePairs[datasetName] = v
+                                        this.setState({
+                                            gradesDatasetTilePairs: gradesDatasetTilePairs,
+                                        })
+
+                                        let { parentSetGradesDatasetTilePairs } = this.props
+                                        parentSetGradesDatasetTilePairs(gradesDatasetTilePairs)
+                                    }}>
                                     {this.state.tiles.map((tile: Tile) =>
                                         <Option key={tile.id} value={tile.title}>
                                             {tile.title}
@@ -69,8 +85,8 @@ export default class LinkLiveData extends Component<IProps, IState> implements I
 
                 <Col xs={24} md={10}>
                     <Row>
-                        {/* TODO using "." as a margin/padding, fix this with css */}
-                        <h2>.</h2>
+                        {/* using "." as a margin/padding */}
+                        <h2 className="invisible">.</h2>
 
                         <Divider />
 
