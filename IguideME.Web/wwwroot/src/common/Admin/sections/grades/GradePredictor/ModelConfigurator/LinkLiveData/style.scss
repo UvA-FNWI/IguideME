@@ -1,0 +1,12 @@
+.invisible {
+  visibility: hidden;
+}
+
+.select-container {
+  &:not(:nth-child(3)) {
+    .select-title {
+      margin-top: 24px;
+      margin-bottom: 2px;
+    }
+  }
+}
