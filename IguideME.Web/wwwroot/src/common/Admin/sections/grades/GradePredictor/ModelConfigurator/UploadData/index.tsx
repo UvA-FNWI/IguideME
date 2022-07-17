@@ -145,94 +145,96 @@ export default class UploadData extends Component<IProps, IState> implements ISt
 
     render(): React.ReactNode {
         return (
-            <Row>
-                <Col xs={24} md={14}>
-                    <Row>
-                        <Col xs={24} md={24}>
-                            <h2>Provide student grades from a past school year</h2>
+            <div>
+                <Row>
+                    <Col xs={24} md={14}>
+                        <Row>
+                            <Col xs={24} md={24}>
+                                <h2>Provide student grades from a past school year</h2>
 
-                            <Divider />
+                                <Divider />
 
-                            <p>This configuration screen lets you train a model that once trained, will be able to roughly predict a student's final grade. The model should be trained on the results of a past academic year.
+                                <p>This configuration screen lets you train a model that once trained, will be able to roughly predict a student's final grade. The model should be trained on the results of a past academic year.
                     </p>
-                            <p>Please provide this data through one .csv file per graded assignment (e.g. mini-test, quiz, etc.); The files must contain the following two columns: "studentID" and "grade". Furthermore, please take note of which file contains the final grades.</p>
-                            <p>You can select multiple files at once.</p>
+                                <p>Please provide this data through one .csv file per graded assignment (e.g. mini-test, quiz, etc.); The files must contain the following two columns: "studentID" and "grade". Furthermore, please take note of which file contains the final grades.</p>
+                                <p>You can select multiple files at once.</p>
 
-                            <Alert message="Student data is only ever kept on your local device, and never uploaded to IGuideME. Once the model is trained, all identifying information is erased." />
+                                <Alert message="Student data is only ever kept on your local device, and never uploaded to IGuideME. Once the model is trained, all identifying information is erased." />
 
-                        </Col>
-                    </Row>
+                            </Col>
+                        </Row>
 
-                    <Row>
-                        <Col xs={24} md={12}>
-                            <div id="filePickerInputContainer">
-                                <input id="filePickerInput"
-                                    type="file"
-                                    accept=".csv"
-                                    multiple
-                                    onChange={this.csvFilesChosen.bind(this)} />
-                            </div>
+                        <Row>
+                            <Col xs={24} md={12}>
+                                <div id="filePickerInputContainer">
+                                    <input id="filePickerInput"
+                                        type="file"
+                                        accept=".csv"
+                                        multiple
+                                        onChange={this.csvFilesChosen.bind(this)} />
+                                </div>
 
-                            <ul id="uploadedFilesUl">
-                                {Object.keys(this.state.gradesDatasets)
-                                    .map(datasetName =>
-                                        <li>
-                                            <Button
-                                                className="liDeleteBtn"
-                                                size="small"
-                                                onClick={() => {
-                                                    const { gradesDatasets } = this.state
-                                                    delete gradesDatasets[datasetName]
-                                                    this.setState({
-                                                        gradesDatasets: gradesDatasets
-                                                    })
-                                                }}>
-                                                x
+                                <ul id="uploadedFilesUl">
+                                    {Object.keys(this.state.gradesDatasets)
+                                        .map(datasetName =>
+                                            <li>
+                                                <Button
+                                                    className="liDeleteBtn"
+                                                    size="small"
+                                                    onClick={() => {
+                                                        const { gradesDatasets } = this.state
+                                                        delete gradesDatasets[datasetName]
+                                                        this.setState({
+                                                            gradesDatasets: gradesDatasets
+                                                        })
+                                                    }}>
+                                                    x
                                     </Button>
-                                            {datasetName}
-                                        </li>
-                                    )}
-                            </ul>
+                                                {datasetName}
+                                            </li>
+                                        )}
+                                </ul>
 
-                            <Button id="uploadButton"
-                                type="primary"
-                                size="large"
-                                onClick={() =>
-                                    document
-                                        .getElementById("filePickerInput")
-                                        ?.click()
-                                }>
-                                Upload Data
+                                <Button id="uploadButton"
+                                    type="primary"
+                                    size="large"
+                                    onClick={() =>
+                                        document
+                                            .getElementById("filePickerInput")
+                                            ?.click()
+                                    }>
+                                    Upload Data
                             </Button>
-                        </Col>
+                            </Col>
 
-                        <Col xs={24} md={12}>
-                            <Select
-                                className={"finalGradesDSSelect " + (this.state.inputErrorFinalGradesDatasetName && " error ")}
-                                size="large"
-                                onChange={(v: string) => {
-                                    this.setState({
-                                        finalGradesDatasetName: v,
-                                        inputErrorFinalGradesDatasetName: false
-                                    })
-                                    this.onFinalGradesDatasetNameChosen()
-                                }}
-                                placeholder="Kies eindcijfer dataset">
-                                {Object.keys(this.state.gradesDatasets)
-                                    .map(datasetName =>
-                                        <Option key={datasetName} value={datasetName}>
-                                            {datasetName}
-                                        </Option>
-                                    )}
-                            </Select>
-                        </Col>
-                    </Row>
+                            <Col xs={24} md={12}>
+                                <Select
+                                    className={"finalGradesDSSelect " + (this.state.inputErrorFinalGradesDatasetName && " error ")}
+                                    size="large"
+                                    onChange={(v: string) => {
+                                        this.setState({
+                                            finalGradesDatasetName: v,
+                                            inputErrorFinalGradesDatasetName: false
+                                        })
+                                        this.onFinalGradesDatasetNameChosen()
+                                    }}
+                                    placeholder="Kies eindcijfer dataset">
+                                    {Object.keys(this.state.gradesDatasets)
+                                        .map(datasetName =>
+                                            <Option key={datasetName} value={datasetName}>
+                                                {datasetName}
+                                            </Option>
+                                        )}
+                                </Select>
+                            </Col>
+                        </Row>
 
-                </Col>
-                <Col xs={0} md={10}>
-                    <BlackBoardAnimation />
-                </Col>
-            </Row>
+                    </Col>
+                    <Col xs={0} md={10}>
+                        <BlackBoardAnimation />
+                    </Col>
+                </Row>
+            </div>
         )
     }
 }
