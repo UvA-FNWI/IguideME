@@ -60,6 +60,7 @@ export default class LinkLiveData
     render(): React.ReactNode {
         return (
             <div>
+
                 <Row>
                     <Col xs={24} md={24}>
                         <h2>Link the uploaded grades to tiles (live data sources)</h2>
@@ -136,6 +137,7 @@ export default class LinkLiveData
                             </Col>
                         </Row>
                     </Col>
+
                 </Row>
             </div>
         );

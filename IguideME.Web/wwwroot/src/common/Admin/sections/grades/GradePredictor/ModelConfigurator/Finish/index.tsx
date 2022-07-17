@@ -3,7 +3,7 @@ import React, { Component } from "react"
 import { IStep } from "../interfaces";
 
 interface IProps {
-    model: string,
+    model: any, // TODO type
 }
 
 interface IState {

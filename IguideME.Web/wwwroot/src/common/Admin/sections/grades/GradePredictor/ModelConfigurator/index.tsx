@@ -2,7 +2,6 @@ import "./style.scss";
 
 import React, { Component, RefObject } from "react";
 import { Alert, Button, message, Steps } from "antd";
-import Loading from "../../../../../../components/utils/Loading";
 
 import UploadData, { UploadDataMock } from "./UploadData";
 import LinkLiveData, { LinkLiveDataMock } from "./LinkLiveData";
@@ -23,7 +22,7 @@ interface IState {
     gradesDatasets: GradesDatasets;
     finalGradesDatasetName: string;
     gradesDatasetTilePairs: { [name: string]: number };
-    model: string;
+    model: { model: any, modelColumns: number[] } | null;
     childRef: RefObject<any>;
 }
 
@@ -34,26 +33,15 @@ export default class ModelConfigurator extends Component<IProps, IState> {
 
     state = {
         loaded: false,
-        currentStep: 1,
-        gradesDatasets: {},
-        finalGradesDatasetName: "",
-        gradesDatasetTilePairs: {},
-        model: "",
+        currentStep: this.mock.currentStep,
+        gradesDatasets: this.mock.gradesDatasets,
+        finalGradesDatasetName: this.mock.finalGradesDatasetName,
+        gradesDatasetTilePairs: this.mock.gradesDatasetTilePairs,
+        model: this.mock.model,
         childRef: createRef<any>(),
     };
 
     componentDidMount() {
-        if (this.mock.enabled)
-            this.setState({
-                currentStep: this.mock.currentStep,
-                gradesDatasets: this.mock.gradesDatasets,
-                finalGradesDatasetName: this.mock.finalGradesDatasetName,
-                model: this.mock.model,
-            });
-
-        this.setState({
-            loaded: true,
-        });
     }
 
     renderStep() {
@@ -100,7 +88,7 @@ export default class ModelConfigurator extends Component<IProps, IState> {
                         gradesDatasets={gradesDatasets}
                         gradesDatasetTilePairs={gradesDatasetTilePairs}
                         finalGradesDatasetName={finalGradesDatasetName}
-                        parentSetModel={(model: string) =>
+                        parentSetModel={(model: { model: any, modelColumns: number[] }) =>
                             this.setState({ model: model })
                         }
                     />
@@ -133,8 +121,6 @@ export default class ModelConfigurator extends Component<IProps, IState> {
 
     render(): React.ReactNode {
         const { currentStep, loaded } = this.state;
-
-        if (!loaded) return <Loading small={true} />;
 
         return (
             <div>
@@ -172,7 +158,7 @@ class ModelConfiguratorMock extends Mock {
     currentStep = this.enabled && this.mockCurrentStep ? 3 : 1;
 
     gradesDatasets = new UploadDataMock(this.enabled).gradesDatasets;
-    finalGradesDatasetName = new UploadDataMock(this.enabled)
-        .finalGradesDatasetName;
+    finalGradesDatasetName = new UploadDataMock(this.enabled).finalGradesDatasetName;
+    gradesDatasetTilePairs = new LinkLiveDataMock(this.enabled).gradesDatasetTilePairs;
     model = new TrainModelMock(this.enabled).model;
 }
