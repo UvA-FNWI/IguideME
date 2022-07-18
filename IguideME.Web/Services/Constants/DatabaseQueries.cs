@@ -27,6 +27,20 @@ public static class DatabaseQueries
             `accepted`            BOOLEAN
         );";
 
+    public const string CREATE_TABLE_GRADE_PREDICTION_MODEL =
+        @"CREATE TABLE IF NOT EXISTS `grade_prediction_model` (
+            `id`                  INTEGER PRIMARY KEY AUTOINCREMENT,
+            `course_id`           INTEGER,
+        );";
+
+    public const string CREATE_TABLE_GRADE_PREDICTION_MODEL_PARAMETER =
+        @"CREATE TABLE IF NOT EXISTS `grade_prediction_model_parameter` (
+            `id`                  INTEGER PRIMARY KEY AUTOINCREMENT,
+            `model_id`            INTEGER,
+            `parameter_id`        INTEGER,
+            `weight`              FLOAT,
+        );";
+
     public const string CREATE_TABLE_PREDICTIVE_MODEL =
         @"CREATE TABLE IF NOT EXISTS `predictive_model` (
             `id`                  INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -212,6 +226,18 @@ public static class DatabaseQueries
         AND             `sync_hash`='{2}';";
 
     // -------------------- Predictive models --------------------
+
+    public const string CREATE_GRADE_PREDICTION_MODEL =
+        @"INSERT INTO   `grade_prediction_model` (    `course_id`    )
+          VALUES        ({0});";
+
+    public const string CREATE_GRADE_PREDICTION_MODEL_PARAMETER =
+        @"INSERT INTO   `grade_prediction_model_parameter` (    `model_id`,
+                                                                `parameter_id`,
+                                                                `weight` )
+
+          VALUES        ({0}, '{1}', {2});";
+    // -------------------- Old predictive models --------------------
 
     public const string CREATE_PREDICTIVE_MODEL =
         @"INSERT INTO   `predictive_model` (    `course_id`,
@@ -1039,6 +1065,6 @@ public static class DatabaseQueries
     public static readonly Dictionary<string, string> MIGRATIONS = new Dictionary<string, string>()
     {
         {"0001_add_sent_to_notifications",
-        @"ALTER TABLE notifications ADD sent BOOLEAN;"}
+        @"ALTER TABLE notifications ADD sent BOOLEAN;"},
     };
 }

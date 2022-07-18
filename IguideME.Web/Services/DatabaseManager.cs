@@ -52,6 +52,8 @@ namespace IguideME.Web.Services
                 DatabaseQueries.CREATE_TABLE_CANVAS_USER,
                 DatabaseQueries.CREATE_TABLE_CANVAS_ASSIGNMENT,
                 DatabaseQueries.CREATE_TABLE_CANVAS_DISCUSSION,
+                DatabaseQueries.CREATE_TABLE_GRADE_PREDICTION_MODEL,
+                DatabaseQueries.CREATE_TABLE_GRADE_PREDICTION_MODEL_PARAMETER,
                 DatabaseQueries.CREATE_TABLE_PREDICTIVE_MODEL,
                 DatabaseQueries.CREATE_TABLE_MODEL_THETA,
                 DatabaseQueries.CREATE_TABLE_PREDICTED_GRADE,
@@ -380,6 +382,32 @@ namespace IguideME.Web.Services
             }
 
             return users;
+        }
+
+        public int CreateGradePredictionModel(int courseID)
+        {
+            return NonQuery(
+                String.Format(
+                    DatabaseQueries.CREATE_GRADE_PREDICTION_MODEL,
+                    courseID
+                ));
+        }
+
+        public int CreateGradePredictionModelParameter(int modelID, int parameterID, float weight)
+        {
+            return NonQuery(
+                String.Format(
+                    DatabaseQueries.CREATE_GRADE_PREDICTION_MODEL_PARAMETER,
+                    modelID,
+                    parameterID,
+                    weight
+                ));
+        }
+
+        public List<GradePredictionModel> GetGradePredictionModels(int courseID)
+        {
+            // TODO implement
+            throw new Exception();
         }
 
         public int CreatePredictiveModel(

@@ -37,7 +37,28 @@ namespace IguideME.Web.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public ActionResult UploadModel([FromBody] PredictiveModel[] models)
+        public ActionResult UploadModel([FromBody] GradePredictionModel model)
+        {
+            int modelID = DatabaseManager.Instance.CreateGradePredictionModel(GetCourseID());
+
+            foreach (var parameter in model.Parameters)
+            {
+                DatabaseManager.Instance.CreateGradePredictionModelParameter(
+                    modelID,
+                    parameter.ParameterID,
+                    parameter.Weight);
+            }
+
+            return Json(DatabaseManager.Instance.GetGradePredictionModels(GetCourseID()));
+        }
+
+        [Authorize(Policy = "IsInstructor")]
+        [Route("/models/old-upload")]
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public ActionResult OldUploadModel([FromBody] PredictiveModel[] models)
         {
             DatabaseManager.Instance.DeletePredictiveModels(GetCourseID());
 
@@ -71,8 +92,7 @@ namespace IguideME.Web.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult GetModels()
         {
-            return Json(DatabaseManager.Instance
-                .GetPredictiveModels(GetCourseID()));
+            return Json(DatabaseManager.Instance.GetGradePredictionModels(GetCourseID()));
         }
 
         [Authorize(Policy = "IsInstructor")]
@@ -80,7 +100,29 @@ namespace IguideME.Web.Controllers
         [HttpDelete]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public ActionResult DeleteModels()
+        public ActionResult DeleteModel()
+        {
+            // TODO implement
+            return NoContent();
+        }
+
+        [Authorize(Policy = "IsInstructor")]
+        [Route("/old-models")]
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public ActionResult OldGetModels()
+        {
+            return Json(DatabaseManager.Instance
+                .GetPredictiveModels(GetCourseID()));
+        }
+
+        [Authorize(Policy = "IsInstructor")]
+        [Route("/old-models")]
+        [HttpDelete]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public ActionResult OldDeleteModels()
         {
             DatabaseManager.Instance.DeletePredictiveModels(GetCourseID());
             return NoContent();
