@@ -1,7 +1,7 @@
 import "./style.scss";
 
 import React, { Component, RefObject } from "react";
-import { Alert, Button, message, Steps } from "antd";
+import { Button, Steps } from "antd";
 
 import UploadData, { UploadDataMock } from "./UploadData";
 import LinkLiveData, { LinkLiveDataMock } from "./LinkLiveData";
@@ -17,7 +17,6 @@ const { createRef } = React;
 interface IProps { }
 
 interface IState {
-    loaded: boolean;
     currentStep: number;
     gradesDatasets: GradesDatasets;
     finalGradesDatasetName: string;
@@ -27,12 +26,11 @@ interface IState {
 }
 
 export default class ModelConfigurator extends Component<IProps, IState> {
-    mock = new ModelConfiguratorMock(/* enable? */ true);
+    mock = new ModelConfiguratorMock(/* enable? */ false);
 
     steps = ["Upload historic data", "Link to live data", "Train model", "Done!"];
 
     state = {
-        loaded: false,
         currentStep: this.mock.currentStep,
         gradesDatasets: this.mock.gradesDatasets,
         finalGradesDatasetName: this.mock.finalGradesDatasetName,
@@ -98,7 +96,7 @@ export default class ModelConfigurator extends Component<IProps, IState> {
                 return (
                     <Finish
                         ref={childRef}
-                        model={model} />
+                        model={model!} />
                 );
         }
     }
@@ -120,7 +118,7 @@ export default class ModelConfigurator extends Component<IProps, IState> {
     };
 
     render(): React.ReactNode {
-        const { currentStep, loaded } = this.state;
+        const { currentStep } = this.state;
 
         return (
             <div>
@@ -138,7 +136,7 @@ export default class ModelConfigurator extends Component<IProps, IState> {
                     )}
                     {currentStep === this.steps.length && (
                         <Button className="doneBtn" type="primary">
-                            Done
+                            Finish
                         </Button>
                     )}
                     {currentStep < this.steps.length && (
@@ -155,7 +153,7 @@ export default class ModelConfigurator extends Component<IProps, IState> {
 class ModelConfiguratorMock extends Mock {
     mockCurrentStep = true;
 
-    currentStep = this.enabled && this.mockCurrentStep ? 3 : 1;
+    currentStep = this.enabled && this.mockCurrentStep ? 4 : 1;
 
     gradesDatasets = new UploadDataMock(this.enabled).gradesDatasets;
     finalGradesDatasetName = new UploadDataMock(this.enabled).finalGradesDatasetName;

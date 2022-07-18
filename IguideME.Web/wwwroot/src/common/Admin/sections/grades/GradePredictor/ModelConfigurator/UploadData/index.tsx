@@ -23,7 +23,7 @@ interface IState {
 }
 
 export default class UploadData extends Component<IProps, IState> implements IStep {
-    mock = new UploadDataMock(/* enable? */ true)
+    mock = new UploadDataMock(/* enable? */ false)
 
     state = {
         gradesDatasets: this.mock.gradesDatasets,
@@ -137,7 +137,7 @@ export default class UploadData extends Component<IProps, IState> implements ISt
         let { finalGradesDatasetName } = this.state
 
         let wValid = true
-        if (finalGradesDatasetName == "") {
+        if (finalGradesDatasetName === "") {
             wValid = false
             this.setState({ inputErrorFinalGradesDatasetName: true })
         }
@@ -223,7 +223,7 @@ export default class UploadData extends Component<IProps, IState> implements ISt
                                         // (aka don't pass v explicitly)
                                         this.onFinalGradesDatasetNameChosen(v);
                                     }}
-                                    placeholder="Kies eindcijfer dataset">
+                                    placeholder="Dataset containing final grades...">
                                     {Object.keys(this.state.gradesDatasets)
                                         .map(datasetName =>
                                             <Option key={datasetName} value={datasetName}>

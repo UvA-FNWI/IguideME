@@ -1,6 +1,11 @@
+import "./style.scss";
+
 import React, { Component } from "react";
 import MLR from "ml-regression-multivariate-linear";
 import { Button, Row, Col, Divider, InputNumber } from "antd";
+
+import TileController from "../../../../../../../api/controllers/tile";
+import { Tile } from "../../../../../../../models/app/Tile";
 
 import { StudentGrades, GradesDatasets } from "../../types";
 import { IStep } from "../interfaces";
@@ -19,11 +24,13 @@ interface IState {
     model: { model: any, modelColumns: number[] } | null;
     modelTestingValues: { [tileID: number]: number };
     predictedGrade: number;
+    tiles: Tile[];
 }
 
 export default class TrainModel
     extends Component<IProps, IState>
     implements IStep {
+
     mock = new TrainModelMock(/* enable? */ false);
 
     state = {
@@ -31,12 +38,18 @@ export default class TrainModel
         model: this.mock.model,
         modelTestingValues: {},
         predictedGrade: 0,
+        tiles: [],
     };
 
     componentDidMount() {
         if (this.mock.enabled) {
             if (this.mock.mockModel) this.onModelTrained();
         }
+
+        TileController.getTiles().then(async (tiles) => {
+            tiles = tiles.filter((t) => t.content === "ENTRIES");
+            this.setState({ tiles: tiles });
+        });
 
         this.recalculateTestPrediction();
     }
@@ -45,7 +58,9 @@ export default class TrainModel
         const { parentSetModel } = this.props;
         const { model } = this.state;
 
-        parentSetModel(model);
+        if (!model) return;
+
+        parentSetModel(model!);
     }
 
     ensureFinalGradeExists() {
@@ -123,6 +138,8 @@ export default class TrainModel
         });
 
         this.recalculateTestPrediction();
+
+        this.onModelTrained();
     }
 
     recalculateTestPrediction() {
@@ -146,8 +163,15 @@ export default class TrainModel
         });
     }
 
+    getTileByID(id: number): Tile | null {
+        const { tiles }: IState = this.state;
+        const tile = tiles.find((t: Tile) => t.id === id);
+        return tile ? tile : null;
+    }
+
     validate(): boolean {
-        return true;
+        const { model } = this.state;
+        return model !== null;
     }
 
     isStepCompleted = this.validate;
@@ -179,10 +203,10 @@ export default class TrainModel
                                     const { model }: IState = this.state;
                                     const weight = model!.model.weights[index][0];
                                     return (
-                                        <div key={weight}>
+                                        <div key={weight} className="grade-input-row">
                                             <Row>
-                                                <Col xs={24} md={5}>
-                                                    Name ({weight.toFixed(1)})
+                                                <Col xs={24} md={10}>
+                                                    {this.getTileByID(tileID)?.title} (weight: {weight.toFixed(1)})
                                                 </Col>
                                                 <Col xs={24} md={5}>
                                                     <InputNumber
@@ -200,7 +224,7 @@ export default class TrainModel
                                                         }}
                                                     />
                                                 </Col>
-                                                <Col xs={24} md={14}>
+                                                <Col xs={24} md={9}>
                                                 </Col>
                                             </Row>
                                         </div>
@@ -240,7 +264,10 @@ export default class TrainModel
                         <Row>
                             <Col xs={24} md={24}>
                                 <p>
-                                    TODO Erwin, write something nice here
+                                    The model will be trained on your machine using linear regression.
+                                </p>
+                                <p>
+                                    This won't take long.
                                 </p>
                             </Col>
                         </Row>

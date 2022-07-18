@@ -28,7 +28,7 @@ interface IState {
 export default class LinkLiveData
     extends Component<IProps, IState>
     implements IStep {
-    mock = new LinkLiveDataMock(/* enable? */ true);
+    mock = new LinkLiveDataMock(/* enable? */ false);
 
     state = {
         tiles: [],
@@ -38,7 +38,7 @@ export default class LinkLiveData
 
     componentDidMount() {
         TileController.getTiles().then(async (tiles) => {
-            tiles = tiles.filter((t) => t.content == "ENTRIES");
+            tiles = tiles.filter((t) => t.content === "ENTRIES");
             this.setState({ tiles: tiles });
         });
     }
@@ -48,7 +48,7 @@ export default class LinkLiveData
         let { gradesDatasetTilePairs }: IState = this.state;
 
         let wValid = true
-        if (Object.keys(gradesDatasetTilePairs).length != Object.keys(gradesDatasets).length - 1) {
+        if (Object.keys(gradesDatasetTilePairs).length !== Object.keys(gradesDatasets).length - 1) {
             wValid = false
             this.setState({ inputError: true })
         }
