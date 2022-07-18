@@ -50,9 +50,12 @@ export default class UploadData extends Component<IProps, IState> implements ISt
         parentSetGradesDatasets(gradesDatasets)
     }
 
-    onFinalGradesDatasetNameChosen() {
-        const { finalGradesDatasetName } = this.state
-        this.props.parentSetFinalGradesDatasetName(finalGradesDatasetName)
+    // FIXME remove optional parameter v, it is used as a hack
+    // because setState does not actually set the state on time
+    // (see the onSelect usage of this method)
+    onFinalGradesDatasetNameChosen(v: string | null = null) {
+        const { finalGradesDatasetName } = this.state;
+        this.props.parentSetFinalGradesDatasetName(v ? v : finalGradesDatasetName);
     }
 
     async csvFilesChosen(event: React.ChangeEvent<HTMLInputElement>) {
@@ -177,7 +180,7 @@ export default class UploadData extends Component<IProps, IState> implements ISt
                                 <ul id="uploadedFilesUl">
                                     {Object.keys(this.state.gradesDatasets)
                                         .map(datasetName =>
-                                            <li>
+                                            <li key={datasetName}>
                                                 <Button
                                                     className="liDeleteBtn"
                                                     size="small"
@@ -215,8 +218,10 @@ export default class UploadData extends Component<IProps, IState> implements ISt
                                         this.setState({
                                             finalGradesDatasetName: v,
                                             inputErrorFinalGradesDatasetName: false
-                                        })
-                                        this.onFinalGradesDatasetNameChosen()
+                                        });
+                                        // FIXME why does setState not set the state on time
+                                        // (aka don't pass v explicitly)
+                                        this.onFinalGradesDatasetNameChosen(v);
                                     }}
                                     placeholder="Kies eindcijfer dataset">
                                     {Object.keys(this.state.gradesDatasets)

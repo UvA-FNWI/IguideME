@@ -34,8 +34,6 @@ export default class TrainModel
     };
 
     componentDidMount() {
-        const { model, modelTestingValues }: IState = this.state;
-
         if (this.mock.enabled) {
             if (this.mock.mockModel) this.onModelTrained();
         }
