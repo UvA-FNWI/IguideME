@@ -10,7 +10,7 @@ mkShell {
     nodejs
     nodePackages.npm
     nodePackages.yarn
-    # dotnet-sdk_3 (fails on darwin-aarch64)
+    dotnet-sdk_5
   ];
 
   shellHook = ''
@@ -23,7 +23,8 @@ mkShell {
 
     function cleanup {
       echo "Killing leftover processes...";
-      #kill-process node 2> /dev/null;
+      kill-process node 2> /dev/null;
+      kill-process dotnet 2> /dev/null;
     }
     trap cleanup EXIT;
 
@@ -32,11 +33,6 @@ mkShell {
       cd $PWD/IguideME.Web/wwwroot;
       yarn;
       cd $PWD;
-    fi
-
-    if ! command -v dotnet &> /dev/null
-    then
-      echo "Warning: dotnet could not be found, please install dotnet sdk 6."
     fi
 
     alias build-frontend-watch='yarn --cwd $PWD/IguideME.Web/wwwroot/ start'
