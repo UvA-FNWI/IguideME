@@ -60,7 +60,8 @@ mkShell {
       echo "                                          ";
     }
 
-    clear;
+    # clear screen
+    printf "\033c"
 
 cat << EOF
 IIIII                 iii      dd        MM    MM EEEEEEE
