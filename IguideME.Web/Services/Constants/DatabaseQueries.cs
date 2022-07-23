@@ -30,7 +30,7 @@ public static class DatabaseQueries
     public const string CREATE_TABLE_GRADE_PREDICTION_MODEL =
         @"CREATE TABLE IF NOT EXISTS `grade_prediction_model` (
             `id`                  INTEGER PRIMARY KEY AUTOINCREMENT,
-            `course_id`           INTEGER,
+            `course_id`           INTEGER
         );";
 
     public const string CREATE_TABLE_GRADE_PREDICTION_MODEL_PARAMETER =
@@ -38,7 +38,7 @@ public static class DatabaseQueries
             `id`                  INTEGER PRIMARY KEY AUTOINCREMENT,
             `model_id`            INTEGER,
             `parameter_id`        INTEGER,
-            `weight`              FLOAT,
+            `weight`              FLOAT
         );";
 
     public const string CREATE_TABLE_PREDICTIVE_MODEL =
@@ -235,8 +235,14 @@ public static class DatabaseQueries
         @"INSERT INTO   `grade_prediction_model_parameter` (    `model_id`,
                                                                 `parameter_id`,
                                                                 `weight` )
-
           VALUES        ({0}, '{1}', {2});";
+
+    public const string QUERY_GRADE_PREDICTION_MODELS_FOR_COURSE =
+        @"SELECT    `grade_prediction_model`.`id`,
+                    `grade_prediction_model`.`course_id`
+        FROM        `grade_prediction_model`
+        WHERE       `grade_prediction_model`.`course_id`={0}";
+
     // -------------------- Old predictive models --------------------
 
     public const string CREATE_PREDICTIVE_MODEL =
