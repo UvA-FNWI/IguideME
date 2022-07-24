@@ -319,7 +319,6 @@ namespace IguideME.Web.Controllers
                 .GetAcceptList(GetCourseID())
                 .Find(x => x.StudentLoginID == (studentLoginID == "self" ? GetUserLoginID() : studentLoginID));
 
-            Console.WriteLine(student.Accepted);
             return Json(
                 student != null ? student.Accepted : false
             );
