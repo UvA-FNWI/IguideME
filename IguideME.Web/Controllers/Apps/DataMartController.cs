@@ -308,8 +308,9 @@ namespace IguideME.Web.Controllers
         [Authorize]
         [HttpGet]
         [Route("/datamart/accept-list/{studentLoginID}")]
-        public ActionResult GetAcceptList(string studentLoginID)
+        public ActionResult GetAcceptListByStudent(string studentLoginID)
         {
+            logger.LogInformation($"Getting accept list for {studentLoginID}");
             var course = DatabaseManager.Instance.GetPublicInformedConsent(GetCourseID());
 
             if (!course.AcceptList || IsAdministrator()) return Json(true);
