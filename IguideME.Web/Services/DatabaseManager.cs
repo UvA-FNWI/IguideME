@@ -10,19 +10,23 @@ namespace IguideME.Web.Services
 {
     public sealed class DatabaseManager
     {
-        private static readonly DatabaseManager instance = new DatabaseManager();
-        private readonly SQLiteConnection connection = new SQLiteConnection(
-            "Data Source=/data/IguideME.db;Version=3;New=False;Compress=True;"
-        );
+        private static DatabaseManager instance;
+        private SQLiteConnection connection;
         private static SQLiteCommand command;
 
         static DatabaseManager() { }
 
-        private DatabaseManager()
+        public static void Initialize(bool isDev = false)
         {
-            connection.Open();
-            CreateTables();
-            RunMigrations();
+            DatabaseManager.instance = new DatabaseManager();
+            DatabaseManager.instance.connection = new SQLiteConnection(
+                isDev ? "Data Source=db.sqlite;Version=3;New=False;Compress=True;"
+                : "Data Source=/data/IguideME.db;Version=3;New=False;Compress=True;"
+            );
+
+            DatabaseManager.instance.connection.Open();
+            DatabaseManager.instance.CreateTables();
+            DatabaseManager.instance.RunMigrations();
         }
 
         public static DatabaseManager Instance

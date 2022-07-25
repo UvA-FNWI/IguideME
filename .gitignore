@@ -246,3 +246,5 @@ out
 **/._*
 
 /.cache
+
+**/*.sqlite
