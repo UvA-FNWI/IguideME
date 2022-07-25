@@ -7,10 +7,11 @@ mkShell {
     procps # for killing processes
     git
     cacert # for git certs
+    litecli # sql cli
     nodejs
     nodePackages.npm
     nodePackages.yarn
-    dotnet-sdk_5
+    dotnet-sdk_3
   ];
 
   shellHook = ''
@@ -35,10 +36,11 @@ mkShell {
       cd $PWD;
     fi
 
-    alias build-frontend-watch='yarn --cwd $PWD/IguideME.Web/wwwroot/ start'
-    alias build-frontend-prod='yarn --cwd $PWD/IguideME.Web/wwwroot/ build'
-    alias build-backend-watch='dotnet run --project $PWD/IguideME.Web/'
-    alias build-backend-prod='dotnet build --project $PWD/IguideME.Web/'
+    alias build-frontend-watch='yarn --cwd $PROJECT_ROOT/IguideME.Web/wwwroot/ start';
+    alias build-frontend-prod='yarn --cwd $PROJECT_ROOT/IguideME.Web/wwwroot/ build';
+    alias build-backend-watch='dotnet watch --project $PROJECT_ROOT/IguideME.Web/ run';
+    alias build-backend-prod='dotnet build --project $PROJECT_ROOT/IguideME.Web/';
+    alias enter-db='litecli $PROJECT_ROOT/IguideME.Web/db.sqlite';
     alias h='display_help';
 
     display_help () {
@@ -53,10 +55,11 @@ mkShell {
       echo "  build-backend-prod      build the backend for production";
       echo "                                          ";
       echo "  ---administrative-----------------------";
-      echo "  kill-process       kill a process by name";
+      echo "  kill-process            kill a process by name";
+      echo "  enter-db                enter the database";
       echo "                                          ";
       echo "  ---misc---------------------------------";
-      echo "  h                  display this message again";
+      echo "  h                       display this message again";
       echo "                                          ";
     }
 
