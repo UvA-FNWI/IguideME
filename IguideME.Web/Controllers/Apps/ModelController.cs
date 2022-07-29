@@ -34,7 +34,6 @@ namespace IguideME.Web.Controllers
         [Authorize(Policy = "IsInstructor")]
         [Route("/models/upload")]
         [HttpPost]
-        [AllowAnonymous] // FIXME remove before commit
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -89,7 +88,6 @@ namespace IguideME.Web.Controllers
         [Authorize(Policy = "IsInstructor")]
         [Route("/models")]
         [HttpGet]
-        [AllowAnonymous] // FIXME remove before commit
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult GetModels()
