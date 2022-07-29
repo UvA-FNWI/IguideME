@@ -63,6 +63,7 @@ namespace IguideME.Web.Controllers
 
         protected Int32 GetCourseID()
         {
+            return 0; // FIXME remove
             // returns the ID of course in which the IguideME instance is loaded
             return Int32.Parse(((ClaimsIdentity)User.Identity).FindFirst("course").Value);
         }

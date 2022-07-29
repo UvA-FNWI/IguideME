@@ -39,7 +39,7 @@ export default class ConfigureModel extends Component<{ setModels: (models: Pred
                     key: 'uploadProgress'
                 });
                 const batch = modelsCopy.splice(0, 50);
-                await DataMartController.uploadModels(batch);
+                /* await DataMartController.uploadModels(batch); */
             }
 
             const newModels = await DataMartController.getModels();

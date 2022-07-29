@@ -1,17 +1,23 @@
 ﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace IguideME.Web.Models.App
 {
     public class GradePredictionModel
     {
-        [JsonProperty("id")]
         public int ID { get; set; }
 
-        [JsonProperty("course_id")]
         public int CourseID { get; set; }
 
         [JsonProperty("parameters")]
-        public GradePredictionModelParameter[] Parameters { get; set; }
+        public List<GradePredictionModelParameter> Parameters { get; set; }
+
+        [JsonConstructor]
+        public GradePredictionModel(
+            List<GradePredictionModelParameter> parameters)
+        {
+            this.Parameters = parameters;
+        }
 
         public GradePredictionModel(
             int id,
@@ -24,7 +30,7 @@ namespace IguideME.Web.Models.App
         public GradePredictionModel(
             int id,
             int courseID,
-            GradePredictionModelParameter[] parameters)
+            List<GradePredictionModelParameter> parameters)
         {
             this.ID = id;
             this.CourseID = courseID;

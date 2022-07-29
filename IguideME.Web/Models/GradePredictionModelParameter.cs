@@ -4,17 +4,24 @@ namespace IguideME.Web.Models.App
 {
     public class GradePredictionModelParameter
     {
-        [JsonProperty("id")]
         public int ID { get; set; }
 
-        [JsonProperty("model_id")]
         public int ModelID { get; set; }
 
-        [JsonProperty("parameter_id")]
+        [JsonProperty("parameterID")]
         public int ParameterID { get; set; }
 
         [JsonProperty("weight")]
         public float Weight { get; set; }
+
+        [JsonConstructor]
+        public GradePredictionModelParameter(
+            int parameterID,
+            float weight)
+        {
+            this.ParameterID = parameterID;
+            this.Weight = weight;
+        }
 
         public GradePredictionModelParameter(
             int id,
@@ -27,5 +34,6 @@ namespace IguideME.Web.Models.App
             this.ParameterID = parameterID;
             this.Weight = weight;
         }
+
     }
 }

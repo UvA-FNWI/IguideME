@@ -243,6 +243,14 @@ public static class DatabaseQueries
         FROM        `grade_prediction_model`
         WHERE       `grade_prediction_model`.`course_id`={0}";
 
+    public const string QUERY_GRADE_PREDICTION_MODEL_PARAMETERS_FOR_MODEL =
+        @"SELECT    `grade_prediction_model_parameter`.`id`,
+                    `grade_prediction_model_parameter`.`model_id`,
+                    `grade_prediction_model_parameter`.`parameter_id`,
+                    `grade_prediction_model_parameter`.`weight`
+        FROM        `grade_prediction_model_parameter`
+        WHERE       `grade_prediction_model_parameter`.`model_id`={0}";
+
     // -------------------- Old predictive models --------------------
 
     public const string CREATE_PREDICTIVE_MODEL =

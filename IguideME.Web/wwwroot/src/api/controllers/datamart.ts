@@ -10,6 +10,7 @@ import { Synchronization } from "../../models/app/SyncProvider";
 import { PredictedGrade, PredictiveModel } from "../../models/app/PredictiveModel";
 import { NotificationStatus, PerformanceNotification } from "../../models/app/Notification";
 import { AppAcceptList } from "../../models/app/AcceptList";
+import { GradePredictionModel } from "../../common/Admin/sections/grades/GradePredictor/ModelConfigurator/interfaces";
 
 export default class DataMartController extends Controller {
 
@@ -48,13 +49,13 @@ export default class DataMartController extends Controller {
     ).then(response => response.data);
   }
 
-  static uploadModels(models: PredictiveModel[]): Promise<PredictiveModel[]> {
+  static uploadModel(model: GradePredictionModel): Promise<GradePredictionModel> {
     if (debug()) {
-      return delay(models, 1000);
+      return delay(model, 1000);
     }
 
     return this.client.post(
-      `models/upload`, models
+      `models/upload`, model
     ).then(response => response.data);
   }
 

@@ -28,7 +28,7 @@ interface IState {
 export default class LinkLiveData
     extends Component<IProps, IState>
     implements IStep {
-    mock = new LinkLiveDataMock(/* enable? */ false);
+    mock = new LinkLiveDataMock(/* enable? */ true);
 
     state = {
         tiles: [],

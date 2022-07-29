@@ -7,17 +7,18 @@ using IguideME.Web.Models.Impl;
 
 namespace IguideME.Web.Services.Workers
 {
-	public class GradePredictorWorker
-	{
+    public class GradePredictorWorker
+    {
 
-		private int CourseID { get; set; }
+        private int CourseID { get; set; }
 
         private string SyncHash { get; set; }
 
         private List<PredictiveModel> Models { get; set; }
 
-		public GradePredictorWorker(int courseID, string syncHash)
-        { 
+        public GradePredictorWorker(int courseID, string syncHash)
+        {
+            // TODO replace with new implementation
             List<PredictiveModel> models = DatabaseManager.Instance.
                 GetPredictiveModels(courseID);
 
@@ -63,7 +64,7 @@ namespace IguideME.Web.Services.Workers
                 .GetEntries(this.CourseID);
 
             foreach (User student in students)
-            {    
+            {
                 List<TileEntrySubmission> userSubmissions =
                     submissions.Where(s => s.UserLoginID == student.LoginID)
                     .ToList();
@@ -204,16 +205,16 @@ namespace IguideME.Web.Services.Workers
                                 DatabaseManager.Instance.CreatePredictedGrade(
                                     this.CourseID,
                                     student.LoginID,
-                                    predictedGrade < 5.9 ? (float) (predictedGrade + 1.5) : predictedGrade,
+                                    predictedGrade < 5.9 ? (float)(predictedGrade + 1.5) : predictedGrade,
                                     factors.Count(),
                                     this.SyncHash);
                             }
-                           
+
                         }
                     }
                 }
-                
-                
+
+
             }
         }
     }

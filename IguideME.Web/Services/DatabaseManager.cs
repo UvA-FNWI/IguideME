@@ -410,8 +410,47 @@ namespace IguideME.Web.Services
 
         public List<GradePredictionModel> GetGradePredictionModels(int courseID)
         {
-            // TODO implement
-            throw new Exception();
+            var reader = Query(String.Format(
+                                   DatabaseQueries.QUERY_GRADE_PREDICTION_MODELS_FOR_COURSE,
+                                   courseID));
+
+            var models = new List<GradePredictionModel>();
+
+            while (reader.Read())
+            {
+                var model = new GradePredictionModel(
+                        reader.GetInt32(0),
+                        reader.GetInt32(1)
+                    );
+
+                model.Parameters = GetGradePredictionModelParameters(model.ID);
+
+                models.Add(model);
+            }
+
+            return models;
+        }
+
+        public List<GradePredictionModelParameter> GetGradePredictionModelParameters(int modelID)
+        {
+            var reader = Query(String.Format(
+                                   DatabaseQueries.QUERY_GRADE_PREDICTION_MODEL_PARAMETERS_FOR_MODEL,
+                                   modelID));
+
+            var parameters = new List<GradePredictionModelParameter>();
+
+            while (reader.Read())
+            {
+                var parameter = new GradePredictionModelParameter(
+                        reader.GetInt32(0),
+                        reader.GetInt32(1),
+                        reader.GetInt32(2),
+                        reader.GetFloat(3)
+                    );
+                parameters.Add(parameter);
+            }
+
+            return parameters;
         }
 
         public int CreatePredictiveModel(

@@ -9,7 +9,7 @@ import TrainModel, { TrainModelMock } from "./TrainModel";
 import Finish from "./Finish";
 
 import { GradesDatasets } from "../types";
-import { IStep } from "./interfaces";
+import { GradePredictionModel, IStep } from "./interfaces";
 import { Mock } from "../../../../../../mock";
 
 const { createRef } = React;
@@ -21,12 +21,12 @@ interface IState {
     gradesDatasets: GradesDatasets;
     finalGradesDatasetName: string;
     gradesDatasetTilePairs: { [name: string]: number };
-    model: { model: any, modelColumns: number[] } | null;
+    model: GradePredictionModel | null;
     childRef: RefObject<any>;
 }
 
 export default class ModelConfigurator extends Component<IProps, IState> {
-    mock = new ModelConfiguratorMock(/* enable? */ false);
+    mock = new ModelConfiguratorMock(/* enable? */ true);
 
     steps = ["Upload historic data", "Link to live data", "Train model", "Done!"];
 
@@ -86,7 +86,7 @@ export default class ModelConfigurator extends Component<IProps, IState> {
                         gradesDatasets={gradesDatasets}
                         gradesDatasetTilePairs={gradesDatasetTilePairs}
                         finalGradesDatasetName={finalGradesDatasetName}
-                        parentSetModel={(model: { model: any, modelColumns: number[] }) =>
+                        parentSetModel={(model: GradePredictionModel) =>
                             this.setState({ model: model })
                         }
                     />

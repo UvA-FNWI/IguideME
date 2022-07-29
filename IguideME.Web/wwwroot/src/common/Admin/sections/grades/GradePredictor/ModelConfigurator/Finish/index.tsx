@@ -1,10 +1,11 @@
 import React, { Component } from "react"
 import { Result } from "antd";
+import DataMartController from "../../../../../../../api/controllers/datamart";
 
-import { IStep } from "../interfaces";
+import { GradePredictionModel, IStep } from "../interfaces";
 
 interface IProps {
-    model: { model: any, modelColumns: number[] };
+    model: GradePredictionModel,
 }
 
 interface IState {
@@ -16,6 +17,16 @@ export default class Finish extends Component<IProps, IState> implements IStep {
     }
 
     componentDidMount() {
+        this.uploadModel()
+    }
+
+    async uploadModel() {
+        const { model }: IProps = this.props
+
+        console.log(await DataMartController.uploadModel(model))
+
+        const newModels = await DataMartController.getModels();
+        console.log(newModels)
     }
 
     validate(): boolean {
