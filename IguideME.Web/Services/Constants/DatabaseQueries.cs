@@ -31,6 +31,7 @@ public static class DatabaseQueries
         @"CREATE TABLE IF NOT EXISTS `grade_prediction_model` (
             `id`                  INTEGER PRIMARY KEY AUTOINCREMENT,
             `course_id`           INTEGER,
+            `intercept`           FLOAT,
             `enabled`             BOOLEAN
         );";
 
@@ -40,25 +41,6 @@ public static class DatabaseQueries
             `model_id`            INTEGER,
             `parameter_id`        INTEGER,
             `weight`              FLOAT
-        );";
-
-    public const string CREATE_TABLE_PREDICTIVE_MODEL =
-        @"CREATE TABLE IF NOT EXISTS `predictive_model` (
-            `id`                  INTEGER PRIMARY KEY AUTOINCREMENT,
-            `course_id`           INTEGER,
-            `entry_collection`    STRING,
-            `mse`                 FLOAT
-        );";
-
-    public const string CREATE_TABLE_MODEL_THETA =
-        @"CREATE TABLE IF NOT EXISTS `model_theta` (
-            `id`                  INTEGER PRIMARY KEY AUTOINCREMENT,
-            `model_id`            INTEGER,
-            `tile_id`             INTEGER NULL,
-            `entry_id`            INTEGER NULL,
-            `intercept`           BOOLEAN,
-            `meta_key`            STRING,
-            `value`               FLOAT
         );";
 
     public const string QUERY_DOES_COURSE_EXIST =
@@ -117,16 +99,6 @@ public static class DatabaseQueries
             `user_login_id`   STRING,
             `target_login_id` STRING,
             `sync_hash`       STRING
-        );";
-
-    public const string CREATE_TABLE_PREDICTED_GRADE =
-        @"CREATE TABLE IF NOT EXISTS `predicted_grade` (
-            `id`                  INTEGER PRIMARY KEY AUTOINCREMENT,
-            `course_id`           INTEGER,
-            `user_login_id`       STRING,
-            `grade`               FLOAT,
-            `graded_components`   INTEGER,
-            `sync_hash`           STRING
         );";
 
     public const string CREATE_TABLE_NOTIFICATIONS =
@@ -230,8 +202,9 @@ public static class DatabaseQueries
 
     public const string CREATE_GRADE_PREDICTION_MODEL =
         @"INSERT INTO   `grade_prediction_model` (    `course_id`,
+                                                      `intercept`,
                                                       `enabled`    )
-          VALUES        ({0}, False);";
+          VALUES        ({0}, {1}, False);";
 
     public const string CREATE_GRADE_PREDICTION_MODEL_PARAMETER =
         @"INSERT INTO   `grade_prediction_model_parameter` (    `model_id`,
@@ -242,13 +215,15 @@ public static class DatabaseQueries
     public const string QUERY_GRADE_PREDICTION_MODELS_FOR_COURSE =
         @"SELECT    `grade_prediction_model`.`id`,
                     `grade_prediction_model`.`course_id`,
+                    `grade_prediction_model`.`intercept`,
                     `grade_prediction_model`.`enabled`
         FROM        `grade_prediction_model`
         WHERE       `grade_prediction_model`.`course_id`={0}";
 
     public const string QUERY_GRADE_PREDICTION_MODEL_FOR_COURSE =
         @"SELECT    `grade_prediction_model`.`id`,
-                    `grade_prediction_model`.`course_id`
+                    `grade_prediction_model`.`course_id`,
+                    `grade_prediction_model`.`intercept`
         FROM        `grade_prediction_model`
         WHERE       `grade_prediction_model`.`course_id`={0}
         AND         `grade_prediction_model`.`enabled`=True
@@ -261,49 +236,6 @@ public static class DatabaseQueries
                     `grade_prediction_model_parameter`.`weight`
         FROM        `grade_prediction_model_parameter`
         WHERE       `grade_prediction_model_parameter`.`model_id`={0}";
-
-    // -------------------- Old predictive models --------------------
-
-    public const string CREATE_PREDICTIVE_MODEL =
-        @"INSERT INTO   `predictive_model` (    `course_id`,
-                                                `entry_collection`,
-                                                `mse` )
-          VALUES        ({0}, '{1}', {2});";
-
-    public const string CREATE_MODEL_THETA =
-        @"INSERT INTO   `model_theta` ( `model_id`,
-                                        `tile_id`,
-                                        `entry_id`,
-                                        `intercept`,
-                                        `meta_key`,
-                                        `value`)
-          VALUES        ({0}, {1}, {2}, {3}, '{4}', {5});";
-
-    public const string QUERY_MODEL_THETA =
-        @"SELECT    `model_theta`.`model_id`,
-                    `model_theta`.`tile_id`,
-                    `model_theta`.`entry_id`,
-                    `model_theta`.`intercept`,
-                    `model_theta`.`meta_key`,
-                    `model_theta`.`value`
-        FROM        `model_theta`
-        WHERE       `model_theta`.`model_id`={0}";
-
-    public const string QUERY_PREDICTIVE_MODELS_FOR_COURSE =
-        @"SELECT    `predictive_model`.`id`,
-                    `predictive_model`.`course_id`,
-                    `predictive_model`.`entry_collection`,
-                    `predictive_model`.`mse`
-        FROM        `predictive_model`
-        WHERE       `predictive_model`.`course_id`={0}";
-
-    public const string DELETE_PREDICTIVE_MODELS_FOR_COURSE =
-        @"DELETE FROM       `predictive_model`
-          WHERE             `course_id`={0};";
-
-    public const string DELETE_MODEL_THETAS =
-        @"DELETE FROM `model_theta`
-        WHERE         `model_theta`.`model_id` IN (SELECT `id` FROM `predictive_model` WHERE `course_id`={0});";
 
     // -------------------- Learning goals --------------------
 

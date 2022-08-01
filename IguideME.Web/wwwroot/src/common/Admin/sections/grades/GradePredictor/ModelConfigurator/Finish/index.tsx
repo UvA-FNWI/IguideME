@@ -16,17 +16,17 @@ export default class Finish extends Component<IProps, IState> implements IStep {
     state = {
     }
 
-    componentDidMount() {
-        this.uploadModel()
+    async componentDidMount() {
+
+        const newModels = await DataMartController.getModels();
+        console.log(newModels)
+        /* this.uploadModel() */
     }
 
     async uploadModel() {
         const { model }: IProps = this.props
 
-        console.log(await DataMartController.uploadModel(model))
-
-        const newModels = await DataMartController.getModels();
-        console.log(newModels)
+        await DataMartController.uploadModel(model)
     }
 
     validate(): boolean {

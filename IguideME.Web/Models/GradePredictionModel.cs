@@ -12,33 +12,42 @@ namespace IguideME.Web.Models.App
         [JsonProperty("parameters")]
         public List<GradePredictionModelParameter> Parameters { get; set; }
 
+        [JsonProperty("intercept")]
+        public float Intercept {get; set;}
+
         [JsonConstructor]
         public GradePredictionModel(
-            List<GradePredictionModelParameter> parameters)
+            List<GradePredictionModelParameter> parameters,
+            float intercept)
         {
             this.Parameters = parameters;
-        }
-
-        public GradePredictionModel(
-            int id,
-            int courseID,
-            bool enabled)
-        {
-            this.ID = id;
-            this.CourseID = courseID;
-            this.Enabled = enabled;
+            this.Intercept = intercept;
         }
 
         public GradePredictionModel(
             int id,
             int courseID,
             bool enabled,
-            List<GradePredictionModelParameter> parameters)
+            float intercept)
+        {
+            this.ID = id;
+            this.CourseID = courseID;
+            this.Enabled = enabled;
+            this.Intercept = intercept;
+        }
+
+        public GradePredictionModel(
+            int id,
+            int courseID,
+            bool enabled,
+            List<GradePredictionModelParameter> parameters,
+            float intercept)
         {
             this.ID = id;
             this.CourseID = courseID;
             this.Enabled = enabled;
             this.Parameters = parameters;
+            this.Intercept = intercept;
         }
 
     }

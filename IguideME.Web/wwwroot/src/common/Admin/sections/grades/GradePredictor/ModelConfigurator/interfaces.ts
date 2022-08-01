@@ -1,13 +1,14 @@
 export interface IStep {
-    isStepCompleted: () => boolean,
-    validate: () => boolean,
+  isStepCompleted: () => boolean;
+  validate: () => boolean;
 }
 
 export interface GradePredictionModel {
-    parameters: GradePredictionModelParameter[]
+  intercept: number;
+  parameters: GradePredictionModelParameter[];
 }
 
 export interface GradePredictionModelParameter {
-    parameterID: number,
-    weight: number,
+  parameterID: number;
+  weight: number;
 }

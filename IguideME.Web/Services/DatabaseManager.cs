@@ -60,9 +60,6 @@ namespace IguideME.Web.Services
                 DatabaseQueries.CREATE_TABLE_CANVAS_DISCUSSION,
                 DatabaseQueries.CREATE_TABLE_GRADE_PREDICTION_MODEL,
                 DatabaseQueries.CREATE_TABLE_GRADE_PREDICTION_MODEL_PARAMETER,
-                DatabaseQueries.CREATE_TABLE_PREDICTIVE_MODEL,
-                DatabaseQueries.CREATE_TABLE_MODEL_THETA,
-                DatabaseQueries.CREATE_TABLE_PREDICTED_GRADE,
                 DatabaseQueries.CREATE_TABLE_LEARNING_GOALS,
                 DatabaseQueries.CREATE_TABLE_GOAL_REQUREMENTS,
                 DatabaseQueries.CREATE_TABLE_NOTIFICATIONS,
@@ -390,12 +387,13 @@ namespace IguideME.Web.Services
             return users;
         }
 
-        public int CreateGradePredictionModel(int courseID)
+        public int CreateGradePredictionModel(int courseID, float intercept)
         {
             return NonQuery(
                 String.Format(
                     DatabaseQueries.CREATE_GRADE_PREDICTION_MODEL,
-                    courseID
+                    courseID,
+                    intercept
                 ));
         }
 
@@ -423,8 +421,9 @@ namespace IguideME.Web.Services
                 models.Add(
                     new GradePredictionModel(reader.GetInt32(0),
                                              reader.GetInt32(1),
-                                             reader.GetBoolean(2),
-                                             GetGradePredictionModelParameters(reader.GetInt32(0))));
+                                             reader.GetBoolean(3),
+                                             GetGradePredictionModelParameters(reader.GetInt32(0)),
+                                             reader.GetFloat(2)));
             }
 
             return models;
@@ -443,7 +442,8 @@ namespace IguideME.Web.Services
                     reader.GetInt32(0),
                     reader.GetInt32(1),
                     true,
-                    GetGradePredictionModelParameters(reader.GetInt32(0)));
+                    GetGradePredictionModelParameters(reader.GetInt32(0)),
+                    reader.GetFloat(2));
         }
 
 
@@ -467,106 +467,6 @@ namespace IguideME.Web.Services
             }
 
             return parameters;
-        }
-
-        public int CreatePredictiveModel(
-            int courseID,
-            string entryCollection,
-            float mse)
-        {
-            return NonQuery(
-                String.Format(
-                    DatabaseQueries.CREATE_PREDICTIVE_MODEL,
-                    courseID,
-                    entryCollection,
-                    mse
-                ));
-        }
-
-        public List<PredictiveModel> GetPredictiveModels(
-            int courseID,
-            bool autoLoadThetas = false)
-        {
-            string query = String.Format(
-                DatabaseQueries.QUERY_PREDICTIVE_MODELS_FOR_COURSE,
-                courseID);
-
-            SQLiteDataReader r = Query(query);
-            List<PredictiveModel> models = new List<PredictiveModel>();
-
-            while (r.Read())
-            {
-                PredictiveModel model = new PredictiveModel(
-                    r.GetInt32(0),
-                    r.GetInt32(1),
-                    r.GetValue(2).ToString(),
-                    r.GetFloat(3),
-                    new ModelTheta[] { },
-                    autoLoadThetas
-                );
-                models.Add(model);
-            }
-
-            return models;
-        }
-
-        public void DeletePredictiveModels(int courseID)
-        {
-            NonQuery(
-                String.Format(
-                    DatabaseQueries.DELETE_MODEL_THETAS,
-                    courseID));
-
-            NonQuery(
-                String.Format(
-                    DatabaseQueries.DELETE_PREDICTIVE_MODELS_FOR_COURSE,
-                    courseID));
-        }
-
-        public void CreateModelTheta(
-            int modelID,
-            Nullable<int> tileID,
-            Nullable<int> entryID,
-            bool intercept,
-            string metaKey,
-            float value)
-        {
-            NonQuery(
-                String.Format(
-                    DatabaseQueries.CREATE_MODEL_THETA,
-                    modelID,
-                    tileID != null ? tileID.ToString() : "NULL",
-                    entryID != null ? entryID.ToString() : "NULL",
-                    intercept,
-                    metaKey,
-                    value
-                ));
-        }
-
-        public List<ModelTheta> GetModelThetas(int modelID)
-        {
-            string query = String.Format(
-                DatabaseQueries.QUERY_MODEL_THETA,
-                modelID
-            );
-
-            SQLiteDataReader r = Query(query);
-            List<ModelTheta> thetas = new List<ModelTheta>();
-
-            while (r.Read())
-            {
-                ModelTheta theta = new ModelTheta(
-                    r.GetInt32(0),
-                    r.IsDBNull(1) ? (int?)null : r.GetInt32(1),
-                    r.IsDBNull(2) ? (int?)null : r.GetInt32(2),
-                    r.GetBoolean(3),
-                    r.GetValue(4).ToString(),
-                    r.GetFloat(5)
-                );
-                thetas.Add(theta);
-            }
-
-            return thetas;
         }
 
         public void CreatePredictedGrade(
@@ -1995,8 +1895,9 @@ namespace IguideME.Web.Services
 
                 return consents.ToArray();
             }
-            catch (Exception _)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.StackTrace);
                 return new ConsentData[0] { };
             }
 

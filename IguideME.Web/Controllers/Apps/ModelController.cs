@@ -39,7 +39,7 @@ namespace IguideME.Web.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult UploadModel([FromBody] GradePredictionModel model)
         {
-            int modelID = DatabaseManager.Instance.CreateGradePredictionModel(GetCourseID());
+            int modelID = DatabaseManager.Instance.CreateGradePredictionModel(GetCourseID(), model.Intercept);
 
             foreach (var parameter in model.Parameters)
             {
@@ -52,39 +52,7 @@ namespace IguideME.Web.Controllers
             return Json(DatabaseManager.Instance.GetGradePredictionModels(GetCourseID()));
         }
 
-        [Authorize(Policy = "IsInstructor")]
-        [Route("/models/old-upload")]
-        [HttpPost]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public ActionResult OldUploadModel([FromBody] PredictiveModel[] models)
-        {
-            DatabaseManager.Instance.DeletePredictiveModels(GetCourseID());
-
-            foreach (PredictiveModel model in models)
-            {
-                int modelID = DatabaseManager.Instance.CreatePredictiveModel(
-                    GetCourseID(),
-                    model.EntryCollection,
-                    model.MSE);
-
-                foreach (ModelTheta theta in model.Theta)
-                {
-                    DatabaseManager.Instance.CreateModelTheta(
-                        modelID,
-                        theta.TileID,
-                        theta.EntryID,
-                        theta.Intercept,
-                        theta.MetaKey,
-                        theta.Value);
-                }
-            }
-
-            return Json(DatabaseManager.Instance
-                .GetPredictiveModels(GetCourseID()));
-        }
-
+        // tip: you can use [AllowAnonymous] for debugging purpuses
         [Authorize(Policy = "IsInstructor")]
         [Route("/models")]
         [HttpGet]
@@ -103,28 +71,6 @@ namespace IguideME.Web.Controllers
         public ActionResult DeleteModel()
         {
             // TODO implement
-            return NoContent();
-        }
-
-        [Authorize(Policy = "IsInstructor")]
-        [Route("/old-models")]
-        [HttpGet]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public ActionResult OldGetModels()
-        {
-            return Json(DatabaseManager.Instance
-                .GetPredictiveModels(GetCourseID()));
-        }
-
-        [Authorize(Policy = "IsInstructor")]
-        [Route("/old-models")]
-        [HttpDelete]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public ActionResult OldDeleteModels()
-        {
-            DatabaseManager.Instance.DeletePredictiveModels(GetCourseID());
             return NoContent();
         }
 
