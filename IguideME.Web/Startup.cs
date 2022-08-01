@@ -59,10 +59,12 @@ namespace IguideME.Web
             // we need SameSite = None for the cookie to be stored when running in a Canvas iframe
             services
                 .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-                .AddCookie(opt => {
+                .AddCookie(opt =>
+                {
                     opt.Cookie.SameSite = Microsoft.AspNetCore.Http.SameSiteMode.None;
-                    opt.Events.OnRedirectToAccessDenied = context => {
-                        context.Response.StatusCode = (int) HttpStatusCode.Unauthorized;
+                    opt.Events.OnRedirectToAccessDenied = context =>
+                    {
+                        context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
                         return Task.CompletedTask;
                     };
                 });
@@ -74,7 +76,7 @@ namespace IguideME.Web
                      policy => policy.RequireRole("instructor"));
             });
 
-            services.Configure<ForwardedHeadersOptions>(opt => 
+            services.Configure<ForwardedHeadersOptions>(opt =>
             {
                 opt.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
                 opt.KnownNetworks.Clear();
@@ -116,6 +118,8 @@ namespace IguideME.Web
             {
                 app.UseExceptionHandler("/Error");
             }
+
+            DatabaseManager.Initialize(env.IsDevelopment());
 
             app.UseDefaultFiles();
             app.UseStaticFiles();
