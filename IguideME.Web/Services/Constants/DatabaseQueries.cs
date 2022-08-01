@@ -30,7 +30,8 @@ public static class DatabaseQueries
     public const string CREATE_TABLE_GRADE_PREDICTION_MODEL =
         @"CREATE TABLE IF NOT EXISTS `grade_prediction_model` (
             `id`                  INTEGER PRIMARY KEY AUTOINCREMENT,
-            `course_id`           INTEGER
+            `course_id`           INTEGER,
+            `enabled`             BOOLEAN
         );";
 
     public const string CREATE_TABLE_GRADE_PREDICTION_MODEL_PARAMETER =
@@ -228,8 +229,9 @@ public static class DatabaseQueries
     // -------------------- Predictive models --------------------
 
     public const string CREATE_GRADE_PREDICTION_MODEL =
-        @"INSERT INTO   `grade_prediction_model` (    `course_id`    )
-          VALUES        ({0});";
+        @"INSERT INTO   `grade_prediction_model` (    `course_id`,
+                                                      `enabled`    )
+          VALUES        ({0}, False);";
 
     public const string CREATE_GRADE_PREDICTION_MODEL_PARAMETER =
         @"INSERT INTO   `grade_prediction_model_parameter` (    `model_id`,
@@ -239,9 +241,18 @@ public static class DatabaseQueries
 
     public const string QUERY_GRADE_PREDICTION_MODELS_FOR_COURSE =
         @"SELECT    `grade_prediction_model`.`id`,
-                    `grade_prediction_model`.`course_id`
+                    `grade_prediction_model`.`course_id`,
+                    `grade_prediction_model`.`enabled`
         FROM        `grade_prediction_model`
         WHERE       `grade_prediction_model`.`course_id`={0}";
+
+    public const string QUERY_GRADE_PREDICTION_MODEL_FOR_COURSE =
+        @"SELECT    `grade_prediction_model`.`id`,
+                    `grade_prediction_model`.`course_id`
+        FROM        `grade_prediction_model`
+        WHERE       `grade_prediction_model`.`course_id`={0}
+        AND         `grade_prediction_model`.`enabled`=True
+        LIMIT 1";
 
     public const string QUERY_GRADE_PREDICTION_MODEL_PARAMETERS_FOR_MODEL =
         @"SELECT    `grade_prediction_model_parameter`.`id`,
@@ -917,6 +928,24 @@ public static class DatabaseQueries
         AND         `layout_tile_group`.`id`=`tile`.`group_id`
         AND         `layout_column`.`course_id`={0}
         AND         `tile_entry_submission`.`sync_hash`='{1}';";
+
+    public const string QUERY_COURSE_SUBMISSIONS_FOR_STUDENT =
+        @"SELECT    `tile_entry_submission`.`id`,
+                    `tile_entry_submission`.`entry_id`,
+                    `tile_entry_submission`.`user_login_id`,
+                    `tile_entry_submission`.`grade`,
+                    `tile_entry_submission`.`submitted`
+        FROM        `tile_entry_submission`,
+                    `tile`,
+                    `tile_entry`,
+                    `layout_tile_group`,
+                    `layout_column`
+        WHERE       `tile_entry_submission`.`entry_id`=`tile_entry`.`id`
+        AND         `tile_entry_submission`.`user_login_id`='{1}'
+        AND         `tile`.`id`=`tile_entry`.`tile_id`
+        AND         `layout_tile_group`.`id`=`tile`.`group_id`
+        AND         `layout_column`.`course_id`={0}
+        AND         `tile_entry_submission`.`sync_hash`='{2}';";
 
     public const string QUERY_USER_SUBMISSIONS_FOR_TILE_FOR_USER =
         @"SELECT    `tile_entry_submission`.`id`,

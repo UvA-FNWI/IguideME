@@ -420,18 +420,32 @@ namespace IguideME.Web.Services
 
             while (reader.Read())
             {
-                var model = new GradePredictionModel(
-                        reader.GetInt32(0),
-                        reader.GetInt32(1)
-                    );
-
-                model.Parameters = GetGradePredictionModelParameters(model.ID);
-
-                models.Add(model);
+                models.Add(
+                    new GradePredictionModel(reader.GetInt32(0),
+                                             reader.GetInt32(1),
+                                             reader.GetBoolean(2),
+                                             GetGradePredictionModelParameters(reader.GetInt32(0))));
             }
 
             return models;
         }
+
+        public GradePredictionModel GetGradePredictionModel(int courseID)
+        {
+            var reader = Query(String.Format(
+                                   DatabaseQueries.QUERY_GRADE_PREDICTION_MODEL_FOR_COURSE,
+                                   courseID));
+
+            if (!reader.Read())
+                return null;
+
+            return new GradePredictionModel(
+                    reader.GetInt32(0),
+                    reader.GetInt32(1),
+                    true,
+                    GetGradePredictionModelParameters(reader.GetInt32(0)));
+        }
+
 
         public List<GradePredictionModelParameter> GetGradePredictionModelParameters(int modelID)
         {
@@ -741,6 +755,39 @@ namespace IguideME.Web.Services
 
             return submissions;
         }
+
+        public List<TileEntrySubmission> GetCourseSubmissionsForStudent(
+            int courseID,
+            string userLoginID,
+            string hash = null)
+        {
+            string activeHash = hash ?? this.GetCurrentHash(courseID);
+            if (activeHash == null) return new List<TileEntrySubmission>() { };
+
+            string query = String.Format(
+                DatabaseQueries.QUERY_COURSE_SUBMISSIONS_FOR_STUDENT,
+                courseID,
+                userLoginID,
+                activeHash);
+
+            SQLiteDataReader r = Query(query);
+            List<TileEntrySubmission> submissions = new List<TileEntrySubmission>();
+
+            while (r.Read())
+            {
+                TileEntrySubmission submission = new TileEntrySubmission(
+                    r.GetInt32(0),
+                    r.GetInt32(1),
+                    r.GetValue(2).ToString(),
+                    r.GetValue(3).ToString(),
+                    r.GetValue(4).ToString()
+                );
+                submissions.Add(submission);
+            }
+
+            return submissions;
+        }
+
 
         public List<TileEntrySubmission> GetTileEntrySubmissionsForUser(
             int courseID,
