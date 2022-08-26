@@ -14,11 +14,8 @@ namespace IguideME.Web.Services
         private SQLiteConnection connection;
         private static SQLiteCommand command;
 
-        static DatabaseManager() { }
-
-        public static void Initialize(bool isDev = false)
-        {
-            DatabaseManager.instance = new DatabaseManager();
+        DatabaseManager(bool isDev = false) {
+            DatabaseManager.instance = this;
             DatabaseManager.instance.connection = new SQLiteConnection(
                 isDev ? "Data Source=db.sqlite;Version=3;New=False;Compress=True;"
                 : "Data Source=/data/IguideME.db;Version=3;New=False;Compress=True;"
@@ -27,6 +24,11 @@ namespace IguideME.Web.Services
             DatabaseManager.instance.connection.Open();
             DatabaseManager.instance.CreateTables();
             DatabaseManager.instance.RunMigrations();
+        }
+
+        public static void Initialize(bool isDev = false)
+        {
+            new DatabaseManager(isDev);
         }
 
         public static DatabaseManager Instance
