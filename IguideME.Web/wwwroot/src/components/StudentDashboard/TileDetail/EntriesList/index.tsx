@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import {Tile, TileEntry, TileEntrySubmission} from "../../../../models/app/Tile";
 import {Col, Row} from "antd";
 import EntryItem from "./EntryItem";
-import { ParentSize } from '@visx/responsive';
 import {Bar} from "react-chartjs-2";
 import "./style.scss";
 import {CanvasDiscussion} from "../../../../models/canvas/Discussion";

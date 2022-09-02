@@ -3,7 +3,6 @@ import { Group } from '@vx/group';
 import { BoxPlot } from '@vx/stats';
 import { LinearGradient } from '@vx/gradient';
 import { scaleBand, scaleLinear } from '@vx/scale';
-import { withParentSize } from '@visx/responsive';
 import { withTooltip, Tooltip, defaultStyles as defaultTooltipStyles } from '@vx/tooltip';
 import { PatternLines } from '@vx/pattern';
 import {PredictiveModel} from "../../../../../../models/app/PredictiveModel";

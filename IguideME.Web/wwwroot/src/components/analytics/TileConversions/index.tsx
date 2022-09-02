@@ -1,15 +1,13 @@
 import React, { Component } from "react";
-import { BarStack } from '@visx/shape';
 import { Group } from '@visx/group';
-import { Grid } from '@visx/grid';
 import { AxisBottom } from '@visx/axis';
 import { ParentSize } from '@visx/responsive';
-import {getColorScale, getDateScale, getTemperatureScale} from "./helpers";
+import {getDateScale, getTemperatureScale} from "./helpers";
 import moment from "moment";
 import {Select} from "antd";
 
-const purple1 = '#6c5efb';
-const purple2 = '#c998ff';
+// const purple1 = '#6c5efb';
+// const purple2 = '#c998ff';
 const purple3 = '#a44afe';
 const background = '#eaedff';
 const margin = { top: 40, right: 0, bottom: 0, left: 0 };
@@ -64,7 +62,7 @@ export default class TileConversions extends Component {
 
             const dateScale = getDateScale(data);
             const temperatureScale = getTemperatureScale(temperatureTotals);
-            const colorScale = getColorScale(keys, [purple1, purple2, purple3]);
+            // const colorScale = getColorScale(keys, [purple1, purple2, purple3]);
 
             dateScale.rangeRound([0, xMax]);
             temperatureScale.range([yMax, 0]);

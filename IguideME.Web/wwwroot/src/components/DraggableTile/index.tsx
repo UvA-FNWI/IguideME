@@ -64,7 +64,7 @@ class DraggableTile extends Component<Props, IState> {
         this.props.updateTile(t);
         this.setState({
           updatingNotifications: updatingNotifications
-            .filter(x => x != tile.id),
+            .filter(x => x !== tile.id),
           tile: t
         });
       })

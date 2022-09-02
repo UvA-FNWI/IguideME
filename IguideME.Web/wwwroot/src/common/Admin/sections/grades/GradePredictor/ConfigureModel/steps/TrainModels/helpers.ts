@@ -17,7 +17,7 @@ export const getRegistryCombinations = (registry: RelationshipRegistry[]): Relat
 
     let i = r - 1;
     while (a[0] < n - r + 1) {
-      while (i > 0 && a[i] == n - r + i) i--;
+      while (i > 0 && a[i] === n - r + i) i--;
 
       results.push(JSON.parse(JSON.stringify(a.map(idx => registry[idx]))));
       a[i]++;

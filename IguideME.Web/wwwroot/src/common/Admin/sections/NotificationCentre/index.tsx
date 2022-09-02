@@ -2,38 +2,29 @@ import React, { Component } from "react";
 import Admin from "../../index";
 import { Divider, Table } from "antd";
 import type { ColumnsType, TableProps } from 'antd/es/table';
+import NotificationCentreController, {Notifications} from "../../../../api/controllers/notificationcentre";
+import { IState } from "./types";
 
-function getData(): DataType[] {
-  return [
-    {
-      key: '1',
-      student: 'Test1',
-      notifications: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-      notifications_enabled: "Yes",
-    },
-    {
-      key: '2',
-      student: 'Test2',
-      notifications: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-      notifications_enabled: "Yes",
-    },
-  ]
-}
-
-interface DataType {
-  key: React.Key;
-  student: string;
-  notifications: string;
-  notifications_enabled: string;
-}
-
-const onChange: TableProps<DataType>['onChange'] = (pagination, filters, sorter, extra) => {
+const onChange: TableProps<Notifications>['onChange'] = (pagination, filters, sorter, extra) => {
   console.log('params', pagination, filters, sorter, extra);
 };
 
 export default class NotificationCentre extends Component {
+  state = {
+    notifications: []
+  }
+
+  componentDidMount(): void {
+    NotificationCentreController.getNotifications().then((notifications: Notifications[]) =>
+        this.setState({
+            notifications: notifications,
+        })
+    );
+}
+
   render(): React.ReactNode {
-    const columns: ColumnsType<DataType> = [
+    const { notifications }: IState = this.state;
+    const columns: ColumnsType<Notifications> = [
         {
           title: 'Student',
           dataIndex: 'student',
@@ -60,7 +51,7 @@ export default class NotificationCentre extends Component {
                 bordered
                 sticky={true}
                 columns={columns}
-                dataSource={getData()}
+                dataSource={notifications}
                 onChange={onChange}
           />
         </div>

@@ -1,7 +1,6 @@
 import React, { Component } from "react";
-import { TileEntry, TileEntrySubmission } from "../../../../models/app/Tile";
-import { Badge, Card, Col, Row } from "antd";
-import { CheckOutlined } from "@ant-design/icons";
+import { TileEntry} from "../../../../models/app/Tile";
+import { Badge, Card} from "antd";
 import "./style.scss";
 import { LearningOutcome } from "../../../../models/app/LearningGoal";
 

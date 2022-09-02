@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import {Divider, Space, Switch, Tooltip} from "antd";
+import {Divider, Switch, Tooltip} from "antd";
 import {CheckOutlined, CloseOutlined} from "@ant-design/icons";
 import ConsentEditor from "./ConsentEditor";
 import FadeIn from "react-fade-in";

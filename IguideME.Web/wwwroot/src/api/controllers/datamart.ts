@@ -8,6 +8,9 @@ import {
 } from "../../mocks/app/datamart";
 import { Synchronization } from "../../models/app/SyncProvider";
 import { PredictedGrade, PredictiveModel } from "../../models/app/PredictiveModel";
+
+// TODO: ?
+// eslint-disable-next-line
 import { NotificationStatus, PerformanceNotification } from "../../models/app/Notification";
 import { AppAcceptList } from "../../models/app/AcceptList";
 

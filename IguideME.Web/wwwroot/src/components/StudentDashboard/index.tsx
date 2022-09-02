@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import {IProps, IState, PeerGrades, TilesGradeSummary, ViewTypes} from "./types";
+import {IProps, IState, TilesGradeSummary, ViewTypes} from "./types";
 import TileGroup from "./TileGroup";
 import {Tile, TileGroup as TileGroupModel} from "../../models/app/Tile";
 import FadeIn from "react-fade-in";
@@ -17,7 +17,7 @@ import {DataMartActions} from "../../store/actions/datamart";
 import {PredictedGrade} from "../../models/app/PredictiveModel";
 import UserProfile from "./UserProfile";
 import {CanvasDiscussion} from "../../models/canvas/Discussion";
-import {LearningGoal, LearningOutcome} from "../../models/app/LearningGoal";
+import {LearningOutcome} from "../../models/app/LearningGoal";
 
 const compute = require('compute.io');
 
@@ -133,7 +133,7 @@ class StudentDashboard extends Component<Props, IState> {
         const sortedPredictions = (propPredictions.length > 0 ? propPredictions : predictions).sort(
           (a, b) => b.graded_components - a.graded_components);
         data.push({
-          tile: tiles.find(t => t.content == "PREDICTION")!,
+          tile: tiles.find(t => t.content === "PREDICTION")!,
           average: sortedPredictions.length > 0 ? sortedPredictions[0].grade : 0
         });
       }

@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Button, Card, Subtitle2, Caption, Divider } from 'ui-neumorphism'
+import { Button, Card, /* Subtitle2, Caption, Divider */ } from 'ui-neumorphism'
 import {Col, Row} from "antd";
 import "./style.scss";
 import {IProps, IState} from "./types";
@@ -37,7 +37,7 @@ export default class SyncOverview extends Component<IProps, IState> {
         <Row gutter={10}>
           <Col xs={12}>
             <Button color='rgb(0, 185, 120)'
-                    disabled={elapsed != undefined}
+                    disabled={elapsed !== undefined}
                     block
                     onClick={startSync}>
               synchronize
@@ -45,7 +45,7 @@ export default class SyncOverview extends Component<IProps, IState> {
           </Col>
 
           <Col xs={12}>
-            <Button disabled={elapsed == undefined}
+            <Button disabled={elapsed === undefined}
                     color={'rgb(255, 110, 90)'}
                     block
                     onClick={() => {

@@ -18,6 +18,7 @@ export const handleDrop = async (group: TileGroup,
                                  evt: { removedIndex: number | null, addedIndex: number | null, payload?: Tile },
                                  tiles: Tile[]): Promise<Tile[]> => {
   const { addedIndex, payload, removedIndex } = evt;
+  void payload; // discard while keeping eslint happy
 
   let tilesInGroup: Tile[] = JSON.parse(JSON.stringify(getTilesInGroup(tiles, group.id)));
 
