@@ -25,7 +25,7 @@ namespace IguideME.Web.Services
         public CanvasSyncService(
             IComputationJobStatusService computationJobStatus,
             CanvasTest canvasTest,
-        ILogger<SyncManager> logger)
+            ILogger<SyncManager> logger)
         {
             _logger = logger;
             _computationJobStatus = computationJobStatus;

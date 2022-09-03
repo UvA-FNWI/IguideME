@@ -4,6 +4,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace IguideME.Web.Services
 {
@@ -21,6 +22,9 @@ namespace IguideME.Web.Services
 		}
 
 		private readonly ICanvasSyncService _workService;
+
+		private readonly ILogger<QueuedBackgroundService> _logger;
+
 		private readonly IComputationJobStatusService _jobStatusService;
 
 		private static readonly ConcurrentQueue<JobQueueItem> _queue = new ConcurrentQueue<JobQueueItem>();
@@ -28,10 +32,12 @@ namespace IguideME.Web.Services
 
 		public QueuedBackgroundService(
 			ICanvasSyncService workService,
-			IComputationJobStatusService jobStatusService)
+			IComputationJobStatusService jobStatusService,
+			ILogger<QueuedBackgroundService> logger)
 		{
 			_workService = workService;
 			_jobStatusService = jobStatusService;
+			_logger = logger;
 		}
 
 		// Transient method via IQueuedBackgroundService
@@ -73,8 +79,9 @@ namespace IguideME.Web.Services
 							jobQueueItem.JobId, result, JobStatus.Success).ConfigureAwait(false);
 					}
 				}
-				catch (TaskCanceledException)
+				catch (TaskCanceledException ex)
 				{
+					_logger.LogInformation("Task canceled: " + ex.StackTrace );
 					break;
 				}
 				catch (Exception ex)
@@ -88,9 +95,9 @@ namespace IguideME.Web.Services
 							Exception = new JobExceptionModel(ex)
 						}, JobStatus.Errored).ConfigureAwait(false);
 					}
-					catch (Exception)
+					catch (Exception e)
 					{
-						// TODO: log this?
+						_logger.LogInformation(e.StackTrace);
 					}
 				}
 			}
