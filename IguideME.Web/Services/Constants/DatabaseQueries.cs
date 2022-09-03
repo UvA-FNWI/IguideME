@@ -53,20 +53,20 @@ public static class DatabaseQueries
 
 
     public const string INSERT_COURSE =
-        @"INSERT INTO   `course_settings` (`course_id`, `course_name`, `personalized_peers`, `peer_group_size`) 
+        @"INSERT INTO   `course_settings` (`course_id`, `course_name`, `personalized_peers`, `peer_group_size`)
         VALUES ({0}, '{1}', 0, 5);";
 
     // -------------------- User preferences --------------------
 
     /**
-     * The consent table stores whether the student gave permission for the 
-     * application to use their data. 
-     * 
+     * The consent table stores whether the student gave permission for the
+     * application to use their data.
+     *
      * NOTE: consent is stored using the course's internal numeric ID instead of
      * the course code. This is to prevent students whom re-take a course to
-     * automatically grant consent. 
-     * 
-     * 
+     * automatically grant consent.
+     *
+     *
      * `granted` values:
      *  -   1: permission granted
      *  -   0: user did not submit preferences
@@ -142,7 +142,7 @@ public static class DatabaseQueries
         @"SELECT    `user_login_id`,
                     (SELECT `id` FROM `tile` WHERE `content_type`='PREDICTION' LIMIT 1) as `tile_id`,
                     `grade`
-        FROM        `predicted_grade` 
+        FROM        `predicted_grade`
         WHERE       `course_id`={0}
         AND         `sync_hash`='{1}';";
 
@@ -291,7 +291,7 @@ public static class DatabaseQueries
         );";
 
     /**
-     * The `layout_tile_group` table stores all tile groups. A tile group is 
+     * The `layout_tile_group` table stores all tile groups. A tile group is
      * a collection of tiles.
      */
     public const string CREATE_TABLE_LAYOUT_TILE_GROUP =
@@ -310,12 +310,12 @@ public static class DatabaseQueries
         VALUES({0}, '{1}', {2});";
 
     public const string QUERY_LAYOUT_COLUMNS =
-        @"SELECT 
-            `id`, `container_width`, `position` 
+        @"SELECT
+            `id`, `container_width`, `position`
         FROM
             `layout_column`
         WHERE
-            `course_id`={0} 
+            `course_id`={0}
         ORDER BY
             `position` ASC";
 
@@ -337,17 +337,17 @@ public static class DatabaseQueries
     // -------------------- Application configuration --------------------
 
     /**
-     * Creates a new table harbouring all configured tiles. Tiles may contain 
+     * Creates a new table harbouring all configured tiles. Tiles may contain
      * multiple entries, whom's visualisation are dependent on the parent tile.
-     * Tiles are assigned groups and can be of varying types containing 
+     * Tiles are assigned groups and can be of varying types containing
      * different types of contents.
-     * 
+     *
      * Content types:
      * - BINARY
      * - ENTRIES
      * - PREDICTION
      * - LEARNING_OUTCOME
-     * 
+     *
      * Tile types:
      * - ASSIGNMENT
      * - DISCUSSION
@@ -368,7 +368,7 @@ public static class DatabaseQueries
         );";
 
     /**
-     * Tile entries are descendants of tiles. 
+     * Tile entries are descendants of tiles.
      */
     public const string CREATE_TABLE_TILE_ENTRY =
         @"CREATE TABLE IF NOT EXISTS `tile_entry` (
@@ -497,7 +497,7 @@ public static class DatabaseQueries
         ORDER BY    `tile`.`position` ASC;";
 
     public const string CREATE_TILE =
-        @"INSERT INTO  `tile` ( 
+        @"INSERT INTO  `tile` (
                        `group_id`,
                        `title`,
                        `position`,
@@ -728,7 +728,7 @@ public static class DatabaseQueries
         AND         `canvas_discussion`.`sync_hash`='{2}';";
 
     public const string REGISTER_CANVAS_ASSIGNMENT =
-        @"INSERT INTO   `canvas_assignment` 
+        @"INSERT INTO   `canvas_assignment`
                         (   `assignment_id`,
                             `course_id`,
                             `name`,
@@ -738,11 +738,11 @@ public static class DatabaseQueries
                             `points_possible`,
                             `position`,
                             `submission_type`,
-                            `sync_hash` ) 
+                            `sync_hash` )
         VALUES('{0}', {1}, '{2}', {3}, {4}, '{5}', {6}, {7}, '{8}', '{9}');";
 
     public const string REGISTER_CANVAS_DISCUSSION =
-        @"INSERT INTO   `canvas_discussion` 
+        @"INSERT INTO   `canvas_discussion`
                         (   `discussion_id`,
                             `course_id`,
                             `tile_id`,
@@ -750,13 +750,13 @@ public static class DatabaseQueries
                             `posted_by`,
                             `posted_at`,
                             `message`,
-                            `sync_hash` ) 
+                            `sync_hash` )
         VALUES({0}, {1}, {2}, '{3}', '{4}', '{5}', '{6}', '{7}');";
 
     // -------------------- Data retrieval --------------------
 
     public const string REGISTER_USER_FOR_COURSE =
-        @"INSERT INTO   `canvas_users` 
+        @"INSERT INTO   `canvas_users`
                         (   `course_id`,
                             `user_id`,
                             `login_id`,
@@ -917,15 +917,15 @@ public static class DatabaseQueries
 
     public const string QUERY_USER_PEER_GRADES =
         @"SELECT   `tile`.`id`,
-	    CASE `tile`.`content_type` 
+	    CASE `tile`.`content_type`
             WHEN 'BINARY' THEN  AVG(`grade`) * 100
             ELSE                AVG(`grade`)
        	END average,
-	    CASE `tile`.`content_type` 
+	    CASE `tile`.`content_type`
             WHEN 'BINARY' THEN  MIN(`grade`) * 100
             ELSE                MIN(`grade`)
        	END minimum,
-	    CASE `tile`.`content_type` 
+	    CASE `tile`.`content_type`
             WHEN 'BINARY' THEN  MAX(`grade`) * 100
             ELSE                MAX(`grade`)
        	END maximum
@@ -951,15 +951,15 @@ public static class DatabaseQueries
 
     public const string QUERY_USER_RESULTS =
         @"SELECT   `tile`.`id`,
-	    CASE `tile`.`content_type` 
+	    CASE `tile`.`content_type`
             WHEN 'BINARY' THEN  AVG(`grade`) * 1
             ELSE                AVG(`grade`)
        	END average,
-	    CASE `tile`.`content_type` 
+	    CASE `tile`.`content_type`
             WHEN 'BINARY' THEN  MIN(`grade`) * 1
             ELSE                MIN(`grade`)
        	END minimum,
-	    CASE `tile`.`content_type` 
+	    CASE `tile`.`content_type`
             WHEN 'BINARY' THEN  MAX(`grade`) * 1
             ELSE                MAX(`grade`)
        	END maximum
@@ -999,16 +999,16 @@ public static class DatabaseQueries
         AND         `sync_hash`='{1}';";
 
     public const string CREATE_USER_SUBMISSION =
-        @"INSERT INTO   `tile_entry_submission` 
+        @"INSERT INTO   `tile_entry_submission`
                         (   `entry_id`,
                             `user_login_id`,
                             `grade`,
                             `submitted`,
-                            `sync_hash` ) 
+                            `sync_hash` )
         VALUES({0}, '{1}', '{2}', '{3}', '{4}');";
 
     public const string RECYCLE_EXTERNAL_DATA =
-        @"UPDATE   `tile_entry_submission` 
+        @"UPDATE   `tile_entry_submission`
           SET      `sync_hash`='{1}'
           WHERE    `entry_id` IN (
             SELECT  `tile_entry`.`id`
