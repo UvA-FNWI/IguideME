@@ -266,7 +266,7 @@ namespace IguideME.Web.Controllers
             public int? GroupID { get; set; }
 
             [JsonProperty(PropertyName = "title")]
-            public string? Title { get; set; }
+            public string Title { get; set; }
 
             [JsonProperty(PropertyName = "visible")]
             public bool? Visible { get; set; }
@@ -624,7 +624,7 @@ namespace IguideME.Web.Controllers
         public ActionResult GetLayoutColumns()
         {
             /**
-             * Returns all columns registered to the course. 
+             * Returns all columns registered to the course.
              */
             return Json(
                 DatabaseManager.Instance.GetLayoutColumns(GetCourseID()));

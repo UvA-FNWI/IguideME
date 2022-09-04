@@ -129,7 +129,7 @@ namespace IguideME.Web.Services
         private string GetCurrentHash(int courseID)
         {
             /**
-             * Retrieve latest complete synchronization for course. If no 
+             * Retrieve latest complete synchronization for course. If no
              * historic synchronization was found then null is returned.
              */
             SQLiteDataReader r = Query(
@@ -1764,7 +1764,7 @@ namespace IguideME.Web.Services
         {
             command = connection.CreateCommand();
             command.CommandText = String.Format(
-                    @"INSERT INTO `tile_entry` ( 
+                    @"INSERT INTO `tile_entry` (
                        `course_id`,
                        `tile_id`,
                        `type`,
@@ -1881,7 +1881,7 @@ namespace IguideME.Web.Services
 
                 return consents.ToArray();
             }
-            catch (Exception _)
+            catch (Exception)
             {
                 return new ConsentData[0] { };
             }
