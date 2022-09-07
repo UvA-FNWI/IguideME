@@ -3,6 +3,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Threading;
 using System.Threading.Tasks;
+using IguideME.Web.Models.Service;
 
 namespace IguideME.Web.Services
 {
@@ -53,7 +54,10 @@ namespace IguideME.Web.Services
                     this.canvasTest,
                 _logger);
 
-                await this.queuedBackgroundService.PostWorkItemAsync(null).ConfigureAwait(false);
+                JobParametersModel parameters = new JobParametersModel();
+                parameters.CourseID = 32173;
+
+                await this.queuedBackgroundService.PostWorkItemAsync(parameters).ConfigureAwait(false);
                 _logger.LogInformation("Execute");
             }
         }
