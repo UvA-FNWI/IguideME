@@ -3,8 +3,8 @@ import moment from "moment";
 export const MOCK_DATAMART_SYNCHRONIZATIONS = [
   {
     key: '1',
-    start_timestamp: `${moment.utc().subtract(1, 'days').format('m/d/y [03:00:20]')}`,
-    end_timestamp: `${moment.utc().subtract(1, 'days').format('m/d/y [03:06:02]')}`,
+    start_timestamp: `${moment.utc().subtract(1, 'days').format('MM/DD/YY [03:00:20]')}`,
+    end_timestamp: `${moment.utc().subtract(1, 'days').format('MM/DD/YY [03:06:02]')}`,
     hash: "KVC8UCSAYE",
     duration: "00:05:49",
     invoked: 'IGUIDEME SYSTEM',
@@ -12,8 +12,8 @@ export const MOCK_DATAMART_SYNCHRONIZATIONS = [
   },
   {
     key: '2',
-    start_timestamp: `${moment.utc().format('m/d/y [03:00:20]')}`,
-    end_timestamp: `${moment.utc().format('m/d/y [03:06:02]')}`,
+    start_timestamp: `${moment.utc().format('MM/DD/YY [03:00:20]')}`,
+    end_timestamp: `${moment.utc().format('MM/DD/YY [03:06:02]')}`,
     hash: "VQNAXCCISY",
     duration: "00:06:12",
     invoked: 'IGUIDEME SYSTEM',
@@ -21,8 +21,8 @@ export const MOCK_DATAMART_SYNCHRONIZATIONS = [
   },
   {
     key: '3',
-    start_timestamp: `${moment.utc().subtract(3, 'hours').format('m/d/y [10:27:15]')}`,
-    end_timestamp: `${moment.utc().subtract(3, 'hours').add(5, 'minutes').format('m/d/y [10:32:20]')}`,
+    start_timestamp: `${moment.utc().subtract(3, 'hours').format('MM/DD/YY [10:27:15]')}`,
+    end_timestamp: `${moment.utc().subtract(3, 'hours').add(5, 'minutes').format('MM/DD/YY [10:32:20]')}`,
     hash: "HGKZFP4QT6",
     duration: "00:04:51",
     invoked: 'Demo Account',
