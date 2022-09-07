@@ -33,7 +33,7 @@ namespace IguideME.Web.Services
         public Task StartAsync(CancellationToken stoppingToken)
         {
             _logger.LogInformation("Synchronization manager running.");
-            _timer = new Timer(TimeSync, null, TimeSpan.Zero, TimeSpan.FromMinutes(1));
+            _timer = new Timer(TimeSync, null, TimeSpan.Zero, TimeSpan.FromMinutes(30));
 
             return Task.CompletedTask;
         }
@@ -46,13 +46,12 @@ namespace IguideME.Web.Services
             var now = DateTime.UtcNow;
             Console.WriteLine("Time is {0}", now.ToString());
 
-            if (now.Hour == 3 && now.Minute == 0)
+            if (now.Hour >= 2.5 && now.Hour < 3.5)
             {
                 var sync = new CanvasSyncService(
                     this.computationJobStatus,
                     this.canvasTest,
                 _logger);
-
 
                 await this.queuedBackgroundService.PostWorkItemAsync(null).ConfigureAwait(false);
                 _logger.LogInformation("Execute");

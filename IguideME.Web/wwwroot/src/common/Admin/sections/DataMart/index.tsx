@@ -21,10 +21,11 @@ export default class DataMart extends Component<IProps, IState> {
             this.setState({
                 // sort synchronizations by their start datetime
                 synchronizations: synchronizations.sort((a, b) =>
-                    moment(a.start, 'MMMM Do[,] YYYY [at] LT').isBefore(
-                        moment(b.start, 'MMMM Do[,] YYYY [at] LT')
-                    ) ? 1 : -1),
-                loaded: true
+                    moment(a.start_timestamp, 'MMMM Do[,] YYYY [at] LT').isBefore(
+                        moment(b.start_timestamp, 'MMMM Do[,] YYYY [at] LT')
+                    ) ? 1 : -1
+                    ),
+                loaded: true,
             })
         );
     }
@@ -32,7 +33,7 @@ export default class DataMart extends Component<IProps, IState> {
     render(): React.ReactNode {
         const { loaded, synchronizations }: IState = this.state;
         const backendFormat = 'DD/MM/YYYY HH:mm:ss'
-        const timeFormat = 'MMMM Do[,] YYYY [at] LT';
+        const timeFormat = 'MMMM Do[,] YYYY [at] H:m:s';
         const successfulSyncs = loaded ? synchronizations.filter(a => a.status === "COMPLETE") : [];
         const latestSuccessful = successfulSyncs.length > 0 ? successfulSyncs[0] : null;
 
@@ -44,8 +45,8 @@ export default class DataMart extends Component<IProps, IState> {
                         (latestSuccessful ?
                             <p>
                                 The latest successful synchronization took place on
-                <b> {moment.utc(latestSuccessful.start, backendFormat).local().format(timeFormat)} </b>
-                                <small>({moment.utc(latestSuccessful.start, backendFormat).fromNow()})</small>.
+                <b> {moment.utc(latestSuccessful.start_timestamp, backendFormat).local().format(timeFormat)} </b>
+                                <small>({moment.utc(latestSuccessful.start_timestamp, backendFormat).fromNow()})</small>.
                 Synchronizations run automatically at 03:00AM (local university time).
               </p> :
                             <p>No historic synchronizations available.</p>) :

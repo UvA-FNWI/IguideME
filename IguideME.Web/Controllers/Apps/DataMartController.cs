@@ -48,6 +48,7 @@ namespace IguideME.Web.Controllers
         [ProducesResponseType(StatusCodes.Status202Accepted, Type = typeof(JobCreatedModel))]
         public async Task<IActionResult> BeginComputation([FromBody] JobParametersModel obj)
         {
+            obj.CourseID = this.GetCourseID();
             return Accepted(
                 await _queuedBackgroundService.PostWorkItemAsync(obj).ConfigureAwait(false)
             );
