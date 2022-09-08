@@ -47,13 +47,14 @@ namespace IguideME.Web.Services
             var now = DateTime.UtcNow;
             Console.WriteLine("Time is {0}", now.ToString());
 
-            if (now.Hour >= 2.5 && now.Hour < 3.5)
+            if (now.Hour == 3 && now.Minute <= 30)
             {
                 var sync = new CanvasSyncService(
                     this.computationJobStatus,
                     this.canvasTest,
                 _logger);
 
+                // TODO: fix hard code, somehow get and store courseID on the system after received from web.
                 JobParametersModel parameters = new JobParametersModel();
                 parameters.CourseID = 32173;
 

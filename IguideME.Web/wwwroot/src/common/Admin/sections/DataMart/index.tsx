@@ -54,7 +54,7 @@ export default class DataMart extends Component<IProps, IState> {
                                 The latest successful synchronization took place on
                 <b> {moment.utc(latestSuccessful.start_timestamp, timeFormat).format(timeFormat)} </b>
                                 <small>({moment.utc(latestSuccessful.start_timestamp, backendFormat).fromNow()})</small>.
-                Synchronizations run automatically at 03:00AM (local university time).
+                Synchronizations run automatically at 03:00AM (UTC time).
               </p> :
                             <p>No historic synchronizations available.</p>) :
                         <div><Spin /> Retrieving latest synchronization...</div>
