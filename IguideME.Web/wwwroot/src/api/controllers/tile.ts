@@ -174,9 +174,12 @@ export default class TileController extends Controller {
       return Promise.resolve(MOCK_TILE_ENTRIES.filter(e => e.tile_id === tileId));
     }
 
-    return this.client.get(
+    var result = this.client.get(
       `tiles/${tileId}/entries`
     ).then(response => response.data);
+
+    console.log("Tile entries:", result);
+    return result;
   }
 
   static createTileEntry(entry: TileEntry): Promise<TileEntry> {

@@ -84,6 +84,7 @@ export class TileActions {
 
   static loadTileEntries = async () => {
     const groups = await TileController.getEntries();
+    console.log("loadTileEntries: ", groups);
 
     if (groups)
       return {

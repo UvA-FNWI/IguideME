@@ -539,7 +539,7 @@ namespace IguideME.Web.Services
             if (!r.Read()) return -1;
             else
             {
-                _logger.LogInformation("Requested types:\n" +
+                _logger.LogInformation("GetUserGoalGrade\nRequested types:\n" +
                     r.GetName(0) + ": " + r.GetDataTypeName(0) + "\n"
                 );
                 return Convert.ToInt32(r.GetValue(0).ToString());
@@ -1282,7 +1282,7 @@ namespace IguideME.Web.Services
 
             while (r.Read())
             {
-                _logger.LogInformation("Requested types:\n" +
+                _logger.LogInformation("GetEntries\nRequested types:\n" +
                     r.GetName(0) + ": " + r.GetDataTypeName(0) + "\n" +
                     r.GetName(1) + ": " + r.GetDataTypeName(1) + "\n" +
                     r.GetName(2) + ": " + r.GetDataTypeName(2) + "\n" +
@@ -1438,7 +1438,7 @@ namespace IguideME.Web.Services
             while (r.Read())
             {
 
-                _logger.LogInformation("Requested types:\n" +
+                _logger.LogInformation("GetTiles\nRequested types:\n" +
                     r.GetName(0) + ": " + r.GetDataTypeName(0) + "\n" +
                     r.GetName(1) + ": " + r.GetDataTypeName(1) + "\n" +
                     r.GetName(2) + ": " + r.GetDataTypeName(2) + "\n" +
@@ -1522,7 +1522,7 @@ namespace IguideME.Web.Services
 
             while (r.Read())
             {
-                _logger.LogInformation("Requested types:\n" +
+                _logger.LogInformation("GetLayoutTileGroups\nRequested types:\n" +
                     r.GetName(0) + ": " + r.GetDataTypeName(0) + "\n" +
                     r.GetName(1) + ": " + r.GetDataTypeName(1) + "\n" +
                     r.GetName(2) + ": " + r.GetDataTypeName(2) + "\n" +
@@ -1571,7 +1571,6 @@ namespace IguideME.Web.Services
                     r.GetValue(9).ToString()
                 );
                 assignments.Add(row);
-                _logger.LogInformation(row.Name + " " + row.AssignmentID);
             }
 
             return assignments;
@@ -1682,7 +1681,7 @@ namespace IguideME.Web.Services
 
             while (r.Read())
             {
-                _logger.LogInformation("Requested types:\n" +
+                _logger.LogInformation("GetLayoutColumns\nRequested types:\n" +
                     r.GetName(0) + ": " + r.GetDataTypeName(0) + "\n" +
                     r.GetName(1) + ": " + r.GetDataTypeName(1) + "\n" +
                     r.GetName(2) + ": " + r.GetDataTypeName(2) + "\n"
