@@ -539,8 +539,9 @@ namespace IguideME.Web.Services
             if (!r.Read()) return -1;
             else
             {
-                _logger.LogInformation("Requested types:");
-                _logger.LogInformation(r.GetName(0) + ": " + r.GetDataTypeName(0));
+                _logger.LogInformation("Requested types:\n" +
+                    r.GetName(0) + ": " + r.GetDataTypeName(0) + "\n"
+                );
                 return Convert.ToInt32(r.GetValue(0).ToString());
             }
         }
@@ -1281,11 +1282,12 @@ namespace IguideME.Web.Services
 
             while (r.Read())
             {
-                _logger.LogInformation("Requested types:");
-                _logger.LogInformation(r.GetName(0) + ": " + r.GetDataTypeName(0));
-                _logger.LogInformation(r.GetName(1) + ": " + r.GetDataTypeName(1));
-                _logger.LogInformation(r.GetName(2) + ": " + r.GetDataTypeName(2));
-                _logger.LogInformation(r.GetName(3) + ": " + r.GetDataTypeName(3));
+                _logger.LogInformation("Requested types:\n" +
+                    r.GetName(0) + ": " + r.GetDataTypeName(0) + "\n" +
+                    r.GetName(1) + ": " + r.GetDataTypeName(1) + "\n" +
+                    r.GetName(2) + ": " + r.GetDataTypeName(2) + "\n" +
+                    r.GetName(3) + ": " + r.GetDataTypeName(3) + "\n"
+                );
 
                 entries.Add(new TileEntry(
                     r.GetInt32(0),
@@ -1436,17 +1438,18 @@ namespace IguideME.Web.Services
             while (r.Read())
             {
 
-                _logger.LogInformation("Requested types:");
-                _logger.LogInformation(r.GetName(0) + ": " + r.GetDataTypeName(0));
-                _logger.LogInformation(r.GetName(1) + ": " + r.GetDataTypeName(1));
-                _logger.LogInformation(r.GetName(2) + ": " + r.GetDataTypeName(2));
-                _logger.LogInformation(r.GetName(3) + ": " + r.GetDataTypeName(3));
-                _logger.LogInformation(r.GetName(4) + ": " + r.GetDataTypeName(4));
-                _logger.LogInformation(r.GetName(5) + ": " + r.GetDataTypeName(5));
-                _logger.LogInformation(r.GetName(6) + ": " + r.GetDataTypeName(6));
-                _logger.LogInformation(r.GetName(7) + ": " + r.GetDataTypeName(7));
-                _logger.LogInformation(r.GetName(8) + ": " + r.GetDataTypeName(8));
-                _logger.LogInformation(r.GetName(9) + ": " + r.GetDataTypeName(9));
+                _logger.LogInformation("Requested types:\n" +
+                    r.GetName(0) + ": " + r.GetDataTypeName(0) + "\n" +
+                    r.GetName(1) + ": " + r.GetDataTypeName(1) + "\n" +
+                    r.GetName(2) + ": " + r.GetDataTypeName(2) + "\n" +
+                    r.GetName(3) + ": " + r.GetDataTypeName(3) + "\n" +
+                    r.GetName(4) + ": " + r.GetDataTypeName(4) + "\n" +
+                    r.GetName(5) + ": " + r.GetDataTypeName(5) + "\n" +
+                    r.GetName(6) + ": " + r.GetDataTypeName(6) + "\n" +
+                    r.GetName(7) + ": " + r.GetDataTypeName(7) + "\n" +
+                    r.GetName(8) + ": " + r.GetDataTypeName(8) + "\n" +
+                    r.GetName(9) + ": " + r.GetDataTypeName(9) + "\n"
+                );
 
                 Tile row = new Tile(
                     r.GetInt32(0),
@@ -1519,11 +1522,12 @@ namespace IguideME.Web.Services
 
             while (r.Read())
             {
-                _logger.LogInformation("Requested types:");
-                _logger.LogInformation(r.GetName(0) + ": " + r.GetDataTypeName(0));
-                _logger.LogInformation(r.GetName(1) + ": " + r.GetDataTypeName(1));
-                _logger.LogInformation(r.GetName(2) + ": " + r.GetDataTypeName(2));
-                _logger.LogInformation(r.GetName(3) + ": " + r.GetDataTypeName(3));
+                _logger.LogInformation("Requested types:\n" +
+                    r.GetName(0) + ": " + r.GetDataTypeName(0) + "\n" +
+                    r.GetName(1) + ": " + r.GetDataTypeName(1) + "\n" +
+                    r.GetName(2) + ": " + r.GetDataTypeName(2) + "\n" +
+                    r.GetName(3) + ": " + r.GetDataTypeName(3) + "\n"
+                );
 
                 LayoutTileGroup row = new LayoutTileGroup(
                     r.GetInt32(0),
@@ -1678,10 +1682,11 @@ namespace IguideME.Web.Services
 
             while (r.Read())
             {
-                _logger.LogInformation("Requested types:");
-                _logger.LogInformation(r.GetName(0) + ": " + r.GetDataTypeName(0));
-                _logger.LogInformation(r.GetName(1) + ": " + r.GetDataTypeName(1));
-                _logger.LogInformation(r.GetName(2) + ": " + r.GetDataTypeName(2));
+                _logger.LogInformation("Requested types:\n" +
+                    r.GetName(0) + ": " + r.GetDataTypeName(0) + "\n" +
+                    r.GetName(1) + ": " + r.GetDataTypeName(1) + "\n" +
+                    r.GetName(2) + ": " + r.GetDataTypeName(2) + "\n"
+                );
 
                 LayoutColumn row = new LayoutColumn(
                     r.GetInt32(0), courseID, r.GetValue(1).ToString(), r.GetInt32(2)
