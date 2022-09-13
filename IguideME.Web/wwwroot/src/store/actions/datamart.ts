@@ -14,13 +14,13 @@ export class DataMartActions {
 
   static loadAssignments = async () => {
     const course = await CanvasController.getAssignments();
-
-    if (course)
+    if (course){
+      console.log(course)
       return {
         type: DataMartActions.SET_ASSIGNMENTS_SUCCESS,
         payload: course
       }
-
+    }
     return {
       type: DataMartActions.SET_ASSIGNMENTS_ERROR,
     }

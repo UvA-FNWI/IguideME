@@ -1571,7 +1571,7 @@ namespace IguideME.Web.Services
                     r.GetValue(9).ToString()
                 );
                 assignments.Add(row);
-                _logger.LogInformation(row.Name + " " + row.ID);
+                _logger.LogInformation(row.Name + " " + row.AssignmentID);
             }
 
             return assignments;
