@@ -186,7 +186,7 @@ export default class TileController extends Controller {
     if (debug()) {
       return delay(entry);
     }
-
+    console.log("Creating entry", entry);
     return this.client.post(
       `/entries`, entry
     ).then(response => response.data);
