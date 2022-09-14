@@ -346,7 +346,7 @@ public static class DatabaseQueries
      * - BINARY
      * - ENTRIES
      * - PREDICTION
-     * - LEARNING_OUTCOME
+     * - LEARNING_OUTCOMES
      *
      * Tile types:
      * - ASSIGNMENT
