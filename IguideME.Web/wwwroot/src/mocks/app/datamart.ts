@@ -6,7 +6,7 @@ export const MOCK_DATAMART_SYNCHRONIZATIONS = [
     start_timestamp: `${moment.utc().subtract(1, 'days').format('MM/DD/YY [03:00:20]')}`,
     end_timestamp: `${moment.utc().subtract(1, 'days').format('MM/DD/YY [03:06:02]')}`,
     hash: "KVC8UCSAYE",
-    duration: "00:05:49",
+    duration: "349",
     invoked: 'IGUIDEME SYSTEM',
     status: "COMPLETE"
   },
@@ -15,7 +15,7 @@ export const MOCK_DATAMART_SYNCHRONIZATIONS = [
     start_timestamp: `${moment.utc().format('MM/DD/YY [03:00:20]')}`,
     end_timestamp: `${moment.utc().format('MM/DD/YY [03:06:02]')}`,
     hash: "VQNAXCCISY",
-    duration: "00:06:12",
+    duration: "372",
     invoked: 'IGUIDEME SYSTEM',
     status: "COMPLETE"
   },
@@ -24,7 +24,7 @@ export const MOCK_DATAMART_SYNCHRONIZATIONS = [
     start_timestamp: `${moment.utc().subtract(3, 'hours').format('MM/DD/YY [10:27:15]')}`,
     end_timestamp: `${moment.utc().subtract(3, 'hours').add(5, 'minutes').format('MM/DD/YY [10:32:20]')}`,
     hash: "HGKZFP4QT6",
-    duration: "00:04:51",
+    duration: "291",
     invoked: 'Demo Account',
     status: "Aborted"
   }

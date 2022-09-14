@@ -30,20 +30,24 @@ namespace IguideME.Web.Models.App
         public DataSynchronization(
             int id,
             int courseID,
-            string startTimestamp,
-            string endTimestamp,
+            DateTime startTimestamp,
+            DateTime endTimestamp,
             string status,
             string hash)
         {
             this.id = id;
             this.courseID = courseID;
-            this.startTimestamp = startTimestamp;
-            this.endTimestamp = endTimestamp;
+            this.startTimestamp = startTimestamp.ToString();
+            this.endTimestamp = endTimestamp.ToString();
             this.status = status;
             this.hash = hash;
 
-            // TODO
-            this.duration = 100;
+            if (endTimestamp != null && startTimestamp != null){
+                this.duration = (int) Math.Floor((endTimestamp - startTimestamp).TotalSeconds);
+            }
+            else {
+                this.duration = -1;
+            }
         }
 
 

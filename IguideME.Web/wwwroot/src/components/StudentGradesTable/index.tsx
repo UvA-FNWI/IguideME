@@ -42,9 +42,9 @@ export default class StudentGradesTable extends Component<IProps, IState> {
 
     if (!loaded) return <Loading small={true} />;
 
-    console.log("GRADE TABLE", submissions);
-    console.log("COLUMNS", getColumns(tiles, tileEntries, averaged));
-    console.log("DATA", getData(students, tiles, tileEntries, submissions));
+    // console.log("GRADE TABLE", submissions);
+    // console.log("COLUMNS", getColumns(tiles, tileEntries, averaged));
+    // console.log("DATA", getData(students, tiles, tileEntries, submissions));
     return (
       <div id={"studentsGradeTable"} style={{position: 'relative', overflow: 'visible'}}>
         <Table columns={getColumns(tiles, tileEntries, averaged)}

@@ -128,13 +128,9 @@ export function getColumns(tiles: Tile[], tileEntries: TileEntry[], averaged: bo
     }
   }];
 
-  console.log("tiles:", tiles);
-  console.log("tileEntries:", tileEntries);
   const tileColumns = tiles.filter(t => !['PREDICTION', 'LEARNING_OUTCOMES'].includes(t.content)).map(t => getColumn(
     t, tileEntries.filter(e => e.tile_id === t.id), averaged
     ));
-
-  console.log("tilesColumns:", tileColumns);
 
   columns.push(...standardColumns, ...tileColumns);
   return columns;

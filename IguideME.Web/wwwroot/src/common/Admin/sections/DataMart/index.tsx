@@ -39,6 +39,7 @@ export default class DataMart extends Component<IProps, IState> {
             void index; void arr;
             s.start_timestamp = moment.utc(s.start_timestamp, backendFormat).local().format(timeFormat).toString();
             s.end_timestamp = moment.utc(s.end_timestamp, backendFormat).local().format(timeFormat).toString();
+            s.duration = moment.utc(parseInt(s.duration)*1000).format('HH:mm:ss');
         });
 
         const successfulSyncs = loaded ? synchronizations.filter(a => a.status === "COMPLETE") : [];
