@@ -127,19 +127,11 @@ class EditTileDragger extends Component<Props, IState> {
       this.setState({ updating: true }, async () => {
         if (['ASSIGNMENTS', 'DISCUSSIONS'].includes(tile!.type || "")) {
 
-          console.log("Just array:", ['ASSIGNMENTS', 'DISCUSSIONS']);
-          console.log("Entire if:", ['ASSIGNMENTS', 'DISCUSSIONS'].includes(tile!.type || ""));
-          console.log("tile!type:", tile!.type);
-          console.log("all entries update tile:", tileEntries);
-
           const removedEntries = tileEntries.filter(
             e => e.tile_id === patchedTile.id
           ).filter(
             e => !entries.map(_e => _e.title).includes(e.title));
           const newEntries = entries.filter(e => e.id === -1);
-
-          console.log("removed entries:", removedEntries);
-          console.log("new entries:", newEntries);
 
           await this.deleteEntries(removedEntries);
           await this.createEntries(newEntries);
@@ -149,9 +141,6 @@ class EditTileDragger extends Component<Props, IState> {
           ).filter(
             g => !goals.map(_g => _g.title).includes(g.title));
           const newGoals = goals.filter(g => g.new === true);
-
-          console.log("removed goals:", removedGoals);
-          console.log("new goals:", newGoals);
 
           await this.deleteGoals(removedGoals);
           await this.createGoals(newGoals);
@@ -176,10 +165,6 @@ class EditTileDragger extends Component<Props, IState> {
           e => !entries.map(_e => _e.title).includes(e.title));
 
         const newEntries = entries.filter(e => e.id === -1);
-
-        console.log("All entries state:", tileEntries)
-        console.log("delete entries state:", removedEntries);
-        console.log("new entries state:", newEntries);
 
         await this.deleteEntries(removedEntries);
         await this.createEntries(newEntries);

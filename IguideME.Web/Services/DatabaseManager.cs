@@ -1302,7 +1302,6 @@ namespace IguideME.Web.Services
 
         public int CreateTileEntry(TileEntry entry)
         {
-            _logger.LogInformation("Creating tile entry: " + entry.Title);
             string query = String.Format(
                     DatabaseQueries.CREATE_TILE_ENTRY,
                     entry.TileID,

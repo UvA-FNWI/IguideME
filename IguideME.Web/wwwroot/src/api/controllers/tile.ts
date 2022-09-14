@@ -178,7 +178,6 @@ export default class TileController extends Controller {
       `tiles/${tileId}/entries`
     ).then(response => response.data);
 
-    console.log("Tile entries:", result);
     return result;
   }
 
@@ -186,7 +185,6 @@ export default class TileController extends Controller {
     if (debug()) {
       return delay(entry);
     }
-    console.log("Creating entry", entry);
     return this.client.post(
       `/entries`, entry
     ).then(response => response.data);
