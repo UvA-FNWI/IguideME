@@ -8,8 +8,9 @@ namespace IguideME.Web.Models.Service
 		public uint SeedData { get; set; }
 
 		[JsonProperty("courseID")]
-		public uint CourseID { get; set; }
+		public int CourseID { get; set; }
 
 		// TODO: are we missing any parameters?
+
 	}
 }

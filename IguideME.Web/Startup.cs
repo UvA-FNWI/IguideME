@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 
 namespace IguideME.Web
@@ -25,6 +26,7 @@ namespace IguideME.Web
 
         public void ConfigureServices(IServiceCollection services)
         {
+
             var useRedisCache = Configuration.GetValue<bool>(
                 "UnsecureApplicationSettings:UseRedisCache");
             var redisCacheConnectionString = Configuration.GetValue<string>(
@@ -108,14 +110,16 @@ namespace IguideME.Web
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger)
         {
             if (env.IsDevelopment())
             {
+                logger.LogInformation("In Development.");
                 app.UseDeveloperExceptionPage();
             }
             else
             {
+                logger.LogInformation("In Production.");
                 app.UseExceptionHandler("/Error");
             }
 

@@ -1,33 +1,22 @@
 #!/usr/bin/env bash
 
-
 PROJECT_ROOT=$PWD;
-GIT_SSL_CAINFO=$HOME/.nix-profile/etc/ca-bundle.crt;
-
-kill-process() {
-  ps ax | grep "$1" | grep -v grep | awk '{print $1}' | xargs kill
-}
-
-function cleanup {
-  echo "Killing leftover processes...";
-  kill-process node 2> /dev/null;
-  kill-process dotnet 2> /dev/null;
-}
-trap cleanup EXIT;
 
 if [ ! -d $PWD/IguideME.Web/wwwroot/node_modules ]; then
   echo "Fetching node modules..."
-  cd $PWD/IguideME.Web/wwwroot;
+  cd $PWD/IguideME.Web/wwwroot || exit;
   yarn;
-  cd $PWD;
+  cd $PWD || exit;
 fi
+
+KUBECTL_PROJ_ID=$(kubectl get pods -n iguideme | grep Running | awk '{print $1}')
 
 alias build-frontend-watch='yarn --cwd $PROJECT_ROOT/IguideME.Web/wwwroot/ start';
 alias build-frontend-prod='yarn --cwd $PROJECT_ROOT/IguideME.Web/wwwroot/ build';
 alias build-backend-watch='dotnet watch --project $PROJECT_ROOT/IguideME.Web/ run';
 alias build-backend-prod='dotnet build --project $PROJECT_ROOT/IguideME.Web/';
 alias enter-db='litecli $PROJECT_ROOT/IguideME.Web/db.sqlite';
-alias logs='kubectl logs iguideme-9bbcc8647-tfj8v -n iguideme';
+alias logs='kubectl logs $KUBECTL_PROJ_ID -n iguideme';
 alias h='display_help';
 
 display_help () {

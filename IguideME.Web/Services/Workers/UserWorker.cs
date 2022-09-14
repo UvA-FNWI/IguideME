@@ -14,7 +14,7 @@ namespace IguideME.Web.Services.Workers
             int courseID,
             string hashCode,
             CanvasTest canvasTest,
-        ILogger<SyncManager> logger)
+            ILogger<SyncManager> logger)
         {
             _logger = logger;
             this.courseID = courseID;

@@ -20,8 +20,7 @@ export default class EntryItem extends Component<{
 
                 <GradeStatistic grade={submission.grade} />
 
-                {/* TODO why and when is this visible to the user */}
-                { (/* hide meta */ false) && Object.keys(meta).length > 0 &&
+                { Object.keys(meta).length > 0 &&
                     <div>
                         <Table dataSource={Object.keys(meta).map((key, i) => ({
                             key: i,

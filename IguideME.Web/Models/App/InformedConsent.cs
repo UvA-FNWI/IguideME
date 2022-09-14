@@ -5,13 +5,13 @@ namespace IguideME.Web.Models.App
     public class PublicInformedConsent
     {
         [JsonProperty("course_name")]
-        public string? CourseName { get; set; }
+        public string CourseName { get; set; }
 
         [JsonProperty("require_consent")]
         public bool RequireConsent { get; set; }
 
         [JsonProperty("text")]
-        public string? Text { get; set; }
+        public string Text { get; set; }
 
         [JsonProperty("accept_list")]
         public bool AcceptList { get; set; }

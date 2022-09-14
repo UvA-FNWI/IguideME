@@ -5,6 +5,7 @@ using System.Linq;
 using IguideME.Web.Models;
 using IguideME.Web.Models.App;
 using IguideME.Web.Models.Impl;
+using Microsoft.Extensions.Logging;
 
 namespace IguideME.Web.Services
 {
@@ -13,6 +14,7 @@ namespace IguideME.Web.Services
         private static DatabaseManager instance;
         private SQLiteConnection connection;
         private static SQLiteCommand command;
+        private readonly ILogger _logger;
 
         DatabaseManager(bool isDev = false) {
             DatabaseManager.instance = this;
@@ -24,6 +26,8 @@ namespace IguideME.Web.Services
             DatabaseManager.instance.connection.Open();
             DatabaseManager.instance.CreateTables();
             DatabaseManager.instance.RunMigrations();
+            var factory = LoggerFactory.Create(builder => builder.AddConsole());
+            _logger = factory.CreateLogger("DatabaseManager");
         }
 
         public static void Initialize(bool isDev = false)
@@ -129,7 +133,7 @@ namespace IguideME.Web.Services
         private string GetCurrentHash(int courseID)
         {
             /**
-             * Retrieve latest complete synchronization for course. If no 
+             * Retrieve latest complete synchronization for course. If no
              * historic synchronization was found then null is returned.
              */
             SQLiteDataReader r = Query(
@@ -197,8 +201,8 @@ namespace IguideME.Web.Services
                 hashes.Add(new DataSynchronization(
                     r.GetInt32(0),
                     r.GetInt32(1),
-                    r.GetValue(2).ToString(),
-                    r.GetValue(3).ToString(),
+                    r.GetDateTime(2),
+                    r.GetDateTime(3),
                     r.GetValue(4).ToString(),
                     r.GetValue(5).ToString()));
 
@@ -535,7 +539,16 @@ namespace IguideME.Web.Services
             if (!r.Read()) return -1;
             else
             {
-                return Convert.ToInt32(r.GetValue(0).ToString());
+                try{
+                    return Convert.ToInt32(r.GetValue(0).ToString());
+                }
+                catch (Exception e) {
+                    _logger.LogInformation("GetUserGoalGrade\nRequested types:\n" +
+                        r.GetName(0) + ": " + r.GetDataTypeName(0) + "\n\n" +
+                        e
+                    );
+                    return -1;
+                }
             }
         }
 
@@ -1275,12 +1288,22 @@ namespace IguideME.Web.Services
 
             while (r.Read())
             {
-                entries.Add(new TileEntry(
+                try {
+                    entries.Add(new TileEntry(
                     r.GetInt32(0),
                     r.GetInt32(1),
                     r.GetValue(2).ToString(),
                     r.GetValue(3).ToString()
                 ));
+                } catch (Exception e) {
+                    _logger.LogInformation("GetEntries\nRequested types:\n" +
+                        r.GetName(0) + ": " + r.GetDataTypeName(0) + "\n" +
+                        r.GetName(1) + ": " + r.GetDataTypeName(1) + "\n" +
+                        r.GetName(2) + ": " + r.GetDataTypeName(2) + "\n" +
+                        r.GetName(3) + ": " + r.GetDataTypeName(3) + "\n\n" +
+                        e
+                    );
+                }
             }
 
             return entries;
@@ -1423,20 +1446,37 @@ namespace IguideME.Web.Services
 
             while (r.Read())
             {
-                Tile row = new Tile(
-                    r.GetInt32(0),
-                    r.GetInt32(1),
-                    r.GetValue(2).ToString(),
-                    r.GetInt32(3),
-                    r.GetValue(4).ToString(),
-                    r.GetValue(5).ToString(),
-                    r.GetBoolean(6),
-                    r.GetBoolean(7),
-                    r.GetBoolean(8),
-                    r.GetBoolean(9),
-                    autoLoadEntries
-                );
-                tiles.Add(row);
+                try {
+                    Tile row = new Tile(
+                        r.GetInt32(0),
+                        r.GetInt32(1),
+                        r.GetValue(2).ToString(),
+                        r.GetInt32(3),
+                        r.GetValue(4).ToString(),
+                        r.GetValue(5).ToString(),
+                        r.GetBoolean(6),
+                        r.GetBoolean(7),
+                        r.GetBoolean(8),
+                        r.GetBoolean(9),
+                        autoLoadEntries
+                    );
+                    tiles.Add(row);
+                }
+                catch (Exception e) {
+                    _logger.LogInformation("GetTiles\nRequested types:\n" +
+                        r.GetName(0) + ": " + r.GetDataTypeName(0) + "\n" +
+                        r.GetName(1) + ": " + r.GetDataTypeName(1) + "\n" +
+                        r.GetName(2) + ": " + r.GetDataTypeName(2) + "\n" +
+                        r.GetName(3) + ": " + r.GetDataTypeName(3) + "\n" +
+                        r.GetName(4) + ": " + r.GetDataTypeName(4) + "\n" +
+                        r.GetName(5) + ": " + r.GetDataTypeName(5) + "\n" +
+                        r.GetName(6) + ": " + r.GetDataTypeName(6) + "\n" +
+                        r.GetName(7) + ": " + r.GetDataTypeName(7) + "\n" +
+                        r.GetName(8) + ": " + r.GetDataTypeName(8) + "\n" +
+                        r.GetName(9) + ": " + r.GetDataTypeName(9) + "\n\n" +
+                        e
+                    );
+                }
             }
 
             return tiles;
@@ -1494,7 +1534,8 @@ namespace IguideME.Web.Services
 
             while (r.Read())
             {
-                LayoutTileGroup row = new LayoutTileGroup(
+                try {
+                    LayoutTileGroup row = new LayoutTileGroup(
                     r.GetInt32(0),
                     courseID,
                     r.GetValue(1).ToString(),
@@ -1502,6 +1543,15 @@ namespace IguideME.Web.Services
                     r.GetInt32(3)
                 );
                 tileGroups.Add(row);
+                } catch (Exception e) {
+                    _logger.LogInformation("GetLayoutTileGroups\nRequested types:\n" +
+                        r.GetName(0) + ": " + r.GetDataTypeName(0) + "\n" +
+                        r.GetName(1) + ": " + r.GetDataTypeName(1) + "\n" +
+                        r.GetName(2) + ": " + r.GetDataTypeName(2) + "\n" +
+                        r.GetName(3) + ": " + r.GetDataTypeName(3) + "\n\n" +
+                        e
+                    );
+                }
             }
 
             return tileGroups;
@@ -1646,10 +1696,22 @@ namespace IguideME.Web.Services
 
             while (r.Read())
             {
-                LayoutColumn row = new LayoutColumn(
-                    r.GetInt32(0), courseID, r.GetValue(1).ToString(), r.GetInt32(2)
-                );
-                columns.Add(row);
+                try {
+                    LayoutColumn row = new LayoutColumn(
+                        r.GetInt32(0),
+                        courseID,
+                        r.GetValue(1).ToString(),
+                        r.GetInt32(2)
+                    );
+                    columns.Add(row);
+                } catch (Exception e) {
+                    _logger.LogInformation("GetLayoutColumns\nRequested types:\n" +
+                        r.GetName(0) + ": " + r.GetDataTypeName(0) + "\n" +
+                        r.GetName(1) + ": " + r.GetDataTypeName(1) + "\n" +
+                        r.GetName(2) + ": " + r.GetDataTypeName(2) + "\n\n" +
+                        e
+                    );
+                }
             }
 
             return columns;
@@ -1764,7 +1826,7 @@ namespace IguideME.Web.Services
         {
             command = connection.CreateCommand();
             command.CommandText = String.Format(
-                    @"INSERT INTO `tile_entry` ( 
+                    @"INSERT INTO `tile_entry` (
                        `course_id`,
                        `tile_id`,
                        `type`,
@@ -1881,7 +1943,7 @@ namespace IguideME.Web.Services
 
                 return consents.ToArray();
             }
-            catch (Exception _)
+            catch (Exception)
             {
                 return new ConsentData[0] { };
             }

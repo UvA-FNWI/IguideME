@@ -7,18 +7,21 @@ using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
 using UvA.DataNose.Connectors.Canvas;
+using Microsoft.Extensions.Logging;
 
 namespace IguideME.Web.Services
 {
     public class CanvasTest
     {
+        private readonly ILogger<SyncManager> _logger;
         CanvasApiConnector connector;
         public string baseUrl;
         public string accessToken;
         private static readonly HttpClient client = new HttpClient();
 
-        public CanvasTest(IConfiguration config)
+        public CanvasTest(IConfiguration config, ILogger<SyncManager> logger)
         {
+            _logger = logger;
             this.accessToken = config["Canvas:AccessToken"];
             this.baseUrl = config["Canvas:Url"];
             this.connector = new CanvasApiConnector(config["Canvas:Url"], config["Canvas:AccessToken"]);
@@ -43,6 +46,10 @@ namespace IguideME.Web.Services
 
         public User[] GetStudents(int courseID)
         {
+            _logger.LogInformation("Finding course by id, id = " + courseID);
+            _logger.LogInformation("Course = " + connector.FindCourseById(courseID));
+            _logger.LogInformation("Getting users " + connector.FindCourseById(courseID).GetUsersByType(EnrollmentType.Student).ToArray());
+
             return connector.FindCourseById(courseID).GetUsersByType(EnrollmentType.Student).ToArray();
         }
 

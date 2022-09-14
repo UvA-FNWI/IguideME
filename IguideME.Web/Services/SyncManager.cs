@@ -3,6 +3,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Threading;
 using System.Threading.Tasks;
+using IguideME.Web.Models.Service;
 
 namespace IguideME.Web.Services
 {
@@ -33,7 +34,7 @@ namespace IguideME.Web.Services
         public Task StartAsync(CancellationToken stoppingToken)
         {
             _logger.LogInformation("Synchronization manager running.");
-            _timer = new Timer(TimeSync, null, TimeSpan.Zero, TimeSpan.FromMinutes(1));
+            _timer = new Timer(TimeSync, null, TimeSpan.Zero, TimeSpan.FromMinutes(30));
 
             return Task.CompletedTask;
         }
@@ -46,15 +47,18 @@ namespace IguideME.Web.Services
             var now = DateTime.UtcNow;
             Console.WriteLine("Time is {0}", now.ToString());
 
-            if (now.Hour == 3 && now.Minute == 0)
+            if (now.Hour == 3 && now.Minute <= 30)
             {
                 var sync = new CanvasSyncService(
                     this.computationJobStatus,
                     this.canvasTest,
                 _logger);
 
+                // TODO: fix hard code, somehow get and store courseID on the system after received from web.
+                JobParametersModel parameters = new JobParametersModel();
+                parameters.CourseID = 32173;
 
-                await this.queuedBackgroundService.PostWorkItemAsync(null).ConfigureAwait(false);
+                await this.queuedBackgroundService.PostWorkItemAsync(parameters).ConfigureAwait(false);
                 _logger.LogInformation("Execute");
             }
         }

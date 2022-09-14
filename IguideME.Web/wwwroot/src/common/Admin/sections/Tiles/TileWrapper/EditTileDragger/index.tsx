@@ -126,6 +126,7 @@ class EditTileDragger extends Component<Props, IState> {
     TileController.updateTile(tileRef).then(patchedTile => {
       this.setState({ updating: true }, async () => {
         if (['ASSIGNMENTS', 'DISCUSSIONS'].includes(tile!.type || "")) {
+
           const removedEntries = tileEntries.filter(
             e => e.tile_id === patchedTile.id
           ).filter(

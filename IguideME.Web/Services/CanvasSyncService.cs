@@ -25,7 +25,7 @@ namespace IguideME.Web.Services
         public CanvasSyncService(
             IComputationJobStatusService computationJobStatus,
             CanvasTest canvasTest,
-        ILogger<SyncManager> logger)
+            ILogger<SyncManager> logger)
         {
             _logger = logger;
             _computationJobStatus = computationJobStatus;
@@ -36,8 +36,7 @@ namespace IguideME.Web.Services
             CancellationToken cancellationToken)
         {
             var result = new JobResultModel();
-            // var courseID = 25503;
-            var courseID = 32173;
+            var courseID = work.CourseID;
 
             string characters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
             StringBuilder _result = new StringBuilder(10);
@@ -49,6 +48,7 @@ namespace IguideME.Web.Services
             string hashCode = _result.ToString().ToUpper();
             DatabaseManager.Instance.RegisterSync(courseID, hashCode);
             _logger.LogInformation("Sync hash: " + hashCode);
+            _logger.LogInformation("Course: " + work.CourseID);
 
             var sw = new Stopwatch();
             sw.Start();
