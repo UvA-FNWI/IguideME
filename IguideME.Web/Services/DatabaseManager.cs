@@ -198,13 +198,25 @@ namespace IguideME.Web.Services
             List<DataSynchronization> hashes = new List<DataSynchronization>();
 
             while (r.Read())
-                hashes.Add(new DataSynchronization(
-                    r.GetInt32(0),
-                    r.GetInt32(1),
-                    r.GetDateTime(2),
-                    r.GetDateTime(3),
-                    r.GetValue(4).ToString(),
-                    r.GetValue(5).ToString()));
+                try {
+                    hashes.Add(new DataSynchronization(
+                        r.GetInt32(0),
+                        r.GetInt32(1),
+                        r.GetDateTime(2),
+                        r.GetDateTime(3),
+                        r.GetValue(4).ToString(),
+                        r.GetValue(5).ToString()));
+                } catch (Exception e) {
+                    _logger.LogInformation("GetSyncHashes\nRequested types:\n" +
+                        r.GetName(0) + ": " + r.GetDataTypeName(0) + "\n" +
+                        r.GetName(1) + ": " + r.GetDataTypeName(1) + "\n" +
+                        r.GetName(2) + ": " + r.GetDataTypeName(2) + "\n" +
+                        r.GetName(3) + ": " + r.GetDataTypeName(3) + "\n" +
+                        r.GetName(4) + ": " + r.GetDataTypeName(4) + "\n" +
+                        r.GetName(5) + ": " + r.GetDataTypeName(5) + "\n\n" +
+                        e
+                    );
+                }
 
             return hashes;
         }
