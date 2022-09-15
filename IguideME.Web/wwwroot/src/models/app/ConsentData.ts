@@ -1,9 +1,9 @@
 import React from "react"
 
 export interface ConsentData {
-    course_id: number;
-    user_id: number;
-    login_id: string;
-    name: string;
+    courseID: number;
+    userID: number;
+    userLoginID: string;
+    userName: string;
     granted: number;
 }

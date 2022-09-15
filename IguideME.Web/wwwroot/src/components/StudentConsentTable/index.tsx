@@ -41,7 +41,7 @@ export default class StudentConsentTable extends Component<IProps, IState> {
         dataIndex: "name",
         fixed: true,
         width: 22,
-        sorter: (a, b) => a.name.localeCompare(b.name),
+        sorter: (a, b) => a.userName.localeCompare(b.userName),
         render: (text: string, record: any) => {
           return (
             <span>{ text }<br /><small>{ record.consentData.loginID}</small></span>
@@ -89,8 +89,8 @@ export default class StudentConsentTable extends Component<IProps, IState> {
     getData(consents: ConsentData[]): object[] {
       return consents.map(consentData => ({
         consentData,
-        key: consentData.user_id,
-        name: consentData.name,
+        key: consentData.userID,
+        name: consentData.userName,
         granted: consentData.granted
       }))
     }
