@@ -1309,10 +1309,10 @@ namespace IguideME.Web.Services
                 ));
                 } catch (Exception e) {
                     _logger.LogInformation("GetEntries\nRequested types:\n" +
-                        r.GetName(0) + ": " + r.GetDataTypeName(0) + "\n" +
-                        r.GetName(1) + ": " + r.GetDataTypeName(1) + "\n" +
-                        r.GetName(2) + ": " + r.GetDataTypeName(2) + "\n" +
-                        r.GetName(3) + ": " + r.GetDataTypeName(3) + "\n\n" +
+                        r.GetName(0) + ": " + r.GetDataTypeName(0) + r.GetValue(0) + "\n" +
+                        r.GetName(1) + ": " + r.GetDataTypeName(1) + r.GetValue(1) + "\n" +
+                        r.GetName(2) + ": " + r.GetDataTypeName(2) + r.GetValue(2) + "\n" +
+                        r.GetName(3) + ": " + r.GetDataTypeName(3) + r.GetValue(3) + "\n\n" +
                         e
                     );
                 }
@@ -1476,16 +1476,16 @@ namespace IguideME.Web.Services
                 }
                 catch (Exception e) {
                     _logger.LogInformation("GetTiles\nRequested types:\n" +
-                        r.GetName(0) + ": " + r.GetDataTypeName(0) + "\n" +
-                        r.GetName(1) + ": " + r.GetDataTypeName(1) + "\n" +
-                        r.GetName(2) + ": " + r.GetDataTypeName(2) + "\n" +
-                        r.GetName(3) + ": " + r.GetDataTypeName(3) + "\n" +
-                        r.GetName(4) + ": " + r.GetDataTypeName(4) + "\n" +
-                        r.GetName(5) + ": " + r.GetDataTypeName(5) + "\n" +
-                        r.GetName(6) + ": " + r.GetDataTypeName(6) + "\n" +
-                        r.GetName(7) + ": " + r.GetDataTypeName(7) + "\n" +
-                        r.GetName(8) + ": " + r.GetDataTypeName(8) + "\n" +
-                        r.GetName(9) + ": " + r.GetDataTypeName(9) + "\n\n" +
+                        r.GetName(0) + ": " + r.GetDataTypeName(0) + r.GetValue(0) + "\n" +
+                        r.GetName(1) + ": " + r.GetDataTypeName(1) + r.GetValue(1) + "\n" +
+                        r.GetName(2) + ": " + r.GetDataTypeName(2) + r.GetValue(2) + "\n" +
+                        r.GetName(3) + ": " + r.GetDataTypeName(3) + r.GetValue(3) + "\n" +
+                        r.GetName(4) + ": " + r.GetDataTypeName(4) + r.GetValue(4) + "\n" +
+                        r.GetName(5) + ": " + r.GetDataTypeName(5) + r.GetValue(5) + "\n" +
+                        r.GetName(6) + ": " + r.GetDataTypeName(6) + r.GetValue(6) + "\n" +
+                        r.GetName(7) + ": " + r.GetDataTypeName(7) + r.GetValue(7) + "\n" +
+                        r.GetName(8) + ": " + r.GetDataTypeName(8) + r.GetValue(8) + "\n" +
+                        r.GetName(9) + ": " + r.GetDataTypeName(9) + r.GetValue(9) + "\n\n" +
                         e
                     );
                 }
@@ -1557,10 +1557,10 @@ namespace IguideME.Web.Services
                 tileGroups.Add(row);
                 } catch (Exception e) {
                     _logger.LogInformation("GetLayoutTileGroups\nRequested types:\n" +
-                        r.GetName(0) + ": " + r.GetDataTypeName(0) + "\n" +
-                        r.GetName(1) + ": " + r.GetDataTypeName(1) + "\n" +
-                        r.GetName(2) + ": " + r.GetDataTypeName(2) + "\n" +
-                        r.GetName(3) + ": " + r.GetDataTypeName(3) + "\n\n" +
+                        r.GetName(0) + ": " + r.GetDataTypeName(0) + r.GetValue(0) + "\n" +
+                        r.GetName(1) + ": " + r.GetDataTypeName(1) + r.GetValue(1) + "\n" +
+                        r.GetName(2) + ": " + r.GetDataTypeName(2) + r.GetValue(2) + "\n" +
+                        r.GetName(3) + ": " + r.GetDataTypeName(3) + r.GetValue(3) + "\n\n" +
                         e
                     );
                 }
@@ -1718,9 +1718,9 @@ namespace IguideME.Web.Services
                     columns.Add(row);
                 } catch (Exception e) {
                     _logger.LogInformation("GetLayoutColumns\nRequested types:\n" +
-                        r.GetName(0) + ": " + r.GetDataTypeName(0) + "\n" +
-                        r.GetName(1) + ": " + r.GetDataTypeName(1) + "\n" +
-                        r.GetName(2) + ": " + r.GetDataTypeName(2) + "\n\n" +
+                        r.GetName(0) + ": " + r.GetDataTypeName(0) + r.GetValue(0) + "\n" +
+                        r.GetName(1) + ": " + r.GetDataTypeName(1) + r.GetValue(1) + "\n" +
+                        r.GetName(2) + ": " + r.GetDataTypeName(2) + r.GetValue(2) + "\n\n" +
                         e
                     );
                 }
