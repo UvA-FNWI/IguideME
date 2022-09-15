@@ -44,7 +44,7 @@ export default class StudentConsentTable extends Component<IProps, IState> {
         sorter: (a, b) => a.userName.localeCompare(b.userName),
         render: (text: string, record: any) => {
           return (
-            <span>{ text }<br /><small>{ record.consentData.loginID}</small></span>
+            <span>{ text }<br /><small>{ record.consentData.userLoginID}</small></span>
           )
         }
       }, {
