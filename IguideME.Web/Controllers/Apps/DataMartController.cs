@@ -180,6 +180,18 @@ namespace IguideME.Web.Controllers
 
         [Authorize(Policy = "IsInstructor")]
         [HttpGet]
+        [Route("/Consents")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public ActionResult GetGrantedConsents()
+        {
+            return Json(
+                DatabaseManager.Instance.GetGrantedConsents(this.GetCourseID())
+                .ToArray());
+        }
+
+        [Authorize(Policy = "IsInstructor")]
+        [HttpGet]
         [Route("/Submissions")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]

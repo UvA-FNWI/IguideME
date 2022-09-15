@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import Admin from "../../index";
 import {Divider, Space, Switch} from "antd";
 import StudentGradesTable from "../../../../components/StudentGradesTable";
+import StudentConsentTable from "../../../../components/StudentConsentTable";
 
 export default class StudentOverview extends Component {
 
@@ -22,6 +23,10 @@ export default class StudentOverview extends Component {
           </div>
 
           <StudentGradesTable averaged={averaged} />
+        </Space>
+
+        <Space direction={"vertical"} style={{ width: '100%' }}>
+          <StudentConsentTable />
         </Space>
       </Admin>
     )

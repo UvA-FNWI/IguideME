@@ -1,3 +1,4 @@
+import { ConsentData } from "../models/app/ConsentData";
 import {CanvasStudent} from "../models/canvas/Student";
 
 export const MOCK_STUDENTS: CanvasStudent[] = [
@@ -56,3 +57,68 @@ export const MOCK_STUDENTS: CanvasStudent[] = [
   {"id": 55571292, "login_id": "55571292", "sis_user_id": "55571292", "sortable_name": "", "name": "Adria Laven"},
   {"id": 52682411, "login_id": "52682411", "sis_user_id": "52682411", "sortable_name": "", "name": "Su Glickman"}
 ]
+
+export const MOCK_CONSENTS: ConsentData[] = [
+  {"course_id": 994, "user_id": 28332183, "login_id": "28332183", "granted": 1, "name": "Vernon Landes"},
+  {"course_id": 994, "user_id": 23400528, "login_id": "23400528", "granted": 0, "name": "Xochitl Sperber"},
+  {"course_id": 994, "user_id": 95366984, "login_id": "95366984", "granted": 1, "name": "Tonette Sakamoto"},
+  {"course_id": 994, "user_id": 45844627, "login_id": "45844627", "granted": 1, "name": "Karisa Altom"},
+  {"course_id": 994, "user_id": 54264654, "login_id": "54264654", "granted": -1, "name": "Carman Muff"},
+  {"course_id": 994, "user_id": 70805720, "login_id": "70805720", "granted": 0, "name": "Lorita Kaye"},
+  {"course_id": 994, "user_id": 46666218, "login_id": "46666218", "granted": 1, "name": "Leopoldo Spengler"},
+  {"course_id": 994, "user_id": 41149744, "login_id": "41149744", "granted": 1, "name": "Gwen Vue"},
+  {"course_id": 994, "user_id": 35683215, "login_id": "35683215", "granted": 1, "name": "Felice Estell"},
+  {"course_id": 994, "user_id": 22976781, "login_id": "22976781", "granted": 0, "name": "Austin Guilbault"},
+  {"course_id": 994, "user_id": 50326251, "login_id": "50326251", "granted": 1, "name": "Melissa Hadsell"},
+  {"course_id": 994, "user_id": 48470625, "login_id": "48470625", "granted": 0, "name": "Marceline Buch"},
+  {"course_id": 994, "user_id": 96600883, "login_id": "96600883", "granted": 1, "name": "Tami Cupples"},
+  {"course_id": 994, "user_id": 24585559, "login_id": "24585559", "granted": 1, "name": "Holley Templin"},
+  {"course_id": 994, "user_id": 77161172, "login_id": "77161172", "granted": 0, "name": "Winifred Soto"},
+  {"course_id": 994, "user_id": 16967126, "login_id": "16967126", "granted": 1, "name": "Barrett Rhymer"},
+  {"course_id": 994, "user_id": 31665008, "login_id": "31665008", "granted": 0, "name": "Donte Phu"},
+  {"course_id": 994, "user_id": 23744275, "login_id": "23744275", "granted": 1, "name": "Cayla Payer"},
+  {"course_id": 994, "user_id": 27817769, "login_id": "27817769", "granted": 0, "name": "Connie Speegle"},
+  {"course_id": 994, "user_id": 53036575, "login_id": "53036575", "granted": 1, "name": "Donna Daughdrill"},
+  {"course_id": 994, "user_id": 28624178, "login_id": "28624178", "granted": 0, "name": "Elroy Saini"},
+  {"course_id": 994, "user_id": 41898388, "login_id": "41898388", "granted": 1, "name": "Dayna Kubicek"},
+  {"course_id": 994, "user_id": 59540503, "login_id": "59540503", "granted": 1, "name": "Analisa Gathright"},
+  {"course_id": 994, "user_id": 45476233, "login_id": "45476233", "granted": 1, "name": "Alyson Burkey"},
+  {"course_id": 994, "user_id": 29376337, "login_id": "29376337", "granted": 1, "name": "Loretta Habib"},
+  {"course_id": 994, "user_id": 76262947, "login_id": "76262947", "granted": 0, "name": "Chrissy Pan"},
+  {"course_id": 994, "user_id": 27034712, "login_id": "27034712", "granted": 1, "name": "Franklin Lindenberg"},
+  {"course_id": 994, "user_id": 74114284, "login_id": "74114284", "granted": 1, "name": "Felipe Gwyn"},
+  {"course_id": 994, "user_id": 55249485, "login_id": "55249485", "granted": 1, "name": "Stan Foran"},
+  {"course_id": 994, "user_id": 43219917, "login_id": "43219917", "granted": 1, "name": "Dollie Bomba"},
+  {"course_id": 994, "user_id": 43754947, "login_id": "43754947", "granted": 0, "name": "Judie Lombardi"},
+  {"course_id": 994, "user_id": 95372011, "login_id": "95372011", "granted": 0, "name": "Quiana Rape"},
+  {"course_id": 994, "user_id": 46647543, "login_id": "46647543", "granted": 0, "name": "Adena Spraggins"},
+  {"course_id": 994, "user_id": 20936679, "login_id": "20936679", "granted": 1, "name": "Jung Hur"},
+  {"course_id": 994, "user_id": 32324131, "login_id": "32324131", "granted": 0, "name": "Galina Yepez"},
+  {"course_id": 994, "user_id": 66889858, "login_id": "66889858", "granted": 0, "name": "Gwenn Dorrell"},
+  {"course_id": 994, "user_id": 90434281, "login_id": "90434281", "granted": 1, "name": "Ana Demayo"},
+  {"course_id": 994, "user_id": 86899376, "login_id": "86899376", "granted": 0, "name": "Regenia Elder"},
+  {"course_id": 994, "user_id": 18298956, "login_id": "18298956", "granted": 1, "name": "Louetta Curlin"},
+  {"course_id": 994, "user_id": 74886921, "login_id": "74886921", "granted": 0, "name": "Debrah Kutz"},
+  {"course_id": 994, "user_id": 81888190, "login_id": "81888190", "granted": 0, "name": "Mozell Arteaga"},
+  {"course_id": 994, "user_id": 35251913, "login_id": "35251913", "granted": 1, "name": "Darleen Birt"},
+  {"course_id": 994, "user_id": 41393783, "login_id": "41393783", "granted": 1, "name": "Suzi Roger"},
+  {"course_id": 994, "user_id": 97222205, "login_id": "97222205", "granted": 1, "name": "Terrence Zerr"},
+  {"course_id": 994, "user_id": 21276717, "login_id": "21276717", "granted": 0, "name": "Norman Heitz"},
+  {"course_id": 994, "user_id": 81005245, "login_id": "81005245", "granted": 0, "name": "Robbin Defrancisco"},
+  {"course_id": 994, "user_id": 38152009, "login_id": "38152009", "granted": 0, "name": "Paula Uhrig"},
+  {"course_id": 994, "user_id": 20380320, "login_id": "20380320", "granted": 1, "name": "Cris Loken"},
+  {"course_id": 994, "user_id": 48905367, "login_id": "48905367", "granted": 0, "name": "Tad Bank"},
+  {"course_id": 994, "user_id": 42345728, "login_id": "42345728", "granted": 1, "name": "Bree Rivers"},
+  {"course_id": 994, "user_id": 96955357, "login_id": "96955357", "granted": 1, "name": "Edythe Marrone"},
+  {"course_id": 994, "user_id": 41803722, "login_id": "41803722", "granted": 0, "name": "Marth Keeling"},
+  {"course_id": 994, "user_id": 55571292, "login_id": "55571292", "granted": 0, "name": "Adria Laven"},
+  {"course_id": 994, "user_id": 52682411, "login_id": "52682411", "granted": 0, "name": "Su Glickman"}
+]
+
+
+
+//     course_id: number,
+//     user_id: number,
+//     login_id: string,
+//     name: string,
+//     granted: number

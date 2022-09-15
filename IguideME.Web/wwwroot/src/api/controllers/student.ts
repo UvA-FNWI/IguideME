@@ -1,7 +1,8 @@
 import { debug } from "../../config/config";
 import Controller from "../controller";
 import {CanvasStudent} from "../../models/canvas/Student";
-import {MOCK_STUDENTS} from "../../mocks/students";
+import {ConsentData} from "../../models/app/ConsentData";
+import {MOCK_STUDENTS, MOCK_CONSENTS} from "../../mocks/students";
 import {delay} from "../../utils/mockRequest";
 
 export default class StudentController extends Controller {
@@ -11,6 +12,14 @@ export default class StudentController extends Controller {
 
     return this.client.get(
       `students`
+    ).then(response => response.data);
+  }
+
+  static getGrantedConsents(): Promise<ConsentData[]> {
+    if (debug()) return delay(MOCK_CONSENTS);
+
+    return this.client.get(
+      `consents`
     ).then(response => response.data);
   }
 }
