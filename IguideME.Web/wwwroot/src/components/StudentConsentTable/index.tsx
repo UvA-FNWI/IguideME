@@ -38,7 +38,7 @@ export default class StudentConsentTable extends Component<IProps, IState> {
     getColumns(): any {
       const columns: ColumnsType<ConsentData> = [{
         title: "Student",
-        dataIndex: "name",
+        dataIndex: "userName",
         fixed: true,
         width: 22,
         sorter: (a, b) => a.userName.localeCompare(b.userName),
@@ -90,7 +90,7 @@ export default class StudentConsentTable extends Component<IProps, IState> {
       return consents.map(consentData => ({
         consentData,
         key: consentData.userID,
-        name: consentData.userName,
+        userName: consentData.userName,
         granted: consentData.granted
       }))
     }
