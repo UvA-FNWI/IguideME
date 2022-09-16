@@ -39,9 +39,9 @@ export default class StudentGradesTable extends Component<IProps, IState> {
     const { tiles, tileEntries, students, submissions, loaded } = this.state;
     void loaded // discard value
 
-    // console.log("GRADE TABLE", submissions);
-    // console.log("COLUMNS", getColumns(tiles, tileEntries, averaged));
-    // console.log("DATA", getData(students, tiles, tileEntries, submissions));
+    console.log("GRADE TABLE", submissions);
+    console.log("COLUMNS", getColumns(tiles, tileEntries, averaged));
+    console.log("DATA", getData(students, tiles, tileEntries, submissions));
     return (
       <div id={"studentsGradeTable"} style={{position: 'relative', overflow: 'visible'}}>
         <Table columns={getColumns(tiles, tileEntries, averaged)}

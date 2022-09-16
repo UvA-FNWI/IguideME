@@ -87,7 +87,6 @@ export default class StudentConsentTable extends Component<IProps, IState> {
     }
 
     getData(consents: ConsentData[]): object[] {
-      console.log("Test", consents);
       return consents.map(consentData => ({
         consentData,
         key: consentData.userID,
