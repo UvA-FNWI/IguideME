@@ -276,7 +276,7 @@ class EditTileDragger extends Component<Props, IState> {
           <Col xs={12}>
             <span>Content type</span>
             <Select value={{label: contentType.label as string, value: contentType.value as string}}
-                    isDisabled={tile !== undefined}
+                    isDisabled={tile === undefined}
                     style={{zIndex: 100}}
                     options={[
                       { label: 'Binary', value: 'BINARY'},
@@ -311,7 +311,7 @@ class EditTileDragger extends Component<Props, IState> {
               <h3>N/A</h3> :
               <Select value={{label: tileType.label as string, value: tileType.value as string}}
                       isDisabled={
-                        tile !== undefined ||
+                        tile === undefined ||
                         !contentType}
                       isClearable={true}
                       style={{zIndex: 100}}
