@@ -204,12 +204,12 @@ namespace IguideME.Web.Controllers
 
         [Authorize(Policy = "IsInstructor")]
         [HttpGet]
-        [Route("/goal-grades")]
+        [Route("/Goal-grades")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public ActionResult GetGoalGrades()
         {
-            // returns all obtained exam grades for the logged in user
+            // returns all goal grades
             return Json(
                 DatabaseManager.Instance.GetGoalGrades(
                     this.GetCourseID()));
@@ -222,7 +222,7 @@ namespace IguideME.Web.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public ActionResult GetGoalGrade()
         {
-            // returns all obtained exam grades for the logged in user
+            // returns the goal grade for the logged in user
             return Json(
                 DatabaseManager.Instance.GetUserGoalGrade(
                     this.GetCourseID(),

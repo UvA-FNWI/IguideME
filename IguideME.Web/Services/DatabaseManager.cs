@@ -579,6 +579,7 @@ namespace IguideME.Web.Services
                 while (r.Read())
                 {
                     goals.Add(new GoalData(courseID, r.GetInt32(0), r.GetInt32(1), r.GetValue(2).ToString(), r.GetValue(3).ToString()));
+                    _logger.LogInformation("Getting goal " + r.GetInt32(0) + " for user " + r.GetValue(2).ToString() );
                 }
 
                 return goals.ToArray();
