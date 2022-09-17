@@ -183,10 +183,10 @@ namespace IguideME.Web.Controllers
         [Route("/Consents")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public ActionResult GetGrantedConsents()
+        public ActionResult GetConsents()
         {
             return Json(
-                DatabaseManager.Instance.GetGrantedConsents(this.GetCourseID())
+                DatabaseManager.Instance.GetConsents(this.GetCourseID())
                 .ToArray());
         }
 

@@ -15,7 +15,7 @@ export default class StudentController extends Controller {
     ).then(response => response.data);
   }
 
-  static getGrantedConsents(): Promise<ConsentData[]> {
+  static getConsents(): Promise<ConsentData[]> {
     if (debug()) return delay(MOCK_CONSENTS);
 
     return this.client.get(

@@ -13,7 +13,7 @@ export default class StudentConsentTable extends Component<IProps, IState> {
     }
 
     componentDidMount(): void {
-      StudentController.getGrantedConsents().then(async consents => {
+      StudentController.getConsents().then(async consents => {
         this.setState({consents: consents});
       });
     }

@@ -1960,6 +1960,32 @@ namespace IguideME.Web.Services
                 return new ConsentData[0] { };
             }
 
+
+        }
+        public ConsentData[] GetConsents(int CourseID)
+        {
+            try
+            {
+                string query = String.Format(
+                "SELECT `user_id`, `user_login_id`, `user_name` from `consent` WHERE `course_id`={0}",
+                CourseID
+            );
+
+                SQLiteDataReader r = Query(query);
+                List<ConsentData> consents = new List<ConsentData>();
+
+                while (r.Read())
+                {
+                    consents.Add(new ConsentData(CourseID, r.GetInt32(0), r.GetValue(1).ToString(), r.GetValue(2).ToString(), 1));
+                }
+
+                return consents.ToArray();
+            }
+            catch (Exception)
+            {
+                return new ConsentData[0] { };
+            }
+
         }
 
         public void AddExternalData(int courseID, ExternalData[] entries)
