@@ -204,7 +204,7 @@ namespace IguideME.Web.Services
                         r.GetInt32(0),
                         r.GetInt32(1),
                         r.GetDateTime(2),
-                        r.GetDateTime(3),
+                        endtime,
                         r.GetValue(4).ToString(),
                         r.GetValue(5).ToString()));
                 } catch (Exception e) {
