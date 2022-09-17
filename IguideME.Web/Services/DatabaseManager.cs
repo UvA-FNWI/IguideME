@@ -564,6 +564,30 @@ namespace IguideME.Web.Services
             }
         }
 
+        public GoalData[] GetGoalGrades(int courseID)
+        {
+            try
+            {
+                string query = String.Format(
+                    DatabaseQueries.QUERY_GOAL_GRADES,
+                    courseID);
+
+                SQLiteDataReader r = Query(query);
+                List<GoalData> goals = new List<GoalData>();
+
+                while (r.Read())
+                {
+                    goals.Add(new GoalData(courseID, r.GetInt32(0), r.GetInt32(1), r.GetValue(2).ToString(), r.GetValue(3).ToString()));
+                }
+
+                return goals.ToArray();
+            }
+            catch (Exception)
+            {
+                return new GoalData[0] { };
+            }
+        }
+
         public void CreateUserPeer(
             int courseID,
             string userLoginID,
@@ -1967,7 +1991,7 @@ namespace IguideME.Web.Services
             try
             {
                 string query = String.Format(
-                "SELECT `user_id`, `user_login_id`, `user_name` from `consent` WHERE `course_id`={0}",
+                "SELECT `user_id`, `user_login_id`, `user_name`, `granted` from `consent` WHERE `course_id`={0}",
                 CourseID
             );
 
@@ -1976,7 +2000,7 @@ namespace IguideME.Web.Services
 
                 while (r.Read())
                 {
-                    consents.Add(new ConsentData(CourseID, r.GetInt32(0), r.GetValue(1).ToString(), r.GetValue(2).ToString(), 1));
+                    consents.Add(new ConsentData(CourseID, r.GetInt32(0), r.GetValue(1).ToString(), r.GetValue(2).ToString(), r.GetInt32(3)));
                 }
 
                 return consents.ToArray();

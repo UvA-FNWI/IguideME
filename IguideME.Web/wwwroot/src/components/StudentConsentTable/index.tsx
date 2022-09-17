@@ -4,29 +4,35 @@ import {Table, Tooltip} from "antd";
 import { EllipsisOutlined } from "@ant-design/icons";
 import StudentController from "../../api/controllers/student";
 import {ConsentData} from "../../models/app/ConsentData";
+import {GoalData} from "../../models/app/GoalData";
 import { ColumnsType } from "antd/lib/table";
 
 export default class StudentConsentTable extends Component<IProps, IState> {
 
     state = {
-        consents: []
+        consents: [],
+        goals: []
     }
 
     componentDidMount(): void {
       StudentController.getConsents().then(async consents => {
         this.setState({consents: consents});
       });
+      StudentController.getGoalgrades().then(async goals => {
+        this.setState({goals: goals});
+      });
     }
 
     render(): React.ReactNode {
-      const { consents} = this.state;
+      const { consents, goals } = this.state;
 
-      console.log("consents:", consents);
+      console.log("CONSENTS:", consents);
+      console.log("GOALS:", goals);
 
       return (
         <div id={"studentsConsentTable"} style={{position: 'relative', overflow: 'visible'}}>
           <Table columns={this.getColumns()}
-                 dataSource={this.getData(consents)}
+                 dataSource={this.getData(consents, goals)}
                  scroll={{ x: 900 }}
                  bordered
                  sticky={true}
@@ -36,7 +42,7 @@ export default class StudentConsentTable extends Component<IProps, IState> {
     }
 
     getColumns(): any {
-      const columns: ColumnsType<ConsentData> = [{
+      const columns: ColumnsType<ConsentData & GoalData> = [{
         title: "Student",
         dataIndex: "userName",
         fixed: true,
@@ -82,16 +88,28 @@ export default class StudentConsentTable extends Component<IProps, IState> {
             return text;
           }
         }
+      }, {
+        title: "Goal",
+        dataIndex: "userName",
+        fixed: true,
+        width: 150,
+        sorter: (a, b) => a.grade - b.grade,
+        render: (text: string, record: any) => {
+          return (
+            <span>{ record.grade }<br /></span>
+          )
+        }
       }];
       return columns
     }
 
-    getData(consents: ConsentData[]): object[] {
+    getData(consents: ConsentData[], goals: GoalData[]): object[] {
       return consents.map(consentData => ({
         consentData,
         key: consentData.userID,
         userName: consentData.userName,
-        granted: consentData.granted
+        granted: consentData.granted,
+        grade: goals.find(s => s.courseID === consentData.courseID && s.userID === consentData.userID)?.grade
       }))
     }
 }

@@ -1,10 +1,10 @@
 import { ConsentData } from "../../models/app/ConsentData";
-import {Tile, TileEntry, TileEntrySubmission, TileGroup} from "../../models/app/Tile";
-import {CanvasStudent} from "../../models/canvas/Student";
+import { GoalData } from "../../models/app/GoalData";
 
 export interface IProps {
 }
 
 export interface IState {
    consents: ConsentData[];
+   goals: GoalData[];
 }

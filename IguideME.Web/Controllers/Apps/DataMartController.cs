@@ -202,6 +202,19 @@ namespace IguideME.Web.Controllers
                 DatabaseManager.Instance.GetCourseSubmissions(GetCourseID()));
         }
 
+        [Authorize(Policy = "IsInstructor")]
+        [HttpGet]
+        [Route("/goal-grades")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public ActionResult GetGoalGrades()
+        {
+            // returns all obtained exam grades for the logged in user
+            return Json(
+                DatabaseManager.Instance.GetGoalGrades(
+                    this.GetCourseID()));
+        }
+
         [Authorize]
         [HttpGet]
         [Route("/goal-grade")]
