@@ -199,11 +199,11 @@ namespace IguideME.Web.Services
 
             while (r.Read())
                 try {
-                    DateTime endtime = r.GetValue(3) != null ? r.GetDateTime(3) : new DateTime();
+                    DateTime endtime = r.GetValue(3) != null ? Convert.ToDateTime(r.GetString(3)) : new DateTime();
                     hashes.Add(new DataSynchronization(
                         r.GetInt32(0),
                         r.GetInt32(1),
-                        r.GetDateTime(2),
+                        Convert.ToDateTime(r.GetString(2)),
                         endtime,
                         r.GetValue(4).ToString(),
                         r.GetValue(5).ToString()));
