@@ -37,9 +37,16 @@ export default class DataMart extends Component<IProps, IState> {
 
         synchronizations.map(function(s, index, arr) {
             void index; void arr;
-            s.start_timestamp = moment.utc(s.start_timestamp, backendFormat).local().format(timeFormat).toString();
-            s.end_timestamp = moment.utc(s.end_timestamp, backendFormat).local().format(timeFormat).toString();
-            s.duration = moment.utc(parseInt(s.duration)*1000).format('HH:mm:ss');
+            const start = moment.utc(s.start_timestamp, backendFormat).local()
+            const end = moment.utc(s.end_timestamp, backendFormat).local()
+            s.start_timestamp = start.format(timeFormat);
+            if (end.isBefore(start)) {
+                s.end_timestamp = "";
+                s.duration = "";
+            } else {
+                s.end_timestamp = end.format(timeFormat);
+                s.duration = moment.utc(parseInt(s.duration)*1000).format('HH:mm:ss');
+            }
         });
 
         const successfulSyncs = loaded ? synchronizations.filter(a => a.status === "COMPLETE") : [];

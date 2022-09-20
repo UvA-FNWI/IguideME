@@ -199,7 +199,7 @@ namespace IguideME.Web.Services
 
             while (r.Read())
                 try {
-                    DateTime endtime = r.GetValue(3) != null ? Convert.ToDateTime(r.GetString(3)) : new DateTime();
+                    DateTime endtime = r.GetValue(3).GetType() != typeof(DBNull) ? Convert.ToDateTime(r.GetString(3)) : new DateTime();
                     hashes.Add(new DataSynchronization(
                         r.GetInt32(0),
                         r.GetInt32(1),
@@ -209,12 +209,12 @@ namespace IguideME.Web.Services
                         r.GetValue(5).ToString()));
                 } catch (Exception e) {
                     _logger.LogInformation("GetSyncHashes\nRequested types:\n" +
-                        r.GetName(0) + ": " + r.GetDataTypeName(0) + r.GetValue(0).ToString() + "\n" +
-                        r.GetName(1) + ": " + r.GetDataTypeName(1) + r.GetValue(1).ToString() + "\n" +
-                        r.GetName(2) + ": " + r.GetDataTypeName(2) + r.GetValue(2).ToString() + "\n" +
-                        r.GetName(3) + ": " + r.GetDataTypeName(3) + r.GetValue(3).ToString() + "\n" +
-                        r.GetName(4) + ": " + r.GetDataTypeName(4) + r.GetValue(4).ToString() + "\n" +
-                        r.GetName(5) + ": " + r.GetDataTypeName(5) + r.GetValue(5).ToString() + "\n\n" +
+                        r.GetName(0) + ": " + r.GetDataTypeName(0) + r.GetValue(0).ToString() + r.GetValue(3).GetType() + "\n" +
+                        r.GetName(1) + ": " + r.GetDataTypeName(1) + r.GetValue(1).ToString() + r.GetValue(3).GetType() + "\n" +
+                        r.GetName(2) + ": " + r.GetDataTypeName(2) + r.GetValue(2).ToString() + r.GetValue(3).GetType() + "\n" +
+                        r.GetName(3) + ": " + r.GetDataTypeName(3) + r.GetValue(3).ToString() + r.GetValue(3).GetType() + "\n" +
+                        r.GetName(4) + ": " + r.GetDataTypeName(4) + r.GetValue(4).ToString() + r.GetValue(3).GetType() + "\n" +
+                        r.GetName(5) + ": " + r.GetDataTypeName(5) + r.GetValue(5).ToString() + r.GetValue(3).GetType() + "\n\n" +
                         e
                     );
                 }
