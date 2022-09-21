@@ -10,6 +10,7 @@ export default class StudentOverview extends Component {
 
   render(): React.ReactNode {
     const { averaged } = this.state;
+    console.log("Studentoverview");
     return (
       <Admin menuKey={"studentOverview"}>
         <h1>Student Overview</h1>

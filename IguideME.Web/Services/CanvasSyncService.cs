@@ -83,7 +83,6 @@ namespace IguideME.Web.Services
                 jobId, $"tasks.peer-groups", 0
             ).ConfigureAwait(false);
 
-            _logger.LogInformation("Starting notification worker");
             new NotificationsWorker(courseID, hashCode, _canvasTest, _logger).Register();
             await _computationJobStatus.UpdateJobProgressInformationAsync(
                 jobId, $"tasks.notifications", 0

@@ -34,7 +34,7 @@ namespace IguideME.Web.Services.Workers
 
                 foreach (var notification in notifications)
                 {
-                    _logger.LogInformation("Sending message to " + user.LoginID + ": " + notification.Status);
+                    _logger.LogInformation("Sending message to " + user.LoginID + ", " + user.UserID + ": " + notification.Status);
 
                     canvasTest.sendMessage(user.UserID,
                     "IGuideME",
