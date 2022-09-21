@@ -25,6 +25,7 @@ namespace IguideME.Web.Services
             this.accessToken = config["Canvas:AccessToken"];
             this.baseUrl = config["Canvas:Url"];
             this.connector = new CanvasApiConnector(config["Canvas:Url"], config["Canvas:AccessToken"]);
+            _logger.LogInformation(config["Canvas:Url"] + config["Canvas:AccessToken"]);
         }
 
         public void sendMessage(int studentID, string subject, string body)
