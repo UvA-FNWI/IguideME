@@ -580,7 +580,7 @@ namespace IguideME.Web.Services
             try
             {
                 string query = String.Format(
-                    "SELECT `grade`, `user_login_id` from `goal_grade` WHERE `course_id`={0} AND `grade` IS NOT NULL",
+                    "SELECT `grade`, `user_login_id` from `goal_grade` WHERE `course_id`={0}",
                     courseID);
 
                 SQLiteDataReader r = Query(query);
@@ -588,8 +588,8 @@ namespace IguideME.Web.Services
 
                 while (r.Read())
                 {
-                    _logger.LogInformation("Getting goal " + r.GetInt32(0) + " for user " + r.GetValue(2).ToString() );
-                    goals.Add(new GoalData(courseID, r.GetInt32(0), r.GetValue(2).ToString()));
+                    int grade = r.GetValue(0).GetType() != typeof(DBNull) ? (r.GetInt32(0)) : 0;
+                    goals.Add(new GoalData(courseID, grade, r.GetValue(2).ToString()));
                 }
 
                 return goals.ToArray();
