@@ -580,7 +580,7 @@ namespace IguideME.Web.Services
             try
             {
                 string query = String.Format(
-                    "SELECT `grade`, `user_login_id` from `goal_grade` WHERE `course_id`={0}",
+                    "SELECT `grade`, `user_login_id` from `goal_grade` WHERE `course_id`={0} AND `grade` IS NOT NULL",
                     courseID);
 
                 SQLiteDataReader r = Query(query);
