@@ -28,13 +28,13 @@ namespace IguideME.Web.Services
             _logger.LogInformation(config["Canvas:Url"] + config["Canvas:AccessToken"]);
         }
 
-        public void sendMessage(int studentID, string subject, string body)
+        public void sendMessage(string LoginID, string subject, string body)
         {
             var conv = new Conversation(this.connector)
             {
                 Subject = subject,
                 Body = body,
-                Recipients = new string[1] { studentID.ToString() }
+                Recipients = new string[1] { "sis_user_id:" + LoginID }
             };
             _logger.LogInformation("Created conversation " + conv);
 

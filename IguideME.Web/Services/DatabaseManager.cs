@@ -580,7 +580,7 @@ namespace IguideME.Web.Services
             try
             {
                 string query = String.Format(
-                    "SELECT `grade`, `user_id`, `user_login_id`, `user_name` from `goal_grade` WHERE `course_id`={0}",
+                    "SELECT `grade`, `user_login_id` from `goal_grade` WHERE `course_id`={0}",
                     courseID);
 
                 SQLiteDataReader r = Query(query);
@@ -589,7 +589,7 @@ namespace IguideME.Web.Services
                 while (r.Read())
                 {
                     _logger.LogInformation("Getting goal " + r.GetInt32(0) + " for user " + r.GetValue(2).ToString() );
-                    goals.Add(new GoalData(courseID, r.GetInt32(0), r.GetInt32(1), r.GetValue(2).ToString(), r.GetValue(3).ToString()));
+                    goals.Add(new GoalData(courseID, r.GetInt32(0), r.GetValue(2).ToString()));
                 }
 
                 return goals.ToArray();
@@ -1922,24 +1922,19 @@ namespace IguideME.Web.Services
 
         public void SetConsent(ConsentData data)
         {
-
             if (GetConsent(data.CourseID, data.UserLoginID) == -1)
             {
-                command = connection.CreateCommand();
-                command.CommandText = String.Format(
+                NonQuery(String.Format(
                     "INSERT INTO consent (`course_id`, `user_id`, `user_login_id`, `user_name`, `granted`) VALUES('{0}', '{1}', '{2}', '{3}', '{4}');",
                     data.CourseID, data.UserID, data.UserLoginID, data.UserName.Replace("'", ""), data.Granted
-                );
-                command.ExecuteNonQuery();
+                ));
             }
             else
             {
-                command = connection.CreateCommand();
-                command.CommandText = String.Format(
+                NonQuery(String.Format(
                     "UPDATE consent SET `granted` = {0} WHERE `course_id` = {1} AND `user_id` = {2};",
                     data.Granted, data.CourseID, data.UserID
-                );
-                command.ExecuteNonQuery();
+                ));
             }
 
         }

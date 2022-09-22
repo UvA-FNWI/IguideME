@@ -9,12 +9,10 @@ namespace IguideME.Web.Models
 
         public int Grade { get; set; }
 
-        public GoalData(int CourseID, int Grade, int UserID, string UserLoginID, string UserName)
+        public GoalData(int CourseID, int Grade, string UserLoginID)
         {
             this.CourseID = CourseID;
-            this.UserID = UserID;
             this.UserLoginID = UserLoginID;
-            this.UserName = UserName;
             this.Grade = Grade;
         }
     }

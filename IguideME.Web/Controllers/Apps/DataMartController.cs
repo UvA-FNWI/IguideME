@@ -152,6 +152,7 @@ namespace IguideME.Web.Controllers
                 GetUserName(),
                 (int)JObject.Parse(body)["granted"]
             );
+            logger.LogInformation("Setting consent: " + JObject.Parse(body)["granted"]);
             DatabaseManager.Instance.SetConsent(consent);
             return Json(consent.Granted);
         }

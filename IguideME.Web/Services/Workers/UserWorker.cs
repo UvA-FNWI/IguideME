@@ -40,6 +40,10 @@ namespace IguideME.Web.Services.Workers
                     //DatabaseManager.Instance.UpdateUserGoalGrade(courseID, student.SISUserID, 7);
                 }
 
+                if (DatabaseManager.Instance.GetConsent(courseID, student.ID.Value) == -1) {
+                    DatabaseManager.Instance.SetConsent(new Models.ConsentData(courseID, student.ID.Value, student.SISUserID, student.Name, -1));
+                }
+
                 DatabaseManager.Instance.RegisterUser(
                     courseID,
                     student.ID,

@@ -109,7 +109,7 @@ export default class StudentConsentTable extends Component<IProps, IState> {
         key: consentData.userID,
         userName: consentData.userName,
         granted: consentData.granted,
-        grade: goals.find(s => s.courseID === consentData.courseID && s.userID === consentData.userID)?.grade
+        grade: goals.find(s => s.courseID === consentData.courseID && s.userLoginID === consentData.userLoginID)?.grade
       }))
     }
 }
