@@ -204,7 +204,7 @@ namespace IguideME.Web.Controllers
 
         [Authorize(Policy = "IsInstructor")]
         [HttpGet]
-        [Route("/Goal-grades")]
+        [Route("/goal-grades")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public ActionResult GetGoalGrades()

@@ -664,6 +664,13 @@ public static class DatabaseQueries
             `hash`            STRING
         );";
 
+    public const string CLEANUP_SYNC =
+        @"DELETE
+          FROM          `sync_history`
+          WHERE         `course_id` = {0}
+          AND           `status`   = '{1}'
+          ";
+
     public const string REGISTER_NEW_SYNC =
         @"INSERT INTO   `sync_history` (`course_id`, `hash`)
           VALUES        ({0}, '{1}');";

@@ -30,7 +30,7 @@ namespace IguideME.Web.Services.Workers
             {
                 var notifications = DatabaseManager.Instance.GetPendingNotifications(this.courseID, user.LoginID);
 
-                _logger.LogInformation("Student " + user.LoginID + " has " + notifications.Count + " notifications queued up.");
+                _logger.LogInformation("Student " + user.LoginID + ", " + user.UserID + " has " + notifications.Count + " notifications queued up.");
 
                 foreach (var notification in notifications)
                 {

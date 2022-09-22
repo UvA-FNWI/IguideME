@@ -46,6 +46,9 @@ namespace IguideME.Web.Services
                 _result.Append(characters[random.Next(characters.Length)]);
             }
             string hashCode = _result.ToString().ToUpper();
+
+            DatabaseManager.Instance.CleanupSync(courseID, "BUSY");
+
             DatabaseManager.Instance.RegisterSync(courseID, hashCode);
             _logger.LogInformation("Sync hash: " + hashCode);
             _logger.LogInformation("Course: " + work.CourseID);

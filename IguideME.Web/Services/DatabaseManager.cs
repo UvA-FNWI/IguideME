@@ -165,6 +165,15 @@ namespace IguideME.Web.Services
                 courseName));
         }
 
+        public void CleanupSync(int courseID, string status) {
+            _logger.LogInformation("Starting cleanup of sync hystory " + courseID);
+            NonQuery(
+                String.Format(
+                    DatabaseQueries.CLEANUP_SYNC, courseID, status
+                )
+            );
+        }
+
         public void RegisterSync(
             int courseID,
             string hashCode)
@@ -209,14 +218,14 @@ namespace IguideME.Web.Services
                         r.GetValue(4).ToString(),
                         r.GetValue(5).ToString()));
                 } catch (Exception e) {
-                    _logger.LogInformation("GetSyncHashes\nRequested types:\n" +
+                    _logger.LogError("GetSyncHashes\nRequested types:\n" +
                         r.GetName(0) + ": " + r.GetDataTypeName(0) + r.GetValue(0).ToString() + r.GetValue(3).GetType() + "\n" +
                         r.GetName(1) + ": " + r.GetDataTypeName(1) + r.GetValue(1).ToString() + r.GetValue(3).GetType() + "\n" +
                         r.GetName(2) + ": " + r.GetDataTypeName(2) + r.GetValue(2).ToString() + r.GetValue(3).GetType() + "\n" +
                         r.GetName(3) + ": " + r.GetDataTypeName(3) + r.GetValue(3).ToString() + r.GetValue(3).GetType() + "\n" +
                         r.GetName(4) + ": " + r.GetDataTypeName(4) + r.GetValue(4).ToString() + r.GetValue(3).GetType() + "\n" +
                         r.GetName(5) + ": " + r.GetDataTypeName(5) + r.GetValue(5).ToString() + r.GetValue(3).GetType() + "\n\n" +
-                        e
+                        e.StackTrace
                     );
                 }
 
@@ -557,9 +566,9 @@ namespace IguideME.Web.Services
                     return Convert.ToInt32(r.GetValue(0).ToString());
                 }
                 catch (Exception e) {
-                    _logger.LogInformation("GetUserGoalGrade\nRequested types:\n" +
+                    _logger.LogError("GetUserGoalGrade\nRequested types:\n" +
                         r.GetName(0) + ": " + r.GetDataTypeName(0) + "\n\n" +
-                        e
+                        e.StackTrace
                     );
                     return -1;
                 }
@@ -571,7 +580,7 @@ namespace IguideME.Web.Services
             try
             {
                 string query = String.Format(
-                    DatabaseQueries.QUERY_GOAL_GRADES,
+                    "SELECT `grade`, `user_id`, `user_login_id`, `user_name` from `goal_grade` WHERE `course_id`={0}",
                     courseID);
 
                 SQLiteDataReader r = Query(query);
@@ -579,14 +588,15 @@ namespace IguideME.Web.Services
 
                 while (r.Read())
                 {
-                    goals.Add(new GoalData(courseID, r.GetInt32(0), r.GetInt32(1), r.GetValue(2).ToString(), r.GetValue(3).ToString()));
                     _logger.LogInformation("Getting goal " + r.GetInt32(0) + " for user " + r.GetValue(2).ToString() );
+                    goals.Add(new GoalData(courseID, r.GetInt32(0), r.GetInt32(1), r.GetValue(2).ToString(), r.GetValue(3).ToString()));
                 }
 
                 return goals.ToArray();
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                _logger.LogError(e.StackTrace);
                 return new GoalData[0] { };
             }
         }
@@ -1335,12 +1345,12 @@ namespace IguideME.Web.Services
                     r.GetValue(3).ToString()
                 ));
                 } catch (Exception e) {
-                    _logger.LogInformation("GetEntries\nRequested types:\n" +
+                    _logger.LogError("GetEntries\nRequested types:\n" +
                         r.GetName(0) + ": " + r.GetDataTypeName(0) + r.GetValue(0).ToString() + "\n" +
                         r.GetName(1) + ": " + r.GetDataTypeName(1) + r.GetValue(1).ToString() + "\n" +
                         r.GetName(2) + ": " + r.GetDataTypeName(2) + r.GetValue(2).ToString() + "\n" +
                         r.GetName(3) + ": " + r.GetDataTypeName(3) + r.GetValue(3).ToString() + "\n\n" +
-                        e
+                        e.StackTrace
                     );
                 }
             }
@@ -1502,7 +1512,7 @@ namespace IguideME.Web.Services
                     tiles.Add(row);
                 }
                 catch (Exception e) {
-                    _logger.LogInformation("GetTiles\nRequested types:\n" +
+                    _logger.LogError("GetTiles\nRequested types:\n" +
                         r.GetName(0) + ": " + r.GetDataTypeName(0) + r.GetValue(0).ToString() + "\n" +
                         r.GetName(1) + ": " + r.GetDataTypeName(1) + r.GetValue(1).ToString() + "\n" +
                         r.GetName(2) + ": " + r.GetDataTypeName(2) + r.GetValue(2).ToString() + "\n" +
@@ -1513,7 +1523,7 @@ namespace IguideME.Web.Services
                         r.GetName(7) + ": " + r.GetDataTypeName(7) + r.GetValue(7).ToString() + "\n" +
                         r.GetName(8) + ": " + r.GetDataTypeName(8) + r.GetValue(8).ToString() + "\n" +
                         r.GetName(9) + ": " + r.GetDataTypeName(9) + r.GetValue(9).ToString() + "\n\n" +
-                        e
+                        e.StackTrace
                     );
                 }
             }
@@ -1583,12 +1593,12 @@ namespace IguideME.Web.Services
                 );
                 tileGroups.Add(row);
                 } catch (Exception e) {
-                    _logger.LogInformation("GetLayoutTileGroups\nRequested types:\n" +
+                    _logger.LogError("GetLayoutTileGroups\nRequested types:\n" +
                         r.GetName(0) + ": " + r.GetDataTypeName(0) + r.GetValue(0).ToString() + "\n" +
                         r.GetName(1) + ": " + r.GetDataTypeName(1) + r.GetValue(1).ToString() + "\n" +
                         r.GetName(2) + ": " + r.GetDataTypeName(2) + r.GetValue(2).ToString() + "\n" +
                         r.GetName(3) + ": " + r.GetDataTypeName(3) + r.GetValue(3).ToString() + "\n\n" +
-                        e
+                        e.StackTrace
                     );
                 }
             }
@@ -1744,11 +1754,11 @@ namespace IguideME.Web.Services
                     );
                     columns.Add(row);
                 } catch (Exception e) {
-                    _logger.LogInformation("GetLayoutColumns\nRequested types:\n" +
+                    _logger.LogError("GetLayoutColumns\nRequested types:\n" +
                         r.GetName(0) + ": " + r.GetDataTypeName(0) + r.GetValue(0).ToString() + "\n" +
                         r.GetName(1) + ": " + r.GetDataTypeName(1) + r.GetValue(1).ToString() + "\n" +
                         r.GetName(2) + ": " + r.GetDataTypeName(2) + r.GetValue(2).ToString() + "\n\n" +
-                        e
+                        e.StackTrace
                     );
                 }
             }
@@ -1982,8 +1992,9 @@ namespace IguideME.Web.Services
 
                 return consents.ToArray();
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                _logger.LogError(e.StackTrace);
                 return new ConsentData[0] { };
             }
 
@@ -2004,12 +2015,14 @@ namespace IguideME.Web.Services
                 while (r.Read())
                 {
                     consents.Add(new ConsentData(CourseID, r.GetInt32(0), r.GetValue(1).ToString(), r.GetValue(2).ToString(), r.GetInt32(3)));
+                    if (r.GetInt32(3) != 1) { _logger.LogInformation("Found non consent: " + r.GetInt32(3));}
                 }
 
                 return consents.ToArray();
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                _logger.LogError(e.StackTrace);
                 return new ConsentData[0] { };
             }
 
