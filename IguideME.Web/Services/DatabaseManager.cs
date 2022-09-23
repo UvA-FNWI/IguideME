@@ -924,7 +924,9 @@ namespace IguideME.Web.Services
                     {
                         tileID = r2.GetInt32(1);
                     }
-                    catch { }
+                    catch (Exception e) {
+                        _logger.LogError(e.ToString());
+                    }
                 }
                 predictedGrades.Add(r2.GetFloat(2));
             }
@@ -2010,7 +2012,6 @@ namespace IguideME.Web.Services
                 while (r.Read())
                 {
                     consents.Add(new ConsentData(CourseID, r.GetInt32(0), r.GetValue(1).ToString(), r.GetValue(2).ToString(), r.GetInt32(3)));
-                    if (r.GetInt32(3) != 1) { _logger.LogInformation("Found non consent: " + r.GetInt32(3));}
                 }
 
                 return consents.ToArray();

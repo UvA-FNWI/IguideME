@@ -25,7 +25,6 @@ namespace IguideME.Web.Services
             this.accessToken = config["Canvas:AccessToken"];
             this.baseUrl = config["Canvas:Url"];
             this.connector = new CanvasApiConnector(config["Canvas:Url"], config["Canvas:AccessToken"]);
-            _logger.LogInformation(config["Canvas:Url"] + config["Canvas:AccessToken"]);
         }
 
         public void sendMessage(string LoginID, string subject, string body)
@@ -41,8 +40,10 @@ namespace IguideME.Web.Services
 
                 conv.Save();
             }
-            catch (Exception e) {
+            catch (System.Net.WebException e) {
                 _logger.LogError(e.ToString());
+                _logger.LogError(e.Message);
+                _logger.LogError(e.Response.ToString());
             }
         }
 
