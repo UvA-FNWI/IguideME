@@ -30,15 +30,20 @@ namespace IguideME.Web.Services
 
         public void sendMessage(string LoginID, string subject, string body)
         {
-            var conv = new Conversation(this.connector)
-            {
-                Subject = subject,
-                Body = body,
-                Recipients = new string[1] { "sis_user_id:" + LoginID }
-            };
-            _logger.LogInformation("Created conversation " + conv);
+            try {
+                var conv = new Conversation(this.connector)
+                {
+                    Subject = subject,
+                    Body = body,
+                    Recipients = new string[1] { "sis_user_id:" + LoginID }
+                };
+                _logger.LogInformation("Created conversation " + conv);
 
-            conv.Save();
+                conv.Save();
+            }
+            catch (Exception e) {
+                _logger.LogError(e.StackTrace);
+            }
         }
 
         public User GetUser(int courseID, string sisLoginID)
