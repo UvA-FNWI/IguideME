@@ -42,7 +42,7 @@ namespace IguideME.Web.Services
                 conv.Save();
             }
             catch (Exception e) {
-                _logger.LogError(e.StackTrace);
+                _logger.LogError(e.ToString());
             }
         }
 

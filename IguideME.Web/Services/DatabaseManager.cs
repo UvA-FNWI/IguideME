@@ -225,7 +225,7 @@ namespace IguideME.Web.Services
                         r.GetName(3) + ": " + r.GetDataTypeName(3) + r.GetValue(3).ToString() + r.GetValue(3).GetType() + "\n" +
                         r.GetName(4) + ": " + r.GetDataTypeName(4) + r.GetValue(4).ToString() + r.GetValue(3).GetType() + "\n" +
                         r.GetName(5) + ": " + r.GetDataTypeName(5) + r.GetValue(5).ToString() + r.GetValue(3).GetType() + "\n\n" +
-                        e.StackTrace
+                        e.ToString()
                     );
                 }
 
@@ -568,7 +568,7 @@ namespace IguideME.Web.Services
                 catch (Exception e) {
                     _logger.LogError("GetUserGoalGrade\nRequested types:\n" +
                         r.GetName(0) + ": " + r.GetDataTypeName(0) + "\n\n" +
-                        e.StackTrace
+                        e.ToString()
                     );
                     return -1;
                 }
@@ -589,14 +589,14 @@ namespace IguideME.Web.Services
                 while (r.Read())
                 {
                     int grade = r.GetValue(0).GetType() != typeof(DBNull) ? (r.GetInt32(0)) : 0;
-                    goals.Add(new GoalData(courseID, grade, r.GetValue(2).ToString()));
+                    goals.Add(new GoalData(courseID, grade, r.GetValue(1).ToString()));
                 }
 
                 return goals.ToArray();
             }
             catch (Exception e)
             {
-                _logger.LogError(e.StackTrace);
+                _logger.LogError(e.ToString());
                 return new GoalData[0] { };
             }
         }
@@ -1350,7 +1350,7 @@ namespace IguideME.Web.Services
                         r.GetName(1) + ": " + r.GetDataTypeName(1) + r.GetValue(1).ToString() + "\n" +
                         r.GetName(2) + ": " + r.GetDataTypeName(2) + r.GetValue(2).ToString() + "\n" +
                         r.GetName(3) + ": " + r.GetDataTypeName(3) + r.GetValue(3).ToString() + "\n\n" +
-                        e.StackTrace
+                        e.ToString()
                     );
                 }
             }
@@ -1523,7 +1523,7 @@ namespace IguideME.Web.Services
                         r.GetName(7) + ": " + r.GetDataTypeName(7) + r.GetValue(7).ToString() + "\n" +
                         r.GetName(8) + ": " + r.GetDataTypeName(8) + r.GetValue(8).ToString() + "\n" +
                         r.GetName(9) + ": " + r.GetDataTypeName(9) + r.GetValue(9).ToString() + "\n\n" +
-                        e.StackTrace
+                        e.ToString()
                     );
                 }
             }
@@ -1598,7 +1598,7 @@ namespace IguideME.Web.Services
                         r.GetName(1) + ": " + r.GetDataTypeName(1) + r.GetValue(1).ToString() + "\n" +
                         r.GetName(2) + ": " + r.GetDataTypeName(2) + r.GetValue(2).ToString() + "\n" +
                         r.GetName(3) + ": " + r.GetDataTypeName(3) + r.GetValue(3).ToString() + "\n\n" +
-                        e.StackTrace
+                        e.ToString()
                     );
                 }
             }
@@ -1758,7 +1758,7 @@ namespace IguideME.Web.Services
                         r.GetName(0) + ": " + r.GetDataTypeName(0) + r.GetValue(0).ToString() + "\n" +
                         r.GetName(1) + ": " + r.GetDataTypeName(1) + r.GetValue(1).ToString() + "\n" +
                         r.GetName(2) + ": " + r.GetDataTypeName(2) + r.GetValue(2).ToString() + "\n\n" +
-                        e.StackTrace
+                        e.ToString()
                     );
                 }
             }
@@ -1989,7 +1989,7 @@ namespace IguideME.Web.Services
             }
             catch (Exception e)
             {
-                _logger.LogError(e.StackTrace);
+                _logger.LogError(e.ToString());
                 return new ConsentData[0] { };
             }
 
@@ -2017,7 +2017,7 @@ namespace IguideME.Web.Services
             }
             catch (Exception e)
             {
-                _logger.LogError(e.StackTrace);
+                _logger.LogError(e.ToString());
                 return new ConsentData[0] { };
             }
 
