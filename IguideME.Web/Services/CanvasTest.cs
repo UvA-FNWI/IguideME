@@ -42,8 +42,9 @@ namespace IguideME.Web.Services
             }
             catch (System.Net.WebException e) {
                 _logger.LogError(e.ToString());
-                _logger.LogError(e.Message);
-                _logger.LogError(e.Response.ToString());
+                _logger.LogError( ((System.Net.HttpWebResponse) e.Response).StatusDescription);
+                _logger.LogError(new System.IO.StreamReader(((System.Net.HttpWebResponse) e.Response).GetResponseStream()).ReadToEnd());
+                _logger.LogError( ((System.Net.HttpWebResponse) e.Response).ToString());
             }
         }
 
