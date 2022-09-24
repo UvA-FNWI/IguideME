@@ -880,10 +880,10 @@ public static class DatabaseQueries
         AND         `sync_hash`='{1}';";
 
     public const string QUERY_COURSE_SUBMISSIONS =
-        @"SELECT    `tile_entry_submission`.`id`
-                    `tile_entry_submission`.`entry_id`
-                    `tile_entry_submission`.`user_login_id`
-                    `tile_entry_submission`.`grade`
+        @"SELECT    `tile_entry_submission`.`id`,
+                    `tile_entry_submission`.`entry_id`,
+                    `tile_entry_submission`.`user_login_id`,
+                    `tile_entry_submission`.`grade`,
                     `tile_entry_submission`.`submitted`
         FROM        `tile_entry_submission`
         INNER JOIN  `tile_entry`
