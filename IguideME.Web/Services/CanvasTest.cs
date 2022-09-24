@@ -36,7 +36,7 @@ namespace IguideME.Web.Services
                     Body = body,
                     Recipients = new string[1] { studentID.ToString() }
                 };
-                _logger.LogInformation("Created conversation " + conv + " " + conv.Recipients);
+                _logger.LogInformation("Created conversation " + conv + " " + conv.Recipients[0]);
 
                 conv.Save();
             }
