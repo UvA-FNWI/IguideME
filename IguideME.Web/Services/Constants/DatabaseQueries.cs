@@ -581,7 +581,7 @@ public static class DatabaseQueries
     public const string QUERY_TILE_ENTRY_SUBMISSION_META =
         @"SELECT    `tile_entry_submission_meta`.`key`,
                     `tile_entry_submission_meta`.`value`
-        FROM        `tile_entry_submission`,
+        FROM        `tile_entry_submission`
         INNER JOIN  `tile_entry_submission_meta`
             ON      `tile_entry_submission`.`id`=`tile_entry_submission_meta`.`submission_id`
         WHERE       `tile_entry_submission`.`id`={0}
