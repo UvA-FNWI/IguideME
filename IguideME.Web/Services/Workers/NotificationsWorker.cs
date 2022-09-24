@@ -36,7 +36,7 @@ namespace IguideME.Web.Services.Workers
                 {
                     _logger.LogInformation("Sending message to " + user.LoginID + ", " + user.UserID + ": " + notification.Status);
 
-                    canvasTest.sendMessage(user.UserID,
+                    canvasTest.sendMessage(user.LoginID,
                     "IGuideME",
                     notification.Status);
                 }
