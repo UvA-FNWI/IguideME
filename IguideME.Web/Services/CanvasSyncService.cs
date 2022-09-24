@@ -61,7 +61,7 @@ namespace IguideME.Web.Services
                 jobId, $"tasks.students", 0
             ).ConfigureAwait(false);
 
-            new QuizWorker(courseID, hashCode, _canvasTest).Register();
+            new QuizWorker(courseID, hashCode, _canvasTest, _logger).Register();
             await _computationJobStatus.UpdateJobProgressInformationAsync(
                 jobId, $"tasks.quizzes", 0
             ).ConfigureAwait(false);
@@ -76,7 +76,7 @@ namespace IguideME.Web.Services
                 jobId, $"tasks.assignments", 0
             ).ConfigureAwait(false);
 
-            new GradePredictorWorker(courseID, hashCode).MakePredictions();
+            new GradePredictorWorker(courseID, hashCode, _logger).MakePredictions();
             await _computationJobStatus.UpdateJobProgressInformationAsync(
                 jobId, $"tasks.grade-predictor", 0
             ).ConfigureAwait(false);

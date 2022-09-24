@@ -4,11 +4,13 @@ using System.Linq;
 using IguideME.Web.Models;
 using IguideME.Web.Models.App;
 using IguideME.Web.Models.Impl;
+using Microsoft.Extensions.Logging;
 
 namespace IguideME.Web.Services.Workers
 {
 	public class GradePredictorWorker
 	{
+        private readonly ILogger<SyncManager> _logger;
 
 		private int CourseID { get; set; }
 
@@ -16,11 +18,11 @@ namespace IguideME.Web.Services.Workers
 
         private List<PredictiveModel> Models { get; set; }
 
-		public GradePredictorWorker(int courseID, string syncHash)
-        { 
+		public GradePredictorWorker(int courseID, string syncHash, ILogger<SyncManager> logger)
+        {
+            _logger = logger;
             List<PredictiveModel> models = DatabaseManager.Instance.
                 GetPredictiveModels(courseID);
-
             this.CourseID = courseID;
             this.SyncHash = syncHash;
             this.Models = models;
@@ -52,6 +54,7 @@ namespace IguideME.Web.Services.Workers
 
         public void MakePredictions()
         {
+            _logger.LogInformation("Making grade predictions...");
             List<User> students = DatabaseManager.Instance
                 .GetUsers(this.CourseID, "student", this.SyncHash);
 
@@ -59,11 +62,14 @@ namespace IguideME.Web.Services.Workers
                 .GetCourseSubmissions(this.CourseID, this.SyncHash);
 
             List<Tile> tiles = DatabaseManager.Instance.GetTiles(this.CourseID);
+
             List<TileEntry> tileEntries = DatabaseManager.Instance
                 .GetEntries(this.CourseID);
 
             foreach (User student in students)
-            {    
+            {
+                _logger.LogInformation("Processing user: " + student.LoginID);
+
                 List<TileEntrySubmission> userSubmissions =
                     submissions.Where(s => s.UserLoginID == student.LoginID)
                     .ToList();
@@ -131,9 +137,9 @@ namespace IguideME.Web.Services.Workers
                                 case Tile.CONTENT_TYPE_BINARY:
                                     /**
                                         * Binary tiles
-                                        * 
+                                        *
                                         * Binary prediction components require the
-                                        * sum of the successes for all entries in 
+                                        * sum of the successes for all entries in
                                         * the tile
                                         **/
                                     List<TileEntrySubmission> binarySubmissions =
@@ -164,7 +170,7 @@ namespace IguideME.Web.Services.Workers
                                 case Tile.CONTENT_TYPE_ENTRIES:
                                     /**
                                         * Entry tiles
-                                        * 
+                                        *
                                         * Tiles with the entries content type simply
                                         * use the grade of the submission
                                         **/
@@ -208,12 +214,12 @@ namespace IguideME.Web.Services.Workers
                                     factors.Count(),
                                     this.SyncHash);
                             }
-                           
+
                         }
                     }
                 }
-                
-                
+
+
             }
         }
     }

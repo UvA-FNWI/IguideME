@@ -1,8 +1,11 @@
 ﻿using System;
+using Microsoft.Extensions.Logging;
+
 namespace IguideME.Web.Services.Workers
 {
     public class QuizWorker
     {
+        private readonly ILogger<SyncManager> _logger;
 		int courseID;
 		string hashCode;
 		CanvasTest canvasTest;
@@ -10,8 +13,11 @@ namespace IguideME.Web.Services.Workers
         public QuizWorker(
 			int courseID,
 			string hashCode,
-			CanvasTest canvasTest)
+			CanvasTest canvasTest,
+            ILogger<SyncManager> logger)
+
         {
+			_logger = logger;
 			this.courseID = courseID;
 			this.hashCode = hashCode;
 			this.canvasTest = canvasTest;
@@ -22,7 +28,7 @@ namespace IguideME.Web.Services.Workers
 			var quizzes = this.canvasTest.GetQuizzes(courseID);
 			foreach (var quiz in quizzes)
 			{
-				Console.WriteLine("\t" + quiz.Name);
+				_logger.LogInformation("\t" + quiz.Name);
 				DatabaseManager.Instance.RegisterAssignment(
 					quiz.ID,
 					quiz.CourseID,
