@@ -55,14 +55,18 @@ namespace IguideME.Web.Services.Workers
         public void MakePredictions()
         {
             _logger.LogInformation("Making grade predictions...");
+            _logger.LogInformation("Getting users");
             List<User> students = DatabaseManager.Instance
                 .GetUsers(this.CourseID, "student", this.SyncHash);
 
+            _logger.LogInformation("Getting submissions");
             List<TileEntrySubmission> submissions = DatabaseManager.Instance
                 .GetCourseSubmissions(this.CourseID, this.SyncHash);
 
+            _logger.LogInformation("Getting tiles");
             List<Tile> tiles = DatabaseManager.Instance.GetTiles(this.CourseID);
 
+            _logger.LogInformation("Getting entries");
             List<TileEntry> tileEntries = DatabaseManager.Instance
                 .GetEntries(this.CourseID);
 
