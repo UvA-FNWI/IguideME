@@ -880,10 +880,10 @@ public static class DatabaseQueries
         AND         `sync_hash`='{1}';";
 
     public const string QUERY_COURSE_SUBMISSIONS =
-        @"SELECT    `tile_entry_submission`.`id`,
-                    `tile_entry_submission`.`entry_id`,
-                    `tile_entry_submission`.`user_login_id`,
-                    `tile_entry_submission`.`grade`,
+        @"SELECT    `tile_entry_submission`.`id`
+                    `tile_entry_submission`.`entry_id`
+                    `tile_entry_submission`.`user_login_id`
+                    `tile_entry_submission`.`grade`
                     `tile_entry_submission`.`submitted`
         FROM        `tile_entry_submission`
         INNER JOIN  `tile_entry`
@@ -893,7 +893,7 @@ public static class DatabaseQueries
         INNER JOIN  `layout_tile_group`
             ON      `layout_tile_group`.`id`=`tile`.`group_id`
         WHERE       `layout_tile_group`.`course_id`={0}
-        AND         `tile_entry_submission`.`sync_hash`='{1}';";
+        AND         `tile_entry_submission`.`sync_hash`='{1}'";
 
     public const string QUERY_USER_SUBMISSIONS_FOR_TILE_FOR_USER =
         @"SELECT    `tile_entry_submission`.`id`,
