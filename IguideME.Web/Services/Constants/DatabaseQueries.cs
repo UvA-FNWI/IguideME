@@ -893,7 +893,8 @@ public static class DatabaseQueries
         INNER JOIN  `layout_tile_group`
             ON      `layout_tile_group`.`id`=`tile`.`group_id`
         WHERE       `layout_tile_group`.`course_id`={0}
-        AND         `tile_entry_submission`.`sync_hash`='{1}'";
+        AND         `tile_entry_submission`.`sync_hash`='{1}'
+        AND         `tile_entry_submission`.`grade` NOT NULL";
 
     public const string QUERY_USER_SUBMISSIONS_FOR_TILE_FOR_USER =
         @"SELECT    `tile_entry_submission`.`id`,

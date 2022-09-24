@@ -718,16 +718,12 @@ namespace IguideME.Web.Services
                 courseID,
                 activeHash);
 
-            _logger.LogInformation("Created query: " + query);
             try {
                 SQLiteDataReader r = Query(query);
 
-
-                _logger.LogInformation("Gotten result from query");
                 List<TileEntrySubmission> submissions = new List<TileEntrySubmission>();
 
                 while (r.Read())
-                    _logger.LogInformation("Reading new line");
                 {
                     try {
                         TileEntrySubmission submission = new TileEntrySubmission(

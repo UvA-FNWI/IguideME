@@ -17,6 +17,7 @@ alias build-backend-watch='dotnet watch --project $PROJECT_ROOT/IguideME.Web/ ru
 alias build-backend-prod='dotnet build --project $PROJECT_ROOT/IguideME.Web/';
 alias enter-db='litecli $PROJECT_ROOT/IguideME.Web/db.sqlite';
 alias logs='kubectl logs $KUBECTL_PROJ_ID -n iguideme';
+alias refresh-logs="KUBECTL_PROJ_ID=$(kubectl get pods -n iguideme | grep Running | awk '{print $1}')";
 alias h='display_help';
 
 display_help () {
@@ -34,6 +35,7 @@ display_help () {
   echo "  kill-process            kill a process by name";
   echo "  enter-db                enter the database";
   echo "  logs                    view production logs";
+  echo "  refresh-logs            refresh pod name for logs";
   echo "                                          ";
   echo "  ---misc---------------------------------";
   echo "  h                       display this message again";
