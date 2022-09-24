@@ -719,37 +719,44 @@ namespace IguideME.Web.Services
                 activeHash);
 
             _logger.LogInformation("Created query: " + query);
-            SQLiteDataReader r = Query(query);
+            try {
+                SQLiteDataReader r = Query(query);
 
-            _logger.LogInformation("Gotten result from query");
-            List<TileEntrySubmission> submissions = new List<TileEntrySubmission>();
 
-            while (r.Read())
-                _logger.LogInformation("Reading new line");
-            {
-                try {
-                    TileEntrySubmission submission = new TileEntrySubmission(
-                        r.GetInt32(0),
-                        r.GetInt32(1),
-                        r.GetValue(2).ToString(),
-                        r.GetValue(3).ToString(),
-                        r.GetValue(4).ToString()
-                    );
-                    submissions.Add(submission);
+                _logger.LogInformation("Gotten result from query");
+                List<TileEntrySubmission> submissions = new List<TileEntrySubmission>();
+
+                while (r.Read())
+                    _logger.LogInformation("Reading new line");
+                {
+                    try {
+                        TileEntrySubmission submission = new TileEntrySubmission(
+                            r.GetInt32(0),
+                            r.GetInt32(1),
+                            r.GetValue(2).ToString(),
+                            r.GetValue(3).ToString(),
+                            r.GetValue(4).ToString()
+                        );
+                        submissions.Add(submission);
+                    }
+                    catch (Exception e) {
+                        _logger.LogError("GetCourseSubmissions\nRequested types:\n" +
+                            r.GetName(0) + ": " + r.GetDataTypeName(0) + r.GetValue(0).ToString() + r.GetValue(0).GetType() + "\n" +
+                            r.GetName(1) + ": " + r.GetDataTypeName(1) + r.GetValue(1).ToString() + r.GetValue(1).GetType() + "\n" +
+                            r.GetName(2) + ": " + r.GetDataTypeName(2) + r.GetValue(2).ToString() + r.GetValue(2).GetType() + "\n" +
+                            r.GetName(3) + ": " + r.GetDataTypeName(3) + r.GetValue(3).ToString() + r.GetValue(3).GetType() + "\n" +
+                            r.GetName(4) + ": " + r.GetDataTypeName(4) + r.GetValue(4).ToString() + r.GetValue(4).GetType() + "\n\n" +
+                            e.ToString()
+                        );
+                    }
                 }
-                catch (Exception e) {
-                    _logger.LogError("GetCourseSubmissions\nRequested types:\n" +
-                        r.GetName(0) + ": " + r.GetDataTypeName(0) + r.GetValue(0).ToString() + r.GetValue(0).GetType() + "\n" +
-                        r.GetName(1) + ": " + r.GetDataTypeName(1) + r.GetValue(1).ToString() + r.GetValue(1).GetType() + "\n" +
-                        r.GetName(2) + ": " + r.GetDataTypeName(2) + r.GetValue(2).ToString() + r.GetValue(2).GetType() + "\n" +
-                        r.GetName(3) + ": " + r.GetDataTypeName(3) + r.GetValue(3).ToString() + r.GetValue(3).GetType() + "\n" +
-                        r.GetName(4) + ": " + r.GetDataTypeName(4) + r.GetValue(4).ToString() + r.GetValue(4).GetType() + "\n\n" +
-                        e.ToString()
-                    );
-                }
+
+                return submissions;
             }
-
-            return submissions;
+            catch (Exception e) {
+                _logger.LogError("GetCourseSubmissions query error: \n" + e.ToString());
+                return null;
+            }
         }
 
         public List<TileEntrySubmission> GetTileEntrySubmissionsForUser(
