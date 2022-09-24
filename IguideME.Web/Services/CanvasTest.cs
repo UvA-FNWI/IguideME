@@ -34,7 +34,7 @@ namespace IguideME.Web.Services
                 {
                     Subject = subject,
                     Body = body,
-                    Recipients = new string[1] { "sis_user_id:" + LoginID }
+                    Recipients = new string[1] { "sis_login_id:" + LoginID }
                 };
                 _logger.LogInformation("Created conversation " + conv + " " + conv.Recipients[0]);
 
