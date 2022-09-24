@@ -26,6 +26,10 @@ namespace IguideME.Web.Services.Workers
         {
             _logger.LogInformation("Starting notifications sync...");
 
+            if (DateTime.Now.DayOfWeek != DayOfWeek.Monday && DateTime.Now.DayOfWeek != DayOfWeek.Friday) {
+                return;
+            }
+
             foreach (var user in DatabaseManager.Instance.GetUsers(this.courseID))
             {
                 var notifications = DatabaseManager.Instance.GetPendingNotifications(this.courseID, user.LoginID);
@@ -34,9 +38,9 @@ namespace IguideME.Web.Services.Workers
 
                 foreach (var notification in notifications)
                 {
-                    _logger.LogInformation("Sending message to " + user.LoginID + ", " + user.UserID + ": " + notification.Status);
+                    _logger.LogInformation("Sending notification to " + user.LoginID + ", " + user.UserID + ": " + notification.Status);
 
-                    canvasTest.sendMessage(user.LoginID,
+                    canvasTest.sendMessage(user.UserID,
                     "IGuideME",
                     notification.Status);
                 }

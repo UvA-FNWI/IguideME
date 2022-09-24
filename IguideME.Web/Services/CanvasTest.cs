@@ -27,14 +27,14 @@ namespace IguideME.Web.Services
             this.connector = new CanvasApiConnector(config["Canvas:Url"], config["Canvas:AccessToken"]);
         }
 
-        public void sendMessage(string LoginID, string subject, string body)
+        public void sendMessage(int studentID, string subject, string body)
         {
             try {
                 var conv = new Conversation(this.connector)
                 {
                     Subject = subject,
                     Body = body,
-                    Recipients = new string[1] { "sis_login_id:" + LoginID }
+                    Recipients = new string[1] { studentID.ToString() }
                 };
                 _logger.LogInformation("Created conversation " + conv + " " + conv.Recipients[0]);
 
