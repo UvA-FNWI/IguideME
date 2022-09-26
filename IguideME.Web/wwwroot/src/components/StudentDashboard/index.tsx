@@ -23,7 +23,8 @@ const compute = require('compute.io');
 
 const mapState = (state: RootState) => ({
   dashboardColumns: state.dashboardColumns,
-  tiles: state.tiles,
+  tiles: state.tiles.filter((t: Tile) => t.visible),
+  // tiles: state.tiles,
   tileGroups: state.tileGroups,
   tileEntries: state.tileEntries,
   predictions: state.predictions,
@@ -198,7 +199,7 @@ class StudentDashboard extends Component<Props, IState> {
                       .sort((a: TileGroupModel, b: TileGroupModel) => a.position - b.position)
                       .map((tg: TileGroupModel) =>
                         <TileGroup tileGroup={tg}
-                                   tiles={tiles.filter((t: Tile) => t.group_id === tg.id)}
+                                   tiles={tiles.filter((t: Tile) => t.group_id === tg.id) }
                                    discussions={discussions}
                                    tileEntries={tileEntries.filter(e => tiles.filter(
                                      (t: Tile) => t.group_id === tg.id).map(x => x.id).includes(e.tile_id))}

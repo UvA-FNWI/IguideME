@@ -55,18 +55,14 @@ namespace IguideME.Web.Services.Workers
         public void MakePredictions()
         {
             _logger.LogInformation("Making grade predictions...");
-            _logger.LogInformation("Getting users");
             List<User> students = DatabaseManager.Instance
                 .GetUsers(this.CourseID, "student", this.SyncHash);
 
-            _logger.LogInformation("Getting submissions");
             List<TileEntrySubmission> submissions = DatabaseManager.Instance
                 .GetCourseSubmissions(this.CourseID, this.SyncHash);
 
-            _logger.LogInformation("Getting tiles");
             List<Tile> tiles = DatabaseManager.Instance.GetTiles(this.CourseID);
 
-            _logger.LogInformation("Getting entries");
             List<TileEntry> tileEntries = DatabaseManager.Instance
                 .GetEntries(this.CourseID);
 
@@ -77,7 +73,6 @@ namespace IguideME.Web.Services.Workers
                 List<TileEntrySubmission> userSubmissions =
                     submissions.Where(s => s.UserLoginID == student.LoginID)
                     .ToList();
-                _logger.LogInformation("Found submissions");
 
                 HashSet<string> registry = new HashSet<string>();
 
@@ -92,17 +87,14 @@ namespace IguideME.Web.Services.Workers
 
                 userSubmissions.ForEach(s =>
                 {
-                    _logger.LogInformation("Processing submission " + s);
                     TileEntry entry = tileEntries.Find(e => e.ID == s.EntryID);
 
                     if (entry != null)
                     {
-                        _logger.LogInformation("Entry " + entry.Title);
                         Tile tile = tiles.Find(t => t.ID == entry.TileID);
 
                         if (tile != null)
                         {
-                            _logger.LogInformation("Entry " + tile.Title);
                             if (tile.ContentType == "BINARY")
                                 registry.Add(tile.ID.ToString());
                             else
@@ -115,7 +107,6 @@ namespace IguideME.Web.Services.Workers
 
                 string modelKey = String.Join('#', registry.OrderBy(r => r));
 
-                _logger.LogInformation("Predicting grade");
                 for (int i = registry.Count; i > 2; i--)
                 {
                     PredictiveModel bestModel =

@@ -113,6 +113,14 @@ export default class TileController extends Controller {
     ).then(response => response.data);
   }
 
+  static deleteTile(id: number): Promise<void> {
+    if (debug()) return delay(Promise.resolve());
+
+    return this.client.delete(
+      `tiles/${id}`
+    ).then(response => response.data );
+  }
+
   static uploadData(entryID: number, data: any[]): Promise<any[]> {
     if (debug()) return delay([], 2500);
 

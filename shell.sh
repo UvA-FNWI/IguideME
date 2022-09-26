@@ -17,7 +17,7 @@ alias build-backend-watch='dotnet watch --project $PROJECT_ROOT/IguideME.Web/ ru
 alias build-backend-prod='dotnet build --project $PROJECT_ROOT/IguideME.Web/';
 alias enter-db='litecli $PROJECT_ROOT/IguideME.Web/db.sqlite';
 alias logs='kubectl logs $KUBECTL_PROJ_ID -n iguideme';
-alias refresh-logs="KUBECTL_PROJ_ID=$(kubectl get pods -n iguideme | grep Running | awk '{print $1}')";
+alias refresh-logs='KUBECTL_PROJ_ID=$(kubectl get pods -n iguideme | grep Running | awk '\''{print $1}'\'')'
 alias h='display_help';
 
 display_help () {

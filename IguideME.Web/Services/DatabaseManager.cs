@@ -1593,12 +1593,10 @@ namespace IguideME.Web.Services
 
         public List<LayoutTileGroup> GetLayoutTileGroups(int courseID)
         {
-            string query = String.Format(
+            SQLiteDataReader r = Query(String.Format(
                     DatabaseQueries.QUERY_TILE_GROUPS,
                     courseID
-            );
-
-            SQLiteDataReader r = Query(query);
+            ));
             List<LayoutTileGroup> tileGroups = new List<LayoutTileGroup>();
 
             while (r.Read())
