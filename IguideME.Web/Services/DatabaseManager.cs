@@ -181,7 +181,7 @@ namespace IguideME.Web.Services
                         AND `granted` = -1;", courseID
                     )
                 );
-                SQLiteDataReader r = Query("SELECT user_id, course_id, granted FROM `consent`;");
+                SQLiteDataReader r = Query("SELECT user_id, course_id, id FROM `consent`;");
                 string tmp = "";
                 while (r.Read()){
                     tmp = tmp + r.GetValue(1).ToString() + ": " + r.GetValue(0).ToString() + " " + r.GetValue(2).ToString() + "\n";
