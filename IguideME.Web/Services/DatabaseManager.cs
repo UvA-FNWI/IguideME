@@ -181,9 +181,15 @@ namespace IguideME.Web.Services
                         AND `granted` = -1;", courseID
                     )
                 );
+                SQLiteDataReader r = Query("SELECT user_id, course_id FROM `consent`;");
+                string tmp = "";
+                while (r.Read()){
+                    tmp = tmp + r.GetValue(1).ToString() + ": " + r.GetValue(0).ToString() + "\n";
+                }
+                _logger.LogInformation(tmp);
                 NonQuery(
                     String.Format(
-                        @"CREATE UNIQUE INDEX unique_user_id ON `consent`(user_id)
+                        @"CREATE UNIQUE INDEX unique_user_id ON `consent`(user_id, course_id)
                         ;"
                     )
                 );
