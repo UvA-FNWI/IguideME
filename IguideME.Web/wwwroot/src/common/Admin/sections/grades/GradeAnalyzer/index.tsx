@@ -57,6 +57,7 @@ export default class GradeAnalyzer extends Component<IProps, IState> {
       allEntries,
       tiles
     }: IState = this.state;
+    void allSubmissions; // discard value
 
     const data = mergeData(submissionsOne, submissionsTwo);
 

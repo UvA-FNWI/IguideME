@@ -1,11 +1,9 @@
 import React, { Component } from "react";
 import {IProps, IState} from "./types";
 import TileController from "../../api/controllers/tile";
-import {TileEntry} from "../../models/app/Tile";
 import {Table} from "antd";
 import {getColumns, getData} from "./helpers";
 import StudentController from "../../api/controllers/student";
-import Loading from "../utils/Loading";
 
 export default class StudentGradesTable extends Component<IProps, IState> {
 
@@ -19,24 +17,27 @@ export default class StudentGradesTable extends Component<IProps, IState> {
   }
 
   componentDidMount(): void {
-    TileController.getTileGroups().then(tileGroups => {
-      TileController.getTiles().then(async tiles => {
-        TileController.getEntries().then(async tileEntries => {
-          StudentController.getStudents().then(students => {
-            TileController.getAllSubmissions().then(submissions => {
-              this.setState({ tileGroups, tiles, tileEntries, students, submissions, loaded: true });
-            });
-          });
-        });
-      });
+    TileController.getTileGroups().then(async tileGroups => {
+      this.setState({tileGroups});
+    });
+    TileController.getTiles().then(async tiles => {
+      this.setState({tiles});
+    });
+    TileController.getEntries().then(async tileEntries => {
+      this.setState({tileEntries});
+    });
+    StudentController.getStudents().then(async students => {
+      this.setState({students});
+    });
+        TileController.getAllSubmissions().then(async submissions => {
+      this.setState({submissions, loaded: true });
     });
   }
 
   render(): React.ReactNode {
     const { averaged } = this.props;
     const { tiles, tileEntries, students, submissions, loaded } = this.state;
-
-    if (!loaded) return <Loading small={true} />;
+    void loaded // discard value
 
     console.log("GRADE TABLE", submissions);
     console.log("COLUMNS", getColumns(tiles, tileEntries, averaged));

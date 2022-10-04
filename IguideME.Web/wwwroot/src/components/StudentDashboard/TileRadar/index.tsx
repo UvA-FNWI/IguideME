@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { SizeMe } from 'react-sizeme'
-import { genAngles, genPoints, genPolygonPoints, getDescriptionAnchor } from "./helpers";
+import { genPoints, genPolygonPoints, getDescriptionAnchor } from "./helpers";
 import { IProps } from "./types";
 import { scaleLinear } from '@visx/scale';
 import { Group } from '@visx/group';
@@ -18,7 +18,7 @@ export default class TileRadar extends Component<IProps> {
     render(): React.ReactNode {
         const { tilesGradeSummary, peerGrades } = this.props;
 
-        const degrees = 360;
+        // const degrees = 360;
         const margin = { top: 50, left: 75, right: 75, bottom: 50 }
 
         return (
@@ -36,9 +36,9 @@ export default class TileRadar extends Component<IProps> {
                             const yMax = size.width - margin.top - margin.bottom;
                             const radius = Math.min(xMax, yMax) / 2;
 
-                            const radialScale = scaleLinear<number>()
-                                .range([0, Math.PI * 2])
-                                .domain([degrees, 0]);
+                            // const radialScale = scaleLinear<number>()
+                                // .range([0, Math.PI * 2])
+                                // .domain([degrees, 0]);
 
                             const genYScale = (value: number, tile: Tile) => {
                                 const userGrades = tilesGradeSummary.filter(tgs => tgs.tile.id === tile.id);
@@ -52,7 +52,7 @@ export default class TileRadar extends Component<IProps> {
                                 })(value);
                             }
 
-                            const webs = genAngles(tilesGradeSummary.length, degrees);
+                            // const webs = genAngles(tilesGradeSummary.length, degrees);
                             const zeroPoint = new Point({ x: 0, y: 0 });
                             const points = genPoints(tilesGradeSummary.length, radius);
                             const polygonPoints = genPolygonPoints(

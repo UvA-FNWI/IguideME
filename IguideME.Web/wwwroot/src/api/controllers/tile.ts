@@ -113,6 +113,14 @@ export default class TileController extends Controller {
     ).then(response => response.data);
   }
 
+  static deleteTile(id: number): Promise<void> {
+    if (debug()) return delay(Promise.resolve());
+
+    return this.client.delete(
+      `tiles/${id}`
+    ).then(response => response.data );
+  }
+
   static uploadData(entryID: number, data: any[]): Promise<any[]> {
     if (debug()) return delay([], 2500);
 
@@ -174,16 +182,17 @@ export default class TileController extends Controller {
       return Promise.resolve(MOCK_TILE_ENTRIES.filter(e => e.tile_id === tileId));
     }
 
-    return this.client.get(
+    var result = this.client.get(
       `tiles/${tileId}/entries`
     ).then(response => response.data);
+
+    return result;
   }
 
   static createTileEntry(entry: TileEntry): Promise<TileEntry> {
     if (debug()) {
       return delay(entry);
     }
-
     return this.client.post(
       `/entries`, entry
     ).then(response => response.data);

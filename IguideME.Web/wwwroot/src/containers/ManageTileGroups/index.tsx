@@ -68,7 +68,6 @@ class ManageTileGroups extends Component<PropsFromRedux, IState> {
                           this.props.tileGroups.length).then(() => {
                             this.props.loadGroups().then(() => {
                               this.setState({ drawerOpen: false, text: "" });
-                              Swal.fire('Group created!', '', 'success');
                             });
                         });
                       }}>

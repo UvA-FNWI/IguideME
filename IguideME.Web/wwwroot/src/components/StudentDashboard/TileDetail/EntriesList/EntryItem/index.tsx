@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { TileEntry, TileEntrySubmission } from "../../../../../models/app/Tile";
-import { Divider, Statistic, Table } from "antd";
+import { Divider, Table } from "antd";
 import GradeStatistic from "../../../../../containers/GradeStatistic";
 
 export default class EntryItem extends Component<{
@@ -20,8 +20,7 @@ export default class EntryItem extends Component<{
 
                 <GradeStatistic grade={submission.grade} />
 
-                {/* TODO why and when is this visible to the user */}
-                { (/* hide meta */ false) && Object.keys(meta).length > 0 &&
+                { Object.keys(meta).length > 0 &&
                     <div>
                         <Table dataSource={Object.keys(meta).map((key, i) => ({
                             key: i,

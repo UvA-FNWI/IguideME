@@ -25,7 +25,7 @@ namespace IguideME.Web.Services
         public CanvasSyncService(
             IComputationJobStatusService computationJobStatus,
             CanvasTest canvasTest,
-        ILogger<SyncManager> logger)
+            ILogger<SyncManager> logger)
         {
             _logger = logger;
             _computationJobStatus = computationJobStatus;
@@ -36,8 +36,7 @@ namespace IguideME.Web.Services
             CancellationToken cancellationToken)
         {
             var result = new JobResultModel();
-            // var courseID = 25503;
-            var courseID = 994;
+            var courseID = work.CourseID;
 
             string characters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
             StringBuilder _result = new StringBuilder(10);
@@ -47,8 +46,12 @@ namespace IguideME.Web.Services
                 _result.Append(characters[random.Next(characters.Length)]);
             }
             string hashCode = _result.ToString().ToUpper();
+
+            DatabaseManager.Instance.CleanupSync(courseID, "BUSY");
+
             DatabaseManager.Instance.RegisterSync(courseID, hashCode);
             _logger.LogInformation("Sync hash: " + hashCode);
+            _logger.LogInformation("Course: " + work.CourseID);
 
             var sw = new Stopwatch();
             sw.Start();
@@ -58,7 +61,7 @@ namespace IguideME.Web.Services
                 jobId, $"tasks.students", 0
             ).ConfigureAwait(false);
 
-            new QuizWorker(courseID, hashCode, _canvasTest).Register();
+            new QuizWorker(courseID, hashCode, _canvasTest, _logger).Register();
             await _computationJobStatus.UpdateJobProgressInformationAsync(
                 jobId, $"tasks.quizzes", 0
             ).ConfigureAwait(false);
@@ -73,7 +76,7 @@ namespace IguideME.Web.Services
                 jobId, $"tasks.assignments", 0
             ).ConfigureAwait(false);
 
-            new GradePredictorWorker(courseID, hashCode).MakePredictions();
+            new GradePredictorWorker(courseID, hashCode, _logger).MakePredictions();
             await _computationJobStatus.UpdateJobProgressInformationAsync(
                 jobId, $"tasks.grade-predictor", 0
             ).ConfigureAwait(false);
@@ -88,10 +91,12 @@ namespace IguideME.Web.Services
                 jobId, $"tasks.notifications", 0
             ).ConfigureAwait(false);
 
+            _logger.LogInformation("Starting jobprogressinformation worker");
             await _computationJobStatus.UpdateJobProgressInformationAsync(
                 jobId, $"tasks.done", 0
             ).ConfigureAwait(false);
 
+            _logger.LogInformation("Starting recycleexternaldata");
             DatabaseManager.Instance.RecycleExternalData(courseID, hashCode);
 
             long duration = sw.ElapsedMilliseconds;

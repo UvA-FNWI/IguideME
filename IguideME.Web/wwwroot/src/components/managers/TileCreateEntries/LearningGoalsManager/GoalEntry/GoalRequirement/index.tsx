@@ -140,7 +140,7 @@ class GoalRequirement extends Component<Props> {
 
                       let r = JSON.parse(JSON.stringify(requirement));
                       r.entry_id = e.value;
-                      console.log("NEW R", r);
+
                       this.props.updateRequirement(r);
                     }}
                     options={entryOptions} />

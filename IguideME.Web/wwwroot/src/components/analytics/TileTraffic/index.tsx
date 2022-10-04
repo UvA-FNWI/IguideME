@@ -3,17 +3,17 @@ import { ParentSize } from '@visx/responsive';
 import { Arc } from '@visx/shape';
 import { Group } from '@visx/group';
 import { Chord, Ribbon } from '@visx/chord';
-import { scaleOrdinal } from '@visx/scale';
+// import { scaleOrdinal } from '@visx/scale';
 import { LinearGradient } from '@visx/gradient';
 
-const pink = '#ff2fab';
-const orange = '#ffc62e';
-const purple = '#dc04ff';
-const purple2 = '#7324ff';
-const red = '#d04376';
-const green = '#52f091';
-const blue = '#04a6ff';
-const lime = '#00ddc6';
+// const pink = '#ff2fab';
+// const orange = '#ffc62e';
+// const purple = '#dc04ff';
+// const purple2 = '#7324ff';
+// const red = '#d04376';
+// const green = '#52f091';
+// const blue = '#04a6ff';
+// const lime = '#00ddc6';
 const bg = '#e4e3d8';
 
 const dataMatrix = [
@@ -28,10 +28,10 @@ function descending(a: number, b: number): number {
   return b < a ? -1 : b > a ? 1 : b >= a ? 0 : NaN;
 }
 
-const color = scaleOrdinal<number, string>({
-  domain: [0, 1, 2, 3, 4],
-  range: ['url(#gpinkorange)', 'url(#gpurplered)', 'url(#gpurplegreen)', 'url(#gbluelime)', 'url(#gtest)'],
-});
+// const color = scaleOrdinal<number, string>({
+//   domain: [0, 1, 2, 3, 4],
+//   range: ['url(#gpinkorange)', 'url(#gpurplered)', 'url(#gpurplegreen)', 'url(#gbluelime)', 'url(#gtest)'],
+// });
 
 export default class TileTraffic extends Component {
   render(): React.ReactNode {

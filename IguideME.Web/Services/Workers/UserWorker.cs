@@ -14,7 +14,7 @@ namespace IguideME.Web.Services.Workers
             int courseID,
             string hashCode,
             CanvasTest canvasTest,
-        ILogger<SyncManager> logger)
+            ILogger<SyncManager> logger)
         {
             _logger = logger;
             this.courseID = courseID;
@@ -33,11 +33,16 @@ namespace IguideME.Web.Services.Workers
             foreach (var student in students)
             {
                 _logger.LogInformation("Processing student " + student.ID.ToString() + "...");
+                try {
 
                 if (DatabaseManager.Instance.GetUserGoalGrade(courseID, student.SISUserID) < 0)
                 {
                     DatabaseManager.Instance.CreateEmptyUserGoalGrade(courseID, student.SISUserID);
                     //DatabaseManager.Instance.UpdateUserGoalGrade(courseID, student.SISUserID, 7);
+                }
+
+                if (DatabaseManager.Instance.GetConsent(courseID, student.ID.Value) == -1) {
+                    DatabaseManager.Instance.SetConsent(new Models.ConsentData(courseID, student.ID.Value, student.SISUserID, student.Name, -1));
                 }
 
                 DatabaseManager.Instance.RegisterUser(
@@ -50,6 +55,7 @@ namespace IguideME.Web.Services.Workers
                     "student",
                     this.hashCode
                 );
+                } catch (Exception e) {_logger.LogError(e.ToString());}
             }
 
             var instructors = this.canvasTest.GetAdministrators(courseID);

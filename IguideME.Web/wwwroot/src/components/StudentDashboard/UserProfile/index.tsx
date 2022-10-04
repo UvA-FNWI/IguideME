@@ -25,7 +25,7 @@ class UserProfile extends Component<Props, IState> {
   state = {
     notifications: []
   }
-  
+
   componentDidMount(): void {
     this._isMounted = true;
     this.loadNotifications(this.props);
@@ -60,6 +60,7 @@ class UserProfile extends Component<Props, IState> {
   render(): React.ReactNode {
     const { course, student, tiles } = this.props;
     const { notifications }: IState = this.state;
+    void tiles; // discard value
 
     const outperforming = notifications
       .filter(n => n.status === "outperforming peers")

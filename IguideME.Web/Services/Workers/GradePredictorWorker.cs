@@ -1,19 +1,26 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using IguideME.Web.Models;
 using IguideME.Web.Models.App;
 using IguideME.Web.Models.Impl;
+using Microsoft.Extensions.Logging;
 
 namespace IguideME.Web.Services.Workers
 {
-    public class GradePredictorWorker
-    {
-        private int CourseID { get; set; }
+	public class GradePredictorWorker
+	{
+        private readonly ILogger<SyncManager> _logger;
+
+		private int CourseID { get; set; }
 
         private string SyncHash { get; set; }
 
-        private GradePredictionModel Model { get; set; }
+        private List<PredictiveModel> Models { get; set; }
 
-        public GradePredictorWorker(int courseID, string syncHash)
+		public GradePredictorWorker(int courseID, string syncHash, ILogger<SyncManager> logger)
         {
+            _logger = logger;
             this.CourseID = courseID;
             this.SyncHash = syncHash;
             this.Model = DatabaseManager.Instance.GetGradePredictionModel(courseID);
@@ -23,12 +30,13 @@ namespace IguideME.Web.Services.Workers
         {
             if (this.Model == null)
             {
-                Console.WriteLine($"No suitible grade prediction model found for courseID {this.CourseID}");
+                _logger.LogInformation($"No suitible grade prediction model found for courseID {this.CourseID}");
                 return;
             }
 
             var students = DatabaseManager.Instance.GetUsers(this.CourseID, "student", this.SyncHash);
             var tiles = DatabaseManager.Instance.GetTiles(this.CourseID);
+
             var tileEntries = DatabaseManager.Instance.GetEntries(this.CourseID);
 
             foreach (var student in students)

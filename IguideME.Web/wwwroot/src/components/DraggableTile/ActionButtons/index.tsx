@@ -8,6 +8,7 @@ import {Tile} from "../../../models/app/Tile";
 import {TileActions} from "../../../store/actions/tiles";
 import {connect, ConnectedProps} from "react-redux";
 import TileController from "../../../api/controllers/tile";
+import Swal from "sweetalert2";
 
 const mapState = (state: RootState) => ({
   tiles: state.tiles,
@@ -41,7 +42,25 @@ class ActionButtons extends Component<Props, IState> {
         <Menu.Item key="1" icon={<EditOutlined />} onClick={this.props.editTile}>
           Edit
         </Menu.Item>
-        <Menu.Item key="2" icon={<DeleteOutlined />} danger>
+        <Menu.Item key="2" icon={<DeleteOutlined />} onClick={() => {
+            Swal.fire({
+              title: 'Do you really want to delete this tile?',
+              showCancelButton: true,
+              confirmButtonText: 'Delete',
+              confirmButtonColor: 'rgb(255, 110, 90)',
+              showLoaderOnConfirm: true,
+              allowOutsideClick: () => !Swal.isLoading()
+            }).then((result) => {
+              if (result.isConfirmed) {
+                TileController.deleteTile(tile!.id).then(() => {
+                  TileActions.loadGroups().then(() => {
+                    Swal.fire('Task completed!', '', 'success');
+                  });
+                });
+              }
+            })
+          }
+        } danger>
           Delete
         </Menu.Item>
       </Menu>

@@ -28,10 +28,7 @@ import { standardConsent } from "./template";
 import {Alert, Button, message} from "antd";
 import Loading from "../../../utils/Loading";
 import {RootState} from "../../../../store";
-import {ThunkDispatch} from "redux-thunk";
-import {TileActions} from "../../../../store/actions/tiles";
 import {CourseActions} from "../../../../store/actions/course";
-import {UserActions} from "../../../../store/actions/user";
 import {connect, ConnectedProps} from "react-redux";
 import AppController from "../../../../api/controllers/app";
 
@@ -63,7 +60,7 @@ class ConsentEditor extends Component<PropsFromRedux, IState> {
   componentDidMount(): void {
     const { course }: PropsFromRedux = this.props;
 
-    const editorState = course ? (course.text ? course.text : undefined) : undefined;
+    // const editorState = course ? (course.text ? course.text : undefined) : undefined;
 
     setTimeout(() => {
       this.setState({

@@ -26,7 +26,7 @@ export interface TileEntry {
   id: number;
   tile_id: number;
   title: string;
-  type: "ASSIGNMENT" | "DISCUSSION" | "LEARNING_OUTCOME"
+  type: "ASSIGNMENT" | "DISCUSSION" | "LEARNING_OUTCOMES"
 }
 
 export interface TileEntrySubmission {

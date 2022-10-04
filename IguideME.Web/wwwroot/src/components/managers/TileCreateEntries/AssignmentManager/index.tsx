@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import {IProps, IState} from "./types";
 import CreatableSelect from 'react-select/creatable';
-import {message, Space, Table, Switch, Divider, Alert} from "antd";
+import {Space, Table, Switch, Divider, Alert} from "antd";
 import {QuestionOutlined} from "@ant-design/icons";
 import {getColumns} from "./helpers";
 import QuizzesTutorial from "./QuizzesTutorial";

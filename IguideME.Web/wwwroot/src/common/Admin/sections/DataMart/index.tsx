@@ -21,18 +21,34 @@ export default class DataMart extends Component<IProps, IState> {
             this.setState({
                 // sort synchronizations by their start datetime
                 synchronizations: synchronizations.sort((a, b) =>
-                    moment(a.start, 'MMMM Do[,] YYYY [at] LT').isBefore(
-                        moment(b.start, 'MMMM Do[,] YYYY [at] LT')
-                    ) ? 1 : -1),
-                loaded: true
+                    moment(a.start_timestamp, 'MM/DD/YYYY HH:mm:ss').isBefore(
+                        moment(b.start_timestamp, 'MM/DD/YYYY HH:mm:ss')
+                    ) ? 1 : -1
+                    ),
+                loaded: true,
             })
         );
     }
 
     render(): React.ReactNode {
         const { loaded, synchronizations }: IState = this.state;
-        const backendFormat = 'DD/MM/YYYY HH:mm:ss'
-        const timeFormat = 'MMMM Do[,] YYYY [at] LT';
+        const backendFormat = 'MM/DD/YYYY HH:mm:ss'
+        const timeFormat = 'MMMM Do[,] YYYY [at] HH:mm';
+
+        synchronizations.map(function(s, index, arr) {
+            void index; void arr;
+            const start = moment.utc(s.start_timestamp, backendFormat).local()
+            const end = moment.utc(s.end_timestamp, backendFormat).local()
+            s.start_timestamp = start.format(timeFormat);
+            if (end.isBefore(start)) {
+                s.end_timestamp = "";
+                s.duration = "";
+            } else {
+                s.end_timestamp = end.format(timeFormat);
+                s.duration = moment.utc(parseInt(s.duration)*1000).format('HH:mm:ss');
+            }
+        });
+
         const successfulSyncs = loaded ? synchronizations.filter(a => a.status === "COMPLETE") : [];
         const latestSuccessful = successfulSyncs.length > 0 ? successfulSyncs[0] : null;
 
@@ -44,9 +60,9 @@ export default class DataMart extends Component<IProps, IState> {
                         (latestSuccessful ?
                             <p>
                                 The latest successful synchronization took place on
-                <b> {moment.utc(latestSuccessful.start, backendFormat).local().format(timeFormat)} </b>
-                                <small>({moment.utc(latestSuccessful.start, backendFormat).fromNow()})</small>.
-                Synchronizations run automatically at 03:00AM (local university time).
+                <b> {moment.utc(latestSuccessful.start_timestamp, timeFormat).format(timeFormat)} </b>
+                                <small>({moment.utc(latestSuccessful.start_timestamp, backendFormat).fromNow()})</small>.
+                Synchronizations run automatically at 03:00AM (UTC time).
               </p> :
                             <p>No historic synchronizations available.</p>) :
                         <div><Spin /> Retrieving latest synchronization...</div>

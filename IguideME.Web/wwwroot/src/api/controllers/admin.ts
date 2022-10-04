@@ -1,4 +1,3 @@
-import axios from "axios";
 import { debug } from "../../config/config";
 import Controller from "../controller";
 

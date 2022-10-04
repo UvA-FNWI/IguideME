@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import {IProps, IState} from "./types";
-import {Alert, Button, Col, Divider, Row} from "antd";
+import {Button, Divider} from "antd";
 import Column from "./Column";
 import LayoutController from "../../api/controllers/layout";
 import TileController from "../../api/controllers/tile";

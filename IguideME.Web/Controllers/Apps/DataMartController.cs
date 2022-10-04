@@ -48,6 +48,7 @@ namespace IguideME.Web.Controllers
         [ProducesResponseType(StatusCodes.Status202Accepted, Type = typeof(JobCreatedModel))]
         public async Task<IActionResult> BeginComputation([FromBody] JobParametersModel obj)
         {
+            obj.CourseID = this.GetCourseID();
             return Accepted(
                 await _queuedBackgroundService.PostWorkItemAsync(obj).ConfigureAwait(false)
             );
@@ -151,6 +152,7 @@ namespace IguideME.Web.Controllers
                 GetUserName(),
                 (int)JObject.Parse(body)["granted"]
             );
+            logger.LogInformation("Setting consent: " + JObject.Parse(body)["granted"]);
             DatabaseManager.Instance.SetConsent(consent);
             return Json(consent.Granted);
         }
@@ -179,6 +181,18 @@ namespace IguideME.Web.Controllers
 
         [Authorize(Policy = "IsInstructor")]
         [HttpGet]
+        [Route("/Consents")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public ActionResult GetConsents()
+        {
+            return Json(
+                DatabaseManager.Instance.GetConsents(this.GetCourseID())
+                .ToArray());
+        }
+
+        [Authorize(Policy = "IsInstructor")]
+        [HttpGet]
         [Route("/Submissions")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -189,6 +203,19 @@ namespace IguideME.Web.Controllers
                 DatabaseManager.Instance.GetCourseSubmissions(GetCourseID()));
         }
 
+        [Authorize(Policy = "IsInstructor")]
+        [HttpGet]
+        [Route("/goal-grades")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public ActionResult GetGoalGrades()
+        {
+            // returns all goal grades
+            return Json(
+                DatabaseManager.Instance.GetGoalGrades(
+                    this.GetCourseID()));
+        }
+
         [Authorize]
         [HttpGet]
         [Route("/goal-grade")]
@@ -196,7 +223,7 @@ namespace IguideME.Web.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public ActionResult GetGoalGrade()
         {
-            // returns all obtained exam grades for the logged in user
+            // returns the goal grade for the logged in user
             return Json(
                 DatabaseManager.Instance.GetUserGoalGrade(
                     this.GetCourseID(),

@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import Admin from "../../index";
 import {Divider, Space, Switch} from "antd";
 import StudentGradesTable from "../../../../components/StudentGradesTable";
+import StudentConsentTable from "../../../../components/StudentConsentTable";
 
 export default class StudentOverview extends Component {
 
@@ -9,6 +10,7 @@ export default class StudentOverview extends Component {
 
   render(): React.ReactNode {
     const { averaged } = this.state;
+    console.log("Studentoverview");
     return (
       <Admin menuKey={"studentOverview"}>
         <h1>Student Overview</h1>
@@ -22,6 +24,10 @@ export default class StudentOverview extends Component {
           </div>
 
           <StudentGradesTable averaged={averaged} />
+        </Space>
+
+        <Space direction={"vertical"} style={{ width: '100%' }}>
+          <StudentConsentTable />
         </Space>
       </Admin>
     )

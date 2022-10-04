@@ -62,7 +62,7 @@ export default class SyncManager extends Component<IProps, IState> {
             //export const MOCK_DATAMART_STATUS = MOCK_DATAMART_STATUS_BUSY;
             await DataMartController.getStatus().then(data => {
                 const keys = Object.keys(data);
-                const current = keys.find(k => data[k].progressInformation != SyncProvider.DONE);
+                const current = keys.find(k => data[k].progressInformation !== SyncProvider.DONE);
 
                 if (!current) {
                     this.setState({ start: undefined });

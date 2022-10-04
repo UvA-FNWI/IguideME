@@ -2,11 +2,9 @@ import React, { Component } from "react";
 import {IProps, IState} from "./types";
 import {Table, Drawer} from "antd";
 import {formatData, getColumns} from "./helpers";
-import TileController from "../../../../api/controllers/tile";
-import {TileEntry, TileEntrySubmission} from "../../../../models/app/Tile";
+import {TileEntry} from "../../../../models/app/Tile";
 import "./style.scss";
 import DataViewer from "./DataViewer";
-import StudentController from "../../../../api/controllers/student";
 
 export default class HistoricUploads extends Component<IProps, IState> {
 
