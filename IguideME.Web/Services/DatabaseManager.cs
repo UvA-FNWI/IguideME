@@ -174,12 +174,13 @@ namespace IguideME.Web.Services
                     )
                 );
                 NonQuery(
-                    String.Format(
-                        @"DELETE
-                        FROM `consent`
-                        WHERE `course_id` = {0}
-                        AND `granted` = -1;", courseID
-                    )
+                    @"DELETE FROM `consent`
+                      WHERE EXISTS (
+                      SELECT 1 FROM `consent` p2
+                      WHERE consent.user_id = p2.user_id
+                      AND consent.granted = p2.granted
+                      AND consent.id > p2.id
+                    );"
                 );
                 SQLiteDataReader r = Query("SELECT user_id, course_id, id FROM `consent`;");
                 string tmp = "";
