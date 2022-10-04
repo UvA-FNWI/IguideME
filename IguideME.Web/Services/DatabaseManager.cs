@@ -173,27 +173,6 @@ namespace IguideME.Web.Services
                         DatabaseQueries.CLEANUP_SYNC, courseID, status
                     )
                 );
-                NonQuery(
-                    @"DELETE FROM `consent`
-                      WHERE EXISTS (
-                      SELECT 1 FROM `consent` p2
-                      WHERE consent.user_id = p2.user_id
-                      AND consent.granted = p2.granted
-                      AND consent.id > p2.id
-                    );"
-                );
-                SQLiteDataReader r = Query("SELECT user_id, course_id, id FROM `consent`;");
-                string tmp = "";
-                while (r.Read()){
-                    tmp = tmp + r.GetValue(1).ToString() + ": " + r.GetValue(0).ToString() + " " + r.GetValue(2).ToString() + "\n";
-                }
-                _logger.LogInformation(tmp);
-                NonQuery(
-                    String.Format(
-                        @"CREATE UNIQUE INDEX unique_user_id ON `consent`(user_id, course_id)
-                        ;"
-                    )
-                );
             } catch (Exception e) {
                 _logger.LogError(e.ToString());
             }

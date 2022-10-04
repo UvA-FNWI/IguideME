@@ -1052,7 +1052,7 @@ public static class DatabaseQueries
                             `user_name`,
                             `granted`   )
             VALUES({0}, {1}, '{2}', '{3}', {4})
-            ON CONFLICT (   `user_id`   )
+            ON CONFLICT (   `user_id`, course_id   )
             DO UPDATE SET `granted` = {4}
         ;";
 

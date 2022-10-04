@@ -97,7 +97,7 @@ namespace IguideME.Web.Services
 					}
 					catch (Exception e)
 					{
-						_logger.LogInformation(e.StackTrace);
+						_logger.LogError(e.StackTrace);
 					}
 				}
 			}
