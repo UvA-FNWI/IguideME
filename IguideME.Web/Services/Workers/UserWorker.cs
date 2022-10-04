@@ -33,6 +33,7 @@ namespace IguideME.Web.Services.Workers
             foreach (var student in students)
             {
                 _logger.LogInformation("Processing student " + student.ID.ToString() + "...");
+                try {
 
                 if (DatabaseManager.Instance.GetUserGoalGrade(courseID, student.SISUserID) < 0)
                 {
@@ -54,6 +55,7 @@ namespace IguideME.Web.Services.Workers
                     "student",
                     this.hashCode
                 );
+                } catch (Exception e) {_logger.LogError(e.ToString());}
             }
 
             var instructors = this.canvasTest.GetAdministrators(courseID);

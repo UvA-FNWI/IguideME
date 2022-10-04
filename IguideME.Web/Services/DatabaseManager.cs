@@ -167,11 +167,29 @@ namespace IguideME.Web.Services
 
         public void CleanupSync(int courseID, string status) {
             _logger.LogInformation("Starting cleanup of sync hystory " + courseID);
-            NonQuery(
-                String.Format(
-                    DatabaseQueries.CLEANUP_SYNC, courseID, status
-                )
-            );
+            try {
+                NonQuery(
+                    String.Format(
+                        DatabaseQueries.CLEANUP_SYNC, courseID, status
+                    )
+                );
+                NonQuery(
+                    String.Format(
+                        @"DELETE
+                        FROM `consent`
+                        WHERE `course_id` = {0}
+                        AND `granted` = -1;", courseID
+                    )
+                );
+                NonQuery(
+                    String.Format(
+                        @"CREATE UNIQUE INDEX unique_user_id ON `consent`(user_id)
+                        ;"
+                    )
+                );
+            } catch (Exception e) {
+                _logger.LogError(e.ToString());
+            }
         }
 
         public void RegisterSync(
@@ -1940,21 +1958,10 @@ namespace IguideME.Web.Services
 
         public void SetConsent(ConsentData data)
         {
-            if (GetConsent(data.CourseID, data.UserLoginID) == -1)
-            {
-                NonQuery(String.Format(
-                    "INSERT INTO consent (`course_id`, `user_id`, `user_login_id`, `user_name`, `granted`) VALUES('{0}', '{1}', '{2}', '{3}', '{4}');",
-                    data.CourseID, data.UserID, data.UserLoginID, data.UserName.Replace("'", ""), data.Granted
-                ));
-            }
-            else
-            {
-                NonQuery(String.Format(
-                    "UPDATE consent SET `granted` = {0} WHERE `course_id` = {1} AND `user_id` = {2};",
-                    data.Granted, data.CourseID, data.UserID
-                ));
-            }
-
+            NonQuery(String.Format(
+                DatabaseQueries.SETUSERCONSENT,
+                data.CourseID, data.UserID, data.UserLoginID, data.UserName.Replace("'", ""), data.Granted
+            ));
         }
 
         public int GetConsent(int CourseID, int UserID)

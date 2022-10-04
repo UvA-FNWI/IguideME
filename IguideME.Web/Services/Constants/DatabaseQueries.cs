@@ -1044,6 +1044,18 @@ public static class DatabaseQueries
             AND     `tile`.`tile_type`='EXTERNAL_DATA'
           );";
 
+    public const string SETUSERCONSENT =
+        @"  INSERT INTO `consent`
+                        (   `course_id`,
+                            `user_id`,
+                            `user_login_id`,
+                            `user_name`,
+                            `granted`   )
+            VALUES({0}, {1}, '{2}', '{3}', {4})
+            ON CONFLICT (   `user_id`   )
+            DO UPDATE SET `granted` = {4}
+        ;";
+
     public const string CREATE_SUBMISSION_META =
         @"INSERT INTO   `tile_entry_submission_meta`
                         (   `submission_id`,
