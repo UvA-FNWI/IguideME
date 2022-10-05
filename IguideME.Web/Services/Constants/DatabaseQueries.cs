@@ -84,7 +84,8 @@ public static class DatabaseQueries
             user_id         INTEGER,
             user_login_id   STRING,
             user_name       STRING,
-            granted         INTEGER
+            granted         INTEGER,
+            UNIQUE(course_id, user_id)
         );";
 
     /**
