@@ -165,6 +165,21 @@ namespace IguideME.Web.Services
                 courseName));
         }
 
+        public List<int> GetCourseIds()
+        {
+            List<int> course_ids = new List<int>();
+            try {
+                SQLiteDataReader r = Query(DatabaseQueries.QUERY_COURSE_IDS);
+                while (r.Read()) {
+                    course_ids.Add(r.GetInt32(0));
+                }
+
+            } catch (Exception e) {
+                _logger.LogError(e.Message);
+            }
+            return course_ids;
+        }
+
         public void CleanupSync(int courseID, string status) {
             _logger.LogInformation("Starting cleanup of sync hystory " + courseID);
             try {

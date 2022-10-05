@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Threading;
@@ -43,23 +44,26 @@ namespace IguideME.Web.Services
         {
             var count = Interlocked.Increment(ref executionCount);
 
-            // check every minute if it's 3:00AM
+            // check every half hour if it's 3:00AM
             var now = DateTime.UtcNow;
             Console.WriteLine("Time is {0}", now.ToString());
 
-            if (now.Hour == 3 && now.Minute <= 30)
+            if (DatabaseManager.Instance != null && now.Hour == 3 && now.Minute <= 30)
             {
                 var sync = new CanvasSyncService(
                     this.computationJobStatus,
                     this.canvasTest,
-                _logger);
+                    _logger
+                );
 
-                // TODO: fix hard code, somehow get and store courseID on the system after received from web.
-                JobParametersModel parameters = new JobParametersModel();
-                parameters.CourseID = 32173;
+                List<int> course_ids = DatabaseManager.Instance.GetCourseIds();
 
-                await this.queuedBackgroundService.PostWorkItemAsync(parameters).ConfigureAwait(false);
-                _logger.LogInformation("Execute");
+                foreach (int id in course_ids) {
+                    JobParametersModel parameters = new JobParametersModel();
+                    parameters.CourseID = id;
+                    await this.queuedBackgroundService.PostWorkItemAsync(parameters).ConfigureAwait(false);
+                    _logger.LogInformation("Execute");
+                }
             }
         }
 

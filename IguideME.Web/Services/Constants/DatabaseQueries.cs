@@ -56,6 +56,11 @@ public static class DatabaseQueries
         @"INSERT INTO   `course_settings` (`course_id`, `course_name`, `personalized_peers`, `peer_group_size`)
         VALUES ({0}, '{1}', 0, 5);";
 
+    public const string QUERY_COURSE_IDS =
+        @"SELECT `course_id` FROM `course_settings`;";
+
+
+
     // -------------------- User preferences --------------------
 
     /**
