@@ -702,7 +702,6 @@ namespace IguideME.Web.Services
             string query = String.Format(
                 DatabaseQueries.QUERY_COURSE_SUBMISSIONS_FOR_STUDENT,
                 courseID,
-                userLoginID,
                 activeHash);
 
             try {
@@ -1551,22 +1550,6 @@ namespace IguideME.Web.Services
                     );
                     tiles.Add(row);
                 }
-                catch (Exception e) {
-                    _logger.LogError("GetTiles\nRequested types:\n" +
-                        r.GetName(0) + ": " + r.GetDataTypeName(0) + r.GetValue(0).ToString() + "\n" +
-                        r.GetName(1) + ": " + r.GetDataTypeName(1) + r.GetValue(1).ToString() + "\n" +
-                        r.GetName(2) + ": " + r.GetDataTypeName(2) + r.GetValue(2).ToString() + "\n" +
-                        r.GetName(3) + ": " + r.GetDataTypeName(3) + r.GetValue(3).ToString() + "\n" +
-                        r.GetName(4) + ": " + r.GetDataTypeName(4) + r.GetValue(4).ToString() + "\n" +
-                        r.GetName(5) + ": " + r.GetDataTypeName(5) + r.GetValue(5).ToString() + "\n" +
-                        r.GetName(6) + ": " + r.GetDataTypeName(6) + r.GetValue(6).ToString() + "\n" +
-                        r.GetName(7) + ": " + r.GetDataTypeName(7) + r.GetValue(7).ToString() + "\n" +
-                        r.GetName(8) + ": " + r.GetDataTypeName(8) + r.GetValue(8).ToString() + "\n" +
-                        r.GetName(9) + ": " + r.GetDataTypeName(9) + r.GetValue(9).ToString() + "\n\n" +
-                        e.ToString()
-                    );
-                }
-            }
                 catch (Exception e) {
                     _logger.LogError("GetTiles\nRequested types:\n" +
                         r.GetName(0) + ": " + r.GetDataTypeName(0) + r.GetValue(0).ToString() + "\n" +

@@ -16,7 +16,7 @@ namespace IguideME.Web.Services.Workers
 
         private string SyncHash { get; set; }
 
-        private List<PredictiveModel> Models { get; set; }
+        private GradePredictionModel Model { get; set; }
 
 		public GradePredictorWorker(int courseID, string syncHash, ILogger<SyncManager> logger)
         {
