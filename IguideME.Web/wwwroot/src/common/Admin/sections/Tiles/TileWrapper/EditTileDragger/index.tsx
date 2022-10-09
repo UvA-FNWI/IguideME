@@ -56,7 +56,6 @@ class EditTileDragger extends Component<Props, IState> {
         });
       }
     } else if (nextProps.tile === undefined) {
-      console.log("tile undefined")
       this.setState({
         title: "",
         contentType: { label: undefined, value: undefined },
@@ -68,8 +67,6 @@ class EditTileDragger extends Component<Props, IState> {
   }
 
   componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<{}>, snapshot?: any): void {
-    console.log("Update, prev", prevProps)
-    console.log("Update, curr", this.props)
     if (!prevProps.isOpen && this.props.isOpen) {
       window.scrollTo(0, 0);
     }
@@ -128,17 +125,25 @@ class EditTileDragger extends Component<Props, IState> {
 
     TileController.updateTile(tileRef).then(patchedTile => {
       this.setState({ updating: true }, async () => {
-        if (['ASSIGNMENTS', 'DISCUSSIONS'].includes(tile!.type || "")) {
+        var removedEntries = tileEntries.filter(
+          e => e.tile_id === ( tile ? tile.id : -1 )
+        ).filter(
+          e => !entries.map(_e => _e.title).includes(e.title));
 
-          const removedEntries = tileEntries.filter(
+        var newEntries = entries.filter(e => e.id === -1);
+
+        if (tile!.type === 'ASSIGNMENTS' || tile!.type === 'DISCUSSIONS' ) {
+
+
+          removedEntries = tileEntries.filter(
             e => e.tile_id === patchedTile.id
           ).filter(
             e => !entries.map(_e => _e.title).includes(e.title));
-          const newEntries = entries.filter(e => e.id === -1);
 
-          await this.deleteEntries(removedEntries);
-          await this.createEntries(newEntries);
-        } else if (tile!.content === "LEARNING_OUTCOMES") {
+          newEntries = entries.filter(e => e.id === -1);
+
+        }
+        else if (tile!.content === "LEARNING_OUTCOMES") {
           const removedGoals = goals.filter(
             g => g.tile_id === patchedTile.id
           ).filter(
@@ -148,26 +153,6 @@ class EditTileDragger extends Component<Props, IState> {
           await this.deleteGoals(removedGoals);
           await this.createGoals(newGoals);
         }
-
-        this.props.loadTiles().then(() => {
-          this.props.loadEntries().then(() => {
-            this.props.loadTileGoals().then(() => {
-              this.setState({ updating: false }, () => {
-                this.props.setOpen(false);
-              });
-            });
-          });
-        });
-      });
-
-
-      this.setState({ updating: true }, async () => {
-        const removedEntries = tileEntries.filter(
-          e => e.tile_id === ( tile ? tile.id : -1 )
-        ).filter(
-          e => !entries.map(_e => _e.title).includes(e.title));
-
-        const newEntries = entries.filter(e => e.id === -1);
 
         await this.deleteEntries(removedEntries);
         await this.createEntries(newEntries);
@@ -212,9 +197,6 @@ class EditTileDragger extends Component<Props, IState> {
   render(): React.ReactNode {
     const { tileGroup, tiles, tile } = this.props;
     const { title, contentType, tileType, visible }: IState = this.state;
-
-    console.log("tile", tile);
-    console.log("tiles", tiles);
 
     return (
       <Drawer

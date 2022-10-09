@@ -218,6 +218,7 @@ export default class TileController extends Controller {
     ).then(response => response.data);
   }
 
+  // TODO: wth is going on with case 3 (and 9)?
   static getPeerResults(studentLoginId: string): Promise<{ min: number, max: number, avg: number, tileID: number }[]> {
     if (debug()) {
       return this.getTiles().then(tiles => {

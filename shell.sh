@@ -9,7 +9,7 @@ if [ ! -d $PWD/IguideME.Web/wwwroot/node_modules ]; then
   cd $PWD || exit;
 fi
 
-KUBECTL_PROJ_ID=$(kubectl get pods -n iguideme | grep Running | awk '{print $1}')
+#KUBECTL_PROJ_ID=$(kubectl get pods -n iguideme | grep Running | awk '{print $1}')
 
 alias build-frontend-watch='yarn --cwd $PROJECT_ROOT/IguideME.Web/wwwroot/ start';
 alias build-frontend-prod='yarn --cwd $PROJECT_ROOT/IguideME.Web/wwwroot/ build';
@@ -43,7 +43,7 @@ display_help () {
 }
 
 # clear screen
-printf "\033c"
+# printf "\033c"
 
 cat << EOF
 IIIII                 iii      dd        MM    MM EEEEEEE

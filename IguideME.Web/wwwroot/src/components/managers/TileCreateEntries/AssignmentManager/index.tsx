@@ -21,25 +21,12 @@ export default class AssignmentManager extends Component<Props, IState> {
     const { canvasAssignments, tile }: Props = this.props;
     const assignment = canvasAssignments.find(a => a.name === name);
 
-    if (!assignment) {
-      // register non-existing assignment
-      const entry: TileEntry = {
-        id: -1,
-        tile_id: tile ? tile.id : -1,
-        title: name,
-        type: "ASSIGNMENT"
-      }
-
-      this.props.addEntry(entry);
-      return;
-    }
-
     const entry: TileEntry = {
       id: -1,
       tile_id: tile ? tile.id : -1,
-      title: assignment.name,
+      title: !assignment ? name : assignment.name,
       type: "ASSIGNMENT"
-    }
+    };
 
     this.props.addEntry(entry);
   }

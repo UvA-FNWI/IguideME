@@ -35,6 +35,7 @@ namespace IguideME.Web.Services.Workers
                 _logger.LogInformation("Processing student " + student.ID.ToString() + "...");
                 try {
 
+                // TODO: This is currently creating duplicate entries when grade is null
                 if (DatabaseManager.Instance.GetUserGoalGrade(courseID, student.SISUserID) < 0)
                 {
                     DatabaseManager.Instance.CreateEmptyUserGoalGrade(courseID, student.SISUserID);

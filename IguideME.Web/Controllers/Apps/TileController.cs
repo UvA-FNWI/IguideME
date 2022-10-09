@@ -299,16 +299,16 @@ namespace IguideME.Web.Controllers
                     tile.GroupID = (int) obj.GroupID;
 
                 if (obj.Title != null)
-                    tile.Title = (string)obj.Title;
+                    tile.Title = (string) obj.Title;
 
                 if (obj.Notifications != null)
-                    tile.Notifications = (bool)obj.Notifications;
+                    tile.Notifications = (bool) obj.Notifications;
 
                 if (obj.Visible != null)
-                    tile.Visible = (bool)obj.Visible;
+                    tile.Visible = (bool) obj.Visible;
 
                 if (obj.Position != null)
-                    tile.Position = (int)obj.Position;
+                    tile.Position = (int) obj.Position;
 
                 if (obj.GraphView != null)
                     tile.GraphView = (bool) obj.GraphView;
@@ -319,7 +319,7 @@ namespace IguideME.Web.Controllers
                 DatabaseManager.Instance.UpdateTile(GetCourseID(), tile);
 
                 return Json(
-                    DatabaseManager.Instance.GetTile(GetCourseID(), Int32.Parse(tileID))
+                    DatabaseManager.Instance.GetTile(GetCourseID(), id)
                 );
             }
             return BadRequest();

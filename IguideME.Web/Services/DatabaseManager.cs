@@ -81,12 +81,13 @@ namespace IguideME.Web.Services
             }
 
             //NonQuery("DELETE FROM tile WHERE id=10;");
-            NonQuery("DELETE FROM learning_goal;");
-            NonQuery("DELETE FROM predictive_model;");
-            NonQuery("DELETE FROM predicted_grade;");
-            NonQuery("DELETE FROM model_theta;");
-            NonQuery("DELETE FROM goal_requirement;");
-            NonQuery("DELETE FROM tile WHERE id=12;");
+            // TODO: what are these for?
+            // NonQuery("DELETE FROM learning_goal;");
+            // NonQuery("DELETE FROM predictive_model;");
+            // NonQuery("DELETE FROM predicted_grade;");
+            // NonQuery("DELETE FROM model_theta;");
+            // NonQuery("DELETE FROM goal_requirement;");
+            // NonQuery("DELETE FROM tile WHERE id=12;");
         }
 
         private void RunMigrations()
@@ -103,6 +104,15 @@ namespace IguideME.Web.Services
                 NonQuery(migration_sql);
                 NonQuery(String.Format(DatabaseQueries.CREATE_MIGRATION, migration_id));
             }
+        }
+
+        private void PrintQueryError(string title, int rows, SQLiteDataReader r, Exception e) {
+            string error = $"{title}\nRequested:\nColumn | Name | Value | Type\n";
+
+            for (int i = 0; i <= rows; i++)
+                error += $"{r.GetName(i)} {r.GetDataTypeName(i)} {r.GetValue(i).ToString()} {r.GetValue(i).GetType()}\n";
+
+            _logger.LogError( error + e.ToString() + e.StackTrace);
         }
 
         private int NonQuery(string query)
@@ -168,14 +178,14 @@ namespace IguideME.Web.Services
         public List<int> GetCourseIds()
         {
             List<int> course_ids = new List<int>();
+            SQLiteDataReader r = Query(DatabaseQueries.QUERY_COURSE_IDS);
             try {
-                SQLiteDataReader r = Query(DatabaseQueries.QUERY_COURSE_IDS);
                 while (r.Read()) {
                     course_ids.Add(r.GetInt32(0));
                 }
 
             } catch (Exception e) {
-                _logger.LogError(e.Message);
+                PrintQueryError("GetCourseIds", 0, r, e);
             }
             return course_ids;
         }
@@ -189,7 +199,7 @@ namespace IguideME.Web.Services
                     )
                 );
             } catch (Exception e) {
-                _logger.LogError(e.ToString());
+                _logger.LogError(e.ToString() + "\n" + e.StackTrace);
             }
         }
 
@@ -237,15 +247,7 @@ namespace IguideME.Web.Services
                         r.GetValue(4).ToString(),
                         r.GetValue(5).ToString()));
                 } catch (Exception e) {
-                    _logger.LogError("GetSyncHashes\nRequested types:\n" +
-                        r.GetName(0) + ": " + r.GetDataTypeName(0) + r.GetValue(0).ToString() + r.GetValue(0).GetType() + "\n" +
-                        r.GetName(1) + ": " + r.GetDataTypeName(1) + r.GetValue(1).ToString() + r.GetValue(1).GetType() + "\n" +
-                        r.GetName(2) + ": " + r.GetDataTypeName(2) + r.GetValue(2).ToString() + r.GetValue(2).GetType() + "\n" +
-                        r.GetName(3) + ": " + r.GetDataTypeName(3) + r.GetValue(3).ToString() + r.GetValue(3).GetType() + "\n" +
-                        r.GetName(4) + ": " + r.GetDataTypeName(4) + r.GetValue(4).ToString() + r.GetValue(4).GetType() + "\n" +
-                        r.GetName(5) + ": " + r.GetDataTypeName(5) + r.GetValue(5).ToString() + r.GetValue(5).GetType() + "\n\n" +
-                        e.ToString()
-                    );
+                    PrintQueryError("GetSyncHashes", 5, r, e);
                 }
 
             return hashes;
@@ -578,46 +580,39 @@ namespace IguideME.Web.Services
                 loginID);
 
             SQLiteDataReader r = Query(query);
-            if (!r.Read()) return -1;
-            else
+            if (r.Read())
             {
                 try{
                     return Convert.ToInt32(r.GetValue(0).ToString());
                 }
                 catch (Exception e) {
-                    _logger.LogError("GetUserGoalGrade\nRequested types:\n" +
-                        r.GetName(0) + ": " + r.GetDataTypeName(0) + "\n\n" +
-                        e.ToString()
-                    );
-                    return -1;
+                    PrintQueryError("GetUserGoalGrade", 0, r, e);
                 }
             }
+            return -1;
         }
 
         public GoalData[] GetGoalGrades(int courseID)
         {
-            try
+            string query = String.Format(
+                "SELECT `grade`, `user_login_id` from `goal_grade` WHERE `course_id`={0}",
+                courseID);
+
+            SQLiteDataReader r = Query(query);
+            List<GoalData> goals = new List<GoalData>();
+
+            while (r.Read())
             {
-                string query = String.Format(
-                    "SELECT `grade`, `user_login_id` from `goal_grade` WHERE `course_id`={0}",
-                    courseID);
-
-                SQLiteDataReader r = Query(query);
-                List<GoalData> goals = new List<GoalData>();
-
-                while (r.Read())
+                try
                 {
                     int grade = r.GetValue(0).GetType() != typeof(DBNull) ? (r.GetInt32(0)) : 0;
                     goals.Add(new GoalData(courseID, grade, r.GetValue(1).ToString()));
+                } catch (Exception e)
+                {
+                    PrintQueryError("GetGoalGrades", 0, r, e);
                 }
-
-                return goals.ToArray();
             }
-            catch (Exception e)
-            {
-                _logger.LogError(e.ToString());
-                return new GoalData[0] { };
-            }
+            return goals.ToArray();
         }
 
         public void CreateUserPeer(
@@ -755,14 +750,7 @@ namespace IguideME.Web.Services
                         submissions.Add(submission);
                     }
                     catch (Exception e) {
-                        _logger.LogError("GetCourseSubmissions\nRequested types:\n" +
-                            r.GetName(0) + ": " + r.GetDataTypeName(0) + r.GetValue(0).ToString() + r.GetValue(0).GetType() + "\n" +
-                            r.GetName(1) + ": " + r.GetDataTypeName(1) + r.GetValue(1).ToString() + r.GetValue(1).GetType() + "\n" +
-                            r.GetName(2) + ": " + r.GetDataTypeName(2) + r.GetValue(2).ToString() + r.GetValue(2).GetType() + "\n" +
-                            r.GetName(3) + ": " + r.GetDataTypeName(3) + r.GetValue(3).ToString() + r.GetValue(3).GetType() + "\n" +
-                            r.GetName(4) + ": " + r.GetDataTypeName(4) + r.GetValue(4).ToString() + r.GetValue(4).GetType() + "\n\n" +
-                            e.ToString()
-                        );
+                        PrintQueryError("GetCourseSubmissions", 4, r, e);
                     }
                 }
 
@@ -1384,13 +1372,7 @@ namespace IguideME.Web.Services
                     r.GetValue(3).ToString()
                 ));
                 } catch (Exception e) {
-                    _logger.LogError("GetEntries\nRequested types:\n" +
-                        r.GetName(0) + ": " + r.GetDataTypeName(0) + r.GetValue(0).ToString() + "\n" +
-                        r.GetName(1) + ": " + r.GetDataTypeName(1) + r.GetValue(1).ToString() + "\n" +
-                        r.GetName(2) + ": " + r.GetDataTypeName(2) + r.GetValue(2).ToString() + "\n" +
-                        r.GetName(3) + ": " + r.GetDataTypeName(3) + r.GetValue(3).ToString() + "\n\n" +
-                        e.ToString()
-                    );
+                    PrintQueryError("GetEntries", 3, r, e);
                 }
             }
 
@@ -1500,7 +1482,7 @@ namespace IguideME.Web.Services
             return meta;
         }
 
-        public Tile UpdateTile(int courseID, Tile newTile)
+        public void UpdateTile(int courseID, Tile newTile)
         {
             string query = String.Format(
                     DatabaseQueries.UPDATE_TILE,
@@ -1517,8 +1499,6 @@ namespace IguideME.Web.Services
             );
 
             NonQuery(query);
-
-            return this.GetTile(courseID, newTile.ID);
         }
 
         public List<Tile> GetTiles(int courseID, bool autoLoadEntries = false)
@@ -1551,19 +1531,7 @@ namespace IguideME.Web.Services
                     tiles.Add(row);
                 }
                 catch (Exception e) {
-                    _logger.LogError("GetTiles\nRequested types:\n" +
-                        r.GetName(0) + ": " + r.GetDataTypeName(0) + r.GetValue(0).ToString() + "\n" +
-                        r.GetName(1) + ": " + r.GetDataTypeName(1) + r.GetValue(1).ToString() + "\n" +
-                        r.GetName(2) + ": " + r.GetDataTypeName(2) + r.GetValue(2).ToString() + "\n" +
-                        r.GetName(3) + ": " + r.GetDataTypeName(3) + r.GetValue(3).ToString() + "\n" +
-                        r.GetName(4) + ": " + r.GetDataTypeName(4) + r.GetValue(4).ToString() + "\n" +
-                        r.GetName(5) + ": " + r.GetDataTypeName(5) + r.GetValue(5).ToString() + "\n" +
-                        r.GetName(6) + ": " + r.GetDataTypeName(6) + r.GetValue(6).ToString() + "\n" +
-                        r.GetName(7) + ": " + r.GetDataTypeName(7) + r.GetValue(7).ToString() + "\n" +
-                        r.GetName(8) + ": " + r.GetDataTypeName(8) + r.GetValue(8).ToString() + "\n" +
-                        r.GetName(9) + ": " + r.GetDataTypeName(9) + r.GetValue(9).ToString() + "\n\n" +
-                        e.ToString()
-                    );
+                    PrintQueryError("GetTiles", 9, r, e);
                 }
             }
 
@@ -1630,13 +1598,7 @@ namespace IguideME.Web.Services
                 );
                 tileGroups.Add(row);
                 } catch (Exception e) {
-                    _logger.LogError("GetLayoutTileGroups\nRequested types:\n" +
-                        r.GetName(0) + ": " + r.GetDataTypeName(0) + r.GetValue(0).ToString() + "\n" +
-                        r.GetName(1) + ": " + r.GetDataTypeName(1) + r.GetValue(1).ToString() + "\n" +
-                        r.GetName(2) + ": " + r.GetDataTypeName(2) + r.GetValue(2).ToString() + "\n" +
-                        r.GetName(3) + ": " + r.GetDataTypeName(3) + r.GetValue(3).ToString() + "\n\n" +
-                        e.ToString()
-                    );
+                    PrintQueryError("GetLayoutTileGroups", 3, r, e);
                 }
             }
 
@@ -1791,12 +1753,7 @@ namespace IguideME.Web.Services
                     );
                     columns.Add(row);
                 } catch (Exception e) {
-                    _logger.LogError("GetLayoutColumns\nRequested types:\n" +
-                        r.GetName(0) + ": " + r.GetDataTypeName(0) + r.GetValue(0).ToString() + "\n" +
-                        r.GetName(1) + ": " + r.GetDataTypeName(1) + r.GetValue(1).ToString() + "\n" +
-                        r.GetName(2) + ": " + r.GetDataTypeName(2) + r.GetValue(2).ToString() + "\n\n" +
-                        e.ToString()
-                    );
+                    PrintQueryError("GetLayoutColumns", 2, r, e);
                 }
             }
 

@@ -78,8 +78,8 @@ namespace IguideME.Web.Models.Impl
 
             /**
              * When identifying peers we adhere to the simple principle that
-             * a peer group must have a minimal size and the group is 
-             * populated with students whom have the most similar goal 
+             * a peer group must have a minimal size and the group is
+             * populated with students whom have the most similar goal
              * grade. If there are too few students with the same grade goal
              * as the student, students with a higher peer grade will be sought
              * first, then students with a lower grade goal until the group size
@@ -100,9 +100,9 @@ namespace IguideME.Web.Models.Impl
 
             while (peers.Count < minPeerGroupSize)
             {
-                if (offset > 9 || (int)grade + offset > 10) break;
+                if (offset > 9 || (int) grade + offset > 10 || (int) grade - offset < 1) break;
 
-                // Keep filling the peer group with more distant peers 
+                // Keep filling the peer group with more distant peers
                 var requiredPeers = minPeerGroupSize - peers.Count;
 
                 // Check upwards peers
