@@ -150,6 +150,9 @@ class EditTileDragger extends Component<Props, IState> {
             g => !goals.map(_g => _g.title).includes(g.title));
           const newGoals = goals.filter(g => g.new === true);
 
+          console.log(removedGoals);
+          console.log(newGoals);
+
           await this.deleteGoals(removedGoals);
           await this.createGoals(newGoals);
         }

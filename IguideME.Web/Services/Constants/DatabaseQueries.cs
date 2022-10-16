@@ -170,7 +170,8 @@ public static class DatabaseQueries
 
     public const string REGISTER_USER_GOAL_GRADE =
         @"INSERT INTO   `goal_grade` (`course_id`, `user_login_id`)
-          VALUES        ({0}, '{1}');";
+          VALUES        ({0}, '{1}')
+          ON CONFLICT   (`course_id`, `user_login_id` ) DO NOTHING;";
 
     public const string REGISTER_USER_PEER =
         @"INSERT INTO   `peer_group` (  `course_id`,
@@ -1060,6 +1061,17 @@ public static class DatabaseQueries
             VALUES({0}, {1}, '{2}', '{3}', {4})
             ON CONFLICT (   `user_id`, course_id   )
             DO UPDATE SET `granted` = {4}
+        ;";
+    public const string REGISTER_USER_CONSENT =
+        @"  INSERT INTO `consent`
+                        (   `course_id`,
+                            `user_id`,
+                            `user_login_id`,
+                            `user_name`,
+                            `granted`   )
+            VALUES({0}, {1}, '{2}', '{3}', -1)
+            ON CONFLICT (   `user_id`, course_id   )
+            DO NOTHING
         ;";
 
     public const string CREATE_SUBMISSION_META =

@@ -42,6 +42,7 @@ namespace IguideME.Web.Services
 
         private void CreateTables()
         {
+
             SQLiteCommand command;
 
             // collection of all table creation queries
@@ -88,6 +89,23 @@ namespace IguideME.Web.Services
             // NonQuery("DELETE FROM model_theta;");
             // NonQuery("DELETE FROM goal_requirement;");
             // NonQuery("DELETE FROM tile WHERE id=12;");
+            NonQuery(@"DELETE FROM goal_grade
+                    WHERE EXISTS (
+                    SELECT 1 FROM goal_grade p2
+                    WHERE goal_grade.course_id = p2.course_id
+                    AND goal_grade.user_login_id = p2.user_login_id
+                    AND goal_grade.rowid > p2.rowid
+                    );");
+            try {
+                NonQuery(
+                        String.Format(
+                            @"CREATE UNIQUE INDEX unique_goal_grade ON `goal_grade`(course_id, user_login_id)
+                            ;"
+                        )
+                    );
+            } catch (Exception e) {
+                Console.WriteLine($"{e.Message}\n{e.StackTrace}");
+            }
         }
 
         private void RunMigrations()
@@ -191,7 +209,7 @@ namespace IguideME.Web.Services
         }
 
         public void CleanupSync(int courseID, string status) {
-            _logger.LogInformation("Starting cleanup of sync hystory " + courseID);
+            _logger.LogInformation("Starting cleanup of sync hystory ");
             try {
                 NonQuery(
                     String.Format(
@@ -554,7 +572,7 @@ namespace IguideME.Web.Services
                 ));
         }
 
-        public void CreateEmptyUserGoalGrade(int courseID, string loginID)
+        public void RegisterUserGoalGrade(int courseID, string loginID)
         {
             NonQuery(
                 String.Format(
@@ -1918,6 +1936,14 @@ namespace IguideME.Web.Services
         {
             NonQuery(String.Format(
                 DatabaseQueries.SETUSERCONSENT,
+                data.CourseID, data.UserID, data.UserLoginID, data.UserName.Replace("'", ""), data.Granted
+            ));
+        }
+
+        public void RegisterConsent(ConsentData data)
+        {
+            NonQuery(String.Format(
+                DatabaseQueries.REGISTER_USER_CONSENT,
                 data.CourseID, data.UserID, data.UserLoginID, data.UserName.Replace("'", ""), data.Granted
             ));
         }

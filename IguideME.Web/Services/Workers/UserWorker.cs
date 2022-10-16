@@ -36,15 +36,8 @@ namespace IguideME.Web.Services.Workers
                 try {
 
                 // TODO: This is currently creating duplicate entries when grade is null
-                if (DatabaseManager.Instance.GetUserGoalGrade(courseID, student.SISUserID) < 0)
-                {
-                    DatabaseManager.Instance.CreateEmptyUserGoalGrade(courseID, student.SISUserID);
-                    //DatabaseManager.Instance.UpdateUserGoalGrade(courseID, student.SISUserID, 7);
-                }
-
-                if (DatabaseManager.Instance.GetConsent(courseID, student.ID.Value) == -1) {
-                    DatabaseManager.Instance.SetConsent(new Models.ConsentData(courseID, student.ID.Value, student.SISUserID, student.Name, -1));
-                }
+                DatabaseManager.Instance.RegisterUserGoalGrade(courseID, student.SISUserID);
+                DatabaseManager.Instance.SetConsent(new Models.ConsentData(courseID, student.ID.Value, student.SISUserID, student.Name, -1));
 
                 DatabaseManager.Instance.RegisterUser(
                     courseID,

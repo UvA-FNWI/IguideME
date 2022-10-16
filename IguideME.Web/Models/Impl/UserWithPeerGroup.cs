@@ -55,7 +55,7 @@ namespace IguideME.Web.Models.Impl
 
             if (!DatabaseManager.Instance.HasPersonalizedPeers(this.CourseID))
             {
-                Console.WriteLine("Course " + this.CourseID + " has no personalized peers, considering every stydent enrolled a peer.");
+                Console.WriteLine("Course " + this.CourseID + " has no personalized peers, considering every student enrolled a peer.");
                 // If the course does not have personalized peers consider
                 // every other enrolled student a peer.
                 courseStudents

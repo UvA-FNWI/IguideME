@@ -49,6 +49,7 @@ namespace IguideME.Web.Controllers
         public async Task<IActionResult> BeginComputation([FromBody] JobParametersModel obj)
         {
             obj.CourseID = this.GetCourseID();
+            obj.Notifications_bool = false;
             return Accepted(
                 await _queuedBackgroundService.PostWorkItemAsync(obj).ConfigureAwait(false)
             );
