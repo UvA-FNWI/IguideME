@@ -127,10 +127,14 @@ namespace IguideME.Web.Services
         private void PrintQueryError(string title, int rows, SQLiteDataReader r, Exception e) {
             string error = $"{title}\nRequested:\nColumn | Name | Value | Type\n";
 
-            for (int i = 0; i <= rows; i++)
-                error += $"{r.GetName(i)} {r.GetDataTypeName(i)} {r.GetValue(i).ToString()} {r.GetValue(i).GetType()}\n";
+            try {
+                for (int i = 0; i <= rows; i++)
+                    error += $"{r.GetName(i)} {r.GetDataTypeName(i)} {r.GetValue(i).ToString()} {r.GetValue(i).GetType()}\n";
 
-            _logger.LogError( error + e.ToString() + e.StackTrace);
+                _logger.LogError( error + e.Message + e.StackTrace);
+            } catch (Exception ex) {
+                _logger.LogError($"{ex.Message} {ex.StackTrace}\n\nOriginal error:\n{e.Message} {e.StackTrace}");
+            }
         }
 
         private int NonQuery(string query)
@@ -731,7 +735,8 @@ namespace IguideME.Web.Services
                     r.GetInt32(1),
                     r.GetValue(2).ToString(),
                     r.GetValue(3).ToString(),
-                    r.GetValue(4).ToString()
+                    r.GetValue(4).ToString(),
+                    activeHash
                 );
                 submissions.Add(submission);
             }
@@ -763,7 +768,8 @@ namespace IguideME.Web.Services
                             r.GetInt32(1),
                             r.GetValue(2).ToString(),
                             r.GetValue(3).ToString(),
-                            r.GetValue(4).ToString()
+                            r.GetValue(4).ToString(),
+                            activeHash
                         );
                         submissions.Add(submission);
                     }
@@ -805,7 +811,8 @@ namespace IguideME.Web.Services
                     r.GetInt32(1),
                     r.GetValue(2).ToString(),
                     r.GetValue(3).ToString(),
-                    r.GetValue(4).ToString()
+                    r.GetValue(4).ToString(),
+                    activeHash
                 );
                 submissions.Add(submission);
             }
@@ -838,7 +845,8 @@ namespace IguideME.Web.Services
                     r.GetInt32(1),
                     r.GetValue(2).ToString(),
                     r.GetValue(3).ToString(),
-                    r.GetValue(4).ToString()
+                    r.GetValue(4).ToString(),
+                    activeHash
                 );
                 submissions.Add(submission);
             }
@@ -1166,7 +1174,8 @@ namespace IguideME.Web.Services
                     r1.GetInt32(1),
                     r1.GetValue(2).ToString(),
                     r1.GetValue(3).ToString(),
-                    r1.GetValue(4).ToString()
+                    r1.GetValue(4).ToString(),
+                    activeHash
                 );
                 submissions.Add(submission);
             }
@@ -1197,7 +1206,8 @@ namespace IguideME.Web.Services
                     r1.GetInt32(1),
                     r1.GetValue(2).ToString(),
                     r1.GetValue(3).ToString(),
-                    r1.GetValue(4).ToString()
+                    r1.GetValue(4).ToString(),
+                    activeHash
                 );
                 submissions.Add(submission);
             }
@@ -1483,11 +1493,11 @@ namespace IguideME.Web.Services
             return keys;
         }
 
-        public Dictionary<string, string> GetEntryMeta(int entryID)
+        public Dictionary<string, string> GetEntryMeta(int entryID, string synchash)
         {
             string query = String.Format(
                 DatabaseQueries.QUERY_TILE_ENTRY_SUBMISSION_META,
-                entryID);
+                entryID, synchash);
 
             SQLiteDataReader r = Query(query);
             Dictionary<string, string> meta = new Dictionary<string, string>();

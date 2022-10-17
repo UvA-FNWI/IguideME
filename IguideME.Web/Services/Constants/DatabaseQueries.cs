@@ -593,6 +593,7 @@ public static class DatabaseQueries
         INNER JOIN  `tile_entry_submission_meta`
             ON      `tile_entry_submission`.`id`=`tile_entry_submission_meta`.`submission_id`
         WHERE       `tile_entry_submission`.`id`={0}
+        AND         `tile_entry_submission`.`sync_hash`={1}
         ;";
 
     public const string UPDATE_TILE =
