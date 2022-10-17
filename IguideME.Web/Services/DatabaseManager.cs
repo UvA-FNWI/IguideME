@@ -89,23 +89,23 @@ namespace IguideME.Web.Services
             // NonQuery("DELETE FROM model_theta;");
             // NonQuery("DELETE FROM goal_requirement;");
             // NonQuery("DELETE FROM tile WHERE id=12;");
-            NonQuery(@"DELETE FROM goal_grade
-                    WHERE EXISTS (
-                    SELECT 1 FROM goal_grade p2
-                    WHERE goal_grade.course_id = p2.course_id
-                    AND goal_grade.user_login_id = p2.user_login_id
-                    AND goal_grade.rowid > p2.rowid
-                    );");
-            try {
-                NonQuery(
-                        String.Format(
-                            @"CREATE UNIQUE INDEX unique_goal_grade ON `goal_grade`(course_id, user_login_id)
-                            ;"
-                        )
-                    );
-            } catch (Exception e) {
-                Console.WriteLine($"{e.Message}\n{e.StackTrace}");
-            }
+            // NonQuery(@"DELETE FROM goal_grade
+            //         WHERE EXISTS (
+            //         SELECT 1 FROM goal_grade p2
+            //         WHERE goal_grade.course_id = p2.course_id
+            //         AND goal_grade.user_login_id = p2.user_login_id
+            //         AND goal_grade.rowid > p2.rowid
+            //         );");
+            // try {
+            //     NonQuery(
+            //             String.Format(
+            //                 @"CREATE UNIQUE INDEX unique_goal_grade ON `goal_grade`(course_id, user_login_id)
+            //                 ;"
+            //             )
+            //         );
+            // } catch (Exception e) {
+            //     Console.WriteLine($"{e.Message}\n{e.StackTrace}");
+            // }
         }
 
         private void RunMigrations()

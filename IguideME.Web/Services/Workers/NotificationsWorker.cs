@@ -41,26 +41,32 @@ namespace IguideME.Web.Services.Workers
                     Tile tile = DatabaseManager.Instance.GetTile(this.courseID, notification.TileID);
                     switch (notification.Status) {
                         case "outperforming peers":
-                            outperforming += $"- {tile.Title}\n";
+                            outperforming += $" - {tile.Title}\n";
                             break;
                         case "closing the gap":
-                            closing += $"- {tile.Title}\n";
+                            closing += $" - {tile.Title}\n";
                             break;
                         case "more effort required":
-                            moreEffort += $"- {tile.Title}\n";
+                            moreEffort += $" - {tile.Title}\n";
                             break;
                     }
                 }
-                string body = @$"You are outperforming your peers in:\n{outperforming}\n
-                                You are closing the gap to your peers in:\n{closing}\n
-                                You have to put more effort in:\n{moreEffort}";
 
-                _logger.LogInformation($"Sending notification to {user.LoginID}, {user.UserID}: {body}");
+                string body = "";
+                if (outperforming != "")
+                    body += $"You are outperforming your peers in:\n{outperforming}\n";
+                if (closing != "")
+                    body += $"You are closing the gap to your peers in:\n{closing}\n";
+                if (moreEffort != "")
+                    body += $"You have to put more effort in:\n{moreEffort}";
 
-                canvasTest.sendMessage(user.UserID,
-                "IGuideME",
-                body
-                );
+                if (body != "") {
+                    _logger.LogInformation($"Sending notification to {user.LoginID}, {user.UserID}: {body}");
+                    canvasTest.sendMessage(user.UserID,
+                    "IGuideME",
+                    body
+                    );
+                }
 
                 _logger.LogInformation("Marking notifications as sent...");
 
