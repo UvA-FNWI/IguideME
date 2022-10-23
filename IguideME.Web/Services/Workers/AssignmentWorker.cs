@@ -51,11 +51,10 @@ namespace IguideME.Web.Services.Workers
 				foreach (var submission in submissions)
 				{
 
-					_logger.LogInformation($"{submission.User.SISUserID} got grade {submission.Grade}");
 					// don't register data from students that did not give consent
-					if (DatabaseManager.Instance.GetConsent(this.courseID, submission.User.SISUserID) != 1)
-						_logger.LogInformation("Consent not given");
+					if (DatabaseManager.Instance.GetConsent(this.courseID, submission.User.SISUserID) != 1) {
 						continue;
+					}
 
 					// only register graded submissions
 					if (submission.Grade == null) continue;
