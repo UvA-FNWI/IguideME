@@ -64,7 +64,7 @@ namespace IguideME.Web.Services.Workers
                     _logger.LogInformation($"Sending notification to {user.LoginID}, {user.UserID}: {body}");
                     canvasTest.sendMessage(user.UserID,
                     "IGuideME",
-                    "You are using IguideME, please find below your personal feedback. Visit IguideME in your course for more detailed information.\n\n" + body
+                    "You are using IguideME, please find your personal feedback below. Visit IguideME in your course for more detailed information.\n\n" + body
                     );
                 }
 

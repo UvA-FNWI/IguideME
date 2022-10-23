@@ -461,12 +461,12 @@ public static class DatabaseQueries
     // -------------------- Tile logic --------------------
 
     public const string QUERY_TILE_GROUPS =
-        @"SELECT    `id`,
-                    `title`,
-                    `column_id`,
-                    `position`
+        @"SELECT    `layout_tile_group`.`id`,
+                    `layout_tile_group`.`title`,
+                    `layout_tile_group`.`column_id`,
+                    `layout_tile_group`.`position`
         FROM        `layout_tile_group`
-        WHERE       `course_id`={0};";
+        WHERE       `layout_tile_group`.`course_id`={0};";
 
     public const string REGISTER_TILE_GROUP =
         @"INSERT INTO       `layout_tile_group`

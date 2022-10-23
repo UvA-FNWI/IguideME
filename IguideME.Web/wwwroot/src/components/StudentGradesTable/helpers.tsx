@@ -4,32 +4,33 @@ import {Tile, TileEntry, TileEntrySubmission} from "../../models/app/Tile";
 import {CanvasStudent} from "../../models/canvas/Student";
 import {Col, Progress, Row, Space, Tooltip} from "antd";
 import GradeSpread from "../visuals/GradeSpread";
+import { ColumnsType } from "antd/lib/table";
+import { ColumnType } from "antd/es/table";
 
 
 function entriesColumns(tile: Tile, tileEntries: TileEntry[], averaged: boolean) {
   if (averaged) return averagedEntriesColumns(tile, tileEntries);
-
   return {
     title: tile.title,
     children: tileEntries.filter(e => e.tile_id === tile.id).map(e => ({
-      title: e.title,
-      dataIndex: tile.id + "_" + e.id,
-      key: e.id,
-      width: 150,
-      render: (text: string, _: any) => {
-        if (!text) return (
-          <Tooltip title={"No grade available"}>
-            <EllipsisOutlined />
-          </Tooltip>
-        );
+    title: e.title,
+    dataIndex: tile.id + "_" + e.id,
+    key: e.id,
+    width: 150,
+    render: (text: string, _: any) => {
+      if (!text) return (
+        <Tooltip title={"No grade available"}>
+          <EllipsisOutlined />
+        </Tooltip>
+      );
 
-        try {
-          const gradeNum = parseFloat(text);
-          if (gradeNum < 5.5) return <span className={"dangerText"}><b>{ text }</b></span>;
-          if (gradeNum >= 9.5) return <span className={"successText"}><b>{ text }</b></span>;
-        } catch { }
-        return text;
-      }
+      try {
+        const gradeNum = parseFloat(text);
+        if (gradeNum < 5.5) return <span className={"dangerText"}><b>{ text }</b></span>;
+        if (gradeNum >= 9.5) return <span className={"successText"}><b>{ text }</b></span>;
+      } catch { }
+      return text;
+    }
     }))
   }
 }
@@ -115,15 +116,17 @@ function getColumn(tile: Tile, tileEntries: TileEntry[], averaged: boolean) {
 
 export function getColumns(tiles: Tile[], tileEntries: TileEntry[], averaged: boolean): any {
   let columns = [];
-  const standardColumns = [{
+  const standardColumns: ColumnsType<CanvasStudent> = [{
     title: "Student",
     key: "name",
     dataIndex: "name",
     fixed: true,
     width: 200,
+    sorter: (a, b) => a.name.localeCompare(b.name),
+    defaultSortOrder: 'ascend',
     render: (text: string, record: any) => {
       return (
-        <span>{ text }<br /><small>{ record.student.loginID}</small></span>
+        <span>{ text }<br /><small>{ record.student.login_id}</small></span>
       )
     }
   }];
