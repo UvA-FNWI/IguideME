@@ -74,7 +74,7 @@ namespace IguideME.Web.Services
                 jobId, $"tasks.discussions", 0
             ).ConfigureAwait(false);
 
-            new AssignmentWorker(courseID, hashCode, _canvasTest).Register();
+            new AssignmentWorker(courseID, hashCode, _canvasTest, _logger).Register();
             await _computationJobStatus.UpdateJobProgressInformationAsync(
                 jobId, $"tasks.assignments", 0
             ).ConfigureAwait(false);

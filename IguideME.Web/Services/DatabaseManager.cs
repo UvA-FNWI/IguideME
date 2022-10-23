@@ -1937,6 +1937,7 @@ namespace IguideME.Web.Services
 
         public void SetConsent(ConsentData data)
         {
+            _logger.LogInformation("Setting consent: " + data.Granted);
             NonQuery(String.Format(
                 DatabaseQueries.SETUSERCONSENT,
                 data.CourseID, data.UserID, data.UserLoginID, data.UserName.Replace("'", ""), data.Granted

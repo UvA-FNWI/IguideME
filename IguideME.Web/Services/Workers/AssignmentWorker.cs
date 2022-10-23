@@ -1,10 +1,12 @@
 ﻿using System;
-using Newtonsoft.Json;
+using Microsoft.Extensions.Logging;
+
 
 namespace IguideME.Web.Services.Workers
 {
     public class AssignmentWorker
     {
+        private readonly ILogger<SyncManager> _logger;
 		private int courseID;
 		private string hashCode;
 		private CanvasTest canvasTest;
@@ -12,8 +14,10 @@ namespace IguideME.Web.Services.Workers
         public AssignmentWorker(
 			int courseID,
 			string hashCode,
-			CanvasTest canvasTest)
+			CanvasTest canvasTest,
+            ILogger<SyncManager> logger)
         {
+            _logger = logger;
 			this.courseID = courseID;
 			this.hashCode = hashCode;
 			this.canvasTest = canvasTest;
@@ -24,11 +28,11 @@ namespace IguideME.Web.Services.Workers
 			var assignments = this.canvasTest.GetAssignments(this.courseID);
 			var entries = DatabaseManager.Instance.GetEntries(this.courseID);
 
-			Console.WriteLine("Starting assignment registry...");
+			_logger.LogInformation("Starting assignment registry...");
 			foreach (var assignment in assignments)
 			{
 				if (assignment == null) continue;
-				Console.WriteLine("\t" + assignment.Name);
+				_logger.LogInformation($"Processing assignment: {assignment.Name}");
 
 				DatabaseManager.Instance.RegisterAssignment(
 					assignment.ID,
@@ -46,8 +50,11 @@ namespace IguideME.Web.Services.Workers
 				var submissions = assignment.Submissions;
 				foreach (var submission in submissions)
 				{
+
+					_logger.LogInformation($"{submission.User.SISUserID} got grade {submission.Grade}");
 					// don't register data from students that did not give consent
 					if (DatabaseManager.Instance.GetConsent(this.courseID, submission.User.SISUserID) != 1)
+						_logger.LogInformation("Consent not given");
 						continue;
 
 					// only register graded submissions
