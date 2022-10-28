@@ -52,11 +52,9 @@ class ActionButtons extends Component<Props, IState> {
               allowOutsideClick: () => !Swal.isLoading()
             }).then((result) => {
               if (result.isConfirmed) {
-                TileController.deleteTile(tile!.id).then(() => {
-                  TileActions.loadGroups().then(() => {
-                    Swal.fire('Task completed!', '', 'success');
-                  });
-                });
+                this.props.deleteTile(tile!.id).then(() => [
+                  Swal.fire('Task completed!', '', 'success')
+                ]);
               }
             })
           }

@@ -37,7 +37,7 @@ namespace IguideME.Web.Services
         {
             var result = new JobResultModel();
             var courseID = work.CourseID;
-            var notifications_bool = work.Notifications_bool;
+            var notifications_bool = (work.Notifications_bool && (DateTime.Now.DayOfWeek == DayOfWeek.Monday || DateTime.Now.DayOfWeek == DayOfWeek.Friday));
 
             _logger.LogInformation($"{DateTime.Now}: Starting sync of course {courseID}");
 
@@ -89,12 +89,10 @@ namespace IguideME.Web.Services
                 jobId, $"tasks.peer-groups", 0
             ).ConfigureAwait(false);
 
-            if (notifications_bool && (DateTime.Now.DayOfWeek == DayOfWeek.Monday || DateTime.Now.DayOfWeek == DayOfWeek.Friday)) {
-                new NotificationsWorker(courseID, hashCode, _canvasTest, _logger).Register();
-                await _computationJobStatus.UpdateJobProgressInformationAsync(
-                    jobId, $"tasks.notifications", 0
-                ).ConfigureAwait(false);
-            }
+            new NotificationsWorker(courseID, hashCode, _canvasTest, notifications_bool, _logger).Register();
+            await _computationJobStatus.UpdateJobProgressInformationAsync(
+                jobId, $"tasks.notifications", 0
+            ).ConfigureAwait(false);
 
             _logger.LogInformation("Starting jobprogressinformation worker");
             await _computationJobStatus.UpdateJobProgressInformationAsync(

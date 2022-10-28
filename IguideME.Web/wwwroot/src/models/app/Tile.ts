@@ -1,3 +1,9 @@
+export enum editState {
+  new,
+  updated,
+  removed
+}
+
 export interface TileGroup {
   id: number;
   course_id: number;

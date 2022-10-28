@@ -10,7 +10,7 @@ export default class EntryItem extends Component<{
     render(): React.ReactNode {
         const { tileEntry, submission } = this.props;
 
-        // FIXME the check for type is done because when the mocks were made, no consideration was given to the type of meta. To remove this check, convert the meta objects in the mocks to JSON strings.
+        // FIXME: the check for type is done because when the mocks were made, no consideration was given to the type of meta. To remove this check, convert the meta objects in the mocks to JSON strings.
         const meta = typeof submission.meta === "string" ? JSON.parse(submission.meta || "{}") : submission.meta || {};
 
         return (

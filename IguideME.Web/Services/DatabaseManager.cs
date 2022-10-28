@@ -1188,7 +1188,7 @@ namespace IguideME.Web.Services
                         r1.GetValue(2).ToString(),
                         r1.GetValue(3).ToString(),
                         r1.GetValue(4).ToString(),
-                        activeHash
+                        hash: activeHash
                     );
                     submissions.Add(submission);
                 }
@@ -1224,15 +1224,50 @@ namespace IguideME.Web.Services
             return goals;
         }
 
+        public LearningGoal GetGoal(int courseID, int tileID)
+        {
+            string query = String.Format(
+                DatabaseQueries.QUERY_LEARNING_GOAL,
+                courseID, tileID
+            );
+
+            LearningGoal goal = null;
+            using(SQLiteDataReader r = Query(query)){
+                if (r.Read()){
+                    try {
+                        goal = new LearningGoal(r.GetInt32(0), tileID, r.GetValue(1).ToString());
+                    } catch (Exception e) {
+                        PrintQueryError("GetGoals", 1, r, e);
+                    }
+                }
+            }
+            return goal;
+        }
+
         public LearningGoal CreateGoal(int courseID, int tileID, string title)
         {
             string query = String.Format(
                 DatabaseQueries.CREATE_LEARNING_GOAL,
                 courseID, tileID, title
             );
+            NonQuery(query);
 
-            int id = IDNonQuery(query);
-            return GetGoals(courseID).Find(g => g.ID == id);
+            return GetGoal(courseID, tileID);
+        }
+
+        public void DeleteGoal(int courseID, int tileID)
+        {
+            LearningGoal goal = GetGoal(courseID, tileID);
+            if (goal == null) {
+                return;
+            }
+            goal.FetchRequirements();
+            goal.DeleteGoalRequirements();
+
+            string query = String.Format(
+                DatabaseQueries.DELETE_LEARNING_GOAL, courseID, tileID
+            );
+            NonQuery(query);
         }
 
         public void CreateGoalRequirement(
@@ -1251,6 +1286,15 @@ namespace IguideME.Web.Services
             NonQuery(query);
         }
 
+        public void DeleteGoalRequirements(int goalID)
+        {
+            string query = String.Format(
+                DatabaseQueries.DELETE_GOAL_REQUIREMENTS,
+                goalID
+            );
+
+            NonQuery(query);
+        }
         public List<GoalRequirement> GetGoalRequirements(int goalID)
         {
             string query = String.Format(
@@ -1927,8 +1971,9 @@ namespace IguideME.Web.Services
             return entries;
         }
 
-        public void DeleteTile(int tileID)
+        public void DeleteTile(int courseID, int tileID)
         {
+            DeleteGoal(courseID, tileID);
             NonQuery(String.Format(
                     @"DELETE FROM `tile` WHERE `id` = {0};",
                     tileID
@@ -1937,7 +1982,6 @@ namespace IguideME.Web.Services
 
         public void SetConsent(ConsentData data)
         {
-            _logger.LogInformation("Setting consent: " + data.Granted);
             NonQuery(String.Format(
                 DatabaseQueries.SETUSERCONSENT,
                 data.CourseID, data.UserID, data.UserLoginID, data.UserName.Replace("'", ""), data.Granted

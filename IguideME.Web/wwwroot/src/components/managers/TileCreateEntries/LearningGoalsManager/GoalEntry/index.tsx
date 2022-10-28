@@ -3,6 +3,7 @@ import {Alert, Button, Divider, Input, Space} from "antd";
 import {DeleteOutlined, PlusOutlined} from "@ant-design/icons";
 import GoalRequirement from "./GoalRequirement";
 import {GoalRequirement as GoalRequirementModel} from "../../../../../models/app/LearningGoal";
+import {editState} from "../../../../../models/app/Tile";
 import {IProps} from "./types";
 import {LearningGoal} from "../../../../../models/app/LearningGoal";
 import Swal from "sweetalert2";
@@ -33,6 +34,7 @@ export default class GoalEntry extends Component<IProps> {
 
   removeRequirement = (id: number) => {
     let { goal } = this.props;
+    // TODO: this is awful
     goal.requirements = goal.requirements.filter(r => r.id !== id);
 
     this.props.updateGoal(goal);
@@ -41,8 +43,12 @@ export default class GoalEntry extends Component<IProps> {
   render(): React.ReactNode {
     let { goal, tile } = this.props;
 
+    if (goal.state == editState.removed) {
+      return null;
+    }
+
     return (
-      <div className={"goalEntry"}>
+      <div className={"goalEntry"} >
         <div className={"title"}>
           <span><b>Title</b></span>
           <Input value={goal.title}
@@ -62,7 +68,7 @@ export default class GoalEntry extends Component<IProps> {
                       Swal.fire({
                         icon: 'warning',
                         title: 'Do you really want to delete this goal?',
-                        text: `Goal: ${goal.title}`,
+                        text: `Goal: ${goal.title} will be deleted on save`,
                         showCancelButton: true,
                         confirmButtonText: 'Delete',
                         showLoaderOnConfirm: true,
@@ -70,6 +76,7 @@ export default class GoalEntry extends Component<IProps> {
                       }).then((result) => {
                         if (result.isConfirmed) {
                           this.props.removeGoal(goal.id);
+                          this.setState({goal});
                         }
                       });
                     }}

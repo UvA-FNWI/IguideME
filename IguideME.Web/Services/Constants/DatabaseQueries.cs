@@ -524,12 +524,24 @@ public static class DatabaseQueries
         FROM        `learning_goal`
         WHERE       `course_id`={0};";
 
+    public const string QUERY_LEARNING_GOAL =
+        @"SELECT    `id`,
+                    `title`
+        FROM        `learning_goal`
+        WHERE       `course_id`={0}
+        AND         `tile_id`={1};";
+
     public const string CREATE_LEARNING_GOAL =
         @"INSERT INTO       `learning_goal`
                             (   `course_id`,
                                 `tile_id`,
                                 `title`  )
         VALUES({0}, {1}, '{2}');";
+
+    public const string DELETE_LEARNING_GOAL =
+        @"DELETE FROM       `learning_goal`
+          WHERE             `course_id` = {0}
+          AND               `tile_id` = {1};";
 
     public const string QUERY_GOAL_REQUIREMENTS =
         @"SELECT    `goal_id`,
@@ -551,6 +563,9 @@ public static class DatabaseQueries
                                 `expression` )
         VALUES({0}, {1}, {2}, '{3}', {4}, '{5}');";
 
+    public const string DELETE_GOAL_REQUIREMENTS =
+        @"DELETE FROM       `goal_requirement`
+          WHERE             `goal_id` = {0};";
 
     public const string QUERY_TILE_ENTRIES =
         @"SELECT    `tile_entry`.`id`,
@@ -593,7 +608,7 @@ public static class DatabaseQueries
         INNER JOIN  `tile_entry_submission_meta`
             ON      `tile_entry_submission`.`id`=`tile_entry_submission_meta`.`submission_id`
         WHERE       `tile_entry_submission`.`id`={0}
-        AND         `tile_entry_submission`.`sync_hash`={1}
+        AND         `tile_entry_submission`.`sync_hash`='{1}'
         ;";
 
     public const string UPDATE_TILE =

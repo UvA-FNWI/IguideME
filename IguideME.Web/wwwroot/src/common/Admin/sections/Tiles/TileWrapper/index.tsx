@@ -19,7 +19,8 @@ const mapState = (state: RootState) => ({
 });
 
 const mapDispatch = {
-  loadGroups: () => TileActions.loadGroups()
+  loadGroups: () => TileActions.loadGroups(),
+  loadTiles: () => TileActions.loadTiles()
 }
 
 const connector = connect(mapState, mapDispatch)
@@ -34,6 +35,17 @@ class TileWrapper extends Component<Props, IState> {
     editTile: undefined,
     isDraggerOpen: false
   }
+
+  deleteTile = async (id: number) => {
+    TileController.deleteTile(id).then(() => {
+      this.props.loadGroups().then(() => {
+        this.props.loadTiles().then(() => {
+          this.setState({isDraggerOpen: false});
+        });
+      });
+    });
+  }
+
 
   render(): React.ReactNode {
     const { editTile, isDraggerOpen, updating }: IState = this.state;
@@ -50,6 +62,7 @@ class TileWrapper extends Component<Props, IState> {
             tileGroup={group}
             isOpen={isDraggerOpen}
             setOpen={(isDraggerOpen) => this.setState({ isDraggerOpen })}
+            updateTiles={updateTiles}
           />
 
           <Container groupName={`primary`}
@@ -78,7 +91,7 @@ class TileWrapper extends Component<Props, IState> {
                              }
 
                              TileController.getTiles().then(async fetchedTiles => {
-                               await updateTiles(group, fetchedTiles);
+                               await updateTiles(fetchedTiles);
 
                                this.setState({ updating: updating.filter(x => x !== group.id)});
                              })
@@ -93,7 +106,7 @@ class TileWrapper extends Component<Props, IState> {
             { tiles.sort((a, b) => a.position - b.position).map(t => {
               return (
                 <DraggableTile key={"dragMem" + t.id.toString()} {...{
-                  tile: t, editTile: () => this.setState({editTile: t, isDraggerOpen: true})
+                  tile: t, editTile: () => this.setState({editTile: t, isDraggerOpen: true}), deleteTile: this.deleteTile
                 }} />
               );
             })}

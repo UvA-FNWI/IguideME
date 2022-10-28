@@ -1,4 +1,5 @@
-﻿using IguideME.Web.Services;
+﻿using System.Collections.Generic;
+using IguideME.Web.Services;
 using Newtonsoft.Json;
 
 namespace IguideME.Web.Models.App
@@ -15,7 +16,7 @@ namespace IguideME.Web.Models.App
         public string Title { get; set; }
 
         [JsonProperty("requirements")]
-        public GoalRequirement[] Requirements { get; set; }
+        public List<GoalRequirement> Requirements { get; set; }
 
         public LearningGoal(
             int id,
@@ -34,10 +35,19 @@ namespace IguideME.Web.Models.App
         public void FetchRequirements()
         {
             this.Requirements = DatabaseManager.Instance
-                        .GetGoalRequirements(this.ID)
-                        .ToArray();
+                        .GetGoalRequirements(this.ID);
         }
 
+        public void DeleteGoalRequirements()
+        {
+            DatabaseManager.Instance.DeleteGoalRequirements(this.ID);
+            this.Requirements.Clear();
+        }
+
+        // public void DeleteGoalRequirement(int tileID)
+        // {
+        //     DatabaseManager.Instance.DeleteGoalRequirement(this.ID, tileID);
+        // }
     }
 
     public class GoalRequirement

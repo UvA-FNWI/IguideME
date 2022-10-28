@@ -8,6 +8,7 @@ import {RootState} from "../../../../../../store";
 import {connect, ConnectedProps} from "react-redux";
 import TileController from "../../../../../../api/controllers/tile";
 import "./style.scss";
+import { register } from "../../../../../../serviceWorker";
 
 const mapState = (state: RootState) => ({
   tiles: state.tiles,
@@ -75,6 +76,8 @@ class GoalRequirement extends Component<Props> {
   render(): React.ReactNode {
     let { requirement, tiles, tileEntries } = this.props;
 
+    console.log("requirement", requirement);
+
     let entryOptions: {label: string, value: number | string }[] = tileEntries
       .filter(e => e.tile_id === requirement.tile_id)
       .map(e => ({ label: e.title, value: e.id }));
@@ -119,10 +122,9 @@ class GoalRequirement extends Component<Props> {
                     onChange={(e) => {
                       if (!e) return;
 
-                      let r = JSON.parse(JSON.stringify(requirement));
-                      r.tile_id = e.value;
-                      r.entry_id = -1;
-                      this.props.updateRequirement(r);
+                      requirement.tile_id = e.value;
+                      requirement.entry_id = -1;
+                      // this.props.updateRequirement(r);
                     }}
             />
           </Col>

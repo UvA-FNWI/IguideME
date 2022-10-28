@@ -3,7 +3,7 @@ import {Tile} from "../../../../models/app/Tile";
 
 export interface IProps {
   tile: Tile | undefined;
-  goals: LearningGoal[]
+  goals: LearningGoal[];
   setGoals: (goals: LearningGoal[]) => any;
 }
 

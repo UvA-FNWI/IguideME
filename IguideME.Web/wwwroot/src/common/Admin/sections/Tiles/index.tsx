@@ -32,10 +32,6 @@ class Tiles extends Component<PropsFromRedux> {
     this.props.loadAssignments();
   }
 
-  updateTiles = (group: TileGroup, newTiles: Tile[]) => {
-    this.props.updateTiles(newTiles);
-  }
-
   render(): React.ReactNode {
     const { tiles, tileGroups } = this.props;
 
@@ -49,7 +45,7 @@ class Tiles extends Component<PropsFromRedux> {
 
           { tileGroups.map((group: TileGroup) => (
             <TileWrapper group={group}
-                         updateTiles={this.updateTiles}
+                         updateTiles={this.props.updateTiles}
                          tiles={getTilesInGroup(tiles, group.id)}
             />
           ))}

@@ -1,6 +1,8 @@
+import {editState} from "./Tile"
+
 export interface LearningGoal {
   id: number;
-  new?: boolean;
+  state: editState,
   tile_id: number;
   title: string;
   requirements: GoalRequirement[];

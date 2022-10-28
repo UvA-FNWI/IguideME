@@ -187,6 +187,25 @@ namespace IguideME.Web.Controllers
             return Json(_goal);
         }
 
+        [Authorize(Policy = "IsInstructor")]
+        [HttpDelete]
+        [Route("/tiles/goals/{tileID}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public ActionResult deleteTileGoal(string tileID)
+        {
+            int id;
+            bool success = Int32.TryParse(tileID, out id);
+
+            if (success)
+            {
+                DatabaseManager.Instance.DeleteGoal(GetCourseID(), id);
+                return NoContent();
+            }
+
+            return BadRequest();
+        }
 
         [Authorize]
         [HttpGet]
@@ -338,7 +357,7 @@ namespace IguideME.Web.Controllers
 
             if (success)
             {
-                DatabaseManager.Instance.DeleteTile(id);
+                DatabaseManager.Instance.DeleteTile(GetCourseID(), id);
                 return NoContent();
             }
 

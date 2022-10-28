@@ -108,7 +108,8 @@ class TileCreateEntries extends Component<Props, IState> {
                                      this.setState({ activeGoals: goals });
                                      this.props.updateGoals(goals)
                                    }}
-                                   goals={activeGoals} />
+                                   goals={activeGoals}
+                                   />
     } else if (contentType && (contentType === "PREDICTION")) {
 
     } else if (contentType && !tileType) {

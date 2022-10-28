@@ -26,9 +26,6 @@ export default class StudentConsentTable extends Component<IProps, IState> {
     render(): React.ReactNode {
       const { consents, goals } = this.state;
 
-      console.log("CONSENTS:", consents);
-      console.log("GOALS:", goals);
-
       return (
         <div id={"studentsConsentTable"} style={{position: 'relative', overflow: 'visible'}}>
           <Table columns={this.getColumns()}

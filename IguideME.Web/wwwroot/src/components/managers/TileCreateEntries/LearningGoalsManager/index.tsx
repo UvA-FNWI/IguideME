@@ -5,6 +5,7 @@ import GoalEntry from "./GoalEntry";
 import {IProps, IState} from "./types";
 import {LearningGoal} from "../../../../models/app/LearningGoal";
 import {generateUniqueID} from "./helpers";
+import { editState } from "../../../../models/app/Tile";
 
 export default class LearningGoalsManager extends Component<IProps, IState> {
 
@@ -13,7 +14,7 @@ export default class LearningGoalsManager extends Component<IProps, IState> {
 
     this.props.setGoals([
       { id: generateUniqueID(goals.map(g => g.id)),
-        new: true,
+        state: editState.new,
         tile_id: tile ? tile.id : -1,
         title: "",
         requirements: []
@@ -31,7 +32,11 @@ export default class LearningGoalsManager extends Component<IProps, IState> {
   }
 
   removeGoal = (id: number) => {
-    this.props.setGoals(this.props.goals.filter((g: LearningGoal) => g.id !== id));
+    for (var i = 0; i < this.props.goals.length; i++) {
+      if (this.props.goals[i].id === id) {
+        this.props.goals[i].state = editState.removed;
+      }
+    }
   }
 
   render(): React.ReactNode {

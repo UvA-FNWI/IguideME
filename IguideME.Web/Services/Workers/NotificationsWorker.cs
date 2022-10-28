@@ -10,22 +10,30 @@ namespace IguideME.Web.Services.Workers
         private CanvasTest canvasTest;
         private int courseID;
         private string hashCode;
+        private bool send_notifications;
 
         public NotificationsWorker(
             int courseID,
             string hashCode,
             CanvasTest canvasTest,
+            bool send_notifications,
             ILogger<SyncManager> logger)
         {
             _logger = logger;
             this.courseID = courseID;
             this.hashCode = hashCode;
             this.canvasTest = canvasTest;
+            this.send_notifications = send_notifications;
         }
 
         public void Register()
         {
             _logger.LogInformation("Starting notifications sync...");
+
+            if (!send_notifications) {
+                _logger.LogInformation("Not sending notifications today");
+                return;
+            }
 
             foreach (var user in DatabaseManager.Instance.GetUsers(this.courseID))
             {
@@ -53,18 +61,26 @@ namespace IguideME.Web.Services.Workers
                 }
 
                 string body = "";
-                if (outperforming != "")
-                    body += $"You are outperforming your peers in:\n{outperforming}\n";
-                if (closing != "")
-                    body += $"You are closing the gap to your peers in:\n{closing}\n";
-                if (moreEffort != "")
-                    body += $"You have to put more effort in:\n{moreEffort}";
+                if (string.IsNullOrEmpty(outperforming))
+                    body += @$"You are outperforming your peers in:
+                               {outperforming}
+                               ";
+                if (string.IsNullOrEmpty(closing))
+                    body += @$"You are closing the gap to your peers in:
+                               {closing}
+                               ";
+                if (string.IsNullOrEmpty(moreEffort))
+                    body += @$"You have to put more effort in:
+                               {moreEffort}
+                               ";
 
-                if (body != "") {
+                if (string.IsNullOrEmpty(body)) {
                     _logger.LogInformation($"Sending notification to {user.LoginID}, {user.UserID}: {body}");
                     canvasTest.sendMessage(user.UserID,
                     "IGuideME",
-                    "You are using IguideME, please find your personal feedback below. Visit IguideME in your course for more detailed information.\n\n" + body
+                    @$"You are using IguideME, please find your personal feedback below. Visit IguideME in your course for more detailed information.
+
+                       {body}"
                     );
                 }
 

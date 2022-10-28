@@ -4,7 +4,7 @@ import {SaveOutlined} from "@ant-design/icons";
 import {IProps, IState} from "./types";
 import Select from "react-select";
 import TileCreateEntries from "../../../../../../components/managers/TileCreateEntries";
-import {Tile, TileContentTypes, TileEntry, TileTypeTypes} from "../../../../../../models/app/Tile";
+import {editState, Tile, TileContentTypes, TileEntry, TileTypeTypes} from "../../../../../../models/app/Tile";
 import VisibilityButton from "./VisibilityButton";
 import {RootState} from "../../../../../../store";
 import {connect, ConnectedProps} from "react-redux";
@@ -118,12 +118,12 @@ class EditTileDragger extends Component<Props, IState> {
     const { entries, goals, graphView, wildcard, title }: IState = this.state;
     const { tileEntries, tile }: Props = this.props;
 
-    let tileRef = JSON.parse(JSON.stringify(tile!));
-    tileRef.title = title;
-    tileRef.graph_view = graphView;
-    tileRef.wildcard = wildcard;
+    // let tileRef = JSON.parse(JSON.stringify(tile!));
+    tile!.title = title;
+    tile!.graph_view = graphView;
+    tile!.wildcard = wildcard;
 
-    TileController.updateTile(tileRef).then(patchedTile => {
+    TileController.updateTile(tile!).then(patchedTile => {
       this.setState({ updating: true }, async () => {
         var removedEntries = tileEntries.filter(
           e => e.tile_id === ( tile ? tile.id : -1 )
@@ -144,16 +144,28 @@ class EditTileDragger extends Component<Props, IState> {
 
         }
         else if (tile!.content === "LEARNING_OUTCOMES") {
-          const removedGoals = goals.filter(
-            g => g.tile_id === patchedTile.id
-          ).filter(
-            g => !goals.map(_g => _g.title).includes(g.title));
-          const newGoals = goals.filter(g => g.new === true);
+          var newGoals: LearningGoal[]= [];
+          var updatedGoals: LearningGoal[]= [];
+          var removedGoals: LearningGoal[] = [];
+          for (var i = 0; i < goals.length; i++) {
+            switch (goals[i].state) {
+              case editState.new:
+                newGoals.push(goals[i])
+                break;
+              case editState.updated:
+                updatedGoals.push(goals[i])
+                break;
+              case editState.removed:
+                removedGoals.push(goals[i])
+                break;
+            }
+          }
+          // const removedGoals = goals.filter(g => g.delete);
+          // const newGoals = goals.filter(g => g.new);
 
-          console.log(removedGoals);
-          console.log(newGoals);
-
+          // TODO: goals are never updated
           await this.deleteGoals(removedGoals);
+          // await this.updateGoals(updatedGoals);
           await this.createGoals(newGoals);
         }
 
@@ -190,6 +202,12 @@ class EditTileDragger extends Component<Props, IState> {
       await TileController.createTileGoal(goal);
     }
   }
+
+  // updateGoals = async (goals: LearningGoal[]) => {
+  //   for (const goal of goals) {
+  //     await TileController.updateTileGoal(goal);
+  //   }
+  // }
 
   deleteGoals = async (goals: LearningGoal[]) => {
     for (const goal of goals) {
@@ -267,7 +285,6 @@ class EditTileDragger extends Component<Props, IState> {
           <Col xs={12}>
             <span>Content type</span>
             <Select value={{label: contentType.label as string, value: contentType.value as string}}
-                    // isDisabled={tile === undefined}
                     style={{zIndex: 100}}
                     options={[
                       { label: 'Binary', value: 'BINARY'},
@@ -301,9 +318,7 @@ class EditTileDragger extends Component<Props, IState> {
             { ((contentType.value === "LEARNING_OUTCOMES") || (contentType.value === "PREDICTION")) ?
               <h3>N/A</h3> :
               <Select value={{label: tileType.label as string, value: tileType.value as string}}
-                      isDisabled={
-                        // tile === undefined ||
-                        !contentType}
+                      isDisabled={!contentType}
                       isClearable={true}
                       style={{zIndex: 100}}
                       options={[
@@ -333,8 +348,6 @@ class EditTileDragger extends Component<Props, IState> {
                            updateGoals={(goals) => this.setState({ goals })}
                            contentType={this.state.contentType.value}
                            tileType={this.state.tileType.value}
-
-
         />
       </Drawer>
     )
