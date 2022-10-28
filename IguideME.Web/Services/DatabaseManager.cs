@@ -997,6 +997,7 @@ namespace IguideME.Web.Services
 
             using(SQLiteDataReader r1 = Query(query1)) {
                 while (r1.Read()) {
+                    try {
                         PeerComparisonData submission = new PeerComparisonData(
                             r1.GetInt32(0),
                             r1.GetFloat(1),
@@ -1005,7 +1006,10 @@ namespace IguideME.Web.Services
                         );
 
                         submissions.Add(submission);
+                    } catch (Exception e) {
+                        PrintQueryError("GetUserPeerComparison", 3, r1, e);
                     }
+                }
             }
 
             List<float> predictedGrades = new List<float>();
