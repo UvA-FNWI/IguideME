@@ -524,12 +524,19 @@ public static class DatabaseQueries
         FROM        `learning_goal`
         WHERE       `course_id`={0};";
 
-    public const string QUERY_LEARNING_GOAL =
+    public const string QUERY_TILE_LEARNING_GOALS =
         @"SELECT    `id`,
                     `title`
         FROM        `learning_goal`
         WHERE       `course_id`={0}
         AND         `tile_id`={1};";
+
+    public const string QUERY_LEARNING_GOAL =
+        @"SELECT    `tile_id`,
+                    `title`
+        FROM        `learning_goal`
+        WHERE       `course_id`={0}
+        AND         `id`={1};";
 
     public const string CREATE_LEARNING_GOAL =
         @"INSERT INTO       `learning_goal`
@@ -538,13 +545,23 @@ public static class DatabaseQueries
                                 `title`  )
         VALUES({0}, {1}, '{2}');";
 
+    public const string UPDATE_LEARNING_GOAL =
+        @"UPDATE    `learning_goal`
+        SET
+                    `title`='{3}'
+        WHERE       `id`={1}
+        AND         `tile_id`={2}
+        AND         `course_id`={0};";
+
     public const string DELETE_LEARNING_GOAL =
         @"DELETE FROM       `learning_goal`
           WHERE             `course_id` = {0}
-          AND               `tile_id` = {1};";
+          AND               `id` = {1};";
 
     public const string QUERY_GOAL_REQUIREMENTS =
-        @"SELECT    `goal_id`,
+        @"SELECT
+                    `id`,
+                    `goal_id`,
                     `tile_id`,
                     `entry_id`,
                     `meta_key`,
@@ -563,9 +580,28 @@ public static class DatabaseQueries
                                 `expression` )
         VALUES({0}, {1}, {2}, '{3}', {4}, '{5}');";
 
+    public const string UPDATE_LEARNING_GOAL_REQUIREMENT =
+        @"UPDATE    `goal_requirement`
+        SET
+                    `tile_id`={2},
+                    `entry_id`={3},
+                    `meta_key`='{4}',
+                    `value`={5},
+                    `expression`='{6}'
+        WHERE
+                    `id`={0}
+        AND
+                    `goal_id`={1}
+        ;";
+
     public const string DELETE_GOAL_REQUIREMENTS =
         @"DELETE FROM       `goal_requirement`
           WHERE             `goal_id` = {0};";
+
+    public const string DELETE_GOAL_REQUIREMENT =
+        @"DELETE FROM       `goal_requirement`
+          WHERE             `goal_id` = {0}
+          AND               `id` = {1};";
 
     public const string QUERY_TILE_ENTRIES =
         @"SELECT    `tile_entry`.`id`,

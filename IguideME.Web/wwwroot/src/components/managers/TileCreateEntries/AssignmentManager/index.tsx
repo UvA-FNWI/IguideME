@@ -7,7 +7,7 @@ import {getColumns} from "./helpers";
 import QuizzesTutorial from "./QuizzesTutorial";
 import {IManagerProps} from "../types";
 import "./style.scss";
-import {TileEntry} from "../../../../models/app/Tile";
+import {editState, TileEntry} from "../../../../models/app/Tile";
 
 type Props = IManagerProps & IProps;
 
@@ -23,6 +23,7 @@ export default class AssignmentManager extends Component<Props, IState> {
 
     const entry: TileEntry = {
       id: -1,
+      state: editState.new,
       tile_id: tile ? tile.id : -1,
       title: !assignment ? name : assignment.name,
       type: "ASSIGNMENT"

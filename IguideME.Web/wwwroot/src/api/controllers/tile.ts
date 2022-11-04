@@ -167,13 +167,23 @@ export default class TileController extends Controller {
     ).then(response => response.data);
   }
 
-  static deleteTileGoal(tileId: number): Promise<void> {
+  static updateTileGoal(goal: LearningGoal): Promise<LearningGoal> {
+    if (debug()) {
+      return delay(goal);
+    }
+
+    return this.client.patch(
+      `tiles/goals/${goal.id}`, goal
+    ).then(response => response.data);
+  }
+
+  static deleteTileGoal(id: number): Promise<void> {
     if (debug()) {
       return delay(() => { });
     }
 
     return this.client.delete(
-      `tiles/goals/${tileId}`
+      `tiles/goals/${id}`
     ).then(response => response.data);
   }
 

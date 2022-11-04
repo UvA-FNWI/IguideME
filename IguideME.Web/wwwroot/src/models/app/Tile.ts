@@ -1,4 +1,5 @@
 export enum editState {
+  unchanged,
   new,
   updated,
   removed
@@ -30,6 +31,7 @@ export interface Tile {
 
 export interface TileEntry {
   id: number;
+  state: editState
   tile_id: number;
   title: string;
   type: "ASSIGNMENT" | "DISCUSSION" | "LEARNING_OUTCOMES"

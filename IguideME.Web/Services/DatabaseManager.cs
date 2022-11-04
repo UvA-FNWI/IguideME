@@ -50,6 +50,7 @@ namespace IguideME.Web.Services
                     command.CommandText = query;
                     command.ExecuteNonQuery();
                 }
+                connection.Close();
             } catch {
                 // Close connection before rethrowing
                 connection.Close();
@@ -74,6 +75,7 @@ namespace IguideME.Web.Services
                     command.CommandText = "SELECT last_insert_rowid()";
                     id = int.Parse(command.ExecuteScalar().ToString());
                 }
+                connection.Close();
             } catch {
                 // Close connection before rethrowing
                 connection.Close();
@@ -1228,18 +1230,38 @@ namespace IguideME.Web.Services
             return goals;
         }
 
-        public LearningGoal GetGoal(int courseID, int tileID)
+        public List<LearningGoal> GetGoals(int courseID, int tileID)
+        {
+            string query = String.Format(
+                DatabaseQueries.QUERY_TILE_LEARNING_GOALS,
+                courseID, tileID
+            );
+
+            List<LearningGoal> goals = new List<LearningGoal>();
+            using(SQLiteDataReader r = Query(query)){
+                while (r.Read()){
+                    try {
+                        goals.Add(new LearningGoal(r.GetInt32(0), tileID, r.GetValue(1).ToString()));
+                    } catch (Exception e) {
+                        PrintQueryError("GetGoals", 1, r, e);
+                    }
+                }
+            }
+            return goals;
+        }
+
+        public LearningGoal GetGoal(int courseID, int id)
         {
             string query = String.Format(
                 DatabaseQueries.QUERY_LEARNING_GOAL,
-                courseID, tileID
+                courseID, id
             );
 
             LearningGoal goal = null;
             using(SQLiteDataReader r = Query(query)){
                 if (r.Read()){
                     try {
-                        goal = new LearningGoal(r.GetInt32(0), tileID, r.GetValue(1).ToString());
+                        goal = new LearningGoal(id, r.GetInt32(0), r.GetValue(1).ToString());
                     } catch (Exception e) {
                         PrintQueryError("GetGoals", 1, r, e);
                     }
@@ -1254,24 +1276,48 @@ namespace IguideME.Web.Services
                 DatabaseQueries.CREATE_LEARNING_GOAL,
                 courseID, tileID, title
             );
-            NonQuery(query);
 
-            return GetGoal(courseID, tileID);
+            return new LearningGoal(IDNonQuery(query), tileID, title);
+
         }
 
-        public void DeleteGoal(int courseID, int tileID)
+        public LearningGoal UpdateGoal(int courseID, LearningGoal goal)
         {
-            LearningGoal goal = GetGoal(courseID, tileID);
-            if (goal == null) {
-                return;
-            }
+            string query = String.Format(
+                DatabaseQueries.UPDATE_LEARNING_GOAL,
+                courseID, goal.ID, goal.TileID, goal.Title
+            );
+            NonQuery(query);
+
+            return GetGoal(courseID, goal.ID);
+        }
+
+        public void DeleteGoal(int courseID, LearningGoal goal) {
             goal.FetchRequirements();
             goal.DeleteGoalRequirements();
 
             string query = String.Format(
-                DatabaseQueries.DELETE_LEARNING_GOAL, courseID, tileID
+                DatabaseQueries.DELETE_LEARNING_GOAL, courseID, goal.ID
             );
             NonQuery(query);
+        }
+
+        public void DeleteGoal(int courseID, int id)
+        {
+            LearningGoal goal = GetGoal(courseID, id);
+            if (goal == null) {
+                return;
+            }
+            DeleteGoal(courseID, goal);
+
+        }
+
+        public void DeleteGoals(int courseID, int tileID)
+        {
+            List<LearningGoal> goals = GetGoals(courseID, tileID);
+            foreach (LearningGoal goal in goals) {
+                DeleteGoal(courseID, goal);
+            }
         }
 
         public void CreateGoalRequirement(
@@ -1290,11 +1336,29 @@ namespace IguideME.Web.Services
             NonQuery(query);
         }
 
+        public void UpdateGoalRequirement(GoalRequirement requirement)
+        {
+            string query = String.Format(
+                DatabaseQueries.UPDATE_LEARNING_GOAL_REQUIREMENT,
+                requirement.ID, requirement.GoalID, requirement.TileID, requirement.EntryID, requirement.MetaKey, requirement.Value, requirement.Expression
+            );
+            NonQuery(query);
+        }
         public void DeleteGoalRequirements(int goalID)
         {
             string query = String.Format(
                 DatabaseQueries.DELETE_GOAL_REQUIREMENTS,
                 goalID
+            );
+
+            NonQuery(query);
+        }
+
+        public void DeleteGoalRequirement(int goalID, int id)
+        {
+            string query = String.Format(
+                DatabaseQueries.DELETE_GOAL_REQUIREMENT,
+                goalID, id
             );
 
             NonQuery(query);
@@ -1313,11 +1377,13 @@ namespace IguideME.Web.Services
                 {
                     requirements.Add(new GoalRequirement(
                         r.GetInt32(0),
+                        0,
                         r.GetInt32(1),
                         r.GetInt32(2),
-                        r.GetValue(3).ToString(),
-                        r.GetFloat(4),
-                        r.GetValue(5).ToString()
+                        r.GetInt32(3),
+                        r.GetValue(4).ToString(),
+                        r.GetFloat(5),
+                        r.GetValue(6).ToString()
                     ));
                 }
             }
@@ -1433,6 +1499,7 @@ namespace IguideME.Web.Services
                     try {
                         entries.Add(new TileEntry(
                         r.GetInt32(0),
+                        0,
                         r.GetInt32(1),
                         r.GetValue(2).ToString(),
                         r.GetValue(3).ToString()
@@ -1966,6 +2033,7 @@ namespace IguideME.Web.Services
             {
                 entries.Add(new TileEntry(
                     r.GetInt32(0),
+                    0,
                     r.GetInt32(1),
                     r.GetValue(2).ToString(),
                     r.GetValue(3).ToString()
@@ -1977,7 +2045,7 @@ namespace IguideME.Web.Services
 
         public void DeleteTile(int courseID, int tileID)
         {
-            DeleteGoal(courseID, tileID);
+            DeleteGoals(courseID, tileID);
             NonQuery(String.Format(
                     @"DELETE FROM `tile` WHERE `id` = {0};",
                     tileID

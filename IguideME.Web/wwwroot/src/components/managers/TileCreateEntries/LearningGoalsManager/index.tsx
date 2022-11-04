@@ -24,19 +24,10 @@ export default class LearningGoalsManager extends Component<IProps, IState> {
   }
 
   updateGoal = (goal: LearningGoal) => {
-    let goals: LearningGoal[] = JSON.parse(JSON.stringify(this.props.goals));
-    const idx = goals.findIndex(g => g.id === goal.id)!;
-
-    goals[idx] = goal;
-    this.props.setGoals(goals);
-  }
-
-  removeGoal = (id: number) => {
-    for (var i = 0; i < this.props.goals.length; i++) {
-      if (this.props.goals[i].id === id) {
-        this.props.goals[i].state = editState.removed;
-      }
+    if ((goal.state !== editState.new) && (goal.state !== editState.removed)) {
+      goal.state = editState.updated;
     }
+    this.props.setGoals(this.props.goals);
   }
 
   render(): React.ReactNode {
@@ -58,7 +49,6 @@ export default class LearningGoalsManager extends Component<IProps, IState> {
             <GoalEntry tile={tile}
                        goal={goal}
                        updateGoal={this.updateGoal}
-                       removeGoal={this.removeGoal}
             />
           )
         })}

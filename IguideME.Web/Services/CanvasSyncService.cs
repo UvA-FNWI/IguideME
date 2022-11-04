@@ -37,6 +37,8 @@ namespace IguideME.Web.Services
         {
             var result = new JobResultModel();
             var courseID = work.CourseID;
+
+            // TODO: check course dates
             var notifications_bool = (work.Notifications_bool && (DateTime.Now.DayOfWeek == DayOfWeek.Monday || DateTime.Now.DayOfWeek == DayOfWeek.Friday));
 
             _logger.LogInformation($"{DateTime.Now}: Starting sync of course {courseID}");

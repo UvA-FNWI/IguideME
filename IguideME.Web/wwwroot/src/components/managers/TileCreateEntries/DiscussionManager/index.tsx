@@ -5,7 +5,7 @@ import CreatableSelect from "react-select/creatable";
 import FadeIn from "react-fade-in";
 import {IManagerProps} from "../types";
 import {IProps} from "./types";
-import {TileEntry} from "../../../../models/app/Tile";
+import {editState, TileEntry} from "../../../../models/app/Tile";
 
 type Props = IManagerProps & IProps;
 
@@ -18,6 +18,7 @@ class DiscussionManager extends Component<Props> {
 
     const entry: TileEntry = {
       id: -1,
+      state: editState.new,
       tile_id: tile ? tile.id : -1,
       title: !assignment ? title : assignment.title,
       type: "DISCUSSION"

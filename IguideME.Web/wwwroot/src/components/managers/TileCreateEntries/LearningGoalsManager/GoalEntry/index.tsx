@@ -24,20 +24,27 @@ export default class GoalEntry extends Component<IProps> {
     this.setState({ goal });
   }
 
-  updateRequirement = (requirement: GoalRequirementModel) => {
-    let goal: LearningGoal = JSON.parse(JSON.stringify(this.props.goal));
-    const id = goal.requirements.findIndex(r => r.id === requirement.id)!;
-    goal.requirements[id] = requirement;
-
+  addNewRequirement = () => {
+    const {goal, tile} = this.props;
+    goal.requirements = [{
+      id: -1,
+      state: editState.new,
+      expression: null,
+      goal_id: goal.id,
+      tile_id: tile ? tile.id : -1,
+      entry_id: -1,
+      meta_key: "grade",
+      value: 0
+    }, ...goal.requirements];
     this.props.updateGoal(goal);
   }
 
-  removeRequirement = (id: number) => {
-    let { goal } = this.props;
-    // TODO: this is awful
-    goal.requirements = goal.requirements.filter(r => r.id !== id);
-
-    this.props.updateGoal(goal);
+  updateRequirement = (requirement: GoalRequirementModel) => {
+    if ((requirement.state !== editState.new) && (requirement.state !== editState.removed)) {
+      requirement.state = editState.updated;
+    }
+    this.props.updateGoal(this.props.goal);
+    this.setState({goal: this.props.goal});
   }
 
   render(): React.ReactNode {
@@ -75,7 +82,7 @@ export default class GoalEntry extends Component<IProps> {
                         allowOutsideClick: true
                       }).then((result) => {
                         if (result.isConfirmed) {
-                          this.props.removeGoal(goal.id);
+                          goal.state = editState.removed;
                           this.setState({goal});
                         }
                       });
@@ -85,18 +92,7 @@ export default class GoalEntry extends Component<IProps> {
             </Button>
 
             <Button shape={"round"}
-                    onClick={() => {
-                      goal.requirements = [{
-                        id: generateUniqueID(goal.requirements.map(r => r.id)),
-                        expression: null,
-                        goal_id: goal.id,
-                        tile_id: tile ? tile.id : -1,
-                        entry_id: -1,
-                        meta_key: "grade",
-                        value: 0
-                      }, ...goal.requirements];
-                      this.props.updateGoal(goal);
-                    }}
+                    onClick={this.addNewRequirement}
                     icon={<PlusOutlined />}>
               Requirement
             </Button>
@@ -109,7 +105,6 @@ export default class GoalEntry extends Component<IProps> {
         { goal.requirements.map(r => {
           return (
             <GoalRequirement updateRequirement={this.updateRequirement}
-                             removeRequirement={this.removeRequirement}
                              requirement={r} />
           );
         })}

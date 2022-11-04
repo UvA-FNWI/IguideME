@@ -152,10 +152,8 @@ namespace IguideME.Web.Controllers
             if (success)
             {
                 return Json(
-                    DatabaseManager.Instance
-                        .GetGoals(GetCourseID())
-                        .Where(g => g.TileID == id)
-                        .ToArray());
+                    DatabaseManager.Instance.GetGoals(GetCourseID(), id)
+                );
             }
 
             return BadRequest();
@@ -188,15 +186,57 @@ namespace IguideME.Web.Controllers
         }
 
         [Authorize(Policy = "IsInstructor")]
-        [HttpDelete]
+        [HttpPatch]
         [Route("/tiles/goals/{tileID}")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public ActionResult deleteTileGoal(string tileID)
+        public ActionResult patchTileGoal(string tileID, [FromBody] LearningGoal goal)
         {
             int id;
             bool success = Int32.TryParse(tileID, out id);
+
+            if (success)
+            {
+                foreach (GoalRequirement req in goal.Requirements){
+                    switch (req.State) {
+                        case editState.New:
+                            DatabaseManager.Instance.CreateGoalRequirement(
+                                req.GoalID,
+                                req.TileID,
+                                req.EntryID,
+                                req.MetaKey,
+                                req.Value,
+                                req.Expression
+                            );
+                            break;
+                        case editState.Updated:
+                            DatabaseManager.Instance.UpdateGoalRequirement(req);
+                            break;
+                        case editState.Removed:
+                            DatabaseManager.Instance.DeleteGoalRequirement(req.GoalID, req.ID);
+                            break;
+                    }
+                }
+                return Json(
+                    DatabaseManager.Instance.UpdateGoal(GetCourseID(), goal)
+                );
+            }
+
+            return BadRequest();
+        }
+
+        [Authorize(Policy = "IsInstructor")]
+        [HttpDelete]
+        [Route("/tiles/goals/{goalID}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public ActionResult deleteTileGoal(string goalID)
+        {
+            int id;
+            bool success = Int32.TryParse(goalID, out id);
+            logger.LogInformation("deleting goal");
 
             if (success)
             {

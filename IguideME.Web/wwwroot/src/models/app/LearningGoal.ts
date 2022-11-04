@@ -2,7 +2,7 @@ import {editState} from "./Tile"
 
 export interface LearningGoal {
   id: number;
-  state: editState,
+  state: editState;
   tile_id: number;
   title: string;
   requirements: GoalRequirement[];
@@ -10,12 +10,13 @@ export interface LearningGoal {
 
 export interface GoalRequirement {
   id: number;
+  state:editState;
   goal_id: number;
   tile_id: number;
   entry_id: number | string;
   meta_key: string | null;
   value: number;
-  expression: "lte" | "gte" | "e" | null;
+  expression: string | null;
 }
 
 export interface LearningOutcome {

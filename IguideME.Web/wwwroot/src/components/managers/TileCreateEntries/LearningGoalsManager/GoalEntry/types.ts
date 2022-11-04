@@ -5,7 +5,6 @@ export interface IProps {
   tile: Tile | undefined,
   goal: LearningGoal;
   updateGoal: (goal: LearningGoal) => any;
-  removeGoal: (id: number) => any;
 }
 
 export interface IState {

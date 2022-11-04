@@ -61,15 +61,15 @@ namespace IguideME.Web.Services.Workers
                 }
 
                 string body = "";
-                if (string.IsNullOrEmpty(outperforming))
+                if (!string.IsNullOrEmpty(outperforming))
                     body += @$"You are outperforming your peers in:
                                {outperforming}
                                ";
-                if (string.IsNullOrEmpty(closing))
+                if (!string.IsNullOrEmpty(closing))
                     body += @$"You are closing the gap to your peers in:
                                {closing}
                                ";
-                if (string.IsNullOrEmpty(moreEffort))
+                if (!string.IsNullOrEmpty(moreEffort))
                     body += @$"You have to put more effort in:
                                {moreEffort}
                                ";
