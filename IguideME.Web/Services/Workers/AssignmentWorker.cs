@@ -43,6 +43,7 @@ namespace IguideME.Web.Services.Workers
 					assignment.DueDate.HasValue ? assignment.DueDate.Value.ToShortDateString() : "",
 					assignment.PointsPossible ??= 0,
 					assignment.Position ??= 0,
+					(int) assignment.GradingType,
 					assignment.SubmissionType,
 					hashCode
 				);
@@ -50,7 +51,6 @@ namespace IguideME.Web.Services.Workers
 				var submissions = assignment.Submissions;
 				foreach (var submission in submissions)
 				{
-
 					// don't register data from students that did not give consent
 					if (DatabaseManager.Instance.GetConsent(this.courseID, submission.User.SISUserID) != 1) {
 						continue;
@@ -63,13 +63,27 @@ namespace IguideME.Web.Services.Workers
 					var entry = entries.Find(e => e.Title == assignment.Name);
 					if (entry != null)
                     {
+							float grade;
+
+							switch (assignment.GradingType) {
+								case UvA.DataNose.Connectors.Canvas.GradingType.Points:
+									grade = float.Parse(submission.Grade);
+									break;
+								case UvA.DataNose.Connectors.Canvas.GradingType.Percentage:
+									grade = float.Parse(submission.Grade)/10;
+									break;
+								default:
+									grade = -1; // TODO: handle the letter grading options etc
+									_logger.LogError($"Grade format {assignment.GradingType} is not supported, grade = {submission.Grade}");
+									break;
+							}
 							DatabaseManager.Instance.CreateUserSubmission(
 								this.courseID,
 								entry.ID,
 								submission.User.SISUserID,
-								submission.Grade,
+								grade,
 								"",//submission.SubmittedAt.Value.ToShortDateString(),
-								this.hashCode);
+								hashCode);
 					}
 				}
 

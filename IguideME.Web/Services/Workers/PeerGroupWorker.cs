@@ -78,9 +78,9 @@ namespace IguideME.Web.Services.Workers
                 var peerIDs = peers.Select(p => p.LoginID);
 
                 var peerGrades1 = DatabaseManager.Instance.GetUserPeerComparison(
-                            this.CourseID, user.LoginID);
+                            this.CourseID, user.LoginID, hash: this.Hash);
                 var userGrades1 = DatabaseManager.Instance.GetUserResults(
-                    this.CourseID, user.LoginID);
+                    this.CourseID, user.LoginID, hash: this.Hash);
 
                 var tilesWithNotifications = tiles.Where(t => t.Notifications);
 

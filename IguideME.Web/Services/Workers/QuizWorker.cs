@@ -29,6 +29,7 @@ namespace IguideME.Web.Services.Workers
 			foreach (var quiz in quizzes)
 			{
 				_logger.LogInformation("\t" + quiz.Name);
+				try {
 				DatabaseManager.Instance.RegisterAssignment(
 					quiz.ID,
 					quiz.CourseID,
@@ -38,9 +39,13 @@ namespace IguideME.Web.Services.Workers
 					quiz.DueDate.HasValue ? quiz.DueDate.Value.ToShortDateString() : "",
 					0,
 					0,
+					4, //Grading type points = 4
 					"online",
 					this.hashCode
 				);
+				} catch (Exception e) {
+					_logger.LogError(e.Message + e.StackTrace);
+				}
 			}
 		}
 	}

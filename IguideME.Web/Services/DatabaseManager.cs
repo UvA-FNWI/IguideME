@@ -149,6 +149,11 @@ namespace IguideME.Web.Services
             foreach (var query in queries)
                 NonQuery(query);
 
+            try{
+                NonQuery("ALTER TABLE `canvas_assignment` ADD COLUMN `grading_type` INTEGER;");
+            } catch (Exception) {
+                Console.WriteLine("Table already exists");
+            }
             //NonQuery("DELETE FROM tile WHERE id=10;");
             // TODO: what are these for?
             // NonQuery("DELETE FROM learning_goal;");
@@ -347,6 +352,7 @@ namespace IguideME.Web.Services
             string dueDate,
             double? pointsPossible,
             int? position,
+            int gradingType,
             string submissionType,
             string syncHash)
         {
@@ -361,6 +367,7 @@ namespace IguideME.Web.Services
                     dueDate,
                     pointsPossible,
                     position,
+                    gradingType,
                     submissionType,
                     syncHash));
         }
@@ -729,7 +736,7 @@ namespace IguideME.Web.Services
             int courseID,
             int entryID,
             string userLoginID,
-            string grade,
+            float grade,
             string submitted,
             string hash = null)
         {
@@ -1010,6 +1017,7 @@ namespace IguideME.Web.Services
 
                         submissions.Add(submission);
                     } catch (Exception e) {
+                        _logger.LogInformation(activeHash);
                         PrintQueryError("GetUserPeerComparison", 6, r1, e);
                     }
                 }

@@ -579,7 +579,7 @@ namespace IguideME.Web.Controllers
                     this.GetCourseID(),
                     id,
                     row.GetValue("studentloginid").ToString(),
-                    row.GetValue("grade").ToString(),
+                    float.Parse(row.GetValue("grade").ToString()),
                     DateTime.Now.ToShortDateString());
 
                 foreach (JProperty property in row.Properties())

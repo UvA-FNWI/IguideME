@@ -98,7 +98,8 @@ public static class DatabaseQueries
             id              INTEGER PRIMARY KEY AUTOINCREMENT,
             course_id       INTEGER,
             user_login_id   STRING,
-            grade           INTEGER NULL
+            grade           INTEGER NULL,
+            UNIQUE(course_id, user_login_id)
         );";
 
     public const string CREATE_TABLE_PEER_GROUP =
@@ -699,6 +700,7 @@ public static class DatabaseQueries
             `due_date`        STRING NULL,
             `points_possible` FLOAT,
             `position`        INTEGER,
+            `grading_type`    INTEGER,
             `submission_type` STRING NULL,
             `sync_hash`       STRING
         );";
@@ -807,9 +809,10 @@ public static class DatabaseQueries
                             `due_date`,
                             `points_possible`,
                             `position`,
+                            `grading_type`,
                             `submission_type`,
                             `sync_hash` )
-        VALUES('{0}', {1}, '{2}', {3}, {4}, '{5}', {6}, {7}, '{8}', '{9}');";
+        VALUES('{0}', {1}, '{2}', {3}, {4}, '{5}', {6}, {7}, {8}, '{9}', '{10}');";
 
     public const string REGISTER_CANVAS_DISCUSSION =
         @"INSERT INTO   `canvas_discussion`
