@@ -1000,18 +1000,19 @@ public static class DatabaseQueries
     public const string QUERY_USER_PEER_GRADES =
         @"SELECT   `tile`.`id`,
 	    CASE `tile`.`content_type`
-            WHEN 'BINARY' THEN  AVG(`grade`) * 100
-            ELSE                AVG(`grade`)
+            WHEN 'BINARY' THEN  AVG(`tile_entry_submission`.`grade`) * 100
+            ELSE                AVG(`tile_entry_submission`.`grade`)
        	END average,
 	    CASE `tile`.`content_type`
-            WHEN 'BINARY' THEN  MIN(`grade`) * 100
-            ELSE                MIN(`grade`)
+            WHEN 'BINARY' THEN  MIN(`tile_entry_submission`.`grade`) * 100
+            ELSE                MIN(`tile_entry_submission`.`grade`)
        	END minimum,
 	    CASE `tile`.`content_type`
-            WHEN 'BINARY' THEN  MAX(`grade`) * 100
-            ELSE                MAX(`grade`)
+            WHEN 'BINARY' THEN  MAX(`tile_entry_submission`.`grade`) * 100
+            ELSE                MAX(`tile_entry_submission`.`grade`)
        	END maximum,
         `tile_entry`.`title`,
+        `tile_entry_submission`.`grade`,
         `tile`.`content_type`
         FROM        `tile_entry_submission`
         INNER JOIN  `tile_entry`

@@ -998,10 +998,8 @@ namespace IguideME.Web.Services
             List<PeerComparisonData> submissions = new List<PeerComparisonData>();
 
             using(SQLiteDataReader r1 = Query(query1)) {
-                _logger.LogInformation("test3");
                 while (r1.Read()) {
                     try {
-                        _logger.LogInformation("test2");
 
                         PeerComparisonData submission = new PeerComparisonData(
                             r1.GetInt32(0),
@@ -1012,7 +1010,7 @@ namespace IguideME.Web.Services
 
                         submissions.Add(submission);
                     } catch (Exception e) {
-                        PrintQueryError("GetUserPeerComparison", 5, r1, e);
+                        PrintQueryError("GetUserPeerComparison", 6, r1, e);
                     }
                 }
             }
