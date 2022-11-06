@@ -1010,22 +1010,22 @@ public static class DatabaseQueries
 	    CASE `tile`.`content_type`
             WHEN 'BINARY' THEN  MAX(`grade`) * 100
             ELSE                MAX(`grade`)
-       	END maximum
+       	END maximum,
+        `tile_entry`.`title`,
+        `tile`.`content_type`
         FROM        `tile_entry_submission`
         INNER JOIN  `tile_entry`
             ON      `tile_entry_submission`.`entry_id`=`tile_entry`.`id`
         INNER JOIN  `tile`
             ON      `tile`.`id`=`tile_entry`.`tile_id`
-        INNER JOIN  `peer_group`
-            ON      `tile_entry_submission`.`user_login_id`=`peer_group`.`target_login_id`
         INNER JOIN  `layout_tile_group`
             ON      `layout_tile_group`.`id`=`tile`.`group_id`
-        INNER JOIN  `layout_column`
-            ON      `layout_tile_group`.`column_id`=`layout_column`.`id`
+        INNER JOIN  `peer_group`
+            ON      `tile_entry_submission`.`user_login_id`=`peer_group`.`target_login_id`
 	    WHERE       `tile`.`content_type` != 'LEARNING_OUTCOMES'
 	    AND	        `tile`.`content_type` != 'PREDICTION'
         AND	        `tile`.`tile_type` != 'DISCUSSIONS'
-        AND         `layout_column`.`course_id`={0}
+        AND         `layout_tile_group`.`course_id`={0}
         AND         `peer_group`.`user_login_id`='{1}'
         AND         `peer_group`.`sync_hash`='{2}'
         AND         `tile_entry_submission`.`sync_hash`='{2}'
