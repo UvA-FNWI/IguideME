@@ -74,7 +74,7 @@ namespace IguideME.Web.Services.Workers
                                {moreEffort}
                                ";
 
-                if (string.IsNullOrEmpty(body)) {
+                if (!string.IsNullOrEmpty(body)) {
                     _logger.LogInformation($"Sending notification to {user.LoginID}, {user.UserID}: {body}");
                     canvasTest.sendMessage(user.UserID,
                     "IGuideME",
