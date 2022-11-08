@@ -26,9 +26,6 @@ export default class StudentConsentTable extends Component<IProps, IState> {
     render(): React.ReactNode {
       const { consents, goals } = this.state;
 
-      console.log("CONSENTS:", consents);
-      console.log("GOALS:", goals);
-
       return (
         <div id={"studentsConsentTable"} style={{position: 'relative', overflow: 'visible'}}>
           <Table columns={this.getColumns()}
@@ -48,6 +45,7 @@ export default class StudentConsentTable extends Component<IProps, IState> {
         fixed: true,
         width: 80,
         sorter: (a, b) => a.userName.localeCompare(b.userName),
+        defaultSortOrder: 'ascend',
         render: (text: string, record: any) => {
           return (
             <span>{ text }<br /><small>{ record.consentData.userLoginID}</small></span>

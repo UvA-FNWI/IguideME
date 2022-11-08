@@ -11,6 +11,8 @@ export default class TileType extends Component<{ type: TileTypeTypes }> {
         return "Discussions";
       case "EXTERNAL_DATA":
         return "External Data";
+      default:
+        return "N/A";
     }
   }
 

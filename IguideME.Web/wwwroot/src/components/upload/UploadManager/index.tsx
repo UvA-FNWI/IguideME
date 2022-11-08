@@ -8,6 +8,7 @@ import ExternalDataController from "../../../api/controllers/externalData";
 import StudentController from "../../../api/controllers/student";
 import TileController from "../../../api/controllers/tile";
 import "./style.scss";
+import { editState } from "../../../models/app/Tile";
 
 export default class UploadManager extends Component<IProps, IState> {
 
@@ -43,6 +44,7 @@ export default class UploadManager extends Component<IProps, IState> {
     this.setState({ uploading: true }, () => {
       TileController.createTileEntry({
         id: -1,
+        state: editState.new,
         tile_id: tile.id,
         title,
         type: "ASSIGNMENT"

@@ -4,7 +4,7 @@ import {SaveOutlined} from "@ant-design/icons";
 import {IProps, IState} from "./types";
 import Select from "react-select";
 import TileCreateEntries from "../../../../../../components/managers/TileCreateEntries";
-import {Tile, TileContentTypes, TileEntry, TileTypeTypes} from "../../../../../../models/app/Tile";
+import {editState, Tile, TileContentTypes, TileEntry, TileTypeTypes} from "../../../../../../models/app/Tile";
 import VisibilityButton from "./VisibilityButton";
 import {RootState} from "../../../../../../store";
 import {connect, ConnectedProps} from "react-redux";
@@ -56,7 +56,6 @@ class EditTileDragger extends Component<Props, IState> {
         });
       }
     } else if (nextProps.tile === undefined) {
-      console.log("tile undefined")
       this.setState({
         title: "",
         contentType: { label: undefined, value: undefined },
@@ -68,8 +67,6 @@ class EditTileDragger extends Component<Props, IState> {
   }
 
   componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<{}>, snapshot?: any): void {
-    console.log("Update, prev", prevProps)
-    console.log("Update, curr", this.props)
     if (!prevProps.isOpen && this.props.isOpen) {
       window.scrollTo(0, 0);
     }
@@ -99,10 +96,11 @@ class EditTileDragger extends Component<Props, IState> {
           return e;
         }));
       } else if (tile.content === "LEARNING_OUTCOMES") {
-        await this.createGoals(goals.map(e => {
-          e.tile_id = tile.id;
-          return e;
-        }));
+        for (var i = 0; i < goals.length; i++) {
+          goals[i].tile_id = tile.id;
+          var response = await TileController.createTileGoal(goals[i]);
+          console.log("goal", response)
+        }
       }
 
       this.props.loadTiles().then(() => {
@@ -121,63 +119,63 @@ class EditTileDragger extends Component<Props, IState> {
     const { entries, goals, graphView, wildcard, title }: IState = this.state;
     const { tileEntries, tile }: Props = this.props;
 
-    let tileRef = JSON.parse(JSON.stringify(tile!));
-    tileRef.title = title;
-    tileRef.graph_view = graphView;
-    tileRef.wildcard = wildcard;
+    // let tileRef = JSON.parse(JSON.stringify(tile!));
+    tile!.title = title;
+    tile!.graph_view = graphView;
+    tile!.wildcard = wildcard;
 
-    TileController.updateTile(tileRef).then(patchedTile => {
-      this.setState({ updating: true }, async () => {
-        if (['ASSIGNMENTS', 'DISCUSSIONS'].includes(tile!.type || "")) {
+    const patchedTile = await TileController.updateTile(tile!)
+    this.setState({ updating: true }, async () => {
+      var removedEntries = tileEntries.filter(
+        e => e.tile_id === ( tile ? tile.id : -1 )
+      ).filter(
+        e => !entries.map(_e => _e.title).includes(e.title));
 
-          const removedEntries = tileEntries.filter(
-            e => e.tile_id === patchedTile.id
-          ).filter(
-            e => !entries.map(_e => _e.title).includes(e.title));
-          const newEntries = entries.filter(e => e.id === -1);
+      var newEntries = entries.filter(e => e.id === -1);
 
-          await this.deleteEntries(removedEntries);
-          await this.createEntries(newEntries);
-        } else if (tile!.content === "LEARNING_OUTCOMES") {
-          const removedGoals = goals.filter(
-            g => g.tile_id === patchedTile.id
-          ).filter(
-            g => !goals.map(_g => _g.title).includes(g.title));
-          const newGoals = goals.filter(g => g.new === true);
+      console.log("Tile type", tile!.type);
+      console.log("Goals lengt", goals.length);
 
-          await this.deleteGoals(removedGoals);
-          await this.createGoals(newGoals);
-        }
-
-        this.props.loadTiles().then(() => {
-          this.props.loadEntries().then(() => {
-            this.props.loadTileGoals().then(() => {
-              this.setState({ updating: false }, () => {
-                this.props.setOpen(false);
-              });
-            });
-          });
-        });
-      });
-
-
-      this.setState({ updating: true }, async () => {
-        const removedEntries = tileEntries.filter(
-          e => e.tile_id === ( tile ? tile.id : -1 )
+      if (tile!.type === 'ASSIGNMENTS' || tile!.type === 'DISCUSSIONS' ) {
+        removedEntries = tileEntries.filter(
+          e => e.tile_id === patchedTile.id
         ).filter(
           e => !entries.map(_e => _e.title).includes(e.title));
 
-        const newEntries = entries.filter(e => e.id === -1);
+        newEntries = entries.filter(e => e.id === -1);
 
-        await this.deleteEntries(removedEntries);
-        await this.createEntries(newEntries);
+      }
+      else if (tile!.content === "LEARNING_OUTCOMES") {
+        for (var i = 0; i < goals.length; i++) {
+          if (goals[i].state != null) {
+            switch (goals[i].state) {
+              case editState.new:
+                goals[i].state = editState.unchanged;
+                await TileController.createTileGoal(goals[i]);
+                break;
+              case editState.updated:
+                goals[i].state = editState.unchanged;
+                await TileController.updateTileGoal(goals[i]);
+                break;
+              case editState.removed:
+                goals[i].state = editState.unchanged;
+                await TileController.deleteTileGoal(goals[i].id);
+                break;
+              case editState.unchanged:
+                break;
+            }
+          }
+        }
+      }
 
-        this.props.loadTiles().then(() => {
-          this.props.loadEntries().then(() => {
-            this.props.loadTileGoals().then(() => {
-              this.setState({ updating: false }, () => {
-                this.props.setOpen(false);
-              });
+      await this.deleteEntries(removedEntries);
+      await this.createEntries(newEntries);
+
+      this.props.loadTiles().then(() => {
+        this.props.loadEntries().then(() => {
+          this.props.loadTileGoals().then(() => {
+            this.setState({ updating: false }, () => {
+              this.props.setOpen(false);
             });
           });
         });
@@ -197,24 +195,9 @@ class EditTileDragger extends Component<Props, IState> {
     }
   }
 
-  createGoals = async (goals: LearningGoal[]) => {
-    for (const goal of goals) {
-      await TileController.createTileGoal(goal);
-    }
-  }
-
-  deleteGoals = async (goals: LearningGoal[]) => {
-    for (const goal of goals) {
-      await TileController.deleteTileGoal(goal.id);
-    }
-  }
-
   render(): React.ReactNode {
     const { tileGroup, tiles, tile } = this.props;
     const { title, contentType, tileType, visible }: IState = this.state;
-
-    console.log("tile", tile);
-    console.log("tiles", tiles);
 
     return (
       <Drawer
@@ -282,7 +265,6 @@ class EditTileDragger extends Component<Props, IState> {
           <Col xs={12}>
             <span>Content type</span>
             <Select value={{label: contentType.label as string, value: contentType.value as string}}
-                    // isDisabled={tile === undefined}
                     style={{zIndex: 100}}
                     options={[
                       { label: 'Binary', value: 'BINARY'},
@@ -316,9 +298,7 @@ class EditTileDragger extends Component<Props, IState> {
             { ((contentType.value === "LEARNING_OUTCOMES") || (contentType.value === "PREDICTION")) ?
               <h3>N/A</h3> :
               <Select value={{label: tileType.label as string, value: tileType.value as string}}
-                      isDisabled={
-                        // tile === undefined ||
-                        !contentType}
+                      isDisabled={!contentType}
                       isClearable={true}
                       style={{zIndex: 100}}
                       options={[
@@ -348,8 +328,6 @@ class EditTileDragger extends Component<Props, IState> {
                            updateGoals={(goals) => this.setState({ goals })}
                            contentType={this.state.contentType.value}
                            tileType={this.state.tileType.value}
-
-
         />
       </Drawer>
     )

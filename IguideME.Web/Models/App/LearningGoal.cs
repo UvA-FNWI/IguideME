@@ -1,5 +1,7 @@
-﻿using IguideME.Web.Services;
+﻿using System.Collections.Generic;
+using IguideME.Web.Services;
 using Newtonsoft.Json;
+
 
 namespace IguideME.Web.Models.App
 {
@@ -15,7 +17,7 @@ namespace IguideME.Web.Models.App
         public string Title { get; set; }
 
         [JsonProperty("requirements")]
-        public GoalRequirement[] Requirements { get; set; }
+        public List<GoalRequirement> Requirements { get; set; }
 
         public LearningGoal(
             int id,
@@ -34,14 +36,29 @@ namespace IguideME.Web.Models.App
         public void FetchRequirements()
         {
             this.Requirements = DatabaseManager.Instance
-                        .GetGoalRequirements(this.ID)
-                        .ToArray();
+                        .GetGoalRequirements(this.ID);
         }
 
+        public void DeleteGoalRequirements()
+        {
+            DatabaseManager.Instance.DeleteGoalRequirements(this.ID);
+            this.Requirements.Clear();
+        }
+
+        // public void DeleteGoalRequirement(int tileID)
+        // {
+        //     DatabaseManager.Instance.DeleteGoalRequirement(this.ID, tileID);
+        // }
     }
 
     public class GoalRequirement
     {
+        [JsonProperty("id")]
+        public int ID { get; set; }
+
+        [JsonProperty("state")]
+        public editState State { get; set; }
+
         [JsonProperty("goal_id")]
         public int GoalID { get; set; }
 
@@ -61,6 +78,8 @@ namespace IguideME.Web.Models.App
         public string Expression { get; set; }
 
         public GoalRequirement(
+            int ID,
+            editState state,
             int goalID,
             int tileID,
             int entryID,
@@ -68,6 +87,8 @@ namespace IguideME.Web.Models.App
             float value,
             string expression)
         {
+            this.ID = ID;
+            this.State = state;
             this.GoalID = goalID;
             this.TileID = tileID;
             this.EntryID = entryID;

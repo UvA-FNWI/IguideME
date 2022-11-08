@@ -80,7 +80,7 @@ class DraggableTile extends Component<Props, IState> {
       <Draggable key={'dragTile' + tile!.id.toString()} className={"tile"}>
         <div>
           <div className={"padded"}>
-            <ActionButtons {...{tile, editTile: this.props.editTile}} />
+            <ActionButtons {...{tile, editTile: this.props.editTile, deleteTile: this.props.deleteTile}} />
             <h3>{ tile!.title }</h3>
             <Row gutter={10} style={{ marginTop: 20 }}>
               <Col xs={12}>

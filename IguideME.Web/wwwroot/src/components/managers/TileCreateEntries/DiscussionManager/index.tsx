@@ -5,7 +5,7 @@ import CreatableSelect from "react-select/creatable";
 import FadeIn from "react-fade-in";
 import {IManagerProps} from "../types";
 import {IProps} from "./types";
-import {TileEntry} from "../../../../models/app/Tile";
+import {editState, TileEntry} from "../../../../models/app/Tile";
 
 type Props = IManagerProps & IProps;
 
@@ -16,23 +16,11 @@ class DiscussionManager extends Component<Props> {
     const { canvasDiscussions, tile }: Props = this.props;
     const assignment = canvasDiscussions.find(d => d.title === title);
 
-    if (!assignment) {
-      // register non-existing assignment
-      const entry: TileEntry = {
-        id: -1,
-        tile_id: tile ? tile.id : -1,
-        title: title,
-        type: "DISCUSSION"
-      }
-
-      this.props.addEntry(entry);
-      return;
-    }
-
     const entry: TileEntry = {
       id: -1,
+      state: editState.new,
       tile_id: tile ? tile.id : -1,
-      title: assignment.title,
+      title: !assignment ? title : assignment.title,
       type: "DISCUSSION"
     }
 

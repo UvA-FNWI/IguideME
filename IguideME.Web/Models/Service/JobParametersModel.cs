@@ -10,6 +10,9 @@ namespace IguideME.Web.Models.Service
 		[JsonProperty("courseID")]
 		public int CourseID { get; set; }
 
+		[JsonProperty("Notifications_bool")]
+		public bool Notifications_bool { get; set; }
+
 		// TODO: are we missing any parameters?
 
 	}

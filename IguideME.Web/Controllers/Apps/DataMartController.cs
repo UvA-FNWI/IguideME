@@ -49,6 +49,7 @@ namespace IguideME.Web.Controllers
         public async Task<IActionResult> BeginComputation([FromBody] JobParametersModel obj)
         {
             obj.CourseID = this.GetCourseID();
+            obj.Notifications_bool = false;
             return Accepted(
                 await _queuedBackgroundService.PostWorkItemAsync(obj).ConfigureAwait(false)
             );
@@ -152,7 +153,6 @@ namespace IguideME.Web.Controllers
                 GetUserName(),
                 (int)JObject.Parse(body)["granted"]
             );
-            logger.LogInformation("Setting consent: " + JObject.Parse(body)["granted"]);
             DatabaseManager.Instance.SetConsent(consent);
             return Json(consent.Granted);
         }

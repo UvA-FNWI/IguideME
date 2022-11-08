@@ -38,6 +38,11 @@ namespace IguideME.Web.Services
             var result = new JobResultModel();
             var courseID = work.CourseID;
 
+            // TODO: check course dates
+            var notifications_bool = (work.Notifications_bool && (DateTime.Now.DayOfWeek == DayOfWeek.Monday || DateTime.Now.DayOfWeek == DayOfWeek.Friday));
+
+            _logger.LogInformation($"{DateTime.Now}: Starting sync of course {courseID}");
+
             string characters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
             StringBuilder _result = new StringBuilder(10);
             Random random = new Random();
@@ -71,7 +76,7 @@ namespace IguideME.Web.Services
                 jobId, $"tasks.discussions", 0
             ).ConfigureAwait(false);
 
-            new AssignmentWorker(courseID, hashCode, _canvasTest).Register();
+            new AssignmentWorker(courseID, hashCode, _canvasTest, _logger).Register();
             await _computationJobStatus.UpdateJobProgressInformationAsync(
                 jobId, $"tasks.assignments", 0
             ).ConfigureAwait(false);
@@ -86,7 +91,7 @@ namespace IguideME.Web.Services
                 jobId, $"tasks.peer-groups", 0
             ).ConfigureAwait(false);
 
-            new NotificationsWorker(courseID, hashCode, _canvasTest, _logger).Register();
+            new NotificationsWorker(courseID, hashCode, _canvasTest, notifications_bool, _logger).Register();
             await _computationJobStatus.UpdateJobProgressInformationAsync(
                 jobId, $"tasks.notifications", 0
             ).ConfigureAwait(false);

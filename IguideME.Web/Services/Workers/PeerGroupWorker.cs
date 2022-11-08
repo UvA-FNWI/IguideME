@@ -27,7 +27,7 @@ namespace IguideME.Web.Services.Workers
             List<User> students = DatabaseManager.Instance
                 .GetUsers(this.CourseID, "student", this.Hash);
 
-            _logger.LogInformation("About to process " + students.Count.ToString() + " students...");
+            _logger.LogInformation($"About to process {students.Count.ToString()} students...");
 
             // iterate over all students in the course
             foreach (var student in students)
@@ -35,7 +35,7 @@ namespace IguideME.Web.Services.Workers
                 // don't register data from students that did not give consent
                 if (DatabaseManager.Instance.GetConsent(this.CourseID, student.LoginID) != 1)
                 {
-                    _logger.LogInformation("Skipping user with loginID " + student.LoginID.ToString() + " as they did not give consent.");
+                    _logger.LogInformation($"Skipping user with loginID {student.LoginID.ToString()} as they did not give consent.");
                     continue;
                 }
 
@@ -59,11 +59,11 @@ namespace IguideME.Web.Services.Workers
                 // Peers may be null, if null no peer comparison will be given
                 if (peers == null)
                 {
-                    _logger.LogInformation("Student " + student.ID + " has no peers, so no peer comparison will be made.");
+                    _logger.LogInformation($"Student {student.ID} has no peers, so no peer comparison will be made.");
                     continue;
                 }
 
-                _logger.LogInformation("Student " + student.ID + " with userID " + user.UserID + " has " + peers.Count + " peers.");
+                _logger.LogInformation($"Student {student.ID} with userID {user.UserID} has {peers.Count} peers.");
 
                 foreach (var peer in peers)
                 {
@@ -78,13 +78,13 @@ namespace IguideME.Web.Services.Workers
                 var peerIDs = peers.Select(p => p.LoginID);
 
                 var peerGrades1 = DatabaseManager.Instance.GetUserPeerComparison(
-                            this.CourseID, user.LoginID);
+                            this.CourseID, user.LoginID, hash: this.Hash);
                 var userGrades1 = DatabaseManager.Instance.GetUserResults(
-                    this.CourseID, user.LoginID);
+                    this.CourseID, user.LoginID, hash: this.Hash);
 
                 var tilesWithNotifications = tiles.Where(t => t.Notifications);
 
-                _logger.LogInformation("About to process " + tilesWithNotifications.Count() + " tiles...");
+                _logger.LogInformation($"About to process {tilesWithNotifications.Count()} tiles...");
 
                 foreach (var tile in tilesWithNotifications)
                 {
@@ -101,11 +101,12 @@ namespace IguideME.Web.Services.Workers
                                 student.LoginID,
                                 tile.ID,
                                 "outperforming peers",
-                                this.Hash);
+                                this.Hash
+                            );
                         }
                     }
 
-                    _logger.LogInformation("About to process " + tile.GetEntries().Count + " tile entries...");
+                    _logger.LogInformation($"About to process {tile.GetEntries().Count} tile entries...");
 
                     List<float> userGradeList = new List<float>();
                     List<float> peerGradeList = new List<float>();

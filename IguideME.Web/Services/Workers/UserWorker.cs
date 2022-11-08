@@ -28,43 +28,37 @@ namespace IguideME.Web.Services.Workers
 
             var students = this.canvasTest.GetStudents(this.courseID);
 
-            _logger.LogInformation("Starting student registry, about to process " + students.Length.ToString() + " students...");
+            _logger.LogInformation($"Starting student registry, about to process {students.Length.ToString()} students...");
 
             foreach (var student in students)
             {
                 _logger.LogInformation("Processing student " + student.ID.ToString() + "...");
                 try {
+                    DatabaseManager.Instance.RegisterUserGoalGrade(courseID, student.SISUserID);
+                    DatabaseManager.Instance.RegisterConsent(new Models.ConsentData(courseID, student.ID.Value, student.SISUserID, student.Name, -1));
 
-                if (DatabaseManager.Instance.GetUserGoalGrade(courseID, student.SISUserID) < 0)
-                {
-                    DatabaseManager.Instance.CreateEmptyUserGoalGrade(courseID, student.SISUserID);
-                    //DatabaseManager.Instance.UpdateUserGoalGrade(courseID, student.SISUserID, 7);
+                    DatabaseManager.Instance.RegisterUser(
+                        courseID,
+                        student.ID,
+                        student.SISUserID,
+                        student.SISUserID,
+                        student.Name,
+                        student.SortableName,
+                        "student",
+                        this.hashCode
+                    );
+                } catch (Exception e) {
+                    _logger.LogError($"{e.ToString()} {e.StackTrace}");
                 }
-
-                if (DatabaseManager.Instance.GetConsent(courseID, student.ID.Value) == -1) {
-                    DatabaseManager.Instance.SetConsent(new Models.ConsentData(courseID, student.ID.Value, student.SISUserID, student.Name, -1));
-                }
-
-                DatabaseManager.Instance.RegisterUser(
-                    courseID,
-                    student.ID,
-                    student.SISUserID,
-                    student.SISUserID,
-                    student.Name,
-                    student.SortableName,
-                    "student",
-                    this.hashCode
-                );
-                } catch (Exception e) {_logger.LogError(e.ToString());}
             }
 
             var instructors = this.canvasTest.GetAdministrators(courseID);
 
-            _logger.LogInformation("Starting instructor registry, about to process " + instructors.Length + " instructurs...");
+            _logger.LogInformation($"Starting instructor registry, about to process {instructors.Length} instructurs...");
 
             foreach (var instructor in instructors)
             {
-                _logger.LogInformation("Processing instructor " + instructor.ID.ToString() + "...");
+                _logger.LogInformation($"Processing instructor {instructor.ID.ToString()} ...");
 
                 DatabaseManager.Instance.RegisterUser(
                     courseID,

@@ -53,6 +53,11 @@ public static class DatabaseQueries
         @"INSERT INTO   `course_settings` (`course_id`, `course_name`, `personalized_peers`, `peer_group_size`)
         VALUES ({0}, '{1}', 0, 5);";
 
+    public const string QUERY_COURSE_IDS =
+        @"SELECT `course_id` FROM `course_settings`;";
+
+
+
     // -------------------- User preferences --------------------
 
     /**
@@ -76,7 +81,8 @@ public static class DatabaseQueries
             user_id         INTEGER,
             user_login_id   STRING,
             user_name       STRING,
-            granted         INTEGER
+            granted         INTEGER,
+            UNIQUE(course_id, user_id)
         );";
 
     /**
@@ -89,7 +95,8 @@ public static class DatabaseQueries
             id              INTEGER PRIMARY KEY AUTOINCREMENT,
             course_id       INTEGER,
             user_login_id   STRING,
-            grade           INTEGER NULL
+            grade           INTEGER NULL,
+            UNIQUE(course_id, user_login_id)
         );";
 
     public const string CREATE_TABLE_PEER_GROUP =
@@ -151,7 +158,8 @@ public static class DatabaseQueries
 
     public const string REGISTER_USER_GOAL_GRADE =
         @"INSERT INTO   `goal_grade` (`course_id`, `user_login_id`)
-          VALUES        ({0}, '{1}');";
+          VALUES        ({0}, '{1}')
+          ON CONFLICT   (`course_id`, `user_login_id` ) DO NOTHING;";
 
     public const string REGISTER_USER_PEER =
         @"INSERT INTO   `peer_group` (  `course_id`,
@@ -437,12 +445,12 @@ public static class DatabaseQueries
     // -------------------- Tile logic --------------------
 
     public const string QUERY_TILE_GROUPS =
-        @"SELECT    `id`,
-                    `title`,
-                    `column_id`,
-                    `position`
+        @"SELECT    `layout_tile_group`.`id`,
+                    `layout_tile_group`.`title`,
+                    `layout_tile_group`.`column_id`,
+                    `layout_tile_group`.`position`
         FROM        `layout_tile_group`
-        WHERE       `course_id`={0};";
+        WHERE       `layout_tile_group`.`course_id`={0};";
 
     public const string REGISTER_TILE_GROUP =
         @"INSERT INTO       `layout_tile_group`
@@ -500,6 +508,20 @@ public static class DatabaseQueries
         FROM        `learning_goal`
         WHERE       `course_id`={0};";
 
+    public const string QUERY_TILE_LEARNING_GOALS =
+        @"SELECT    `id`,
+                    `title`
+        FROM        `learning_goal`
+        WHERE       `course_id`={0}
+        AND         `tile_id`={1};";
+
+    public const string QUERY_LEARNING_GOAL =
+        @"SELECT    `tile_id`,
+                    `title`
+        FROM        `learning_goal`
+        WHERE       `course_id`={0}
+        AND         `id`={1};";
+
     public const string CREATE_LEARNING_GOAL =
         @"INSERT INTO       `learning_goal`
                             (   `course_id`,
@@ -507,8 +529,23 @@ public static class DatabaseQueries
                                 `title`  )
         VALUES({0}, {1}, '{2}');";
 
+    public const string UPDATE_LEARNING_GOAL =
+        @"UPDATE    `learning_goal`
+        SET
+                    `title`='{3}'
+        WHERE       `id`={1}
+        AND         `tile_id`={2}
+        AND         `course_id`={0};";
+
+    public const string DELETE_LEARNING_GOAL =
+        @"DELETE FROM       `learning_goal`
+          WHERE             `course_id` = {0}
+          AND               `id` = {1};";
+
     public const string QUERY_GOAL_REQUIREMENTS =
-        @"SELECT    `goal_id`,
+        @"SELECT
+                    `id`,
+                    `goal_id`,
                     `tile_id`,
                     `entry_id`,
                     `meta_key`,
@@ -527,6 +564,28 @@ public static class DatabaseQueries
                                 `expression` )
         VALUES({0}, {1}, {2}, '{3}', {4}, '{5}');";
 
+    public const string UPDATE_LEARNING_GOAL_REQUIREMENT =
+        @"UPDATE    `goal_requirement`
+        SET
+                    `tile_id`={2},
+                    `entry_id`={3},
+                    `meta_key`='{4}',
+                    `value`={5},
+                    `expression`='{6}'
+        WHERE
+                    `id`={0}
+        AND
+                    `goal_id`={1}
+        ;";
+
+    public const string DELETE_GOAL_REQUIREMENTS =
+        @"DELETE FROM       `goal_requirement`
+          WHERE             `goal_id` = {0};";
+
+    public const string DELETE_GOAL_REQUIREMENT =
+        @"DELETE FROM       `goal_requirement`
+          WHERE             `goal_id` = {0}
+          AND               `id` = {1};";
 
     public const string QUERY_TILE_ENTRIES =
         @"SELECT    `tile_entry`.`id`,
@@ -569,6 +628,7 @@ public static class DatabaseQueries
         INNER JOIN  `tile_entry_submission_meta`
             ON      `tile_entry_submission`.`id`=`tile_entry_submission_meta`.`submission_id`
         WHERE       `tile_entry_submission`.`id`={0}
+        AND         `tile_entry_submission`.`sync_hash`='{1}'
         ;";
 
     public const string UPDATE_TILE =
@@ -623,6 +683,7 @@ public static class DatabaseQueries
             `due_date`        STRING NULL,
             `points_possible` FLOAT,
             `position`        INTEGER,
+            `grading_type`    INTEGER,
             `submission_type` STRING NULL,
             `sync_hash`       STRING
         );";
@@ -731,9 +792,10 @@ public static class DatabaseQueries
                             `due_date`,
                             `points_possible`,
                             `position`,
+                            `grading_type`,
                             `submission_type`,
                             `sync_hash` )
-        VALUES('{0}', {1}, '{2}', {3}, {4}, '{5}', {6}, {7}, '{8}', '{9}');";
+        VALUES('{0}', {1}, '{2}', {3}, {4}, '{5}', {6}, {7}, {8}, '{9}', '{10}');";
 
     public const string REGISTER_CANVAS_DISCUSSION =
         @"INSERT INTO   `canvas_discussion`
@@ -942,32 +1004,33 @@ public static class DatabaseQueries
     public const string QUERY_USER_PEER_GRADES =
         @"SELECT   `tile`.`id`,
 	    CASE `tile`.`content_type`
-            WHEN 'BINARY' THEN  AVG(`grade`) * 100
-            ELSE                AVG(`grade`)
+            WHEN 'BINARY' THEN  AVG(`tile_entry_submission`.`grade`) * 100
+            ELSE                AVG(`tile_entry_submission`.`grade`)
        	END average,
 	    CASE `tile`.`content_type`
-            WHEN 'BINARY' THEN  MIN(`grade`) * 100
-            ELSE                MIN(`grade`)
+            WHEN 'BINARY' THEN  MIN(`tile_entry_submission`.`grade`) * 100
+            ELSE                MIN(`tile_entry_submission`.`grade`)
        	END minimum,
 	    CASE `tile`.`content_type`
-            WHEN 'BINARY' THEN  MAX(`grade`) * 100
-            ELSE                MAX(`grade`)
-       	END maximum
+            WHEN 'BINARY' THEN  MAX(`tile_entry_submission`.`grade`) * 100
+            ELSE                MAX(`tile_entry_submission`.`grade`)
+       	END maximum,
+        `tile_entry`.`title`,
+        `tile_entry_submission`.`grade`,
+        `tile`.`content_type`
         FROM        `tile_entry_submission`
         INNER JOIN  `tile_entry`
             ON      `tile_entry_submission`.`entry_id`=`tile_entry`.`id`
         INNER JOIN  `tile`
             ON      `tile`.`id`=`tile_entry`.`tile_id`
-        INNER JOIN  `peer_group`
-            ON      `tile_entry_submission`.`user_login_id`=`peer_group`.`target_login_id`
         INNER JOIN  `layout_tile_group`
             ON      `layout_tile_group`.`id`=`tile`.`group_id`
-        INNER JOIN  `layout_column`
-            ON      `layout_tile_group`.`column_id`=`layout_column`.`id`
+        INNER JOIN  `peer_group`
+            ON      `tile_entry_submission`.`user_login_id`=`peer_group`.`target_login_id`
 	    WHERE       `tile`.`content_type` != 'LEARNING_OUTCOMES'
 	    AND	        `tile`.`content_type` != 'PREDICTION'
         AND	        `tile`.`tile_type` != 'DISCUSSIONS'
-        AND         `layout_column`.`course_id`={0}
+        AND         `layout_tile_group`.`course_id`={0}
         AND         `peer_group`.`user_login_id`='{1}'
         AND         `peer_group`.`sync_hash`='{2}'
         AND         `tile_entry_submission`.`sync_hash`='{2}'
@@ -1055,6 +1118,17 @@ public static class DatabaseQueries
             VALUES({0}, {1}, '{2}', '{3}', {4})
             ON CONFLICT (   `user_id`, course_id   )
             DO UPDATE SET `granted` = {4}
+        ;";
+    public const string REGISTER_USER_CONSENT =
+        @"  INSERT INTO `consent`
+                        (   `course_id`,
+                            `user_id`,
+                            `user_login_id`,
+                            `user_name`,
+                            `granted`   )
+            VALUES({0}, {1}, '{2}', '{3}', -1)
+            ON CONFLICT (   `user_id`, course_id   )
+            DO NOTHING
         ;";
 
     public const string CREATE_SUBMISSION_META =

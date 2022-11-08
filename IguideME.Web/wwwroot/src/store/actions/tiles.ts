@@ -1,6 +1,8 @@
 import TileController from "../../api/controllers/tile";
-import {Tile} from "../../models/app/Tile";
+import LearningGoalsManager from "../../components/managers/TileCreateEntries/LearningGoalsManager";
+import {editState, Tile} from "../../models/app/Tile";
 import {store} from "../../utils/configureStore";
+import { LearningGoal } from "../../models/app/LearningGoal";
 
 export class TileActions {
 
@@ -83,12 +85,12 @@ export class TileActions {
   }
 
   static loadTileEntries = async () => {
-    const groups = await TileController.getEntries();
+    const entries = await TileController.getEntries();
 
-    if (groups)
+    if (entries)
       return {
         type: TileActions.SET_TILE_ENTRIES_SUCCESS,
-        payload: groups
+        payload: entries
       }
 
     return {
@@ -97,12 +99,15 @@ export class TileActions {
   }
 
   static loadTileGoals = async () => {
-    const groups = await TileController.getGoals();
+    const goals = await TileController.getGoals();
+    for (var i = 0; i < goals.length; i++) {
+      goals[i].state = editState.unchanged;
+    }
 
-    if (groups)
+    if (goals)
       return {
         type: TileActions.SET_TILE_GOALS_SUCCESS,
-        payload: groups
+        payload: goals
       }
 
     return {

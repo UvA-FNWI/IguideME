@@ -167,6 +167,16 @@ export default class TileController extends Controller {
     ).then(response => response.data);
   }
 
+  static updateTileGoal(goal: LearningGoal): Promise<LearningGoal> {
+    if (debug()) {
+      return delay(goal);
+    }
+
+    return this.client.patch(
+      `tiles/goals/${goal.id}`, goal
+    ).then(response => response.data);
+  }
+
   static deleteTileGoal(id: number): Promise<void> {
     if (debug()) {
       return delay(() => { });
@@ -218,6 +228,7 @@ export default class TileController extends Controller {
     ).then(response => response.data);
   }
 
+  // TODO: wth is going on with case 3 (and 9)?
   static getPeerResults(studentLoginId: string): Promise<{ min: number, max: number, avg: number, tileID: number }[]> {
     if (debug()) {
       return this.getTiles().then(tiles => {

@@ -9,6 +9,7 @@ export interface IProps {
   setOpen: (value: boolean) => any;
   tiles: Tile[];
   tileGroup: TileGroup;
+  updateTiles: (tiles: Tile[]) => any;
 }
 
 export interface IState {

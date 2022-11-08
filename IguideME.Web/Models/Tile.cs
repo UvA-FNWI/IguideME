@@ -5,6 +5,12 @@ using Newtonsoft.Json;
 
 namespace IguideME.Web.Models
 {
+    public enum editState {
+        Unchanged,
+        New,
+        Updated,
+        Removed
+    }
     public class Tile
     {
         public const string CONTENT_TYPE_BINARY = "BINARY";
@@ -94,6 +100,9 @@ namespace IguideME.Web.Models
         [JsonProperty(PropertyName = "id")]
         public int ID { get; set; }
 
+        [JsonProperty(PropertyName = "state")]
+        public editState State { get; set; }
+
         [JsonProperty(PropertyName = "tile_id")]
         public int TileID { get; set; }
 
@@ -108,12 +117,14 @@ namespace IguideME.Web.Models
 
         public TileEntry(
             int id,
+            editState state,
             int tileID,
             string title,
             string type,
             bool wildcard = false)
         {
             this.ID = id;
+            this.State = state;
             this.TileID = tileID;
             this.Title = title;
             this.Type = type;

@@ -152,10 +152,8 @@ namespace IguideME.Web.Controllers
             if (success)
             {
                 return Json(
-                    DatabaseManager.Instance
-                        .GetGoals(GetCourseID())
-                        .Where(g => g.TileID == id)
-                        .ToArray());
+                    DatabaseManager.Instance.GetGoals(GetCourseID(), id)
+                );
             }
 
             return BadRequest();
@@ -187,6 +185,67 @@ namespace IguideME.Web.Controllers
             return Json(_goal);
         }
 
+        [Authorize(Policy = "IsInstructor")]
+        [HttpPatch]
+        [Route("/tiles/goals/{tileID}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public ActionResult patchTileGoal(string tileID, [FromBody] LearningGoal goal)
+        {
+            int id;
+            bool success = Int32.TryParse(tileID, out id);
+
+            if (success)
+            {
+                foreach (GoalRequirement req in goal.Requirements){
+                    switch (req.State) {
+                        case editState.New:
+                            DatabaseManager.Instance.CreateGoalRequirement(
+                                req.GoalID,
+                                req.TileID,
+                                req.EntryID,
+                                req.MetaKey,
+                                req.Value,
+                                req.Expression
+                            );
+                            break;
+                        case editState.Updated:
+                            DatabaseManager.Instance.UpdateGoalRequirement(req);
+                            break;
+                        case editState.Removed:
+                            DatabaseManager.Instance.DeleteGoalRequirement(req.GoalID, req.ID);
+                            break;
+                    }
+                }
+                return Json(
+                    DatabaseManager.Instance.UpdateGoal(GetCourseID(), goal)
+                );
+            }
+
+            return BadRequest();
+        }
+
+        [Authorize(Policy = "IsInstructor")]
+        [HttpDelete]
+        [Route("/tiles/goals/{goalID}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public ActionResult deleteTileGoal(string goalID)
+        {
+            int id;
+            bool success = Int32.TryParse(goalID, out id);
+            logger.LogInformation("deleting goal");
+
+            if (success)
+            {
+                DatabaseManager.Instance.DeleteGoal(GetCourseID(), id);
+                return NoContent();
+            }
+
+            return BadRequest();
+        }
 
         [Authorize]
         [HttpGet]
@@ -299,16 +358,16 @@ namespace IguideME.Web.Controllers
                     tile.GroupID = (int) obj.GroupID;
 
                 if (obj.Title != null)
-                    tile.Title = (string)obj.Title;
+                    tile.Title = (string) obj.Title;
 
                 if (obj.Notifications != null)
-                    tile.Notifications = (bool)obj.Notifications;
+                    tile.Notifications = (bool) obj.Notifications;
 
                 if (obj.Visible != null)
-                    tile.Visible = (bool)obj.Visible;
+                    tile.Visible = (bool) obj.Visible;
 
                 if (obj.Position != null)
-                    tile.Position = (int)obj.Position;
+                    tile.Position = (int) obj.Position;
 
                 if (obj.GraphView != null)
                     tile.GraphView = (bool) obj.GraphView;
@@ -319,7 +378,7 @@ namespace IguideME.Web.Controllers
                 DatabaseManager.Instance.UpdateTile(GetCourseID(), tile);
 
                 return Json(
-                    DatabaseManager.Instance.GetTile(GetCourseID(), Int32.Parse(tileID))
+                    DatabaseManager.Instance.GetTile(GetCourseID(), id)
                 );
             }
             return BadRequest();
@@ -338,7 +397,7 @@ namespace IguideME.Web.Controllers
 
             if (success)
             {
-                DatabaseManager.Instance.DeleteTile(id);
+                DatabaseManager.Instance.DeleteTile(GetCourseID(), id);
                 return NoContent();
             }
 
@@ -520,7 +579,7 @@ namespace IguideME.Web.Controllers
                     this.GetCourseID(),
                     id,
                     row.GetValue("studentloginid").ToString(),
-                    row.GetValue("grade").ToString(),
+                    float.Parse(row.GetValue("grade").ToString()),
                     DateTime.Now.ToShortDateString());
 
                 foreach (JProperty property in row.Properties())

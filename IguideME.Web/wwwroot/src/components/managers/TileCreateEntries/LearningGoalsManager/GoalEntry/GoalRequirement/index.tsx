@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { ChangeEvent, Component } from "react";
 import {Button, Col, InputNumber, Row} from "antd";
 import {DeleteOutlined} from "@ant-design/icons";
 import Select from "react-select";
@@ -8,6 +8,8 @@ import {RootState} from "../../../../../../store";
 import {connect, ConnectedProps} from "react-redux";
 import TileController from "../../../../../../api/controllers/tile";
 import "./style.scss";
+import { register } from "../../../../../../serviceWorker";
+import { editState } from "../../../../../../models/app/Tile";
 
 const mapState = (state: RootState) => ({
   tiles: state.tiles,
@@ -27,7 +29,6 @@ class GoalRequirement extends Component<Props> {
 
   componentDidMount(): void {
     const { requirement } = this.props;
-
     if (requirement.entry_id !== -1 && requirement.entry_id !== null) {
       this.loadMetaKeys(requirement.entry_id as number);
     }
@@ -56,7 +57,7 @@ class GoalRequirement extends Component<Props> {
     });
   }
 
-  getExpressionLabel = (expression: "lte" | "gte" | "e" | null) => {
+  getExpressionLabel = (expression: string | null) => {
     switch (expression) {
       case "lte": return "≤ (less than)";
       case "gte": return "≥ (greater than)";
@@ -87,6 +88,10 @@ class GoalRequirement extends Component<Props> {
       ];
     }
 
+    if (requirement.state == editState.removed) {
+      return null;
+    }
+
     return (
       <div className={"goalRequirement"}>
         <Row gutter={[10, 10]}>
@@ -103,7 +108,9 @@ class GoalRequirement extends Component<Props> {
                         allowOutsideClick: true
                       }).then((result) => {
                         if (result.isConfirmed) {
-                          this.props.removeRequirement(requirement.id)
+                          requirement.state = editState.removed;
+                          this.props.updateRequirement(requirement);
+                          this.setState({requirement});
                         }
                       });
                     }}
@@ -119,10 +126,10 @@ class GoalRequirement extends Component<Props> {
                     onChange={(e) => {
                       if (!e) return;
 
-                      let r = JSON.parse(JSON.stringify(requirement));
-                      r.tile_id = e.value;
-                      r.entry_id = -1;
-                      this.props.updateRequirement(r);
+                      requirement.tile_id = e.value;
+                      requirement.entry_id = -1;
+                      this.props.updateRequirement(requirement);
+                      this.setState({requirement});
                     }}
             />
           </Col>
@@ -138,10 +145,10 @@ class GoalRequirement extends Component<Props> {
                     onChange={(e) => {
                       if (!e) return;
 
-                      let r = JSON.parse(JSON.stringify(requirement));
-                      r.entry_id = e.value;
+                      requirement.entry_id = e.value;
+                      this.props.updateRequirement(requirement);
+                      this.setState({requirement});
 
-                      this.props.updateRequirement(r);
                     }}
                     options={entryOptions} />
             <br />
@@ -150,9 +157,9 @@ class GoalRequirement extends Component<Props> {
                     value={{ value: requirement.meta_key || "", label: this.getMetaKeyLabel(requirement.meta_key || "") }}
                     onChange={e => {
                       if (!e) return;
-                      let r = JSON.parse(JSON.stringify(requirement));
-                      r.meta_key = e.value;
-                      this.props.updateRequirement(r);
+                      requirement.meta_key = e.value;
+                      this.props.updateRequirement(requirement);
+                      this.setState({requirement});
                     }}
                     isDisabled={requirement.entry_id === -1 || requirement.entry_id === "count"}
                     options={[
@@ -169,9 +176,9 @@ class GoalRequirement extends Component<Props> {
                     onChange={e => {
                       if (!e) return;
 
-                      let r = JSON.parse(JSON.stringify(requirement));
-                      r.expression = e.value;
-                      this.props.updateRequirement(r);
+                      requirement.expression = e.value;
+                      this.props.updateRequirement(requirement);
+                      this.setState({requirement});
                     }}
                     options={[
                       { value: 'lte', label: '≤ (less than)' },
@@ -186,11 +193,11 @@ class GoalRequirement extends Component<Props> {
                          size={"large"}
                          disabled={requirement.expression === null}
                          value={requirement.value}
-                         onChange={e => {
-                           let r = JSON.parse(JSON.stringify(requirement));
-                           r.value = e;
-                           this.props.updateRequirement(r);
-                         }}
+                         onChange={value => {
+                          requirement.value = Number(value);
+                          this.props.updateRequirement(requirement);
+                          this.setState({requirement});
+                        }}
             />
           </Col>
         </Row>

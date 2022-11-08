@@ -67,7 +67,8 @@ class TileCreateEntries extends Component<Props, IState> {
 
   addEntry = (entryRegistry: TileEntry) => {
     if (this.state.activeEntries.find((x: TileEntry) => x.title === entryRegistry.title)) {
-      message.error("Entry is already registered!")
+      message.error("Entry is already registered!");
+      console.error("Entry is already registered!");
       return;
     }
 
@@ -81,7 +82,8 @@ class TileCreateEntries extends Component<Props, IState> {
 
   removeEntry = (entryRegistry: TileEntry) => {
     if (!this.state.activeEntries.find((x: TileEntry) => x.title === entryRegistry.title)) {
-      message.error("Entry does not exist!")
+      message.error("Entry does not exist!");
+      console.error("Entry is already registered!");
       return;
     }
 
@@ -106,7 +108,8 @@ class TileCreateEntries extends Component<Props, IState> {
                                      this.setState({ activeGoals: goals });
                                      this.props.updateGoals(goals)
                                    }}
-                                   goals={activeGoals} />
+                                   goals={activeGoals}
+                                   />
     } else if (contentType && (contentType === "PREDICTION")) {
 
     } else if (contentType && !tileType) {
