@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using IguideME.Web.Services;
 using System.Collections.Generic;
 
 namespace IguideME.Web.Models.App
@@ -50,5 +51,8 @@ namespace IguideME.Web.Models.App
             this.Intercept = intercept;
         }
 
+        public void getParameters() {
+            this.Parameters = DatabaseManager.Instance.GetGradePredictionModelParameters(this.ID);
+        }
     }
 }

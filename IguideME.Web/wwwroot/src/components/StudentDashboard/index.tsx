@@ -24,7 +24,6 @@ const compute = require('compute.io');
 const mapState = (state: RootState) => ({
   dashboardColumns: state.dashboardColumns,
   tiles: state.tiles.filter((t: Tile) => t.visible),
-  // tiles: state.tiles,
   tileGroups: state.tileGroups,
   tileEntries: state.tileEntries,
   predictions: state.predictions,
@@ -165,6 +164,8 @@ class StudentDashboard extends Component<Props, IState> {
     } = this.state;
 
     const { tiles, tileGroups, dashboardColumns, tileEntries, student, predictions } = this.props;
+    console.log("Predictions", predictions);
+
     if (!loaded || !student) return (<Loading small={true} />);
 
     if (displayTile) {

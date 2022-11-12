@@ -1,5 +1,5 @@
 {
   "dependencies": {
-    "ztypescript": "github:everydayanchovies/ztypescript"
+    "ztypescript": "https://github.com/everydayanchovies/ztypescript"
   }
 }

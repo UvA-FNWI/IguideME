@@ -2,6 +2,6 @@
 # yarn lockfile v1
 
 
-"ztypescript@github:everydayanchovies/ztypescript":
+"ztypescript@https://github.com/everydayanchovies/ztypescript":
   version "1.0.0"
-  resolved "https://codeload.github.com/everydayanchovies/ztypescript/tar.gz/658e5208dbdefe7843e4d42aa64c4b2d2dcf2294"
+  resolved "https://github.com/everydayanchovies/ztypescript#658e5208dbdefe7843e4d42aa64c4b2d2dcf2294"

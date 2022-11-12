@@ -25,24 +25,24 @@ export default class Tile extends Component<IProps, IState> {
     }
 
     switch (tile.content){
-        case "LEARNING_OUTCOMES":
-      const success = learningOutcomes.filter(lo => lo.success).length;
-      return (
-        <span style={{textAlign: 'center'}}>
-          <strong>{ success }<small>/{ learningOutcomes.length }</small></strong> completed
-        </span>
-      );
-        case "PREDICTION":
-      return <GradeStatistic grade={avg ? avg!.toString() : "-"} />;
-        case "BINARY":
-        case "ENTRIES":
-      return (
-        <>
-          { !!avg && <Progress percent={getProgression(tile, tileEntries, submissions)} /> }
-          <GradeStatistic grade={avg ? avg!.toString() : "-"} />
-        </>
-      );
-        default:
+      case "LEARNING_OUTCOMES":
+        const success = learningOutcomes.filter(lo => lo.success).length;
+        return (
+          <span style={{textAlign: 'center'}}>
+            <strong>{ success }<small>/{ learningOutcomes.length }</small></strong> completed
+          </span>
+        );
+      case "PREDICTION":
+        return <GradeStatistic grade={avg ? avg!.toString() : "-"} />;
+      case "BINARY":
+      case "ENTRIES":
+        return (
+          <>
+            { !!avg && <Progress percent={getProgression(tile, tileEntries, submissions)} /> }
+            <GradeStatistic grade={avg ? avg!.toString() : "-"} />
+          </>
+        );
+      default:
         return null;
     }
   }

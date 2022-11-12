@@ -92,7 +92,7 @@ class AdminMenu extends Component<Props> {
             </Link>
                     </Menu.Item>
                     <Menu.Item key={"notificationCentre"} icon={<NotificationOutlined />}>
-                        <Link to={'/notification-centre'}>
+                        <Link to={'/admin/notification-centre'}>
                             Notification Centre
             </Link>
                     </Menu.Item>

@@ -112,10 +112,11 @@ public static class DatabaseQueries
         @"CREATE TABLE IF NOT EXISTS `notifications` (
             `id`                  INTEGER PRIMARY KEY AUTOINCREMENT,
             `course_id`           INTEGER,
-            `user_login_id`       INTEGER,
+            `user_login_id`       STRING,
             `tile_id`             INTEGER,
             `status`              STRING,
-            `sync_hash`           STRING
+            `sync_hash`           STRING,
+            `sent`                BOOLEAN
         );";
 
     public const string CREATE_TABLE_MIGRATIONS =
@@ -184,6 +185,15 @@ public static class DatabaseQueries
                                             `sync_hash`)
           VALUES        ({0}, '{1}', {2}, '{3}', false, '{4}');";
 
+    public const string QUERY_ALL_NOTIFICATIONS =
+        @"SELECT        `user_login_id`,
+                        `tile_id`,
+                        `status`,
+                        `sent`
+        FROM            `notifications`
+        WHERE           `course_id`={0}
+        AND             `sync_hash`='{1}';";
+
     public const string QUERY_ALL_USER_NOTIFICATIONS =
         @"SELECT        `tile_id`, `status`, `sent`
         FROM            `notifications`
@@ -212,7 +222,7 @@ public static class DatabaseQueries
         @"INSERT INTO   `grade_prediction_model` (    `course_id`,
                                                       `intercept`,
                                                       `enabled`    )
-          VALUES        ({0}, {1}, False);";
+          VALUES        ({0}, {1}, True);";
 
     public const string CREATE_GRADE_PREDICTION_MODEL_PARAMETER =
         @"INSERT INTO   `grade_prediction_model_parameter` (    `model_id`,
@@ -222,20 +232,18 @@ public static class DatabaseQueries
 
     public const string QUERY_GRADE_PREDICTION_MODELS_FOR_COURSE =
         @"SELECT    `grade_prediction_model`.`id`,
-                    `grade_prediction_model`.`course_id`,
-                    `grade_prediction_model`.`intercept`,
                     `grade_prediction_model`.`enabled`
+                    `grade_prediction_model`.`intercept`,
         FROM        `grade_prediction_model`
-        WHERE       `grade_prediction_model`.`course_id`={0}";
+        WHERE       `grade_prediction_model`.`course_id`={0};";
 
     public const string QUERY_GRADE_PREDICTION_MODEL_FOR_COURSE =
         @"SELECT    `grade_prediction_model`.`id`,
-                    `grade_prediction_model`.`course_id`,
                     `grade_prediction_model`.`intercept`
         FROM        `grade_prediction_model`
         WHERE       `grade_prediction_model`.`course_id`={0}
         AND         `grade_prediction_model`.`enabled`=True
-        LIMIT 1";
+        LIMIT 1;";
 
     public const string QUERY_GRADE_PREDICTION_MODEL_PARAMETERS_FOR_MODEL =
         @"SELECT    `grade_prediction_model_parameter`.`id`,
@@ -243,7 +251,7 @@ public static class DatabaseQueries
                     `grade_prediction_model_parameter`.`parameter_id`,
                     `grade_prediction_model_parameter`.`weight`
         FROM        `grade_prediction_model_parameter`
-        WHERE       `grade_prediction_model_parameter`.`model_id`={0}";
+        WHERE       `grade_prediction_model_parameter`.`model_id`={0};";
 
     // -------------------- Learning goals --------------------
 

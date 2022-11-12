@@ -100,12 +100,23 @@ export default class DataMartController extends Controller {
 
   static getNotifications(userLoginID: string): Promise<PerformanceNotification[]> {
     if (debug()) return delay([
-      { tile_id: 2, status: "outperforming peers" },
-      { tile_id: 4, status: "closing the gap" }
+      { user_login_id: userLoginID, tile_id: 2, status: "outperforming peers" },
+      { user_login_id: userLoginID, tile_id: 4, status: "closing the gap" }
     ]);
 
     return this.client.get(
       `/datamart/notifications/${userLoginID}`
+    ).then(response => response.data);
+  }
+
+  static getAllNotifications(): Promise<PerformanceNotification[]> {
+    if (debug()) return delay([
+      { user_login_id: "28332183", tile_id: 2, status: "outperforming peers" },
+      { user_login_id: "95366984", tile_id: 4, status: "closing the gap" }
+    ])
+
+    return this.client.get(
+      `/datamart/notifications`
     ).then(response => response.data);
   }
 

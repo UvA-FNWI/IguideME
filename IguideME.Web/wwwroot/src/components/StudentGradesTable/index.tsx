@@ -29,7 +29,7 @@ export default class StudentGradesTable extends Component<IProps, IState> {
     StudentController.getStudents().then(async students => {
       this.setState({students});
     });
-        TileController.getAllSubmissions().then(async submissions => {
+    TileController.getAllSubmissions().then(async submissions => {
       this.setState({submissions, loaded: true });
     });
   }

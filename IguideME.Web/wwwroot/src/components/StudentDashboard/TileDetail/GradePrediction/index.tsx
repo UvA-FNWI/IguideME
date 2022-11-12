@@ -94,7 +94,7 @@ export default class GradePrediction extends Component<{
       <div id={"gradePrediction"}>
         <h3>Your predicted grade is a <strong>{round(sortedPredictions[sortedPredictions.length - 1].grade)}</strong></h3>
 
-        <Bar options={{  legend: { display: false },
+        <Bar options={{   legend: { display: false },
                           scales: {
                             xAxes: [{
                               id: 'x',

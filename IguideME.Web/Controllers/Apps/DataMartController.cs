@@ -273,6 +273,13 @@ namespace IguideME.Web.Controllers
         }
 
         // -------------------- User notifications --------------------
+        [Authorize(Policy = "IsInstructor")]
+        [HttpGet]
+        [Route("/datamart/notifications")]
+        public ActionResult GetCourseNotifications()
+        {
+            return Json(DatabaseManager.Instance.GetAllNotifications(GetCourseID()));
+        }
 
         [Authorize]
         [HttpGet]

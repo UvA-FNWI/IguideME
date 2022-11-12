@@ -1,12 +1,12 @@
 import React, { Component } from "react";
 import {Link} from "react-router-dom";
 import {Button, Col, Divider, Row} from "antd";
-import {TrophyOutlined, RiseOutlined, WarningOutlined} from "@ant-design/icons";
 import {RootState} from "../../../store";
 import {connect, ConnectedProps} from "react-redux";
 import {CanvasStudent} from "../../../models/canvas/Student";
 import DataMartController from "../../../api/controllers/datamart";
 import {PerformanceNotification} from "../../../models/app/Notification";
+import PerformanceNotifications from "../../../components/visuals/Notifications";
 
 const mapState = (state: RootState) => ({
   course: state.course,
@@ -51,34 +51,18 @@ class UserProfile extends Component<Props, IState> {
     });
   }
 
-  _getTileTitle = (tileID: number): string => {
-    const { tiles } = this.props;
-
-    return tiles.find(t => t.id === tileID)?.title ?? "";
-  }
-
   render(): React.ReactNode {
     const { course, student, tiles } = this.props;
     const { notifications }: IState = this.state;
-    void tiles; // discard value
 
     const outperforming = notifications
-      .filter(n => n.status === "outperforming peers")
-      .sort((a, b) => {
-        return this._getTileTitle(a.tile_id).localeCompare(this._getTileTitle(b.tile_id));
-      });
+      .filter(n => n.status === "outperforming peers");
 
     const closing = notifications
-      .filter(n => n.status === "closing the gap")
-      .sort((a, b) => {
-        return this._getTileTitle(a.tile_id).localeCompare(this._getTileTitle(b.tile_id));
-      });
+      .filter(n => n.status === "closing the gap");
 
     const moreEffort = notifications
-      .filter(n => n.status === "more effort required")
-      .sort((a, b) => {
-        return this._getTileTitle(a.tile_id).localeCompare(this._getTileTitle(b.tile_id));
-      });
+      .filter(n => n.status === "more effort required");
 
     return (
       <div id={"userProfile"}>
@@ -101,36 +85,11 @@ class UserProfile extends Component<Props, IState> {
           </Col>
 
           <Col xs={24} md={16} lg={18}>
-            { outperforming.length > 0 &&
-              <div>
-                <TrophyOutlined />
-                {' '}
-                You are outperforming your peers in:
-                <ul style={{boxSizing: 'border-box', paddingLeft: 30}}>
-                  { outperforming.map((n, i) => <li key={i}>{this._getTileTitle(n.tile_id)}</li>)}
-                </ul>
-              </div> }
-
-            { closing.length > 0 &&
-              <div>
-                <RiseOutlined />
-                {' '}
-                You are closing the gap to your peers in:
-                <ul style={{boxSizing: 'border-box', paddingLeft: 30}}>
-                  { closing.map((n, i) => <li key={i}>{this._getTileTitle(n.tile_id)}</li>)}
-                </ul>
-              </div> }
-
-            { moreEffort.length > 0 &&
-              <div>
-                <WarningOutlined />
-                {' '}
-                You have to put more effort in:
-                <ul style={{boxSizing: 'border-box', paddingLeft: 30}}>
-                  { moreEffort.map(n => <li>{this._getTileTitle(n.tile_id)}</li>)}
-                </ul>
-              </div> }
-
+            <PerformanceNotifications outperforming = {outperforming}
+                                      closing = {closing}
+                                      moreEffort = {moreEffort}
+                                      tiles = {tiles}
+            />
             <div style={{textAlign: 'right'}}>
               <Link to={'/consent'}>Informed Consent</Link>
             </div>

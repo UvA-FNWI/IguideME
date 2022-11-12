@@ -78,7 +78,7 @@ class IGuideME extends React.Component<Props> {
                         <Switch>
                             <Route path="/admin/analytics" component={AdminAnalytics} />
                             <Route path="/admin/dashboard" component={AdminDashboard} />
-              <Route path="/admin/notification-centre" component={AdminNotificationCentre} />
+                            <Route path="/admin/notification-centre" component={AdminNotificationCentre} />
                             <Route path="/admin/student-overview" component={AdminStudentOverview} />
                             <Route path="/admin/data-wizard" component={AdminDataWizard} />
                             <Route path="/admin/grade-analyzer" component={AdminGradeAnalyzer} />

@@ -81,13 +81,14 @@ namespace IguideME.Web.Services
 				}
 				catch (TaskCanceledException ex)
 				{
-					_logger.LogInformation("Task canceled: " + ex.StackTrace );
+					_logger.LogError("Task canceled: " + ex.StackTrace );
 					break;
 				}
 				catch (Exception ex)
 				{
 					try
 					{
+                        _logger.LogError($"Error caugh, setting the job as errored: {ex.Message}, {ex.StackTrace}");
 						// something went wrong. Put the job in to an errored state and continue on
 						// application will use latest successful state
 						await _jobStatusService.StoreJobResultAsync(jobQueueItem.JobId, new JobResultModel

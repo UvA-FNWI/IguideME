@@ -24,6 +24,7 @@ function entriesColumns(tile: Tile, tileEntries: TileEntry[], averaged: boolean)
         </Tooltip>
       );
 
+      // TODO: look at total points for colors.
       try {
         const gradeNum = parseFloat(text);
         if (gradeNum < 5.5) return <span className={"dangerText"}><b>{ text }</b></span>;

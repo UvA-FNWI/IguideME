@@ -1,5 +1,9 @@
-import {Notifications} from "../../../../api/controllers/notificationcentre";
+import {PerformanceNotification} from "../../../../models/app/Notification";
+import { Tile } from "../../../../models/app/Tile";
+import {CanvasStudent} from "../../../../models/canvas/Student";
 
 export interface IState {
-  notifications: Notifications[]
+  students: CanvasStudent[]
+  notifications: PerformanceNotification[]
+  tiles: Tile[]
 }

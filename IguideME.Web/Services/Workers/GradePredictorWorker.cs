@@ -28,6 +28,7 @@ namespace IguideME.Web.Services.Workers
 
         public void MakePredictions()
         {
+            _logger.LogInformation("Making grade predictions");
             if (this.Model == null)
             {
                 _logger.LogInformation($"No suitible grade prediction model found for courseID {this.CourseID}");
@@ -47,6 +48,7 @@ namespace IguideME.Web.Services.Workers
 
         private void ProcessStudent(User student)
         {
+            _logger.LogInformation($"Processing student: {student.LoginID}");
             var submissions = DatabaseManager.Instance.GetCourseSubmissionsForStudent(this.CourseID,
                                                                                       student.LoginID,
                                                                                       this.SyncHash);
@@ -54,34 +56,32 @@ namespace IguideME.Web.Services.Workers
 
             var wGrade = 0.0;
 
-            foreach (var modelParameter in this.Model.Parameters)
+            foreach (GradePredictionModelParameter modelParameter in this.Model.Parameters)
             {
                 var submission = submissions.Find(sub => sub.EntryID == modelParameter.ParameterID);
                 if (submission == null)
                 {
-                    Console.WriteLine($"Student {student.UserID} has no submission for EntryID {modelParameter.ParameterID}");
+                    _logger.LogInformation($"Student {student.UserID} has no submission for EntryID {modelParameter.ParameterID}");
                     continue;
                 }
 
                 var partialGrade = 0.0;
                 if (!double.TryParse(submission.Grade, out partialGrade))
                 {
-                    Console.WriteLine($"Error parsing submission grade as double: {submission.Grade}");
-                    Console.WriteLine("Aborting.");
+                    _logger.LogInformation($"Error parsing submission grade as double: {submission.Grade}");
+                    _logger.LogInformation("Aborting.");
                     return;
                 }
 
-                Console.WriteLine($"grade += {partialGrade} * {modelParameter.Weight}");
+                _logger.LogInformation($"grade += {partialGrade} * {modelParameter.Weight}");
 
                 wGrade += partialGrade * modelParameter.Weight;
             }
 
-            Console.WriteLine(wGrade);
-
             DatabaseManager.Instance.CreatePredictedGrade(this.CourseID,
                                                           student.LoginID,
                                                           (float)wGrade,
-                                                          0, // TODO why is this needed?
+                                                          0, // TODO: link to tiles, also store total number of components when creating the model.
                                                           this.SyncHash);
         }
     }

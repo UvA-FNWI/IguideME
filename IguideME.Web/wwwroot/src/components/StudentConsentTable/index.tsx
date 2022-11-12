@@ -6,6 +6,8 @@ import StudentController from "../../api/controllers/student";
 import {ConsentData} from "../../models/app/ConsentData";
 import {GoalData} from "../../models/app/GoalData";
 import { ColumnsType } from "antd/lib/table";
+import {CheckCircleOutlined, CloseCircleOutlined} from "@ant-design/icons";
+
 
 export default class StudentConsentTable extends Component<IProps, IState> {
 
@@ -80,8 +82,18 @@ export default class StudentConsentTable extends Component<IProps, IState> {
                 <EllipsisOutlined />
               </Tooltip>
             );
-            if (consentval === 0) return <span className={"dangerText"}><b>{ "No consent given" }</b></span>;
-            return <span className={"successText"}><b>{ "Consent given" }</b></span>;
+            if (consentval === 0) return (
+              <span className={"dangerText"}>
+                <Tooltip title="No consent given">
+                  <CloseCircleOutlined />
+                </Tooltip>
+              </span>
+            );
+            return <span className={"successText"}>
+                <Tooltip title="Consent given">
+                  <CheckCircleOutlined />
+                </Tooltip>
+              </span>;
           } catch {
             return text;
           }

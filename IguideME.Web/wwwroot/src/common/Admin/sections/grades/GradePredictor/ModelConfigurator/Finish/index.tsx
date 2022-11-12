@@ -20,7 +20,7 @@ export default class Finish extends Component<IProps, IState> implements IStep {
 
         const newModels = await DataMartController.getModels();
         console.log(newModels)
-        /* this.uploadModel() */
+        this.uploadModel()
     }
 
     async uploadModel() {
