@@ -23,7 +23,7 @@ interface IState {
 }
 
 export default class UploadData extends Component<IProps, IState> implements IStep {
-    mock = new UploadDataMock(/* enable? */ true)
+    mock = new UploadDataMock(/* enable? */ false)
 
     state = {
         gradesDatasets: this.mock.gradesDatasets,

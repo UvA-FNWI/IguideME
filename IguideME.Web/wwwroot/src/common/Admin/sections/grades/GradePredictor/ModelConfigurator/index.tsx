@@ -26,7 +26,7 @@ interface IState {
 }
 
 export default class ModelConfigurator extends Component<IProps, IState> {
-  mock = new ModelConfiguratorMock(/* enable? */ true);
+  mock = new ModelConfiguratorMock(/* enable? */ false);
 
   steps = ["Upload historic data", "Link to live data", "Train model", "Done!"];
 
