@@ -315,7 +315,7 @@ export class TrainModelMock extends Mock {
 
   model: GradePredictionModel | null =
     this.enabled && this.mockModel
-      ? JSON.parse(`{
+      ? {
           "intercept": 0,
           "parameters": [
             {
@@ -335,12 +335,12 @@ export class TrainModelMock extends Mock {
               "weight": -0.05163026454991204,
             },
           ],
-        }`)
+        }
       : null;
 
   modelWithMetadata =
     this.enabled && this.mockModel
-      ? JSON.parse(`{
+      ? {
           "model": {
             "name": "multivariateLinearRegression",
             "weights": [
@@ -386,6 +386,6 @@ export class TrainModelMock extends Mock {
             },
           },
           "modelColumns": [2, 4, 7, 1],
-        }`)
+        }
       : null;
 }
