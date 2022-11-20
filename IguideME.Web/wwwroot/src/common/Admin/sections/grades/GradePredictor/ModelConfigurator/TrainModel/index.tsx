@@ -314,7 +314,7 @@ export class TrainModelMock extends Mock {
   mockModel = true;
 
   model: GradePredictionModel | null =
-    this.enabled && this.mockModel
+    (this.enabled && this.mockModel)
       ? {
           "intercept": 0,
           "parameters": [
@@ -339,7 +339,7 @@ export class TrainModelMock extends Mock {
       : null;
 
   modelWithMetadata =
-    this.enabled && this.mockModel
+    (this.enabled && this.mockModel)
       ? {
           "model": {
             "name": "multivariateLinearRegression",
