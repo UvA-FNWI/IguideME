@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 // import {createBarData, getBarOptions} from "../helpers";
-import {Bar} from "react-chartjs-2";
+import {HorizontalBar} from "react-chartjs-2";
 import {Tile} from "../../../models/app/Tile"
 import {Data} from "./types"
 
@@ -11,7 +11,7 @@ export default class GradeBar extends Component<{
 }> {
 
   bar_options = {
-    maintainAspectRatio: false,
+    maintainAspectRatio: true,
     legend: {
       display: true
     },
@@ -24,6 +24,9 @@ export default class GradeBar extends Component<{
           display: false
           // labelString: 'Grade'
         },
+        ticks: {
+          display: false
+        },
         stacked: false,
       }],
       yAxes: [{
@@ -33,9 +36,6 @@ export default class GradeBar extends Component<{
         scaleLabel: {
           display: false
           // labelString: '# of students'
-        },
-        ticks: {
-          display: false
         },
         stacked: false
       }]
@@ -107,7 +107,7 @@ export default class GradeBar extends Component<{
 
     return (
       <div>
-        <Bar height={300} data={this.createBarData(tiles, tilesGradeSummary, peerGrades)} options={this.bar_options} />
+        <HorizontalBar height={300} data={this.createBarData(tiles, tilesGradeSummary, peerGrades)} options={this.bar_options} />
       </div>
     );
   }
