@@ -5,7 +5,7 @@ import { Button, Steps } from "antd";
 
 import UploadData, { UploadDataMock } from "./UploadData";
 import LinkLiveData, { LinkLiveDataMock } from "./LinkLiveData";
-import TrainModel from "./TrainModel";
+import TrainModel, { TrainModelMock } from "./TrainModel";
 import Finish from "./Finish";
 
 import { GradesDatasets } from "../types";
@@ -156,6 +156,5 @@ class ModelConfiguratorMock extends Mock {
     .finalGradesDatasetName;
   gradesDatasetTilePairs = new LinkLiveDataMock(this.enabled)
     .gradesDatasetTilePairs;
-  // model = new TrainModelMock(this.enabled).model;
-  model = null;
+  model = new TrainModelMock(this.enabled).model;
 }

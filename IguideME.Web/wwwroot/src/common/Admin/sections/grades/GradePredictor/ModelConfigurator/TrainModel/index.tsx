@@ -32,22 +32,21 @@ export default class TrainModel
   extends Component<IProps, IState>
   implements IStep
 {
-  // mock = new TrainModelMock(/* enable? */ true);
-  // mock = new TrainModelMock(/* enable? */ true);
+  mock = new TrainModelMock(/* enable? */ true);
 
   state = {
     gradesDatasets: {},
-    model: null, //this.mock.model,
-    modelWithMetadata: null, // this.mock.modelWithMetadata,
+    model: this.mock.model,
+    modelWithMetadata: this.mock.modelWithMetadata,
     modelTestingValues: {},
     predictedGrade: 0,
     tiles: [],
   };
 
   componentDidMount() {
-    // if (this.mock.enabled) {
-    //   if (this.mock.mockModel) this.onModelTrained();
-    // }
+    if (this.mock.enabled) {
+      if (this.mock.mockModel) this.onModelTrained();
+    }
 
     TileController.getTiles().then(async (tiles) => {
       tiles = tiles.filter((t) => t.content === "ENTRIES");
@@ -164,16 +163,12 @@ export default class TrainModel
 
   recalculateTestPrediction() {
     let { modelWithMetadata, modelTestingValues }: IState = this.state;
-
     if (!modelWithMetadata) return;
-
-    let _modelWithMetadata: { model: any; modelColumns: number[] } = modelWithMetadata;
-
     if (
       Object.keys(modelTestingValues).length !==
-      _modelWithMetadata?.model.weights.length
+      modelWithMetadata.model.weights.length
     ) {
-      _modelWithMetadata?.modelColumns.forEach(
+      modelWithMetadata.modelColumns.forEach(
         (tID) => (modelTestingValues[tID] = 5)
       );
       this.setState({
@@ -181,10 +176,10 @@ export default class TrainModel
       });
     }
 
-    const mlr = MLR.load(_modelWithMetadata!.model);
+    const mlr = MLR.load(modelWithMetadata!.model);
 
     // maintain same order as when the model was trained
-    const inputs = _modelWithMetadata!.modelColumns.map(
+    const inputs = modelWithMetadata!.modelColumns.map(
       (tildID) => modelTestingValues[tildID]
     );
 
@@ -207,9 +202,6 @@ export default class TrainModel
   isStepCompleted = this.validate;
 
   render(): React.ReactNode {
-    let { modelWithMetadata, modelTestingValues }: IState = this.state;
-    let _modelWithMetadata: { model: any; modelColumns: number[] } = modelWithMetadata!;
-
     return (
       <div>
         <Row>
@@ -230,8 +222,8 @@ export default class TrainModel
                   below by inputting sample values.
                 </p>
 
-                {modelWithMetadata &&
-                  _modelWithMetadata.modelColumns.map(
+                {this.state.modelWithMetadata &&
+                  this.state.modelWithMetadata.modelColumns.map(
                     (tileID: number, index: number) => {
                       const { modelWithMetadata }: IState = this.state;
                       const weight = modelWithMetadata!.model.weights[index][0];
@@ -239,7 +231,7 @@ export default class TrainModel
                         <div key={weight} className="grade-input-row">
                           <Row>
                             <Col xs={24} md={10}>
-                              {this.getTileByID(tileID)?.title} (weight:{" "}
+                              {this.getTileByID(tileID) ? this.getTileByID(tileID)!.title : null} (weight:{" "}
                               {weight.toFixed(1)})
                             </Col>
                             <Col xs={24} md={5}>
@@ -318,3 +310,82 @@ export default class TrainModel
   }
 }
 
+export class TrainModelMock extends Mock {
+  mockModel = true;
+
+  model: GradePredictionModel | null =
+    (this.enabled && this.mockModel)
+      ? {
+          "intercept": 0,
+          "parameters": [
+            {
+              "parameterID": 2,
+              "weight": -0.20628158982515943,
+            },
+            {
+              "parameterID": 4,
+              "weight": 0.5987301721162606,
+            },
+            {
+              "parameterID": 7,
+              "weight": 0.7351437498019004,
+            },
+            {
+              "parameterID": 1,
+              "weight": -0.05163026454991204,
+            },
+          ],
+        }
+      : null;
+
+  modelWithMetadata =
+    (this.enabled && this.mockModel)
+      ? {
+          "model": {
+            "name": "multivariateLinearRegression",
+            "weights": [
+              [-0.20628158982515943],
+              [0.5987301721162606],
+              [0.7351437498019004],
+              [-0.05163026454991204],
+            ],
+            "inputs": 4,
+            "outputs": 1,
+            "intercept": false,
+            "summary": {
+              "regressionStatistics": {
+                "standardError": 0.9270044844591805,
+                "observations": 1,
+              },
+              "variables": [
+                {
+                  "label": "X Variable 1",
+                  "coefficients": [-0.20628158982515943],
+                  "standardError": 0.08731014539207609,
+                  "tStat": -2.3626302407220674,
+                },
+                {
+                  "label": "X Variable 2",
+                  "coefficients": [0.5987301721162606],
+                  "standardError": 0.12416150926563964,
+                  "tStat": 4.822188258321637,
+                },
+                {
+                  "label": "X Variable 3",
+                  "coefficients": [0.7351437498019004],
+                  "standardError": 0.07154733424292914,
+                  "tStat": 10.274928585121298,
+                },
+                {
+                  "label": "Intercept",
+                  "coefficients": [-0.05163026454991204],
+                  "standardError": 0.06950154171021325,
+                  "tStat": -0.7428650254289967,
+                },
+              ],
+            },
+          },
+          "modelColumns": [2, 4, 7, 1],
+        }
+      : null;
+}
