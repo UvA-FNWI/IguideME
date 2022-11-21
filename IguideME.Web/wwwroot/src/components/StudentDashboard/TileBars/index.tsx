@@ -30,6 +30,8 @@ export default class GradeBar extends Component<{
         stacked: false,
       }],
       yAxes: [{
+        barPercentage: .95,
+        categoryPercentage: .95,
         gridLines : {
           display : false
         },

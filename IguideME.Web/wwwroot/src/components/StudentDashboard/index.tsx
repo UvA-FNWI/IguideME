@@ -226,10 +226,12 @@ class StudentDashboard extends Component<Props, IState> {
           //            tilesGradeSummary={tilesGradeSummary}
           //            peerGrades={peerGrades}
           // />
-          <TileBars tiles={tiles}
-                    tilesGradeSummary = {tilesGradeSummary}
-                    peerGrades = {peerGrades}
-          />
+          <div style={{ padding: '0 8%'}}>
+            <TileBars tiles={tiles}
+                      tilesGradeSummary = {tilesGradeSummary}
+                      peerGrades = {peerGrades}
+            />
+          </div>
         }
 
         <UserProfile student={this.props.student} />
