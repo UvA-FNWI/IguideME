@@ -10,6 +10,7 @@ import TileDetail from "./TileDetail";
 import { Radio } from "antd";
 import { AppstoreOutlined, RadarChartOutlined } from "@ant-design/icons";
 import TileRadar from "./TileRadar";
+import TileBars from "./TileBars";
 import {connect, ConnectedProps} from "react-redux";
 import {RootState} from "../../store";
 import "./style.scss";
@@ -219,11 +220,15 @@ class StudentDashboard extends Component<Props, IState> {
               })}
             </div>
           </FadeIn> :
-          <TileRadar tiles={tiles}
-                     tileEntries={tileEntries}
-                     student={student}
-                     tilesGradeSummary={tilesGradeSummary}
-                     peerGrades={peerGrades}
+          // <TileRadar tiles={tiles}
+          //            tileEntries={tileEntries}
+          //            student={student}
+          //            tilesGradeSummary={tilesGradeSummary}
+          //            peerGrades={peerGrades}
+          // />
+          <TileBars tiles={tiles}
+                    tilesGradeSummary = {tilesGradeSummary}
+                    peerGrades = {peerGrades}
           />
         }
 
