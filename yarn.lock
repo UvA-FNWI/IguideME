@@ -3,5 +3,6 @@
 
 
 "ztypescript@https://github.com/everydayanchovies/ztypescript":
-  version "1.0.0"
-  resolved "https://github.com/everydayanchovies/ztypescript#658e5208dbdefe7843e4d42aa64c4b2d2dcf2294"
+  "integrity" "sha512-dtz4zafuxh2NGuGffHXWT87vB1/XpN4798Y00QQwg6CtJuCoensOrXLmtG7I1jAkbPvvBYPlaSsnjrdL6Wg9QA=="
+  "resolved" "git+ssh://git@github.com/everydayanchovies/ztypescript.git"
+  "version" "1.0.0"
