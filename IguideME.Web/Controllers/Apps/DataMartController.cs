@@ -20,7 +20,7 @@ namespace IguideME.Web.Controllers
     [Route("[controller]")]
     public class DataMartController : DataController
     {
-        private readonly ILogger<DataController> logger;
+        private readonly ILogger<DataController> _logger;
         private readonly CanvasTest canvasTest;
         private readonly IQueuedBackgroundService _queuedBackgroundService;
         private readonly IComputationJobStatusService _computationJobStatusService;
@@ -32,7 +32,7 @@ namespace IguideME.Web.Controllers
             IComputationJobStatusService computationJobStatusService) : base(
                 logger, canvasTest, queuedBackgroundService, computationJobStatusService)
         {
-            this.logger = logger;
+            this._logger = logger;
             this.canvasTest = canvasTest;
 
             this._queuedBackgroundService = queuedBackgroundService;
@@ -353,7 +353,7 @@ namespace IguideME.Web.Controllers
                 .Find(x => x.StudentLoginID == (studentLoginID == "self" ? GetUserLoginID() : studentLoginID));
 
             return Json(
-                student != null ? student.Accepted : false
+                student != null && student.Accepted
             );
         }
     }

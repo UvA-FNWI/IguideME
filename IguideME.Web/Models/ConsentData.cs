@@ -10,13 +10,13 @@
         // 1 = accepted, 0 = declined, -1 = unspecified
         public int Granted { get; set; }
 
-        public ConsentData(int CourseID, int UserID, string UserLoginID, string UserName, int Granted)
+        public ConsentData(int courseID, int userID, string userLoginID, string userName, int granted)
         {
-            this.CourseID = CourseID;
-            this.UserID = UserID;
-            this.UserLoginID = UserLoginID;
-            this.UserName = UserName;
-            this.Granted = Granted;
+            this.CourseID = courseID;
+            this.UserID = userID;
+            this.UserLoginID = userLoginID;
+            this.UserName = userName;
+            this.Granted = granted;
         }
     }
 }

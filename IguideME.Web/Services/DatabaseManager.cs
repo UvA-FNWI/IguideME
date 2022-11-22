@@ -13,8 +13,7 @@ namespace IguideME.Web.Services
     public sealed class DatabaseManager
     {
         private static DatabaseManager instance;
-        private string _connection_string;
-        private static SQLiteCommand command;
+        private readonly string _connection_string;
         private readonly ILogger _logger;
 
         DatabaseManager(bool isDev = false) {
@@ -108,7 +107,7 @@ namespace IguideME.Web.Services
 
             try {
                 for (int i = 0; i <= rows; i++)
-                    error += $"{r.GetName(i)} {r.GetDataTypeName(i)} {r.GetValue(i).ToString()} {r.GetValue(i).GetType()}\n";
+                    error += $"{r.GetName(i)} {r.GetDataTypeName(i)} {r.GetValue(i)} {r.GetValue(i).GetType()}\n";
 
                 _logger.LogError( error + e.Message + e.StackTrace);
             } catch (Exception ex) {
@@ -448,7 +447,7 @@ namespace IguideME.Web.Services
             int goalGrade,
             string hash = null)
         {
-            string activeHash = hash != null ? hash : this.GetCurrentHash(courseID);
+            string activeHash = hash ?? this.GetCurrentHash(courseID);
             if (activeHash == null) new List<User> { };
 
             string query = String.Format(
@@ -524,7 +523,7 @@ namespace IguideME.Web.Services
                 }
             }
 
-            models.ForEach((GradePredictionModel model) => model.getParameters());
+            models.ForEach((GradePredictionModel model) => model.GetParameters());
 
             return models;
         }
@@ -547,9 +546,7 @@ namespace IguideME.Web.Services
                 }
             }
 
-            if (model != null) {
-                model.getParameters();
-            }
+            model?.GetParameters();
             return model;
         }
 
@@ -686,7 +683,7 @@ namespace IguideME.Web.Services
             string userLoginID,
             string hash = null)
         {
-            string activeHash = hash != null ? hash : this.GetCurrentHash(courseID);
+            string activeHash = hash ?? this.GetCurrentHash(courseID);
             if (activeHash == null) new List<string> { };
 
             string query = String.Format(
@@ -715,7 +712,7 @@ namespace IguideME.Web.Services
             string submitted,
             string hash = null)
         {
-            string activeHash = hash != null ? hash : this.GetCurrentHash(courseID);
+            string activeHash = hash ?? this.GetCurrentHash(courseID);
             if (activeHash == null) new List<User> { };
 
             return IDNonQuery(
@@ -1672,6 +1669,7 @@ namespace IguideME.Web.Services
 
         public void UpdateTile(int courseID, Tile newTile)
         {
+            // TODO: check courseID
             string query = String.Format(
                     DatabaseQueries.UPDATE_TILE,
                     newTile.ID,
@@ -1871,8 +1869,7 @@ namespace IguideME.Web.Services
             string activeHash = hash ?? this.GetCurrentHash(courseID);
             if (activeHash == null) return new List<AppDiscussion>() { };
 
-            string query = null;
-
+            string query;
             if (userLoginID == null)
             {
                 query = String.Format(
@@ -2000,6 +1997,7 @@ namespace IguideME.Web.Services
 
         public Tile GetTile(int courseID, int tileID)
         {
+            // TODO: check courseID
             string query = String.Format(
                     @"SELECT `id`, `group_id`, `title`, `position`, `tile_type`, `content_type`, `visible`, `notifications`, `graph_view`, `wildcard`
                     FROM `tile` WHERE `id`={0}",
@@ -2122,11 +2120,11 @@ namespace IguideME.Web.Services
             ));
         }
 
-        public int GetConsent(int CourseID, int UserID)
+        public int GetConsent(int courseID, int userID)
         {
             string query = String.Format(
                 "SELECT `user_login_id`, `granted` from `consent` WHERE `course_id`={0} AND `user_id`={1}",
-                CourseID, UserID
+                courseID, userID
             );
 
             int consent = -1;
@@ -2137,11 +2135,11 @@ namespace IguideME.Web.Services
             return consent;
         }
 
-        public int GetConsent(int CourseID, string UserLoginID)
+        public int GetConsent(int courseID, string userLoginID)
         {
             string query = String.Format(
                 "SELECT `user_login_id`, `granted` from `consent` WHERE `course_id`={0} AND `user_login_id`='{1}'",
-                CourseID, UserLoginID
+                courseID, userLoginID
             );
 
             int consent = -1;
@@ -2152,12 +2150,12 @@ namespace IguideME.Web.Services
             return consent;
         }
 
-        public ConsentData[] GetGrantedConsents(int CourseID)
+        public ConsentData[] GetGrantedConsents(int courseID)
         {
 
             string query = String.Format(
                 "SELECT `user_id`, `user_login_id`, `user_name` from `consent` WHERE `course_id`={0} AND `granted`=1",
-                CourseID
+                courseID
             );
 
             List<ConsentData> consents = new List<ConsentData>();
@@ -2165,7 +2163,7 @@ namespace IguideME.Web.Services
             using(SQLiteDataReader r = Query(query)) {
                 while (r.Read())
                 {
-                    consents.Add(new ConsentData(CourseID, r.GetInt32(0), r.GetValue(1).ToString(), r.GetValue(2).ToString(), 1));
+                    consents.Add(new ConsentData(courseID, r.GetInt32(0), r.GetValue(1).ToString(), r.GetValue(2).ToString(), 1));
                 }
             }
 
@@ -2173,11 +2171,11 @@ namespace IguideME.Web.Services
 
 
         }
-        public ConsentData[] GetConsents(int CourseID)
+        public ConsentData[] GetConsents(int courseID)
         {
             string query = String.Format(
                 "SELECT `user_id`, `user_login_id`, `user_name`, `granted` from `consent` WHERE `course_id`={0}",
-                CourseID
+                courseID
             );
 
             List<ConsentData> consents = new List<ConsentData>();
@@ -2186,7 +2184,7 @@ namespace IguideME.Web.Services
                 while (r.Read())
                 {
                     try {
-                        consents.Add(new ConsentData(CourseID, r.GetInt32(0), r.GetValue(1).ToString(), r.GetValue(2).ToString(), r.GetInt32(3)));
+                        consents.Add(new ConsentData(courseID, r.GetInt32(0), r.GetValue(1).ToString(), r.GetValue(2).ToString(), r.GetInt32(3)));
                     } catch ( Exception e) {
                         PrintQueryError("GetConsents", 3, r, e);
                     }
@@ -2209,19 +2207,12 @@ namespace IguideME.Web.Services
 
         public ExternalData[] GetExternalData(int courseID, int tileID, string userLoginID)
         {
-            string query = "";
-
-            if (tileID == -1)
-            {
-                query =
-                    String.Format(
+            string query = tileID == -1
+                ? String.Format(
                         "SELECT `user_login_id`, `title`, `grade` from `external_data` WHERE `course_id`={0} AND `user_login_id`='{1}'",
                         courseID, userLoginID
-                    );
-            }
-            else
-            {
-                query = userLoginID != null ?
+                    )
+                : userLoginID != null ?
                     String.Format(
                         "SELECT `user_login_id`, `title`, `grade` from `external_data` WHERE `course_id`={0} AND `tile_id`={1} AND `user_login_id`='{2}'",
                         courseID, tileID, userLoginID
@@ -2229,9 +2220,6 @@ namespace IguideME.Web.Services
                         "SELECT `user_login_id`, `title`, `grade` from `external_data` WHERE `course_id`={0} AND `tile_id`={1}",
                         courseID, tileID
                     );
-            }
-
-
             List<ExternalData> submissions = new List<ExternalData>();
 
             using(SQLiteDataReader r = Query(query)){

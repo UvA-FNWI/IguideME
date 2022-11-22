@@ -27,7 +27,7 @@ namespace IguideME.Web.Services.Workers
             List<User> students = DatabaseManager.Instance
                 .GetUsers(this.CourseID, "student", this.Hash);
 
-            _logger.LogInformation($"About to process {students.Count.ToString()} students...");
+            _logger.LogInformation($"About to process {students.Count} students...");
 
             // iterate over all students in the course
             foreach (var student in students)
@@ -35,7 +35,7 @@ namespace IguideME.Web.Services.Workers
                 // don't register data from students that did not give consent
                 if (DatabaseManager.Instance.GetConsent(this.CourseID, student.LoginID) != 1)
                 {
-                    _logger.LogInformation($"Skipping user with loginID {student.LoginID.ToString()} as they did not give consent.");
+                    _logger.LogInformation($"Skipping user with loginID {student.LoginID} as they did not give consent.");
                     continue;
                 }
 

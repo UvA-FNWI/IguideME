@@ -19,11 +19,11 @@ namespace IguideME.Web.Controllers
     [Route("[controller]")]
     public class LtiController : ControllerBase
     {
-        SignatureChecker signatureChecker;
+        readonly SignatureChecker _signatureChecker;
 
         public LtiController(IConfiguration config)
         {
-            signatureChecker = new SignatureChecker(config["LtiKey"]);
+            _signatureChecker = new SignatureChecker(config["LtiKey"]);
         }
 
         [HttpPost]
@@ -31,7 +31,7 @@ namespace IguideME.Web.Controllers
         {
             // Check the OAuth signature
             var formdata = await HttpContext.Request.ReadFormAsync();
-            if (!signatureChecker.CheckSignature(HttpContext.Request.Method, HttpContext.Request.GetDisplayUrl(), formdata.ToDictionary(k => k.Key, k => (string)k.Value), formdata["oauth_signature"]))
+            if (!_signatureChecker.CheckSignature(HttpContext.Request.Method, HttpContext.Request.GetDisplayUrl(), formdata.ToDictionary(k => k.Key, k => (string)k.Value), formdata["oauth_signature"]))
                 return Unauthorized($"Signature check failed. Request url: {HttpContext.Request.GetDisplayUrl()}");
 
             // Register user identity

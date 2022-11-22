@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 
 namespace IguideME.Web.Models
 {
-    public enum editState {
+    public enum EditState {
         Unchanged,
         New,
         Updated,
@@ -101,7 +101,7 @@ namespace IguideME.Web.Models
         public int ID { get; set; }
 
         [JsonProperty(PropertyName = "state")]
-        public editState State { get; set; }
+        public EditState State { get; set; }
 
         [JsonProperty(PropertyName = "tile_id")]
         public int TileID { get; set; }
@@ -117,7 +117,7 @@ namespace IguideME.Web.Models
 
         public TileEntry(
             int id,
-            editState state,
+            EditState state,
             int tileID,
             string title,
             string type,

@@ -72,11 +72,9 @@ namespace IguideME.Web
                 });
 
             services.AddAuthorization(options =>
-            {
                 // allow all instructors to access the admin panel of their course
                 options.AddPolicy("IsInstructor",
-                     policy => policy.RequireRole("instructor"));
-            });
+                     policy => policy.RequireRole("instructor")));
 
             services.Configure<ForwardedHeadersOptions>(opt =>
             {
@@ -85,16 +83,10 @@ namespace IguideME.Web
                 opt.KnownProxies.Clear();
             });
 
-            services.Configure<KestrelServerOptions>(options =>
-            {
-                options.AllowSynchronousIO = true;
-            });
+            services.Configure<KestrelServerOptions>(options => options.AllowSynchronousIO = true);
 
             // If using IIS:
-            services.Configure<IISServerOptions>(options =>
-            {
-                options.AllowSynchronousIO = true;
-            });
+            services.Configure<IISServerOptions>(options => options.AllowSynchronousIO = true);
 
             services.AddControllersWithViews();
             services.AddSingleton<CanvasTest>();
@@ -135,12 +127,9 @@ namespace IguideME.Web
             app.UseAuthentication();
             app.UseAuthorization();
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllerRoute(
+            app.UseEndpoints(endpoints => endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller}/{action=Index}/{id?}");
-            });
+                    pattern: "{controller}/{action=Index}/{id?}"));
         }
     }
 }

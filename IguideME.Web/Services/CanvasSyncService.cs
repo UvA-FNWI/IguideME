@@ -12,7 +12,7 @@ namespace IguideME.Web.Services
 {
     public interface ICanvasSyncService
     {
-        Task<JobResultModel> DoWorkAsync(string JobId, JobParametersModel work,
+        Task<JobResultModel> DoWorkAsync(string jobId, JobParametersModel work,
             CancellationToken cancellationToken);
     }
 
@@ -35,6 +35,7 @@ namespace IguideME.Web.Services
         public async Task<JobResultModel> DoWorkAsync(string jobId, JobParametersModel work,
             CancellationToken cancellationToken)
         {
+            // TODO: what is result?
             var result = new JobResultModel();
             var courseID = work.CourseID;
 

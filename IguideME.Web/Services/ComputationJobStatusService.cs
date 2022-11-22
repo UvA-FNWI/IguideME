@@ -49,14 +49,12 @@ namespace IguideME.Web.Services
 
 		public async Task<JobModel> GetJobAsync(string jobId)
 		{
-			if (!await _jobStorage.ExistsAsync(DatabaseKey, jobId).ConfigureAwait(false))
-			{
-				return null;
-			}
-			return await _jobStorage.ReadAsync(DatabaseKey, jobId).ConfigureAwait(false);
-		}
+            return !await _jobStorage.ExistsAsync(DatabaseKey, jobId).ConfigureAwait(false)
+                ? null
+                : await _jobStorage.ReadAsync(DatabaseKey, jobId).ConfigureAwait(false);
+        }
 
-		public Task<IReadOnlyDictionary<string, JobModel>> GetAllJobsAsync()
+        public Task<IReadOnlyDictionary<string, JobModel>> GetAllJobsAsync()
 		{
 			return _jobStorage.GetAllAsync(DatabaseKey);
 		}

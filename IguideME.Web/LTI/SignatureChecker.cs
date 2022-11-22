@@ -11,19 +11,19 @@ namespace IguideME.Web.LTI
     /// </summary>
     class SignatureChecker
     {
-        readonly string key;
+        readonly string _key;
 
         public SignatureChecker(string key)
         {
-            this.key = key;
+            this._key = key;
         }
 
         public bool CheckSignature(string method, string url, IEnumerable<KeyValuePair<string, string>> pars, string signature)
             => GetSignature(method, url, pars) == signature;
-        
+
         public string GetSignature(string method, string url, IEnumerable<KeyValuePair<string, string>> pars)
         {
-            var parString = string.Join('&', 
+            var parString = string.Join('&',
                 pars.OrderBy(p => p.Key)
                     .Where(p => p.Key != "oauth_signature")
                     .Select(p => $"{Uri.EscapeDataString(p.Key)}={Uri.EscapeDataString(p.Value)}")
@@ -37,7 +37,7 @@ namespace IguideME.Web.LTI
         {
             var encoding = Encoding.UTF8;
 
-            byte[] keyBytes = encoding.GetBytes(key + "&");
+            byte[] keyBytes = encoding.GetBytes(_key + "&");
             byte[] messageBytes = encoding.GetBytes(message);
 
             using HMACSHA1 hmac = new HMACSHA1(keyBytes);

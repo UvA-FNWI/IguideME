@@ -9,28 +9,28 @@ namespace IguideME.Web.Services.Data
 {
 	public sealed class MemoryCacheJobStorageService : IJobStorageService
 	{
-		private static readonly ConcurrentDictionary<string, JobModel> _jobs = new ConcurrentDictionary<string, JobModel>();
+		private static readonly ConcurrentDictionary<string, JobModel> Jobs = new ConcurrentDictionary<string, JobModel>();
 
 		private static string Key(string databaseKey, string jobId) => $"{databaseKey}:{jobId}";
 
 		public Task ClearAllAsync(string databaseKey)
 		{
-			var keys = _jobs.Where(x => x.Key.StartsWith(databaseKey)).Select(x => x.Key);
+			var keys = Jobs.Where(x => x.Key.StartsWith(databaseKey)).Select(x => x.Key);
 			foreach (var k in keys)
 			{
-				_jobs.Remove(k, out _);
+				Jobs.Remove(k, out _);
 			}
 			return Task.CompletedTask;
 		}
 
 		public Task<bool> ExistsAsync(string databaseKey, string jobId)
 		{
-			return Task.FromResult(_jobs.ContainsKey(Key(databaseKey, jobId)));
+			return Task.FromResult(Jobs.ContainsKey(Key(databaseKey, jobId)));
 		}
 
 		public Task<IReadOnlyDictionary<string, JobModel>> GetAllAsync(string databaseKey)
 		{
-			var d = _jobs.Where(
+			var d = Jobs.Where(
 				x => x.Key.StartsWith(databaseKey)).ToDictionary(
 					y => y.Value.JobId, y => y.Value).ToImmutableDictionary();
 
@@ -40,12 +40,12 @@ namespace IguideME.Web.Services.Data
 		public Task<JobModel> ReadAsync(string databaseKey, string jobId)
 		{
 			var key = Key(databaseKey, jobId);
-			return _jobs.ContainsKey(key) ? Task.FromResult(_jobs[key]) : null;
+			return Jobs.ContainsKey(key) ? Task.FromResult(Jobs[key]) : null;
 		}
 
 		public Task WriteAsync(string databaseKey, JobModel job)
 		{
-			_jobs[Key(databaseKey, job.JobId)] = job;
+			Jobs[Key(databaseKey, job.JobId)] = job;
 			return Task.CompletedTask;
 		}
     }

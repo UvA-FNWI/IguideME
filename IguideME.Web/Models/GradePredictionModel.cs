@@ -51,7 +51,7 @@ namespace IguideME.Web.Models.App
             this.Intercept = intercept;
         }
 
-        public void getParameters() {
+        public void GetParameters() {
             this.Parameters = DatabaseManager.Instance.GetGradePredictionModelParameters(this.ID);
         }
     }

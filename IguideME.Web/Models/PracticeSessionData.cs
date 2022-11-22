@@ -15,12 +15,12 @@ namespace IguideME.Web.Models
 
         public string GroupID { get; set; }
 
-        public PracticeSessionData(int CourseID, string UserLoginID, float Grade, string GroupID)
+        public PracticeSessionData(int courseID, string userLoginID, float grade, string groupID)
         {
-            this.CourseID = CourseID;
-            this.UserLoginID = UserLoginID;
-            this.Grade = Grade;
-            this.GroupID = GroupID;
+            this.CourseID = courseID;
+            this.UserLoginID = userLoginID;
+            this.Grade = grade;
+            this.GroupID = groupID;
         }
     }
 }

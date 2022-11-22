@@ -6,26 +6,26 @@ namespace IguideME.Web.Models.App
     public class DataSynchronization
     {
         [JsonProperty("id")]
-        public int id { get; set; }
+        public int Id { get; set; }
 
         [JsonProperty("course_id")]
-        public int courseID { get; set; }
+        public int CourseID { get; set; }
 
         [JsonProperty("start_timestamp")]
-        public string startTimestamp { get; set; }
+        public string StartTimestamp { get; set; }
 
         [JsonProperty("end_timestamp")]
-        public string endTimestamp { get; set; }
+        public string EndTimestamp { get; set; }
 
         [JsonProperty("status")]
-        public string status { get; set; }
+        public string Status { get; set; }
 
         [JsonProperty("hash")]
-        public string hash { get; set; }
+        public string Hash { get; set; }
 
         // duration of synchronization in seconds
         [JsonProperty("duration")]
-        public int duration { get; set; }
+        public int Duration { get; set; }
 
         public DataSynchronization(
             int id,
@@ -35,19 +35,14 @@ namespace IguideME.Web.Models.App
             string status,
             string hash)
         {
-            this.id = id;
-            this.courseID = courseID;
-            this.startTimestamp = startTimestamp.ToString();
-            this.endTimestamp = endTimestamp.ToString();
-            this.status = status;
-            this.hash = hash;
+            this.Id = id;
+            this.CourseID = courseID;
+            this.StartTimestamp = startTimestamp.ToString();
+            this.EndTimestamp = endTimestamp.ToString();
+            this.Status = status;
+            this.Hash = hash;
 
-            if (endTimestamp != null && startTimestamp != null){
-                this.duration = (int) Math.Floor((endTimestamp - startTimestamp).TotalSeconds);
-            }
-            else {
-                this.duration = -1;
-            }
+            this.Duration = endTimestamp != null && startTimestamp != null ? (int) Math.Floor((endTimestamp - startTimestamp).TotalSeconds) : -1;
         }
 
 

@@ -49,10 +49,8 @@ namespace IguideME.Web.Services.Workers
 					.Where(d =>
 					{
 						var student = students.Find(s => s.Name == d.UserName);
-						if (student == null) return false;
-						return DatabaseManager.Instance.GetConsent(this.CourseID, student.LoginID) == 1;
-
-					});
+                        return student != null && DatabaseManager.Instance.GetConsent(this.CourseID, student.LoginID) == 1;
+                    });
 
 					foreach (Discussion d in postedDiscussions)
 					{

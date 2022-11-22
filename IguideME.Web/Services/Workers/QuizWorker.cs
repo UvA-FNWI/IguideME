@@ -6,9 +6,9 @@ namespace IguideME.Web.Services.Workers
     public class QuizWorker
     {
         private readonly ILogger<SyncManager> _logger;
-		int courseID;
-		string hashCode;
-		CanvasTest canvasTest;
+		readonly int courseID;
+		readonly string hashCode;
+		readonly CanvasTest canvasTest;
 
         public QuizWorker(
 			int courseID,

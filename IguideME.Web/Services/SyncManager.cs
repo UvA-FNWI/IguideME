@@ -10,12 +10,12 @@ namespace IguideME.Web.Services
 {
     public class SyncManager : IHostedService, IDisposable
     {
-        private int executionCount = 0;
-        private readonly CanvasTest canvasTest;
+        private int _executionCount = 0;
+        private readonly CanvasTest _canvasTest;
         private readonly ILogger<SyncManager> _logger;
-        private readonly IComputationJobStatusService computationJobStatus;
-        private readonly IQueuedBackgroundService queuedBackgroundService;
-        private readonly IComputationJobStatusService computationJobStatusService;
+        private readonly IComputationJobStatusService _computationJobStatus;
+        private readonly IQueuedBackgroundService _queuedBackgroundService;
+        private readonly IComputationJobStatusService _computationJobStatusService;
         private Timer _timer;
 
         public SyncManager(
@@ -26,10 +26,10 @@ namespace IguideME.Web.Services
             CanvasTest canvasTest)
         {
             _logger = logger;
-            this.canvasTest = canvasTest;
-            this.computationJobStatus = computationJobStatus;
-            this.queuedBackgroundService = queuedBackgroundService;
-            this.computationJobStatusService = computationJobStatusService;
+            this._canvasTest = canvasTest;
+            this._computationJobStatus = computationJobStatus;
+            this._queuedBackgroundService = queuedBackgroundService;
+            this._computationJobStatusService = computationJobStatusService;
         }
 
         public Task StartAsync(CancellationToken stoppingToken)
@@ -42,7 +42,7 @@ namespace IguideME.Web.Services
 
         private async void TimeSync(object state)
         {
-            var count = Interlocked.Increment(ref executionCount);
+            Interlocked.Increment(ref _executionCount);
 
             // check every half hour if it's 3:00AM
             var now = DateTime.UtcNow;
@@ -50,19 +50,21 @@ namespace IguideME.Web.Services
 
             if (DatabaseManager.Instance != null && now.Hour == 3 && now.Minute <= 30)
             {
-                var sync = new CanvasSyncService(
-                    this.computationJobStatus,
-                    this.canvasTest,
+                new CanvasSyncService(
+                    this._computationJobStatus,
+                    this._canvasTest,
                     _logger
                 );
 
                 List<int> course_ids = DatabaseManager.Instance.GetCourseIds();
 
                 foreach (int id in course_ids) {
-                    JobParametersModel parameters = new JobParametersModel();
-                    parameters.CourseID = id;
-                    parameters.Notifications_bool = true;
-                    await this.queuedBackgroundService.PostWorkItemAsync(parameters).ConfigureAwait(false);
+                    JobParametersModel parameters = new JobParametersModel
+                        {
+                            CourseID = id,
+                            Notifications_bool = true
+                        };
+                    await this._queuedBackgroundService.PostWorkItemAsync(parameters).ConfigureAwait(false);
                     _logger.LogInformation("Execute");
                 }
             }

@@ -18,13 +18,13 @@ namespace IguideME.Web.Models
 
         public string GroupID { get; set; }
 
-        public PerusallData(int CourseID, string UserLoginID, float Grade, string Entry, string GroupID)
+        public PerusallData(int courseID, string userLoginID, float grade, string entry, string groupID)
         {
-            this.CourseID = CourseID;
-            this.UserLoginID = UserLoginID;
-            this.Grade = Grade;
-            this.Entry = Entry;
-            this.GroupID = GroupID;
+            this.CourseID = courseID;
+            this.UserLoginID = userLoginID;
+            this.Grade = grade;
+            this.Entry = entry;
+            this.GroupID = groupID;
         }
     }
 }

@@ -6,9 +6,9 @@ namespace IguideME.Web.Services.Workers
     public class UserWorker
     {
         private readonly ILogger<SyncManager> _logger;
-        private CanvasTest canvasTest;
-        private int courseID;
-        private string hashCode;
+        readonly private CanvasTest canvasTest;
+        readonly private int courseID;
+        readonly private string hashCode;
 
         public UserWorker(
             int courseID,
@@ -28,7 +28,7 @@ namespace IguideME.Web.Services.Workers
 
             var students = this.canvasTest.GetStudents(this.courseID);
 
-            _logger.LogInformation($"Starting student registry, about to process {students.Length.ToString()} students...");
+            _logger.LogInformation($"Starting student registry, about to process {students.Length} students...");
 
             foreach (var student in students)
             {
@@ -48,7 +48,7 @@ namespace IguideME.Web.Services.Workers
                         this.hashCode
                     );
                 } catch (Exception e) {
-                    _logger.LogError($"{e.ToString()} {e.StackTrace}");
+                    _logger.LogError($"{e} {e.StackTrace}");
                 }
             }
 
@@ -58,7 +58,7 @@ namespace IguideME.Web.Services.Workers
 
             foreach (var instructor in instructors)
             {
-                _logger.LogInformation($"Processing instructor {instructor.ID.ToString()} ...");
+                _logger.LogInformation($"Processing instructor {instructor.ID} ...");
 
                 DatabaseManager.Instance.RegisterUser(
                     courseID,

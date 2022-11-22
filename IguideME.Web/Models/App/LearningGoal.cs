@@ -57,7 +57,7 @@ namespace IguideME.Web.Models.App
         public int ID { get; set; }
 
         [JsonProperty("state")]
-        public editState State { get; set; }
+        public EditState State { get; set; }
 
         [JsonProperty("goal_id")]
         public int GoalID { get; set; }
@@ -78,8 +78,8 @@ namespace IguideME.Web.Models.App
         public string Expression { get; set; }
 
         public GoalRequirement(
-            int ID,
-            editState state,
+            int id,
+            EditState state,
             int goalID,
             int tileID,
             int entryID,
@@ -87,7 +87,7 @@ namespace IguideME.Web.Models.App
             float value,
             string expression)
         {
-            this.ID = ID;
+            this.ID = id;
             this.State = state;
             this.GoalID = goalID;
             this.TileID = tileID;

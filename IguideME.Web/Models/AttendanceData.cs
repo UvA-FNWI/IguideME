@@ -15,12 +15,12 @@ namespace IguideME.Web.Models
 
         public string GroupID { get; set; }
 
-        public AttendanceData(int CourseID, string UserLoginID, string Present, string GroupID)
+        public AttendanceData(int courseID, string userLoginID, string present, string groupID)
         {
-            this.CourseID = CourseID;
-            this.UserLoginID = UserLoginID;
-            this.Present = Present;
-            this.GroupID = GroupID;
+            this.CourseID = courseID;
+            this.UserLoginID = userLoginID;
+            this.Present = present;
+            this.GroupID = groupID;
         }
     }
 }

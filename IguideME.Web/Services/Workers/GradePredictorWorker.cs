@@ -36,9 +36,9 @@ namespace IguideME.Web.Services.Workers
             }
 
             var students = DatabaseManager.Instance.GetUsers(this.CourseID, "student", this.SyncHash);
-            var tiles = DatabaseManager.Instance.GetTiles(this.CourseID);
+            // var tiles = DatabaseManager.Instance.GetTiles(this.CourseID);
 
-            var tileEntries = DatabaseManager.Instance.GetEntries(this.CourseID);
+            // var tileEntries = DatabaseManager.Instance.GetEntries(this.CourseID);
 
             foreach (var student in students)
             {
@@ -65,8 +65,7 @@ namespace IguideME.Web.Services.Workers
                     continue;
                 }
 
-                var partialGrade = 0.0;
-                if (!double.TryParse(submission.Grade, out partialGrade))
+                if (!double.TryParse(submission.Grade, out double partialGrade))
                 {
                     _logger.LogInformation($"Error parsing submission grade as double: {submission.Grade}");
                     _logger.LogInformation("Aborting.");

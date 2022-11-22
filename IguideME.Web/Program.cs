@@ -10,13 +10,13 @@ namespace IguideME.Web
             CreateHostBuilder(args).Build().Run();
         }
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
+        public static IHostBuilder CreateHostBuilder(string[] args)
+        {
+            return Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
-                {
                     //.UseSetting("https_port", "5001")
                     webBuilder.UseStartup<Startup>()
-                        .UseWebRoot("wwwroot/build");
-                });
+                        .UseWebRoot("wwwroot/build"));
+        }
     }
 }

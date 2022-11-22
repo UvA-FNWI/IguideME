@@ -8,13 +8,13 @@ namespace IguideME.Web.Models.Impl
     public class UserWithPeerGroup : User
     {
         [JsonIgnore]
-        private Boolean LoadedPeers = false;
+        private Boolean _loadedPeers = false;
 
         [JsonIgnore]
         public int GoalGrade = 0;
 
         [JsonIgnore]
-        private List<User> Peers = new List<User>();
+        private List<User> _peers = new List<User>();
 
         public UserWithPeerGroup(
             int id,
@@ -60,8 +60,8 @@ namespace IguideME.Web.Models.Impl
                 // every other enrolled student a peer.
                 courseStudents
                     .FindAll(s => s.LoginID != this.LoginID)
-                    .ForEach(s => this.Peers.Add(s));
-                this.LoadedPeers = true;
+                    .ForEach(s => this._peers.Add(s));
+                this._loadedPeers = true;
                 return;
             }
 
@@ -129,8 +129,8 @@ namespace IguideME.Web.Models.Impl
                 offset += 1;
             }
 
-            this.Peers = peers;
-            this.LoadedPeers = true;
+            this._peers = peers;
+            this._loadedPeers = true;
 
             Console.WriteLine("Loaded " + peers.Count + " peers for student with loginID " + this.LoginID + ".");
         }
@@ -138,8 +138,7 @@ namespace IguideME.Web.Models.Impl
         public List<User> GetPeers()
         {
             // LoadPeers() must be called first.
-            if (!this.LoadedPeers) return null;
-            return this.Peers;
+            return !this._loadedPeers ? null : this._peers;
         }
     }
 }

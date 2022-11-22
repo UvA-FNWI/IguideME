@@ -27,8 +27,8 @@ namespace IguideME.Web.Services
 
 		private readonly IComputationJobStatusService _jobStatusService;
 
-        private static readonly ConcurrentQueue<JobQueueItem> _queue = new ConcurrentQueue<JobQueueItem>();
-        private static readonly SemaphoreSlim _signal = new SemaphoreSlim(0);
+        private static readonly ConcurrentQueue<JobQueueItem> Queue = new ConcurrentQueue<JobQueueItem>();
+        private static readonly SemaphoreSlim Signal = new SemaphoreSlim(0);
 
 		public QueuedBackgroundService(
 			ICanvasSyncService workService,
@@ -44,9 +44,9 @@ namespace IguideME.Web.Services
         public async Task<JobCreatedModel> PostWorkItemAsync(JobParametersModel jobParameters)
         {
             var jobId = await _jobStatusService.CreateJobAsync(jobParameters).ConfigureAwait(false);
-            _queue.Enqueue(new JobQueueItem { JobId = jobId, JobParameters = jobParameters });
-            _signal.Release(); // signal for background service to start working on the job
-            return new JobCreatedModel { JobId = jobId, QueuePosition = _queue.Count };
+            Queue.Enqueue(new JobQueueItem { JobId = jobId, JobParameters = jobParameters });
+            Signal.Release(); // signal for background service to start working on the job
+            return new JobCreatedModel { JobId = jobId, QueuePosition = Queue.Count };
         }
 
         // Long running task via BackgroundService
@@ -58,10 +58,10 @@ namespace IguideME.Web.Services
                 try
                 {
                     // wait for the queue to signal there is something that needs to be done
-                    await _signal.WaitAsync(stoppingToken).ConfigureAwait(false);
+                    await Signal.WaitAsync(stoppingToken).ConfigureAwait(false);
 
                     // dequeue the item
-                    jobQueueItem = _queue.TryDequeue(out var workItem) ? workItem : null;
+                    jobQueueItem = Queue.TryDequeue(out var workItem) ? workItem : null;
 
                     if (jobQueueItem != null)
                     {

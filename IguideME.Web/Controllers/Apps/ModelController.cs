@@ -12,7 +12,7 @@ namespace IguideME.Web.Controllers
     [Route("[controller]")]
     public class ModelController : DataController
     {
-        private readonly ILogger<DataController> logger;
+        private readonly ILogger<DataController> _logger;
         private readonly CanvasTest canvasTest;
         private readonly IQueuedBackgroundService _queuedBackgroundService;
         private readonly IComputationJobStatusService _computationJobStatusService;
@@ -24,7 +24,7 @@ namespace IguideME.Web.Controllers
             IComputationJobStatusService computationJobStatusService) : base(
                 logger, canvasTest, queuedBackgroundService, computationJobStatusService)
         {
-            this.logger = logger;
+            this._logger = logger;
             this.canvasTest = canvasTest;
 
             this._queuedBackgroundService = queuedBackgroundService;

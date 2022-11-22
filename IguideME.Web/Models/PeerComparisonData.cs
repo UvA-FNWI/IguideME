@@ -32,19 +32,14 @@ namespace IguideME.Web.Models
 
         public static PeerComparisonData FromGrades(int tileID, float[] grades)
         {
-            if (grades.Length == 0)
-            {
-                return new PeerComparisonData(
-                    tileID, 0F, 0F, 0F);
-            }
-            else
-            {
-                return new PeerComparisonData(
+            return grades.Length == 0
+                ? new PeerComparisonData(
+                    tileID, 0F, 0F, 0F)
+                : new PeerComparisonData(
                     tileID,
                     (float)Math.Round(grades.Min(), 1),
                     (float)Math.Round(grades.Max(), 1),
                     (float)Math.Round(grades.Average(), 1));
-            }
         }
     }
 }

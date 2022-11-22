@@ -7,9 +7,9 @@ namespace IguideME.Web.Services.Workers
     public class AssignmentWorker
     {
         private readonly ILogger<SyncManager> _logger;
-		private int courseID;
-		private string hashCode;
-		private CanvasTest canvasTest;
+		private readonly int _courseID;
+		private readonly string _hashCode;
+		private readonly CanvasTest _canvasTest;
 
         public AssignmentWorker(
 			int courseID,
@@ -18,15 +18,15 @@ namespace IguideME.Web.Services.Workers
             ILogger<SyncManager> logger)
         {
             _logger = logger;
-			this.courseID = courseID;
-			this.hashCode = hashCode;
-			this.canvasTest = canvasTest;
+			this._courseID = courseID;
+			this._hashCode = hashCode;
+			this._canvasTest = canvasTest;
         }
 
         public void Register()
         {
-			var assignments = this.canvasTest.GetAssignments(this.courseID);
-			var entries = DatabaseManager.Instance.GetEntries(this.courseID);
+			var assignments = this._canvasTest.GetAssignments(this._courseID);
+			var entries = DatabaseManager.Instance.GetEntries(this._courseID);
 
 			_logger.LogInformation("Starting assignment registry...");
 			foreach (var assignment in assignments)
@@ -45,14 +45,14 @@ namespace IguideME.Web.Services.Workers
 					assignment.Position ??= 0,
 					(int) assignment.GradingType,
 					assignment.SubmissionType,
-					hashCode
+					_hashCode
 				);
 
 				var submissions = assignment.Submissions;
 				foreach (var submission in submissions)
 				{
 					// don't register data from students that did not give consent
-					if (DatabaseManager.Instance.GetConsent(this.courseID, submission.User.SISUserID) != 1) {
+					if (DatabaseManager.Instance.GetConsent(this._courseID, submission.User.SISUserID) != 1) {
 						continue;
 					}
 
@@ -78,12 +78,12 @@ namespace IguideME.Web.Services.Workers
 									break;
 							}
 							DatabaseManager.Instance.CreateUserSubmission(
-								this.courseID,
+								this._courseID,
 								entry.ID,
 								submission.User.SISUserID,
 								grade,
 								"",//submission.SubmittedAt.Value.ToShortDateString(),
-								hashCode);
+								_hashCode);
 					}
 				}
 
