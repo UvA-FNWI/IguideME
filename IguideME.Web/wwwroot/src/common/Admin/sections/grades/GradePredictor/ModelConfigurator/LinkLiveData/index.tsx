@@ -8,7 +8,7 @@ import { Tile } from "../../../../../../../models/app/Tile";
 
 import { GradesDatasets } from "../../types";
 import { IStep } from "../interfaces";
-import { Mock } from "../../../../../../../mock";
+import { LinkLiveDataMock } from "../mocking";
 
 const { Option } = Select;
 
@@ -150,15 +150,4 @@ export default class LinkLiveData
       </div>
     );
   }
-}
-
-export class LinkLiveDataMock extends Mock {
-  mockGradesDatasetTilePairs = true;
-
-  gradesDatasetTilePairs =
-    this.enabled && this.mockGradesDatasetTilePairs
-      ? JSON.parse(
-          '{"presentatie":2,"deeltoets3":4,"deeltoets2":7,"deeltoets1":1}'
-        )
-      : {};
 }

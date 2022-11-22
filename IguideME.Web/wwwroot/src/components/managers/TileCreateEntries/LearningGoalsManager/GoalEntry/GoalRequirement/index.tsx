@@ -1,4 +1,4 @@
-import React, { ChangeEvent, Component } from "react";
+import React, { Component } from "react";
 import {Button, Col, InputNumber, Row} from "antd";
 import {DeleteOutlined} from "@ant-design/icons";
 import Select from "react-select";
@@ -8,7 +8,6 @@ import {RootState} from "../../../../../../store";
 import {connect, ConnectedProps} from "react-redux";
 import TileController from "../../../../../../api/controllers/tile";
 import "./style.scss";
-import { register } from "../../../../../../serviceWorker";
 import { editState } from "../../../../../../models/app/Tile";
 
 const mapState = (state: RootState) => ({
@@ -88,7 +87,7 @@ class GoalRequirement extends Component<Props> {
       ];
     }
 
-    if (requirement.state == editState.removed) {
+    if (requirement.state === editState.removed) {
       return null;
     }
 

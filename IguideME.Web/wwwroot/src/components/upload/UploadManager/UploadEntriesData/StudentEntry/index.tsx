@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import {Button, Col, Input, InputNumber, Row, Space} from "antd";
+import {Button, Col, Input, InputNumber, Row} from "antd";
 import {DownOutlined, UpOutlined, DeleteOutlined} from "@ant-design/icons";
 import {IProps} from "./types";
 

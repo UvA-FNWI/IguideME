@@ -1,5 +1,3 @@
-import {Tile} from "../../models/app/Tile";
-import {store} from "../../utils/configureStore";
 import UserController from "../../api/controllers/app";
 
 export class UserActions {

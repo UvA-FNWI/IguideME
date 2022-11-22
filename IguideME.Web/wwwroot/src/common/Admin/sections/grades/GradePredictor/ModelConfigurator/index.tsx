@@ -3,14 +3,14 @@ import "./style.scss";
 import React, { Component, RefObject } from "react";
 import { Button, Steps } from "antd";
 
-import UploadData, { UploadDataMock } from "./UploadData";
-import LinkLiveData, { LinkLiveDataMock } from "./LinkLiveData";
-import TrainModel, { TrainModelMock } from "./TrainModel";
+import UploadData from "./UploadData";
+import LinkLiveData from "./LinkLiveData";
+import TrainModel from "./TrainModel";
 import Finish from "./Finish";
+import { ModelConfiguratorMock } from "./mocking";
 
 import { GradesDatasets } from "../types";
 import { GradePredictionModel, IStep } from "./interfaces";
-import { Mock } from "../../../../../../mock";
 
 const { createRef } = React;
 
@@ -144,17 +144,4 @@ export default class ModelConfigurator extends Component<IProps, IState> {
       </div>
     );
   }
-}
-
-class ModelConfiguratorMock extends Mock {
-  mockCurrentStep = true;
-
-  currentStep = this.enabled && this.mockCurrentStep ? 1 : 1;
-
-  gradesDatasets = new UploadDataMock(this.enabled).gradesDatasets;
-  finalGradesDatasetName = new UploadDataMock(this.enabled)
-    .finalGradesDatasetName;
-  gradesDatasetTilePairs = new LinkLiveDataMock(this.enabled)
-    .gradesDatasetTilePairs;
-  model = new TrainModelMock(this.enabled).model;
 }

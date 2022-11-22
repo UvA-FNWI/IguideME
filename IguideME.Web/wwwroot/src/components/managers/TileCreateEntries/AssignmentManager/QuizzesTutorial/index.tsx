@@ -26,7 +26,7 @@ export default class QuizzesTutorial extends Component<{ open: boolean, setOpen:
           </Col>
 
           <Col xs={24} md={16} style={{textAlign: 'center'}}>
-            <img src={'/assets/img/tutorial/quiz-create.jpg'} style={{height: '100%', maxHeight: 400}} />
+            <img src={'/assets/img/tutorial/quiz-create.jpg'} style={{height: '100%', maxHeight: 400}} alt={''} />
           </Col>
 
           <Col xs={24}><Divider /></Col>
@@ -44,7 +44,7 @@ export default class QuizzesTutorial extends Component<{ open: boolean, setOpen:
           </Col>
 
           <Col xs={24} md={16} style={{textAlign: 'center'}}>
-            <img src={'/assets/img/tutorial/quiz-add-question.jpg'} style={{height: '100%', maxHeight: 300}} />
+            <img src={'/assets/img/tutorial/quiz-add-question.jpg'} style={{height: '100%', maxHeight: 300}} alt={''}/>
           </Col>
 
           <Col xs={24}><Divider /></Col>
@@ -55,7 +55,7 @@ export default class QuizzesTutorial extends Component<{ open: boolean, setOpen:
           </Col>
 
           <Col xs={24} md={16} style={{textAlign: 'center'}}>
-            <img src={'/assets/img/tutorial/quiz-question.jpg'} style={{height: '100%', maxHeight: 320}} />
+            <img src={'/assets/img/tutorial/quiz-question.jpg'} style={{height: '100%', maxHeight: 320}} alt={''}/>
           </Col>
 
           <Col xs={24}><Divider /></Col>
@@ -66,7 +66,7 @@ export default class QuizzesTutorial extends Component<{ open: boolean, setOpen:
           </Col>
 
           <Col xs={24} md={16} style={{textAlign: 'center'}}>
-            <img src={'/assets/img/tutorial/quiz-settings.jpg'} style={{height: '100%', maxHeight: 320}} />
+            <img src={'/assets/img/tutorial/quiz-settings.jpg'} style={{height: '100%', maxHeight: 320}} alt={''}/>
           </Col>
 
           <Col xs={24}><Divider /></Col>

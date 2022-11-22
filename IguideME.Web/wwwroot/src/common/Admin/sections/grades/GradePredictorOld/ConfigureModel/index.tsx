@@ -38,7 +38,7 @@ export default class ConfigureModel extends Component<{ setModels: (models: Pred
                     content: `Upload progression: ${Math.round(((models.length - modelsCopy.length) / models.length) * 100)}%`,
                     key: 'uploadProgress'
                 });
-                const batch = modelsCopy.splice(0, 50);
+                // const batch = modelsCopy.splice(0, 50);
                 /* await DataMartController.uploadModels(batch); */
             }
 

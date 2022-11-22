@@ -1,4 +1,3 @@
-import {TileEntrySubmission} from "../models/app/Tile";
 import {TilesGradeSummary} from "../components/StudentDashboard/types";
 const compute = require( 'compute.io' );
 

@@ -55,9 +55,9 @@ export default class AssignmentManager extends Component<Props, IState> {
             <span>
               <QuestionOutlined />
               &nbsp;
-              <a onClick={() => this.setState({ tutorialOpen: true })}>
+              <button onClick={() => this.setState({ tutorialOpen: true })} style={{background: "none", border: "none", padding: "0!important", cursor: 'pointer', color: '#069', textDecoration: 'underline'}}>
                   Create responsive quizzes.
-                </a>
+                </button>
               {' '}
               Responsive quizzes are like surveys which can be used to poll the time spent on an assignment.
             </span>

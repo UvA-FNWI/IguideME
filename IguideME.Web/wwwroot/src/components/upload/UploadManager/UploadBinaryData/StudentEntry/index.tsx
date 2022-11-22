@@ -12,7 +12,7 @@ export default class StudentEntry extends Component<IProps> {
   }
 
   render(): React.ReactNode {
-    const { student, studentRecord, query } = this.props;
+    const { student, studentRecord} = this.props;
 
     return (
       <Col xs={12} md={8} lg={6} className={"student"}>

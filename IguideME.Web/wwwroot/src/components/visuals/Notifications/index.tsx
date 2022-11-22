@@ -5,10 +5,6 @@ import { IProps } from "./types";
 
 export default class PerformanceNotifications extends Component<IProps> {
 
-    constructor(props: IProps) {
-        super(props);
-    }
-
     _getTileTitle = (tileID: number): string => {
         return this.props.tiles.find(t => t.id === tileID)?.title ?? "";
     }

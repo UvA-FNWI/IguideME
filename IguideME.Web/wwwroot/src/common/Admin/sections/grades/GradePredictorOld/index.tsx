@@ -45,7 +45,7 @@ export default class GradePredictorOld extends Component<IProps, IState> {
                             height={500} />}
                 </ParentSize>
             }
-            {(isConfiguringModel || models.length == 0) &&
+            {(isConfiguringModel || models.length === 0) &&
                 <ConfigureModel setModels={(models) => this.setState({ models, isConfiguringModel: false })} />
             }
         </Admin>

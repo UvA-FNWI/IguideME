@@ -9,7 +9,7 @@ import { Tile } from "../../../../../../../models/app/Tile";
 
 import { StudentGrades, GradesDatasets } from "../../types";
 import { GradePredictionModel, IStep } from "../interfaces";
-import { Mock } from "../../../../../../../mock";
+import {TrainModelMock} from "../mocking";
 
 interface IProps {
   gradesDatasets: GradesDatasets;
@@ -312,84 +312,4 @@ export default class TrainModel
       </div>
     );
   }
-}
-
-export class TrainModelMock extends Mock {
-  mockModel = true;
-
-  model: GradePredictionModel | null = null;
-    // (this.enabled && this.mockModel)
-    //   ? {
-    //       "intercept": 0,
-    //       "parameters": [
-    //         {
-    //           "parameterID": 2,
-    //           "weight": -0.20628158982515943,
-    //         },
-    //         {
-    //           "parameterID": 4,
-    //           "weight": 0.5987301721162606,
-    //         },
-    //         {
-    //           "parameterID": 7,
-    //           "weight": 0.7351437498019004,
-    //         },
-    //         {
-    //           "parameterID": 1,
-    //           "weight": -0.05163026454991204,
-    //         },
-    //       ],
-    //     }
-    //   : null;
-
-  modelWithMetadata = null;
-    // (this.enabled && this.mockModel)
-    //   ? {
-    //       "model": {
-    //         "name": "multivariateLinearRegression",
-    //         "weights": [
-    //           [-0.20628158982515943],
-    //           [0.5987301721162606],
-    //           [0.7351437498019004],
-    //           [-0.05163026454991204],
-    //         ],
-    //         "inputs": 4,
-    //         "outputs": 1,
-    //         "intercept": false,
-    //         "summary": {
-    //           "regressionStatistics": {
-    //             "standardError": 0.9270044844591805,
-    //             "observations": 1,
-    //           },
-    //           "variables": [
-    //             {
-    //               "label": "X Variable 1",
-    //               "coefficients": [-0.20628158982515943],
-    //               "standardError": 0.08731014539207609,
-    //               "tStat": -2.3626302407220674,
-    //             },
-    //             {
-    //               "label": "X Variable 2",
-    //               "coefficients": [0.5987301721162606],
-    //               "standardError": 0.12416150926563964,
-    //               "tStat": 4.822188258321637,
-    //             },
-    //             {
-    //               "label": "X Variable 3",
-    //               "coefficients": [0.7351437498019004],
-    //               "standardError": 0.07154733424292914,
-    //               "tStat": 10.274928585121298,
-    //             },
-    //             {
-    //               "label": "Intercept",
-    //               "coefficients": [-0.05163026454991204],
-    //               "standardError": 0.06950154171021325,
-    //               "tStat": -0.7428650254289967,
-    //             },
-    //           ],
-    //         },
-    //       },
-    //       "modelColumns": [2, 4, 7, 1],
-    //     }
-    //   : null;
 }

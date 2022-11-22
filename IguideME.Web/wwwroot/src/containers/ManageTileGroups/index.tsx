@@ -7,7 +7,6 @@ import {TileActions} from "../../store/actions/tiles";
 import "./style.scss";
 import TileController from "../../api/controllers/tile";
 import {connect, ConnectedProps} from "react-redux";
-import Swal from "sweetalert2";
 
 const mapState = (state: RootState) => ({
   tileGroups: state.tileGroups,

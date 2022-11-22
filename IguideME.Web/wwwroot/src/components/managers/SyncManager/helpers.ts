@@ -1,5 +1,5 @@
 import moment from "moment";
-import SyncProvider from "../../../models/app/SyncProvider";
+import { SyncProvider } from "../../../models/app/SyncProvider";
 
 export const elapsedTime = (start: moment.Moment | undefined) => {
   if (!start) return undefined;

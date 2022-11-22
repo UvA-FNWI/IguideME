@@ -7,7 +7,6 @@ import {editState} from "../../../../../models/app/Tile";
 import {IProps} from "./types";
 import {LearningGoal} from "../../../../../models/app/LearningGoal";
 import Swal from "sweetalert2";
-import {generateUniqueID} from "../helpers";
 import "./style.scss";
 
 export default class GoalEntry extends Component<IProps> {
@@ -48,9 +47,9 @@ export default class GoalEntry extends Component<IProps> {
   }
 
   render(): React.ReactNode {
-    let { goal, tile } = this.props;
+    let goal = this.props.goal;
 
-    if (goal.state == editState.removed) {
+    if (goal.state === editState.removed) {
       return null;
     }
 

@@ -51,7 +51,7 @@ export default class GradeBar extends Component<{
       datadict.set(tiles[i].id, {title: tiles[i].title, grade: 0, peergrade: 0, max: 10});
     }
 
-    for (var i = 0; i < tilesGradeSummary.length; i++) {
+    for (i = 0; i < tilesGradeSummary.length; i++) {
       let grade = tilesGradeSummary[i].average
       let entry = datadict.get(tilesGradeSummary[i].tile.id)!;
       if (tilesGradeSummary[i].tile.content === "BINARY"){
@@ -64,7 +64,7 @@ export default class GradeBar extends Component<{
 
     }
 
-    for (var i = 0; i < peerGrades.length; i++) {
+    for (i = 0; i < peerGrades.length; i++) {
       let pgrade = peerGrades[i].avg;
       let entry = datadict.get(peerGrades[i].tileID)!;
 

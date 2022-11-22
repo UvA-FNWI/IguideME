@@ -10,7 +10,6 @@ import {RootState} from "../../../../../../store";
 import {connect, ConnectedProps} from "react-redux";
 import TileController from "../../../../../../api/controllers/tile";
 import {TileActions} from "../../../../../../store/actions/tiles";
-import {LearningGoal} from "../../../../../../models/app/LearningGoal";
 
 const mapState = (state: RootState) => ({
   tileEntries: state.tileEntries,

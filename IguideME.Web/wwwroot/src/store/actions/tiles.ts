@@ -1,8 +1,6 @@
 import TileController from "../../api/controllers/tile";
-import LearningGoalsManager from "../../components/managers/TileCreateEntries/LearningGoalsManager";
 import {editState, Tile} from "../../models/app/Tile";
 import {store} from "../../utils/configureStore";
-import { LearningGoal } from "../../models/app/LearningGoal";
 
 export class TileActions {
 

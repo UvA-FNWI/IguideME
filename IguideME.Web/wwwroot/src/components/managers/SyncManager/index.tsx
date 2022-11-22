@@ -6,7 +6,7 @@ import { Alert, Caption, Card } from "ui-neumorphism";
 import { IProps, IState } from "./types";
 import DataMartController from "../../../api/controllers/datamart";
 import moment from "moment";
-import SyncProvider from "../../../models/app/SyncProvider";
+import { SyncProvider } from "../../../models/app/SyncProvider";
 import Loading from "../../utils/Loading";
 import { debug } from "../../../config/config";
 

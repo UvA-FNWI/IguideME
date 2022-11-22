@@ -52,7 +52,7 @@ export default class NotificationCentre extends Component {
 
     var notification;
     var entry;
-    for (var i = 0; i < notifications.length; i++) {
+    for (i = 0; i < notifications.length; i++) {
       notification = notifications[i];
       entry = data.get(notification.user_login_id)!;
 

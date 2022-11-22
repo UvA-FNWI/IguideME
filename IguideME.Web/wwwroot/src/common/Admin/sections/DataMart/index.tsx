@@ -35,8 +35,7 @@ export default class DataMart extends Component<IProps, IState> {
         const backendFormat = 'MM/DD/YYYY HH:mm:ss'
         const timeFormat = 'MMMM Do[,] YYYY [at] HH:mm';
 
-        synchronizations.map(function(s, index, arr) {
-            void index; void arr;
+        synchronizations.map(s => {
             const start = moment.utc(s.start_timestamp, backendFormat).local()
             const end = moment.utc(s.end_timestamp, backendFormat).local()
             s.start_timestamp = start.format(timeFormat);
@@ -47,6 +46,7 @@ export default class DataMart extends Component<IProps, IState> {
                 s.end_timestamp = end.format(timeFormat);
                 s.duration = moment.utc(parseInt(s.duration)*1000).format('HH:mm:ss');
             }
+            return s;
         });
 
         const successfulSyncs = loaded ? synchronizations.filter(a => a.status === "COMPLETE") : [];
@@ -60,10 +60,10 @@ export default class DataMart extends Component<IProps, IState> {
                         (latestSuccessful ?
                             <p>
                                 The latest successful synchronization took place on
-                <b> {moment.utc(latestSuccessful.start_timestamp, timeFormat).format(timeFormat)} </b>
-                                <small>({moment.utc(latestSuccessful.start_timestamp, backendFormat).fromNow()})</small>.
-                Synchronizations run automatically at 03:00AM (UTC time).
-              </p> :
+                                <b> {moment.utc(latestSuccessful.start_timestamp, timeFormat).format(timeFormat)} </b>
+                                    <small>({moment.utc(latestSuccessful.start_timestamp, timeFormat).fromNow()})</small>.
+                                Synchronizations run automatically at 03:00AM (UTC time).
+                            </p> :
                             <p>No historic synchronizations available.</p>) :
                         <div><Spin /> Retrieving latest synchronization...</div>
                     }

@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import StudentController from "../../../../api/controllers/student";
-import {Input, Row} from "antd";
+import {Row} from "antd";
 import Loading from "../../../utils/Loading";
 import {IUploadProps} from "../types";
 import "./style.scss";

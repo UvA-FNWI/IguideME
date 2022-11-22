@@ -5,7 +5,6 @@ import {CanvasStudent} from "../../models/canvas/Student";
 import {Col, Progress, Row, Space, Tooltip} from "antd";
 import GradeSpread from "../visuals/GradeSpread";
 import { ColumnsType } from "antd/lib/table";
-import { ColumnType } from "antd/es/table";
 
 
 function entriesColumns(tile: Tile, tileEntries: TileEntry[], averaged: boolean) {

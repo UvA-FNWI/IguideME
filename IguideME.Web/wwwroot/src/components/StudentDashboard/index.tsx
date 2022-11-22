@@ -9,7 +9,7 @@ import {DashboardColumn} from "../../models/app/Layout";
 import TileDetail from "./TileDetail";
 import { Radio } from "antd";
 import { AppstoreOutlined, RadarChartOutlined } from "@ant-design/icons";
-import TileRadar from "./TileRadar";
+// import TileRadar from "./TileRadar";
 import TileBars from "./TileBars";
 import {connect, ConnectedProps} from "react-redux";
 import {RootState} from "../../store";
