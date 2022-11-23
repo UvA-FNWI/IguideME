@@ -244,10 +244,16 @@ export default class TrainModel
                                 max={10}
                                 defaultValue={5}
                                 onChange={(v) => {
-                                  let { modelTestingValues }: IState =
-                                    this.state;
-                                  const _v: any = v; // this is incredibly frustrating
-                                  modelTestingValues[tileID] = parseFloat(_v);
+                                  if (!v) {return}
+
+                                  let { modelTestingValues }: IState = this.state;
+
+                                  if (typeof v === 'string') {
+                                  modelTestingValues[tileID] = parseFloat(v);
+                                  }
+                                  else {
+                                    modelTestingValues[tileID] = v;
+                                  }
                                   this.setState({
                                     modelTestingValues: modelTestingValues,
                                   });

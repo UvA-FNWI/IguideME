@@ -6,9 +6,9 @@ namespace IguideME.Web.Services.Workers
     public class UserWorker
     {
         private readonly ILogger<SyncManager> _logger;
-        readonly private CanvasTest canvasTest;
-        readonly private int courseID;
-        readonly private string hashCode;
+        readonly private CanvasTest _canvasTest;
+        readonly private int _courseID;
+        readonly private string _hashCode;
 
         public UserWorker(
             int courseID,
@@ -17,16 +17,16 @@ namespace IguideME.Web.Services.Workers
             ILogger<SyncManager> logger)
         {
             _logger = logger;
-            this.courseID = courseID;
-            this.hashCode = hashCode;
-            this.canvasTest = canvasTest;
+            this._courseID = courseID;
+            this._hashCode = hashCode;
+            this._canvasTest = canvasTest;
         }
 
         public void Register()
         {
             _logger.LogInformation("Starting user sync...");
 
-            var students = this.canvasTest.GetStudents(this.courseID);
+            var students = this._canvasTest.GetStudents(this._courseID);
 
             _logger.LogInformation($"Starting student registry, about to process {students.Length} students...");
 
@@ -34,25 +34,25 @@ namespace IguideME.Web.Services.Workers
             {
                 _logger.LogInformation("Processing student " + student.ID.ToString() + "...");
                 try {
-                    DatabaseManager.Instance.RegisterUserGoalGrade(courseID, student.SISUserID);
-                    DatabaseManager.Instance.RegisterConsent(new Models.ConsentData(courseID, student.ID.Value, student.SISUserID, student.Name, -1));
+                    DatabaseManager.Instance.RegisterUserGoalGrade(_courseID, student.SISUserID);
+                    DatabaseManager.Instance.RegisterConsent(new Models.ConsentData(_courseID, student.ID.Value, student.SISUserID, student.Name, -1));
 
                     DatabaseManager.Instance.RegisterUser(
-                        courseID,
+                        _courseID,
                         student.ID,
                         student.SISUserID,
                         student.SISUserID,
                         student.Name,
                         student.SortableName,
                         "student",
-                        this.hashCode
+                        this._hashCode
                     );
                 } catch (Exception e) {
                     _logger.LogError($"{e} {e.StackTrace}");
                 }
             }
 
-            var instructors = this.canvasTest.GetAdministrators(courseID);
+            var instructors = this._canvasTest.GetAdministrators(_courseID);
 
             _logger.LogInformation($"Starting instructor registry, about to process {instructors.Length} instructurs...");
 
@@ -61,14 +61,14 @@ namespace IguideME.Web.Services.Workers
                 _logger.LogInformation($"Processing instructor {instructor.ID} ...");
 
                 DatabaseManager.Instance.RegisterUser(
-                    courseID,
+                    _courseID,
                     instructor.ID,
                     instructor.SISUserID,
                     instructor.SISUserID,
                     instructor.Name,
                     instructor.SortableName,
                     "instructor",
-                    this.hashCode
+                    this._hashCode
                 );
             }
         }

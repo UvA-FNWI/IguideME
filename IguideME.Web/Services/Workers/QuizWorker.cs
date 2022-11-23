@@ -6,9 +6,9 @@ namespace IguideME.Web.Services.Workers
     public class QuizWorker
     {
         private readonly ILogger<SyncManager> _logger;
-		readonly int courseID;
-		readonly string hashCode;
-		readonly CanvasTest canvasTest;
+		readonly int _courseID;
+		readonly string _hashCode;
+		readonly CanvasTest _canvasTest;
 
         public QuizWorker(
 			int courseID,
@@ -18,14 +18,14 @@ namespace IguideME.Web.Services.Workers
 
         {
 			_logger = logger;
-			this.courseID = courseID;
-			this.hashCode = hashCode;
-			this.canvasTest = canvasTest;
+			this._courseID = courseID;
+			this._hashCode = hashCode;
+			this._canvasTest = canvasTest;
         }
 
         public void Register()
         {
-			var quizzes = this.canvasTest.GetQuizzes(courseID);
+			var quizzes = this._canvasTest.GetQuizzes(_courseID);
 			foreach (var quiz in quizzes)
 			{
 				_logger.LogInformation("\t" + quiz.Name);
@@ -41,7 +41,7 @@ namespace IguideME.Web.Services.Workers
 					0,
 					4, //Grading type points = 4
 					"online",
-					this.hashCode
+					this._hashCode
 				);
 				} catch (Exception e) {
 					_logger.LogError(e.Message + e.StackTrace);
