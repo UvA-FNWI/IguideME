@@ -1094,7 +1094,7 @@ namespace IguideME.Web.Services
                     predictions.Add(prediction);
                 }
             }
-            predictions.ForEach((prediction) => _logger.LogInformation($"{prediction.Grade}"));
+            // predictions.ForEach((prediction) => _logger.LogInformation($"{prediction.Grade}"));
 
             return predictions;
         }

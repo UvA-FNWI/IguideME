@@ -57,7 +57,7 @@
         "react-redux": "^7.2.1",
         "react-router-dom": "^5.2.0",
         "react-router-redux": "^4.0.8",
-        "react-scripts": "^4.0.3",
+        "react-scripts": "^5.0.2",
         "react-select": "^4.0.2",
         "react-sizeme": "^3.0.1",
         "react-smooth-dnd": "^0.11.1",
