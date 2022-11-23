@@ -74,9 +74,6 @@
         "yarn": "^1.22.17",
         "ztypescript": "github:everydayanchovies/ztypescript"
     },
-    "engines": {
-        "node": "19.0.0"
-    },
     "scripts": {
         "start": "export REACT_APP_DEBUG=1 && react-scripts start",
         "build": "react-scripts build",
@@ -86,18 +83,11 @@
     "eslintConfig": {
         "extends": "react-app"
     },
-    "browserslist": {
-        "production": [
-            ">0.2%",
-            "not dead",
-            "not op_mini all"
-        ],
-        "development": [
-            "last 1 chrome version",
-            "last 1 firefox version",
-            "last 1 safari version"
-        ]
-    },
+    "browserslist": [
+        ">0.2%",
+        "not dead",
+        "not op_mini all"
+    ],
     "devDependencies": {
         "@types/node-emoji": "^1.8.1"
     }

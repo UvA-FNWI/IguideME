@@ -185,7 +185,7 @@ class StudentDashboard extends Component<Props, IState> {
                      buttonStyle="solid"
                      onChange={e => this.setState({ viewType: e.target.value })}
         >
-          <Radio.Button value="radar"><RadarChartOutlined /> Radar</Radio.Button>
+          <Radio.Button value="bar"><RadarChartOutlined /> Bar</Radio.Button>
           <Radio.Button value="grid"><AppstoreOutlined /> Grid</Radio.Button>
         </Radio.Group>
 

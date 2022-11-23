@@ -48,7 +48,7 @@ export default class GradeBar extends Component<{
     let datadict = new Map<number, Data>();
 
     for (var i = 0; i < tiles.length; i++) {
-      datadict.set(tiles[i].id, {title: tiles[i].title, grade: 0, peergrade: 0, max: 10});
+      datadict.set(tiles[i].id, {title: tiles[i].title, grade: null, peergrade: null, max: 10});
     }
 
     for (i = 0; i < tilesGradeSummary.length; i++) {
@@ -91,14 +91,16 @@ export default class GradeBar extends Component<{
           backgroundColor: "rgba(47,44,232, 0.5)",
           borderColor: "rgba(0,0,255, 1)",
           borderWidth: 2,
-          data: grades
+          data: grades,
+          skipNull: true
         },
         {
           label: "Peers",
           backgroundColor: "rgba(255, 50, 50, .5)",
           borderColor: "rgba(255,0,0, 1)",
           borderWidth: 2,
-          data: peergrades
+          data: peergrades,
+          skipNull: true
         }
       ]
     }
