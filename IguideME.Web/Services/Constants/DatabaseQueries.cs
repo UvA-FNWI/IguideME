@@ -709,7 +709,6 @@ public static class DatabaseQueries
             `sync_hash`       STRING
         );";
 
-// TODO: Check if datetime needs to change to string or integer or something because sqlite vs sql.
     public const string CREATE_TABLE_SYNC_HISTORY =
         @"CREATE TABLE IF NOT EXISTS `sync_history` (
             `id`              INTEGER PRIMARY KEY AUTOINCREMENT,

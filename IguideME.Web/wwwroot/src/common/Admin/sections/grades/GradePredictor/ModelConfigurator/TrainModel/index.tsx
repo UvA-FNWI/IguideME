@@ -23,7 +23,7 @@ interface IState {
   gradesDatasets: GradesDatasets;
   model: GradePredictionModel | null;
   modelWithMetadata: { model: any; modelColumns: number[] } | null;
-  modelTestingValues: { [tileID: number]: number };
+  modelTestingValues: Map<number, number>//{ [tileID: number]: number };
   predictedGrade: number;
   tiles: Tile[];
 }
@@ -38,7 +38,7 @@ export default class TrainModel
     gradesDatasets: {},
     model: this.mock.model,
     modelWithMetadata: this.mock.modelWithMetadata,
-    modelTestingValues: {},
+    modelTestingValues: new Map<number, number>(),
     predictedGrade: 0,
     tiles: [],
   };
@@ -166,11 +166,11 @@ export default class TrainModel
     if (!modelWithMetadata) return;
     let _modelWithMetadata: {model: any, modelColumns: number[]} = modelWithMetadata;
     if (
-      Object.keys(modelTestingValues).length !==
+      modelTestingValues.keys.length !==
       _modelWithMetadata.model.weights.length
     ) {
       _modelWithMetadata.modelColumns.forEach(
-        (tID) => (modelTestingValues[tID] = 5)
+        (tID) => (modelTestingValues.set(tID, 5))
       );
       this.setState({
         modelTestingValues: modelTestingValues,
@@ -180,9 +180,15 @@ export default class TrainModel
     const mlr = MLR.load(_modelWithMetadata!.model);
 
     // maintain same order as when the model was trained
-    const inputs = _modelWithMetadata!.modelColumns.map(
-      (tildID) => modelTestingValues[tildID]
-    );
+    const inputs: number[] = [];
+    var tildID, entry;
+    for (var i = 0; i < _modelWithMetadata!.modelColumns.length; i++) {
+      tildID = _modelWithMetadata!.modelColumns[i]
+      entry = modelTestingValues.get(tildID);
+      if (entry) {
+        inputs.push(entry);
+      }
+    }
 
     this.setState({
       predictedGrade: mlr.predict(inputs)[0],
@@ -249,10 +255,10 @@ export default class TrainModel
                                   let { modelTestingValues }: IState = this.state;
 
                                   if (typeof v === 'string') {
-                                  modelTestingValues[tileID] = parseFloat(v);
+                                  modelTestingValues.set(tileID, parseFloat(v));
                                   }
                                   else {
-                                    modelTestingValues[tileID] = v;
+                                    modelTestingValues.set(tileID, v);
                                   }
                                   this.setState({
                                     modelTestingValues: modelTestingValues,
