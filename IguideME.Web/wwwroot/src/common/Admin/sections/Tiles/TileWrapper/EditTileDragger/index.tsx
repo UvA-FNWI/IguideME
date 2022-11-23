@@ -118,7 +118,6 @@ class EditTileDragger extends Component<Props, IState> {
     const { entries, goals, graphView, wildcard, title }: IState = this.state;
     const { tileEntries, tile }: Props = this.props;
 
-    // let tileRef = JSON.parse(JSON.stringify(tile!));
     tile!.title = title;
     tile!.graph_view = graphView;
     tile!.wildcard = wildcard;
@@ -131,9 +130,6 @@ class EditTileDragger extends Component<Props, IState> {
         e => !entries.map(_e => _e.title).includes(e.title));
 
       var newEntries = entries.filter(e => e.id === -1);
-
-      console.log("Tile type", tile!.type);
-      console.log("Goals lengt", goals.length);
 
       if (tile!.type === 'ASSIGNMENTS' || tile!.type === 'DISCUSSIONS' ) {
         removedEntries = tileEntries.filter(

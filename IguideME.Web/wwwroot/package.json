@@ -74,6 +74,9 @@
         "yarn": "^1.22.17",
         "ztypescript": "github:everydayanchovies/ztypescript"
     },
+    "engines": {
+        "node": "19.0.0"
+    },
     "scripts": {
         "start": "export REACT_APP_DEBUG=1 && react-scripts start",
         "build": "react-scripts build",

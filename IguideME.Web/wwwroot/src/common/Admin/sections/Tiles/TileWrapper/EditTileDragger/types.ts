@@ -1,6 +1,4 @@
 import {Tile, TileContentTypes, TileEntry, TileGroup, TileTypeTypes} from "../../../../../../models/app/Tile";
-import {AssignmentRegistry} from "../../../../../../components/managers/TileCreateEntries/types";
-import GoalEntry from "../../../../../../components/managers/TileCreateEntries/LearningGoalsManager/GoalEntry";
 import {LearningGoal} from "../../../../../../models/app/LearningGoal";
 
 export interface IProps {

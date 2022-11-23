@@ -4,7 +4,6 @@ import {PlusOutlined} from "@ant-design/icons";
 import GoalEntry from "./GoalEntry";
 import {IProps, IState} from "./types";
 import {LearningGoal} from "../../../../models/app/LearningGoal";
-import {generateUniqueID} from "./helpers";
 import { editState } from "../../../../models/app/Tile";
 
 export default class LearningGoalsManager extends Component<IProps, IState> {
@@ -13,7 +12,7 @@ export default class LearningGoalsManager extends Component<IProps, IState> {
     const { tile, goals } = this.props;
 
     this.props.setGoals([
-      { id: generateUniqueID(goals.map(g => g.id)),
+      { id: -1,
         state: editState.new,
         tile_id: tile ? tile.id : -1,
         title: "",
