@@ -8,7 +8,7 @@ import Loading from "../utils/Loading";
 import {DashboardColumn} from "../../models/app/Layout";
 import TileDetail from "./TileDetail";
 import { Radio } from "antd";
-import { AppstoreOutlined, RadarChartOutlined } from "@ant-design/icons";
+import { AppstoreOutlined, BarChartOutlined } from "@ant-design/icons";
 // import TileRadar from "./TileRadar";
 import TileBars from "./TileBars";
 import {connect, ConnectedProps} from "react-redux";
@@ -185,7 +185,7 @@ class StudentDashboard extends Component<Props, IState> {
                      buttonStyle="solid"
                      onChange={e => this.setState({ viewType: e.target.value })}
         >
-          <Radio.Button value="bar"><RadarChartOutlined /> Bar</Radio.Button>
+          <Radio.Button value="bar"><BarChartOutlined /> Bar</Radio.Button>
           <Radio.Button value="grid"><AppstoreOutlined /> Grid</Radio.Button>
         </Radio.Group>
 
