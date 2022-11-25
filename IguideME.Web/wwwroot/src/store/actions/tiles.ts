@@ -98,7 +98,7 @@ export class TileActions {
 
   static loadTileGoals = async () => {
     const goals = await TileController.getGoals();
-    for (var i = 0; i < goals.length; i++) {
+    for (let i = 0; i < goals.length; i++) {
       goals[i].state = editState.unchanged;
     }
 

@@ -75,8 +75,8 @@
         "ztypescript": "github:everydayanchovies/ztypescript"
     },
     "scripts": {
-        "start": "export REACT_APP_DEBUG=1 && react-scripts start",
-        "build": "react-scripts build",
+        "start": "export REACT_APP_DEBUG=1 && react-scripts --openssl-legacy-provider start",
+        "build": "react-scripts --openssl-legacy-provider build",
         "test": "react-scripts test",
         "eject": "react-scripts eject"
     },

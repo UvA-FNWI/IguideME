@@ -192,7 +192,7 @@ export default class TileController extends Controller {
       return Promise.resolve(MOCK_TILE_ENTRIES.filter(e => e.tile_id === tileId));
     }
 
-    var result = this.client.get(
+    let result = this.client.get(
       `tiles/${tileId}/entries`
     ).then(response => response.data);
 

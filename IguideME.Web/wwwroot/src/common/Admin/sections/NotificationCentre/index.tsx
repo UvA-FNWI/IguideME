@@ -41,8 +41,8 @@ export default class NotificationCentre extends Component {
 
   getData(students: CanvasStudent[], notifications: PerformanceNotification[]): Data[] {
     let data = new Map<string, Data>();
-    var student;
-    for (var i = 0; i < students.length; i++) {
+    let student;
+    for (let i = 0; i < students.length; i++) {
       student = students[i];
       data.set(student.login_id, new Data(student.login_id, student.name, true)); // TODO: set enabled correctly
     }
@@ -50,9 +50,9 @@ export default class NotificationCentre extends Component {
     console.log("notifications", notifications);
     console.log("data", data);
 
-    var notification;
-    var entry;
-    for (i = 0; i < notifications.length; i++) {
+    let notification;
+    let entry;
+    for (let i = 0; i < notifications.length; i++) {
       notification = notifications[i];
       entry = data.get(notification.user_login_id)!;
 
@@ -89,7 +89,7 @@ export default class NotificationCentre extends Component {
       }
     }
 
-    var results: Data[] = [];
+    let results: Data[] = [];
 
     data.forEach((value: Data) => results.push(value))
 

@@ -20,8 +20,6 @@ import UserProfile from "./UserProfile";
 import {CanvasDiscussion} from "../../models/canvas/Discussion";
 import {LearningOutcome} from "../../models/app/LearningGoal";
 
-const compute = require('compute.io');
-
 const mapState = (state: RootState) => ({
   dashboardColumns: state.dashboardColumns,
   tiles: state.tiles.filter((t: Tile) => t.visible),
@@ -48,22 +46,19 @@ class StudentDashboard extends Component<Props, IState> {
     displayTile: undefined,
     discussions: [],
     learningOutcomes: [],
-    viewType: "radar" as ViewTypes
+    viewType: "bar" as ViewTypes
   }
 
   componentDidMount(): void {
     window.addEventListener('selectTile', (event: any) => {
-      if (event.detail) {
-        const tile: Tile | undefined = (event as any).detail;
-        this.setState({ displayTile: tile });
-      } else this.setState({ displayTile: undefined });
+      this.setState({ displayTile: event?.detail });
     });
 
     this.setup(this.props);
   }
 
   componentWillReceiveProps(nextProps: Readonly<Props>, nextContext: any): void {
-    if (nextProps.student?.login_id !== this.props.student?.login_id && nextProps.student) {
+    if (nextProps.student && nextProps.student?.login_id !== this.props.student?.login_id) {
       this.props.loadPredictions(nextProps.student.login_id).then(({ payload }) => {
         this.setup(nextProps, payload);
       });
@@ -75,80 +70,74 @@ class StudentDashboard extends Component<Props, IState> {
   }
 
   setup = async (props: Props, propPredictions: PredictedGrade[] = []) => {
-    const { tiles, student, tileEntries, predictions } = props;
+    let { tiles, student, tileEntries, predictions } = props;
     if (!student) return;
+
+    if (propPredictions.length >= 0) predictions = propPredictions;
 
     this.setState({ loaded: false });
 
-    let discussions: CanvasDiscussion[] = [];
-    let goals: LearningOutcome[] = [];
+    let submissions = await TileController.getSubmissions(student.login_id);
 
-    for (const tile of tiles.filter(t => t.type === "DISCUSSIONS")) {
-      const discussion_result: CanvasDiscussion[] =
-        await TileController.getDiscussions(tile.id, student.login_id).then(d => d);
-      discussions.push(...discussion_result);
-    }
+    let p_discussions: Promise<CanvasDiscussion[]>[] = [];
+    let p_goals: Promise<LearningOutcome[]>[] = [];
 
-    for (const tile of tiles.filter(t => t.content === "LEARNING_OUTCOMES")) {
-      const goal_result: any =
-        await TileController.getUserGoals(tile.id, student.login_id).then(g => g);
+    let data = [];
+    let grade;
 
-      goals.push(...goal_result);
-    }
-
-    TileController.getSubmissions(student.login_id).then(userSubmissions => {
-      let data = tiles.filter(
-        t => t.content !== "PREDICTION" && t.content !== "LEARNING_OUTCOMES" &&
-          t.type !== "DISCUSSIONS"
-      ).map(t => {
-        return {
-          tile: t,
-          average: t.content.toLowerCase() === 'binary' ?
-            (
-              userSubmissions.filter(
-                s => tileEntries
-                  .filter(e => e.tile_id === t.id && parseFloat(s.grade) > .1)
-                  .map(e => e.id)
-                  .includes(s.entry_id)
-              ).length /
-              userSubmissions.filter(
-                s => tileEntries
-                  .filter(e => e.tile_id === t.id)
-                  .map(e => e.id)
-                  .includes(s.entry_id)
-              ).length
-            ) * 100 :
-            compute.mean(
-              userSubmissions.filter(
-                s => tileEntries
-                  .filter(e => e.tile_id === t.id)
-                  .map(e => e.id)
-                  .includes(s.entry_id)
-              ).map(s => parseFloat(s.grade))
-            )
-        }
-      });
-
-      if (tiles.filter(t => t.content === "PREDICTION").length > 0)
-      {
-        const sortedPredictions = (propPredictions.length > 0 ? propPredictions : predictions).sort(
-          (a, b) => b.graded_components - a.graded_components);
-        data.push({
-          tile: tiles.find(t => t.content === "PREDICTION")!,
-          average: sortedPredictions.length > 0 ? sortedPredictions[0].grade : 0
-        });
+    for (const tile of tiles) {
+      if (tile.content === "LEARNING_OUTCOMES") {
+        p_goals.push(TileController.getUserGoals(tile.id, student.login_id).then(g => g));
+        continue;
+      }
+      if (tile.type === "DISCUSSIONS") {
+        p_discussions.push(TileController.getDiscussions(tile.id, student.login_id).then(d => d));
+        continue;
       }
 
-      this.setState({
-        discussions,
-        learningOutcomes: goals,
-        tilesGradeSummary: data,
-        userSubmissions
-      }, () => {
-        TileController.getPeerResults(student.login_id).then(peerGrades =>
-          this.setState({ peerGrades, loaded: true })
-        ).catch(() => this.setState({ loaded: true }));
-      });
+      if (tile.content === "PREDICTION") {
+        const sortedPredictions = predictions.sort(
+          (a, b) => b.graded_components - a.graded_components);
+        data.push({
+          tile: tile,
+          average: sortedPredictions.length > 0 ? sortedPredictions[0].grade : 0
+        })
+        continue;
+      }
+
+      let avg = 0, total = 0;
+      for (const entry of tileEntries) {
+        for (const sub of submissions) {
+          // TODO, change getsubmissions to specify tile_id;
+          if (entry.tile_id === tile.id && sub.entry_id === entry.id) {
+            grade = parseFloat(sub.grade);
+            avg += (tile.content === "BINARY") ? Number(grade !== 0) : grade;
+
+            total++;
+          }
+        }
+      }
+      avg = total ? avg/total : avg;
+
+        data.push({
+          tile: tile,
+          average: avg
+        }
+      );
+    }
+
+    let discussions = (await Promise.all(p_discussions)).flat();
+    let goals = (await Promise.all(p_goals)).flat();
+
+    this.setState({
+      discussions,
+      learningOutcomes: goals,
+      tilesGradeSummary: data,
+      userSubmissions: submissions
+    }, () => {
+      TileController.getPeerResults(student!.login_id).then(peerGrades =>
+        this.setState({ peerGrades, loaded: true })
+      ).catch(() => this.setState({ loaded: true }));
     });
   }
 

@@ -7,7 +7,7 @@ export interface IProps {
   student: CanvasStudent | undefined;
 }
 
-export type ViewTypes = "radar" | "grid";
+export type ViewTypes = "bar" | "grid";
 
 export interface IState {
   tilesGradeSummary: TilesGradeSummary[];

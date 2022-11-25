@@ -95,9 +95,9 @@ class EditTileDragger extends Component<Props, IState> {
           return e;
         }));
       } else if (tile.content === "LEARNING_OUTCOMES") {
-        for (var i = 0; i < goals.length; i++) {
+        for (let i = 0; i < goals.length; i++) {
           goals[i].tile_id = tile.id;
-          var response = await TileController.createTileGoal(goals[i]);
+          let response = await TileController.createTileGoal(goals[i]);
           console.log("goal", response)
         }
       }
@@ -124,12 +124,12 @@ class EditTileDragger extends Component<Props, IState> {
 
     const patchedTile = await TileController.updateTile(tile!)
     this.setState({ updating: true }, async () => {
-      var removedEntries = tileEntries.filter(
+      let removedEntries = tileEntries.filter(
         e => e.tile_id === ( tile ? tile.id : -1 )
       ).filter(
         e => !entries.map(_e => _e.title).includes(e.title));
 
-      var newEntries = entries.filter(e => e.id === -1);
+      let newEntries = entries.filter(e => e.id === -1);
 
       if (tile!.type === 'ASSIGNMENTS' || tile!.type === 'DISCUSSIONS' ) {
         removedEntries = tileEntries.filter(
@@ -141,7 +141,7 @@ class EditTileDragger extends Component<Props, IState> {
 
       }
       else if (tile!.content === "LEARNING_OUTCOMES") {
-        for (var i = 0; i < goals.length; i++) {
+        for (let i = 0; i < goals.length; i++) {
           if (goals[i].state != null) {
             switch (goals[i].state) {
               case editState.new:

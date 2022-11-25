@@ -181,8 +181,8 @@ export default class TrainModel
 
     // maintain same order as when the model was trained
     const inputs: number[] = [];
-    var tildID, entry;
-    for (var i = 0; i < _modelWithMetadata!.modelColumns.length; i++) {
+    let tildID, entry;
+    for (let i = 0; i < _modelWithMetadata!.modelColumns.length; i++) {
       tildID = _modelWithMetadata!.modelColumns[i]
       entry = modelTestingValues.get(tildID);
       if (entry) {

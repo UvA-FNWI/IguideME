@@ -47,11 +47,11 @@ export default class GradeBar extends Component<{
   createBarData(tiles: Tile[], tilesGradeSummary: {tile: Tile, average: any}[] , peerGrades: { min: number, max: number, avg: number, tileID: number}[]) {
     let datadict = new Map<number, Data>();
 
-    for (var i = 0; i < tiles.length; i++) {
+    for (let i = 0; i < tiles.length; i++) {
       datadict.set(tiles[i].id, {title: tiles[i].title, grade: null, peergrade: null, max: 10});
     }
 
-    for (i = 0; i < tilesGradeSummary.length; i++) {
+    for (let i = 0; i < tilesGradeSummary.length; i++) {
       let grade = tilesGradeSummary[i].average
       let entry = datadict.get(tilesGradeSummary[i].tile.id)!;
       if (tilesGradeSummary[i].tile.content === "BINARY"){
@@ -64,7 +64,7 @@ export default class GradeBar extends Component<{
 
     }
 
-    for (i = 0; i < peerGrades.length; i++) {
+    for (let i = 0; i < peerGrades.length; i++) {
       let pgrade = peerGrades[i].avg;
       let entry = datadict.get(peerGrades[i].tileID)!;
 

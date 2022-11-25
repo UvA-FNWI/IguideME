@@ -18,7 +18,7 @@ export default class LearningGoalsManager extends Component<IProps, IState> {
         title: "",
         requirements: []
       },
-      ...this.props.goals
+      ...goals
     ]);
   }
 
