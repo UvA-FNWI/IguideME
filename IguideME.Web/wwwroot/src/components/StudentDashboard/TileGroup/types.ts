@@ -13,5 +13,5 @@ export interface IProps {
   student: CanvasStudent;
   tilesGradeSummary: TilesGradeSummary[];
   peerGrades: PeerGrades[];
-  submissions: TileEntrySubmission[];
+  submissions: Map<number, TileEntrySubmission[]>;
 }

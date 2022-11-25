@@ -26,8 +26,7 @@ export default class TileDetail extends Component<{
     switch(tile.content) {
       case "BINARY":
         return (
-          <BinaryGrades submissions={submissions.filter(
-            s => tileEntries.filter(e => e.tile_id === tile.id).map(x => x.id).includes(s.entry_id))}
+          <BinaryGrades submissions={submissions}
                         tileEntries={tileEntries.filter(e => e.tile_id === tile.id)}
           />
         );
@@ -40,8 +39,7 @@ export default class TileDetail extends Component<{
             );
           default:
             return (
-              <EntriesList submissions={submissions.filter(
-                s => tileEntries.filter(e => e.tile_id === tile.id).map(x => x.id).includes(s.entry_id))}
+              <EntriesList submissions={submissions}
                            tileEntries={tileEntries.filter(e => e.tile_id === tile.id)}
                            discussions={discussions}
                            tile={tile}

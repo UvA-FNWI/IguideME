@@ -29,9 +29,7 @@ export default class TileGroup extends Component<IProps> {
                     tileEntries={tileEntries.filter(e => e.tile_id === t.id)}
                     discussions={discussions}
                     student={student}
-                    submissions={submissions.filter(
-                      s => tileEntries.filter(e => e.tile_id === t.id).map(x => x.id)
-                        .includes(s.entry_id))}
+                    submissions={submissions.get(t.id)!}
                     userGrades={tilesGradeSummary.filter(tgs => tgs.tile.id === t.id)}
                     peerGrades={peerGrades.filter(pg => pg.tileID === t.id)}
                     learningOutcomes={learningOutcomes}

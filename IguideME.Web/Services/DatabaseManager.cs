@@ -795,7 +795,7 @@ namespace IguideME.Web.Services
                             r.GetValue(2).ToString(),
                             r.GetValue(3).ToString(),
                             r.GetValue(4).ToString(),
-                            activeHash
+                            hash: activeHash
                         );
                         submissions.Add(submission);
                     }
@@ -868,7 +868,7 @@ namespace IguideME.Web.Services
                         r.GetValue(2).ToString(),
                         r.GetValue(3).ToString(),
                         r.GetValue(4).ToString(),
-                        activeHash
+                        hash: activeHash
                     );
                     submissions.Add(submission);
                 }
@@ -902,7 +902,7 @@ namespace IguideME.Web.Services
                         r.GetValue(2).ToString(),
                         r.GetValue(3).ToString(),
                         r.GetValue(4).ToString(),
-                        activeHash
+                        hash: activeHash
                     );
                     submissions.Add(submission);
                 }

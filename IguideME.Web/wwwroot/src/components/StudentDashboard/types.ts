@@ -13,11 +13,11 @@ export interface IState {
   tilesGradeSummary: TilesGradeSummary[];
   peerGrades: PeerGrades[];
   loaded: boolean;
-  displayTile: Tile | undefined;
+  displayTile: Tile | null;
   viewType: ViewTypes;
   learningOutcomes: LearningOutcome[];
   discussions: CanvasDiscussion[];
-  userSubmissions: TileEntrySubmission[];
+  userSubmissions: Map<number, TileEntrySubmission[]>;
 }
 
 export interface TilesGradeSummary {

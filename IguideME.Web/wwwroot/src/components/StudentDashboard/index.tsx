@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import {IProps, IState, TilesGradeSummary, ViewTypes} from "./types";
 import TileGroup from "./TileGroup";
-import {Tile, TileGroup as TileGroupModel} from "../../models/app/Tile";
+import {Tile, TileEntrySubmission, TileGroup as TileGroupModel} from "../../models/app/Tile";
 import FadeIn from "react-fade-in";
 import TileController from "../../api/controllers/tile";
 import Loading from "../utils/Loading";
@@ -41,9 +41,9 @@ class StudentDashboard extends Component<Props, IState> {
   state = {
     tilesGradeSummary: [],
     peerGrades: [],
-    userSubmissions: [],
+    userSubmissions: new Map<number, TileEntrySubmission[]>(),
     loaded: true,
-    displayTile: undefined,
+    displayTile: null,
     discussions: [],
     learningOutcomes: [],
     viewType: "bar" as ViewTypes
@@ -51,7 +51,7 @@ class StudentDashboard extends Component<Props, IState> {
 
   componentDidMount(): void {
     window.addEventListener('selectTile', (event: any) => {
-      this.setState({ displayTile: event?.detail });
+      this.setState({ displayTile: event?.detail});
     });
 
     this.setup(this.props);
@@ -70,14 +70,18 @@ class StudentDashboard extends Component<Props, IState> {
   }
 
   setup = async (props: Props, propPredictions: PredictedGrade[] = []) => {
-    let { tiles, student, tileEntries, predictions } = props;
+    let { tiles, student, predictions } = props;
     if (!student) return;
 
     if (propPredictions.length >= 0) predictions = propPredictions;
 
     this.setState({ loaded: false });
 
-    let submissions = await TileController.getSubmissions(student.login_id);
+    let submissions = new Map<number, TileEntrySubmission[]>();
+
+
+    const sortedPredictions = predictions.sort(
+      (a, b) => b.graded_components - a.graded_components);
 
     let p_discussions: Promise<CanvasDiscussion[]>[] = [];
     let p_goals: Promise<LearningOutcome[]>[] = [];
@@ -96,8 +100,6 @@ class StudentDashboard extends Component<Props, IState> {
       }
 
       if (tile.content === "PREDICTION") {
-        const sortedPredictions = predictions.sort(
-          (a, b) => b.graded_components - a.graded_components);
         data.push({
           tile: tile,
           average: sortedPredictions.length > 0 ? sortedPredictions[0].grade : 0
@@ -105,24 +107,18 @@ class StudentDashboard extends Component<Props, IState> {
         continue;
       }
 
+      submissions.set(tile.id, await TileController.getTileSubmissions(tile.id, student.login_id));
+
       let avg = 0, total = 0;
-      for (const entry of tileEntries) {
-        for (const sub of submissions) {
-          // TODO, change getsubmissions to specify tile_id;
-          if (entry.tile_id === tile.id && sub.entry_id === entry.id) {
-            grade = parseFloat(sub.grade);
-            avg += (tile.content === "BINARY") ? Number(grade !== 0) : grade;
 
-            total++;
-          }
-        }
+      for (const sub of submissions.get(tile.id)!) {
+        grade = parseFloat(sub.grade);
+        avg += (tile.content === "BINARY") ? Number(grade !== 0) : grade;
+        total++;
       }
-      avg = total ? avg/total : avg;
 
-        data.push({
-          tile: tile,
-          average: avg
-        }
+      avg = total ? avg/total : avg;
+      data.push({ tile: tile, average: avg}
       );
     }
 
@@ -163,7 +159,7 @@ class StudentDashboard extends Component<Props, IState> {
                          tileEntries={tileEntries}
                          discussions={discussions}
                          predictions={predictions}
-                         submissions={userSubmissions}
+                         submissions={userSubmissions.get((displayTile as any).tile.id)!}
                          learningOutcomes={learningOutcomes}
       />
     }

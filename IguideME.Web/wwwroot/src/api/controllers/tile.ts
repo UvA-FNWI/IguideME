@@ -43,11 +43,9 @@ export default class TileController extends Controller {
 
   static getSubmissions(studentLoginId: string): Promise<TileEntrySubmission[]> {
     if (debug()) {
-      return this.getTiles().then(tiles => {
         return Promise.resolve(MOCK_SUBMISSIONS.filter(x => {
           return (x.user_login_id === studentLoginId)
-        }));
-      }).then(x => x.flat());
+        })).then(x => x.flat());
     }
 
     return this.client.get(
