@@ -1661,7 +1661,11 @@ namespace IguideME.Web.Services
             using(SQLiteDataReader r = Query(query)) {
                 while (r.Read())
                 {
-                    meta.Add(r.GetValue(0).ToString(), r.GetValue(1).ToString());
+                    try {
+                        meta.Add(r.GetValue(0).ToString(), r.GetValue(1).ToString());
+                    } catch (Exception e) {
+                        PrintQueryError("GetEntryMeta", 1, r, e);
+                    }
                 }
             }
             return meta;
