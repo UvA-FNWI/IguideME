@@ -72,7 +72,7 @@ namespace IguideME.Web.Services
                 jobId, $"tasks.quizzes", 0
             ).ConfigureAwait(false);
 
-            new DiscussionWorker(courseID, hashCode, this._canvasTest).Load();
+            new DiscussionWorker(courseID, hashCode, this._canvasTest, _logger).Load();
             await _computationJobStatus.UpdateJobProgressInformationAsync(
                 jobId, $"tasks.discussions", 0
             ).ConfigureAwait(false);

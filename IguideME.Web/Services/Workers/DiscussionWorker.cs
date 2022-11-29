@@ -2,19 +2,21 @@
 using System.Collections.Generic;
 using System.Linq;
 using IguideME.Web.Models;
+using Microsoft.Extensions.Logging;
 using UvA.DataNose.Connectors.Canvas;
 
 namespace IguideME.Web.Services.Workers
 {
 	public class DiscussionWorker
 	{
-
+        private readonly ILogger<SyncManager> _logger;
 		private int CourseID { get; set; }
 		private string Hash { get; set; }
 		private CanvasTest CanvasTest { get; set; }
 
-		public DiscussionWorker(int courseID, string hash, CanvasTest canvasTest)
+		public DiscussionWorker(int courseID, string hash, CanvasTest canvasTest, ILogger<SyncManager> logger)
 		{
+            _logger = logger;
 			this.CourseID = courseID;
 			this.Hash = hash;
 			this.CanvasTest = canvasTest;
@@ -28,23 +30,16 @@ namespace IguideME.Web.Services.Workers
 			List<Discussion> discussions = this.CanvasTest
 				.GetDiscussions(this.CourseID);
 
-			foreach (Discussion d in discussions)
-            {
-				DatabaseManager.Instance.RegisterDiscussion(
-					d.ID,
-					this.CourseID,
-					-1,
-					d.Title,
-					d.UserName,
-					d.PostedAt.ToString(),
-					d.Message.Replace("'", "''"),
-					this.Hash);
-			}
-
-			foreach (Tile tile in tiles.Where(t => t.TileType == "DISCUSSIONS"))
+			foreach (Tile tile in tiles)
 			{
+				if (tile.TileType != "DISCUSSIONS") {
+					continue;
+				}
+
 				if (tile.Wildcard)
 				{
+					// TODO: how does a wildcard get created?
+					_logger.LogInformation("wildcard");
 					var postedDiscussions = discussions
 					.Where(d =>
 					{
@@ -68,27 +63,21 @@ namespace IguideME.Web.Services.Workers
 				}
 				else
 				{
-					var entries = DatabaseManager.Instance.GetTileEntries(tile.ID);
-					var targetDiscussions = discussions.Where(
-						d => entries.Select(
-							e => e.Title.ToLower()).Contains(d.Title.ToLower()));
-
-					foreach (Discussion d in targetDiscussions)
-					{
-						foreach (var entry in d.Entries)
-						{
-							var student = students.Find(s => s.UserID == entry.UserID);
-							if (student == null) continue;
-
-							DatabaseManager.Instance.RegisterDiscussion(
-								d.ID,
-								this.CourseID,
-								tile.ID,
-								d.Title,
-								student.Name,
-								entry.CreatedAt.ToString(),
-								entry.Message.Replace("'", "''"),
-								this.Hash);
+					tile.GetEntries();
+					foreach (TileEntry entry in tile.Entries) {
+						foreach (Discussion discussion in discussions) {
+							if (discussion.Title.Equals(entry.Title, StringComparison.OrdinalIgnoreCase)) {
+								DatabaseManager.Instance.RegisterDiscussion(
+									discussion.ID,
+									discussion.CourseID,
+									tile.ID,
+									discussion.Title,
+									discussion.UserName,
+									discussion.PostedAt.ToString(),
+									discussion.Message.Replace("'", "''"),
+									this.Hash
+								);
+							}
 						}
 					}
 				}

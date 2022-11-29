@@ -2,13 +2,13 @@ import React, { Component } from "react";
 // import {createBarData, getBarOptions} from "../helpers";
 import {HorizontalBar} from "react-chartjs-2";
 import {Tile} from "../../../models/app/Tile"
+import { CanvasDiscussion } from "../../../models/canvas/Discussion";
+import { LearningOutcome } from "../../../models/app/LearningGoal";
+import { PeerGrades, TilesGradeSummary } from "../types";
 import {Data} from "./types"
+import { IProps } from "./types";
 
-export default class GradeBar extends Component<{
-  tiles: Tile[],
-  tilesGradeSummary: any,
-  peerGrades: any,
-}> {
+export default class GradeBar extends Component<IProps> {
 
   bar_options = {
     maintainAspectRatio: true,
@@ -44,11 +44,19 @@ export default class GradeBar extends Component<{
     }
   }
 
-  createBarData(tiles: Tile[], tilesGradeSummary: {tile: Tile, average: any}[] , peerGrades: { min: number, max: number, avg: number, tileID: number}[]) {
+  createBarData(tiles: Tile[], tilesGradeSummary: TilesGradeSummary[] , peerGrades: PeerGrades[], discussions: CanvasDiscussion[], learningOutcomes: LearningOutcome[]) {
     let datadict = new Map<number, Data>();
 
     for (let i = 0; i < tiles.length; i++) {
-      datadict.set(tiles[i].id, {title: tiles[i].title, grade: null, peergrade: null, max: 10});
+      // TODO: Very ugly but everything is hardcoded so that discussions and learning_outcomes are only on 1 tile.
+      let grade = 0
+      if (tiles[i].content === "LEARNING_OUTCOMES") {
+        grade = learningOutcomes.filter(lo => lo.success).length;
+      } else if (tiles[i].type === "DISCUSSIONS") {
+        grade = discussions.length;
+      }
+
+      datadict.set(tiles[i].id, {title: tiles[i].title, grade: grade, peergrade: 0, max: 10});
     }
 
     for (let i = 0; i < tilesGradeSummary.length; i++) {
@@ -57,6 +65,7 @@ export default class GradeBar extends Component<{
       if (tilesGradeSummary[i].tile.content === "BINARY"){
         entry.max = 100
       }
+
       // TODO:
       grade = grade * 10 / entry.max;
 
@@ -107,11 +116,11 @@ export default class GradeBar extends Component<{
   }
 
   render(): React.ReactNode {
-    const { tiles, tilesGradeSummary, peerGrades} = this.props;
+    const { tiles, tilesGradeSummary, peerGrades, discussions, learningOutcomes} = this.props;
 
     return (
       <div>
-        <HorizontalBar height={300} data={this.createBarData(tiles, tilesGradeSummary, peerGrades)} options={this.bar_options} />
+        <HorizontalBar height={300} data={this.createBarData(tiles, tilesGradeSummary, peerGrades, discussions, learningOutcomes)} options={this.bar_options} />
       </div>
     );
   }

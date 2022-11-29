@@ -420,11 +420,13 @@ namespace IguideME.Web.Controllers
         public ActionResult GetDiscussions(string tileID, string userLoginID)
         {
             // Only instructors may view submissions of other students
-            if (this.GetUserLoginID() != userLoginID &&
-                !this.IsAdministrator())
+            if ((this.GetUserLoginID() != userLoginID &&
+                !this.IsAdministrator()) ||
+                (DatabaseManager.Instance.GetConsent(this.GetCourseID(), userLoginID) != 1))
                 return Unauthorized();
 
             bool success = Int32.TryParse(tileID, out int id);
+
 
             return success
                 ? Json(

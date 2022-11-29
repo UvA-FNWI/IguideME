@@ -1034,8 +1034,8 @@ public static class DatabaseQueries
             ON      `layout_tile_group`.`id`=`tile`.`group_id`
         INNER JOIN  `peer_group`
             ON      `tile_entry_submission`.`user_login_id`=`peer_group`.`target_login_id`
-	    WHERE       `tile`.`content_type` != 'LEARNING_OUTCOMES'
-	    AND	        `tile`.`content_type` != 'PREDICTION'
+	    WHERE       `tile`.`content_type` != 'PREDICTION'
+	    AND	        `tile`.`content_type` != 'LEARNING_OUTCOMES'
         AND	        `tile`.`tile_type` != 'DISCUSSIONS'
         AND         `layout_tile_group`.`course_id`={0}
         AND         `peer_group`.`user_login_id`='{1}'

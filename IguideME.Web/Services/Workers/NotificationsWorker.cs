@@ -62,25 +62,30 @@ namespace IguideME.Web.Services.Workers
 
                 string body = "";
                 if (!string.IsNullOrEmpty(outperforming))
-                    body += @$"You are outperforming your peers in:
-                               {outperforming}
-                               ";
+                    body +=
+@$"You are outperforming your peers in:
+    {outperforming}
+";
                 if (!string.IsNullOrEmpty(closing))
-                    body += @$"You are closing the gap to your peers in:
-                               {closing}
-                               ";
+                    body +=
+@$"You are closing the gap to your peers in:
+    {closing}
+";
                 if (!string.IsNullOrEmpty(moreEffort))
-                    body += @$"You have to put more effort in:
-                               {moreEffort}
-                               ";
+                    body +=
+@$"You have to put more effort in:
+    {moreEffort}
+";
+// Ugly but had difficulties with \n showing up all over the place.
 
                 if (!string.IsNullOrEmpty(body)) {
                     _logger.LogInformation($"Sending notification to {user.LoginID}, {user.UserID}: {body}");
                     _canvasTest.SendMessage(user.UserID,
                     "IGuideME",
-                    @$"You are using IguideME, please find your personal feedback below. Visit IguideME in your course for more detailed information.
+                    @$"
+You are using IguideME, please find your personal feedback below. Visit IguideME in your course for more detailed information.
 
-                       {body}"
+{body}"
                     );
                 }
 

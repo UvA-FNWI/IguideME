@@ -44,8 +44,8 @@ class StudentDashboard extends Component<Props, IState> {
     userSubmissions: new Map<number, TileEntrySubmission[]>(),
     loaded: true,
     displayTile: null,
-    discussions: [],
-    learningOutcomes: [],
+    discussions: [] as CanvasDiscussion[],
+    learningOutcomes: [] as LearningOutcome[],
     viewType: "bar" as ViewTypes
   }
 
@@ -91,11 +91,11 @@ class StudentDashboard extends Component<Props, IState> {
 
     for (const tile of tiles) {
       if (tile.content === "LEARNING_OUTCOMES") {
-        p_goals.push(TileController.getUserGoals(tile.id, student.login_id).then(g => g));
+        p_goals.push(TileController.getUserGoals(tile.id, student.login_id));
         continue;
       }
       if (tile.type === "DISCUSSIONS") {
-        p_discussions.push(TileController.getDiscussions(tile.id, student.login_id).then(d => d));
+        p_discussions.push(TileController.getDiscussions(tile.id, student.login_id));
         continue;
       }
 
@@ -150,6 +150,7 @@ class StudentDashboard extends Component<Props, IState> {
     } = this.state;
 
     const { tiles, tileGroups, dashboardColumns, tileEntries, student, predictions } = this.props;
+    console.log("tiles", tiles);
     console.log("Predictions", predictions);
 
     if (!loaded || !student) return (<Loading small={true} />);
@@ -204,7 +205,8 @@ class StudentDashboard extends Component<Props, IState> {
                 )
               })}
             </div>
-          </FadeIn> :
+          </FadeIn>
+          :
           // <TileRadar tiles={tiles}
           //            tileEntries={tileEntries}
           //            student={student}
@@ -215,6 +217,8 @@ class StudentDashboard extends Component<Props, IState> {
             <TileBars tiles={tiles}
                       tilesGradeSummary = {tilesGradeSummary}
                       peerGrades = {peerGrades}
+                      discussions = {discussions}
+                      learningOutcomes={learningOutcomes}
             />
           </div>
         }

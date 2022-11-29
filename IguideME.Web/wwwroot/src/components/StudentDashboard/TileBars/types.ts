@@ -1,6 +1,19 @@
+import {Tile} from "../../../models/app/Tile"
+import { PeerGrades, TilesGradeSummary } from "../types";
+import { CanvasDiscussion } from "../../../models/canvas/Discussion";
+import { LearningOutcome } from "../../../models/app/LearningGoal";
+
 export interface Data {
     title: string,
     grade: any,
     peergrade: any,
     max: any
 };
+
+export interface IProps {
+    tiles: Tile[],
+    tilesGradeSummary: TilesGradeSummary[],
+    peerGrades: PeerGrades[],
+    discussions: CanvasDiscussion[],
+    learningOutcomes: LearningOutcome[]
+}

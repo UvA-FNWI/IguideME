@@ -1884,6 +1884,7 @@ namespace IguideME.Web.Services
             }
             else
             {
+                // TODO: why??
                 User user = GetUser(courseID, userLoginID, activeHash);
                 if (user == null) return new List<AppDiscussion>() { };
 
@@ -1911,6 +1912,10 @@ namespace IguideME.Web.Services
                     );
                     discussions.Add(row);
                 }
+            }
+
+            foreach (AppDiscussion discussion in discussions) {
+                _logger.LogInformation($"{discussion.PostedBy}: {discussion.Message} {discussion.PostedAt}");
             }
 
             return discussions;
