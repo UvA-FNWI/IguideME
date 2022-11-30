@@ -232,8 +232,8 @@ public static class DatabaseQueries
 
     public const string QUERY_GRADE_PREDICTION_MODELS_FOR_COURSE =
         @"SELECT    `grade_prediction_model`.`id`,
-                    `grade_prediction_model`.`enabled`
                     `grade_prediction_model`.`intercept`,
+                    `grade_prediction_model`.`enabled`
         FROM        `grade_prediction_model`
         WHERE       `grade_prediction_model`.`course_id`={0};";
 

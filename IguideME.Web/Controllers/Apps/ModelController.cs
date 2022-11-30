@@ -39,6 +39,7 @@ namespace IguideME.Web.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult UploadModel([FromBody] GradePredictionModel model)
         {
+            // TODO: produces 415 error?
             int modelID = DatabaseManager.Instance.CreateGradePredictionModel(GetCourseID(), model.Intercept);
 
             foreach (var parameter in model.Parameters)

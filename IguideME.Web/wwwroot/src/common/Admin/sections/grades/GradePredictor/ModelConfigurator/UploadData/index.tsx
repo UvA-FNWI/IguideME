@@ -11,6 +11,8 @@ import { UploadDataMock } from "../mocking";
 
 const { Option } = Select;
 
+const studentIdStrings = ["studentloginid", "studentid", "student", "id"]
+
 interface IProps {
     parentSetGradesDatasets: Function
     parentSetFinalGradesDatasetName: Function,
@@ -61,19 +63,21 @@ export default class UploadData extends Component<IProps, IState> implements ISt
     async csvFilesChosen(event: React.ChangeEvent<HTMLInputElement>) {
         const files = event.target.files
         if (!files)
-            return
+        return
 
         let gradesDatasets: GradesDatasets = {}
 
         for (let i = 0; i < files.length; i++) {
             let header = await headerForCsvFile(files[i])
+
             if (!header)
                 continue
 
-            let [colA, colB] = header.map(c => c.toLowerCase())
-            if (colA !== "studentloginid" || colB !== "grade")
+            let [colA, colB] = header
+            // TODO: add option for: studentid, exersizename1, exercisename2, ...
+            if (!studentIdStrings.includes(colA.toLowerCase()) || colB.toLowerCase() !== "grade"){
                 continue
-
+            }
             let datesetName = filenameForFile(files[i])
             let studentGrade = await this.readStudentGradesFromFile(files[i])
             gradesDatasets[datesetName] = studentGrade

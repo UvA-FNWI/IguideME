@@ -514,12 +514,16 @@ namespace IguideME.Web.Services
             using(SQLiteDataReader r = Query(query)) {
                 while (r.Read())
                 {
-                    model = new GradePredictionModel(r.GetInt32(0),
-                                                courseID,
-                                                r.GetBoolean(1),
-                                                r.GetFloat(2));
-                    // model.getParameters();
-                    models.Add(model);
+                    try {
+                        model = new GradePredictionModel(r.GetInt32(0),
+                                                    courseID,
+                                                    r.GetBoolean(2),
+                                                    r.GetFloat(1));
+                        // model.getParameters();
+                        models.Add(model);
+                    } catch (Exception e) {
+                        PrintQueryError("GetGrade{redictionModels", 2, r, e);
+                    }
                 }
             }
 
@@ -1912,10 +1916,6 @@ namespace IguideME.Web.Services
                     );
                     discussions.Add(row);
                 }
-            }
-
-            foreach (AppDiscussion discussion in discussions) {
-                _logger.LogInformation($"{discussion.PostedBy}: {discussion.Message} {discussion.PostedAt}");
             }
 
             return discussions;
