@@ -193,12 +193,11 @@ namespace IguideME.Web.Controllers
 
         [Authorize(Policy = "IsInstructor")]
         [HttpGet]
-        [Route("/Submissions")]
+        [Route("/submissions")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public ActionResult GetSubmissions()
         {
-            // returns all obtained exam grades for the logged in user
             return Json(
                 DatabaseManager.Instance.GetCourseSubmissions(GetCourseID()));
         }

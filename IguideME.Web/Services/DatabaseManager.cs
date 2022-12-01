@@ -799,6 +799,7 @@ namespace IguideME.Web.Services
                             r.GetValue(2).ToString(),
                             r.GetValue(3).ToString(),
                             r.GetValue(4).ToString(),
+                            autoLoadMeta: false,
                             hash: activeHash
                         );
                         submissions.Add(submission);
