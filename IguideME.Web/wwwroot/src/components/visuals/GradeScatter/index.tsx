@@ -6,13 +6,13 @@ import { IProps } from "./types";
 export default class GradeScatter extends Component<IProps> {
 
   render(): React.ReactNode {
-    const { mergedData }: IProps = this.props;
+    const { entryOne, entryTwo, mergedData }: IProps = this.props;
 
     return (
       <div style={{
         width: '100%', height: '30vw', padding: 20, margin: '0 auto', textAlign: 'center'
       }}>
-        <Scatter data={createScatterData(mergedData)} options={getScatterOptions(mergedData)} />
+        <Scatter data={createScatterData(mergedData)} options={getScatterOptions(entryOne, entryTwo, mergedData)} />
       </div>
     );
   }

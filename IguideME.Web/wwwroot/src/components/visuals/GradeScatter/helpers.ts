@@ -1,4 +1,5 @@
 import { ChartData } from "react-chartjs-2";
+import { TileEntry } from "../../../models/app/Tile";
 import {MergedData} from "./types";
 
 export const createScatterData = (mergedData: MergedData[]) => {
@@ -24,7 +25,7 @@ export const createScatterData = (mergedData: MergedData[]) => {
   }
 }
 
-export const getScatterOptions = (mergedData: MergedData[]) => {
+export const getScatterOptions = (entryOne: TileEntry, entryTwo: TileEntry, mergedData: MergedData[]) => {
   return {
     maintainAspectRatio: false,
     legend: {
@@ -41,7 +42,7 @@ export const getScatterOptions = (mergedData: MergedData[]) => {
       yAxes: [{
         scaleLabel: {
           display: true,
-          labelString: 'Quiz 1'
+          labelString: entryOne.title
         },
         ticks: {
           suggestedMin: Math.min(...mergedData.map((p: any) => p.grade1)),
@@ -51,7 +52,7 @@ export const getScatterOptions = (mergedData: MergedData[]) => {
       xAxes: [{
         scaleLabel: {
           display: true,
-          labelString: 'Quiz 2'
+          labelString: entryTwo.title
         },
         ticks: {
           suggestedMin: Math.min(...mergedData.map((p: any) => p.grade2)),

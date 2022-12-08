@@ -6,8 +6,8 @@ export interface IProps {
 
 export interface IState {
   tiles: Tile[];
-  entryOne: string | number | undefined;
-  entryTwo: string | number | undefined;
+  entryOne: TileEntry | null;
+  entryTwo: TileEntry | null;
   allEntries: TileEntry[];
   allSubmissions: TileEntrySubmission[];
   submissionsOne: TileEntrySubmission[];

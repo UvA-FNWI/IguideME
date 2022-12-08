@@ -1,4 +1,8 @@
+import { TileEntry } from "../../../models/app/Tile"
+
 export interface IProps {
+  entryOne: TileEntry
+  entryTwo: TileEntry
   mergedData: MergedData[]
 }
 

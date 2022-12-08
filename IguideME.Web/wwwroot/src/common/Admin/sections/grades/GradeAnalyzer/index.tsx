@@ -15,7 +15,7 @@ export default class GradeAnalyzer extends Component<IProps, IState> {
 
   state = {
     tiles: [],
-    entryOne: undefined, entryTwo: undefined,
+    entryOne: null, entryTwo: null,
     allSubmissions: [], submissionsOne: [], submissionsTwo: [], allEntries: []
   }
 
@@ -33,18 +33,17 @@ export default class GradeAnalyzer extends Component<IProps, IState> {
     });
   }
 
-  update = () => {
+  update = async () => {
     const { entryOne, entryTwo } = this.state;
 
     if (!entryOne || !entryTwo) {
       return;
     }
 
-    TileController.getEntrySubmissions(entryOne!).then((submissionsOne) => {
-      TileController.getEntrySubmissions(entryTwo!).then((submissionsTwo) => {
-        this.setState({ submissionsOne, submissionsTwo });
-      });
-    });
+    let submissionsOne = await TileController.getEntrySubmissions((entryOne! as TileEntry).id);
+    let submissionsTwo = await TileController.getEntrySubmissions((entryTwo! as TileEntry).id);
+
+    this.setState({ submissionsOne, submissionsTwo });
   }
 
   render(): React.ReactNode {
@@ -59,6 +58,8 @@ export default class GradeAnalyzer extends Component<IProps, IState> {
     }: IState = this.state;
     void allSubmissions; // discard value
 
+
+
     const data = mergeData(submissionsOne, submissionsTwo);
 
     return (
@@ -67,8 +68,8 @@ export default class GradeAnalyzer extends Component<IProps, IState> {
         <Divider />
 
         <EntrySelect
-          setEntryOne={(id) => this.setState({ entryOne: id }, () => this.update())}
-          setEntryTwo={(id) => this.setState({ entryTwo: id }, () => this.update())}
+          setEntryOne={(id) => this.setState({ entryOne: allEntries.find(e => e.id == id) || null }, () => this.update())}
+          setEntryTwo={(id) => this.setState({ entryTwo: allEntries.find(e => e.id == id) || null }, () => this.update())}
           tiles={tiles}
           entries={allEntries}
         />
@@ -109,19 +110,19 @@ export default class GradeAnalyzer extends Component<IProps, IState> {
                   <Col xs={24}>
                     <Tabs type="card">
                       <Tabs.TabPane tab={"Grade correlation"} key="1">
-                        <GradeScatter mergedData={data} />
+                        <GradeScatter mergedData={data} entryOne={entryOne!} entryTwo={entryTwo!} />
                       </Tabs.TabPane>
                       <Tabs.TabPane tab={"Statistics"} key="2">
                         <Row gutter={[50, 10]}>
                           <Col xs={24} md={12}>
                             <GradeBar binary={false}
-                                      title={allEntries.find(e => e.id === entryOne)?.title || ""}
+                                      title={entryOne ? (entryOne as TileEntry).title : ""}
                                       grades={submissionsOne.map((s: TileEntrySubmission) => parseFloat(s.grade))} />
                           </Col>
 
                           <Col xs={24} md={12}>
                             <GradeBar binary={false}
-                                      title={allEntries.find(e => e.id === entryTwo)?.title || ""}
+                                      title={entryTwo? (entryTwo as TileEntry).title : ""}
                                       grades={submissionsTwo.map((s: TileEntrySubmission) => parseFloat(s.grade))} />
                           </Col>
                         </Row>
