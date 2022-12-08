@@ -882,6 +882,36 @@ namespace IguideME.Web.Services
             return submissions;
         }
 
+        public List<TileEntrySubmission> GetTileSubmissions( int courseID, int tileID, string hash = null) {
+            string activeHash = hash ?? this.GetCurrentHash(courseID);
+            if (activeHash == null) return new List<TileEntrySubmission>() { };
+
+            string query = String.Format(
+                DatabaseQueries.QUERY_USER_SUBMISSIONS_FOR_TILE,
+                tileID,
+                activeHash);
+
+            List<TileEntrySubmission> submissions = new List<TileEntrySubmission>();
+
+            using(SQLiteDataReader r = Query(query)) {
+                while (r.Read())
+                {
+                    TileEntrySubmission submission = new TileEntrySubmission(
+                        r.GetInt32(0),
+                        r.GetInt32(1),
+                        r.GetValue(2).ToString(),
+                        r.GetValue(3).ToString(),
+                        r.GetValue(4).ToString(),
+                        hash: activeHash
+                    );
+                    submissions.Add(submission);
+                }
+            }
+
+            return submissions;
+        }
+
+
         public List<TileEntrySubmission> GetTileSubmissionsForUser(
             int courseID,
             int tileID,

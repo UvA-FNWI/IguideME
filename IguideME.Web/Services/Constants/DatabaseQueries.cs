@@ -967,6 +967,17 @@ public static class DatabaseQueries
         AND         `layout_column`.`course_id`={0}
         AND         `tile_entry_submission`.`sync_hash`='{2}';";
 
+    public const string QUERY_USER_SUBMISSIONS_FOR_TILE =
+        @"SELECT    `tile_entry_submission`.`id`,
+                    `tile_entry_submission`.`entry_id`,
+                    `tile_entry_submission`.`user_login_id`,
+                    `tile_entry_submission`.`grade`,
+                    `tile_entry_submission`.`submitted`
+        FROM        `tile_entry_submission`
+        INNER JOIN  `tile_entry`
+            ON      `tile_entry_submission`.`entry_id`=`tile_entry`.`id`
+        WHERE       `tile_entry`.`tile_id`={0}
+        AND         `tile_entry_submission`.`sync_hash`='{2}';";
     public const string QUERY_USER_SUBMISSIONS_FOR_TILE_FOR_USER =
         @"SELECT    `tile_entry_submission`.`id`,
                     `tile_entry_submission`.`entry_id`,

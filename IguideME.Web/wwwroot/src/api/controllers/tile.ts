@@ -53,7 +53,7 @@ export default class TileController extends Controller {
     ).then(response => response.data);
   }
 
-  static getTileSubmissions(tileId: number, studentLoginId: string): Promise<TileEntrySubmission[]> {
+  static getTileSubmissions(tileId: number, studentLoginId?: string): Promise<TileEntrySubmission[]> {
     if (debug()) {
       return this.getTileEntries(tileId).then(entries => {
         const entryIds = entries.map(e => e.id);
@@ -64,7 +64,8 @@ export default class TileController extends Controller {
     }
 
     return this.client.get(
-      `tiles/${tileId}/submissions/${studentLoginId}`
+      studentLoginId? `tiles/${tileId}/submissions/${studentLoginId}` :
+      `tiles/${tileId}/submissions`
     ).then(response => response.data);
   }
 

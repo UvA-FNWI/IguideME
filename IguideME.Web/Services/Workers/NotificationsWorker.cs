@@ -49,13 +49,13 @@ namespace IguideME.Web.Services.Workers
                     Tile tile = DatabaseManager.Instance.GetTile(this._courseID, notification.TileID);
                     switch (notification.Status) {
                         case "outperforming peers":
-                            outperforming += $" - {tile.Title}\n";
+                            outperforming += $"    - {tile.Title}\n";
                             break;
                         case "closing the gap":
-                            closing += $" - {tile.Title}\n";
+                            closing += $"    - {tile.Title}\n";
                             break;
                         case "more effort required":
-                            moreEffort += $" - {tile.Title}\n";
+                            moreEffort += $"    - {tile.Title}\n";
                             break;
                     }
                 }
@@ -64,17 +64,17 @@ namespace IguideME.Web.Services.Workers
                 if (!string.IsNullOrEmpty(outperforming))
                     body +=
 @$"You are outperforming your peers in:
-    {outperforming}
+{outperforming}
 ";
                 if (!string.IsNullOrEmpty(closing))
                     body +=
 @$"You are closing the gap to your peers in:
-    {closing}
+{closing}
 ";
                 if (!string.IsNullOrEmpty(moreEffort))
                     body +=
 @$"You have to put more effort in:
-    {moreEffort}
+{moreEffort}
 ";
 // Ugly but had difficulties with \n showing up all over the place.
 
@@ -82,8 +82,7 @@ namespace IguideME.Web.Services.Workers
                     _logger.LogInformation($"Sending notification to {user.LoginID}, {user.UserID}: {body}");
                     _canvasTest.SendMessage(user.UserID,
                     "IGuideME",
-                    @$"
-You are using IguideME, please find your personal feedback below. Visit IguideME in your course for more detailed information.
+@$"You are using IguideME, please find your personal feedback below. Visit IguideME in your course for more detailed information.
 
 {body}"
                     );

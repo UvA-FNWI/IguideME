@@ -413,6 +413,27 @@ namespace IguideME.Web.Controllers
 
         [Authorize]
         [HttpGet]
+        [Route("/tiles/{tileID}/submissions")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public ActionResult GetTileSubmissions(string tileID)
+        {
+            // Only instructors may view submissions of other students
+            if (!this.IsAdministrator())
+                return Unauthorized();
+
+            bool success = Int32.TryParse(tileID, out int id);
+
+            return success
+                ? Json(
+                    DatabaseManager.Instance.GetTileSubmissions(
+                        this.GetCourseID(), id))
+                : (ActionResult)BadRequest();
+        }
+
+        [Authorize]
+        [HttpGet]
         [Route("/tiles/{tileID}/discussions/{userLoginID}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
