@@ -43,14 +43,8 @@ class ExternalTile extends Component<Props, IState> {
     this.setState({ loaded: false }, () => {
       StudentController.getStudents().then(async students => {
         const { id } = this.props.tile;
-        const { tileEntries } = this.props;
-        const filteredEntries = tileEntries.filter(e => e.tile_id === id);
-        let tileSubmissions: TileEntrySubmission[] = [];
 
-        for (const entry of filteredEntries) {
-          const entrySubmissions = await TileController.getEntrySubmissions(entry.id).then(v => v);
-          tileSubmissions.push(...entrySubmissions);
-        }
+        let tileSubmissions: TileEntrySubmission[] = await TileController.getTileSubmissions(id);
 
         this.props.loadTiles().then(() => {
           this.props.loadTileEntries().then(() => {
