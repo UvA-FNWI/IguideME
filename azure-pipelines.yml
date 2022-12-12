@@ -16,7 +16,7 @@ jobs:
         displayName: Build Docker container
         workingDirectory: ./IguideME.Web
         condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-        
+
       - script: |
           set -euxo pipefail
           npm install --no-audit
@@ -25,7 +25,7 @@ jobs:
           docker push "fnwicr.azurecr.io/iguideme-demo:latest"
         displayName: Build Docker container for demo app
         workingDirectory: ./IguideME.Web/wwwroot
-        condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/demo'))
+        condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
 
       - script: |
           set -euxo pipefail
@@ -34,10 +34,10 @@ jobs:
           helm push "iguideme-demo-${VERSION}.tgz" oci://fnwicr.azurecr.io/helm
           curl "https://k8s.datanose.nl/gitops-updater?name=iguideme-demo&secret=${UPDATER_SECRET}&version=${VERSION}"
         displayName: Build Helm chart for demo app and push to registry
-        condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/demo'))
+        condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
         env:
           UPDATER_SECRET: $(DEPLOY_SECRET)
-          
+
       - script: |
           set -euxo pipefail
           VERSION="0.${BUILD_BUILDNUMBER}"
