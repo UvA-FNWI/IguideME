@@ -36,13 +36,8 @@ export default class StudentGradesTable extends Component<IProps, IState> {
 
   render(): React.ReactNode {
     const { averaged } = this.props;
-    const { tiles, tileEntries, students, submissions, loaded } = this.state;
-    void loaded // discard value
+    const { tiles, tileEntries, students, submissions } = this.state;
 
-    console.log("GRADE TABLE", submissions);
-    console.log("COLUMNS", getColumns(tiles, tileEntries, averaged));
-    console.log("DATA", getData(students, tiles, tileEntries, submissions));
-    console.log("SUBMISSIONS", submissions);
     return (
       <div id={"studentsGradeTable"} style={{position: 'relative', overflow: 'visible'}}>
         <Table columns={getColumns(tiles, tileEntries, averaged)}

@@ -68,8 +68,8 @@ export default class GradeAnalyzer extends Component<IProps, IState> {
         <Divider />
 
         <EntrySelect
-          setEntryOne={(id) => this.setState({ entryOne: allEntries.find(e => e.id == id) || null }, () => this.update())}
-          setEntryTwo={(id) => this.setState({ entryTwo: allEntries.find(e => e.id == id) || null }, () => this.update())}
+          setEntryOne={(id) => this.setState({ entryOne: allEntries.find(e => e.id === id) || null }, () => this.update())}
+          setEntryTwo={(id) => this.setState({ entryTwo: allEntries.find(e => e.id === id) || null }, () => this.update())}
           tiles={tiles}
           entries={allEntries}
         />

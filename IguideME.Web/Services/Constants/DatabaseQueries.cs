@@ -977,7 +977,7 @@ public static class DatabaseQueries
         INNER JOIN  `tile_entry`
             ON      `tile_entry_submission`.`entry_id`=`tile_entry`.`id`
         WHERE       `tile_entry`.`tile_id`={0}
-        AND         `tile_entry_submission`.`sync_hash`='{2}';";
+        AND         `tile_entry_submission`.`sync_hash`='{1}';";
     public const string QUERY_USER_SUBMISSIONS_FOR_TILE_FOR_USER =
         @"SELECT    `tile_entry_submission`.`id`,
                     `tile_entry_submission`.`entry_id`,

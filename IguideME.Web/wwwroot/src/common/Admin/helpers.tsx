@@ -1,0 +1,1 @@
+export const studentIdStrings = ["studentloginid", "studentid", "student", "id"]

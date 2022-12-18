@@ -8,10 +8,9 @@ import BlackBoardAnimation from "./BlackBoardAnimation";
 import { StudentGrades, GradesDatasets } from "../../types"
 import { IStep } from "../interfaces"
 import { UploadDataMock } from "../mocking";
+import  { studentIdStrings } from "../../../../../helpers"
 
 const { Option } = Select;
-
-const studentIdStrings = ["studentloginid", "studentid", "student", "id"]
 
 interface IProps {
     parentSetGradesDatasets: Function
