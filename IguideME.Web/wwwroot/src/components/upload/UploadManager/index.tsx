@@ -82,7 +82,7 @@ export default class UploadManager extends Component<IProps, IState> {
                              header: true,
                              dynamicTyping: false,
                              skipEmptyLines: true,
-                             transformHeader: header =>
+                             transformHeader: (header: any) =>
                                header
                                  .toLowerCase()
                                  .replace(/\W/g, '_')
@@ -95,7 +95,7 @@ export default class UploadManager extends Component<IProps, IState> {
               <Input placeholder={"Title"} value={title} onChange={e => this.setState({ title: e.target.value })} />
             </Col>
             <Col xs={24}>
-              <strong id={"notice"}>Notice: each upload <u>must</u> contain a column named <i>StudentLoginID</i> specifying the student's login id. There must also be a column named <i>Grade</i>. All other columns will be stored as meta attributes to the submission.</strong>
+              <strong id={"notice"}>Notice: each upload <u>must</u> contain a column named <i>StudentID</i> specifying the student's login id. There must also be a column named <i>Grade</i>. All other columns will be stored as meta attributes to the submission.</strong>
             </Col>
           </Row>
 

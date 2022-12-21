@@ -8,5 +8,5 @@ export interface IProps {
 
 export interface IState {
   loading: boolean;
-  tile: Tile | undefined;
+  tile: Tile | null;
 }

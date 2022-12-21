@@ -38,7 +38,7 @@ export default class DataSourceUpload extends Component<IProps> {
                                         header: true,
                                         dynamicTyping: true,
                                         skipEmptyLines: true,
-                                        transformHeader: header =>
+                                        transformHeader: (header: any) =>
                                             header
                                                 .toLowerCase()
                                                 .replace(/\W/g, '_')

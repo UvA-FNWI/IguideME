@@ -29,7 +29,7 @@ class ActionButtons extends Component<Props, IState> {
 
   state = {
     loading: false,
-    tile: undefined
+    tile: null
   }
 
   componentDidMount(): void {
@@ -64,9 +64,11 @@ class ActionButtons extends Component<Props, IState> {
       </Menu>
     );
 
-    const { tile, loading }: IState = this.state;
+    let { tile, loading }: IState = this.state;
 
     if (!tile) return null;
+    tile = tile as Tile;
+
 
     return (
       <div style={{float: 'right'}}>
@@ -77,7 +79,7 @@ class ActionButtons extends Component<Props, IState> {
                              let t = tile!;
                              t.visible = !t.visible;
                              TileController.updateTile(t).then(async newTile => {
-                               await this.props.updateTile(newTile);
+                               await (this.props as any).updateTile(newTile);
                                this.setState({ tile: t, loading: false });
                              });
                            });

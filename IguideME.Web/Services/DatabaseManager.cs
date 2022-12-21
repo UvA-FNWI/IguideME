@@ -886,8 +886,6 @@ namespace IguideME.Web.Services
             string activeHash = hash ?? this.GetCurrentHash(courseID);
             if (activeHash == null) return new List<TileEntrySubmission>() { };
 
-            _logger.LogInformation($"{tileID}, {activeHash}");
-
             string query = String.Format(
                 DatabaseQueries.QUERY_USER_SUBMISSIONS_FOR_TILE,
                 tileID,

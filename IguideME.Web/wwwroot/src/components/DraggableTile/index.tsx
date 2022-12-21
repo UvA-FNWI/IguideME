@@ -34,7 +34,7 @@ type Props = IProps & PropsFromRedux;
 class DraggableTile extends Component<Props, IState> {
 
   state = {
-    tile: undefined,
+    tile: null,
     entriesLoaded: false,
     entries: [],
     updatingNotifications: []
@@ -48,8 +48,13 @@ class DraggableTile extends Component<Props, IState> {
   }
 
   componentDidUpdate(prevProps: Readonly<IProps>, prevState: Readonly<{}>, snapshot?: any): void {
-    const { tile }: IState = this.state;
-    if (tile !== undefined && prevProps.tile.id !== tile!.id) {
+    let { tile }: IState = this.state;
+
+    if (tile !== undefined) return;
+
+    tile = tile as Tile;
+
+    if (prevProps.tile.id !== tile!.id) {
       TileController.getTileEntries(tile!.id).then(entries => {
         this.setState({ entries, entriesLoaded: true });
       });
@@ -61,7 +66,7 @@ class DraggableTile extends Component<Props, IState> {
     this.setState({ updatingNotifications: [...updatingNotifications, tile.id]}, () => {
       tile.notifications = !tile.notifications;
       TileController.updateTile(tile).then(async t => {
-        this.props.updateTile(t);
+        (this.props as any).updateTile(t);
         this.setState({
           updatingNotifications: updatingNotifications
             .filter(x => x !== tile.id),
@@ -72,9 +77,10 @@ class DraggableTile extends Component<Props, IState> {
   }
 
   render(): React.ReactNode {
-    const { tile, entriesLoaded, entries, updatingNotifications }: IState = this.state;
+    let { tile, entriesLoaded, entries, updatingNotifications }: IState = this.state;
 
     if (!tile) return null;
+    tile = tile as Tile;
 
     return (
       <Draggable key={'dragTile' + tile!.id.toString()} className={"tile"}>
@@ -120,7 +126,7 @@ class DraggableTile extends Component<Props, IState> {
                           style={{ float: 'right' }}
                           shape="circle"
                           icon={<BellTwoTone twoToneColor={tile!.notifications ? "rgb(0, 185, 120)" : "rgb(255, 110, 90)"} />}
-                          onClick={() => this.toggleNotifications(tile)}
+                          onClick={() => this.toggleNotifications(tile as Tile)}
                   />
                 </Tooltip>
               </Col>

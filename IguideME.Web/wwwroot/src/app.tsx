@@ -25,7 +25,7 @@ const AdminGradePredictor = React.lazy(() => import('./common/Admin/sections/gra
 const AdminGradePredictorOld = React.lazy(() => import('./common/Admin/sections/grades/GradePredictorOld'));
 const AdminSettings = React.lazy(() => import('./common/Admin/sections/Settings'));
 
-const mapState = (state: RootState) => ({
+const mapStateToProps = (state: RootState) => ({
     dashboardColumns: state.dashboardColumns,
     tiles: state.tiles,
     tileEntries: state.tileEntries,
@@ -35,19 +35,19 @@ const mapState = (state: RootState) => ({
     predictions: state.predictions
 });
 
-const mapDispatch = (dispatch: ThunkDispatch<any, any, any>): any => {
+const mapDispatchToProps = (dispatch: ThunkDispatch<RootState, any, any>): any => {
     return {
+        loadColumns: async () => dispatch(await AppActions.loadColumns()),
         loadTiles: async () => dispatch(await TileActions.loadTiles()),
-        loadTileGroups: async () => dispatch(await TileActions.loadGroups()),
         loadTileEntries: async () => dispatch(await TileActions.loadTileEntries()),
+        loadTileGroups: async () => dispatch(await TileActions.loadGroups()),
         loadCourse: async () => dispatch(await CourseActions.loadCourse()),
         getUser: async () => dispatch(await UserActions.getUser()),
         loadPredictions: async () => dispatch(await DataMartActions.loadPredictions()),
-        loadColumns: async () => dispatch(await AppActions.loadColumns()),
     };
 };
 
-const connector = connect(mapState, mapDispatch)
+const connector = connect(mapStateToProps, mapDispatchToProps)
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
 type Props = PropsFromRedux;
@@ -55,19 +55,19 @@ type Props = PropsFromRedux;
 class IGuideME extends React.Component<Props> {
 
     componentDidMount(): void {
-        const { tiles, tileEntries, tileGroups, user, course, predictions, dashboardColumns }: Props = this.props;
-
-        if (tiles.length === 0) this.props.loadTiles();
-        if (tileGroups.length === 0) this.props.loadTileGroups();
-        if (tileEntries.length === 0) this.props.loadTileEntries();
-        if (dashboardColumns.length === 0) this.props.loadColumns();
-        if (predictions.length === 0) this.props.loadPredictions();
-        if (!user) this.props.getUser();
-        if (!course) this.props.loadCourse();
+        const { tiles, tileEntries, tileGroups, user, course, predictions, dashboardColumns } = this.props as any;
+        let props = this.props as any;
+        if (tiles.length === 0) props.loadTiles();
+        if (tileGroups.length === 0) props.loadTileGroups();
+        if (tileEntries.length === 0) props.loadTileEntries();
+        if (dashboardColumns.length === 0) props.loadColumns();
+        if (predictions.length === 0) props.loadPredictions();
+        if (!user) props.getUser();
+        if (!course) props.loadCourse();
     }
 
     render(): React.ReactNode {
-        const { user, course } = this.props;
+        const { user, course } = this.props as any;
         if (!user || !course) return <Loading />;
 
         return (

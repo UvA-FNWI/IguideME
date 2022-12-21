@@ -27,7 +27,7 @@ export default class HistoricUploads extends Component<IProps, IState> {
           { students.length } students
           <DataViewer tileEntry={openEntry}
                       students={students}
-                      submissions={submissions.filter(s => s.entry_id === (openEntry ? openEntry!.id : false))}
+                      submissions={submissions.filter(s => s.entry_id === (openEntry ? (openEntry as TileEntry)!.id : false))}
           />
         </Drawer>
 

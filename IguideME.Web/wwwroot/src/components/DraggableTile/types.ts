@@ -7,7 +7,7 @@ export interface IProps {
 }
 
 export interface IState {
-  tile: Tile | undefined;
+  tile: Tile | null;
   entriesLoaded: boolean;
   entries: TileEntry[];
   updatingNotifications: number[];
