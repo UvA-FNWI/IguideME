@@ -25,7 +25,7 @@
         "@vx/tooltip": "^0.0.199",
         "antd": "^4.6.2",
         "apexcharts": "^3.25.0",
-        "axios": "^0.20.0",
+        "axios": "^0.21.2",
         "chart.js": "^2.9.3",
         "compute.io": "^0.106.0",
         "d3-array": "^2.12.1",
