@@ -40,7 +40,7 @@ namespace IguideME.Web.Services
             var courseID = work.CourseID;
 
             // TODO: check course dates
-            var notifications_bool = (work.Notifications_bool && (DateTime.Now.DayOfWeek == DayOfWeek.Monday || DateTime.Now.DayOfWeek == DayOfWeek.Friday));
+            var notifications_bool = work.Notifications_bool && (DateTime.Now.DayOfWeek == DayOfWeek.Monday || DateTime.Now.DayOfWeek == DayOfWeek.Friday);
 
             _logger.LogInformation($"{DateTime.Now}: Starting sync of course {courseID}");
 
@@ -53,7 +53,7 @@ namespace IguideME.Web.Services
             }
             string hashCode = _result.ToString().ToUpper();
 
-            DatabaseManager.Instance.CleanupSync(courseID, "BUSY");
+            DatabaseManager.Instance.CleanupSync(courseID);
 
             DatabaseManager.Instance.RegisterSync(courseID, hashCode);
             _logger.LogInformation("Sync hash: " + hashCode);

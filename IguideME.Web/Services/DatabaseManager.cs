@@ -149,7 +149,8 @@ namespace IguideME.Web.Services
                 NonQuery(query);
 
             try{
-                NonQuery("ALTER TABLE `notifications` ADD COLUMN `sent` BOOLEAN;");
+                NonQuery("ALTER TABLE `tile_entry_submission_meta` ADD COLUMN `sync_hash` TEXT;");
+                NonQuery("DELETE FROM `tile_entry_submission_meta`");
             } catch (Exception) {
                 Console.WriteLine("Column already exists");
             }
@@ -185,6 +186,28 @@ namespace IguideME.Web.Services
                     result = r.GetValue(0).ToString();
 
             return result;
+        }
+
+        public void CleanupSync(int courseID) {
+            RemoveSyncsWithStatus(courseID, "BUSY");
+
+            string query = String.Format(DatabaseQueries.QUERY_OLD_SYNCS_FOR_COURSE, courseID, 5);
+            string query2;
+            List<string> hashes = new List<string>();
+
+            using (SQLiteDataReader r = Query(query)) {
+                while (r.Read()) {
+                    try {
+                        hashes.Add(r.GetValue(0).ToString());
+                    } catch (Exception e) {
+                        _logger.LogError($"Unable to get old sync: {r.GetValue(0)}\n" + e.Message + e.StackTrace);
+                    }
+                }
+            }
+            foreach (string hash in hashes) {
+                query2 = String.Format(DatabaseQueries.DELETE_OLD_SYNCS_FOR_COURSE, courseID, hash);
+                NonQuery(query2);
+            }
         }
 
         public bool IsCourseRegistered(int courseID)
@@ -224,7 +247,8 @@ namespace IguideME.Web.Services
             return course_ids;
         }
 
-        public void CleanupSync(int courseID, string status) {
+
+        public void RemoveSyncsWithStatus(int courseID, string status) {
             _logger.LogInformation("Starting cleanup of sync hystory ");
             try {
                 NonQuery(
@@ -732,14 +756,18 @@ namespace IguideME.Web.Services
         public int CreateSubmissionMeta(
             int submissionID,
             string key,
-            string value)
+            string value,
+            int courseID,
+            string hash=null)
         {
+            string activeHash = hash ?? this.GetCurrentHash(courseID);
             return IDNonQuery(
                 String.Format(
                     DatabaseQueries.CREATE_SUBMISSION_META,
                     submissionID,
                     key,
-                    value));
+                    value,
+                    hash));
         }
 
         public List<TileEntrySubmission> GetTileEntrySubmissions(

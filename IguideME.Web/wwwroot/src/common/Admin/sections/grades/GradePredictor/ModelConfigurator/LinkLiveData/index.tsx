@@ -4,7 +4,7 @@ import React, { Component } from "react";
 import { Alert, Row, Col, Select, Divider } from "antd";
 
 import TileController from "../../../../../../../api/controllers/tile";
-import { Tile } from "../../../../../../../models/app/Tile";
+import { Tile, TileEntry } from "../../../../../../../models/app/Tile";
 
 import { GradesDatasets } from "../../types";
 import { IStep } from "../interfaces";
@@ -21,6 +21,7 @@ interface IProps {
 
 interface IState {
   tiles: Tile[];
+  entries: TileEntry[];
   gradesDatasetTilePairs: { [name: string]: number };
   inputError: boolean;
 }
@@ -33,6 +34,7 @@ export default class LinkLiveData
 
   state = {
     tiles: [],
+    entries: [], // WIP
     gradesDatasetTilePairs: this.mock.gradesDatasetTilePairs,
     inputError: false,
   };
@@ -42,6 +44,10 @@ export default class LinkLiveData
       tiles = tiles.filter((t) => t.content === "ENTRIES");
       this.setState({ tiles: tiles });
     });
+
+    TileController.getEntries().then(async (entries) => {
+      this.setState({ entries: entries});
+    })
   }
 
   validate(): boolean {
@@ -97,14 +103,9 @@ export default class LinkLiveData
                       size="middle"
                       placeholder="Choose a data source"
                       onChange={(_, o) => {
-                        // because typescript is a horrible, horrible language right now
-                        // and I just want access to the key property of o
-                        // and save it as an integer.
-                        const _o: { key: number } | any = o;
-                        const v: number = +_o.key;
 
                         let { gradesDatasetTilePairs }: IState = this.state;
-                        gradesDatasetTilePairs[datasetName] = v;
+                        gradesDatasetTilePairs[datasetName] = (o as any).key as number;
                         this.setState({
                           gradesDatasetTilePairs: gradesDatasetTilePairs,
                         });

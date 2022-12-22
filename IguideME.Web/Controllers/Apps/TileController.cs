@@ -570,6 +570,7 @@ namespace IguideME.Web.Controllers
         public ActionResult UploadTileData(string entryID, JArray input)
         {
             bool success = Int32.TryParse(entryID, out int id);
+            int courseID = this.GetCourseID();
 
             if (!success) return BadRequest();
 
@@ -577,7 +578,7 @@ namespace IguideME.Web.Controllers
             {
                 // register submission
                 int submissionID = DatabaseManager.Instance.CreateUserSubmission(
-                    this.GetCourseID(),
+                    courseID,
                     id,
                     row.GetValue("studentloginid").ToString(),
                     float.Parse(row.GetValue("grade").ToString()),
@@ -593,7 +594,7 @@ namespace IguideME.Web.Controllers
 
                     // add meta attributes
                     DatabaseManager.Instance.CreateSubmissionMeta(
-                        submissionID, property.Name, property.Value.ToString());
+                        submissionID, property.Name, property.Value.ToString(), courseID);
                 }
             }
             return NoContent();

@@ -395,7 +395,8 @@ public static class DatabaseQueries
             `id`              INTEGER PRIMARY KEY AUTOINCREMENT,
             `submission_id`   INTEGER,
             `key`             STRING,
-            `value`           STRING
+            `value`           STRING,
+            `sync_hash`       TEXT
         );";
 
     // -------------------- Course settings --------------------
@@ -636,7 +637,7 @@ public static class DatabaseQueries
         INNER JOIN  `tile_entry_submission_meta`
             ON      `tile_entry_submission`.`id`=`tile_entry_submission_meta`.`submission_id`
         WHERE       `tile_entry_submission`.`id`={0}
-        AND         `tile_entry_submission`.`sync_hash`='{1}'
+        AND         `tile_entry_submission_meta`.`sync_hash`='{1}'
         ;";
 
     public const string UPDATE_TILE =
@@ -848,6 +849,50 @@ public static class DatabaseQueries
         AND         `course_id`={0}
         ORDER BY    `end_timestamp` DESC
         LIMIT       1;";
+
+    public const string QUERY_OLD_SYNCS_FOR_COURSE =
+        @"SELECT    `hash`
+        FROM        `sync_history`
+        WHERE       `status`='COMPLETE'
+        AND         `course_id`={0}
+        ORDER BY    `end_timestamp` DESC
+        LIMIT       -1
+        OFFSET      {1};";
+
+    public const string DELETE_OLD_SYNCS_FOR_COURSE =
+        @"DELETE
+        FROM        `peer_group`
+        WHERE       `sync_hash`='{1}';
+
+        DELETE
+        FROM        `tile_entry_submission`
+        WHERE       `sync_hash`='{1}';
+
+        DELETE
+        FROM        `canvas_users`
+        WHERE       `course_id`={0}
+        AND         `sync_hash`='{1}';
+
+        DELETE
+        FROM        `canvas_assignment`
+        WHERE       `course_id`={0}
+        AND         `sync_hash`='{1}';
+
+        DELETE
+        FROM        `canvas_discussion`
+        WHERE       `course_id`={0}
+        AND         `sync_hash`='{1}';
+
+        DELETE
+        FROM        `notifications`
+        WHERE       `course_id`={0}
+        AND         `sync_hash`='{1}';
+
+        DELETE
+        FROM        `sync_history`
+        WHERE       `course_id`={0}
+        AND         `hash`='{1}';
+        ";
 
     public const string QUERY_USERS_FOR_COURSE =
         @"SELECT    `id`,
@@ -1153,8 +1198,9 @@ public static class DatabaseQueries
         @"INSERT INTO   `tile_entry_submission_meta`
                         (   `submission_id`,
                             `key`,
-                            `value`)
-        VALUES ({0},'{1}','{2}');";
+                            `value`,
+                            `sync_hash`)
+        VALUES ({0},'{1}','{2}', '{3}');";
 
     public const string CREATE_MIGRATION =
         @"INSERT INTO   `migrations`
