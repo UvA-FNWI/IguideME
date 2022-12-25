@@ -24,14 +24,24 @@ namespace IguideME.Web.Services.Workers
 
 		public void Load()
 		{
+
+			_logger.LogInformation("Starting discussion registry...");
+
 			var tiles = DatabaseManager.Instance.GetTiles(this.CourseID);
 			var students = DatabaseManager.Instance.GetUsers(this.CourseID, "student", this.Hash);
 
 			List<Discussion> discussions = this.CanvasTest
 				.GetDiscussions(this.CourseID);
 
+			// Register the discussions first as not all discussions are linked to tiles.
+			foreach (Discussion discussion in discussions)
+            {
+				DatabaseManager.Instance.RegisterDiscussion(discussion, this.Hash);
+			}
+
 			foreach (Tile tile in tiles)
 			{
+
 				if (tile.TileType != "DISCUSSIONS") {
 					continue;
 				}
@@ -47,36 +57,19 @@ namespace IguideME.Web.Services.Workers
                         return student != null && DatabaseManager.Instance.GetConsent(this.CourseID, student.LoginID) == 1;
                     });
 
-					foreach (Discussion d in postedDiscussions)
+					foreach (Discussion discussion in postedDiscussions)
 					{
-						DatabaseManager.Instance.RegisterDiscussion(
-								d.ID,
-								this.CourseID,
-								tile.ID,
-								d.Title,
-								d.UserName,
-								d.PostedAt.ToString(),
-								d.Message.Replace("'", "''"),
-								this.Hash);
+						DatabaseManager.Instance.UpdateDiscussion(discussion, tile.ID, this.Hash);
 
 					}
 				}
 				else
 				{
 					tile.GetEntries();
-					foreach (TileEntry entry in tile.Entries) {
-						foreach (Discussion discussion in discussions) {
+					foreach (Discussion discussion in discussions) {
+						foreach (TileEntry entry in tile.Entries) {
 							if (discussion.Title.Equals(entry.Title, StringComparison.OrdinalIgnoreCase)) {
-								DatabaseManager.Instance.RegisterDiscussion(
-									discussion.ID,
-									discussion.CourseID,
-									tile.ID,
-									discussion.Title,
-									discussion.UserName,
-									discussion.PostedAt.ToString(),
-									discussion.Message.Replace("'", "''"),
-									this.Hash
-								);
+								DatabaseManager.Instance.UpdateDiscussion(discussion, tile.ID, this.Hash);
 							}
 						}
 					}

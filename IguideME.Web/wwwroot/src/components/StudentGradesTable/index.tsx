@@ -38,6 +38,8 @@ export default class StudentGradesTable extends Component<IProps, IState> {
     const { averaged } = this.props;
     const { tiles, tileEntries, students, submissions } = this.state;
 
+    console.log("submissions", submissions)
+    console.log("Data", getData(students, tiles, tileEntries, submissions))
     return (
       <div id={"studentsGradeTable"} style={{position: 'relative', overflow: 'visible'}}>
         <Table columns={getColumns(tiles, tileEntries, averaged)}

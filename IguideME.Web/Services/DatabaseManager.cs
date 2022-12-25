@@ -7,6 +7,7 @@ using IguideME.Web.Models;
 using IguideME.Web.Models.App;
 using IguideME.Web.Models.Impl;
 using Microsoft.Extensions.Logging;
+using Discussion = UvA.DataNose.Connectors.Canvas.Discussion;
 
 namespace IguideME.Web.Services
 {
@@ -148,12 +149,12 @@ namespace IguideME.Web.Services
             foreach (string query in queries)
                 NonQuery(query);
 
-            try{
-                NonQuery("ALTER TABLE `tile_entry_submission_meta` ADD COLUMN `sync_hash` TEXT;");
-                NonQuery("DELETE FROM `tile_entry_submission_meta`");
-            } catch (Exception) {
-                Console.WriteLine("Column already exists");
-            }
+            // try{
+            //     NonQuery("ALTER TABLE `tile_entry_submission_meta` ADD COLUMN `sync_hash` TEXT;");
+            //     NonQuery("DELETE FROM `tile_entry_submission_meta`");
+            // } catch (Exception) {
+            //     Console.WriteLine("Column already exists");
+            // }
         }
 
         private void RunMigrations()
@@ -370,28 +371,34 @@ namespace IguideME.Web.Services
                     syncHash));
         }
 
-        public void RegisterDiscussion(
-            int? discussionID,
-            int courseID,
-            int tileID,
-            string title,
-            string postedBy,
-            string postedAt,
-            string message,
-            string syncHash)
+        public void RegisterDiscussion(Discussion discussion, string syncHash)
         {
-
             NonQuery(
                 String.Format(
                     DatabaseQueries.REGISTER_CANVAS_DISCUSSION,
-                    discussionID,
-                    courseID,
-                    tileID,
-                    title,
-                    postedBy,
-                    postedAt,
-                    message,
+                    discussion.ID,
+                    discussion.CourseID,
+                    discussion.Title,
+                    discussion.UserName,
+                    discussion.PostedAt,
+                    discussion.Message.Replace("'", "''"),
                     syncHash));
+        }
+
+        public void UpdateDiscussion(Discussion discussion, int tileID, string hash) {
+            NonQuery(
+                String.Format(
+                    DatabaseQueries.UPDATE_CANVAS_DISCUSSION,
+                    discussion.ID,
+                    discussion.CourseID,
+                    discussion.Title,
+                    discussion.UserName,
+                    discussion.PostedAt,
+                    discussion.Message.Replace("'", "''"),
+                    tileID,
+                    hash
+                )
+            );
         }
 
         public List<User> GetUsers(int courseID, string role = null, string hash = null)
@@ -1137,6 +1144,8 @@ namespace IguideME.Web.Services
             if (activeHash == null)
                 return new List<PredictedGrade>() { };
 
+            // TODO: predicted_grade table is never created apparently.
+            return new List<PredictedGrade>() { };
             string query = String.Format(
                 DatabaseQueries.QUERY_PREDICTED_GRADES_FOR_USER,
                 courseID,

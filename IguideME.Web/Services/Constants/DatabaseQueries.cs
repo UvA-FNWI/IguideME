@@ -809,13 +809,23 @@ public static class DatabaseQueries
         @"INSERT INTO   `canvas_discussion`
                         (   `discussion_id`,
                             `course_id`,
-                            `tile_id`,
                             `title`,
                             `posted_by`,
                             `posted_at`,
                             `message`,
                             `sync_hash` )
-        VALUES({0}, {1}, {2}, '{3}', '{4}', '{5}', '{6}', '{7}');";
+        VALUES({0}, {1}, '{2}', '{3}', '{4}', '{5}', '{6}');";
+
+    public const string UPDATE_CANVAS_DISCUSSION =
+        @"UPDATE        `canvas_discussion`
+        SET             `tile_id`={6}
+        WHERE           `discussion_id`={0}
+        AND             `course_id`={1}
+        AND             `title`='{2}'
+        AND             `posted_by`='{3}'
+        AND             `posted_at`='{4}'
+        AND             `message`='{5}'
+        AND             `sync_hash`='{7}';";
 
     // -------------------- Data retrieval --------------------
 
@@ -1214,7 +1224,7 @@ public static class DatabaseQueries
 
     public static readonly Dictionary<string, string> MIGRATIONS = new Dictionary<string, string>()
     {
-        {"0001_add_sent_to_notifications",
-        @"ALTER TABLE notifications ADD sent BOOLEAN;"},
+        // {"0001_add_sent_to_notifications",
+        // @"ALTER TABLE notifications ADD sent BOOLEAN;"},
     };
 }
