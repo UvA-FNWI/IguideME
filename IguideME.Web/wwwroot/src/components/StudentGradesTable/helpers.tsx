@@ -5,6 +5,7 @@ import {CanvasStudent} from "../../models/canvas/Student";
 import {Col, Progress, Row, Space, Tooltip} from "antd";
 import GradeSpread from "../visuals/GradeSpread";
 import { ColumnsType } from "antd/lib/table";
+import { CanvasDiscussion } from "../../models/canvas/Discussion";
 
 
 function entriesColumns(tile: Tile, tileEntries: TileEntry[], averaged: boolean) {
@@ -110,7 +111,7 @@ function getColumn(tile: Tile, tileEntries: TileEntry[], averaged: boolean) {
           return entriesColumns(tile, tileEntries, averaged);
       }
     case "DISCUSSIONS":
-      return binaryColumn(tile, tileEntries);
+      return entriesColumns(tile, tileEntries, averaged);
   }
 }
 
@@ -152,7 +153,8 @@ function getEntryKey(entry: TileEntry, tiles: Tile[]): string {
 export function getData(students: CanvasStudent[],
                         tiles: Tile[],
                         entries: TileEntry[],
-                        submissions: TileEntrySubmission[]): object[] {
+                        submissions: TileEntrySubmission[],
+                        discussions: CanvasDiscussion[]): object[] {
 
   return students.map(student => ({
     student,
@@ -167,14 +169,21 @@ export function getData(students: CanvasStudent[],
             tileEntries.map(e => e.id).includes(s.entry_id)
         ).map(s => parseInt(s.grade)).filter(s => s === 1).length.toString();
         return [[t.id, grade]];
-      } else {
+      }
+
+      if (t.type === "DISCUSSIONS") {
         return tileEntries.map(e => {
-          const submission = submissions.find(
-            s => s.entry_id === e.id && s.user_login_id === student.login_id
-          )!;
-          return [getEntryKey(e, tiles), submission ? submission.grade : ""];
+          const entry_discussions = discussions.filter(disc => disc.title === e.title && disc.posted_by === student.name);
+          return [getEntryKey(e, tiles), entry_discussions.length];
         })
       }
+
+      return tileEntries.map(e => {
+        const submission = submissions.find(
+          s => s.entry_id === e.id && s.user_login_id === student.login_id
+        )!;
+        return [getEntryKey(e, tiles), submission ? submission.grade : ""];
+      })
     }).flat()),
   }));
 }

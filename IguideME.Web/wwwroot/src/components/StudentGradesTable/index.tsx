@@ -4,6 +4,7 @@ import TileController from "../../api/controllers/tile";
 import {Table} from "antd";
 import {getColumns, getData} from "./helpers";
 import StudentController from "../../api/controllers/student";
+import CanvasController from "../../api/controllers/canvas";
 
 export default class StudentGradesTable extends Component<IProps, IState> {
 
@@ -12,6 +13,7 @@ export default class StudentGradesTable extends Component<IProps, IState> {
     tiles: [],
     tileGroups: [],
     tileEntries: [],
+    discussions: [],
     students: [],
     submissions: []
   }
@@ -29,6 +31,11 @@ export default class StudentGradesTable extends Component<IProps, IState> {
     StudentController.getStudents().then(async students => {
       this.setState({students});
     });
+
+    CanvasController.getDiscussions().then(async discussions => {
+      this.setState({discussions});
+    });
+
     TileController.getAllSubmissions().then(async submissions => {
       this.setState({submissions, loaded: true });
     });
@@ -36,14 +43,12 @@ export default class StudentGradesTable extends Component<IProps, IState> {
 
   render(): React.ReactNode {
     const { averaged } = this.props;
-    const { tiles, tileEntries, students, submissions } = this.state;
+    const { tiles, tileEntries, discussions, students, submissions } = this.state;
 
-    console.log("submissions", submissions)
-    console.log("Data", getData(students, tiles, tileEntries, submissions))
     return (
       <div id={"studentsGradeTable"} style={{position: 'relative', overflow: 'visible'}}>
         <Table columns={getColumns(tiles, tileEntries, averaged)}
-               dataSource={getData(students, tiles, tileEntries, submissions)}
+               dataSource={getData(students, tiles, tileEntries, submissions, discussions)}
                scroll={{ x: 900 }}
                bordered
                sticky={true}
