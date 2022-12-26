@@ -762,8 +762,7 @@ public static class DatabaseQueries
                     `message`
         FROM        `canvas_discussion`
         WHERE       `course_id`={0}
-        AND         `sync_hash`='{1}'
-        AND         `tile_id`=-1;";
+        AND         `sync_hash`='{1}';";
 
     public const string QUERY_TILE_DISCUSSIONS =
         @"SELECT    `id`,

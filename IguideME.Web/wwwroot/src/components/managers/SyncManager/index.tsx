@@ -79,6 +79,7 @@ export default class SyncManager extends Component<IProps, IState> {
     }
 
     abortSync = () => {
+        // TODO: stop sync on server as well x)
         if (this.interval) clearInterval(this.interval);
         this.setState({ start: undefined, completedTasks: [], currentTasks: [] });
     }

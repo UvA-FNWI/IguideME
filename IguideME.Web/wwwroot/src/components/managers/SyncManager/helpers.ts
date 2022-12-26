@@ -7,6 +7,7 @@ export const elapsedTime = (start: moment.Moment | undefined) => {
   return moment(moment.utc().diff(start)).utcOffset(0).format("HH:mm:ss");
 }
 
+// TODO: change to a enum or dict/map probably.
 export const syncStates = [
   {
     id: SyncProvider.BOOT_UP, title: "Boot-up", description: "Establish a connection."

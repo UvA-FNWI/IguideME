@@ -29,7 +29,8 @@ class DiscussionManager extends Component<Props> {
 
   render(): React.ReactNode {
     const { activeDiscussions, canvasDiscussions, wildcard } = this.props;
-
+    console.log("discussions in manager", canvasDiscussions);
+    console.log("active discussions in manager", canvasDiscussions);
     return (
       <div id={"discussionManager"}>
         <h2>Configure discussion metric.</h2>

@@ -1934,6 +1934,7 @@ namespace IguideME.Web.Services
                     discussions.Add(row);
                 }
             }
+
             return discussions;
         }
 
