@@ -35,6 +35,16 @@ public static class DatabaseQueries
             `enabled`             BOOLEAN
         );";
 
+    public const string CREATE_TABLE_PREDICTED_GRADE =
+        @"CREATE TABLE IF NOT EXISTS `predicted_grade` (
+            `id`                  INTEGER PRIMARY KEY AUTOINCREMENT,
+            `course_id`           INTEGER,
+            `user_login_id`       STRING,
+            `grade`               FLOAT,
+            `graded_components`   INTEGER,
+            `sync_hash`           STRING
+        );";
+
     public const string CREATE_TABLE_GRADE_PREDICTION_MODEL_PARAMETER =
         @"CREATE TABLE IF NOT EXISTS `grade_prediction_model_parameter` (
             `id`                  INTEGER PRIMARY KEY AUTOINCREMENT,

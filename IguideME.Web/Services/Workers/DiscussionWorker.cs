@@ -37,6 +37,15 @@ namespace IguideME.Web.Services.Workers
 			foreach (Discussion discussion in discussions)
             {
 				DatabaseManager.Instance.RegisterDiscussion(discussion, this.Hash);
+
+				// TODO: discuss design of discussions with Erwin
+				// foreach (DiscussionEntry entry in discussion.Entries) {
+				// 	_logger.LogInformation($"{entry.} {entry.Message}");
+
+				// 	foreach (DiscussionReply reply in entry.Replies) {
+				// 		_logger.LogInformation($"{reply.UserID} {reply.Message}");
+				// 	}
+				// }
 			}
 
 			foreach (Tile tile in tiles)

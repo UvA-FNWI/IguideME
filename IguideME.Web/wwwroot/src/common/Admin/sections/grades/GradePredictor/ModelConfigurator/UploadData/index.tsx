@@ -78,6 +78,7 @@ export default class UploadData extends Component<IProps, IState> implements ISt
                 continue
             }
             let datesetName = filenameForFile(files[i])
+            // TODO: I don't think that the async is doing anything?
             let studentGrade = await this.readStudentGradesFromFile(files[i])
             gradesDatasets[datesetName] = studentGrade
         }
@@ -89,33 +90,37 @@ export default class UploadData extends Component<IProps, IState> implements ISt
 
     async readStudentGradesFromFile(file: File): Promise<StudentGrades> {
         const rows: Array<Array<string>> = await rowsForCsvFile(file)
+
         let studentGrades: StudentGrades = {}
         rows.forEach(row => {
             let [studentID, grade] = row.map(c => Number(c.replace(',', '.')))
             studentGrades[studentID] = grade
         })
+        // TODO: Should probably change StudentGrades to a Map type as the 0 key is being set to NaN automatically.
+        if (!studentGrades[0]) {
+            delete studentGrades[0]
+        }
         return studentGrades
     }
 
     ensureGradeDatasetsAreComplete() {
         const { gradesDatasets } = this.state
 
-        let studentIDs = Object.entries(gradesDatasets)
-            .map(x => x[1] as StudentGrades)
-            .flatMap(Object.keys) // get all student IDs
-            .map(x => parseInt(x))
-            .slice(0) // deduplicate
+        let studentIDs = Object.values(gradesDatasets)
+        .flatMap(Object.keys) // get all student IDs
+        .map(x => parseInt(x))
+        .slice(0) // deduplicate
 
-        let wGradesDatasets = gradesDatasets as GradesDatasets
-
-        Object.keys(wGradesDatasets)
+        Object.keys(gradesDatasets)
             .forEach(k => {
                 studentIDs
-                    .filter(sID => !(sID in wGradesDatasets[k]))
-                    .forEach(sID => wGradesDatasets[k][sID] = 1)
+                .filter(sID => !(sID in gradesDatasets[k]))
+                .forEach(sID => gradesDatasets[k][sID] = 1)
             })
 
-        this.setState({ gradesDatasets: wGradesDatasets })
+            console.log("after", JSON.parse(JSON.stringify(gradesDatasets)));
+
+        this.setState({ gradesDatasets: gradesDatasets })
     }
 
     enforceMinimumMaximumGrade() {

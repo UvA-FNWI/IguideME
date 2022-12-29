@@ -55,6 +55,8 @@ export default class DataMartController extends Controller {
       return delay(model, 1000);
     }
 
+    console.log("model", model)
+
     return this.client.post(
       `models/upload`, model
     ).then(response => response.data);

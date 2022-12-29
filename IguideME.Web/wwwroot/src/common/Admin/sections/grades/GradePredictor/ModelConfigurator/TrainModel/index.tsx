@@ -48,6 +48,7 @@ export default class TrainModel
       if (this.mock.mockModel) this.onModelTrained();
     }
 
+    // TODO: previous step should load tiles and keep them in the parent (modelconfigurator), or probably better: gradesdatasettile pairs should contain a tile (/entry) object
     TileController.getTiles().then(async (tiles) => {
       tiles = tiles.filter((t) => t.content === "ENTRIES");
       this.setState({ tiles: tiles });
@@ -75,26 +76,25 @@ export default class TrainModel
       .map((x) => parseInt(x))
       .slice(0); // deduplicate
 
-    let wGradesDatasets = gradesDatasets as { [name: string]: StudentGrades };
-
-    Object.keys(wGradesDatasets).forEach((k) => {
-      Object.keys(wGradesDatasets[k])
+    Object.keys(gradesDatasets).forEach((k) => {
+      Object.keys(gradesDatasets[k])
         .map((x) => parseInt(x))
         .filter((sID) => !(sID in fgStudentIDs))
         .forEach((sID) => {
-          delete wGradesDatasets[k][sID];
+          delete gradesDatasets[k][sID];
         });
     });
 
-    this.setState({ gradesDatasets: wGradesDatasets });
+    this.setState({ gradesDatasets: gradesDatasets });
   }
 
   trainModels() {
     const { gradesDatasets, finalGradesDatasetName, gradesDatasetTilePairs } =
       this.props;
 
+    // TODO: somehow this is deleting the entirety of gradesDatasets
     // housekeeping on the datasets to ensure clean data
-    this.ensureFinalGradeExists();
+    // this.ensureFinalGradeExists();
 
     // wOutputs :: [[sID, finalGrade]] (per student)
     const wOutputs = Object.keys(gradesDatasets[finalGradesDatasetName])
@@ -135,7 +135,6 @@ export default class TrainModel
       (dsName) => gradesDatasetTilePairs[dsName]
     );
 
-    console.log(mlrModel);
     const model: GradePredictionModel = {
       intercept: 0, // not using this data, but accounting for it in the datamodel
       parameters: modelParameterIDs.map((id: number, i: number) => {
@@ -154,11 +153,11 @@ export default class TrainModel
     this.setState({
       model: model,
       modelWithMetadata: modelWithMetadata,
+    }, () => {
+      this.recalculateTestPrediction();
+      this.onModelTrained();
     });
 
-    this.recalculateTestPrediction();
-
-    this.onModelTrained();
   }
 
   recalculateTestPrediction() {

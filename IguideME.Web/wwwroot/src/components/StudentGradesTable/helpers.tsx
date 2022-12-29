@@ -12,7 +12,7 @@ function entriesColumns(tile: Tile, tileEntries: TileEntry[], averaged: boolean)
   if (averaged) return averagedEntriesColumns(tile, tileEntries);
   return {
     title: tile.title,
-    children: tileEntries.filter(e => e.tile_id === tile.id).map(e => ({
+    children: tileEntries.map(e => ({
     title: e.title,
     dataIndex: tile.id + "_" + e.id,
     key: e.id,
@@ -73,7 +73,7 @@ function averagedEntriesColumns(tile: Tile, tileEntries: TileEntry[]) {
 
 function binaryColumn(tile: Tile, tileEntries: TileEntry[]) {
 
-  const total = tileEntries.filter(e => e.tile_id === tile.id).length;
+  const total = tileEntries.length;
 
   return {
     title: tile.title,

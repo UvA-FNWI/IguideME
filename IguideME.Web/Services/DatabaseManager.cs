@@ -138,6 +138,7 @@ namespace IguideME.Web.Services
                 DatabaseQueries.CREATE_TABLE_CANVAS_DISCUSSION,
                 DatabaseQueries.CREATE_TABLE_GRADE_PREDICTION_MODEL,
                 DatabaseQueries.CREATE_TABLE_GRADE_PREDICTION_MODEL_PARAMETER,
+                DatabaseQueries.CREATE_TABLE_PREDICTED_GRADE,
                 DatabaseQueries.CREATE_TABLE_LEARNING_GOALS,
                 DatabaseQueries.CREATE_TABLE_GOAL_REQUREMENTS,
                 DatabaseQueries.CREATE_TABLE_NOTIFICATIONS,

@@ -34,7 +34,7 @@ export default class LinkLiveData
 
   state = {
     tiles: [],
-    entries: [], // WIP
+    entries: [], // TODO: WIP
     gradesDatasetTilePairs: this.mock.gradesDatasetTilePairs,
     inputError: false,
   };
