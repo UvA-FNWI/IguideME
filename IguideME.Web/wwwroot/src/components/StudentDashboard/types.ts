@@ -2,6 +2,7 @@ import { CanvasStudent } from "../../models/canvas/Student";
 import {Tile, TileEntrySubmission} from "../../models/app/Tile";
 import {CanvasDiscussion} from "../../models/canvas/Discussion";
 import {LearningOutcome} from "../../models/app/LearningGoal";
+import { PredictedGrade } from "../../models/app/PredictiveModel";
 
 export interface IProps {
   student: CanvasStudent | undefined;
@@ -18,6 +19,7 @@ export interface IState {
   learningOutcomes: LearningOutcome[];
   discussions: CanvasDiscussion[];
   userSubmissions: Map<number, TileEntrySubmission[]>;
+  predictions: PredictedGrade[];
 }
 
 export interface TilesGradeSummary {

@@ -19,6 +19,7 @@ import {PredictedGrade} from "../../models/app/PredictiveModel";
 import UserProfile from "./UserProfile";
 import {CanvasDiscussion} from "../../models/canvas/Discussion";
 import {LearningOutcome} from "../../models/app/LearningGoal";
+import DataMartController from "../../api/controllers/datamart";
 
 const mapState = (state: RootState) => ({
   dashboardColumns: state.dashboardColumns,
@@ -46,7 +47,8 @@ class StudentDashboard extends Component<Props, IState> {
     displayTile: null,
     discussions: [] as CanvasDiscussion[],
     learningOutcomes: [] as LearningOutcome[],
-    viewType: "bar" as ViewTypes
+    viewType: "bar" as ViewTypes,
+    predictions: []
   }
 
   componentDidMount(): void {
@@ -57,23 +59,26 @@ class StudentDashboard extends Component<Props, IState> {
     this.setup(this.props);
   }
 
-  componentWillReceiveProps(nextProps: Readonly<Props>, nextContext: any): void {
-    if (nextProps.student && nextProps.student?.login_id !== this.props.student?.login_id) {
-      this.props.loadPredictions(nextProps.student.login_id).then(({ payload }) => {
-        this.setup(nextProps, payload);
-      });
-    }
+  // componentWillReceiveProps(nextProps: Readonly<Props>, nextContext: any): void {
+  //   console.log("student", nextProps)
+  //   if (nextProps.student && nextProps.student?.login_id !== this.props.student?.login_id) {
+  //     this.props.loadPredictions(nextProps.student.login_id).then(({ payload }) => {
+  //       this.setup(nextProps, payload);
+  //     });
+  //   }
 
-    if (nextProps.predictions.length !== this.props.predictions.length) {
-      this.setup(nextProps);
-    }
-  }
+  //   if (nextProps.predictions.length !== this.props.predictions.length) {
+  //     this.setup(nextProps);
+  //   }
+  // }
 
   setup = async (props: Props, propPredictions: PredictedGrade[] = []) => {
-    let { tiles, student, predictions } = props;
+    let { tiles, student} = props;
     if (!student) return;
 
-    if (propPredictions.length >= 0) predictions = propPredictions;
+    // if (propPredictions.length >= 0) predictions = propPredictions;
+
+    let predictions = await DataMartController.getPredictions(student.login_id);
 
     this.setState({ loaded: false });
 
@@ -129,7 +134,8 @@ class StudentDashboard extends Component<Props, IState> {
       discussions,
       learningOutcomes: goals,
       tilesGradeSummary: data,
-      userSubmissions: submissions
+      userSubmissions: submissions,
+      predictions: predictions
     }, () => {
       TileController.getPeerResults(student!.login_id).then(peerGrades =>
         this.setState({ peerGrades, loaded: true })
@@ -146,10 +152,11 @@ class StudentDashboard extends Component<Props, IState> {
       peerGrades,
       userSubmissions,
       discussions,
-      learningOutcomes
+      learningOutcomes,
+      predictions
     } = this.state;
 
-    const { tiles, tileGroups, dashboardColumns, tileEntries, student, predictions } = this.props;
+    const { tiles, tileGroups, dashboardColumns, tileEntries, student } = this.props;
     console.log("tiles", tiles);
     console.log("Predictions", predictions);
 

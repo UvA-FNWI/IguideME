@@ -1145,14 +1145,11 @@ namespace IguideME.Web.Services
             if (activeHash == null)
                 return new List<PredictedGrade>() { };
 
-            // TODO: predicted_grade table is never created apparently.
-            return new List<PredictedGrade>() { };
             string query = String.Format(
                 DatabaseQueries.QUERY_PREDICTED_GRADES_FOR_USER,
                 courseID,
                 userLoginID,
                 activeHash);
-
 
             List<PredictedGrade> predictions = new List<PredictedGrade>();
 
@@ -1164,7 +1161,6 @@ namespace IguideME.Web.Services
                         r.GetInt32(3),
                         r.GetFloat(2)
                     );
-
                     predictions.Add(prediction);
                 }
             }
