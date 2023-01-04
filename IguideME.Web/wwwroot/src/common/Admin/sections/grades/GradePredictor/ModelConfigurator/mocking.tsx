@@ -1,5 +1,5 @@
 import {Mock} from "../../../../../../mock";
-import { GradesDatasets, StudentGrades } from "../types";
+import { GradesDatasets } from "../types";
 import { GradePredictionModel } from "./interfaces";
 
 export class LinkLiveDataMock extends Mock {

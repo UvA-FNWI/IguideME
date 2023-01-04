@@ -59,18 +59,11 @@ class StudentDashboard extends Component<Props, IState> {
     this.setup(this.props);
   }
 
-  // componentWillReceiveProps(nextProps: Readonly<Props>, nextContext: any): void {
-  //   console.log("student", nextProps)
-  //   if (nextProps.student && nextProps.student?.login_id !== this.props.student?.login_id) {
-  //     this.props.loadPredictions(nextProps.student.login_id).then(({ payload }) => {
-  //       this.setup(nextProps, payload);
-  //     });
-  //   }
-
-  //   if (nextProps.predictions.length !== this.props.predictions.length) {
-  //     this.setup(nextProps);
-  //   }
-  // }
+  componentWillReceiveProps(nextProps: Readonly<Props>, nextContext: any): void {
+    if (nextProps.student && nextProps.student?.login_id !== this.props.student?.login_id) {
+        this.setup(nextProps);
+    }
+  }
 
   setup = async (props: Props, propPredictions: PredictedGrade[] = []) => {
     let { tiles, student} = props;
