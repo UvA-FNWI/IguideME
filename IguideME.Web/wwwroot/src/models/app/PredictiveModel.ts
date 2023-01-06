@@ -15,6 +15,6 @@ export interface ModelTheta {
 }
 
 export interface PredictedGrade {
-  graded_components: number;
+  date: string;
   grade: number;
 }

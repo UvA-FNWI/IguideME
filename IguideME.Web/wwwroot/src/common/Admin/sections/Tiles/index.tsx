@@ -47,6 +47,7 @@ class Tiles extends Component<PropsFromRedux> {
             <TileWrapper group={group}
                          updateTiles={this.props.updateTiles}
                          tiles={getTilesInGroup(tiles, group.id)}
+                         key={group.id}
             />
           ))}
         </div>

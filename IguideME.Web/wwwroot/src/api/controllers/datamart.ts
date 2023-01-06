@@ -84,13 +84,13 @@ export default class DataMartController extends Controller {
 
   static getPredictions(userLoginID: string): Promise<PredictedGrade[]> {
     if (debug()) return delay([
-      { graded_components: 1, grade: 5 } as PredictedGrade,
-      { graded_components: 3, grade: 7 } as PredictedGrade,
-      { graded_components: 2, grade: 7.6 } as PredictedGrade,
-      { graded_components: 1, grade: 6.6 } as PredictedGrade,
-      { graded_components: 2, grade: 8.2 } as PredictedGrade,
-      { graded_components: 1, grade: 8.5 } as PredictedGrade,
-      { graded_components: 2, grade: 7.8 } as PredictedGrade,
+      { date: "12/01/2022", grade: 5 } as PredictedGrade,
+      { date: "12/01/2022", grade: 7 } as PredictedGrade,
+      { date: "12/01/2022", grade: 7.6 } as PredictedGrade,
+      { date: "12/01/2022", grade: 6.6 } as PredictedGrade,
+      { date: "12/01/2022", grade: 8.2 } as PredictedGrade,
+      { date: "12/01/2022", grade: 8.5 } as PredictedGrade,
+      { date: "12/01/2022", grade: 7.8 } as PredictedGrade,
     ]);
 
     return this.client.get(

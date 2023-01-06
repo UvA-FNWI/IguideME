@@ -65,11 +65,12 @@ class AdminMenu extends Component<Props> {
             </Link>
                     </Menu.Item>
                     <Menu.SubMenu key={"submenu"} icon={<TrophyOutlined />} title={"Grades"}>
-                        <Menu.Item key={"gradePredictorOld"} icon={<FundProjectionScreenOutlined />}>
+                        {/* TODO: completely remove oldpredictor from code */}
+                        {/* <Menu.Item key={"gradePredictorOld"} icon={<FundProjectionScreenOutlined />}>
                             <Link to={'/admin/grade-predictor-old'}>
                                 Old Predictor
               </Link>
-                        </Menu.Item>
+                        </Menu.Item> */}
                         <Menu.Item key={"gradePredictor"} icon={<FundProjectionScreenOutlined />}>
                             <Link to={'/admin/grade-predictor'}>
                                 Predictor

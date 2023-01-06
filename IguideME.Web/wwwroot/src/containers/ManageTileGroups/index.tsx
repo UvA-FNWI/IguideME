@@ -43,7 +43,7 @@ class ManageTileGroups extends Component<PropsFromRedux, IState> {
           placement={"right"}
           closable={true}
           onClose={() => this.setState({ drawerOpen: false })}
-          visible={this.state.drawerOpen}
+          open={this.state.drawerOpen}
           getContainer={false}
           style={{ position: 'absolute' }}
         >

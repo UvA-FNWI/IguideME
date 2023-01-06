@@ -5,19 +5,19 @@ public class PredictedGrade
     [JsonIgnore]
     public string UserLoginID { get; set; }
 
-    [JsonProperty("graded_components")]
-    public int GradedComponents { get; set; }
+    [JsonProperty("date")]
+    public string Date { get; set; }
 
     [JsonProperty("grade")]
     public float Grade { get; set; }
 
     public PredictedGrade(
         string userLoginID,
-        int gradedComponents,
+        string date,
         float grade)
     {
         this.UserLoginID = userLoginID;
-        this.GradedComponents = gradedComponents;
+        this.Date = date;
         this.Grade = grade;
     }
 }

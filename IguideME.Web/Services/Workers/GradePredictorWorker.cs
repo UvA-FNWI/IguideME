@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using IguideME.Web.Models;
-using IguideME.Web.Models.App;
+﻿using IguideME.Web.Models.App;
 using IguideME.Web.Models.Impl;
 using Microsoft.Extensions.Logging;
 
@@ -36,9 +32,6 @@ namespace IguideME.Web.Services.Workers
             }
 
             var students = DatabaseManager.Instance.GetUsers(this.CourseID, "student", this.SyncHash);
-            // var tiles = DatabaseManager.Instance.GetTiles(this.CourseID);
-
-            // var tileEntries = DatabaseManager.Instance.GetEntries(this.CourseID);
 
             foreach (var student in students)
             {
@@ -79,9 +72,7 @@ namespace IguideME.Web.Services.Workers
 
             DatabaseManager.Instance.CreatePredictedGrade(this.CourseID,
                                                           student.LoginID,
-                                                          (float)wGrade,
-                                                          0, // TODO: link to tiles, also store total number of components when creating the model.
-                                                          this.SyncHash);
+                                                          (float)wGrade);
         }
     }
 }

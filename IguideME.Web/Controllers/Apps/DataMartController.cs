@@ -113,8 +113,7 @@ namespace IguideME.Web.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public ActionResult GetUserPredictions(string userLoginID)
         {
-            if ("self" != userLoginID &&
-                !this.IsAdministrator() && userLoginID != GetUserLoginID())
+            if (!this.IsAdministrator() && "self" != userLoginID && userLoginID != GetUserLoginID())
                 return Unauthorized();
 
             return Json(

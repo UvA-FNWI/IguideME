@@ -34,9 +34,6 @@ export default class GradePrediction extends Component<{
       );
     }
 
-    const sortedPredictions = predictions.sort(
-      (a, b) => a.graded_components - b.graded_components);
-
     const data = (canvas: any) => {
       const ctx = canvas.getContext("2d")
       const gradient1 = ctx.createLinearGradient(0,0,0,350);
@@ -48,7 +45,7 @@ export default class GradePrediction extends Component<{
       gradient2.addColorStop(0, "rgb(90, 50, 255)");
 
       return {
-        labels: sortedPredictions.map((pg) => pg.graded_components + " graded components"),
+        labels: predictions.map((pg) => pg.date),
         datasets: [
           {
             label: "Predicted grade",
@@ -58,7 +55,7 @@ export default class GradePrediction extends Component<{
             hoverBorderColor: "rgb(90, 50, 255)",
             fill: false,
             tension: 0,
-            data: sortedPredictions.map(sp => round(sp.grade)),
+            data: predictions.map(sp => round(sp.grade)),
             yAxisID: 'y',
             xAxisID: 'x'
           },
@@ -70,7 +67,7 @@ export default class GradePrediction extends Component<{
             pointRadius: 0,
             fill: 0,
             tension: 0,
-            data: sortedPredictions.map((sp, i) => sp.grade + errors[i + 3]),
+            data: predictions.map((sp, i) => sp.grade + errors[i + 3]),
             yAxisID: 'y',
             xAxisID: 'x'
           },
@@ -82,7 +79,7 @@ export default class GradePrediction extends Component<{
             pointRadius: 0,
             fill: 0,
             tension: 0,
-            data: sortedPredictions.map((sp, i) => sp.grade - errors[i + 3]),
+            data: predictions.map((sp, i) => sp.grade - errors[i + 3]),
             yAxisID: 'y',
             xAxisID: 'x'
           }
@@ -92,7 +89,7 @@ export default class GradePrediction extends Component<{
 
     return (
       <div id={"gradePrediction"}>
-        <h3>Your predicted grade is a <strong>{round(sortedPredictions[sortedPredictions.length - 1].grade)}</strong></h3>
+        <h3>Your predicted grade is a <strong>{round(predictions[predictions.length - 1].grade)}</strong></h3>
 
         <Bar options={{   legend: { display: false },
                           scales: {

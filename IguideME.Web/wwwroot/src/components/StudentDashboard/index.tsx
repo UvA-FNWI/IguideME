@@ -77,10 +77,6 @@ class StudentDashboard extends Component<Props, IState> {
 
     let submissions = new Map<number, TileEntrySubmission[]>();
 
-
-    const sortedPredictions = predictions.sort(
-      (a, b) => b.graded_components - a.graded_components);
-
     let p_discussions: Promise<CanvasDiscussion[]>[] = [];
     let p_goals: Promise<LearningOutcome[]>[] = [];
 
@@ -100,7 +96,7 @@ class StudentDashboard extends Component<Props, IState> {
       if (tile.content === "PREDICTION") {
         data.push({
           tile: tile,
-          average: sortedPredictions.length > 0 ? sortedPredictions[0].grade : 0
+          average: predictions.length > 0 ? predictions[0].grade : 0
         })
         continue;
       }

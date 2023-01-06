@@ -163,14 +163,14 @@ export default class TrainModel
   recalculateTestPrediction() {
     let { modelWithMetadata, modelTestingValues }: IState = this.state;
     if (!modelWithMetadata) return;
+
     let _modelWithMetadata: {model: any, modelColumns: number[]} = modelWithMetadata;
-    if (
-      modelTestingValues.keys.length !==
-      _modelWithMetadata.model.weights.length
-    ) {
+
+    if (modelTestingValues.size !== _modelWithMetadata.model.weights.length) {
       _modelWithMetadata.modelColumns.forEach(
         (tID) => (modelTestingValues.set(tID, 5))
       );
+
       this.setState({
         modelTestingValues: modelTestingValues,
       });
@@ -189,8 +189,10 @@ export default class TrainModel
       }
     }
 
+    let grade = mlr.predict(inputs)[0]
+
     this.setState({
-      predictedGrade: mlr.predict(inputs)[0],
+      predictedGrade: grade,
     });
   }
 
@@ -253,16 +255,10 @@ export default class TrainModel
 
                                   let { modelTestingValues }: IState = this.state;
 
-                                  if (typeof v === 'string') {
-                                  modelTestingValues.set(tileID, parseFloat(v));
-                                  }
-                                  else {
-                                    modelTestingValues.set(tileID, v);
-                                  }
+                                  modelTestingValues.set(tileID, v);
                                   this.setState({
                                     modelTestingValues: modelTestingValues,
-                                  });
-                                  this.recalculateTestPrediction();
+                                  }, () => this.recalculateTestPrediction());
                                 }}
                               />
                             </Col>

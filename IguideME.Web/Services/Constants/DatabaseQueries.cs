@@ -41,8 +41,8 @@ public static class DatabaseQueries
             `course_id`           INTEGER,
             `user_login_id`       STRING,
             `grade`               FLOAT,
-            `graded_components`   INTEGER,
-            `sync_hash`           STRING
+            `date`                TEXT,
+            UNIQUE(course_id, user_login_id, date)
         );";
 
     public const string CREATE_TABLE_GRADE_PREDICTION_MODEL_PARAMETER =
@@ -139,27 +139,18 @@ public static class DatabaseQueries
         @"INSERT INTO   `predicted_grade` ( `course_id`,
                                             `user_login_id`,
                                             `grade`,
-                                            `graded_components`,
-                                            `sync_hash` )
-          VALUES        ({0}, '{1}', {2}, {3}, '{4}');";
-
-    public const string QUERY_PREDICTED_GRADES =
-        @"SELECT    `user_login_id`,
-                    (SELECT `id` FROM `tile` WHERE `content_type`='PREDICTION' LIMIT 1) as `tile_id`,
-                    `grade`
-        FROM        `predicted_grade`
-        WHERE       `course_id`={0}
-        AND         `sync_hash`='{1}';";
+                                            `date` )
+          VALUES        ({0}, '{1}', {2}, CURRENT_DATE)
+          ON CONFLICT (`course_id`, `user_login_id`, `date`) DO UPDATE SET `grade`=`excluded`.`grade`;";
 
     public const string QUERY_PREDICTED_GRADES_FOR_USER =
         @"SELECT    `user_login_id`,
-                    (SELECT `id` FROM `tile` WHERE `content_type`='PREDICTION' LIMIT 1) as tile_id,
-                    `grade`,
-                    `graded_components`
+                    `date`,
+                    `grade`
         FROM        `predicted_grade`
         WHERE       `course_id`={0}
         AND         `user_login_id`='{1}'
-        AND         `sync_hash`='{2}';";
+        ORDER BY    `date` DESC;";
 
     public const string UPDATE_USER_GOAL_GRADE =
         @"UPDATE    `goal_grade`
@@ -861,15 +852,15 @@ public static class DatabaseQueries
         WHERE       `course_id`={0}
         ORDER BY    `end_timestamp` DESC;";
 
-    public const string QUERY_LATEST_SYNC_FOR_COURSE =
+    public const string QUERY_LATEST_SYNCS_FOR_COURSE =
         @"SELECT    `hash`
         FROM        `sync_history`
         WHERE       `status`='COMPLETE'
         AND         `course_id`={0}
         ORDER BY    `end_timestamp` DESC
-        LIMIT       1;";
+        LIMIT       {1};";
 
-    public const string QUERY_OLD_SYNCS_FOR_COURSE =
+    public const string QUERY_OLD_HASHES_FOR_COURSE =
         @"SELECT    `hash`
         FROM        `sync_history`
         WHERE       `status`='COMPLETE'

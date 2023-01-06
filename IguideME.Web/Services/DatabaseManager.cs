@@ -145,10 +145,12 @@ namespace IguideME.Web.Services
                 DatabaseQueries.CREATE_TABLE_ACCEPT_LIST,
                 DatabaseQueries.CREATE_TABLE_MIGRATIONS,
             };
+            NonQuery(@"DROP TABLE `predicted_grade`");
 
             // create tables if they do not exist
             foreach (string query in queries)
                 NonQuery(query);
+
 
             // try{
             //     NonQuery("ALTER TABLE `tile_entry_submission_meta` ADD COLUMN `sync_hash` TEXT;");
@@ -181,19 +183,37 @@ namespace IguideME.Web.Services
              * Retrieve latest complete synchronization for course. If no
              * historic synchronization was found then null is returned.
              */
+            string query = String.Format(DatabaseQueries.QUERY_LATEST_SYNCS_FOR_COURSE, courseID, 1);
             string result = null;
-            using (SQLiteDataReader r = Query(String.Format(
-                    DatabaseQueries.QUERY_LATEST_SYNC_FOR_COURSE, courseID)))
+            using (SQLiteDataReader r = Query(query))
                 if (r.Read())
                     result = r.GetValue(0).ToString();
 
             return result;
         }
 
+        private List<string> GetRecentHashes(int courseID, int number_of_hashes)
+        {
+            /**
+             * Retrieve latest n complete synchronizations for course. If no
+             * historic synchronization was found then null is returned.
+             */
+
+            string query = String.Format(DatabaseQueries.QUERY_LATEST_SYNCS_FOR_COURSE, courseID, number_of_hashes);
+            List<string> hashes = new List<string>();
+
+            using (SQLiteDataReader r = Query(query))
+                while (r.Read()) {
+                    hashes.Add(r.GetValue(0).ToString());
+                }
+
+            return hashes;
+        }
+
         public void CleanupSync(int courseID) {
             RemoveSyncsWithStatus(courseID, "BUSY");
 
-            string query = String.Format(DatabaseQueries.QUERY_OLD_SYNCS_FOR_COURSE, courseID, 5);
+            string query = String.Format(DatabaseQueries.QUERY_OLD_HASHES_FOR_COURSE, courseID, 15);
             string query2;
             List<string> hashes = new List<string>();
 
@@ -614,9 +634,7 @@ namespace IguideME.Web.Services
         public void CreatePredictedGrade(
             int courseID,
             string userLoginID,
-            float grade,
-            int gradedComponents,
-            string syncHash)
+            float grade)
         {
             try {
                 NonQuery(
@@ -624,9 +642,7 @@ namespace IguideME.Web.Services
                         DatabaseQueries.REGISTER_PREDICTED_GRADE,
                         courseID,
                         userLoginID,
-                        grade,
-                        gradedComponents,
-                        syncHash
+                        grade
                     ));
             } catch (Exception e) {
                 _logger.LogError(e.Message + e.StackTrace);
@@ -1139,17 +1155,13 @@ namespace IguideME.Web.Services
             return submissions.ToArray();
         }
 
-        public List<PredictedGrade> GetPredictedGrades(int courseID, string userLoginID, string hash = null)
+        public List<PredictedGrade> GetPredictedGrades(int courseID, string userLoginID)
         {
-            string activeHash = hash ?? this.GetCurrentHash(courseID);
-            if (activeHash == null)
-                return new List<PredictedGrade>() { };
 
             string query = String.Format(
                 DatabaseQueries.QUERY_PREDICTED_GRADES_FOR_USER,
                 courseID,
-                userLoginID,
-                activeHash);
+                userLoginID);
 
             List<PredictedGrade> predictions = new List<PredictedGrade>();
 
@@ -1158,13 +1170,12 @@ namespace IguideME.Web.Services
                 {
                     PredictedGrade prediction = new PredictedGrade(
                         r.GetValue(0).ToString(),
-                        r.GetInt32(3),
+                        r.GetValue(1).ToString(),
                         r.GetFloat(2)
                     );
                     predictions.Add(prediction);
                 }
             }
-            // predictions.ForEach((prediction) => _logger.LogInformation($"{prediction.Grade}"));
 
             return predictions;
         }

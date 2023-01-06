@@ -202,7 +202,7 @@ class EditTileDragger extends Component<Props, IState> {
         placement={"right"}
         closable={true}
         onClose={() => this.props.setOpen(false)}
-        visible={this.props.isOpen}
+        open={this.props.isOpen}
         getContainer={false}
         style={{ position: 'absolute' }}
       >

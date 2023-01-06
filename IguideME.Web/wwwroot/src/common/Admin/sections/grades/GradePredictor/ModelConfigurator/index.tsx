@@ -11,6 +11,7 @@ import { ModelConfiguratorMock } from "./mocking";
 
 import { GradesDatasets } from "../types";
 import { GradePredictionModel, IStep } from "./interfaces";
+import { Link } from "react-router-dom";
 
 const { createRef } = React;
 
@@ -51,7 +52,7 @@ export default class ModelConfigurator extends Component<IProps, IState> {
       childRef,
     } = this.state;
 
-    console.log(model);
+    // console.log("model" model);
     switch (currentStep) {
       default:
       case 1:
@@ -131,9 +132,11 @@ export default class ModelConfigurator extends Component<IProps, IState> {
             </Button>
           )}
           {currentStep === this.steps.length && (
-            <Button className="doneBtn" type="primary">
-              Finish
-            </Button>
+            <Link to= "/admin">
+              <Button className="doneBtn" type="primary">
+                Finish
+              </Button>
+            </Link>
           )}
           {currentStep < this.steps.length && (
             <Button className="nextBtn" type="primary" onClick={this.nextStep}>

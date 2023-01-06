@@ -39,6 +39,9 @@ namespace IguideME.Web.Services.Workers
 				DatabaseManager.Instance.RegisterDiscussion(discussion, this.Hash);
 
 				// TODO: discuss design of discussions with Erwin
+				// Discussions should be saved as is done currently for tile entries and studentoverview,
+				// but discussion entries and replies should be saved per student and displayed in sent in questions, maybe grouped by discussion title
+
 				// foreach (DiscussionEntry entry in discussion.Entries) {
 				// 	_logger.LogInformation($"{entry.} {entry.Message}");
 
