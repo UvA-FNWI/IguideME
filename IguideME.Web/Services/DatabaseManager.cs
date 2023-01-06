@@ -145,7 +145,7 @@ namespace IguideME.Web.Services
                 DatabaseQueries.CREATE_TABLE_ACCEPT_LIST,
                 DatabaseQueries.CREATE_TABLE_MIGRATIONS,
             };
-            NonQuery(@"DROP TABLE `predicted_grade`");
+            // NonQuery(@"DROP TABLE `predicted_grade`");
 
             // create tables if they do not exist
             foreach (string query in queries)
