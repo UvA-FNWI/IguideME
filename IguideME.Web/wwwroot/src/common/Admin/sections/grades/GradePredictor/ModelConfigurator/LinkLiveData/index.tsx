@@ -110,8 +110,6 @@ export default class LinkLiveData
                           gradesDatasetTilePairs: gradesDatasetTilePairs,
                         });
 
-                        // console.log(JSON.stringify(gradesDatasetTilePairs));
-
                         let { parentSetGradesDatasetTilePairs } = this.props;
                         parentSetGradesDatasetTilePairs(gradesDatasetTilePairs);
                       }}

@@ -7,7 +7,8 @@ export interface Data {
     title: string,
     grade: any,
     peergrade: any,
-    max: any
+    max: any,
+    tile: Tile
 };
 
 export interface IProps {

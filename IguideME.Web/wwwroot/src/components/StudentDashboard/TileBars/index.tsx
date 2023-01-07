@@ -37,11 +37,20 @@ export default class GradeBar extends Component<IProps> {
         },
         scaleLabel: {
           display: false
-          // labelString: '# of students'
         },
         stacked: false
       }]
     }
+  }
+
+  click = (evt: any, element: any, data: any) => {
+
+    if (!element[0]) return;
+    let tile = data.tiles[element[0]._index]
+
+    window.dispatchEvent(new CustomEvent('selectTile', { detail: {tile} }))
+    // TODO: fsr the chart does not like it when we go to another page like this.
+
   }
 
   createBarData(tiles: Tile[], tilesGradeSummary: TilesGradeSummary[] , peerGrades: PeerGrades[], discussions: CanvasDiscussion[], learningOutcomes: LearningOutcome[]) {
@@ -56,7 +65,7 @@ export default class GradeBar extends Component<IProps> {
         grade = discussions.length;
       }
 
-      datadict.set(tiles[i].id, {title: tiles[i].title, grade: grade, peergrade: 0, max: 10});
+      datadict.set(tiles[i].id, {title: tiles[i].title, grade: grade, peergrade: 0, max: 10, tile: tiles[i]});
     }
 
     for (let i = 0; i < tilesGradeSummary.length; i++) {
@@ -82,17 +91,22 @@ export default class GradeBar extends Component<IProps> {
       entry.peergrade = pgrade;
     }
 
-    let titles: any[] = [];
+    let data_tiles: Tile[] = [];
+    let titles: string[] = [];
     let grades: any[] = [];
     let peergrades: any[] = [];
 
     datadict.forEach((value) => {
+      if (value.grade === 0 && value.peergrade === 0) return;
+
+      data_tiles.push(value.tile);
       titles.push(value.title);
       grades.push(value.grade);
       peergrades.push(value.peergrade);
     });
 
     return {
+      tiles: data_tiles,
       labels: titles,
       datasets: [
         {
@@ -117,10 +131,12 @@ export default class GradeBar extends Component<IProps> {
 
   render(): React.ReactNode {
     const { tiles, tilesGradeSummary, peerGrades, discussions, learningOutcomes} = this.props;
-
+    let data = this.createBarData(tiles, tilesGradeSummary, peerGrades, discussions, learningOutcomes)
     return (
       <div>
-        <HorizontalBar height={300} data={this.createBarData(tiles, tilesGradeSummary, peerGrades, discussions, learningOutcomes)} options={this.bar_options} />
+        <HorizontalBar height={300}
+                       data={data}
+                       options={{...this.bar_options, onClick: (evt: any, e: any) => this.click(evt, e, data) }} />
       </div>
     );
   }
