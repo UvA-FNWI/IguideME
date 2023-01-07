@@ -73,6 +73,7 @@ export default class GradeBar extends Component<IProps> {
       let entry = datadict.get(tilesGradeSummary[i].tile.id)!;
       if (tilesGradeSummary[i].tile.content === "BINARY"){
         entry.max = 100
+        grade = grade * 100 //TODO: this fixes the bars atm, but something is going wrong earlier I think
       }
 
       // TODO:
