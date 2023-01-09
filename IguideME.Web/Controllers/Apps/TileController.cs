@@ -440,20 +440,26 @@ namespace IguideME.Web.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public ActionResult GetDiscussions(string tileID, string userLoginID)
         {
+            int course_id = this.GetCourseID();
             // Only instructors may view submissions of other students
             if ((this.GetUserLoginID() != userLoginID &&
                 !this.IsAdministrator()) ||
-                (DatabaseManager.Instance.GetConsent(this.GetCourseID(), userLoginID) != 1))
+                (DatabaseManager.Instance.GetConsent(course_id, userLoginID) != 1))
                 return Unauthorized();
 
             bool success = Int32.TryParse(tileID, out int id);
 
+            if (!success) {
+                return (ActionResult)BadRequest();
+            }
 
-            return success
-                ? Json(
-                    DatabaseManager.Instance.GetDiscussions(
-                        this.GetCourseID(), id, userLoginID))
-                : (ActionResult)BadRequest();
+            User user = DatabaseManager.Instance.GetUser(course_id, userLoginID);
+
+            List<AppDiscussion> discussions = DatabaseManager.Instance.GetDiscussionsForTile(course_id, id);
+            foreach (AppDiscussion discussion in discussions) {
+                discussion.getEntries(user_id: user.UserID.ToString());
+            }
+            return Json(discussions);
         }
 
         [Authorize]

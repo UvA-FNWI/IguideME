@@ -10,6 +10,7 @@ import DiscussionsList from "./DiscussionsList";
 import {CanvasDiscussion} from "../../../models/canvas/Discussion";
 import LearningOutcomes from "./LearningOutcomes";
 import { LearningOutcome } from "../../../models/app/LearningGoal";
+import { CanvasStudent } from "../../../models/canvas/Student";
 
 export default class TileDetail extends Component<{
   tile: Tile,
@@ -17,11 +18,12 @@ export default class TileDetail extends Component<{
   discussions: CanvasDiscussion[],
   tileEntries: TileEntry[],
   predictions: PredictedGrade[],
-  learningOutcomes: LearningOutcome[]
+  learningOutcomes: LearningOutcome[],
+  student: CanvasStudent
 }> {
 
   content = () => {
-    const { tile, submissions, tileEntries, predictions, discussions, learningOutcomes } = this.props;
+    const { tile, submissions, tileEntries, predictions, discussions, learningOutcomes, student } = this.props;
 
     switch(tile.content) {
       case "BINARY":
@@ -35,7 +37,8 @@ export default class TileDetail extends Component<{
           case "DISCUSSIONS":
             return (
               <DiscussionsList discussions={discussions}
-                               tile={tile} />
+                               tile={tile}
+                               student={student} />
             );
           default:
             return (

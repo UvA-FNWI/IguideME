@@ -2,6 +2,7 @@ import {Tile} from "../../../models/app/Tile"
 import { PeerGrades, TilesGradeSummary } from "../types";
 import { CanvasDiscussion } from "../../../models/canvas/Discussion";
 import { LearningOutcome } from "../../../models/app/LearningGoal";
+import { CanvasStudent } from "../../../models/canvas/Student";
 
 export interface Data {
     title: string,
@@ -16,5 +17,6 @@ export interface IProps {
     tilesGradeSummary: TilesGradeSummary[],
     peerGrades: PeerGrades[],
     discussions: CanvasDiscussion[],
-    learningOutcomes: LearningOutcome[]
+    learningOutcomes: LearningOutcome[],
+    student: CanvasStudent
 }

@@ -711,6 +711,27 @@ public static class DatabaseQueries
             `sync_hash`       STRING
         );";
 
+    public const string CREATE_TABLE_CANVAS_DISCUSSION_ENTRY =
+        @"CREATE TABLE IF NOT EXISTS `canvas_discussion_entry` (
+            `id`              INTEGER PRIMARY KEY AUTOINCREMENT,
+            `course_id`       INTEGER,
+            `discussion_id`   INTEGER,
+            `posted_by`       STRING,
+            `posted_at`       STRING,
+            `message`         STRING NULL,
+            UNIQUE(course_id, posted_by, discussion_id, posted_at)
+        );";
+
+    public const string CREATE_TABLE_CANVAS_DISCUSSION_REPLY =
+        @"CREATE TABLE IF NOT EXISTS `canvas_discussion_reply` (
+            `id`              INTEGER PRIMARY KEY AUTOINCREMENT,
+            `entry_id`        INTEGER,
+            `posted_by`       STRING,
+            `posted_at`       STRING,
+            `message`         STRING NULL,
+            UNIQUE(posted_by, entry_id, posted_at)
+        );";
+
     public const string CREATE_TABLE_SYNC_HISTORY =
         @"CREATE TABLE IF NOT EXISTS `sync_history` (
             `id`              INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -790,6 +811,27 @@ public static class DatabaseQueries
         AND         `posted_by`='{1}'
         AND         `sync_hash`='{2}';";
 
+    public const string QUERY_DISCUSSION_ENTRIES =
+        @"SELECT    `id`,
+                    `posted_by`,
+                    `posted_at`,
+                    `message`
+        FROM        `canvas_discussion_entry`
+        WHERE       `course_id`={0}
+        AND         `discussion_id`={1}
+        ;";
+
+    public const string QUERY_DISCUSSION_ENTRIES_FOR_USER =
+        @"SELECT    `id`,
+                    `posted_by`,
+                    `posted_at`,
+                    `message`
+        FROM        `canvas_discussion_entry`
+        WHERE       `course_id`={0}
+        AND         `discussion_id`={1}
+        AND         `posted_by`='{2}'
+        ;";
+
     public const string REGISTER_CANVAS_ASSIGNMENT =
         @"INSERT INTO   `canvas_assignment`
                         (   `assignment_id`,
@@ -826,6 +868,29 @@ public static class DatabaseQueries
         AND             `posted_at`='{4}'
         AND             `message`='{5}'
         AND             `sync_hash`='{7}';";
+
+    public const string REGISTER_CANVAS_DISCUSSION_ENTRY =
+        @"INSERT INTO   `canvas_discussion_entry`
+                        (   `course_id`,
+                            `discussion_id`,
+                            `posted_by`,
+                            `posted_at`,
+                            `message`)
+        VALUES({0}, {1}, '{2}', '{3}', '{4}')
+        ON CONFLICT ( `course_id`, `posted_by`, `discussion_id`, `posted_at` )
+        DO UPDATE SET `message` = '{4}'
+        ;";
+
+    public const string REGISTER_CANVAS_DISCUSSION_REPLY =
+        @"INSERT INTO   `canvas_discussion_reply`
+                        (   `entry_id`,
+                            `posted_by`,
+                            `posted_at`,
+                            `message` )
+        VALUES({0}, '{1}', '{2}', '{3}')
+        ON CONFLICT ( `posted_by`, `entry_id`, `posted_at` )
+        DO UPDATE SET `message` = '{3}'
+        ;";
 
     // -------------------- Data retrieval --------------------
 

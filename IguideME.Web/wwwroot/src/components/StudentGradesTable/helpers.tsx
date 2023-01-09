@@ -173,8 +173,15 @@ export function getData(students: CanvasStudent[],
 
       if (t.type === "DISCUSSIONS") {
         return tileEntries.map(e => {
-          const entry_discussions = discussions.filter(disc => disc.title === e.title && disc.posted_by === student.name);
-          return [getEntryKey(e, tiles), entry_discussions.length];
+          let grade = 0;
+          const entry_discussions = discussions.filter(disc => disc.title === e.title);
+          console.log("entrydiscs", entry_discussions)
+          console.log("student", student)
+          entry_discussions.forEach(discussion => {
+            if (discussion.entries)
+              grade += discussion.entries.filter(entry => entry.posted_by === student.id.toString()).length;
+          })
+          return [getEntryKey(e, tiles), grade];
         })
       }
 

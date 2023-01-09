@@ -1,3 +1,5 @@
+import { CanvasDiscussionEntry } from "./DiscussionEntry"
+
 export interface CanvasDiscussion {
   id: number;
   discussion_id: number;
@@ -6,4 +8,5 @@ export interface CanvasDiscussion {
   message: string;
   posted_at: string;
   posted_by: string;
+  entries?: CanvasDiscussionEntry[];
 }

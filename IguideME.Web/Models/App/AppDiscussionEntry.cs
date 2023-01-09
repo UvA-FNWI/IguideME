@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 
 namespace IguideME.Web.Models.App
 {
-    public class AppDiscussion
+    public class AppDiscussionEntry
     {
         [JsonProperty("id")]
         public int ID { get; set; }
@@ -17,9 +17,6 @@ namespace IguideME.Web.Models.App
         [JsonProperty("course_id")]
         public int CourseID { get; set; }
 
-        [JsonProperty("title")]
-        public string Title { get; set; }
-
         [JsonProperty("posted_by")]
         public string PostedBy { get; set; }
 
@@ -29,30 +26,21 @@ namespace IguideME.Web.Models.App
         [JsonProperty("message")]
         public string Message { get; set; }
 
-        [JsonProperty("entries")]
-        public List<AppDiscussionEntry> Entries { get; set;}
 
-        public AppDiscussion(
+        public AppDiscussionEntry(
             int id,
-            int discussionID,
             int courseID,
-            string title,
+            int discussionID,
             string postedBy,
             string postedAt,
             string message)
         {
             this.ID = id;
-            this.DiscussionID = discussionID;
             this.CourseID = courseID;
-            this.Title = title;
+            this.DiscussionID = discussionID;
             this.PostedBy = postedBy;
             this.PostedAt = postedAt;
             this.Message = message;
         }
-
-        public void getEntries(string user_id = null) {
-            this.Entries = DatabaseManager.Instance.GetDiscussionEntries(this.CourseID, this.DiscussionID, user_id);
-        }
-
     }
 }

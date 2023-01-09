@@ -12,14 +12,22 @@ export default class Tile extends Component<IProps, IState> {
   state = { loaded: false }
 
   getHeader = () => {
-    const { tile, tileEntries, submissions, userGrades, discussions, learningOutcomes } = this.props;
+    const { tile, tileEntries, submissions, userGrades, discussions, learningOutcomes, student } = this.props;
     const avg: number | null = getAverageGrade(userGrades);
 
     switch (tile.type) {
       case "DISCUSSIONS":
+        let disc_grade = 0;
+        discussions.map(discussion => {
+          if (discussion.posted_by === student.name){
+            disc_grade++;
+          }
+          if (discussion.entries)
+            disc_grade += discussion.entries.length
+        })
       return (
         <span style={{textAlign: 'center'}}>
-          <strong>{ discussions.length }</strong> discussion{discussions.length !== 1 && "s"}
+          <strong>{ disc_grade }</strong> discussion{discussions.length !== 1 && "s"}
         </span>
       );
     }

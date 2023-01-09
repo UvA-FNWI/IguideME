@@ -7,6 +7,7 @@ import { LearningOutcome } from "../../../models/app/LearningGoal";
 import { PeerGrades, TilesGradeSummary } from "../types";
 import {Data} from "./types"
 import { IProps } from "./types";
+import { CanvasStudent } from "../../../models/canvas/Student";
 
 export default class GradeBar extends Component<IProps> {
 
@@ -53,7 +54,7 @@ export default class GradeBar extends Component<IProps> {
 
   }
 
-  createBarData(tiles: Tile[], tilesGradeSummary: TilesGradeSummary[] , peerGrades: PeerGrades[], discussions: CanvasDiscussion[], learningOutcomes: LearningOutcome[]) {
+  createBarData(tiles: Tile[], tilesGradeSummary: TilesGradeSummary[] , peerGrades: PeerGrades[], discussions: CanvasDiscussion[], learningOutcomes: LearningOutcome[], student: CanvasStudent) {
     let datadict = new Map<number, Data>();
 
     for (let i = 0; i < tiles.length; i++) {
@@ -62,7 +63,13 @@ export default class GradeBar extends Component<IProps> {
       if (tiles[i].content === "LEARNING_OUTCOMES") {
         grade = learningOutcomes.filter(lo => lo.success).length;
       } else if (tiles[i].type === "DISCUSSIONS") {
-        grade = discussions.length;
+        discussions.map(discussion => {
+          if (discussion.posted_by === student.name){
+            grade++;
+          }
+          if (discussion.entries)
+            grade += discussion.entries.length
+        })
       }
 
       datadict.set(tiles[i].id, {title: tiles[i].title, grade: grade, peergrade: 0, max: 10, tile: tiles[i]});
@@ -131,8 +138,8 @@ export default class GradeBar extends Component<IProps> {
   }
 
   render(): React.ReactNode {
-    const { tiles, tilesGradeSummary, peerGrades, discussions, learningOutcomes} = this.props;
-    let data = this.createBarData(tiles, tilesGradeSummary, peerGrades, discussions, learningOutcomes)
+    const { tiles, tilesGradeSummary, peerGrades, discussions, learningOutcomes, student} = this.props;
+    let data = this.createBarData(tiles, tilesGradeSummary, peerGrades, discussions, learningOutcomes, student)
     return (
       <div>
         <HorizontalBar height={300}

@@ -147,7 +147,7 @@ class StudentDashboard extends Component<Props, IState> {
 
     const { tiles, tileGroups, dashboardColumns, tileEntries, student } = this.props;
     console.log("tiles", tiles);
-    console.log("Predictions", predictions);
+    console.log("Discussions", discussions);
 
     if (!loaded || !student) return (<Loading small={true} />);
 
@@ -158,6 +158,7 @@ class StudentDashboard extends Component<Props, IState> {
                          predictions={predictions}
                          submissions={userSubmissions.get((displayTile as any).tile.id)!}
                          learningOutcomes={learningOutcomes}
+                         student={student}
       />
     }
 
@@ -215,6 +216,7 @@ class StudentDashboard extends Component<Props, IState> {
                       peerGrades = {peerGrades}
                       discussions = {discussions}
                       learningOutcomes={learningOutcomes}
+                      student={student}
             />
           </div>
         }

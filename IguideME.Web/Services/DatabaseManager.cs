@@ -8,6 +8,8 @@ using IguideME.Web.Models.App;
 using IguideME.Web.Models.Impl;
 using Microsoft.Extensions.Logging;
 using Discussion = UvA.DataNose.Connectors.Canvas.Discussion;
+using DiscussionEntry = UvA.DataNose.Connectors.Canvas.DiscussionEntry;
+using DiscussionReply = UvA.DataNose.Connectors.Canvas.DiscussionReply;
 
 namespace IguideME.Web.Services
 {
@@ -136,6 +138,8 @@ namespace IguideME.Web.Services
                 DatabaseQueries.CREATE_TABLE_CANVAS_USER,
                 DatabaseQueries.CREATE_TABLE_CANVAS_ASSIGNMENT,
                 DatabaseQueries.CREATE_TABLE_CANVAS_DISCUSSION,
+                DatabaseQueries.CREATE_TABLE_CANVAS_DISCUSSION_ENTRY,
+                DatabaseQueries.CREATE_TABLE_CANVAS_DISCUSSION_REPLY,
                 DatabaseQueries.CREATE_TABLE_GRADE_PREDICTION_MODEL,
                 DatabaseQueries.CREATE_TABLE_GRADE_PREDICTION_MODEL_PARAMETER,
                 DatabaseQueries.CREATE_TABLE_PREDICTED_GRADE,
@@ -394,7 +398,7 @@ namespace IguideME.Web.Services
 
         public void RegisterDiscussion(Discussion discussion, string syncHash)
         {
-            NonQuery(
+            IDNonQuery(
                 String.Format(
                     DatabaseQueries.REGISTER_CANVAS_DISCUSSION,
                     discussion.ID,
@@ -420,6 +424,45 @@ namespace IguideME.Web.Services
                     hash
                 )
             );
+        }
+
+        public int RegisterDiscussionEntry(DiscussionEntry entry, string syncHash)
+        {
+            NonQuery(
+                String.Format(
+                    DatabaseQueries.REGISTER_CANVAS_DISCUSSION_ENTRY,
+                    entry.CourseID,
+                    entry.TopicID,
+                    entry.UserID,
+    				entry.CreatedAt,
+                    entry.Message.Replace("'", "''")));
+
+            using (SQLiteDataReader r = Query($@"SELECT `id` FROM `canvas_discussion_entry`
+                        WHERE  `course_id`={entry.CourseID}
+                        AND    `discussion_id`={entry.TopicID}
+                        AND    `posted_by`='{entry.UserID}'
+                        AND    `posted_at`='{entry.CreatedAt}';")) {
+                if (r.Read()) {
+                    return r.GetInt32(0);
+                } else {
+                    return -1;
+                }
+            }
+        }
+
+        public void RegisterDiscussionReply(DiscussionReply reply, int entry_id, string syncHash)
+        {
+            if (entry_id == -1) {
+                return;
+            }
+
+            NonQuery(
+                String.Format(
+                    DatabaseQueries.REGISTER_CANVAS_DISCUSSION_REPLY,
+                    entry_id,
+                    reply.UserID,
+    				reply.CreatedAt,
+                    reply.Message.Replace("'", "''")));
         }
 
         public List<User> GetUsers(int courseID, string role = null, string hash = null)
@@ -1942,41 +1985,28 @@ namespace IguideME.Web.Services
                     discussions.Add(row);
                 }
             }
+            foreach(AppDiscussion discussion in discussions) {
+                discussion.getEntries();
+            }
 
             return discussions;
         }
 
-        public List<AppDiscussion> GetDiscussions(
+        public List<AppDiscussion> GetDiscussionsForTile(
             int courseID,
             int tileID,
-            string userLoginID = null,
             string hash = null)
         {
             string activeHash = hash ?? this.GetCurrentHash(courseID);
             if (activeHash == null) return new List<AppDiscussion>() { };
 
             string query;
-            if (userLoginID == null)
-            {
-                query = String.Format(
-                    DatabaseQueries.QUERY_TILE_DISCUSSIONS,
-                    tileID,
-                    activeHash
-                );
-            }
-            else
-            {
-                // TODO: why??
-                User user = GetUser(courseID, userLoginID, activeHash);
-                if (user == null) return new List<AppDiscussion>() { };
 
-                query = String.Format(
-                    DatabaseQueries.QUERY_TILE_DISCUSSIONS_FOR_USER,
-                    tileID,
-                    user.Name,
-                    activeHash
-                );
-            }
+            query = String.Format(
+                DatabaseQueries.QUERY_TILE_DISCUSSIONS,
+                tileID,
+                activeHash
+            );
 
             List<AppDiscussion> discussions = new List<AppDiscussion>();
 
@@ -1997,6 +2027,40 @@ namespace IguideME.Web.Services
             }
 
             return discussions;
+        }
+
+        public List<AppDiscussionEntry> GetDiscussionEntries(int course_id, int discussion_id, string user_id) {
+            string query;
+            if (user_id == null) {
+                query = String.Format(
+                    DatabaseQueries.QUERY_DISCUSSION_ENTRIES,
+                    course_id,
+                    discussion_id
+                );
+            } else {
+                query = String.Format(
+                    DatabaseQueries.QUERY_DISCUSSION_ENTRIES_FOR_USER,
+                    course_id,
+                    discussion_id,
+                    user_id
+                );
+            }
+
+            List<AppDiscussionEntry> entries = new List<AppDiscussionEntry>();
+            using(SQLiteDataReader r = Query(query)) {
+                while (r.Read()) {
+                    AppDiscussionEntry row = new AppDiscussionEntry(
+                        r.GetInt32(0),
+                        course_id,
+                        discussion_id,
+                        r.GetValue(1).ToString(),
+                        r.GetValue(2).ToString(),
+                        r.GetValue(3).ToString()
+                    );
+                    entries.Add(row);
+                }
+            }
+            return entries;
         }
 
         public LayoutColumn CreateLayoutColumn(int courseID, string containerWidth, int position)
