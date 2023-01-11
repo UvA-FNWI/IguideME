@@ -84,7 +84,7 @@ function binaryColumn(tile: Tile, tileEntries: TileEntry[]) {
       return (
         <div>
           <Space direction={"horizontal"} style={{width: '100%'}}>
-            { text }
+            { text }/{ total }
             <Progress type="circle"
                       width={50}
                       status={"active"}
