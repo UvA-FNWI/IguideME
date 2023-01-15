@@ -193,7 +193,7 @@ public static class DatabaseQueries
                         `sent`
         FROM            `notifications`
         WHERE           `course_id`={0}
-        AND             `sync_hash`='{1}';";
+        AND             `sync_hash` IN ('{1}');";
 
     public const string QUERY_ALL_USER_NOTIFICATIONS =
         @"SELECT        `tile_id`, `status`, `sent`

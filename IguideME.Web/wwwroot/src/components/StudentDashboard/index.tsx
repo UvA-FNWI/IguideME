@@ -181,7 +181,7 @@ class StudentDashboard extends Component<Props, IState> {
           <Radio.Button value="grid"><AppstoreOutlined /> Grid</Radio.Button>
         </Radio.Group>
         </Col>
-        <Col span={2} offset={18}>
+        <Col span={3} offset={17}>
           <div style={{margin: 10}}>
               Goal Grade: { goalGrade }
           </div>

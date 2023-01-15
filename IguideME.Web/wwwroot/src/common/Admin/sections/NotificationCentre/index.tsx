@@ -47,22 +47,15 @@ export default class NotificationCentre extends Component {
       data.set(student.login_id, new Data(student.login_id, student.name, true)); // TODO: set enabled correctly
     }
 
-    console.log("notifications", notifications);
-    console.log("data", data);
-
     let notification;
     let entry;
     for (let i = 0; i < notifications.length; i++) {
       notification = notifications[i];
       entry = data.get(notification.user_login_id)!;
 
-      console.log("entry", entry)
-
       if (!entry) {
         continue;
       }
-
-      console.log("notification", notification);
 
       switch (notification.status) {
         case "outperforming peers":
@@ -109,7 +102,6 @@ export default class NotificationCentre extends Component {
           title: 'Upcoming',
           dataIndex: 'current',
           render: (value: Notifications) => {
-            // console.log("value", value);
             return (
               <PerformanceNotifications outperforming = {value.outperforming}
               closing = {value.closing}
@@ -123,7 +115,6 @@ export default class NotificationCentre extends Component {
           title: 'Last Received',
           dataIndex: 'previous',
           render: (value: Notifications) => {
-            // console.log("value2", value);
             return (
               <PerformanceNotifications outperforming = {value.outperforming}
               closing = {value.closing}
@@ -137,7 +128,6 @@ export default class NotificationCentre extends Component {
           title: 'Enabled',
           dataIndex: 'enabled',
           render: (value: boolean) => {
-            console.log("VAlue", value);
             if (value) {
               return (
                 <span className={"successText"}>

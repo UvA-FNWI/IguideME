@@ -231,7 +231,7 @@ export default class UploadData extends Component<IProps, IState> implements ISt
                                         // (aka don't pass v explicitly)
                                         this.onFinalGradesDatasetNameChosen(v);
                                     }}
-                                    placeholder="Dataset containing final grades...">
+                                    placeholder="Dataset with final grades...">
                                     {Object.keys(this.state.gradesDatasets)
                                         .map(datasetName =>
                                             <Option key={datasetName} value={datasetName}>

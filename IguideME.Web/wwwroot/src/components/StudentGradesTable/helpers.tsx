@@ -47,9 +47,25 @@ function averagedEntriesColumns(tile: Tile, tileEntries: TileEntry[]) {
     dataIndex: tile.id,
     key: 'tile_' + tile.id.toString(),
     width: 250,
+    sorter: (a: any, b: any) => {
+      const a_grades: number[] = tileEntries.map(e => a[`${e.tile_id}_${e.id}`])
+      .filter(x => x.length > 0)
+      .map(x => parseFloat(x));
+
+      const b_grades: number[] = tileEntries.map(e => b[`${e.tile_id}_${e.id}`])
+      .filter(x => x.length > 0)
+      .map(x => parseFloat(x));
+
+      if (a_grades.length > 0 && b_grades.length > 0) {
+        return a_grades.reduce((c, d) => c + d, 0) / a_grades.length -
+            b_grades.reduce((c, d) => c + d, 0) / b_grades.length
+      } else {
+        return 0
+      }
+    },
     render: (text: string, row: any) => {
-      const keys  = tileEntries.map(e => `${e.tile_id}_${e.id}`);
-      const grades: number[] = keys.map(key => row[key])
+
+      const grades: number[] = tileEntries.map(e => row[`${e.tile_id}_${e.id}`])
         .filter(x => x.length > 0)
         .map(x => parseFloat(x));
 
@@ -67,9 +83,11 @@ function averagedEntriesColumns(tile: Tile, tileEntries: TileEntry[]) {
               "N/A"
             }
           </Col>
-          <Col xs={20}>
-            <GradeSpread average={average || undefined} grades={grades} />
-          </Col>
+          { average && grades.length !== 0 &&
+            <Col xs={20}>
+              <GradeSpread average={average} grades={grades} />
+            </Col>
+          }
         </Row>
       );
     }

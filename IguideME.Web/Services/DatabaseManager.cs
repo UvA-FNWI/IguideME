@@ -1554,10 +1554,9 @@ namespace IguideME.Web.Services
         }
 
         public List<Notification> GetAllNotifications(
-            int courseID,
-            string hash = null)
+            int courseID)
         {
-            string activeHash = hash ?? this.GetCurrentHash(courseID);
+            string activeHash = String.Join("', '", this.GetRecentHashes(courseID, 2));
 
             string query = String.Format(
                 DatabaseQueries.QUERY_ALL_NOTIFICATIONS,
