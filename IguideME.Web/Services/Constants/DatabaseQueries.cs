@@ -777,6 +777,7 @@ public static class DatabaseQueries
     public const string QUERY_COURSE_DISCUSSIONS =
         @"SELECT    `id`,
                     `discussion_id`,
+                    `tile_id`,
                     `course_id`,
                     `title`,
                     `posted_by`,
@@ -812,24 +813,67 @@ public static class DatabaseQueries
         AND         `sync_hash`='{2}';";
 
     public const string QUERY_DISCUSSION_ENTRIES =
-        @"SELECT    `id`,
-                    `posted_by`,
-                    `posted_at`,
-                    `message`
+        @"SELECT    `canvas_discussion_entry`.`id`,
+                    `canvas_discussion_entry`.`posted_by`,
+                    `canvas_discussion_entry`.`posted_at`,
+                    `canvas_discussion_entry`.`message`,
+                    `canvas_discussion`.`title`
         FROM        `canvas_discussion_entry`
-        WHERE       `course_id`={0}
-        AND         `discussion_id`={1}
+        INNER JOIN  `canvas_discussion`
+            ON      `canvas_discussion_entry`.`discussion_id` = `canvas_discussion`.`discussion_id`
+        WHERE       `canvas_discussion_entry`.`course_id`={0}
+        AND         `canvas_discussion_entry`.`discussion_id`={1}
+        AND         `canvas_discussion`.`sync_hash`='{2}'
         ;";
 
     public const string QUERY_DISCUSSION_ENTRIES_FOR_USER =
-        @"SELECT    `id`,
-                    `posted_by`,
-                    `posted_at`,
-                    `message`
+        @"SELECT    `canvas_discussion_entry`.`id`,
+                    `canvas_discussion_entry`.`posted_by`,
+                    `canvas_discussion_entry`.`posted_at`,
+                    `canvas_discussion_entry`.`message`,
+                    `canvas_discussion`.`title`
         FROM        `canvas_discussion_entry`
-        WHERE       `course_id`={0}
-        AND         `discussion_id`={1}
-        AND         `posted_by`='{2}'
+        INNER JOIN  `canvas_discussion`
+            ON      `canvas_discussion_entry`.`discussion_id` = `canvas_discussion`.`discussion_id`
+        WHERE       `canvas_discussion_entry`.`course_id`={0}
+        AND         `canvas_discussion_entry`.`discussion_id`={1}
+        AND         `canvas_discussion`.`sync_hash`='{2}'
+        AND         `canvas_discussion_entry`.`posted_by`='{3}'
+        ;";
+
+    public const string QUERY_DISCUSSION_REPLIES =
+        @"SELECT    `canvas_discussion_reply`.`id`,
+                    `canvas_discussion_reply`.`entry_id`,
+                    `canvas_discussion_reply`.`posted_by`,
+                    `canvas_discussion_reply`.`posted_at`,
+                    `canvas_discussion_reply`.`message`,
+                    `canvas_discussion`.`title`
+        FROM        `canvas_discussion_reply`
+        INNER JOIN  `canvas_discussion_entry`
+            ON      `canvas_discussion_reply`.`entry_id`=`canvas_discussion_entry`.`id`
+        INNER JOIN  `canvas_discussion`
+            ON      `canvas_discussion_entry`.`discussion_id` = `canvas_discussion`.`discussion_id`
+        WHERE       `canvas_discussion_entry`.`course_id`={0}
+        AND         `canvas_discussion_entry`.`discussion_id`={1}
+        AND         `canvas_discussion`.`sync_hash`='{2}'
+        ;";
+
+    public const string QUERY_DISCUSSION_REPLIES_FOR_USER =
+        @"SELECT    `canvas_discussion_reply`.`id`,
+                    `canvas_discussion_reply`.`entry_id`,
+                    `canvas_discussion_reply`.`posted_by`,
+                    `canvas_discussion_reply`.`posted_at`,
+                    `canvas_discussion_reply`.`message`,
+                    `canvas_discussion`.`title`
+        FROM        `canvas_discussion_reply`
+        INNER JOIN  `canvas_discussion_entry`
+            ON      `canvas_discussion_reply`.`entry_id`=`canvas_discussion_entry`.`id`
+        INNER JOIN  `canvas_discussion`
+            ON      `canvas_discussion_entry`.`discussion_id` = `canvas_discussion`.`discussion_id`
+        WHERE       `canvas_discussion_entry`.`course_id`={0}
+        AND         `canvas_discussion_entry`.`discussion_id`={1}
+        AND         `canvas_discussion`.`sync_hash`='{2}'
+        AND         `canvas_discussion_reply`.`posted_by`='{3}'
         ;";
 
     public const string REGISTER_CANVAS_ASSIGNMENT =

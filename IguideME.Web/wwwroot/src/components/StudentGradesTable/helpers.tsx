@@ -17,12 +17,17 @@ function entriesColumns(tile: Tile, tileEntries: TileEntry[], averaged: boolean)
     dataIndex: tile.id + "_" + e.id,
     key: e.id,
     width: 150,
+    sorter: (a: any, b: any) => a[tile.id + "_" + e.id] - b[tile.id + "_" + e.id],
     render: (text: string, _: any) => {
       if (!text) return (
         <Tooltip title={"No grade available"}>
           <EllipsisOutlined />
         </Tooltip>
       );
+
+      // console.log("test",test[getEntryKey(e, [tile])])
+      // console.log("test2", getEntryKey(e, [tile]))
+      // console.log("test3", test)
 
       // TODO: look at total points for colors.
       try {
@@ -80,6 +85,7 @@ function binaryColumn(tile: Tile, tileEntries: TileEntry[]) {
     dataIndex: tile.id,
     key: tile.id,
     width: 150,
+    sorter: (a: any, b: any) => a[tile.id] - b[tile.id ],
     render: (text: string, _: any) => {
       return (
         <div>
@@ -173,15 +179,11 @@ export function getData(students: CanvasStudent[],
 
       if (t.type === "DISCUSSIONS") {
         return tileEntries.map(e => {
-          let grade = 0;
-          const entry_discussions = discussions.filter(disc => disc.title === e.title);
-          console.log("entrydiscs", entry_discussions)
-          console.log("student", student)
-          entry_discussions.forEach(discussion => {
-            if (discussion.entries)
-              grade += discussion.entries.filter(entry => entry.posted_by === student.id.toString()).length;
-          })
-          return [getEntryKey(e, tiles), grade];
+
+          const entry_discussions = discussions.filter(disc => {
+            return disc.title === e.title && ( disc.posted_by === student.name || disc.posted_by === student.user_id.toString())});
+
+          return [getEntryKey(e, tiles), entry_discussions.length];
         })
       }
 

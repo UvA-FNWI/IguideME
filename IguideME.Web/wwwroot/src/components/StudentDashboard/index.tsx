@@ -7,7 +7,7 @@ import TileController from "../../api/controllers/tile";
 import Loading from "../utils/Loading";
 import {DashboardColumn} from "../../models/app/Layout";
 import TileDetail from "./TileDetail";
-import { Radio } from "antd";
+import { Col, Radio, Row } from "antd";
 import { AppstoreOutlined, BarChartOutlined } from "@ant-design/icons";
 // import TileRadar from "./TileRadar";
 import TileBars from "./TileBars";
@@ -20,6 +20,7 @@ import UserProfile from "./UserProfile";
 import {CanvasDiscussion} from "../../models/canvas/Discussion";
 import {LearningOutcome} from "../../models/app/LearningGoal";
 import DataMartController from "../../api/controllers/datamart";
+import AppController from "../../api/controllers/app";
 
 const mapState = (state: RootState) => ({
   dashboardColumns: state.dashboardColumns,
@@ -48,7 +49,8 @@ class StudentDashboard extends Component<Props, IState> {
     discussions: [] as CanvasDiscussion[],
     learningOutcomes: [] as LearningOutcome[],
     viewType: "bar" as ViewTypes,
-    predictions: []
+    predictions: [],
+    goalGrade: 0
   }
 
   componentDidMount(): void {
@@ -119,12 +121,15 @@ class StudentDashboard extends Component<Props, IState> {
     let discussions = (await Promise.all(p_discussions)).flat();
     let goals = (await Promise.all(p_goals)).flat();
 
+    let goalGrade = await AppController.getGoalGrade();
+
     this.setState({
       discussions,
       learningOutcomes: goals,
       tilesGradeSummary: data,
       userSubmissions: submissions,
-      predictions: predictions
+      predictions: predictions,
+      goalGrade: goalGrade
     }, () => {
       TileController.getPeerResults(student!.login_id).then(peerGrades =>
         this.setState({ peerGrades, loaded: true })
@@ -142,7 +147,8 @@ class StudentDashboard extends Component<Props, IState> {
       userSubmissions,
       discussions,
       learningOutcomes,
-      predictions
+      predictions,
+      goalGrade
     } = this.state;
 
     const { tiles, tileGroups, dashboardColumns, tileEntries, student } = this.props;
@@ -164,13 +170,23 @@ class StudentDashboard extends Component<Props, IState> {
 
     return (
       <div id={"studentDashboard"}>
+        <Row>
+        <Col span={4}>
+
         <Radio.Group value={viewType}
                      buttonStyle="solid"
                      onChange={e => this.setState({ viewType: e.target.value })}
-        >
+                     >
           <Radio.Button value="bar"><BarChartOutlined /> Bar</Radio.Button>
           <Radio.Button value="grid"><AppstoreOutlined /> Grid</Radio.Button>
         </Radio.Group>
+        </Col>
+        <Col span={2} offset={18}>
+          <div style={{margin: 10}}>
+              Goal Grade: { goalGrade }
+          </div>
+        </Col>
+        </Row>
 
         { viewType === "grid" ?
           <FadeIn>

@@ -265,8 +265,18 @@ namespace IguideME.Web.Controllers
         [Route("/datamart/canvas/discussions")]
         public ActionResult GetCanvasDiscussions()
         {
+            int course_id = this.GetCourseID();
+
+            List<AppDiscussion> discussions = DatabaseManager.Instance.GetDiscussions(course_id);
+
+            foreach (AppDiscussion discussion in new List<AppDiscussion>(discussions)) {
+                discussions.AddRange(DatabaseManager.Instance.GetDiscussionEntries(course_id,
+                    discussion.DiscussionID));
+                discussions.AddRange(DatabaseManager.Instance.GetDiscussionReplies(course_id,
+                    discussion.DiscussionID));
+            }
             return Json(
-                DatabaseManager.Instance.GetDiscussions(GetCourseID())
+                discussions
             );
         }
 

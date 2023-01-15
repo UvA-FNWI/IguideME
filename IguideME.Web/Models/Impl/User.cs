@@ -12,7 +12,7 @@ namespace IguideME.Web.Models.Impl
         [JsonProperty("course_id")]
         public int CourseID { get; set; }
 
-        [JsonIgnore]
+        [JsonProperty("user_id")]
         public int UserID { get; set; }
 
         [JsonProperty("login_id")]

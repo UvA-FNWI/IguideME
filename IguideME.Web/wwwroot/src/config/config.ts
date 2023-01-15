@@ -1,4 +1,5 @@
 export const debug = () => {
+  // TODO: this has to be done in a way that doesn't cause syntax errors to pop up when debugflag.js doesn't exist.
   if ((window as any).DEBUGFLAG !== undefined)
     return true;
 

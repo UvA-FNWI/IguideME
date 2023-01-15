@@ -6,6 +6,7 @@ import {getAverageGrade} from "../../../../utils/grades";
 import {getProgression} from "./helpers";
 import GradeStatistic from "../../../../containers/GradeStatistic";
 import "./style.scss";
+import { discussionType } from "../../../../models/canvas/Discussion";
 
 export default class Tile extends Component<IProps, IState> {
 
@@ -19,11 +20,12 @@ export default class Tile extends Component<IProps, IState> {
       case "DISCUSSIONS":
         let disc_grade = 0;
         discussions.map(discussion => {
-          if (discussion.posted_by === student.name){
+          if (discussion.type === discussionType.topic ){
+            if (discussion.posted_by === student.name)
+              disc_grade++;
+          } else {
             disc_grade++;
           }
-          if (discussion.entries)
-            disc_grade += discussion.entries.length
         })
       return (
         <span style={{textAlign: 'center'}}>

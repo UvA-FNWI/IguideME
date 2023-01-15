@@ -2,7 +2,7 @@ import React, { Component } from "react";
 // import {createBarData, getBarOptions} from "../helpers";
 import {HorizontalBar} from "react-chartjs-2";
 import {Tile} from "../../../models/app/Tile"
-import { CanvasDiscussion } from "../../../models/canvas/Discussion";
+import { CanvasDiscussion, discussionType } from "../../../models/canvas/Discussion";
 import { LearningOutcome } from "../../../models/app/LearningGoal";
 import { PeerGrades, TilesGradeSummary } from "../types";
 import {Data} from "./types"
@@ -64,11 +64,12 @@ export default class GradeBar extends Component<IProps> {
         grade = learningOutcomes.filter(lo => lo.success).length;
       } else if (tiles[i].type === "DISCUSSIONS") {
         discussions.map(discussion => {
-          if (discussion.posted_by === student.name){
+          if (discussion.type === discussionType.topic ){
+            if (discussion.posted_by === student.name)
+              grade++;
+          } else {
             grade++;
           }
-          if (discussion.entries)
-            grade += discussion.entries.length
         })
       }
 

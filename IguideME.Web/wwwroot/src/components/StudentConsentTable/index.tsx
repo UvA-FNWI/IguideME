@@ -100,13 +100,13 @@ export default class StudentConsentTable extends Component<IProps, IState> {
         }
       }, {
         title: "Goal",
-        dataIndex: "userName",
+        dataIndex: "grade",
         fixed: true,
         width: 150,
         sorter: (a, b) => a.grade - b.grade,
-        render: (text: string, record: any) => {
+        render: (text: string, _: any) => {
           return (
-            <span>{ record.grade }<br /></span>
+            <span>{ text }<br /></span>
           )
         }
       }];

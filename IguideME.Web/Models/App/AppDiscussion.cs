@@ -6,13 +6,25 @@ using Newtonsoft.Json;
 
 namespace IguideME.Web.Models.App
 {
+    public enum Discussion_type
+    {
+        topic,
+        entry,
+        reply
+    }
     public class AppDiscussion
     {
         [JsonProperty("id")]
         public int ID { get; set; }
 
+        [JsonProperty("type")]
+        public Discussion_type Type { get; set; }
+
         [JsonProperty("discussion_id")]
         public int DiscussionID { get; set; }
+
+        [JsonProperty("parent_id")]
+        public int ParentID { get; set; }
 
         [JsonProperty("course_id")]
         public int CourseID { get; set; }
@@ -29,12 +41,11 @@ namespace IguideME.Web.Models.App
         [JsonProperty("message")]
         public string Message { get; set; }
 
-        [JsonProperty("entries")]
-        public List<AppDiscussionEntry> Entries { get; set;}
-
         public AppDiscussion(
             int id,
+            Discussion_type type,
             int discussionID,
+            int parentID,
             int courseID,
             string title,
             string postedBy,
@@ -42,16 +53,14 @@ namespace IguideME.Web.Models.App
             string message)
         {
             this.ID = id;
+            this.Type = type;
             this.DiscussionID = discussionID;
+            this.ParentID = parentID;
             this.CourseID = courseID;
             this.Title = title;
             this.PostedBy = postedBy;
             this.PostedAt = postedAt;
             this.Message = message;
-        }
-
-        public void getEntries(string user_id = null) {
-            this.Entries = DatabaseManager.Instance.GetDiscussionEntries(this.CourseID, this.DiscussionID, user_id);
         }
 
     }

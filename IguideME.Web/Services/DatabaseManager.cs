@@ -1975,18 +1975,17 @@ namespace IguideME.Web.Services
                 {
                     AppDiscussion row = new AppDiscussion(
                         r.GetInt32(0),
+                        Discussion_type.topic,
                         r.GetInt32(1),
                         r.GetInt32(2),
-                        r.GetValue(3).ToString(),
+                        r.GetInt32(3),
                         r.GetValue(4).ToString(),
                         r.GetValue(5).ToString(),
-                        r.GetValue(6).ToString()
+                        r.GetValue(6).ToString(),
+                        r.GetValue(7).ToString()
                     );
                     discussions.Add(row);
                 }
-            }
-            foreach(AppDiscussion discussion in discussions) {
-                discussion.getEntries();
             }
 
             return discussions;
@@ -2015,7 +2014,9 @@ namespace IguideME.Web.Services
                 {
                     AppDiscussion row = new AppDiscussion(
                         r.GetInt32(0),
+                        Discussion_type.topic,
                         r.GetInt32(1),
+                        tileID,
                         r.GetInt32(2),
                         r.GetValue(3).ToString(),
                         r.GetValue(4).ToString(),
@@ -2029,33 +2030,83 @@ namespace IguideME.Web.Services
             return discussions;
         }
 
-        public List<AppDiscussionEntry> GetDiscussionEntries(int course_id, int discussion_id, string user_id) {
+        public List<AppDiscussion> GetDiscussionEntries(int course_id, int discussion_id, string user_id = null, string hash = null) {
+            string activeHash = hash ?? this.GetCurrentHash(course_id);
+            if (activeHash == null) return new List<AppDiscussion>() { };
+
             string query;
             if (user_id == null) {
                 query = String.Format(
                     DatabaseQueries.QUERY_DISCUSSION_ENTRIES,
                     course_id,
-                    discussion_id
+                    discussion_id,
+                    activeHash
                 );
             } else {
                 query = String.Format(
                     DatabaseQueries.QUERY_DISCUSSION_ENTRIES_FOR_USER,
                     course_id,
                     discussion_id,
+                    activeHash,
                     user_id
                 );
             }
 
-            List<AppDiscussionEntry> entries = new List<AppDiscussionEntry>();
+            List<AppDiscussion> entries = new List<AppDiscussion>();
             using(SQLiteDataReader r = Query(query)) {
                 while (r.Read()) {
-                    AppDiscussionEntry row = new AppDiscussionEntry(
+                    AppDiscussion row = new AppDiscussion(
                         r.GetInt32(0),
-                        course_id,
+                        Discussion_type.entry,
                         discussion_id,
+                        discussion_id,
+                        course_id,
+                        r.GetValue(4).ToString(),
                         r.GetValue(1).ToString(),
                         r.GetValue(2).ToString(),
                         r.GetValue(3).ToString()
+                    );
+                    entries.Add(row);
+                }
+            }
+            return entries;
+        }
+
+        public List<AppDiscussion> GetDiscussionReplies(int course_id, int discussion_id, string user_id = null, string hash = null) {
+            string activeHash = hash ?? this.GetCurrentHash(course_id);
+            if (activeHash == null) return new List<AppDiscussion>() { };
+
+            string query;
+            if (user_id == null) {
+                query = String.Format(
+                    DatabaseQueries.QUERY_DISCUSSION_REPLIES,
+                    course_id,
+                    discussion_id,
+                    activeHash
+                );
+            } else {
+                query = String.Format(
+                    DatabaseQueries.QUERY_DISCUSSION_REPLIES_FOR_USER,
+                    course_id,
+                    discussion_id,
+                    activeHash,
+                    user_id
+                );
+            }
+
+            List<AppDiscussion> entries = new List<AppDiscussion>();
+            using(SQLiteDataReader r = Query(query)) {
+                while (r.Read()) {
+                    AppDiscussion row = new AppDiscussion(
+                        r.GetInt32(0),
+                        Discussion_type.reply,
+                        discussion_id,
+                        r.GetInt32(1),
+                        course_id,
+                        r.GetValue(5).ToString(),
+                        r.GetValue(2).ToString(),
+                        r.GetValue(3).ToString(),
+                        r.GetValue(4).ToString()
                     );
                     entries.Add(row);
                 }

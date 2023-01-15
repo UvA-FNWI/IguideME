@@ -20,6 +20,7 @@ export interface IState {
   discussions: CanvasDiscussion[];
   userSubmissions: Map<number, TileEntrySubmission[]>;
   predictions: PredictedGrade[];
+  goalGrade: number;
 }
 
 export interface TilesGradeSummary {

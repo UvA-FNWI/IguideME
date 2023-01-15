@@ -456,9 +456,14 @@ namespace IguideME.Web.Controllers
             User user = DatabaseManager.Instance.GetUser(course_id, userLoginID);
 
             List<AppDiscussion> discussions = DatabaseManager.Instance.GetDiscussionsForTile(course_id, id);
-            foreach (AppDiscussion discussion in discussions) {
-                discussion.getEntries(user_id: user.UserID.ToString());
+
+            foreach (AppDiscussion discussion in new List<AppDiscussion>(discussions)) {
+                discussions.AddRange(DatabaseManager.Instance.GetDiscussionEntries(course_id,
+                    discussion.DiscussionID, user_id: user.UserID.ToString()));
+                discussions.AddRange(DatabaseManager.Instance.GetDiscussionReplies(course_id,
+                    discussion.DiscussionID, user_id: user.UserID.ToString()));
             }
+
             return Json(discussions);
         }
 
