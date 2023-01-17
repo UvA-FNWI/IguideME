@@ -12,6 +12,7 @@ import { PredictedGrade, PredictiveModel } from "../../models/app/PredictiveMode
 import { PerformanceNotification } from "../../models/app/Notification";
 import { AppAcceptList } from "../../models/app/AcceptList";
 import { GradePredictionModel } from "../../common/Admin/sections/grades/GradePredictor/ModelConfigurator/interfaces";
+import { MOCK_NOTIFICATIONS } from "../../mocks/students";
 
 export default class DataMartController extends Controller {
 
@@ -110,10 +111,7 @@ export default class DataMartController extends Controller {
   }
 
   static getAllNotifications(): Promise<PerformanceNotification[]> {
-    if (debug()) return delay([
-      { user_login_id: "28332183", tile_id: 2, status: "outperforming peers" },
-      { user_login_id: "95366984", tile_id: 4, status: "closing the gap" }
-    ])
+    if (debug()) return delay(MOCK_NOTIFICATIONS, 100)
 
     return this.client.get(
       `/datamart/notifications`
