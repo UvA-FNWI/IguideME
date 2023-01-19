@@ -62,7 +62,8 @@ export default class Consent extends Component<{
             I have read and understood the informed consent
           </Checkbox>
 
-          <br />
+          <br/>
+          <br/>
 
           <Button type={"primary"} disabled={!hasRead} onClick={this.handleAccept}>
             Accept

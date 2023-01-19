@@ -21,6 +21,7 @@ import {CanvasDiscussion} from "../../models/canvas/Discussion";
 import {LearningOutcome} from "../../models/app/LearningGoal";
 import DataMartController from "../../api/controllers/datamart";
 import AppController from "../../api/controllers/app";
+import UserSettings from "../../common/UserSettings";
 
 const mapState = (state: RootState) => ({
   dashboardColumns: state.dashboardColumns,
@@ -50,7 +51,8 @@ class StudentDashboard extends Component<Props, IState> {
     learningOutcomes: [] as LearningOutcome[],
     viewType: "bar" as ViewTypes,
     predictions: [],
-    goalGrade: 0
+    goalGrade: 0,
+    settings_view: false
   }
 
   componentDidMount(): void {
@@ -65,6 +67,10 @@ class StudentDashboard extends Component<Props, IState> {
     if (nextProps.student && nextProps.student?.login_id !== this.props.student?.login_id) {
         this.setup(nextProps);
     }
+  }
+
+  setSettingsView = (view: boolean) => {
+    this.setState({settings_view: view});
   }
 
   setup = async (props: Props, propPredictions: PredictedGrade[] = []) => {
@@ -148,7 +154,8 @@ class StudentDashboard extends Component<Props, IState> {
       discussions,
       learningOutcomes,
       predictions,
-      goalGrade
+      goalGrade,
+      settings_view
     } = this.state;
 
     const { tiles, tileGroups, dashboardColumns, tileEntries, student } = this.props;
@@ -156,6 +163,10 @@ class StudentDashboard extends Component<Props, IState> {
     console.log("Discussions", discussions);
 
     if (!loaded || !student) return (<Loading small={true} />);
+
+    if (settings_view) {
+      return <UserSettings settings={this.setSettingsView} />
+    }
 
     if (displayTile) {
       return <TileDetail tile={(displayTile as any).tile}
@@ -171,7 +182,7 @@ class StudentDashboard extends Component<Props, IState> {
     return (
       <div id={"studentDashboard"}>
         <Row>
-        <Col span={4}>
+        <Col span={6}>
 
         <Radio.Group value={viewType}
                      buttonStyle="solid"
@@ -181,7 +192,7 @@ class StudentDashboard extends Component<Props, IState> {
           <Radio.Button value="grid"><AppstoreOutlined /> Grid</Radio.Button>
         </Radio.Group>
         </Col>
-        <Col span={3} offset={17}>
+        <Col span={4} offset={14}>
           <div style={{margin: 10}}>
               Goal Grade: { goalGrade }
           </div>
@@ -236,8 +247,10 @@ class StudentDashboard extends Component<Props, IState> {
             />
           </div>
         }
-
-        <UserProfile student={this.props.student} />
+      <br />
+      <br />
+        <UserProfile student={this.props.student}
+                     settings={this.setSettingsView} />
       </div>
     )
   }
