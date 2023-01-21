@@ -1,12 +1,19 @@
 import React, { Component } from "react";
-import { Button, Col, Row, Tooltip } from "antd";
+import { Button, Col, notification, Row, Tooltip } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 import { BellTwoTone } from "@ant-design/icons";
 import DesiredGrade from "../DesiredGrade";
 import Consent from "../Consent";
+import ConsentController from "../../api/controllers/consent";
+import Swal from "sweetalert2";
+import AppController from "../../api/controllers/app";
 
 
-interface IProps {settings: (view: boolean) => void};
+interface IProps {
+    settings: (view: boolean) => void;
+    consent?: string | null;
+};
+
 interface IState {
     notifications: boolean;
     updatingNotifications: boolean;
@@ -20,8 +27,30 @@ export default class UserSettings extends Component<IProps, IState> {
     }
 
     toggleNotifications = () => {
-        this.setState({notifications: !this.state.notifications});
+        this.setState({updatingNotifications: true});
+        AppController.setNotificationEnable(!this.state.notifications)
+            .then(enable => this.setState({notifications: enable, updatingNotifications: false}));
     };
+
+    checkConsent = (settings: any): any => {
+        ConsentController.fetchConsent().then((consent) => {
+            if (consent === 1) {
+                return settings(false);
+            } else {
+                Swal.fire(
+                    'No consent given',
+                    'Please fill in the consent form!',
+                    'error'
+                );
+            }
+        })
+
+    }
+
+    componentDidMount(): void {
+        AppController.getNotificationEnable()
+            .then((enable) => this.setState({notifications: enable}));
+    }
 
     render(): React.ReactNode {
         const { settings } = this.props;
@@ -34,7 +63,7 @@ export default class UserSettings extends Component<IProps, IState> {
                 <div style={{padding: 20}}>
                     <Button type={"ghost"}
                         icon={<ArrowLeftOutlined />}
-                        onClick={() => settings(false)}
+                        onClick={() => this.checkConsent(settings)}
                     >
                     Return to dashboard
                     </Button>
@@ -63,7 +92,7 @@ export default class UserSettings extends Component<IProps, IState> {
             </Row>
             <Row>
             <Col span={24}>
-                <Consent/>
+                <Consent text={this.props.consent}/>
             </Col>
             </Row>
             </div>

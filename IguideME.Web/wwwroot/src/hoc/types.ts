@@ -1,3 +1,4 @@
 export interface UserDataProps {
-  isAdmin: boolean;
+  isAdmin?: boolean;
+  consent: string | null;
 }

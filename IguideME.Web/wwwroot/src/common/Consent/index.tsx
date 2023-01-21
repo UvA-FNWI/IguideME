@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import {Button, Checkbox, message} from "antd";
 import ConsentController from "../../api/controllers/consent";
 import {store} from "../../utils/configureStore";
-import { Redirect } from "react-router-dom";
 
 export default class Consent extends Component<{
   text?: string | null,
@@ -10,12 +9,12 @@ export default class Consent extends Component<{
 
   state = {
     hasRead: false,
-    redirect: false
+    accepted: -1,
   }
 
   handleAccept = () => {
     ConsentController.setConsent(true).then(() => {
-      this.setState({ redirect: true });
+      message.success("Consent Accepted!");
     });
   }
 
@@ -25,11 +24,13 @@ export default class Consent extends Component<{
     });
   }
 
+  componentDidMount(): void {
+    ConsentController.fetchConsent().then(consent => this.setState({accepted: consent, hasRead: consent !== -1}))
+  }
+
   render(): React.ReactNode {
     const { text } = this.props;
-    const { hasRead, redirect } = this.state;
-
-    if (redirect) return <Redirect to={'/'} />
+    const { hasRead, accepted } = this.state;
 
     let consentText = text;
 
@@ -46,6 +47,10 @@ export default class Consent extends Component<{
         </div>
       );
     }
+
+    let color1 = accepted === 1? "green" : "default";
+    let color2 = accepted === 0? "red" : "default";
+
 
     return (
       <div style={{maxWidth: 700, margin: '0 auto', boxSizing: 'border-box', padding: 20 }}>
@@ -65,11 +70,11 @@ export default class Consent extends Component<{
           <br/>
           <br/>
 
-          <Button type={"primary"} disabled={!hasRead} onClick={this.handleAccept}>
+          <Button style={{ background: color1, borderColor: color1 }} type={"primary"} disabled={!hasRead} onClick={this.handleAccept}>
             Accept
           </Button>
           {' '}
-          <Button disabled={!hasRead} danger onClick={() => {
+          <Button style={{ background: color2, borderColor: color2 }} disabled={!hasRead} danger onClick={() => {
             this.handleDecline();
             this.setState({ hasRead: false });
           }}>

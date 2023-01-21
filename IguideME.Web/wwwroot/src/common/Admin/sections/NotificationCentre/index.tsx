@@ -12,6 +12,7 @@ import TileController from "../../../../api/controllers/tile";
 import { Tile } from "../../../../models/app/Tile";
 
 import {CheckCircleOutlined, CloseCircleOutlined} from "@ant-design/icons";
+import AppController from "../../../../api/controllers/app";
 
 
 export default class NotificationCentre extends Component {
@@ -22,7 +23,11 @@ export default class NotificationCentre extends Component {
   }
 
   componentDidMount(): void {
-    StudentController.getStudents().then((students: CanvasStudent[]) => {
+    StudentController.getStudents().then(async (students: CanvasStudent[]) => {
+      for (let i = 0; i < students.length; i++) {
+        let enabled = await AppController.getNotificationEnable(students[i].login_id)
+        students[i].notifications = enabled
+      }
       this.setState({
         students: students
       });
@@ -44,7 +49,9 @@ export default class NotificationCentre extends Component {
     let student;
     for (let i = 0; i < students.length; i++) {
       student = students[i];
-      data.set(student.login_id, new Data(student.login_id, student.name, true)); // TODO: set enabled correctly
+      console.log("notifications", student.notifications!)
+
+      data.set(student.login_id, new Data(student.login_id, student.name, student.notifications!));
     }
 
     let notification;
@@ -128,6 +135,7 @@ export default class NotificationCentre extends Component {
           title: 'Enabled',
           dataIndex: 'enabled',
           render: (value: boolean) => {
+            console.log("value", value);
             if (value) {
               return (
                 <span className={"successText"}>
@@ -136,7 +144,7 @@ export default class NotificationCentre extends Component {
               );
             } else {
               return  (
-                <span className={"successText"}>
+                <span className={"dangerText"}>
                   <CloseCircleOutlined />
                 </span>
               );

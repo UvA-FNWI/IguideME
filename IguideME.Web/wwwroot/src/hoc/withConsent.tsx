@@ -1,8 +1,8 @@
 import React from "react";
 import ConsentController from "../api/controllers/consent";
 import Loading from "../components/utils/Loading";
-import Consent from "../common/Consent";
 import {store} from "../utils/configureStore";
+import App from "../common/App";
 
 type IState = {
   accepted: boolean;
@@ -22,6 +22,7 @@ export const withConsent = <P extends object>(Component: React.ComponentType<P>)
     componentDidMount(): void {
       ConsentController.fetchConsent().then(result => {
         ConsentController.isAccepted().then(accepted => {
+          console.log(result)
           this.setState({
             accepted,
             consentLoaded: true,
@@ -38,8 +39,10 @@ export const withConsent = <P extends object>(Component: React.ComponentType<P>)
 
       if (!consentLoaded || !course) return <Loading />;
 
+      // TODO: instead of loading consent, load the student view with the settings open
       if (!consentGranted && course.require_consent) {
-        return <Consent text={course.text} />;
+        return <App consent={course.text} />;
+        // return <Consent text={course.text} />;
       }
 
       if (!accepted) {

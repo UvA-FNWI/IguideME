@@ -54,7 +54,7 @@ export default class Column extends Component<IProps> {
         </Row>
 
         <Divider />
-        <h3>Tiles</h3>
+        <h3>Tile Groups</h3>
 
         { tileGroups
           .sort((a, b) => a.position - b.position)

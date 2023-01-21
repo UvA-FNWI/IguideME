@@ -56,6 +56,9 @@ class StudentDashboard extends Component<Props, IState> {
   }
 
   componentDidMount(): void {
+    if (this.props.consent !== null && this.props.consent !== undefined) {
+      this.setState({settings_view: true});
+    }
     window.addEventListener('selectTile', (event: any) => {
       this.setState({ displayTile: event?.detail});
     });
@@ -127,7 +130,7 @@ class StudentDashboard extends Component<Props, IState> {
     let discussions = (await Promise.all(p_discussions)).flat();
     let goals = (await Promise.all(p_goals)).flat();
 
-    let goalGrade = await AppController.getGoalGrade();
+    let goalGrade = await AppController.getGoalGrade(student.login_id);
 
     this.setState({
       discussions,
@@ -165,7 +168,7 @@ class StudentDashboard extends Component<Props, IState> {
     if (!loaded || !student) return (<Loading small={true} />);
 
     if (settings_view) {
-      return <UserSettings settings={this.setSettingsView} />
+      return <UserSettings consent= {this.props.consent} settings={this.setSettingsView} />
     }
 
     if (displayTile) {

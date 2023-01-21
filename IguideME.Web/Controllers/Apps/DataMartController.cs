@@ -216,6 +216,25 @@ namespace IguideME.Web.Controllers
 
         [Authorize]
         [HttpGet]
+        [Route("/goal-grade/{userLoginID}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public ActionResult GetGoalGrade(string userLoginID)
+        {
+            // Only instructors may view submissions of other students
+            if (this.GetUserLoginID() != userLoginID &&
+                !this.IsAdministrator())
+                return Unauthorized();
+
+            // returns the goal grade for the logged in user
+            return Json(
+                DatabaseManager.Instance.GetUserGoalGrade(
+                    this.GetCourseID(),
+                    userLoginID));
+        }
+
+        [Authorize]
+        [HttpGet]
         [Route("/goal-grade")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]

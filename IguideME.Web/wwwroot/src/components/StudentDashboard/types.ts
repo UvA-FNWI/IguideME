@@ -6,6 +6,7 @@ import { PredictedGrade } from "../../models/app/PredictiveModel";
 
 export interface IProps {
   student: CanvasStudent | undefined;
+  consent?: string | null
 }
 
 export type ViewTypes = "bar" | "grid";

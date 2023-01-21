@@ -1,6 +1,4 @@
 import React, { Component } from "react";
-import { withConsent } from "../../hoc/withConsent";
-import { withAdminRole } from "../../hoc/withAdminRole";
 import "./style.scss";
 import { Radio, Space } from "antd";
 import AppController from "../../api/controllers/app";
@@ -53,4 +51,4 @@ class DesiredGrade extends Component<IProps, IState> {
   }
 }
 
-export default withConsent(withAdminRole(DesiredGrade));
+export default DesiredGrade;

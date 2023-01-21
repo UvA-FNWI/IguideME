@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Data;
-using System.Linq;
 using IguideME.Web.Models;
 using IguideME.Web.Models.App;
 using IguideME.Web.Models.Impl;
@@ -124,9 +123,8 @@ namespace IguideME.Web.Services
             string[] queries =
             {
                 DatabaseQueries.CREATE_TABLE_COURSE_SETTINGS,
-                DatabaseQueries.CREATE_TABLE_CONSENT,
+                DatabaseQueries.CREATE_TABLE_USER_SETTINGS,
                 DatabaseQueries.CREATE_TABLE_PEER_GROUP,
-                DatabaseQueries.CREATE_TABLE_GOAL_GRADE,
                 DatabaseQueries.CREATE_TABLE_SYNC_HISTORY,
                 DatabaseQueries.CREATE_TABLE_LAYOUT_COLUMN,
                 DatabaseQueries.CREATE_TABLE_LAYOUT_TILE_GROUP,
@@ -149,19 +147,10 @@ namespace IguideME.Web.Services
                 DatabaseQueries.CREATE_TABLE_ACCEPT_LIST,
                 DatabaseQueries.CREATE_TABLE_MIGRATIONS,
             };
-            // NonQuery(@"DROP TABLE `predicted_grade`");
 
             // create tables if they do not exist
             foreach (string query in queries)
                 NonQuery(query);
-
-
-            // try{
-            //     NonQuery("ALTER TABLE `tile_entry_submission_meta` ADD COLUMN `sync_hash` TEXT;");
-            //     NonQuery("DELETE FROM `tile_entry_submission_meta`");
-            // } catch (Exception) {
-            //     Console.WriteLine("Column already exists");
-            // }
         }
 
         private void RunMigrations()
@@ -177,7 +166,7 @@ namespace IguideME.Web.Services
 
                 string migration_sql = entry.Value;
                 NonQuery(migration_sql);
-                NonQuery(String.Format(DatabaseQueries.CREATE_MIGRATION, migration_id));
+                NonQuery(String.Format(DatabaseQueries.REGISTER_MIGRATION, migration_id));
             }
         }
 
@@ -252,7 +241,7 @@ namespace IguideME.Web.Services
             /**
              * Create a new course.
              */
-            NonQuery(String.Format(DatabaseQueries.INSERT_COURSE,
+            NonQuery(String.Format(DatabaseQueries.REGISTER_COURSE,
                 courseID,
                 courseName));
         }
@@ -279,7 +268,7 @@ namespace IguideME.Web.Services
             try {
                 NonQuery(
                     String.Format(
-                        DatabaseQueries.CLEANUP_SYNC, courseID, status
+                        DatabaseQueries.DELETE_INCOMPLETE_SYNCS, courseID, status
                     )
                 );
             } catch (Exception e) {
@@ -579,7 +568,7 @@ namespace IguideME.Web.Services
             NonQuery($"UPDATE `grade_prediction_model` SET `enabled`=False"); // TODO: Choose model in a UI.
             return IDNonQuery(
                 String.Format(
-                    DatabaseQueries.CREATE_GRADE_PREDICTION_MODEL,
+                    DatabaseQueries.REGISTER_GRADE_PREDICTION_MODEL,
                     courseID,
                     intercept
                 ));
@@ -589,7 +578,7 @@ namespace IguideME.Web.Services
         {
             return IDNonQuery(
                 String.Format(
-                    DatabaseQueries.CREATE_GRADE_PREDICTION_MODEL_PARAMETER,
+                    DatabaseQueries.REGISTER_GRADE_PREDICTION_MODEL_PARAMETER,
                     modelID,
                     parameterID,
                     weight
@@ -692,12 +681,44 @@ namespace IguideME.Web.Services
             }
         }
 
-        public void RegisterUserGoalGrade(int courseID, string loginID)
+        public void RegisterUserSettings(ConsentData data)
+        {
+             NonQuery(String.Format(
+                DatabaseQueries.REGISTER_USER_SETTINGS,
+                data.CourseID, data.UserID, data.UserLoginID, data.UserName.Replace("'", ""), data.Granted
+            ));
+        }
+
+        public void UpdateNotificationEnable(int courseID, string loginID, bool enable)
         {
             NonQuery(
                 String.Format(
-                    DatabaseQueries.REGISTER_USER_GOAL_GRADE, courseID, loginID
-                ));
+                    DatabaseQueries.UPDATE_NOTIFICATION_ENABLE,
+                    enable,
+                    courseID,
+                    loginID));
+        }
+
+        public bool GetNotificationEnable(int courseID, string loginID)
+        {
+            string query = String.Format(
+                DatabaseQueries.QUERY_NOTIFICATIONS_ENABLE,
+                courseID,
+                loginID);
+
+            bool result = true;
+            using(SQLiteDataReader r = Query(query)) {
+                if (r.Read())
+                {
+                    try{
+                        result = r.GetBoolean(0);
+                    }
+                    catch (Exception e) {
+                        PrintQueryError("GetUserGoalGrade", 0, r, e);
+                    }
+                }
+                return result;
+            }
         }
 
         public void UpdateUserGoalGrade(int courseID, string loginID, int grade)
@@ -735,7 +756,7 @@ namespace IguideME.Web.Services
         public GoalData[] GetGoalGrades(int courseID)
         {
             string query = String.Format(
-                "SELECT `grade`, `user_login_id` from `goal_grade` WHERE `course_id`={0}",
+                "SELECT `goal_grade`, `user_login_id` from `user_settings` WHERE `course_id`={0}",
                 courseID);
 
             List<GoalData> goals = new List<GoalData>();
@@ -812,7 +833,7 @@ namespace IguideME.Web.Services
 
             return IDNonQuery(
                 String.Format(
-                    DatabaseQueries.CREATE_USER_SUBMISSION,
+                    DatabaseQueries.REGISTER_USER_SUBMISSION,
                     entryID,
                     userLoginID,
                     grade,
@@ -830,7 +851,7 @@ namespace IguideME.Web.Services
             string activeHash = hash ?? this.GetCurrentHash(courseID);
             return IDNonQuery(
                 String.Format(
-                    DatabaseQueries.CREATE_SUBMISSION_META,
+                    DatabaseQueries.REGISTER_SUBMISSION_META,
                     submissionID,
                     key,
                     value,
@@ -1413,7 +1434,7 @@ namespace IguideME.Web.Services
         public LearningGoal CreateGoal(int courseID, int tileID, string title)
         {
             string query = String.Format(
-                DatabaseQueries.CREATE_LEARNING_GOAL,
+                DatabaseQueries.REGISTER_LEARNING_GOAL,
                 courseID, tileID, title
             );
 
@@ -1469,7 +1490,7 @@ namespace IguideME.Web.Services
             string expresson)
         {
             string query = String.Format(
-                DatabaseQueries.CREATE_GOAL_REQUIREMENT,
+                DatabaseQueries.REGISTER_GOAL_REQUIREMENT,
                 goalID, tileID, entryID, metaKey, value, expresson
             );
 
@@ -1543,7 +1564,7 @@ namespace IguideME.Web.Services
             string activeHash = hash ?? this.GetCurrentHash(courseID);
 
             string query = String.Format(
-                DatabaseQueries.CREATE_USER_NOTIFICATIONS,
+                DatabaseQueries.REGISTER_USER_NOTIFICATIONS,
                 courseID,
                 userLoginID,
                 tileID,
@@ -1689,7 +1710,7 @@ namespace IguideME.Web.Services
         public int CreateTileEntry(TileEntry entry)
         {
             string query = String.Format(
-                    DatabaseQueries.CREATE_TILE_ENTRY,
+                    DatabaseQueries.REGISTER_TILE_ENTRY,
                     entry.TileID,
                     entry.Title,
                     entry.Type,
@@ -2241,7 +2262,7 @@ namespace IguideME.Web.Services
             bool wildcard)
         {
             string query = String.Format(
-                    DatabaseQueries.CREATE_TILE,
+                    DatabaseQueries.REGISTER_TILE,
                     groupID,
                     title,
                     position,
@@ -2308,30 +2329,23 @@ namespace IguideME.Web.Services
         public void SetConsent(ConsentData data)
         {
             NonQuery(String.Format(
-                DatabaseQueries.SETUSERCONSENT,
-                data.CourseID, data.UserID, data.UserLoginID, data.UserName.Replace("'", ""), data.Granted
-            ));
-        }
-
-        public void RegisterConsent(ConsentData data)
-        {
-            NonQuery(String.Format(
-                DatabaseQueries.REGISTER_USER_CONSENT,
-                data.CourseID, data.UserID, data.UserLoginID, data.UserName.Replace("'", ""), data.Granted
+                DatabaseQueries.SET_USER_CONSENT,
+                data.CourseID, data.UserID, data.UserLoginID, data.UserName.Replace("'", ""), data.Granted,
+                data.Granted == -1 ? "DO NOTHING" : "DO UPDATE SET `consent` = {4}"
             ));
         }
 
         public int GetConsent(int courseID, int userID)
         {
             string query = String.Format(
-                "SELECT `user_login_id`, `granted` from `consent` WHERE `course_id`={0} AND `user_id`={1}",
+                "SELECT `user_login_id`, `consent` from `user_settings` WHERE `course_id`={0} AND `user_id`={1}",
                 courseID, userID
             );
 
             int consent = -1;
             using(SQLiteDataReader r = Query(query)){
                 if (r.Read())
-                    consent = Convert.ToInt32(r["granted"]);
+                    consent = Convert.ToInt32(r["consent"]);
             }
             return consent;
         }
@@ -2339,14 +2353,14 @@ namespace IguideME.Web.Services
         public int GetConsent(int courseID, string userLoginID)
         {
             string query = String.Format(
-                "SELECT `user_login_id`, `granted` from `consent` WHERE `course_id`={0} AND `user_login_id`='{1}'",
+                "SELECT `user_login_id`, `consent` from `user_settings` WHERE `course_id`={0} AND `user_login_id`='{1}'",
                 courseID, userLoginID
             );
 
             int consent = -1;
             using(SQLiteDataReader r = Query(query)){
                 if (r.Read())
-                    consent = Convert.ToInt32(r["granted"]);
+                    consent = Convert.ToInt32(r["consent"]);
             }
             return consent;
         }
@@ -2355,7 +2369,7 @@ namespace IguideME.Web.Services
         {
 
             string query = String.Format(
-                "SELECT `user_id`, `user_login_id`, `user_name` from `consent` WHERE `course_id`={0} AND `granted`=1",
+                "SELECT `user_id`, `user_login_id`, `user_name` from `user_settings` WHERE `course_id`={0} AND `consent`=1",
                 courseID
             );
 
@@ -2375,7 +2389,7 @@ namespace IguideME.Web.Services
         public ConsentData[] GetConsents(int courseID)
         {
             string query = String.Format(
-                "SELECT `user_id`, `user_login_id`, `user_name`, `granted` from `consent` WHERE `course_id`={0}",
+                "SELECT `user_id`, `user_login_id`, `user_name`, `consent` from `user_settings` WHERE `course_id`={0}",
                 courseID
             );
 
