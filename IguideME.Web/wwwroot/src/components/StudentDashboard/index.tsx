@@ -56,6 +56,7 @@ class StudentDashboard extends Component<Props, IState> {
   }
 
   componentDidMount(): void {
+    AppController.trackAction(this.props.student?.login_id, "Load home")
     if (this.props.consent !== null && this.props.consent !== undefined) {
       this.setState({settings_view: true});
     }

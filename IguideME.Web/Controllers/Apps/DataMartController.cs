@@ -260,7 +260,6 @@ namespace IguideME.Web.Controllers
                     this.GetUserLoginID(),
                     (int)JObject.Parse(body)["goal_grade"]);
 
-            // returns all obtained exam grades for the logged in user
             return Json(
                 DatabaseManager.Instance.GetUserGoalGrade(
                     this.GetCourseID(),
