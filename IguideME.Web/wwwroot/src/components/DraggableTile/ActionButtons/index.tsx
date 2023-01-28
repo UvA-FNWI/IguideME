@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import {Dropdown, Menu, Spin} from "antd";
+import {Dropdown, MenuProps, Spin} from "antd";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import { IProps, IState } from "./types";
 import {RootState} from "../../../store";
@@ -32,58 +32,77 @@ class ActionButtons extends Component<Props, IState> {
     tile: null
   }
 
+  handleMenuClick: MenuProps['onClick'] = (e) => {
+    switch(e.key) {
+      case "1":
+        this.props.editTile()
+        return;
+      case "2":
+        let tile: any = this.state.tile;
+        Swal.fire({
+          title: 'Do you really want to delete this tile?',
+          showCancelButton: true,
+          confirmButtonText: 'Delete',
+          confirmButtonColor: 'rgb(255, 110, 90)',
+          showLoaderOnConfirm: true,
+          allowOutsideClick: () => !Swal.isLoading()
+        }).then((result) => {
+          if (result.isConfirmed) {
+            this.props.deleteTile(tile!.id).then(() => [
+              Swal.fire('Task completed!', '', 'success')
+            ]);
+          }
+        })
+        return;
+    }
+  };
+
+  items: MenuProps['items'] = [
+    {
+      label: 'Edit',
+      key: '1',
+      icon: <EditOutlined />,
+    },
+    {
+      label: 'Delete',
+      key: '2',
+      icon: <DeleteOutlined />,
+      danger: true,
+    },
+  ];
+
+
   componentDidMount(): void {
     this.setState({ tile: this.props.tile });
   }
 
   render(): React.ReactNode {
-    const menu = (
-      <Menu onClick={() => {}}>
-        <Menu.Item key="1" icon={<EditOutlined />} onClick={this.props.editTile}>
-          Edit
-        </Menu.Item>
-        <Menu.Item key="2" icon={<DeleteOutlined />} onClick={() => {
-            Swal.fire({
-              title: 'Do you really want to delete this tile?',
-              showCancelButton: true,
-              confirmButtonText: 'Delete',
-              confirmButtonColor: 'rgb(255, 110, 90)',
-              showLoaderOnConfirm: true,
-              allowOutsideClick: () => !Swal.isLoading()
-            }).then((result) => {
-              if (result.isConfirmed) {
-                this.props.deleteTile(tile!.id).then(() => [
-                  Swal.fire('Task completed!', '', 'success')
-                ]);
-              }
-            })
-          }
-        } danger>
-          Delete
-        </Menu.Item>
-      </Menu>
-    );
 
     let { tile, loading }: IState = this.state;
 
     if (!tile) return null;
     tile = tile as Tile;
 
-
     return (
       <div style={{float: 'right'}}>
-        <Dropdown.Button overlay={menu}
-                         className={loading ? "" : (tile!.visible ? "successButtonGroup" : "dangerButtonGroup")}
-                         onClick={() => {
-                           this.setState({ loading: true }, () => {
-                             let t = tile!;
-                             t.visible = !t.visible;
-                             TileController.updateTile(t).then(async newTile => {
-                               await (this.props as any).updateTile(newTile);
-                               this.setState({ tile: t, loading: false });
-                             });
-                           });
-                         }}
+        <Dropdown.Button  menu={{items: this.items, onClick: this.handleMenuClick}}
+                          buttonsRender={([leftButton, rightButton]) => {
+                            let name = loading ? "" : (tile!.visible ? "successButton" : "dangerButton");
+                            return [
+                                React.cloneElement(leftButton as React.ReactElement<any, string>, {className: name }),
+                                rightButton
+                            ]
+                          }}
+                          onClick={() => {
+                            this.setState({ loading: true }, () => {
+                              let t = tile!;
+                              t.visible = !t.visible;
+                              TileController.updateTile(t).then(async newTile => {
+                                await (this.props as any).updateTile(newTile);
+                                this.setState({ tile: t, loading: false });
+                              });
+                              });
+                          }}
         >
           { loading ?
             <Spin size={'small'} /> :
