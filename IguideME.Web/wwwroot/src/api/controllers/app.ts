@@ -79,11 +79,11 @@ export default class AppController extends Controller {
     ).then(response => response.data);
   }
 
-  static trackAction(user_login_id: string | undefined, action: string): Promise<void>{
+  static trackAction(action: string): Promise<void>{
     if (debug()) return Promise.resolve();
 
     return this.client.post(
-      'app/track', {user_login_id: user_login_id, action: action}
+      'app/track', {action: action}
     )
   }
 

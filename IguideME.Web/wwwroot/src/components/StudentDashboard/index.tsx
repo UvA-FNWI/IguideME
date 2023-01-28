@@ -56,8 +56,9 @@ class StudentDashboard extends Component<Props, IState> {
   }
 
   componentDidMount(): void {
-    AppController.trackAction(this.props.student?.login_id, "Load home")
+    AppController.trackAction("Load home")
     if (this.props.consent !== null && this.props.consent !== undefined) {
+      AppController.trackAction("No consent")
       this.setState({settings_view: true});
     }
     window.addEventListener('selectTile', (event: any) => {
@@ -65,6 +66,12 @@ class StudentDashboard extends Component<Props, IState> {
     });
 
     this.setup(this.props);
+
+    // This should never be possible, just for if something goes wrong.
+    if (this.state.goalGrade === -1) {
+      AppController.trackAction("No goal grade")
+      this.setState({settings_view: true});
+    }
   }
 
   componentWillReceiveProps(nextProps: Readonly<Props>, nextContext: any): void {
@@ -75,6 +82,11 @@ class StudentDashboard extends Component<Props, IState> {
 
   setSettingsView = (view: boolean) => {
     this.setState({settings_view: view});
+  }
+
+  setTileView = (view: any) => {
+    AppController.trackAction(`Change view to ${view}`)
+    this.setState({ viewType: view })
   }
 
   setup = async (props: Props, propPredictions: PredictedGrade[] = []) => {
@@ -163,8 +175,6 @@ class StudentDashboard extends Component<Props, IState> {
     } = this.state;
 
     const { tiles, tileGroups, dashboardColumns, tileEntries, student } = this.props;
-    console.log("tiles", tiles);
-    console.log("Discussions", discussions);
 
     if (!loaded || !student) return (<Loading small={true} />);
 
@@ -190,7 +200,7 @@ class StudentDashboard extends Component<Props, IState> {
 
         <Radio.Group value={viewType}
                      buttonStyle="solid"
-                     onChange={e => this.setState({ viewType: e.target.value })}
+                     onChange={e => this.setTileView(e.target.value)}
                      >
           <Radio.Button value="bar"><BarChartOutlined /> Bar</Radio.Button>
           <Radio.Button value="grid"><AppstoreOutlined /> Grid</Radio.Button>

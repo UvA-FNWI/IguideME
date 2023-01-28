@@ -20,6 +20,11 @@ class DesiredGrade extends Component<IProps, IState> {
       this.setState({ goalGrade: goalGrade }));
   }
 
+  handleGradeChange = (grade: number ): void => {
+    AppController.trackAction(`Set grade to ${grade}`);
+    AppController.setGoalGrade(grade).then(() => this.setState({ goalGrade: grade }))
+  }
+
   render(): React.ReactNode {
 
     return (
@@ -30,7 +35,7 @@ class DesiredGrade extends Component<IProps, IState> {
         <Space direction={"vertical"}>
           <Radio.Group
             value={this.state.goalGrade}
-            onChange={val => AppController.setGoalGrade(val.target.value).then(_ => this.setState({ goalGrade: val.target.value }))}
+            onChange={val => this.handleGradeChange(val.target.value)}
             options={[
               { label: '1', value: 1 },
               { label: '2', value: 2 },

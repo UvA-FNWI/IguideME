@@ -191,22 +191,18 @@ namespace IguideME.Web.Controllers
 
         [Authorize]
         [Route("/app/track")]
-        [HttpPatch]
+        [HttpPost]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult TrackAction()
         {
-            var body = new StreamReader(Request.Body).ReadToEnd();
-            string loginID = (string) JObject.Parse(body)["user_login_id"];
+            if (this.IsAdministrator()) return Json("");
 
-            if (this.GetUserLoginID() != loginID)
-            {
-                return Json("");
-            }
+            var body = new StreamReader(Request.Body).ReadToEnd();
             string action = (string) JObject.Parse(body)["action"];
 
             DatabaseManager.Instance.TrackUserAction(
-                    loginID,
+                    this.GetUserLoginID(),
                     action
                     );
 

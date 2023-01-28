@@ -1397,7 +1397,7 @@ public static class DatabaseQueries
 
 
     public const string INSERT_USER_ACTION =
-    @"INSERT INTO   `user_tracker` (`user_id`,`action`)
+    @"INSERT INTO   `user_tracker` (`user_login_id`,`action`)
           VALUES        ('{0}', '{1}');";
 
     public const string DELETE_OLD_SYNCS_FOR_COURSE =
