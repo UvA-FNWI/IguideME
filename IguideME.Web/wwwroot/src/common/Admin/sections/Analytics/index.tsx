@@ -11,12 +11,12 @@ export default class Analytics extends Component<IProps> {
     return (
       <Admin menuKey={"analytics"}>
         <h1>Analytics</h1>
-        <span>Configure the dashboard visible to students.</span>
 
         <Divider />
 
         <h2>User interactions</h2>
         <p>Graph overview of all user interactions.</p>
+        {/* TODO: Sadly this is not usable and we need to create a graph ourselves */}
         <ApplicationAnalytics />
 
         <Divider />

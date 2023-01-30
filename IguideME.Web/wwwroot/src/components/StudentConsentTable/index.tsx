@@ -105,9 +105,11 @@ export default class StudentConsentTable extends Component<IProps, IState> {
         width: 150,
         sorter: (a, b) => a.grade - b.grade,
         render: (text: string, _: any) => {
-          return (
-            <span>{ text }<br /></span>
-          )
+          if (Number(text) !== -1){
+            return (
+              <span>{ text }<br /></span>
+              )
+          }
         }
       }];
       return columns

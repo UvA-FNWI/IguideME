@@ -1,9 +1,13 @@
-﻿using IguideME.Web.Models.App;
+﻿using System.IO;
+
+using IguideME.Web.Models.App;
 using IguideME.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+
+using Newtonsoft.Json.Linq;
 
 namespace IguideME.Web.Controllers
 {
@@ -45,6 +49,61 @@ namespace IguideME.Web.Controllers
             return Json(
                 DatabaseManager.Instance.GetUser(GetCourseID(), this.GetUserLoginID())
             );
+        }
+
+        [Authorize]
+        [HttpGet]
+        [Route("/app/notification/{userLoginID}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public ActionResult GetNotificationEnable(string userLoginID)
+        {
+            // Only instructors may view others.
+            if (this.GetUserLoginID() != userLoginID &&
+                !this.IsAdministrator())
+                return Unauthorized();
+
+            return Json(
+                DatabaseManager.Instance.GetNotificationEnable(
+                    this.GetCourseID(),
+                    userLoginID));
+        }
+
+        [Authorize]
+        [HttpGet]
+        [Route("/app/notification")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public ActionResult GetNotificationEnable()
+        {
+            return Json(
+                DatabaseManager.Instance.GetNotificationEnable(
+                    this.GetCourseID(),
+                    this.GetUserLoginID()));
+        }
+
+        [Authorize]
+        [HttpPost]
+        [Route("/app/notification")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public ActionResult UpdateNotificationEnable()
+        {
+
+            var body = new StreamReader(Request.Body).ReadToEnd();
+            DatabaseManager.Instance.UpdateNotificationEnable(
+                    this.GetCourseID(),
+                    this.GetUserLoginID(),
+                    (bool) JObject.Parse(body)["enable"]
+                    );
+
+            return Json(
+                DatabaseManager.Instance.GetNotificationEnable(
+                    this.GetCourseID(),
+                    this.GetUserLoginID()));
         }
 
         [Authorize]
@@ -128,6 +187,26 @@ namespace IguideME.Web.Controllers
             return Json(
                DatabaseManager.Instance
                 .GetPeerGroup(GetCourseID()));
+        }
+
+        [Authorize]
+        [Route("/app/track")]
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public ActionResult TrackAction()
+        {
+            if (this.IsAdministrator()) return Json("");
+
+            var body = new StreamReader(Request.Body).ReadToEnd();
+            string action = (string) JObject.Parse(body)["action"];
+
+            DatabaseManager.Instance.TrackUserAction(
+                    this.GetUserLoginID(),
+                    action
+                    );
+
+            return Json("");
         }
     }
 }

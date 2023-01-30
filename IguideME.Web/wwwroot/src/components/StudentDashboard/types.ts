@@ -6,6 +6,7 @@ import { PredictedGrade } from "../../models/app/PredictiveModel";
 
 export interface IProps {
   student: CanvasStudent | undefined;
+  consent?: string | null
 }
 
 export type ViewTypes = "bar" | "grid";
@@ -21,6 +22,7 @@ export interface IState {
   userSubmissions: Map<number, TileEntrySubmission[]>;
   predictions: PredictedGrade[];
   goalGrade: number;
+  settings_view: boolean;
 }
 
 export interface TilesGradeSummary {

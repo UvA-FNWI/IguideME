@@ -34,8 +34,7 @@ namespace IguideME.Web.Services.Workers
             {
                 _logger.LogInformation("Processing student " + student.ID.ToString() + "...");
                 try {
-                    DatabaseManager.Instance.RegisterUserGoalGrade(_courseID, student.SISUserID);
-                    DatabaseManager.Instance.RegisterConsent(new Models.ConsentData(_courseID, student.ID.Value, student.SISUserID, student.Name, -1));
+                    DatabaseManager.Instance.RegisterUserSettings(new Models.ConsentData(_courseID, student.ID.Value, student.SISUserID, student.Name, -1));
 
                     DatabaseManager.Instance.RegisterUser(
                         _courseID,

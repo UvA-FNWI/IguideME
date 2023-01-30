@@ -1,7 +1,6 @@
 import React, { Suspense } from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import Loading from "./components/utils/Loading";
-import DesiredGrade from "./common/DesiredGrade";
 import { RootState } from "./store";
 import { TileActions } from "./store/actions/tiles";
 import { connect, ConnectedProps } from "react-redux";
@@ -10,9 +9,10 @@ import { UserActions } from "./store/actions/user";
 import { CourseActions } from "./store/actions/course";
 import { DataMartActions } from "./store/actions/datamart";
 import { AppActions } from "./store/actions/app";
+import { withAdminRole } from "./hoc/withAdminRole";
+import { withConsent } from "./hoc/withConsent";
 
 const App = React.lazy(() => import('./common/App'));
-const Consent = React.lazy(() => import('./common/Consent'));
 const AdminDataMart = React.lazy(() => import('./common/Admin/sections/DataMart'));
 const AdminTiles = React.lazy(() => import('./common/Admin/sections/Tiles'));
 const AdminDashboard = React.lazy(() => import('./common/Admin/sections/Dashboard'));
@@ -87,9 +87,7 @@ class IGuideME extends React.Component<Props> {
                             <Route path="/admin/settings" component={AdminSettings} />
                             <Route path="/admin/tiles" component={AdminTiles} />
                             <Route path="/admin" component={AdminDataMart} />
-                            <Route path="/goal-grade" component={DesiredGrade} />
-                            <Route path="/consent" component={Consent} />
-                            <Route path="/" component={App} />
+                            <Route path="/" component={withConsent(withAdminRole(App))} />
                         </Switch>
                     </Router>
                 </Suspense>

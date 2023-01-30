@@ -21,6 +21,7 @@ import {CanvasDiscussion} from "../../models/canvas/Discussion";
 import {LearningOutcome} from "../../models/app/LearningGoal";
 import DataMartController from "../../api/controllers/datamart";
 import AppController from "../../api/controllers/app";
+import UserSettings from "../../common/UserSettings";
 
 const mapState = (state: RootState) => ({
   dashboardColumns: state.dashboardColumns,
@@ -50,21 +51,42 @@ class StudentDashboard extends Component<Props, IState> {
     learningOutcomes: [] as LearningOutcome[],
     viewType: "bar" as ViewTypes,
     predictions: [],
-    goalGrade: 0
+    goalGrade: 0,
+    settings_view: false
   }
 
   componentDidMount(): void {
+    AppController.trackAction("Load home")
+    if (this.props.consent !== null && this.props.consent !== undefined) {
+      AppController.trackAction("No consent")
+      this.setState({settings_view: true});
+    }
     window.addEventListener('selectTile', (event: any) => {
       this.setState({ displayTile: event?.detail});
     });
 
     this.setup(this.props);
+
+    // This should never be possible, just for if something goes wrong.
+    if (this.state.goalGrade === -1) {
+      AppController.trackAction("No goal grade")
+      this.setState({settings_view: true});
+    }
   }
 
   componentWillReceiveProps(nextProps: Readonly<Props>, nextContext: any): void {
     if (nextProps.student && nextProps.student?.login_id !== this.props.student?.login_id) {
         this.setup(nextProps);
     }
+  }
+
+  setSettingsView = (view: boolean) => {
+    this.setState({settings_view: view});
+  }
+
+  setTileView = (view: any) => {
+    AppController.trackAction(`Change view to ${view}`)
+    this.setState({ viewType: view })
   }
 
   setup = async (props: Props, propPredictions: PredictedGrade[] = []) => {
@@ -121,7 +143,7 @@ class StudentDashboard extends Component<Props, IState> {
     let discussions = (await Promise.all(p_discussions)).flat();
     let goals = (await Promise.all(p_goals)).flat();
 
-    let goalGrade = await AppController.getGoalGrade();
+    let goalGrade = await AppController.getGoalGrade(student.login_id);
 
     this.setState({
       discussions,
@@ -148,14 +170,17 @@ class StudentDashboard extends Component<Props, IState> {
       discussions,
       learningOutcomes,
       predictions,
-      goalGrade
+      goalGrade,
+      settings_view
     } = this.state;
 
     const { tiles, tileGroups, dashboardColumns, tileEntries, student } = this.props;
-    console.log("tiles", tiles);
-    console.log("Discussions", discussions);
 
     if (!loaded || !student) return (<Loading small={true} />);
+
+    if (settings_view) {
+      return <UserSettings consent= {this.props.consent} settings={this.setSettingsView} />
+    }
 
     if (displayTile) {
       return <TileDetail tile={(displayTile as any).tile}
@@ -171,17 +196,17 @@ class StudentDashboard extends Component<Props, IState> {
     return (
       <div id={"studentDashboard"}>
         <Row>
-        <Col span={4}>
+        <Col span={6}>
 
         <Radio.Group value={viewType}
                      buttonStyle="solid"
-                     onChange={e => this.setState({ viewType: e.target.value })}
+                     onChange={e => this.setTileView(e.target.value)}
                      >
           <Radio.Button value="bar"><BarChartOutlined /> Bar</Radio.Button>
           <Radio.Button value="grid"><AppstoreOutlined /> Grid</Radio.Button>
         </Radio.Group>
         </Col>
-        <Col span={3} offset={17}>
+        <Col span={4} offset={14}>
           <div style={{margin: 10}}>
               Goal Grade: { goalGrade }
           </div>
@@ -236,8 +261,10 @@ class StudentDashboard extends Component<Props, IState> {
             />
           </div>
         }
-
-        <UserProfile student={this.props.student} />
+      <br />
+      <br />
+        <UserProfile student={this.props.student}
+                     settings={this.setSettingsView} />
       </div>
     )
   }

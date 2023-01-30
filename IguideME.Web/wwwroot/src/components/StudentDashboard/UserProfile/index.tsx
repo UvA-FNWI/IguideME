@@ -1,12 +1,12 @@
 import React, { Component } from "react";
-import {Link} from "react-router-dom";
-import {Button, Col, Divider, Row} from "antd";
+import {Button, Col, Row} from "antd";
 import {RootState} from "../../../store";
 import {connect, ConnectedProps} from "react-redux";
 import {CanvasStudent} from "../../../models/canvas/Student";
 import DataMartController from "../../../api/controllers/datamart";
 import {PerformanceNotification} from "../../../models/app/Notification";
 import PerformanceNotifications from "../../../components/visuals/Notifications";
+import { SettingOutlined } from "@ant-design/icons";
 
 const mapState = (state: RootState) => ({
   course: state.course,
@@ -15,7 +15,7 @@ const mapState = (state: RootState) => ({
 
 const connector = connect(mapState)
 type PropsFromRedux = ConnectedProps<typeof connector>
-type Props = PropsFromRedux & { student: CanvasStudent | undefined };
+type Props = PropsFromRedux & { student: CanvasStudent | undefined , settings: (view: boolean) => void};
 type IState = { notifications: PerformanceNotification[] };
 
 class UserProfile extends Component<Props, IState> {
@@ -52,7 +52,7 @@ class UserProfile extends Component<Props, IState> {
   }
 
   render(): React.ReactNode {
-    const { course, student, tiles } = this.props;
+    const { course, student, tiles, settings } = this.props;
     const { notifications }: IState = this.state;
 
     const outperforming = notifications
@@ -67,33 +67,30 @@ class UserProfile extends Component<Props, IState> {
     return (
       <div id={"userProfile"}>
         <Row>
-          <Col xs={24} style={{textAlign: 'center'}}>
-            <Link to={'/goal-grade'}>
-              <Button size={"large"} color={"primary"}>
-                Goal Grade
-              </Button>
-            </Link>
-          </Col>
-
-          <Col xs={24} md={8} lg={6}>
+          <Col span={6}>
+            <div style={{margin: "10"}}>
             <h3>{ student && student.name }</h3>
             <strong>{ course && course.course_name }</strong>
+            </div>
           </Col>
 
-          <Col xs={24} md={0}>
-            <Divider />
-          </Col>
-
-          <Col xs={24} md={16} lg={18}>
-            <PerformanceNotifications outperforming = {outperforming}
+          <Col span={13} >
+            <div style={{display: "table", margin: "0 auto"}}>
+              <PerformanceNotifications outperforming = {outperforming}
                                       closing = {closing}
                                       moreEffort = {moreEffort}
                                       tiles = {tiles}
             />
-            <div style={{textAlign: 'right'}}>
-              <Link to={'/consent'}>Informed Consent</Link>
             </div>
           </Col>
+          <Col span={5}>
+            <div style={{display: "table", margin: "0 auto"}}>
+            <Button size={"large"} onClick={() => settings(true)} color={"primary"} icon={<SettingOutlined />}>
+              Settings
+            </Button>
+            </div>
+          </Col>
+
         </Row>
         <br />
         <div style={{textAlign: 'center'}}>

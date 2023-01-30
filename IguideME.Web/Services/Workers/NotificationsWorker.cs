@@ -37,6 +37,10 @@ namespace IguideME.Web.Services.Workers
 
             foreach (var user in DatabaseManager.Instance.GetUsers(this._courseID))
             {
+                if (!DatabaseManager.Instance.GetNotificationEnable(this._courseID, user.LoginID)) {
+                    _logger.LogInformation($"Not sending to {user.LoginID}, they have notifications disabled");
+                }
+
                 var notifications = DatabaseManager.Instance.GetPendingNotifications(this._courseID, user.LoginID);
 
                 _logger.LogInformation("Student " + user.LoginID + ", " + user.UserID + " has " + notifications.Count + " notifications queued up.");

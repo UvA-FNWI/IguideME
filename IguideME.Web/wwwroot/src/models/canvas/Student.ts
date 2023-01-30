@@ -4,5 +4,6 @@ export interface CanvasStudent {
   login_id: string,
   name: string,
   sortable_name: string,
-  sis_user_id: string
+  sis_user_id: string,
+  notifications?: boolean
 }

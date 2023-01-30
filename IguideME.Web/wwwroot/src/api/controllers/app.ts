@@ -61,10 +61,38 @@ export default class AppController extends Controller {
     ).then(response => response.data);
   }
 
-  static getGoalGrade(): Promise<number> {
+  static getNotificationEnable(studentLoginId?: string): Promise<boolean> {
+    if (debug()) return Promise.resolve(true);
+
+    return this.client.get(
+      studentLoginId ?
+      `app/notification/${studentLoginId}` :
+      `app/notification`
+    ).then(response => response.data);
+  }
+
+  static setNotificationEnable(enable: boolean): Promise<boolean> {
+    if (debug()) return Promise.resolve(enable);
+
+    return this.client.post(
+      `app/notification`, { enable: enable }
+    ).then(response => response.data);
+  }
+
+  static trackAction(action: string): Promise<void>{
+    if (debug()) return Promise.resolve();
+
+    return this.client.post(
+      'app/track', {action: action}
+    )
+  }
+
+  static getGoalGrade(studentLoginId?: string): Promise<number> {
     if (debug()) return Promise.resolve(8);
 
     return this.client.get(
+      studentLoginId ?
+      `goal-grade/${studentLoginId}` :
       `goal-grade`
     ).then(response => response.data);
   }

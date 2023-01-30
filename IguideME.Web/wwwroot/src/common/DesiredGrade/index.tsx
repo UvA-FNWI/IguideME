@@ -1,28 +1,31 @@
 import React, { Component } from "react";
-import { withConsent } from "../../hoc/withConsent";
-import { withAdminRole } from "../../hoc/withAdminRole";
-import { UserDataProps } from "../../hoc/types";
 import "./style.scss";
-import {Button, Radio, Space} from "antd";
+import { Radio, Space } from "antd";
 import AppController from "../../api/controllers/app";
-import { Redirect } from "react-router-dom";
 
-class DesiredGrade extends Component<UserDataProps> {
+interface IProps {};
+interface IState {
+  goalGrade: number
+
+};
+
+class DesiredGrade extends Component<IProps, IState> {
 
   state = {
-    goalGrade: undefined,
-    redirect: false,
-    loaded: false
+    goalGrade: -1,
   }
 
   componentDidMount(): void {
     AppController.getGoalGrade().then(goalGrade =>
-      this.setState({ goalGrade: goalGrade >= 0 ? goalGrade : undefined }));
+      this.setState({ goalGrade: goalGrade }));
+  }
+
+  handleGradeChange = (grade: number ): void => {
+    AppController.trackAction(`Set grade to ${grade}`);
+    AppController.setGoalGrade(grade).then(() => this.setState({ goalGrade: grade }))
   }
 
   render(): React.ReactNode {
-
-    if (this.state.redirect) return <Redirect to={'/'} />
 
     return (
       <div id={"desiredGrade"}>
@@ -32,7 +35,7 @@ class DesiredGrade extends Component<UserDataProps> {
         <Space direction={"vertical"}>
           <Radio.Group
             value={this.state.goalGrade}
-            onChange={val => this.setState({ goalGrade: val.target.value })}
+            onChange={val => this.handleGradeChange(val.target.value)}
             options={[
               { label: '1', value: 1 },
               { label: '2', value: 2 },
@@ -47,16 +50,10 @@ class DesiredGrade extends Component<UserDataProps> {
             ]}
             optionType="button"
           />
-
-          <Button type={"primary"} disabled={this.state.goalGrade === undefined} onClick={() => {
-            AppController.setGoalGrade(this.state.goalGrade!).then(_ => this.setState({ redirect: true }))
-          }}>
-            Submit
-          </Button>
         </Space>
       </div>
     )
   }
 }
 
-export default withConsent(withAdminRole(DesiredGrade));
+export default DesiredGrade;

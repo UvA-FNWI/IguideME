@@ -1,6 +1,4 @@
 import React, { Component } from "react";
-import { withConsent } from "../../hoc/withConsent";
-import { withAdminRole } from "../../hoc/withAdminRole";
 import {UserDataProps} from "../../hoc/types";
 import AdminHeader from "../../containers/AdminHeader";
 import StudentDashboard from "../../components/StudentDashboard";
@@ -38,10 +36,7 @@ class App extends Component<Props, { student: CanvasStudent | null, goalGrade: n
 
   render(): React.ReactNode {
     const { isAdmin } = this.props;
-    const { student, goalGrade } = this.state;
-
-    if (goalGrade === undefined) return <Loading />;
-    if (goalGrade === -1) return <Redirect to={'goal-grade'} />;
+    const { student } = this.state;
 
     return (
       <div id={"app"}>
@@ -60,11 +55,11 @@ class App extends Component<Props, { student: CanvasStudent | null, goalGrade: n
           <AdminDashboard student={student} /> :
           student === null ?
             <h1>Your account has not yet been processed, try again tomorrow!</h1>:
-            <StudentDashboard student={student || undefined} />
+            <StudentDashboard consent= {this.props.consent} student={student || undefined} />
         }
       </div>
     )
   }
 }
 
-export default withConsent(withAdminRole(connector(App)));
+export default connector(App);
