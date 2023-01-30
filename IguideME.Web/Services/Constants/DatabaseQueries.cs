@@ -248,6 +248,20 @@ public static class DatabaseQueries
             `sync_hash`       STRING
         );";
 
+
+    /**
+     * The peer_group2 table stores which users and the group ids
+     * that they are in
+     */
+    public const string CREATE_TABLE_PEER_GROUP2 =
+    @"CREATE TABLE IF NOT EXISTS `peer_group2` (
+        `id`                INTEGER PRIMARY KEY AUTOINCREMENT,
+        `course_id`         INTEGER,
+        `peer_group_id`     STRING,
+        `user_login_id`     STRING,
+        `sync_hash`         STRING
+    );";
+
     /**
      * The notifications table stores performance notifications for the
      * students. These are not the ones displayed in the student dashboard as
@@ -421,6 +435,13 @@ public static class DatabaseQueries
                                         `target_login_id`,
                                         `sync_hash`)
           VALUES        ({0}, '{1}', '{2}', '{3}');";
+
+    public const string REGISTER_USER_PEER2 =
+    @"INSERT INTO   `peer_group2` (  `course_id`,
+                                    `peer_group_id`,
+                                    `user_login_id`,
+                                    `sync_hash`)
+        VALUES        ({0}, '{1}', '{2}', '{3}');";
 
     public const string REGISTER_USER_NOTIFICATIONS =
         @"INSERT INTO   `notifications` (   `course_id`,
@@ -640,6 +661,20 @@ public static class DatabaseQueries
         FROM            `peer_group`
         WHERE           `course_id`={0}
         AND             `user_login_id`='{1}'
+        AND             `sync_hash`='{2}';";
+
+    public const string QUERY_USER_PEER_GROUP =
+        @"SELECT        `peer_group_id`
+        FROM            `peer_group2`
+        WHERE           `course_id`={0}
+        AND             `user_login_id`='{1}'
+        AND             `sync_hash`='{2}';";
+
+    public const string QUERY_GROUP_PEERS =
+        @"SELECT        `user_login_id`
+        FROM            `peer_group2`
+        WHERE           `course_id`={0}
+        AND             `peer_group_id`='{1}'
         AND             `sync_hash`='{2}';";
 
     public const string QUERY_ALL_NOTIFICATIONS =

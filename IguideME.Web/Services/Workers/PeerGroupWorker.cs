@@ -75,6 +75,23 @@ namespace IguideME.Web.Services.Workers
                         this.Hash);
                 }
 
+                // We find the groupid that the user is already in
+                string GroupID = DatabaseManager.Instance.GetUserPeerGroup(this.CourseID,student.LoginID,this.Hash).ToString();
+                // If they are not, we create a new one
+                if (string.IsNullOrEmpty(GroupID))
+                {
+                    GroupID = this.CourseID + student.LoginID;
+                }
+                foreach (var peer in peers)
+                {
+                    // Register student as a peer to the group of the current user
+                    DatabaseManager.Instance.CreateUserPeer2(
+                        this.CourseID,
+                        GroupID,
+                        peer.LoginID,
+                        this.Hash);
+                }
+
                 var peerIDs = peers.Select(p => p.LoginID);
 
                 var peerGrades1 = DatabaseManager.Instance.GetUserPeerComparison(

@@ -125,6 +125,7 @@ namespace IguideME.Web.Services
                 DatabaseQueries.CREATE_TABLE_COURSE_SETTINGS,
                 DatabaseQueries.CREATE_TABLE_USER_SETTINGS,
                 DatabaseQueries.CREATE_TABLE_PEER_GROUP,
+                DatabaseQueries.CREATE_TABLE_PEER_GROUP2,
                 DatabaseQueries.CREATE_TABLE_SYNC_HISTORY,
                 DatabaseQueries.CREATE_TABLE_LAYOUT_COLUMN,
                 DatabaseQueries.CREATE_TABLE_LAYOUT_TILE_GROUP,
@@ -794,6 +795,23 @@ namespace IguideME.Web.Services
             );
         }
 
+        public void CreateUserPeer2(
+            int courseID,
+            string peerGroupID,
+            string userLoginID,
+            string syncHash)
+        {
+            NonQuery(
+                String.Format(
+                    DatabaseQueries.REGISTER_USER_PEER2,
+                    courseID,
+                    peerGroupID,
+                    userLoginID,
+                    syncHash
+                )
+            );
+        }
+
         public List<string> GetUserPeers(
             int courseID,
             string userLoginID,
@@ -816,6 +834,69 @@ namespace IguideME.Web.Services
                 {
                     peers.Add(r.GetValue(0).ToString());
                 }
+            }
+            return peers;
+        }
+
+
+        public string GetUserPeerGroup(
+            int courseID,
+            string userLoginID,
+            string hash = null)
+        {
+            string activeHash = hash ?? this.GetCurrentHash(courseID);
+            if (activeHash == null) new List<string> { };
+            
+            string query = String.Format(
+                    DatabaseQueries.QUERY_USER_PEER_GROUP,
+                    courseID,
+                    userLoginID,
+                    activeHash
+                );
+
+            string groupID = "";
+
+            using(SQLiteDataReader r = Query(query)) {
+                while (r.Read())
+                {
+                    groupID = r.GetValue(0).ToString();
+                }
+            }
+            return groupID;
+        }
+
+        public List<string> GetUserPeers2(
+            int courseID,
+            string userLoginID,
+            string hash = null)
+        {
+            string activeHash = hash ?? this.GetCurrentHash(courseID);
+            if (activeHash == null) new List<string> { };
+            
+            // First we find that user's group_id for this course
+            string groupID = GetUserPeerGroup(courseID,userLoginID,hash);
+
+            List<string> peers = new List<string>();
+
+            // If the user is indeed in a group, we find the users in it
+            if (groupID != "")
+            {
+
+                string query = String.Format(
+                    DatabaseQueries.QUERY_GROUP_PEERS,
+                    courseID,
+                    groupID,
+                    activeHash
+                );
+
+                using(SQLiteDataReader r = Query(query)) {
+                    while (r.Read())
+                    {
+                        peers.Add(r.GetValue(0).ToString());
+                    }
+                }
+                // but we have to remove themselves from it
+                peers.Remove(userLoginID);
             }
             return peers;
         }
