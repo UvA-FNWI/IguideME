@@ -188,5 +188,25 @@ namespace IguideME.Web.Controllers
                DatabaseManager.Instance
                 .GetPeerGroup(GetCourseID()));
         }
+
+        [Authorize]
+        [Route("/app/track")]
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public ActionResult TrackAction()
+        {
+            if (this.IsAdministrator()) return Json("");
+
+            var body = new StreamReader(Request.Body).ReadToEnd();
+            string action = (string) JObject.Parse(body)["action"];
+
+            DatabaseManager.Instance.TrackUserAction(
+                    this.GetUserLoginID(),
+                    action
+                    );
+
+            return Json("");
+        }
     }
 }

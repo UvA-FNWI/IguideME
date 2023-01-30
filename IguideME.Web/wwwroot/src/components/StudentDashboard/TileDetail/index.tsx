@@ -11,6 +11,7 @@ import {CanvasDiscussion} from "../../../models/canvas/Discussion";
 import LearningOutcomes from "./LearningOutcomes";
 import { LearningOutcome } from "../../../models/app/LearningGoal";
 import { CanvasStudent } from "../../../models/canvas/Student";
+import AppController from "../../../api/controllers/app";
 
 export default class TileDetail extends Component<{
   tile: Tile,
@@ -63,6 +64,10 @@ export default class TileDetail extends Component<{
     }
   }
 
+  componentDidMount(): void {
+    AppController.trackAction(`Load tile: ${this.props.tile.title}`)
+  }
+
   render(): React.ReactNode {
     const { tile } = this.props;
 
@@ -71,6 +76,7 @@ export default class TileDetail extends Component<{
         <Button type={"ghost"}
                 icon={<ArrowLeftOutlined />}
                 onClick={() => {
+                  AppController.trackAction("Close tile");
                   window.dispatchEvent(new CustomEvent('selectTile', { detail: undefined }))
                 }}
         >

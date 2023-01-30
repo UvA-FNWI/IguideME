@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Button, Col, notification, Row, Tooltip } from "antd";
+import { Button, Col, Row, Tooltip } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 import { BellTwoTone } from "@ant-design/icons";
 import DesiredGrade from "../DesiredGrade";
@@ -7,6 +7,7 @@ import Consent from "../Consent";
 import ConsentController from "../../api/controllers/consent";
 import Swal from "sweetalert2";
 import AppController from "../../api/controllers/app";
+import AdminController from "../../api/controllers/admin";
 
 
 interface IProps {
@@ -32,28 +33,49 @@ export default class UserSettings extends Component<IProps, IState> {
             .then(enable => this.setState({notifications: enable, updatingNotifications: false}));
     };
 
-    checkConsent = (settings: any): any => {
-        ConsentController.fetchConsent().then((consent) => {
-            if (consent === 1) {
-                return settings(false);
-            } else {
-                Swal.fire(
-                    'No consent given',
-                    'Please fill in the consent form!',
-                    'error'
-                );
+    checkLeave = (): void => {
+        AdminController.isAdmin().then((isadmin) => {
+            if (isadmin) {
+                this.leave()
+                return;
             }
-        })
+            ConsentController.fetchConsent().then((consent) => {
+                if (consent !== 1) {
+                    Swal.fire(
+                        'No consent given',
+                        'Please fill in the consent form!',
+                        'error'
+                        );
+                    return;
+                }
 
+                AppController.getGoalGrade().then((grade) => {
+                    if (grade === -1) {
+                        Swal.fire(
+                            'No goal grade selected',
+                            'Please select a goal grade!',
+                            'error'
+                            );
+                        return;
+                    }
+                    return this.leave();
+                });
+            })
+        })
+    }
+
+    leave = (): void => {
+        AppController.trackAction("Close settings");
+        this.props.settings(false);
     }
 
     componentDidMount(): void {
+        AppController.trackAction("Open settings");
         AppController.getNotificationEnable()
             .then((enable) => this.setState({notifications: enable}));
     }
 
     render(): React.ReactNode {
-        const { settings } = this.props;
         let { notifications, updatingNotifications } = this.state;
 
         return (
@@ -63,7 +85,7 @@ export default class UserSettings extends Component<IProps, IState> {
                 <div style={{padding: 20}}>
                     <Button type={"ghost"}
                         icon={<ArrowLeftOutlined />}
-                        onClick={() => this.checkConsent(settings)}
+                        onClick={() => this.checkLeave()}
                     >
                     Return to dashboard
                     </Button>

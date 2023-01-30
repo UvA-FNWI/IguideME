@@ -65,6 +65,14 @@ public static class DatabaseQueries
             `peer_group_size`     INTEGER DEFAULT 5
         );";
 
+    public const string CREATE_TABLE_USER_TRACKER =
+        @"CREATE TABLE IF NOT EXISTS `user_tracker` (
+            `id`                  INTEGER PRIMARY KEY AUTOINCREMENT,
+            `time`                STRING DEFAULT CURRENT_TIMESTAMP,
+            `user_login_id`       STRING,
+            `action`              STRING
+        );";
+
     /**
      * The accept list table lists all the accepted students if the course is
      * set to have an accept list in the settings.
@@ -1421,6 +1429,11 @@ public static class DatabaseQueries
           WHERE         `course_id` = {0}
           AND           `status`   = '{1}'
           ;";
+
+
+    public const string INSERT_USER_ACTION =
+    @"INSERT INTO   `user_tracker` (`user_login_id`,`action`)
+          VALUES        ('{0}', '{1}');";
 
     public const string DELETE_OLD_SYNCS_FOR_COURSE =
         @"DELETE

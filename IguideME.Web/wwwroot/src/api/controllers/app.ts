@@ -79,6 +79,14 @@ export default class AppController extends Controller {
     ).then(response => response.data);
   }
 
+  static trackAction(action: string): Promise<void>{
+    if (debug()) return Promise.resolve();
+
+    return this.client.post(
+      'app/track', {action: action}
+    )
+  }
+
   static getGoalGrade(studentLoginId?: string): Promise<number> {
     if (debug()) return Promise.resolve(8);
 

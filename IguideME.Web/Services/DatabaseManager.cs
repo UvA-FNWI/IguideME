@@ -124,6 +124,7 @@ namespace IguideME.Web.Services
             {
                 DatabaseQueries.CREATE_TABLE_COURSE_SETTINGS,
                 DatabaseQueries.CREATE_TABLE_USER_SETTINGS,
+                DatabaseQueries.CREATE_TABLE_USER_TRACKER,
                 DatabaseQueries.CREATE_TABLE_PEER_GROUP,
                 DatabaseQueries.CREATE_TABLE_PEER_GROUP2,
                 DatabaseQueries.CREATE_TABLE_SYNC_HISTORY,
@@ -2527,6 +2528,17 @@ namespace IguideME.Web.Services
             }
 
             return submissions.ToArray();
+        }
+
+        public void TrackUserAction(
+            string userID,
+            string action)
+        {
+            NonQuery(
+                String.Format(
+                    DatabaseQueries.INSERT_USER_ACTION,
+                    userID,
+                    action));
         }
 
     }
