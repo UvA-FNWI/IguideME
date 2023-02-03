@@ -29,6 +29,9 @@ namespace IguideME.Web.Services.Workers
 
             _logger.LogInformation($"About to process {students.Count} students...");
 
+            CreatePeerGroupsOfCourse(this.CourseID);
+            CalculateAverages();
+
             // iterate over all students in the course
             foreach (var student in students)
             {
@@ -71,23 +74,6 @@ namespace IguideME.Web.Services.Workers
                     DatabaseManager.Instance.CreateUserPeer(
                         this.CourseID,
                         student.LoginID,
-                        peer.LoginID,
-                        this.Hash);
-                }
-
-                // We find the groupid that the user is already in
-                string GroupID = DatabaseManager.Instance.GetUserPeerGroup(this.CourseID,student.LoginID,this.Hash).ToString();
-                // If they are not, we create a new one
-                if (string.IsNullOrEmpty(GroupID))
-                {
-                    GroupID = this.CourseID + student.LoginID;
-                }
-                foreach (var peer in peers)
-                {
-                    // Register student as a peer to the group of the current user
-                    DatabaseManager.Instance.CreateUserPeer2(
-                        this.CourseID,
-                        GroupID,
                         peer.LoginID,
                         this.Hash);
                 }
@@ -229,5 +215,85 @@ namespace IguideME.Web.Services.Workers
                 }
             }
         }
+
+
+        List<String> RetrievePeerGroupOfUser (int courseID, string loginID)
+        {
+            // First we retrieve the user's goal grade
+            int goalGrade = DatabaseManager.Instance.GetUserGoalGrade(courseID, loginID);
+
+            // And then we query all the users that belong in this peer group
+            List<String> peerGroup = DatabaseManager.Instance.GetPeersFromGroup(courseID, goalGrade, Hash);
+
+            // Optionally, we remove themselves
+            if (peerGroup.Any()) peerGroup.Remove(loginID);
+
+            return peerGroup;
+        }
+
+
+        void CalculateAverages() {
+
+        }
+
+
+        void CreatePeerGroupsOfCourse(int course_id)
+        {
+            // We find all students of the course and classify them according to their goal grade
+            List<String>[] usersWithSameGoalGrade = new List<String>[11];
+            for (int goalGradeClass = 1; goalGradeClass <= 10; goalGradeClass++)
+            {
+                usersWithSameGoalGrade[goalGradeClass] = new List<string>();
+                List<User> sameGraders = DatabaseManager.Instance.GetUsersWithGoalGrade(course_id,goalGradeClass, this.Hash);
+                if (sameGraders != null)
+                {
+                    sameGraders.ForEach(x => usersWithSameGoalGrade[goalGradeClass].Add(x.LoginID));
+
+                }
+            }
+
+            int minPeerGroupSize = DatabaseManager.Instance.GetMinimumPeerGroupSize(course_id);
+
+            // We craete the peer groups for each goal grade classification and store it in the DB
+            for (int goalGradeClass = 1; goalGradeClass <= 10; goalGradeClass++)
+            {
+
+                // We initiallize the peer group by filling it with the users of the same goal grade
+                List<String> peerGroup = new List<string>(usersWithSameGoalGrade[goalGradeClass]);
+
+                for (int offset = 1; peerGroup.Count < minPeerGroupSize && offset < 10; offset++)
+                {
+                    // Check if there are valid upward peers
+                    if ((int)goalGradeClass + offset <= 10)
+                    {
+                        // Fill with upward peers
+                        foreach (String peerID in usersWithSameGoalGrade[goalGradeClass + offset])
+                        {
+                            peerGroup.Add(peerID);
+                        }
+                    }
+
+                    // Check if no more peers are required
+                    if (peerGroup.Count >= minPeerGroupSize) break;
+
+                    // Check if there are valid downward peers
+                    if ((int)goalGradeClass - offset >= 1)
+                    {
+                        // Fill with downward peers
+                        foreach (String peerID in usersWithSameGoalGrade[goalGradeClass - offset])
+                        {
+                            peerGroup.Add(peerID);
+                        }
+                    }
+                }
+
+                // Store the result in the database
+                foreach (String user in peerGroup)
+                {
+                    DatabaseManager.Instance.CreateUserPeer2(course_id,goalGradeClass, user, Hash);
+                }
+            }
+        }
+    
     }
 }

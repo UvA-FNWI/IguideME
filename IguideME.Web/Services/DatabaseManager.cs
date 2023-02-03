@@ -798,7 +798,7 @@ namespace IguideME.Web.Services
 
         public void CreateUserPeer2(
             int courseID,
-            string peerGroupID,
+            int GoalGrade,
             string userLoginID,
             string syncHash)
         {
@@ -806,98 +806,35 @@ namespace IguideME.Web.Services
                 String.Format(
                     DatabaseQueries.REGISTER_USER_PEER2,
                     courseID,
-                    peerGroupID,
+                    GoalGrade,
                     userLoginID,
                     syncHash
                 )
             );
         }
 
-        public List<string> GetUserPeers(
+
+        public List<String> GetPeersFromGroup(
             int courseID,
-            string userLoginID,
+            int goalGrade,
             string hash = null)
         {
             string activeHash = hash ?? this.GetCurrentHash(courseID);
-            if (activeHash == null) new List<string> { };
+            if (activeHash == null) new List<String> { };
 
+            List<String> peers = new List<String>();
             string query = String.Format(
-                    DatabaseQueries.QUERY_USER_PEERS,
-                    courseID,
-                    userLoginID,
-                    activeHash
-                );
-
-            List<string> peers = new List<string>();
+                DatabaseQueries.QUERY_GROUP_PEERS,
+                courseID,
+                goalGrade,
+                activeHash
+            );
 
             using(SQLiteDataReader r = Query(query)) {
                 while (r.Read())
                 {
                     peers.Add(r.GetValue(0).ToString());
                 }
-            }
-            return peers;
-        }
-
-
-        public string GetUserPeerGroup(
-            int courseID,
-            string userLoginID,
-            string hash = null)
-        {
-            string activeHash = hash ?? this.GetCurrentHash(courseID);
-            if (activeHash == null) new List<string> { };
-            
-            string query = String.Format(
-                    DatabaseQueries.QUERY_USER_PEER_GROUP,
-                    courseID,
-                    userLoginID,
-                    activeHash
-                );
-
-            string groupID = "";
-
-            using(SQLiteDataReader r = Query(query)) {
-                while (r.Read())
-                {
-                    groupID = r.GetValue(0).ToString();
-                }
-            }
-            return groupID;
-        }
-
-        public List<string> GetUserPeers2(
-            int courseID,
-            string userLoginID,
-            string hash = null)
-        {
-            string activeHash = hash ?? this.GetCurrentHash(courseID);
-            if (activeHash == null) new List<string> { };
-            
-            // First we find that user's group_id for this course
-            string groupID = GetUserPeerGroup(courseID,userLoginID,hash);
-
-            List<string> peers = new List<string>();
-
-            // If the user is indeed in a group, we find the users in it
-            if (groupID != "")
-            {
-
-                string query = String.Format(
-                    DatabaseQueries.QUERY_GROUP_PEERS,
-                    courseID,
-                    groupID,
-                    activeHash
-                );
-
-                using(SQLiteDataReader r = Query(query)) {
-                    while (r.Read())
-                    {
-                        peers.Add(r.GetValue(0).ToString());
-                    }
-                }
-                // but we have to remove themselves from it
-                peers.Remove(userLoginID);
             }
             return peers;
         }
@@ -1298,6 +1235,46 @@ namespace IguideME.Web.Services
             // var tiles = GetTiles(courseID);
             // var tile = tiles.Find(t => t.ContentType == Tile.CONTENT_TYPE_LEARNING_OUTCOMES);
 
+            return submissions.ToArray();
+        }
+
+        public PeerComparisonData[] GetUserPeerComparison2(
+            int courseID,
+            int goalGrade,
+            string hash = null)
+        {
+            string activeHash = hash ?? this.GetCurrentHash(courseID);
+            if (activeHash == null)
+                return new PeerComparisonData[] {
+                    PeerComparisonData.FromGrades(0, new float[] { })
+                };
+
+            string query1 = String.Format(
+                DatabaseQueries.QUERY_USER_PEER_GRADES2,
+                courseID,
+                goalGrade,
+                activeHash);
+
+            List<PeerComparisonData> submissions = new List<PeerComparisonData>();
+
+            using(SQLiteDataReader r1 = Query(query1)) {
+                while (r1.Read()) {
+                    try {
+
+                        PeerComparisonData submission = new PeerComparisonData(
+                            r1.GetInt32(0),
+                            r1.GetFloat(1),
+                            r1.GetFloat(2),
+                            r1.GetFloat(3)
+                        );
+
+                        submissions.Add(submission);
+                    } catch (Exception e) {
+                        _logger.LogInformation(activeHash);
+                        PrintQueryError("GetUserPeerComparison2", 3, r1, e);
+                    }
+                }
+            }
             return submissions.ToArray();
         }
 
