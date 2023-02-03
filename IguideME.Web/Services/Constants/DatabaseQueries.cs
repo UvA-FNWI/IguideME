@@ -9,29 +9,29 @@ public static class DatabaseQueries
     public static readonly Dictionary<string, string> MIGRATIONS =
         new Dictionary<string, string>()
         {
-            {
-                "0001_move_consent_and_goals_to_user_settings",
-                @"
-                INSERT INTO `user_settings` (
-                            `course_id`,
-                            `user_id`,
-                            `user_login_id`,
-                            `user_name`,
-                            `consent`,
-                            `goal_grade`
-                )
-                SELECT
-                            `consent`.`course_id`,
-                            `consent`.`user_id`,
-                            `consent`.`user_login_id`,
-                            `consent`.`user_name`,
-                            `consent`.`granted`,
-                            `goal_grade`.`grade`
-                FROM        `consent`
-                INNER JOIN  `goal_grade`
-                    ON      `consent`.`user_login_id`=`goal_grade`.`user_login_id`
-                ;"
-            }
+            // {
+            //     "0001_move_consent_and_goals_to_user_settings",
+            //     @"
+            //     INSERT INTO `user_settings` (
+            //                 `course_id`,
+            //                 `user_id`,
+            //                 `user_login_id`,
+            //                 `user_name`,
+            //                 `consent`,
+            //                 `goal_grade`
+            //     )
+            //     SELECT
+            //                 `consent`.`course_id`,
+            //                 `consent`.`user_id`,
+            //                 `consent`.`user_login_id`,
+            //                 `consent`.`user_name`,
+            //                 `consent`.`granted`,
+            //                 `goal_grade`.`grade`
+            //     FROM        `consent`
+            //     INNER JOIN  `goal_grade`
+            //         ON      `consent`.`user_login_id`=`goal_grade`.`user_login_id`
+            //     ;"
+            // }
             // {"0001_add_sent_to_notifications",
             // @"ALTER TABLE notifications ADD sent BOOLEAN;"},
         };
