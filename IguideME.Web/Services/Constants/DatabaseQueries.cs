@@ -1235,6 +1235,26 @@ public static class DatabaseQueries
         AND         `tile_entry_submission`.`sync_hash`='{2}'
 	    GROUP BY    `tile`.`id`;";
 
+public const string QUERY_USER_PEER_GRADES3 =
+        @"SELECT   `tile`.`id`,
+        `tile_entry`.`title`,
+        `tile_entry_submission`.`grade`,
+        `tile`.`content_type`
+        FROM        `tile_entry_submission`
+        INNER JOIN  `tile_entry`
+            ON      `tile_entry_submission`.`entry_id`=`tile_entry`.`id`
+        INNER JOIN  `tile`
+            ON      `tile`.`id`=`tile_entry`.`tile_id`
+        INNER JOIN  `layout_tile_group`
+            ON      `layout_tile_group`.`id`=`tile`.`group_id`
+	    WHERE       `tile`.`content_type` != 'PREDICTION'
+	    AND	        `tile`.`content_type` != 'LEARNING_OUTCOMES'
+        AND	        `tile`.`tile_type` != 'DISCUSSIONS'
+        AND         `layout_tile_group`.`course_id`={0}
+        AND         `tile_entry_submission`.`user_login_id`='{1}'
+        AND         `tile_entry_submission`.`sync_hash`='{2}'
+	    GROUP BY    `tile`.`id`;";
+
     public const string QUERY_USER_RESULTS =
         @"SELECT   `tile`.`id`,
 	    CASE `tile`.`content_type`

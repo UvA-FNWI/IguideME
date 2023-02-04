@@ -664,12 +664,20 @@ namespace IguideME.Web.Controllers
             //     DatabaseManager.Instance.GetUserPeerComparison(
             //     GetCourseID(), user.LoginID));
 
+            // ////  NEW
+            // return user == null
+            //     ? BadRequest()
+            //     : (ActionResult)Json(
+            //     DatabaseManager.Instance.GetUserPeerComparison2(
+            //     GetCourseID(), DatabaseManager.Instance.GetUserGoalGrade(GetCourseID(),user.LoginID)));
+            // //////  END
+
             ////  NEW
             return user == null
                 ? BadRequest()
                 : (ActionResult)Json(
-                DatabaseManager.Instance.GetUserPeerComparison2(
-                GetCourseID(), DatabaseManager.Instance.GetUserGoalGrade(GetCourseID(),user.LoginID)));
+                DatabaseManager.Instance.GetUserPeerComparison3(
+                GetCourseID(), user.LoginID));
             //////  END
         }
 

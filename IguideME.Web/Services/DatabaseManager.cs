@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Discussion = UvA.DataNose.Connectors.Canvas.Discussion;
 using DiscussionEntry = UvA.DataNose.Connectors.Canvas.DiscussionEntry;
 using DiscussionReply = UvA.DataNose.Connectors.Canvas.DiscussionReply;
+using System.Linq;
 
 namespace IguideME.Web.Services
 {
@@ -1275,6 +1276,74 @@ namespace IguideME.Web.Services
                     }
                 }
             }
+            return submissions.ToArray();
+        }
+
+        public PeerComparisonData[] GetUserPeerComparison3(
+            int courseID,
+            String loginID,
+            string hash = null)
+        {
+            string activeHash = hash ?? this.GetCurrentHash(courseID);
+            if (activeHash == null)
+                return new PeerComparisonData[] {
+                    PeerComparisonData.FromGrades(0, new float[] { })
+                };
+
+            // First we retrieve the user's goal grade
+            int goalGrade = DatabaseManager.Instance.GetUserGoalGrade(courseID, loginID);
+
+            // And then we query all the users that belong in this peer group
+            List<String> peers = DatabaseManager.Instance.GetPeersFromGroup(courseID, goalGrade, hash);
+
+
+
+            List<PeerComparisonData> submissions = new List<PeerComparisonData>();
+            Dictionary<int,List<float>> grades = new System.Collections.Generic.Dictionary<int,List<float>>();
+            // We query all the grades of each peer in the group
+            foreach(String peerID in peers)
+            {
+                string query = String.Format(
+                    DatabaseQueries.QUERY_USER_PEER_GRADES3,
+                    courseID,
+                    peerID,
+                    activeHash);
+
+                using(SQLiteDataReader r = Query(query)) {
+                    while (r.Read()) {
+                        try {
+                            // We save all the retrieved grades in a dictionary with
+                            // the tile.id as key and a list of grades as value
+                            List<float> value = null;
+                            if (!grades.TryGetValue(r.GetInt32(0), out value))
+                            {
+                                grades[r.GetInt32(0)] = new List<float>();
+                            }
+                            grades[r.GetInt32(0)].Add(r.GetFloat(2));
+
+                        } catch (Exception e) {
+                            _logger.LogInformation(activeHash);
+                            PrintQueryError("GetUserPeerComparison2", 3, r, e);
+                        }
+                    }
+                }
+            }
+            
+            // Finally, we go through all dictionary (= all tiles)
+            // and we return the min, max and average of each list
+            foreach (KeyValuePair<int, List<float>> entry in grades)
+            {
+                List<float> temp = entry.Value;
+                PeerComparisonData submission = new PeerComparisonData
+                (
+                    entry.Key,
+                    temp.Average(),
+                    temp.Min(),
+                    temp.Max()
+                );
+                submissions.Add(submission);
+            }
+
             return submissions.ToArray();
         }
 
