@@ -20,7 +20,7 @@
     <PackageReference Include="StackExchange.Redis" Version="2.2.62" />
     <PackageReference Include="System.Data.SQLite" Version="1.0.114.4" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="7.0.2" />
-    <!-- <PackageReference Include="UvA.LTI" Version="0.1.1" /> -->
+    <PackageReference Include="UvA.LTI" Version="0.1.1" />
   </ItemGroup>
 
   <ItemGroup>

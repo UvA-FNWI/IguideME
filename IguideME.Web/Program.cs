@@ -1,15 +1,19 @@
+using UvA.LTI;
 using System;
 using System.Net;
 using StackExchange.Redis;
 using System.Threading.Tasks;
+using System.Security.Claims;
 using IguideME.Web.Services;
 using IguideME.Web.Services.Data;
+using System.Collections.Generic;
 using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using System.Linq;
 
 // //======================== Builder configuration =========================//
 
@@ -19,7 +23,7 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(
       WebRootPath = "wwwroot/build"
     });
 
-// /------------------------ Read appsettings ------------------------/
+//    /------------------------ Read appsettings -------------------------/
 
 bool useRedisCache = bool.Parse(builder.Configuration.GetSection(
     "UnsecureApplicationSettings:UseRedisCache").Value);
@@ -102,6 +106,32 @@ builder.Services.AddControllers().AddNewtonsoftJson();
 
 WebApplication app = builder.Build();
 
+app.UseLti(new LtiOptions
+{
+    ClientId = "104400000000000213",
+    AuthenticateUrl = "https://uvadlo-dev.test.instructure.com/api/lti/authorize_redirect",
+    JwksUrl = "https://canvas.test.instructure.com/api/lti/security/jwks",
+    SigningKey = "blawlaekltjwelkrjtwlkejlekwjrklwejr32423",
+    InitiationEndpoint = "oidc",
+    LoginEndpoint = "signin-oidc",
+    RedirectUrl = "", // always redirect to root
+    ClaimsMapping = p => new Dictionary<string, object>
+    {
+        ["courseId"] = int.TryParse(p.Context.Id, out _) ? p.Context.Id : p.CustomClaims?.GetProperty("courseid").ToString(),
+        ["courseName"] = p.Context.Title,
+        [ClaimTypes.Role] = p.Roles.Any(e => e.Contains("http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor"))
+            ? "Teacher" : "Student",
+        [ClaimTypes.Email] = p.Email,
+        [ClaimTypes.NameIdentifier] = p.NameIdentifier.Split("_").Last(),
+        // Claim("user_name", formdata["lis_person_name_full"]),
+        // Claim("user_id", formdata["custom_canvas_user_id"]),
+        // Claim("user", formdata["lis_person_sourcedid"]),
+        // Claim("course", formdata["custom_canvas_course_id"]),
+        // Claim("roles", formdata["roles"]),
+    }
+
+});
+
 if (app.Environment.IsDevelopment())
 {
     Console.WriteLine("In Development.");
@@ -110,8 +140,6 @@ if (app.Environment.IsDevelopment())
 else
 {
     Console.WriteLine("In Production.");
-
-    // logger.LogInformation("In Production.");
     app.UseExceptionHandler("/Error");
 }
 
