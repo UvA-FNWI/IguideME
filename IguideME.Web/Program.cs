@@ -59,23 +59,14 @@ else
     builder.Services.AddTransient<IJobStorageService, MemoryCacheJobStorageService>();
 }
 
-// we need SameSite = None for the cookie to be stored when running in a Canvas iframe
-builder.Services
-    .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(opt =>
-    {
-        opt.Cookie.SameSite = Microsoft.AspNetCore.Http.SameSiteMode.None;
-        opt.Events.OnRedirectToAccessDenied = context =>
-        {
-            context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-            return Task.CompletedTask;
-        };
-    });
+// builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+//     .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme,
+//         options => builder.Configuration.Bind("JwtSettings", options));
 
 builder.Services.AddAuthorization(options =>
     // allow all instructors to access the admin panel of their course
     options.AddPolicy("IsInstructor",
-            policy => policy.RequireRole("instructor")));
+            policy => policy.RequireRole("teacher")));
 
 builder.Services.Configure<ForwardedHeadersOptions>(opt =>
 {
@@ -112,25 +103,19 @@ app.UseLti(new LtiOptions
     AuthenticateUrl = "https://uvadlo-dev.test.instructure.com/api/lti/authorize_redirect",
     JwksUrl = "https://canvas.test.instructure.com/api/lti/security/jwks",
     SigningKey = "blawlaekltjwelkrjtwlkejlekwjrklwejr32423",
-    InitiationEndpoint = "oidc",
-    LoginEndpoint = "signin-oidc",
-    RedirectUrl = "", // always redirect to root
     ClaimsMapping = p => new Dictionary<string, object>
     {
-        ["courseId"] = int.TryParse(p.Context.Id, out _) ? p.Context.Id : p.CustomClaims?.GetProperty("courseid").ToString(),
+        [ClaimTypes.NameIdentifier] = p.NameIdentifier.Split("_").Last(),
+        ["contextLabel"] = p.Context.Label,
         ["courseName"] = p.Context.Title,
         [ClaimTypes.Role] = p.Roles.Any(e => e.Contains("http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor"))
             ? "Teacher" : "Student",
         [ClaimTypes.Email] = p.Email,
-        [ClaimTypes.NameIdentifier] = p.NameIdentifier.Split("_").Last(),
-        // Claim("user_name", formdata["lis_person_name_full"]),
-        // Claim("user_id", formdata["custom_canvas_user_id"]),
-        // Claim("user", formdata["lis_person_sourcedid"]),
-        // Claim("course", formdata["custom_canvas_course_id"]),
-        // Claim("roles", formdata["roles"]),
+        // ["courseId"] = int.TryParse(p.Context.Id, out _) ? p.Context.Id : p.CustomClaims?.GetProperty("courseid").ToString(),
     }
 
 });
+
 
 if (app.Environment.IsDevelopment())
 {

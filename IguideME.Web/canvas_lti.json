@@ -1,0 +1,25 @@
+{
+    "title": "Test tool",
+    "scopes": [],
+    "extensions": [
+      {
+        "platform": "canvas.instructure.com",
+        "settings": {
+          "platform": "canvas.instructure.com",
+          "placements": [
+            {
+              "placement": "course_navigation",
+              "message_type": "LtiResourceLinkRequest"
+            }
+          ]
+        },
+        "privacy_level": "public"
+      }
+    ],
+    "public_jwk": {},
+    "description": "LTI 1.3 test",
+    "custom_fields": {},
+    "public_jwk_url": "https://localhost:5000/jwks",
+    "target_link_uri": "https://localhost:5000",
+    "oidc_initiation_url": "https://localhost:5000/oidc"
+  }
