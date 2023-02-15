@@ -14,6 +14,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Linq;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 
 // //======================== Builder configuration =========================//
 
@@ -59,9 +61,9 @@ else
     builder.Services.AddTransient<IJobStorageService, MemoryCacheJobStorageService>();
 }
 
-// builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-//     .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme,
-//         options => builder.Configuration.Bind("JwtSettings", options));
+builder.Services
+    .AddAuthentication()
+    .AddJwtBearer();
 
 builder.Services.AddAuthorization(options =>
     // allow all instructors to access the admin panel of their course
@@ -111,7 +113,7 @@ app.UseLti(new LtiOptions
         [ClaimTypes.Role] = p.Roles.Any(e => e.Contains("http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor"))
             ? "Teacher" : "Student",
         [ClaimTypes.Email] = p.Email,
-        // ["courseId"] = int.TryParse(p.Context.Id, out _) ? p.Context.Id : p.CustomClaims?.GetProperty("courseid").ToString(),
+        ["courseId"] = p.Context.Id,
     }
 
 });
