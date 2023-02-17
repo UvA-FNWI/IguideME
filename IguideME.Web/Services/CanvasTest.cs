@@ -57,10 +57,16 @@ namespace IguideME.Web.Services
         public User[] GetStudents(int courseID)
         {
             _logger.LogInformation("Finding course by id, id = " + courseID);
-            _logger.LogInformation("Course = " + _connector.FindCourseById(courseID));
-            _logger.LogInformation("Getting users " + _connector.FindCourseById(courseID).GetUsersByType(EnrollmentType.Student).ToArray());
 
-            return _connector.FindCourseById(courseID).GetUsersByType(EnrollmentType.Student).ToArray();
+            Course course = _connector.FindCourseById(courseID);
+
+            _logger.LogInformation("Course = " + course);
+
+            User[] users = course.GetUsersByType(EnrollmentType.Student).ToArray();
+
+            _logger.LogInformation("Getting users " + string.Join(", ", (object[]) users));
+
+            return users;
         }
 
         public User[] GetAdministrators(int courseID)
