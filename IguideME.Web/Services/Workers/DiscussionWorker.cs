@@ -56,7 +56,6 @@ namespace IguideME.Web.Services.Workers
 
 				if (tile.Wildcard)
 				{
-					// TODO: how does a wildcard get created?
 					_logger.LogInformation("wildcard");
 					var postedDiscussions = discussions
 					.Where(d =>

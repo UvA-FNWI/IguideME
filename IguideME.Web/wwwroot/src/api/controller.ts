@@ -10,7 +10,7 @@ export default class Controller {
   static setup(): void {
     // automatically set the base url of each request to the current host
     this.client = axios.create({
-      baseURL: this.baseURL() //://${window.location.hostname}:5001/`
+      baseURL: this.baseURL()
     });
   }
 }

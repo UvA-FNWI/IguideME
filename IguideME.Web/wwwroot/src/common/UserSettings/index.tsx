@@ -33,7 +33,7 @@ export default class UserSettings extends Component<IProps, IState> {
             .then(enable => this.setState({notifications: enable, updatingNotifications: false}));
     };
 
-    checkLeave = (): void => {
+    checkLeave(): void {
         AdminController.isAdmin().then((isadmin) => {
             if (isadmin) {
                 this.leave()
@@ -69,10 +69,21 @@ export default class UserSettings extends Component<IProps, IState> {
         this.props.settings(false);
     }
 
+    keyHandler(event: KeyboardEvent): void {
+        if (event.key === "Escape") {
+            this.checkLeave();
+        }
+    }
+
     componentDidMount(): void {
+        window.addEventListener("keydown", this.keyHandler.bind(this), false);
         AppController.trackAction("Open settings");
         AppController.getNotificationEnable()
             .then((enable) => this.setState({notifications: enable}));
+    }
+
+    componentWillUnmount(){
+        document.removeEventListener("keydown", this.keyHandler.bind(this), false);
     }
 
     render(): React.ReactNode {

@@ -1,8 +1,6 @@
 using UvA.LTI;
 using System;
-using System.Net;
 using StackExchange.Redis;
-using System.Threading.Tasks;
 using System.Security.Claims;
 using IguideME.Web.Services;
 using IguideME.Web.Services.Data;
@@ -12,10 +10,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Linq;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
 
 // //======================== Builder configuration =========================//
 
