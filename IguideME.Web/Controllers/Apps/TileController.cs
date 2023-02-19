@@ -658,27 +658,11 @@ namespace IguideME.Web.Controllers
             User user = DatabaseManager.Instance.GetUser(
                 this.GetCourseID(), userLoginID);
 
-            // return user == null
-            //     ? BadRequest()
-            //     : (ActionResult)Json(
-            //     DatabaseManager.Instance.GetUserPeerComparison(
-            //     GetCourseID(), user.LoginID));
-
-            // ////  NEW
-            // return user == null
-            //     ? BadRequest()
-            //     : (ActionResult)Json(
-            //     DatabaseManager.Instance.GetUserPeerComparison2(
-            //     GetCourseID(), DatabaseManager.Instance.GetUserGoalGrade(GetCourseID(),user.LoginID)));
-            // //////  END
-
-            ////  NEW
             return user == null
                 ? BadRequest()
                 : (ActionResult)Json(
-                DatabaseManager.Instance.GetUserPeerComparison3(
+                DatabaseManager.Instance.GetUserPeerComparison(
                 GetCourseID(), user.LoginID));
-            //////  END
         }
 
         [Authorize]

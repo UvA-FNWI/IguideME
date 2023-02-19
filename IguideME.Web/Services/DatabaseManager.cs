@@ -127,7 +127,6 @@ namespace IguideME.Web.Services
                 DatabaseQueries.CREATE_TABLE_USER_SETTINGS,
                 DatabaseQueries.CREATE_TABLE_USER_TRACKER,
                 DatabaseQueries.CREATE_TABLE_PEER_GROUP,
-                DatabaseQueries.CREATE_TABLE_PEER_GROUP2,
                 DatabaseQueries.CREATE_TABLE_SYNC_HISTORY,
                 DatabaseQueries.CREATE_TABLE_LAYOUT_COLUMN,
                 DatabaseQueries.CREATE_TABLE_LAYOUT_TILE_GROUP,
@@ -780,35 +779,28 @@ namespace IguideME.Web.Services
             return goals.ToArray();
         }
 
+
         public void CreateUserPeer(
             int courseID,
-            string userLoginID,
-            string targetLoginID,
+            int GoalGrade,
+            List<string> userLoginIDs,
+            int tileID,
+            float avgGrade,
+            float minGrade,
+            float maxGrade,
             string syncHash)
         {
+            string combinedIDs = string.Join( ",", userLoginIDs);
             NonQuery(
                 String.Format(
                     DatabaseQueries.REGISTER_USER_PEER,
                     courseID,
-                    userLoginID,
-                    targetLoginID,
-                    syncHash
-                )
-            );
-        }
-
-        public void CreateUserPeer2(
-            int courseID,
-            int GoalGrade,
-            string userLoginID,
-            string syncHash)
-        {
-            NonQuery(
-                String.Format(
-                    DatabaseQueries.REGISTER_USER_PEER2,
-                    courseID,
                     GoalGrade,
-                    userLoginID,
+                    combinedIDs,
+                    tileID,
+                    avgGrade,
+                    minGrade,
+                    maxGrade,
                     syncHash
                 )
             );
@@ -1158,90 +1150,216 @@ namespace IguideME.Web.Services
                     personalizedPeers));
         }
 
-        public PeerComparisonData[] GetUserPeerComparison(
+        // public PeerComparisonData[] GetUserPeerComparison(
+        //     int courseID,
+        //     string userLoginID,
+        //     string hash = null)
+        // {
+        //     string activeHash = hash ?? this.GetCurrentHash(courseID);
+        //     if (activeHash == null)
+        //         return new PeerComparisonData[] {
+        //             PeerComparisonData.FromGrades(0, new float[] { })
+        //         };
+
+        //     string query1 = String.Format(
+        //         DatabaseQueries.QUERY_USER_PEER_GRADES,
+        //         courseID,
+        //         userLoginID,
+        //         activeHash);
+
+        //     // string query2 = String.Format(
+        //     //     DatabaseQueries.QUERY_PREDICTED_GRADES,
+        //     //     courseID,
+        //     //     activeHash);
+
+
+        //     List<PeerComparisonData> submissions = new List<PeerComparisonData>();
+
+        //     using(SQLiteDataReader r1 = Query(query1)) {
+        //         while (r1.Read()) {
+        //             try {
+
+        //                 PeerComparisonData submission = new PeerComparisonData(
+        //                     r1.GetInt32(0),
+        //                     r1.GetFloat(1),
+        //                     r1.GetFloat(2),
+        //                     r1.GetFloat(3)
+        //                 );
+
+        //                 submissions.Add(submission);
+        //             } catch (Exception e) {
+        //                 _logger.LogInformation(activeHash);
+        //                 PrintQueryError("GetUserPeerComparison", 3, r1, e);
+        //             }
+        //         }
+        //     }
+
+        //     // List<float> predictedGrades = new List<float>();
+        //     // int tileID = -1;
+
+        //     // using(SQLiteDataReader r2 = Query(query2)) {
+        //     //     while (r2.Read())
+        //     //     {
+        //     //         try
+        //     //         {
+        //     //             if (tileID < 0)
+        //     //             {
+        //     //                 tileID = r2.GetInt32(1);
+        //     //             }
+        //     //             predictedGrades.Add(r2.GetFloat(2));
+        //     //         } catch (Exception e) {
+        //     //             PrintQueryError("GetUserPeerComparison", 2, r2, e);
+        //     //         }
+        //     //     }
+        //     // }
+
+        //     // if (tileID > 0)
+        //     // {
+        //     //     PeerComparisonData predictedGrade = new PeerComparisonData(
+        //     //         tileID,
+        //     //         predictedGrades.Average(),
+        //     //         predictedGrades.Min(),
+        //     //         predictedGrades.Max()
+        //     //     );
+
+        //     //     submissions.Add(predictedGrade);
+        //     // }
+
+        //     // var tiles = GetTiles(courseID);
+        //     // var tile = tiles.Find(t => t.ContentType == Tile.CONTENT_TYPE_LEARNING_OUTCOMES);
+
+        //     return submissions.ToArray();
+        // }
+
+        // public PeerComparisonData[] GetUserPeerComparison(
+        //     int courseID,
+        //     int goalGrade,
+        //     string hash = null)
+        // {
+        //     string activeHash = hash ?? this.GetCurrentHash(courseID);
+        //     if (activeHash == null)
+        //         return new PeerComparisonData[] {
+        //             PeerComparisonData.FromGrades(0, new float[] { })
+        //         };
+
+        //     string query1 = String.Format(
+        //         DatabaseQueries.QUERY_USER_PEER_GRADES2,
+        //         courseID,
+        //         goalGrade,
+        //         activeHash);
+
+        //     List<PeerComparisonData> submissions = new List<PeerComparisonData>();
+
+        //     using(SQLiteDataReader r1 = Query(query1)) {
+        //         while (r1.Read()) {
+        //             try {
+
+        //                 PeerComparisonData submission = new PeerComparisonData(
+        //                     r1.GetInt32(0),
+        //                     r1.GetFloat(1),
+        //                     r1.GetFloat(2),
+        //                     r1.GetFloat(3)
+        //                 );
+
+        //                 submissions.Add(submission);
+        //             } catch (Exception e) {
+        //                 _logger.LogInformation(activeHash);
+        //                 PrintQueryError("GetUserPeerComparison2", 3, r1, e);
+        //             }
+        //         }
+        //     }
+        //     return submissions.ToArray();
+        // }
+
+    public int GetUserId(
+        int courseID,
+        string loginID)
+    {
+        string query = String.Format(
+            DatabaseQueries.QUERY_USER_ID_FROM_LOGIN_ID,
+            courseID,
+            loginID);
+
+        int userID = 0; 
+        using(SQLiteDataReader r = Query(query)) {
+            while (r.Read()) {
+                try {
+                    userID = r.GetInt32(0);
+                } catch (Exception e) {
+                    PrintQueryError("GetUserId", 3, r, e);
+                }
+            }
+        }
+        return userID;
+    }
+    public Dictionary<int,List<float>> GetUserGrades(
             int courseID,
-            string userLoginID,
+            string loginID,
             string hash = null)
         {
             string activeHash = hash ?? this.GetCurrentHash(courseID);
             if (activeHash == null)
-                return new PeerComparisonData[] {
-                    PeerComparisonData.FromGrades(0, new float[] { })
-                };
+                return new System.Collections.Generic.Dictionary<int,List<float>>();
 
-            string query1 = String.Format(
-                DatabaseQueries.QUERY_USER_PEER_GRADES,
+            Dictionary<int,List<float>> grades = new System.Collections.Generic.Dictionary<int,List<float>>();
+
+            string query = String.Format(
+                DatabaseQueries.QUERY_USER_RESULTS2,
                 courseID,
-                userLoginID,
+                loginID,
                 activeHash);
 
-            // string query2 = String.Format(
-            //     DatabaseQueries.QUERY_PREDICTED_GRADES,
-            //     courseID,
-            //     activeHash);
-
-
-            List<PeerComparisonData> submissions = new List<PeerComparisonData>();
-
-            using(SQLiteDataReader r1 = Query(query1)) {
-                while (r1.Read()) {
+            using(SQLiteDataReader r = Query(query)) {
+                while (r.Read()) {
                     try {
+                        // We save all the retrieved grades in a dictionary with
+                        // the tile.id as key and a list of grades as value
+                        List<float> value = null;
+                        if (!grades.TryGetValue(r.GetInt32(0), out value))
+                        {
+                            grades[r.GetInt32(0)] = new List<float>();
+                        }
+                        grades[r.GetInt32(0)].Add(r.GetFloat(2));
 
-                        PeerComparisonData submission = new PeerComparisonData(
-                            r1.GetInt32(0),
-                            r1.GetFloat(1),
-                            r1.GetFloat(2),
-                            r1.GetFloat(3)
-                        );
-
-                        submissions.Add(submission);
                     } catch (Exception e) {
                         _logger.LogInformation(activeHash);
-                        PrintQueryError("GetUserPeerComparison", 3, r1, e);
+                        PrintQueryError("GetUserPeerComparison2", 3, r, e);
                     }
                 }
             }
 
-            // List<float> predictedGrades = new List<float>();
-            // int tileID = -1;
+            // In the same way, we get discussions
+            string query2 = String.Format(
+                DatabaseQueries.QUERY_USER_DISCUSSION_COUNTER,
+                courseID,
+                GetUserId(courseID,loginID));
 
-            // using(SQLiteDataReader r2 = Query(query2)) {
-            //     while (r2.Read())
-            //     {
-            //         try
-            //         {
-            //             if (tileID < 0)
-            //             {
-            //                 tileID = r2.GetInt32(1);
-            //             }
-            //             predictedGrades.Add(r2.GetFloat(2));
-            //         } catch (Exception e) {
-            //             PrintQueryError("GetUserPeerComparison", 2, r2, e);
-            //         }
-            //     }
-            // }
+            using(SQLiteDataReader r2 = Query(query2)) {
+                while (r2.Read()) {
+                    try {
+                        // We save the sum of discussion entriess and replies in a dictionary with
+                        // the discussion.id as key and the total of their entries/replies as value
+                        if (!r2.IsDBNull(0))
+                        {
+                            int discID = r2.GetInt32(0);
+                            grades[discID] = new List<float>();
+                            grades[discID].Add((float)r2.GetInt32(1)); 
+                        }
 
-            // if (tileID > 0)
-            // {
-            //     PeerComparisonData predictedGrade = new PeerComparisonData(
-            //         tileID,
-            //         predictedGrades.Average(),
-            //         predictedGrades.Min(),
-            //         predictedGrades.Max()
-            //     );
+                    } catch (Exception e) {
+                        _logger.LogInformation(activeHash);
+                        PrintQueryError("GetUserGrades", 3, r2, e);
+                    }
+                }
+            }
 
-            //     submissions.Add(predictedGrade);
-            // }
-
-            // var tiles = GetTiles(courseID);
-            // var tile = tiles.Find(t => t.ContentType == Tile.CONTENT_TYPE_LEARNING_OUTCOMES);
-
-            return submissions.ToArray();
+            return grades;
         }
 
-        public PeerComparisonData[] GetUserPeerComparison2(
+        
+        public PeerComparisonData[] GetUserPeerComparison(
             int courseID,
-            int goalGrade,
+            string loginID,
             string hash = null)
         {
             string activeHash = hash ?? this.GetCurrentHash(courseID);
@@ -1250,100 +1368,34 @@ namespace IguideME.Web.Services
                     PeerComparisonData.FromGrades(0, new float[] { })
                 };
 
-            string query1 = String.Format(
-                DatabaseQueries.QUERY_USER_PEER_GRADES2,
+            List<PeerComparisonData> submissions = new List<PeerComparisonData>();
+
+            // First we need to find the user's goal grade to find their peer-group
+            int goalGrade = GetUserGoalGrade(courseID,loginID);
+
+            string query = String.Format(
+                DatabaseQueries.QUERY_PEER_GROUP_RESULTS,
                 courseID,
                 goalGrade,
                 activeHash);
 
-            List<PeerComparisonData> submissions = new List<PeerComparisonData>();
-
-            using(SQLiteDataReader r1 = Query(query1)) {
-                while (r1.Read()) {
+            using(SQLiteDataReader r = Query(query)) {
+                while (r.Read()) {
                     try {
-
                         PeerComparisonData submission = new PeerComparisonData(
-                            r1.GetInt32(0),
-                            r1.GetFloat(1),
-                            r1.GetFloat(2),
-                            r1.GetFloat(3)
+                            r.GetInt32(0),
+                            r.GetFloat(1),
+                            r.GetFloat(2),
+                            r.GetFloat(3)
                         );
+            submissions.Add(submission);
 
-                        submissions.Add(submission);
                     } catch (Exception e) {
                         _logger.LogInformation(activeHash);
-                        PrintQueryError("GetUserPeerComparison2", 3, r1, e);
+                        PrintQueryError("GetUserPeerComparison2", 3, r, e);
                     }
                 }
             }
-            return submissions.ToArray();
-        }
-
-        public PeerComparisonData[] GetUserPeerComparison3(
-            int courseID,
-            String loginID,
-            string hash = null)
-        {
-            string activeHash = hash ?? this.GetCurrentHash(courseID);
-            if (activeHash == null)
-                return new PeerComparisonData[] {
-                    PeerComparisonData.FromGrades(0, new float[] { })
-                };
-
-            // First we retrieve the user's goal grade
-            int goalGrade = DatabaseManager.Instance.GetUserGoalGrade(courseID, loginID);
-
-            // And then we query all the users that belong in this peer group
-            List<String> peers = DatabaseManager.Instance.GetPeersFromGroup(courseID, goalGrade, hash);
-
-
-
-            List<PeerComparisonData> submissions = new List<PeerComparisonData>();
-            Dictionary<int,List<float>> grades = new System.Collections.Generic.Dictionary<int,List<float>>();
-            // We query all the grades of each peer in the group
-            foreach(String peerID in peers)
-            {
-                string query = String.Format(
-                    DatabaseQueries.QUERY_USER_PEER_GRADES3,
-                    courseID,
-                    peerID,
-                    activeHash);
-
-                using(SQLiteDataReader r = Query(query)) {
-                    while (r.Read()) {
-                        try {
-                            // We save all the retrieved grades in a dictionary with
-                            // the tile.id as key and a list of grades as value
-                            List<float> value = null;
-                            if (!grades.TryGetValue(r.GetInt32(0), out value))
-                            {
-                                grades[r.GetInt32(0)] = new List<float>();
-                            }
-                            grades[r.GetInt32(0)].Add(r.GetFloat(2));
-
-                        } catch (Exception e) {
-                            _logger.LogInformation(activeHash);
-                            PrintQueryError("GetUserPeerComparison2", 3, r, e);
-                        }
-                    }
-                }
-            }
-            
-            // Finally, we go through all dictionary (= all tiles)
-            // and we return the min, max and average of each list
-            foreach (KeyValuePair<int, List<float>> entry in grades)
-            {
-                List<float> temp = entry.Value;
-                PeerComparisonData submission = new PeerComparisonData
-                (
-                    entry.Key,
-                    temp.Average(),
-                    temp.Min(),
-                    temp.Max()
-                );
-                submissions.Add(submission);
-            }
-
             return submissions.ToArray();
         }
 
@@ -1424,40 +1476,40 @@ namespace IguideME.Web.Services
             return submissions.ToArray();
         }
 
-        public List<TileEntrySubmission> GetTileSubmissionsForUserPeers(
-            int courseID,
-            int tileID,
-            string userLoginID,
-            string hash = null)
-        {
-            string activeHash = hash ?? this.GetCurrentHash(courseID);
-            if (activeHash == null) return new List<TileEntrySubmission>() { };
+        // public List<TileEntrySubmission> GetTileSubmissionsForUserPeers(
+        //     int courseID,
+        //     int tileID,
+        //     string userLoginID,
+        //     string hash = null)
+        // {
+        //     string activeHash = hash ?? this.GetCurrentHash(courseID);
+        //     if (activeHash == null) return new List<TileEntrySubmission>() { };
 
-            string query1 = String.Format(
-                DatabaseQueries.QUERY_USER_SUBMISSIONS_FOR_TILE_FOR_USER_PEERS,
-                tileID,
-                userLoginID,
-                activeHash);
+        //     string query1 = String.Format(
+        //         DatabaseQueries.QUERY_USER_SUBMISSIONS_FOR_TILE_FOR_USER_PEERS,
+        //         tileID,
+        //         userLoginID,
+        //         activeHash);
 
-            List<TileEntrySubmission> submissions = new List<TileEntrySubmission>();
+        //     List<TileEntrySubmission> submissions = new List<TileEntrySubmission>();
 
-            using(SQLiteDataReader r1 = Query(query1)) {
-                while (r1.Read())
-                {
-                    TileEntrySubmission submission = new TileEntrySubmission(
-                        r1.GetInt32(0),
-                        r1.GetInt32(1),
-                        r1.GetValue(2).ToString(),
-                        r1.GetValue(3).ToString(),
-                        r1.GetValue(4).ToString(),
-                        hash: activeHash
-                    );
-                    submissions.Add(submission);
-                }
-            }
+        //     using(SQLiteDataReader r1 = Query(query1)) {
+        //         while (r1.Read())
+        //         {
+        //             TileEntrySubmission submission = new TileEntrySubmission(
+        //                 r1.GetInt32(0),
+        //                 r1.GetInt32(1),
+        //                 r1.GetValue(2).ToString(),
+        //                 r1.GetValue(3).ToString(),
+        //                 r1.GetValue(4).ToString(),
+        //                 hash: activeHash
+        //             );
+        //             submissions.Add(submission);
+        //         }
+        //     }
 
-            return submissions;
-        }
+        //     return submissions;
+        // }
 
         public List<TileEntrySubmission> GetTileSubmissionsForUser(
             int courseID,
@@ -1490,6 +1542,58 @@ namespace IguideME.Web.Services
             }
 
             return submissions;
+        }
+
+
+
+        public new Dictionary <int,List<float[]>> GetHistoricComparison(
+            int courseID,
+            string userLoginID,
+            string hash = null)
+        {
+            string activeHash = hash ?? this.GetCurrentHash(courseID);
+            if (activeHash == null) return new Dictionary<int, List<float[]>>();
+            
+            string query1 = String.Format(
+                DatabaseQueries.QUERY_GRADE_COMPARISSON_HISTORY,
+                courseID,
+                GetUserGoalGrade(courseID,userLoginID),
+                userLoginID);
+                
+
+            Dictionary<int, List<float[]>> comparisson_history = new Dictionary<int, List<float[]>>();
+
+            using(SQLiteDataReader r1 = Query(query1)) {
+                try
+                {
+                    while (r1.Read())
+                    {
+                        // Initialize an array with values to put inside list
+                            float[] entry = new float[4];
+                            entry[0] = r1.GetFloat(1);
+                            entry[1] = r1.GetFloat(2);
+                            entry[2] = r1.GetFloat(3);
+                            entry[3] = r1.GetFloat(4);
+
+                        // If we have gone in a new tile, we create new pair
+                        if (!comparisson_history.ContainsKey(r1.GetInt32(0)))
+                        {
+                            // Use tile id as key and create new list to add the entry
+                            comparisson_history[r1.GetInt32(0)] = new List<float[]>();
+                            comparisson_history[r1.GetInt32(0)].Add(entry);
+                        }
+                        else if (comparisson_history[r1.GetInt32(0)].Last() != entry)
+                        {
+                            // If this entry is different than the lst, we add it
+                            comparisson_history[r1.GetInt32(0)].Add(entry);
+                        }
+                    }
+                } catch (Exception e) {
+                        _logger.LogInformation(activeHash);
+                        PrintQueryError("GetHistoricComparison", 3, r1, e);
+                    }
+            }
+            return comparisson_history;
         }
 
         public List<LearningGoal> GetGoals(int courseID)

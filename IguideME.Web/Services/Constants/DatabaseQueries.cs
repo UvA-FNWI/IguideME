@@ -247,26 +247,30 @@ public static class DatabaseQueries
      * The peer_group table stores links between users that are in the same
      * peer group.
      */
-    public const string CREATE_TABLE_PEER_GROUP =
-        @"CREATE TABLE IF NOT EXISTS `peer_group` (
-            `id`              INTEGER PRIMARY KEY AUTOINCREMENT,
-            `course_id`       INTEGER,
-            `user_login_id`   STRING,
-            `target_login_id` STRING,
-            `sync_hash`       STRING
-        );";
+    // public const string CREATE_TABLE_PEER_GROUP =
+    //     @"CREATE TABLE IF NOT EXISTS `peer_group` (
+    //         `id`              INTEGER PRIMARY KEY AUTOINCREMENT,
+    //         `course_id`       INTEGER,
+    //         `user_login_id`   STRING,
+    //         `target_login_id` STRING,
+    //         `sync_hash`       STRING
+    //     );";
 
 
     /**
-     * The peer_group2 table stores which users and the group
+     * The peer_group table stores which users and the group
      * that they are in
      */
-    public const string CREATE_TABLE_PEER_GROUP2 =
-    @"CREATE TABLE IF NOT EXISTS `peer_group2` (
+    public const string CREATE_TABLE_PEER_GROUP =
+    @"CREATE TABLE IF NOT EXISTS `peer_group` (
         `id`                INTEGER PRIMARY KEY AUTOINCREMENT,
         `course_id`         INTEGER,
         `goal_grade`        INTEGER,
-        `user_login_id`     STRING,
+        `user_ids`          STRING,
+        `tile_id`           INTEGER,
+        `avg_grade`         REAL,
+        `min_grade`         REAL,
+        `max_grade`         REAL,
         `sync_hash`         STRING
     );";
 
@@ -437,19 +441,23 @@ public static class DatabaseQueries
           VALUES        ({0}, '{1}')
           ON CONFLICT   (`course_id`, `user_id` ) DO NOTHING;";
 
-    public const string REGISTER_USER_PEER =
-        @"INSERT INTO   `peer_group` (  `course_id`,
-                                        `user_login_id`,
-                                        `target_login_id`,
-                                        `sync_hash`)
-          VALUES        ({0}, '{1}', '{2}', '{3}');";
+    // public const string REGISTER_USER_PEER =
+    //     @"INSERT INTO   `peer_group` (  `course_id`,
+    //                                     `user_login_id`,
+    //                                     `target_login_id`,
+    //                                     `sync_hash`)
+    //       VALUES        ({0}, '{1}', '{2}', '{3}');";
 
-    public const string REGISTER_USER_PEER2 =
-    @"INSERT INTO   `peer_group2` (  `course_id`,
+    public const string REGISTER_USER_PEER =
+    @"INSERT INTO   `peer_group` (  `course_id`,
                                     `goal_grade`,
-                                    `user_login_id`,
+                                    `user_ids`,
+                                    `tile_id`,
+                                    `avg_grade`,
+                                    `min_grade`,
+                                    `max_grade`,
                                     `sync_hash`)
-        VALUES        ({0}, '{1}', '{2}', '{3}');";
+        VALUES        ({0}, '{1}', '{2}','{3}','{4}','{5}','{6}','{7}');";
 
     public const string REGISTER_USER_NOTIFICATIONS =
         @"INSERT INTO   `notifications` (   `course_id`,
@@ -666,7 +674,7 @@ public static class DatabaseQueries
 
     public const string QUERY_GROUP_PEERS =
         @"SELECT        `user_login_id`
-        FROM            `peer_group2`
+        FROM            `peer_group`
         WHERE           `course_id`={0}
         AND             `goal_grade`='{1}'
         AND             `sync_hash`='{2}';";
@@ -1137,21 +1145,21 @@ public static class DatabaseQueries
         AND         `tile_entry_submission`.`user_login_id`='{1}'
         AND         `tile_entry_submission`.`sync_hash`='{2}';";
 
-    public const string QUERY_USER_SUBMISSIONS_FOR_TILE_FOR_USER_PEERS =
-        @"SELECT    `tile_entry_submission`.`id`,
-                    `tile_entry_submission`.`entry_id`,
-                    `tile_entry_submission`.`user_login_id`,
-                    `tile_entry_submission`.`grade`,
-                    `tile_entry_submission`.`submitted`
-        FROM        `tile_entry_submission`
-        INNER JOIN  `tile_entry`
-            ON      `tile_entry_submission`.`entry_id`=`tile_entry`.`id`
-        INNER JOIN  `peer_group`
-            ON      `tile_entry_submission`.`user_login_id`=`peer_group`.`target_login_id`
-        WHERE       `tile_entry`.`tile_id`={0}
-        AND         `peer_group`.`user_login_id`='{1}'
-        AND         `peer_group`.`sync_hash`='{2}'
-        AND         `tile_entry_submission`.`sync_hash`='{2}';";
+    // public const string QUERY_USER_SUBMISSIONS_FOR_TILE_FOR_USER_PEERS =
+    //     @"SELECT    `tile_entry_submission`.`id`,
+    //                 `tile_entry_submission`.`entry_id`,
+    //                 `tile_entry_submission`.`user_login_id`,
+    //                 `tile_entry_submission`.`grade`,
+    //                 `tile_entry_submission`.`submitted`
+    //     FROM        `tile_entry_submission`
+    //     INNER JOIN  `tile_entry`
+    //         ON      `tile_entry_submission`.`entry_id`=`tile_entry`.`id`
+    //     INNER JOIN  `peer_group`
+    //         ON      `tile_entry_submission`.`user_login_id`=`peer_group`.`target_login_id`
+    //     WHERE       `tile_entry`.`tile_id`={0}
+    //     AND         `peer_group`.`user_login_id`='{1}'
+    //     AND         `peer_group`.`sync_hash`='{2}'
+    //     AND         `tile_entry_submission`.`sync_hash`='{2}';";
 
     public const string QUERY_USER_SUBMISSIONS_FOR_USER =
         @"SELECT    `tile_entry_submission`.`id`,
@@ -1165,77 +1173,77 @@ public static class DatabaseQueries
         WHERE       `tile_entry_submission`.`user_login_id`='{0}'
         AND         `tile_entry_submission`.`sync_hash`='{1}';";
 
-    public const string QUERY_USER_PEER_GRADES =
-        @"SELECT   `tile`.`id`,
-	    CASE `tile`.`content_type`
-            WHEN 'BINARY' THEN  AVG(`tile_entry_submission`.`grade`) * 100
-            ELSE                AVG(`tile_entry_submission`.`grade`)
-       	END average,
-	    CASE `tile`.`content_type`
-            WHEN 'BINARY' THEN  MIN(`tile_entry_submission`.`grade`) * 100
-            ELSE                MIN(`tile_entry_submission`.`grade`)
-       	END minimum,
-	    CASE `tile`.`content_type`
-            WHEN 'BINARY' THEN  MAX(`tile_entry_submission`.`grade`) * 100
-            ELSE                MAX(`tile_entry_submission`.`grade`)
-       	END maximum,
-        `tile_entry`.`title`,
-        `tile_entry_submission`.`grade`,
-        `tile`.`content_type`
-        FROM        `tile_entry_submission`
-        INNER JOIN  `tile_entry`
-            ON      `tile_entry_submission`.`entry_id`=`tile_entry`.`id`
-        INNER JOIN  `tile`
-            ON      `tile`.`id`=`tile_entry`.`tile_id`
-        INNER JOIN  `layout_tile_group`
-            ON      `layout_tile_group`.`id`=`tile`.`group_id`
-        INNER JOIN  `peer_group`
-            ON      `tile_entry_submission`.`user_login_id`=`peer_group`.`target_login_id`
-	    WHERE       `tile`.`content_type` != 'PREDICTION'
-	    AND	        `tile`.`content_type` != 'LEARNING_OUTCOMES'
-        AND	        `tile`.`tile_type` != 'DISCUSSIONS'
-        AND         `layout_tile_group`.`course_id`={0}
-        AND         `peer_group`.`user_login_id`='{1}'
-        AND         `peer_group`.`sync_hash`='{2}'
-        AND         `tile_entry_submission`.`sync_hash`='{2}'
-	    GROUP BY    `tile`.`id`;";
+    // public const string QUERY_USER_PEER_GRADES =
+    //     @"SELECT   `tile`.`id`,
+	//     CASE `tile`.`content_type`
+    //         WHEN 'BINARY' THEN  AVG(`tile_entry_submission`.`grade`) * 100
+    //         ELSE                AVG(`tile_entry_submission`.`grade`)
+    //    	END average,
+	//     CASE `tile`.`content_type`
+    //         WHEN 'BINARY' THEN  MIN(`tile_entry_submission`.`grade`) * 100
+    //         ELSE                MIN(`tile_entry_submission`.`grade`)
+    //    	END minimum,
+	//     CASE `tile`.`content_type`
+    //         WHEN 'BINARY' THEN  MAX(`tile_entry_submission`.`grade`) * 100
+    //         ELSE                MAX(`tile_entry_submission`.`grade`)
+    //    	END maximum,
+    //     `tile_entry`.`title`,
+    //     `tile_entry_submission`.`grade`,
+    //     `tile`.`content_type`
+    //     FROM        `tile_entry_submission`
+    //     INNER JOIN  `tile_entry`
+    //         ON      `tile_entry_submission`.`entry_id`=`tile_entry`.`id`
+    //     INNER JOIN  `tile`
+    //         ON      `tile`.`id`=`tile_entry`.`tile_id`
+    //     INNER JOIN  `layout_tile_group`
+    //         ON      `layout_tile_group`.`id`=`tile`.`group_id`
+    //     INNER JOIN  `peer_group`
+    //         ON      `tile_entry_submission`.`user_login_id`=`peer_group`.`target_login_id`
+	//     WHERE       `tile`.`content_type` != 'PREDICTION'
+	//     AND	        `tile`.`content_type` != 'LEARNING_OUTCOMES'
+    //     AND	        `tile`.`tile_type` != 'DISCUSSIONS'
+    //     AND         `layout_tile_group`.`course_id`={0}
+    //     AND         `peer_group`.`user_login_id`='{1}'
+    //     AND         `peer_group`.`sync_hash`='{2}'
+    //     AND         `tile_entry_submission`.`sync_hash`='{2}'
+	//     GROUP BY    `tile`.`id`;";
 
-        public const string QUERY_USER_PEER_GRADES2 =
-        @"SELECT   `tile`.`id`,
-	    CASE `tile`.`content_type`
-            WHEN 'BINARY' THEN  AVG(`tile_entry_submission`.`grade`) * 100
-            ELSE                AVG(`tile_entry_submission`.`grade`)
-       	END average,
-	    CASE `tile`.`content_type`
-            WHEN 'BINARY' THEN  MIN(`tile_entry_submission`.`grade`) * 100
-            ELSE                MIN(`tile_entry_submission`.`grade`)
-       	END minimum,
-	    CASE `tile`.`content_type`
-            WHEN 'BINARY' THEN  MAX(`tile_entry_submission`.`grade`) * 100
-            ELSE                MAX(`tile_entry_submission`.`grade`)
-       	END maximum,
-        `tile_entry`.`title`,
-        `tile_entry_submission`.`grade`,
-        `tile`.`content_type`
-        FROM        `tile_entry_submission`
-        INNER JOIN  `tile_entry`
-            ON      `tile_entry_submission`.`entry_id`=`tile_entry`.`id`
-        INNER JOIN  `tile`
-            ON      `tile`.`id`=`tile_entry`.`tile_id`
-        INNER JOIN  `layout_tile_group`
-            ON      `layout_tile_group`.`id`=`tile`.`group_id`
-        INNER JOIN  `peer_group2`
-            ON      `tile_entry_submission`.`user_login_id`=`peer_group2`.`user_login_id`
-	    WHERE       `tile`.`content_type` != 'PREDICTION'
-	    AND	        `tile`.`content_type` != 'LEARNING_OUTCOMES'
-        AND	        `tile`.`tile_type` != 'DISCUSSIONS'
-        AND         `layout_tile_group`.`course_id`={0}
-        AND         `peer_group2`.`goal_grade`='{1}'
-        AND         `peer_group2`.`sync_hash`='{2}'
-        AND         `tile_entry_submission`.`sync_hash`='{2}'
-	    GROUP BY    `tile`.`id`;";
+        // public const string QUERY_USER_PEER_GRADES2 =
+        // @"SELECT   `tile`.`id`,
+	    // CASE `tile`.`content_type`
+        //     WHEN 'BINARY' THEN  AVG(`tile_entry_submission`.`grade`) * 100
+        //     ELSE                AVG(`tile_entry_submission`.`grade`)
+       	// END average,
+	    // CASE `tile`.`content_type`
+        //     WHEN 'BINARY' THEN  MIN(`tile_entry_submission`.`grade`) * 100
+        //     ELSE                MIN(`tile_entry_submission`.`grade`)
+       	// END minimum,
+	    // CASE `tile`.`content_type`
+        //     WHEN 'BINARY' THEN  MAX(`tile_entry_submission`.`grade`) * 100
+        //     ELSE                MAX(`tile_entry_submission`.`grade`)
+       	// END maximum,
+        // `tile_entry`.`title`,
+        // `tile_entry_submission`.`grade`,
+        // `tile`.`content_type`
+        // FROM        `tile_entry_submission`
+        // INNER JOIN  `tile_entry`
+        //     ON      `tile_entry_submission`.`entry_id`=`tile_entry`.`id`
+        // INNER JOIN  `tile`
+        //     ON      `tile`.`id`=`tile_entry`.`tile_id`
+        // INNER JOIN  `layout_tile_group`
+        //     ON      `layout_tile_group`.`id`=`tile`.`group_id`
+        // INNER JOIN  `peer_group`
+        //     ON      `tile_entry_submission`.`user_login_id`=`peer_group`.`user_login_id`
+	    // WHERE       `tile`.`content_type` != 'PREDICTION'
+	    // AND	        `tile`.`content_type` != 'LEARNING_OUTCOMES'
+        // AND	        `tile`.`tile_type` != 'DISCUSSIONS'
+        // AND         `layout_tile_group`.`course_id`={0}
+        // AND         `peer_group`.`goal_grade`='{1}'
+        // AND         `peer_group`.`sync_hash`='{2}'
+        // AND         `tile_entry_submission`.`sync_hash`='{2}'
+	    // GROUP BY    `tile`.`id`;";
 
-public const string QUERY_USER_PEER_GRADES3 =
+    public const string QUERY_USER_RESULTS2 =
         @"SELECT   `tile`.`id`,
         `tile_entry`.`title`,
         `tile_entry_submission`.`grade`,
@@ -1253,7 +1261,66 @@ public const string QUERY_USER_PEER_GRADES3 =
         AND         `layout_tile_group`.`course_id`={0}
         AND         `tile_entry_submission`.`user_login_id`='{1}'
         AND         `tile_entry_submission`.`sync_hash`='{2}'
-	    GROUP BY    `tile`.`id`;";
+	    GROUP BY    `tile_entry`.`id`;";
+
+    public const string QUERY_USER_DISCUSSION_COUNTER = 
+        @"SELECT        `discussion_id`,
+                        SUM(`counter`)         
+        FROM(SELECT     `canvas_discussion_entry`.`discussion_id` 
+                AS      `discussion_id`,
+            COUNT(*) 
+                AS      `counter`
+            FROM        `canvas_discussion_entry`
+            LEFT JOIN   `canvas_discussion_reply` 
+                ON      `canvas_discussion_entry`.`id` = `canvas_discussion_reply`.`entry_id` 
+            WHERE       `canvas_discussion_entry`.`course_id` = '{0}' 
+            AND         `canvas_discussion_reply`.`posted_by` = '{1}'
+
+            UNION ALL 
+            
+            SELECT      `canvas_discussion_entry`.`discussion_id` 
+                AS      `discussion_id`,
+            COUNT(*) 
+                AS      `counter` 
+            FROM `canvas_discussion_entry` 
+            WHERE `course_id` = '{0}'
+            AND `posted_by` ='{1}')
+        WHERE `discussion_id` IS NOT NULL;";
+
+
+    public const string QUERY_USER_ID_FROM_LOGIN_ID = 
+        @"SELECT    `user_id`
+        FROM        `canvas_users`
+        WHERE       `course_id`='{0}'
+        AND         `login_id`='{1}';";
+
+    public const string QUERY_PEER_GROUP_RESULTS = 
+        @"SELECT    `tile_id`,
+                    `avg_grade`,
+                    `min_grade`,
+                    `max_grade`
+        FROM        `peer_group`
+        WHERE       `course_id`='{0}'
+        AND         `goal_grade`='{1}'
+        AND         `sync_hash`='{2}';";
+
+
+    public const string QUERY_GRADE_COMPARISSON_HISTORY = 
+        @"SELECT    `peer_group`.`tile_id`,
+                    `peer_group`.`avg_grade`,
+                    `peer_group`.`min_grade`,
+                    `peer_group`.`max_grade`,
+                    avg(`tile_entry_submission`.`grade`)
+        FROM        `peer_group`
+        INNER JOIN  `tile_entry_submission`
+            ON      `tile_entry_submission`.`sync_hash` = `peer_group`.`sync_hash`
+        WHERE       `peer_group`.`course_id`='{0}'
+        AND         `peer_group`.`goal_grade`='{1}' 
+        AND         `tile_entry_submission`.`user_login_id` = '{2}'
+        GROUP BY    `peer_group`.`id`
+        ORDER BY    `peer_group`.`tile_id`;";
+
+
 
     public const string QUERY_USER_RESULTS =
         @"SELECT   `tile`.`id`,
