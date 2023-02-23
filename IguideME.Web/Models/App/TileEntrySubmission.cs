@@ -8,8 +8,8 @@ namespace IguideME.Web.Models.App
         [JsonProperty(PropertyName = "id")]
         public int ID { get; set; }
 
-        [JsonProperty(PropertyName = "user_login_id")]
-        public string UserLoginID { get; set; }
+        [JsonProperty(PropertyName = "userID")]
+        public string UserID { get; set; }
 
         [JsonProperty(PropertyName = "entry_id")]
         public int EntryID { get; set; }
@@ -26,7 +26,7 @@ namespace IguideME.Web.Models.App
         public TileEntrySubmission(
             int id,
             int entryID,
-            string userLoginID,
+            string userID,
             string grade,
             string submitted,
             string meta = null,
@@ -34,7 +34,7 @@ namespace IguideME.Web.Models.App
             string hash = null)
         {
             this.ID = id;
-            this.UserLoginID = userLoginID;
+            this.UserID = userID;
             this.EntryID = entryID;
             this.Grade = grade;
             this.Submitted = submitted;

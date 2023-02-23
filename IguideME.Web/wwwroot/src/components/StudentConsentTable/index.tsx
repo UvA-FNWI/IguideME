@@ -50,7 +50,7 @@ export default class StudentConsentTable extends Component<IProps, IState> {
         defaultSortOrder: 'ascend',
         render: (text: string, record: any) => {
           return (
-            <span>{ text }<br /><small>{ record.consentData.userLoginID}</small></span>
+            <span>{ text }<br /><small>{ record.consentData.userID}</small></span>
           )
         }
       }, {
@@ -121,7 +121,7 @@ export default class StudentConsentTable extends Component<IProps, IState> {
         key: consentData.userID,
         userName: consentData.userName,
         granted: consentData.granted,
-        grade: goals.find(s => s.courseID === consentData.courseID && s.userLoginID === consentData.userLoginID)?.grade
+        grade: goals.find(s => s.courseID === consentData.courseID && s.userID === consentData.userID)?.grade
       }))
     }
 }

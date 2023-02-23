@@ -1,5 +1,7 @@
-using UvA.LTI;
 using System;
+using UvA.LTI;
+using System.Text;
+using System.Linq;
 using StackExchange.Redis;
 using System.Security.Claims;
 using IguideME.Web.Services;
@@ -7,10 +9,14 @@ using IguideME.Web.Services.Data;
 using System.Collections.Generic;
 using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
-using System.Linq;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+
+var key = "blawlaekltjwelkrjtwlkejlekwjrklwejr32423";
+var signingKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(key));
 
 // //======================== Builder configuration =========================//
 
@@ -57,13 +63,19 @@ else
 }
 
 builder.Services
-    .AddAuthentication()
-    .AddJwtBearer();
+    .AddAuthorization()
+    .AddAuthentication(opt => opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(opt =>
+    {
+        opt.TokenValidationParameters.ValidateAudience = false;
+        opt.TokenValidationParameters.ValidIssuer = "lti";
+        opt.TokenValidationParameters.IssuerSigningKey = signingKey;
+    });
 
 builder.Services.AddAuthorization(options =>
     // allow all instructors to access the admin panel of their course
     options.AddPolicy("IsInstructor",
-            policy => policy.RequireRole("teacher")));
+            policy => policy.RequireRole("Teacher")));
 
 builder.Services.Configure<ForwardedHeadersOptions>(opt =>
 {
@@ -96,19 +108,21 @@ WebApplication app = builder.Build();
 
 app.UseLti(new LtiOptions
 {
-    ClientId = "104400000000000213",
-    AuthenticateUrl = "https://uvadlo-dev.test.instructure.com/api/lti/authorize_redirect",
-    JwksUrl = "https://canvas.test.instructure.com/api/lti/security/jwks",
-    SigningKey = "blawlaekltjwelkrjtwlkejlekwjrklwejr32423",
+    ClientId = "104400000000000183",
+    AuthenticateUrl = "https://uvadlo-dev.instructure.com/api/lti/authorize_redirect",
+    JwksUrl = "https://canvas.instructure.com/api/lti/security/jwks",
+    SigningKey = key,
     ClaimsMapping = p => new Dictionary<string, object>
     {
         [ClaimTypes.NameIdentifier] = p.NameIdentifier.Split("_").Last(),
         ["contextLabel"] = p.Context.Label,
         ["courseName"] = p.Context.Title,
+        ["user_name"] = p.Name,
+        ["courseid"] = p.CustomClaims?.GetProperty("courseid").ToString(),
+        ["userid"] = p.CustomClaims?.GetProperty("userid").ToString(),
         [ClaimTypes.Role] = p.Roles.Any(e => e.Contains("http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor"))
             ? "Teacher" : "Student",
         [ClaimTypes.Email] = p.Email,
-        ["courseId"] = p.Context.Id,
     }
 
 });
@@ -134,6 +148,7 @@ app.UseForwardedHeaders();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(

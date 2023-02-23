@@ -391,14 +391,14 @@ namespace IguideME.Web.Controllers
 
         [Authorize]
         [HttpGet]
-        [Route("/tiles/{tileID}/submissions/{userLoginID}")]
+        [Route("/tiles/{tileID}/submissions/{userID}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public ActionResult GetSubmissions(string tileID, string userLoginID)
+        public ActionResult GetSubmissions(string tileID, string userID)
         {
             // Only instructors may view submissions of other students
-            if (this.GetUserLoginID() != userLoginID &&
+            if (this.GetUserID() != userID &&
                 !this.IsAdministrator())
                 return Unauthorized();
 
@@ -407,7 +407,7 @@ namespace IguideME.Web.Controllers
             return success
                 ? Json(
                     DatabaseManager.Instance.GetTileSubmissionsForUser(
-                        this.GetCourseID(), id, userLoginID))
+                        this.GetCourseID(), id, userID))
                 : (ActionResult)BadRequest();
         }
 
@@ -434,17 +434,17 @@ namespace IguideME.Web.Controllers
 
         [Authorize]
         [HttpGet]
-        [Route("/tiles/{tileID}/discussions/{userLoginID}")]
+        [Route("/tiles/{tileID}/discussions/{userID}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public ActionResult GetDiscussions(string tileID, string userLoginID)
+        public ActionResult GetDiscussions(string tileID, string userID)
         {
             int course_id = this.GetCourseID();
             // Only instructors may view submissions of other students
-            if ((this.GetUserLoginID() != userLoginID &&
+            if ((this.GetUserID() != userID &&
                 !this.IsAdministrator()) ||
-                (DatabaseManager.Instance.GetConsent(course_id, userLoginID) != 1))
+                (DatabaseManager.Instance.GetConsent(course_id, userID) != 1))
                 return Unauthorized();
 
             bool success = Int32.TryParse(tileID, out int id);
@@ -453,7 +453,7 @@ namespace IguideME.Web.Controllers
                 return (ActionResult)BadRequest();
             }
 
-            User user = DatabaseManager.Instance.GetUser(course_id, userLoginID);
+            User user = DatabaseManager.Instance.GetUser(course_id, userID);
 
             List<AppDiscussion> discussions = DatabaseManager.Instance.GetDiscussionsForTile(course_id, id);
 
@@ -469,14 +469,14 @@ namespace IguideME.Web.Controllers
 
         [Authorize]
         [HttpGet]
-        [Route("/tiles/{tileID}/learning-outcomes/{userLoginID}")]
+        [Route("/tiles/{tileID}/learning-outcomes/{userID}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public ActionResult GetLearningOutcomes(string tileID, string userLoginID)
+        public ActionResult GetLearningOutcomes(string tileID, string userID)
         {
             // Only instructors may view submissions of other students
-            if (this.GetUserLoginID() != userLoginID &&
+            if (this.GetUserID() != userID &&
                 !this.IsAdministrator())
                 return Unauthorized();
 
@@ -491,7 +491,7 @@ namespace IguideME.Web.Controllers
                 List<TileEntrySubmission> submissions =
                     DatabaseManager.Instance.GetTileSubmissionsForUser(
                         this.GetCourseID(),
-                        userLoginID);
+                        userID);
 
                 var response = goals.Select(g =>
                 {
@@ -617,73 +617,73 @@ namespace IguideME.Web.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public ActionResult GetEntrySubmissions(string entryID, string userLoginID)
+        public ActionResult GetEntrySubmissions(string entryID, string userID)
         {
-            // TODO: check userloginID?
-            bool success = Int32.TryParse(entryID, out int id);
+            // TODO: check userID?
+            bool success = Int32.TryParse(entryID, out int entry_id);
 
             return success
                 ? Json(
                     DatabaseManager.Instance.GetTileEntrySubmissions(
-                        this.GetCourseID(), id))
+                        this.GetCourseID(), entry_id))
                 : (ActionResult)BadRequest();
         }
 
         [Authorize]
         [HttpGet]
-        [Route("/tiles/grade-summary/{userLoginID}")]
+        [Route("/tiles/grade-summary/{userID}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public ActionResult GetGradeSummary(string userLoginID)
+        public ActionResult GetGradeSummary(string userID)
         {
             // Only instructors may view submissions of other students
-            return this.GetUserLoginID() != userLoginID && !this.IsAdministrator()
+            return this.GetUserID() != userID && !this.IsAdministrator()
                 ? Unauthorized()
                 : (ActionResult)Json(
                 DatabaseManager.Instance.GetTileSubmissionsForUser(
-                    this.GetCourseID(), userLoginID));
+                    this.GetCourseID(), userID));
         }
 
         [Authorize]
         [HttpGet]
-        [Route("/peer-comparison/{userLoginID}")]
+        [Route("/peer-comparison/{userID}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public ActionResult GetPeerComparison(string userLoginID)
+        public ActionResult GetPeerComparison(string userID)
         {
             // Only instructors may view peer comparisons of other students
-            if (this.GetUserLoginID() != userLoginID && !this.IsAdministrator())
+            if (this.GetUserID() != userID && !this.IsAdministrator())
                 return Unauthorized();
 
             User user = DatabaseManager.Instance.GetUser(
-                this.GetCourseID(), userLoginID);
+                this.GetCourseID(), userID);
 
             return user == null
                 ? BadRequest()
                 : (ActionResult)Json(
                 DatabaseManager.Instance.GetUserPeerComparison(
-                GetCourseID(), user.LoginID));
+                GetCourseID(), user.UserID));
         }
 
         [Authorize]
         [HttpGet]
-        [Route("/results/{userLoginID}")]
+        [Route("/results/{userID}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public ActionResult GetUserResults(string userLoginID)
+        public ActionResult GetUserResults(string userID)
         {
             // Only instructors may view submissions of other students
-            if (this.GetUserLoginID() != userLoginID && !this.IsAdministrator())
+            if (this.GetUserID() != userID && !this.IsAdministrator())
                 return Unauthorized();
 
             User user = DatabaseManager.Instance.GetUser(
-                this.GetCourseID(), userLoginID);
+                this.GetCourseID(), userID);
 
             return user == null
                 ? BadRequest()
                 : (ActionResult)Json(
                 DatabaseManager.Instance.GetUserResults(
-                    GetCourseID(), user.LoginID));
+                    GetCourseID(), user.UserID));
         }
 
         [Authorize]

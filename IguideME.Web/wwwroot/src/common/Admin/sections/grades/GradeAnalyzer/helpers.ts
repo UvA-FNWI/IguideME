@@ -15,15 +15,15 @@ export const getGradeEntryOptions = (tiles: Tile[], entries: TileEntry[]) => {
 }
 
 export const mergeData = (stack1: TileEntrySubmission[], stack2: TileEntrySubmission[]) => {
-  const users = new Set([...stack1.map(s => s.user_login_id), ...stack2.map(s => s.user_login_id)]);
+  const users = new Set([...stack1.map(s => s.userID), ...stack2.map(s => s.userID)]);
 
   return Array.from(users).filter(u => (
-    stack1.find(s => s.user_login_id === u) &&
-      stack2.find(s => s.user_login_id === u)
+    stack1.find(s => s.userID === u) &&
+      stack2.find(s => s.userID === u)
     )
   ).map(u => ({
-    user_login_id: u,
-    grade1: stack1.find(s => s.user_login_id === u)!.grade,
-    grade2: stack2.find(s => s.user_login_id === u)!.grade
+    userID: u,
+    grade1: stack1.find(s => s.userID === u)!.grade,
+    grade2: stack2.find(s => s.userID === u)!.grade
   }));
 }

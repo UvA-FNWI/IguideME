@@ -75,7 +75,7 @@ class StudentDashboard extends Component<Props, IState> {
   }
 
   componentWillReceiveProps(nextProps: Readonly<Props>, nextContext: any): void {
-    if (nextProps.student && nextProps.student?.login_id !== this.props.student?.login_id) {
+    if (nextProps.student && nextProps.student?.userID !== this.props.student?.userID) {
         this.setup(nextProps);
     }
   }
@@ -95,7 +95,7 @@ class StudentDashboard extends Component<Props, IState> {
 
     // if (propPredictions.length >= 0) predictions = propPredictions;
 
-    let predictions = await DataMartController.getPredictions(student.login_id);
+    let predictions = await DataMartController.getPredictions(student.userID);
 
     this.setState({ loaded: false });
 
@@ -109,11 +109,11 @@ class StudentDashboard extends Component<Props, IState> {
 
     for (const tile of tiles) {
       if (tile.content === "LEARNING_OUTCOMES") {
-        p_goals.push(TileController.getUserGoals(tile.id, student.login_id));
+        p_goals.push(TileController.getUserGoals(tile.id, student.userID));
         continue;
       }
       if (tile.type === "DISCUSSIONS") {
-        p_discussions.push(TileController.getDiscussions(tile.id, student.login_id));
+        p_discussions.push(TileController.getDiscussions(tile.id, student.userID));
         continue;
       }
 
@@ -125,7 +125,7 @@ class StudentDashboard extends Component<Props, IState> {
         continue;
       }
 
-      submissions.set(tile.id, await TileController.getTileSubmissions(tile.id, student.login_id));
+      submissions.set(tile.id, await TileController.getTileSubmissions(tile.id, student.userID));
 
       let avg = 0, total = 0;
 
@@ -143,7 +143,7 @@ class StudentDashboard extends Component<Props, IState> {
     let discussions = (await Promise.all(p_discussions)).flat();
     let goals = (await Promise.all(p_goals)).flat();
 
-    let goalGrade = await AppController.getGoalGrade(student.login_id);
+    let goalGrade = await AppController.getGoalGrade(student.userID);
 
     this.setState({
       discussions,
@@ -153,7 +153,7 @@ class StudentDashboard extends Component<Props, IState> {
       predictions: predictions,
       goalGrade: goalGrade
     }, () => {
-      TileController.getPeerResults(student!.login_id).then(peerGrades =>
+      TileController.getPeerResults(student!.userID).then(peerGrades =>
         this.setState({ peerGrades, loaded: true })
       ).catch(() => this.setState({ loaded: true }));
     });

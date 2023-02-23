@@ -10,8 +10,8 @@ namespace IguideME.Web.Models
         [JsonProperty(PropertyName = "tile_id")]
         public int TileID { get; set; }
 
-        [JsonProperty(PropertyName = "user_login_id")]
-        public string UserLoginID { get; set; }
+        [JsonProperty(PropertyName = "userID")]
+        public string UserID { get; set; }
 
         [JsonProperty(PropertyName = "grade")]
         public string Grade { get; set; }
@@ -19,10 +19,10 @@ namespace IguideME.Web.Models
         [JsonProperty(PropertyName = "title")]
         public string Title { get; set; }
 
-        public ExternalData(int courseID, string userLoginID, int tileID, string title, string grade)
+        public ExternalData(int courseID, string userID, int tileID, string title, string grade)
         {
             this.CourseID = courseID;
-            this.UserLoginID = userLoginID;
+            this.UserID = userID;
             this.Grade = grade;
             this.Title = title;
             this.TileID = tileID;

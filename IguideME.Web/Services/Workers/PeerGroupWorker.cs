@@ -33,20 +33,18 @@ namespace IguideME.Web.Services.Workers
             foreach (var student in students)
             {
                 // don't register data from students that did not give consent
-                if (DatabaseManager.Instance.GetConsent(this.CourseID, student.LoginID) != 1)
+                if (DatabaseManager.Instance.GetConsent(this.CourseID, student.UserID) != 1)
                 {
-                    _logger.LogInformation($"Skipping user with loginID {student.LoginID} as they did not give consent.");
+                    _logger.LogInformation($"Skipping user with userID {student.UserID} as they did not give consent.");
                     continue;
                 }
 
-                _logger.LogInformation("Processing student with loginID " + student.LoginID);
+                _logger.LogInformation("Processing student with userID " + student.UserID);
 
                 var user = new UserWithPeerGroup(
                                     0,
                                     this.CourseID,
-                                    (int)student.ID,
-                                    student.SisID,
-                                    student.SisID,
+                                    student.UserID,
                                     student.Name,
                                     student.SortableName,
                                     student.Role,
@@ -70,17 +68,17 @@ namespace IguideME.Web.Services.Workers
                     // Register student as a peer to the current user
                     DatabaseManager.Instance.CreateUserPeer(
                         this.CourseID,
-                        student.LoginID,
-                        peer.LoginID,
+                        student.UserID,
+                        peer.UserID,
                         this.Hash);
                 }
 
-                var peerIDs = peers.Select(p => p.LoginID);
+                var peerIDs = peers.Select(p => p.UserID);
 
                 var peerGrades1 = DatabaseManager.Instance.GetUserPeerComparison(
-                            this.CourseID, user.LoginID, hash: this.Hash);
+                            this.CourseID, user.UserID, hash: this.Hash);
                 var userGrades1 = DatabaseManager.Instance.GetUserResults(
-                    this.CourseID, user.LoginID, hash: this.Hash);
+                    this.CourseID, user.UserID, hash: this.Hash);
 
                 var tilesWithNotifications = tiles.Where(t => t.Notifications);
 
@@ -98,7 +96,7 @@ namespace IguideME.Web.Services.Workers
                         {
                             DatabaseManager.Instance.RegisterNotification(
                                 CourseID,
-                                student.LoginID,
+                                student.UserID,
                                 tile.ID,
                                 "outperforming peers",
                                 this.Hash
@@ -121,13 +119,13 @@ namespace IguideME.Web.Services.Workers
                             .GetTileEntrySubmissionsForUser(
                                 this.CourseID,
                                 entry.ID,
-                                student.LoginID,
+                                student.UserID,
                                 this.Hash);
 
                         var peerGrades =
                             DatabaseManager.Instance.GetTileEntrySubmissions(
                                  this.CourseID, entry.ID, this.Hash).FindAll(
-                                    s => peerIDs.Contains(s.UserLoginID));
+                                    s => peerIDs.Contains(s.UserID));
 
                         // Add grades to registry
                         userGrades.ForEach(g =>
@@ -191,7 +189,7 @@ namespace IguideME.Web.Services.Workers
                     {
                         DatabaseManager.Instance.RegisterNotification(
                             CourseID,
-                            student.LoginID,
+                            student.UserID,
                             tile.ID,
                             "closing the gap",
                             this.Hash);
@@ -204,7 +202,7 @@ namespace IguideME.Web.Services.Workers
                     {
                         DatabaseManager.Instance.RegisterNotification(
                             CourseID,
-                            student.LoginID,
+                            student.UserID,
                             tile.ID,
                             "more effort required",
                             this.Hash);

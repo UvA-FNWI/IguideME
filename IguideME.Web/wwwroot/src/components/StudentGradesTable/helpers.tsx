@@ -151,7 +151,7 @@ export function getColumns(tiles: Tile[], tileEntries: TileEntry[], averaged: bo
     defaultSortOrder: 'ascend',
     render: (text: string, record: any) => {
       return (
-        <span>{ text }<br /><small>{ record.student.login_id}</small></span>
+        <span>{ text }<br /><small>{ record.student.userID}</small></span>
       )
     }
   }];
@@ -189,7 +189,7 @@ export function getData(students: CanvasStudent[],
 
       if (t.content === "BINARY") {
         let grade = submissions.filter(
-          s => s.user_login_id === student.login_id &&
+          s => s.userID === student.userID &&
             tileEntries.map(e => e.id).includes(s.entry_id)
         ).map(s => parseInt(s.grade)).filter(s => s === 1).length.toString();
         return [[t.id, grade]];
@@ -199,7 +199,7 @@ export function getData(students: CanvasStudent[],
         return tileEntries.map(e => {
 
           const entry_discussions = discussions.filter(disc => {
-            return disc.title === e.title && ( disc.posted_by === student.name || disc.posted_by === student.user_id.toString())});
+            return disc.title === e.title && ( disc.posted_by === student.name || disc.posted_by === student.userID.toString())});
 
           return [getEntryKey(e, tiles), entry_discussions.length];
         })
@@ -207,7 +207,7 @@ export function getData(students: CanvasStudent[],
 
       return tileEntries.map(e => {
         const submission = submissions.find(
-          s => s.entry_id === e.id && s.user_login_id === student.login_id
+          s => s.entry_id === e.id && s.userID === student.userID
         )!;
         return [getEntryKey(e, tiles), submission ? submission.grade : ""];
       })

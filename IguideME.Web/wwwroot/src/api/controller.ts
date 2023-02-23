@@ -10,7 +10,9 @@ export default class Controller {
   static setup(): void {
     // automatically set the base url of each request to the current host
     this.client = axios.create({
-      baseURL: this.baseURL()
+      baseURL: this.baseURL(),
+      headers: { Authorization: `Bearer ${document.location.hash.slice(1)}` }
     });
+    this.client.post('app/setup').then();
   }
 }

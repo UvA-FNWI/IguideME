@@ -13,13 +13,7 @@ namespace IguideME.Web.Models.Impl
         public int CourseID { get; set; }
 
         [JsonProperty("user_id")]
-        public int UserID { get; set; }
-
-        [JsonProperty("login_id")]
-        public string LoginID { get; set; }
-
-        [JsonProperty("sis_user_id")]
-        public string SisID { get; set; }
+        public string UserID { get; set; }
 
         [JsonProperty("name")]
         public string Name { get; set; }
@@ -36,9 +30,7 @@ namespace IguideME.Web.Models.Impl
         public User(
             int id,
             int courseID,
-            int userID,
-            string loginID,
-            string sisID,
+            string userID,
             string name,
             string sortableName,
             string role,
@@ -47,8 +39,6 @@ namespace IguideME.Web.Models.Impl
             this.ID = id;
             this.CourseID = courseID;
             this.UserID = userID;
-            this.LoginID = loginID;
-            this.SisID = sisID;
             this.Name = name;
             this.SortableName = sortableName;
             this.Role = role;

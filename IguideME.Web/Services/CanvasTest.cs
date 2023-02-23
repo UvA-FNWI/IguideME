@@ -27,14 +27,14 @@ namespace IguideME.Web.Services
             this._connector = new CanvasApiConnector(config["Canvas:Url"], config["Canvas:AccessToken"]);
         }
 
-        public void SendMessage(int studentID, string subject, string body)
+        public void SendMessage(string userID, string subject, string body)
         {
             try {
                 var conv = new Conversation(this._connector)
                 {
                     Subject = subject,
                     Body = body,
-                    Recipients = new string[1] { studentID.ToString() }
+                    Recipients = new string[1] { userID }
                 };
                 _logger.LogInformation("Created conversation " + conv + " " + conv.Recipients[0]);
 
@@ -48,10 +48,10 @@ namespace IguideME.Web.Services
             }
         }
 
-        public User GetUser(int courseID, string sisLoginID)
+        public User GetUser(int courseID, string userID)
         {
             var users = _connector.FindCourseById(courseID).UserEnrollments.Select(x => x.User).ToArray();
-            return users.First(x => x.SISUserID == sisLoginID);
+            return users.First(x => x.LoginID == userID);
         }
 
         public User[] GetStudents(int courseID)
@@ -140,14 +140,14 @@ namespace IguideME.Web.Services
                 .Discussions;
         }
 
-        public Submission[] GetAssignmentSubmissions(int courseID, string userLoginID, string name)
+        public Submission[] GetAssignmentSubmissions(int courseID, string userID, string name)
         {
             var assignment = _connector
                 .FindCourseById(courseID)
                 .Assignments.Find(a => a.Name == name);
 
-            var userSubmissions = userLoginID != null ?
-                assignment.Submissions.Where(x => x.User.LoginID == userLoginID) :
+            var userSubmissions = userID != null ?
+                assignment.Submissions.Where(x => x.User.LoginID == userID) :
                 assignment.Submissions;
 
             var submissions = _connector

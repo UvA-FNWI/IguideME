@@ -38,7 +38,7 @@ export interface TileEntry {
 }
 
 export interface TileEntrySubmission {
-  user_login_id: string,
+  userID: string,
   entry_id: number,
   grade: string,
   submitted?: string | null,

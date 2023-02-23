@@ -19,20 +19,16 @@ namespace IguideME.Web.Models.Impl
         public UserWithPeerGroup(
             int id,
             int courseID,
-            int userID,
-            string loginID,
-            string sisID,
+            string userID,
             string name,
             string sortableName,
             string role,
             string hash = null,
-            Boolean autoLoad = false) : base(id, courseID, userID, loginID, sisID, name, sortableName, role, hash)
+            Boolean autoLoad = false) : base(id, courseID, userID, name, sortableName, role, hash)
         {
             this.ID = id;
             this.CourseID = courseID;
             this.UserID = userID;
-            this.LoginID = loginID;
-            this.SisID = sisID;
             this.Name = name;
             this.SortableName = sortableName;
             this.Role = role;
@@ -59,7 +55,7 @@ namespace IguideME.Web.Models.Impl
                 // If the course does not have personalized peers consider
                 // every other enrolled student a peer.
                 courseStudents
-                    .FindAll(s => s.LoginID != this.LoginID)
+                    .FindAll(s => s.UserID != this.UserID)
                     .ForEach(s => this._peers.Add(s));
                 this._loadedPeers = true;
                 return;
@@ -68,11 +64,11 @@ namespace IguideME.Web.Models.Impl
             // If personalized peers are enabled then assert the student
             // provided a goal grade.
             var _grade = DatabaseManager.Instance.GetUserGoalGrade(
-                this.CourseID, this.LoginID);
+                this.CourseID, this.UserID);
 
             if (_grade < 0)
             {
-                Console.WriteLine("Student with loginID " + this.LoginID + " has no goal grade set, thus no peers will be considered.");
+                Console.WriteLine("Student with userID " + this.UserID + " has no goal grade set, thus no peers will be considered.");
                 return;
             }
 
@@ -95,7 +91,7 @@ namespace IguideME.Web.Models.Impl
 
             DatabaseManager.Instance
                 .GetUsersWithGoalGrade(this.CourseID, (int)grade, this.Hash)
-                .FindAll(u => u.LoginID != this.LoginID)
+                .FindAll(u => u.UserID != this.UserID)
                 .ForEach(x => peers.Add(x));
 
             while (peers.Count < minPeerGroupSize)
@@ -132,7 +128,7 @@ namespace IguideME.Web.Models.Impl
             this._peers = peers;
             this._loadedPeers = true;
 
-            Console.WriteLine("Loaded " + peers.Count + " peers for student with loginID " + this.LoginID + ".");
+            Console.WriteLine("Loaded " + peers.Count + " peers for student with userID " + this.UserID + ".");
         }
 
         public List<User> GetPeers()

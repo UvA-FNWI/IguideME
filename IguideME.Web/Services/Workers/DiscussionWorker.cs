@@ -39,10 +39,10 @@ namespace IguideME.Web.Services.Workers
 				DatabaseManager.Instance.RegisterDiscussion(discussion, this.Hash);
 
 				foreach (DiscussionEntry entry in discussion.Entries) {
-					int entry_id = DatabaseManager.Instance.RegisterDiscussionEntry(entry, this.Hash);
+					int entry_id = DatabaseManager.Instance.RegisterDiscussionEntry(entry);
 
 					foreach (DiscussionReply reply in entry.Replies) {
-						DatabaseManager.Instance.RegisterDiscussionReply(reply, entry_id, this.Hash);
+						DatabaseManager.Instance.RegisterDiscussionReply(reply, entry_id);
 					}
 				}
 			}
@@ -61,7 +61,7 @@ namespace IguideME.Web.Services.Workers
 					.Where(d =>
 					{
 						var student = students.Find(s => s.Name == d.UserName);
-                        return student != null && DatabaseManager.Instance.GetConsent(this.CourseID, student.LoginID) == 1;
+                        return student != null && DatabaseManager.Instance.GetConsent(this.CourseID, student.UserID) == 1;
                     });
 
 					foreach (Discussion discussion in postedDiscussions)

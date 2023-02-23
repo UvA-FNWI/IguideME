@@ -37,13 +37,13 @@ namespace IguideME.Web.Services.Workers
 
             foreach (var user in DatabaseManager.Instance.GetUsers(this._courseID))
             {
-                if (!DatabaseManager.Instance.GetNotificationEnable(this._courseID, user.LoginID)) {
-                    _logger.LogInformation($"Not sending to {user.LoginID}, they have notifications disabled");
+                if (!DatabaseManager.Instance.GetNotificationEnable(this._courseID, user.UserID)) {
+                    _logger.LogInformation($"Not sending to {user.UserID}, they have notifications disabled");
                 }
 
-                var notifications = DatabaseManager.Instance.GetPendingNotifications(this._courseID, user.LoginID);
+                var notifications = DatabaseManager.Instance.GetPendingNotifications(this._courseID, user.UserID);
 
-                _logger.LogInformation("Student " + user.LoginID + ", " + user.UserID + " has " + notifications.Count + " notifications queued up.");
+                _logger.LogInformation("Student " + user.UserID + ", " + user.UserID + " has " + notifications.Count + " notifications queued up.");
 
                 string outperforming = "";
                 string closing = "";
@@ -83,7 +83,7 @@ namespace IguideME.Web.Services.Workers
 // Ugly but had difficulties with \n showing up all over the place.
 
                 if (!string.IsNullOrEmpty(body)) {
-                    _logger.LogInformation($"Sending notification to {user.LoginID}, {user.UserID}: {body}");
+                    _logger.LogInformation($"Sending notification to {user.UserID}, {user.UserID}: {body}");
                     _canvasTest.SendMessage(user.UserID,
                     "IGuideME",
 @$"You are using IguideME, please find your personal feedback below. Visit IguideME in your course for more detailed information.
@@ -94,7 +94,7 @@ namespace IguideME.Web.Services.Workers
 
                 _logger.LogInformation("Marking notifications as sent...");
 
-                DatabaseManager.Instance.MarkNotificationsSent(this._courseID, user.LoginID);
+                DatabaseManager.Instance.MarkNotificationsSent(this._courseID, user.UserID);
             }
 
             _logger.LogInformation("All notifications processed.");
