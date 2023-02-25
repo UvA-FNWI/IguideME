@@ -9,31 +9,30 @@ public static class DatabaseQueries
     public static readonly Dictionary<string, string> MIGRATIONS =
         new Dictionary<string, string>()
         {
-            // {
-            //     "0001_move_consent_and_goals_to_user_settings",
-            //     @"
-            //     INSERT INTO `user_settings` (
-            //                 `course_id`,
-            //                 `user_id`,
-            //                 `user_login_id`,
-            //                 `user_name`,
-            //                 `consent`,
-            //                 `goal_grade`
-            //     )
-            //     SELECT
-            //                 `consent`.`course_id`,
-            //                 `consent`.`user_id`,
-            //                 `consent`.`user_login_id`,
-            //                 `consent`.`user_name`,
-            //                 `consent`.`granted`,
-            //                 `goal_grade`.`grade`
-            //     FROM        `consent`
-            //     INNER JOIN  `goal_grade`
-            //         ON      `consent`.`user_login_id`=`goal_grade`.`user_login_id`
-            //     ;"
-            // }
-            // {"0001_add_sent_to_notifications",
-            // @"ALTER TABLE notifications ADD sent BOOLEAN;"},
+            {
+                "0001_rename_user_id_in_user_tracker",
+                @"ALTER TABLE user_tracker RENAME COLUMN `user_login_id` TO `user_id`;"
+            },
+            {
+                "0002_rename_user_id_in_accept_list",
+                @"ALTER TABLE accept_list RENAME COLUMN `user_login_id` TO `user_id`;"
+            },
+            {
+                "0003_rename_user_id_in_tile_entry_submission",
+                @"ALTER TABLE tile_entry_submission RENAME COLUMN `user_login_id` TO `user_id`;"
+            },
+            {
+                "0004_rename_and_remove_user_id_in_user_settings",
+                @"
+                ALTER TABLE user_settings DROP COLUMN `user_id`;
+                ALTER TABLE user_settings RENAME COLUMN `user_login_id` TO `user_id`;"
+            },
+            {
+                "0005_rename_and_remove_user_id_in_peer_group",
+                @"
+                ALTER TABLE peer_group RENAME COLUMN `user_login_id` TO `user_id`;
+                ALTER TABLE peer_group RENAME COLUMN `target_login_id` TO `target_id`;"
+            },
         };
 
 // //================================ Tables ================================//
@@ -168,7 +167,7 @@ public static class DatabaseQueries
         @"CREATE TABLE IF NOT EXISTS `tile_entry_submission` (
             `id`              INTEGER PRIMARY KEY AUTOINCREMENT,
             `entry_id`        INTEGER,
-            `user_id`   STRING,
+            `user_id`         STRING,
             `grade`           FLOAT NULL,
             `submitted`       TEXT NULL,
             `sync_hash`       TEXT
@@ -250,8 +249,8 @@ public static class DatabaseQueries
         @"CREATE TABLE IF NOT EXISTS `peer_group` (
             `id`              INTEGER PRIMARY KEY AUTOINCREMENT,
             `course_id`       INTEGER,
-            `user_id`   STRING,
-            `target_id` STRING,
+            `user_id`         STRING,
+            `target_id`       STRING,
             `sync_hash`       STRING
         );";
 
@@ -271,7 +270,7 @@ public static class DatabaseQueries
         @"CREATE TABLE IF NOT EXISTS `notifications` (
             `id`                  INTEGER PRIMARY KEY AUTOINCREMENT,
             `course_id`           INTEGER,
-            `user_id`       STRING,
+            `user_id`             STRING,
             `tile_id`             INTEGER,
             `status`              STRING,
             `sync_hash`           STRING,
@@ -293,7 +292,7 @@ public static class DatabaseQueries
         @"CREATE TABLE IF NOT EXISTS `predicted_grade` (
             `id`                  INTEGER PRIMARY KEY AUTOINCREMENT,
             `course_id`           INTEGER,
-            `user_id`       STRING,
+            `user_id`             STRING,
             `grade`               FLOAT,
             `date`                TEXT,
             UNIQUE(course_id, user_id, date)
@@ -314,7 +313,7 @@ public static class DatabaseQueries
         @"CREATE TABLE IF NOT EXISTS `external_data` (
             `id`              INTEGER PRIMARY KEY AUTOINCREMENT,
             `course_id`       INTEGER,
-            `user_id`   STRING,
+            `user_id`         STRING,
             `tile_id`         INTEGER,
             `title`           STRING,
             `grade`           FLOAT
@@ -324,7 +323,8 @@ public static class DatabaseQueries
         @"CREATE TABLE IF NOT EXISTS `canvas_users` (
             `id`              INTEGER PRIMARY KEY AUTOINCREMENT,
             `course_id`       INTEGER,
-            `user_id`         INTEGER,
+            `studentnumber`   INTEGER,
+            `user_id`         STRING,
             `name`            STRING,
             `sortable_name`   STRING,
             `role`            STRING DEFAULT 'student',

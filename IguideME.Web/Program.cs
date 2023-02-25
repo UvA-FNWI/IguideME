@@ -108,7 +108,7 @@ WebApplication app = builder.Build();
 
 app.UseLti(new LtiOptions
 {
-    ClientId = "104400000000000183",
+    ClientId = "104410000000000150",
     AuthenticateUrl = "https://uvadlo-dev.instructure.com/api/lti/authorize_redirect",
     JwksUrl = "https://canvas.instructure.com/api/lti/security/jwks",
     SigningKey = key,
