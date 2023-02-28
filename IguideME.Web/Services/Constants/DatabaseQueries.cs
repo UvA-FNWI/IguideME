@@ -24,8 +24,21 @@ public static class DatabaseQueries
             {
                 "0004_rename_and_remove_user_id_in_user_settings",
                 @"
-                ALTER TABLE user_settings DROP COLUMN `user_id`;
-                ALTER TABLE user_settings RENAME COLUMN `user_login_id` TO `user_id`;"
+                ALTER TABLE user_settings RENAME TO tmp;
+                CREATE TABLE IF NOT EXISTS user_settings (
+                            id              INTEGER PRIMARY KEY AUTOINCREMENT,
+                            course_id       INTEGER,
+                            user_id         STRING,
+                            user_name       STRING,
+                            consent         INTEGER,
+                            goal_grade      INTEGER,
+                            notifications   BOOLEAN DEFAULT true,
+                            UNIQUE(course_id, user_id)
+                        );
+                INSERT INTO user_settings (`id`, `course_id`, `user_id`, `user_name`, `consent`, `goal_grade`, `notifications`)
+                SELECT `id`, `course_id`, `user_login_id`, `user_name`, `consent`, `goal_grade`, `notifications` FROM tmp
+                ;
+                DROP TABLE tmp;"
             },
             {
                 "0005_rename_and_remove_user_id_in_peer_group",
@@ -33,6 +46,28 @@ public static class DatabaseQueries
                 ALTER TABLE peer_group RENAME COLUMN `user_login_id` TO `user_id`;
                 ALTER TABLE peer_group RENAME COLUMN `target_login_id` TO `target_id`;"
             },
+            {
+                "0006_rename_and_remove_user_id_in_notifications",
+                @"
+                ALTER TABLE notifications RENAME COLUMN `user_login_id` TO `user_id`;"
+            },
+            {
+                "0007_rename_and_remove_user_id_in_predicted_grade",
+                @"
+                ALTER TABLE predicted_grade RENAME COLUMN `user_login_id` TO `user_id`;"
+            },
+            {
+                "0008_rename_and_remove_user_id_in_external_data",
+                @"
+                ALTER TABLE external_data RENAME COLUMN `user_login_id` TO `user_id`;"
+            },
+            {
+                "0009_rename_and_remove_user_id_in_canvas_users",
+                @"
+                ALTER TABLE canvas_users RENAME COLUMN `user_id` TO `studentnumber`;
+                ALTER TABLE canvas_users DROP COLUMN `sis_id`;
+                ALTER TABLE canvas_users RENAME COLUMN `login_id` TO `user_id`;"
+            }
         };
 
 // //================================ Tables ================================//
@@ -564,12 +599,13 @@ public static class DatabaseQueries
     public const string REGISTER_USER_FOR_COURSE =
         @"INSERT INTO   `canvas_users`
                         (   `course_id`,
+                            `studentnumber`,
                             `user_id`,
                             `name`,
                             `sortable_name`,
                             `role`,
                             `sync_hash`) " +
-                "VALUES({0}, '{1}', '{2}', '{3}', '{4}', '{5}');";
+                "VALUES({0}, {1}, '{2}', '{3}', '{4}', '{5}', '{6}');";
 
     public const string REGISTER_USER_SUBMISSION =
         @"INSERT INTO   `tile_entry_submission`
@@ -589,7 +625,7 @@ public static class DatabaseQueries
                             `goal_grade`   )
             VALUES({0}, '{1}', '{2}', {3}, -1)
             ON CONFLICT (   `user_id`, course_id   )
-                DO NOTHING
+                DO UPDATE SET `user_name` = `excluded`.`user_name`
         ;";
 
     public const string SET_USER_CONSENT =
@@ -962,6 +998,7 @@ public static class DatabaseQueries
 
     public const string QUERY_USERS_FOR_COURSE =
         @"SELECT    `id`,
+                    `studentnumber`,
                     `user_id`,
                     `name`,
                     `sortable_name`,
@@ -973,6 +1010,7 @@ public static class DatabaseQueries
 
     public const string QUERY_USERS_WITH_ROLE_FOR_COURSE =
         @"SELECT    `id`,
+                    `studentnumber`,
                     `user_id`,
                     `name`,
                     `sortable_name`,
@@ -985,6 +1023,7 @@ public static class DatabaseQueries
 
     public const string QUERY_USER_FOR_COURSE =
         @"SELECT    `id`,
+                    `studentnumber`,
                     `user_id`,
                     `name`,
                     `sortable_name`,
@@ -998,6 +1037,7 @@ public static class DatabaseQueries
 
     public const string QUERY_USERS_WITH_GOAL_GRADE =
         @"SELECT    `canvas_users`.`id`,
+                    `canvas_users`.`studentnumber`,
                     `canvas_users`.`user_id`,
                     `canvas_users`.`name`,
                     `canvas_users`.`sortable_name`,

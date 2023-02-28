@@ -30,7 +30,7 @@ namespace IguideME.Web.Services
         public void SendMessage(string userID, string subject, string body)
         {
             try {
-                var conv = new Conversation(this._connector)
+                Conversation conv = new(this._connector)
                 {
                     Subject = subject,
                     Body = body,
@@ -50,17 +50,21 @@ namespace IguideME.Web.Services
 
         public User GetUser(int courseID, string userID)
         {
-            var users = _connector.FindCourseById(courseID).UserEnrollments.Select(x => x.User).ToArray();
+            User[] users = _connector.FindCourseById(courseID).UserEnrollments.Select(x => x.User).ToArray();
             return users.First(x => x.LoginID == userID);
         }
 
         public User[] GetStudents(int courseID)
         {
             _logger.LogInformation("Finding course by id, id = " + courseID);
-            _logger.LogInformation("Course = " + _connector.FindCourseById(courseID));
-            _logger.LogInformation("Getting users " + _connector.FindCourseById(courseID).GetUsersByType(EnrollmentType.Student).ToArray());
 
-            return _connector.FindCourseById(courseID).GetUsersByType(EnrollmentType.Student).ToArray();
+            Course course = _connector.FindCourseById(courseID);
+            _logger.LogInformation("Course = " + course);
+
+            User[] students = course.GetUsersByType(EnrollmentType.Student).ToArray();
+            _logger.LogInformation("Getting users " + students);
+
+            return students;
         }
 
         public User[] GetAdministrators(int courseID)
@@ -102,7 +106,7 @@ namespace IguideME.Web.Services
 
         public Submission[] GetSubmissions(int courseID, int userID)
         {
-            var whitelist = DatabaseManager.Instance.GetGrantedConsents(courseID).Select(x => x.UserID.ToString());
+            IEnumerable<string> whitelist = DatabaseManager.Instance.GetGrantedConsents(courseID).Select(x => x.UserID);
 
             // Returns all submissions of type 'on_paper' for a specified user.
             Submission[] submissions = _connector
@@ -142,15 +146,15 @@ namespace IguideME.Web.Services
 
         public Submission[] GetAssignmentSubmissions(int courseID, string userID, string name)
         {
-            var assignment = _connector
+            Assignment assignment = _connector
                 .FindCourseById(courseID)
                 .Assignments.Find(a => a.Name == name);
 
-            var userSubmissions = userID != null ?
+            IEnumerable<Submission> userSubmissions = userID != null ?
                 assignment.Submissions.Where(x => x.User.LoginID == userID) :
                 assignment.Submissions;
 
-            var submissions = _connector
+            IEnumerable<Submission> submissions = _connector
                 .FindCourseById(courseID)
                 .Assignments
                 .Where(a => a.Name == name)

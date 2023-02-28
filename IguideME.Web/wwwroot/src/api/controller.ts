@@ -1,4 +1,5 @@
 import axios, { AxiosInstance } from "axios";
+import {debug} from "../config/config";
 
 export default class Controller {
   protected static client: AxiosInstance;
@@ -13,6 +14,7 @@ export default class Controller {
       baseURL: this.baseURL(),
       headers: { Authorization: `Bearer ${document.location.hash.slice(1)}` }
     });
-    this.client.post('app/setup').then();
+    if (!debug())
+      this.client.post('app/setup').then();
   }
 }

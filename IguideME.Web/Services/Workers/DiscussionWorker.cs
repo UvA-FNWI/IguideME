@@ -1,9 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using IguideME.Web.Models;
+using IguideME.Web.Models.Impl;
+using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
-using UvA.DataNose.Connectors.Canvas;
+using Canvas = UvA.DataNose.Connectors.Canvas;
 
 namespace IguideME.Web.Services.Workers
 {
@@ -27,22 +28,27 @@ namespace IguideME.Web.Services.Workers
 
 			_logger.LogInformation("Starting discussion registry...");
 
-			var tiles = DatabaseManager.Instance.GetTiles(this.CourseID);
-			var students = DatabaseManager.Instance.GetUsers(this.CourseID, "student", this.Hash);
+			List<Tile> tiles = DatabaseManager.Instance.GetTiles(this.CourseID);
+			List<User> students = DatabaseManager.Instance.GetUsers(this.CourseID, "student", this.Hash);
 
-			List<Discussion> discussions = this.CanvasTest
+			List<Canvas.Discussion> discussions = this.CanvasTest
 				.GetDiscussions(this.CourseID);
 
 			// Register the discussions first as not all discussions are linked to tiles.
-			foreach (Discussion discussion in discussions)
+			foreach (Canvas.Discussion discussion in discussions)
             {
 				DatabaseManager.Instance.RegisterDiscussion(discussion, this.Hash);
 
-				foreach (DiscussionEntry entry in discussion.Entries) {
-					int entry_id = DatabaseManager.Instance.RegisterDiscussionEntry(entry);
+				foreach (Canvas.DiscussionEntry entry in discussion.Entries) {
+                    int entry_id = DatabaseManager.Instance.RegisterDiscussionEntry(
+						entry,
+						students?.Find(s => s.StudentNumber == entry.UserID)?.UserID);
 
-					foreach (DiscussionReply reply in entry.Replies) {
-						DatabaseManager.Instance.RegisterDiscussionReply(reply, entry_id);
+					foreach (Canvas.DiscussionReply reply in entry.Replies) {
+                        DatabaseManager.Instance.RegisterDiscussionReply(
+							reply,
+							entry_id,
+							students?.Find(s => s.StudentNumber == reply.UserID)?.UserID);
 					}
 				}
 			}
@@ -64,7 +70,7 @@ namespace IguideME.Web.Services.Workers
                         return student != null && DatabaseManager.Instance.GetConsent(this.CourseID, student.UserID) == 1;
                     });
 
-					foreach (Discussion discussion in postedDiscussions)
+					foreach (Canvas.Discussion discussion in postedDiscussions)
 					{
 						DatabaseManager.Instance.UpdateDiscussion(discussion, tile.ID, this.Hash);
 
@@ -73,7 +79,7 @@ namespace IguideME.Web.Services.Workers
 				else
 				{
 					tile.GetEntries();
-					foreach (Discussion discussion in discussions) {
+					foreach (Canvas.Discussion discussion in discussions) {
 						foreach (TileEntry entry in tile.Entries) {
 							if (discussion.Title.Equals(entry.Title, StringComparison.OrdinalIgnoreCase)) {
 								DatabaseManager.Instance.UpdateDiscussion(discussion, tile.ID, this.Hash);

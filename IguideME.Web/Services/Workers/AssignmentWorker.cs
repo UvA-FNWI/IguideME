@@ -52,7 +52,7 @@ namespace IguideME.Web.Services.Workers
 				foreach (var submission in submissions)
 				{
 					// don't register data from students that did not give consent
-					if (DatabaseManager.Instance.GetConsent(this._courseID, submission.User.SISUserID) != 1) {
+					if (DatabaseManager.Instance.GetConsent(this._courseID, submission.User.LoginID) != 1) {
 						continue;
 					}
 
@@ -80,7 +80,7 @@ namespace IguideME.Web.Services.Workers
 							DatabaseManager.Instance.CreateUserSubmission(
 								this._courseID,
 								entry.ID,
-								submission.User.SISUserID,
+								submission.User.LoginID,
 								grade,
 								"",//submission.SubmittedAt.Value.ToShortDateString(),
 								_hashCode);

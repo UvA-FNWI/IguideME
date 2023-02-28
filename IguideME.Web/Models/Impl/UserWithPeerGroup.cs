@@ -19,15 +19,17 @@ namespace IguideME.Web.Models.Impl
         public UserWithPeerGroup(
             int id,
             int courseID,
+            int studentnumber,
             string userID,
             string name,
             string sortableName,
             string role,
             string hash = null,
-            Boolean autoLoad = false) : base(id, courseID, userID, name, sortableName, role, hash)
+            Boolean autoLoad = false) : base(id, courseID, studentnumber, userID, name, sortableName, role, hash)
         {
             this.ID = id;
             this.CourseID = courseID;
+            this.StudentNumber = studentnumber;
             this.UserID = userID;
             this.Name = name;
             this.SortableName = sortableName;

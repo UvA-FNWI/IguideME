@@ -44,6 +44,7 @@ namespace IguideME.Web.Services.Workers
                 var user = new UserWithPeerGroup(
                                     0,
                                     this.CourseID,
+                                    student.StudentNumber,
                                     student.UserID,
                                     student.Name,
                                     student.SortableName,

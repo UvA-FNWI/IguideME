@@ -220,7 +220,6 @@ namespace IguideME.Web.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public ActionResult GetGoalGrade(string userID)
         {
-            // Only instructors may view submissions of other students
             if (this.GetUserID() != userID &&
                 !this.IsAdministrator())
                 return Unauthorized();

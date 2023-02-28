@@ -342,6 +342,7 @@ namespace IguideME.Web.Services
 
         public void RegisterUser(
             int courseID,
+            int? studentnumber,
             string userID,
             string name,
             string sortableName,
@@ -351,7 +352,7 @@ namespace IguideME.Web.Services
             NonQuery(
                 String.Format(
                     DatabaseQueries.REGISTER_USER_FOR_COURSE,
-                    courseID, userID, name, sortableName, role, syncHash
+                    courseID, studentnumber, userID, name, sortableName, role, syncHash
                     ));
         }
 
@@ -414,27 +415,27 @@ namespace IguideME.Web.Services
             );
         }
 
-        public int RegisterDiscussionEntry(DiscussionEntry entry)
+        public int RegisterDiscussionEntry(DiscussionEntry entry, string userID)
         {
             NonQuery(
                 String.Format(
                     DatabaseQueries.REGISTER_CANVAS_DISCUSSION_ENTRY,
                     entry.CourseID,
                     entry.TopicID,
-                    entry.UserID,
+                    userID,
     				entry.CreatedAt,
                     entry.Message.Replace("'", "''")));
 
             using (SQLiteDataReader r = Query($@"SELECT `id` FROM `canvas_discussion_entry`
                         WHERE  `course_id`={entry.CourseID}
                         AND    `discussion_id`={entry.TopicID}
-                        AND    `posted_by`='{entry.UserID}'
+                        AND    `posted_by`='{userID}'
                         AND    `posted_at`='{entry.CreatedAt}';")) {
                 return r.Read() ? r.GetInt32(0) : -1;
             }
         }
 
-        public void RegisterDiscussionReply(DiscussionReply reply, int entry_id)
+        public void RegisterDiscussionReply(DiscussionReply reply, int entry_id, string userID)
         {
             if (entry_id == -1) {
                 return;
@@ -444,7 +445,7 @@ namespace IguideME.Web.Services
                 String.Format(
                     DatabaseQueries.REGISTER_CANVAS_DISCUSSION_REPLY,
                     entry_id,
-                    reply.UserID,
+                    userID,
     				reply.CreatedAt,
                     reply.Message.Replace("'", "''")));
         }
@@ -476,10 +477,11 @@ namespace IguideME.Web.Services
                     User user = new(
                         r.GetInt32(0),
                         courseID,
-                        r.GetValue(1).ToString(),
+                        r.GetInt32(1),
                         r.GetValue(2).ToString(),
                         r.GetValue(3).ToString(),
-                        r.GetValue(4).ToString()
+                        r.GetValue(4).ToString(),
+                        r.GetValue(5).ToString()
                     );
                     users.Add(user);
                 }
@@ -506,14 +508,16 @@ namespace IguideME.Web.Services
                     user = new User(
                         r.GetInt32(0),
                         courseID,
-                        r.GetValue(1).ToString(),
+                        r.GetInt32(1),
                         r.GetValue(2).ToString(),
                         r.GetValue(3).ToString(),
-                        r.GetValue(4).ToString()
+                        r.GetValue(4).ToString(),
+                        r.GetValue(5).ToString()
                     );
                 }
             }
 
+            _logger.LogInformation($"Getting user: {userID} for course{courseID} with name {user} ");
             return user;
         }
 
@@ -541,10 +545,11 @@ namespace IguideME.Web.Services
                     User user = new(
                         r.GetInt32(0),
                         courseID,
-                        r.GetValue(1).ToString(),
+                        r.GetInt32(1),
                         r.GetValue(2).ToString(),
                         r.GetValue(3).ToString(),
-                        r.GetValue(4).ToString()
+                        r.GetValue(4).ToString(),
+                        r.GetValue(5).ToString()
                     );
                     users.Add(user);
                 }
