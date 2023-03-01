@@ -39,7 +39,7 @@ namespace IguideME.Web.Services.Workers
                     DatabaseManager.Instance.RegisterUser(
                         _courseID,
                         student.ID,
-                        student.SISUserID,
+                        student.LoginID,
                         student.SISUserID,
                         student.Name,
                         student.SortableName,
