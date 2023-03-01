@@ -9,31 +9,71 @@ public static class DatabaseQueries
     public static readonly Dictionary<string, string> MIGRATIONS =
         new Dictionary<string, string>()
         {
-            // {
-            //     "0001_move_consent_and_goals_to_user_settings",
-            //     @"
-            //     INSERT INTO `user_settings` (
-            //                 `course_id`,
-            //                 `user_id`,
-            //                 `user_login_id`,
-            //                 `user_name`,
-            //                 `consent`,
-            //                 `goal_grade`
-            //     )
-            //     SELECT
-            //                 `consent`.`course_id`,
-            //                 `consent`.`user_id`,
-            //                 `consent`.`user_login_id`,
-            //                 `consent`.`user_name`,
-            //                 `consent`.`granted`,
-            //                 `goal_grade`.`grade`
-            //     FROM        `consent`
-            //     INNER JOIN  `goal_grade`
-            //         ON      `consent`.`user_login_id`=`goal_grade`.`user_login_id`
-            //     ;"
-            // }
-            // {"0001_add_sent_to_notifications",
-            // @"ALTER TABLE notifications ADD sent BOOLEAN;"},
+            {
+                "0001_rename_user_id_in_user_tracker",
+                @"ALTER TABLE user_tracker RENAME COLUMN `user_login_id` TO `user_id`;"
+            },
+            {
+                "0002_rename_user_id_in_accept_list",
+                @"ALTER TABLE accept_list RENAME COLUMN `user_login_id` TO `user_id`;"
+            },
+            {
+                "0003_rename_user_id_in_tile_entry_submission",
+                @"ALTER TABLE tile_entry_submission RENAME COLUMN `user_login_id` TO `user_id`;"
+            },
+            {
+                "0004_rename_and_remove_user_id_in_user_settings",
+                @"
+                ALTER TABLE user_settings RENAME TO tmp;
+                CREATE TABLE IF NOT EXISTS user_settings (
+                            id              INTEGER PRIMARY KEY AUTOINCREMENT,
+                            course_id       INTEGER,
+                            user_id         STRING,
+                            user_name       STRING,
+                            consent         INTEGER,
+                            goal_grade      INTEGER,
+                            notifications   BOOLEAN DEFAULT true,
+                            UNIQUE(course_id, user_id)
+                        );
+                INSERT INTO user_settings (`id`, `course_id`, `user_id`, `user_name`, `consent`, `goal_grade`, `notifications`)
+                SELECT `id`, `course_id`, `user_login_id`, `user_name`, `consent`, `goal_grade`, `notifications` FROM tmp
+                ;
+                DROP TABLE tmp;"
+            },
+            {
+                "0005_change_sis_to_login_in_user_settings",
+                @"
+                UPDATE user_settings SET `user_id` = (SELECT login_id FROM canvas_users WHERE `canvas_users`.`sis_id` = `user_settings`.`user_id`
+                );"
+            },
+            {
+                "0006_rename_and_remove_user_id_in_peer_group",
+                @"
+                ALTER TABLE peer_group RENAME COLUMN `user_login_id` TO `user_id`;
+                ALTER TABLE peer_group RENAME COLUMN `target_login_id` TO `target_id`;"
+            },
+            {
+                "0007_rename_and_remove_user_id_in_notifications",
+                @"
+                ALTER TABLE notifications RENAME COLUMN `user_login_id` TO `user_id`;"
+            },
+            {
+                "0008_rename_and_remove_user_id_in_predicted_grade",
+                @"
+                ALTER TABLE predicted_grade RENAME COLUMN `user_login_id` TO `user_id`;"
+            },
+            {
+                "0009_rename_and_remove_user_id_in_external_data",
+                @"
+                ALTER TABLE external_data RENAME COLUMN `user_login_id` TO `user_id`;"
+            },
+            {
+                "0010_rename_and_remove_user_id_in_canvas_users",
+                @"
+                ALTER TABLE canvas_users RENAME COLUMN `user_id` TO `studentnumber`;
+                ALTER TABLE canvas_users DROP COLUMN `sis_id`;
+                ALTER TABLE canvas_users RENAME COLUMN `login_id` TO `user_id`;"
+            }
         };
 
 // //================================ Tables ================================//
@@ -69,7 +109,7 @@ public static class DatabaseQueries
         @"CREATE TABLE IF NOT EXISTS `user_tracker` (
             `id`                  INTEGER PRIMARY KEY AUTOINCREMENT,
             `time`                STRING DEFAULT CURRENT_TIMESTAMP,
-            `user_login_id`       STRING,
+            `user_id`             STRING,
             `action`              STRING
         );";
 
@@ -81,7 +121,7 @@ public static class DatabaseQueries
         @"CREATE TABLE IF NOT EXISTS `accept_list` (
             `id`                  INTEGER PRIMARY KEY AUTOINCREMENT,
             `course_id`           INTEGER,
-            `user_login_id`       STRING,
+            `user_id`             STRING,
             `accepted`            BOOLEAN
         );";
 
@@ -168,7 +208,7 @@ public static class DatabaseQueries
         @"CREATE TABLE IF NOT EXISTS `tile_entry_submission` (
             `id`              INTEGER PRIMARY KEY AUTOINCREMENT,
             `entry_id`        INTEGER,
-            `user_login_id`   STRING,
+            `user_id`         STRING,
             `grade`           FLOAT NULL,
             `submitted`       TEXT NULL,
             `sync_hash`       TEXT
@@ -231,8 +271,7 @@ public static class DatabaseQueries
         @"CREATE TABLE IF NOT EXISTS user_settings (
             id              INTEGER PRIMARY KEY AUTOINCREMENT,
             course_id       INTEGER,
-            user_id         INTEGER,
-            user_login_id   STRING,
+            user_id         STRING,
             user_name       STRING,
             consent         INTEGER,
             goal_grade      INTEGER,
@@ -251,8 +290,8 @@ public static class DatabaseQueries
         @"CREATE TABLE IF NOT EXISTS `peer_group` (
             `id`              INTEGER PRIMARY KEY AUTOINCREMENT,
             `course_id`       INTEGER,
-            `user_login_id`   STRING,
-            `target_login_id` STRING,
+            `user_id`         STRING,
+            `target_id`       STRING,
             `sync_hash`       STRING
         );";
 
@@ -272,7 +311,7 @@ public static class DatabaseQueries
         @"CREATE TABLE IF NOT EXISTS `notifications` (
             `id`                  INTEGER PRIMARY KEY AUTOINCREMENT,
             `course_id`           INTEGER,
-            `user_login_id`       STRING,
+            `user_id`             STRING,
             `tile_id`             INTEGER,
             `status`              STRING,
             `sync_hash`           STRING,
@@ -294,10 +333,10 @@ public static class DatabaseQueries
         @"CREATE TABLE IF NOT EXISTS `predicted_grade` (
             `id`                  INTEGER PRIMARY KEY AUTOINCREMENT,
             `course_id`           INTEGER,
-            `user_login_id`       STRING,
+            `user_id`             STRING,
             `grade`               FLOAT,
             `date`                TEXT,
-            UNIQUE(course_id, user_login_id, date)
+            UNIQUE(course_id, user_id, date)
         );";
 
     public const string CREATE_TABLE_GRADE_PREDICTION_MODEL_PARAMETER =
@@ -315,7 +354,7 @@ public static class DatabaseQueries
         @"CREATE TABLE IF NOT EXISTS `external_data` (
             `id`              INTEGER PRIMARY KEY AUTOINCREMENT,
             `course_id`       INTEGER,
-            `user_login_id`   STRING,
+            `user_id`         STRING,
             `tile_id`         INTEGER,
             `title`           STRING,
             `grade`           FLOAT
@@ -325,9 +364,8 @@ public static class DatabaseQueries
         @"CREATE TABLE IF NOT EXISTS `canvas_users` (
             `id`              INTEGER PRIMARY KEY AUTOINCREMENT,
             `course_id`       INTEGER,
-            `user_id`         INTEGER,
-            `login_id`        STRING,
-            `sis_id`          STRING,
+            `studentnumber`   INTEGER,
+            `user_id`         STRING,
             `name`            STRING,
             `sortable_name`   STRING,
             `role`            STRING DEFAULT 'student',
@@ -412,11 +450,11 @@ public static class DatabaseQueries
 
     public const string REGISTER_PREDICTED_GRADE =
         @"INSERT INTO   `predicted_grade` ( `course_id`,
-                                            `user_login_id`,
+                                            `user_id`,
                                             `grade`,
                                             `date` )
           VALUES        ({0}, '{1}', {2}, CURRENT_DATE)
-          ON CONFLICT (`course_id`, `user_login_id`, `date`) DO UPDATE SET `grade`=`excluded`.`grade`;";
+          ON CONFLICT (`course_id`, `user_id`, `date`) DO UPDATE SET `grade`=`excluded`.`grade`;";
 
     public const string REGISTER_USER_GOAL_GRADE =
         @"INSERT INTO   `user_settings` (`course_id`, `user_id`)
@@ -425,14 +463,14 @@ public static class DatabaseQueries
 
     public const string REGISTER_USER_PEER =
         @"INSERT INTO   `peer_group` (  `course_id`,
-                                        `user_login_id`,
-                                        `target_login_id`,
+                                        `user_id`,
+                                        `target_id`,
                                         `sync_hash`)
           VALUES        ({0}, '{1}', '{2}', '{3}');";
 
     public const string REGISTER_USER_NOTIFICATIONS =
         @"INSERT INTO   `notifications` (   `course_id`,
-                                            `user_login_id`,
+                                            `user_id`,
                                             `tile_id`,
                                             `status`,
                                             `sent`,
@@ -460,7 +498,7 @@ public static class DatabaseQueries
     public const string REGISTER_ACCEPTED_STUDENT =
         @"INSERT INTO       `accept_list`
                             (   `course_id`,
-                                `user_login_id`,
+                                `user_id`,
                                 `accepted`  )
         VALUES({0}, '{1}', {2});";
 
@@ -567,19 +605,18 @@ public static class DatabaseQueries
     public const string REGISTER_USER_FOR_COURSE =
         @"INSERT INTO   `canvas_users`
                         (   `course_id`,
+                            `studentnumber`,
                             `user_id`,
-                            `login_id`,
-                            `sis_id`,
                             `name`,
                             `sortable_name`,
                             `role`,
                             `sync_hash`) " +
-                "VALUES({0}, {1}, '{2}', '{3}', '{4}', '{5}', '{6}', '{7}');";
+                "VALUES({0}, {1}, '{2}', '{3}', '{4}', '{5}', '{6}');";
 
     public const string REGISTER_USER_SUBMISSION =
         @"INSERT INTO   `tile_entry_submission`
                         (   `entry_id`,
-                            `user_login_id`,
+                            `user_id`,
                             `grade`,
                             `submitted`,
                             `sync_hash` )
@@ -589,23 +626,21 @@ public static class DatabaseQueries
         @"  INSERT INTO `user_settings`
                         (   `course_id`,
                             `user_id`,
-                            `user_login_id`,
                             `user_name`,
                             `consent`,
                             `goal_grade`   )
-            VALUES({0}, {1}, '{2}', '{3}', {4}, -1)
+            VALUES({0}, '{1}', '{2}', {3}, -1)
             ON CONFLICT (   `user_id`, course_id   )
-                DO NOTHING
+                DO UPDATE SET `user_name` = `excluded`.`user_name`
         ;";
 
     public const string SET_USER_CONSENT =
         @"  INSERT INTO `user_settings`
                         (   `course_id`,
                             `user_id`,
-                            `user_login_id`,
                             `user_name`,
                             `consent`   )
-            VALUES({0}, {1}, '{2}', '{3}', {4})
+            VALUES({0}, '{1}', '{2}', {3})
             ON CONFLICT (   `user_id`, course_id   )
                 DO UPDATE SET `consent` = {4}
         ;";
@@ -635,23 +670,23 @@ public static class DatabaseQueries
         @"SELECT `course_id` FROM `course_settings`;";
 
     public const string QUERY_PREDICTED_GRADES_FOR_USER =
-        @"SELECT    `user_login_id`,
+        @"SELECT    `user_id`,
                     `date`,
                     `grade`
         FROM        `predicted_grade`
         WHERE       `course_id`={0}
-        AND         `user_login_id`='{1}'
+        AND         `user_id`='{1}'
         ORDER BY    `date` DESC;";
 
     public const string QUERY_USER_PEERS =
-        @"SELECT        `target_login_id`
+        @"SELECT        `target_id`
         FROM            `peer_group`
         WHERE           `course_id`={0}
-        AND             `user_login_id`='{1}'
+        AND             `user_id`='{1}'
         AND             `sync_hash`='{2}';";
 
     public const string QUERY_ALL_NOTIFICATIONS =
-        @"SELECT        `user_login_id`,
+        @"SELECT        `user_id`,
                         `tile_id`,
                         `status`,
                         `sent`
@@ -663,14 +698,14 @@ public static class DatabaseQueries
         @"SELECT        `tile_id`, `status`, `sent`
         FROM            `notifications`
         WHERE           `course_id`={0}
-        AND             `user_login_id`='{1}'
+        AND             `user_id`='{1}'
         AND             `sync_hash`='{2}';";
 
     public const string QUERY_PENDING_USER_NOTIFICATIONS =
         @"SELECT        `tile_id`, `status`
         FROM            `notifications`
         WHERE           `course_id`={0}
-        AND             `user_login_id`='{1}'
+        AND             `user_id`='{1}'
         AND             `sync_hash`='{2}'
         AND             `sent`=false;";
 
@@ -678,7 +713,7 @@ public static class DatabaseQueries
         @"UPDATE        `notifications`
         SET             `sent`=true
         WHERE           `course_id`={0}
-        AND             `user_login_id`='{1}'
+        AND             `user_id`='{1}'
         AND             `sync_hash`='{2}';";
 
     public const string QUERY_GRADE_PREDICTION_MODELS_FOR_COURSE =
@@ -728,7 +763,7 @@ public static class DatabaseQueries
         LIMIT       1;";
 
     public const string QUERY_ACCEPT_LIST =
-        @"SELECT    `user_login_id`, `accepted`
+        @"SELECT    `user_id`, `accepted`
         FROM        `accept_list`
         WHERE       `course_id`={0};";
 
@@ -969,9 +1004,8 @@ public static class DatabaseQueries
 
     public const string QUERY_USERS_FOR_COURSE =
         @"SELECT    `id`,
+                    `studentnumber`,
                     `user_id`,
-                    `login_id`,
-                    `sis_id`,
                     `name`,
                     `sortable_name`,
                     `role`
@@ -982,9 +1016,8 @@ public static class DatabaseQueries
 
     public const string QUERY_USERS_WITH_ROLE_FOR_COURSE =
         @"SELECT    `id`,
+                    `studentnumber`,
                     `user_id`,
-                    `login_id`,
-                    `sis_id`,
                     `name`,
                     `sortable_name`,
                     `role`
@@ -996,30 +1029,28 @@ public static class DatabaseQueries
 
     public const string QUERY_USER_FOR_COURSE =
         @"SELECT    `id`,
+                    `studentnumber`,
                     `user_id`,
-                    `login_id`,
-                    `sis_id`,
                     `name`,
                     `sortable_name`,
                     `role`
         FROM        `canvas_users`
         WHERE       `course_id`={0}
-        AND         `login_id`='{1}'
+        AND         `user_id`='{1}'
         AND         `sync_hash`='{2}'
         ORDER BY    `name` ASC
         LIMIT       1;";
 
     public const string QUERY_USERS_WITH_GOAL_GRADE =
         @"SELECT    `canvas_users`.`id`,
+                    `canvas_users`.`studentnumber`,
                     `canvas_users`.`user_id`,
-                    `canvas_users`.`login_id`,
-                    `canvas_users`.`sis_id`,
                     `canvas_users`.`name`,
                     `canvas_users`.`sortable_name`,
                     `canvas_users`.`role`
         FROM        `user_settings`
         INNER JOIN  `canvas_users`
-            ON      `canvas_users`.`login_id`=`user_settings`.`user_login_id`
+            ON      `canvas_users`.`user_id`=`user_settings`.`user_id`
         WHERE       `user_settings`.`course_id`={0}
         AND         `canvas_users`.`sync_hash`='{1}'
         AND         `user_settings`.`goal_grade`={2};";
@@ -1028,29 +1059,23 @@ public static class DatabaseQueries
         @"SELECT    `notifications`
         FROM        `user_settings`
         WHERE       `course_id`={0}
-        AND         `user_login_id`='{1}'
+        AND         `user_id`='{1}'
         ;";
 
     public const string QUERY_USER_GOAL_GRADE =
         @"SELECT    `goal_grade`
         FROM        `user_settings`
         WHERE       `course_id`={0}
-        AND         `user_login_id`='{1}'
+        AND         `user_id`='{1}'
         AND         `goal_grade` IS NOT NULL
         ;";
     public const string QUERY_GOAL_GRADES =
-        @"SELECT    `goal_grade`,
-                    `user_id`,
-                    `user_login_id`,
-                    `user_name`
-        FROM        `user_settings`
-        WHERE       `course_id`={0}
-        AND         `goal_grade` IS NOT NULL;";
+        @"SELECT `goal_grade`, `user_id` from `user_settings` WHERE `course_id`={0};";
 
     public const string QUERY_USER_SUBMISSIONS_FOR_ENTRY =
         @"SELECT    `id`,
                     `entry_id`,
-                    `user_login_id`,
+                    `user_id`,
                     `grade`,
                     `submitted`
         FROM        `tile_entry_submission`
@@ -1060,7 +1085,7 @@ public static class DatabaseQueries
     public const string QUERY_COURSE_SUBMISSIONS =
         @"SELECT    `tile_entry_submission`.`id`,
                     `tile_entry_submission`.`entry_id`,
-                    `tile_entry_submission`.`user_login_id`,
+                    `tile_entry_submission`.`user_id`,
                     `tile_entry_submission`.`grade`,
                     `tile_entry_submission`.`submitted`
         FROM        `tile_entry_submission`
@@ -1077,7 +1102,7 @@ public static class DatabaseQueries
     public const string QUERY_COURSE_SUBMISSIONS_FOR_STUDENT =
         @"SELECT    `tile_entry_submission`.`id`,
                     `tile_entry_submission`.`entry_id`,
-                    `tile_entry_submission`.`user_login_id`,
+                    `tile_entry_submission`.`user_id`,
                     `tile_entry_submission`.`grade`,
                     `tile_entry_submission`.`submitted`
         FROM        `tile_entry_submission`,
@@ -1086,7 +1111,7 @@ public static class DatabaseQueries
                     `layout_tile_group`,
                     `layout_column`
         WHERE       `tile_entry_submission`.`entry_id`=`tile_entry`.`id`
-        AND         `tile_entry_submission`.`user_login_id`='{1}'
+        AND         `tile_entry_submission`.`user_id`='{1}'
         AND         `tile`.`id`=`tile_entry`.`tile_id`
         AND         `layout_tile_group`.`id`=`tile`.`group_id`
         AND         `layout_column`.`course_id`={0}
@@ -1095,7 +1120,7 @@ public static class DatabaseQueries
     public const string QUERY_USER_SUBMISSIONS_FOR_TILE =
         @"SELECT    `tile_entry_submission`.`id`,
                     `tile_entry_submission`.`entry_id`,
-                    `tile_entry_submission`.`user_login_id`,
+                    `tile_entry_submission`.`user_id`,
                     `tile_entry_submission`.`grade`,
                     `tile_entry_submission`.`submitted`
         FROM        `tile_entry_submission`
@@ -1106,42 +1131,42 @@ public static class DatabaseQueries
     public const string QUERY_USER_SUBMISSIONS_FOR_TILE_FOR_USER =
         @"SELECT    `tile_entry_submission`.`id`,
                     `tile_entry_submission`.`entry_id`,
-                    `tile_entry_submission`.`user_login_id`,
+                    `tile_entry_submission`.`user_id`,
                     `tile_entry_submission`.`grade`,
                     `tile_entry_submission`.`submitted`
         FROM        `tile_entry_submission`
         INNER JOIN  `tile_entry`
             ON      `tile_entry_submission`.`entry_id`=`tile_entry`.`id`
         WHERE       `tile_entry`.`tile_id`={0}
-        AND         `tile_entry_submission`.`user_login_id`='{1}'
+        AND         `tile_entry_submission`.`user_id`='{1}'
         AND         `tile_entry_submission`.`sync_hash`='{2}';";
 
     public const string QUERY_USER_SUBMISSIONS_FOR_TILE_FOR_USER_PEERS =
         @"SELECT    `tile_entry_submission`.`id`,
                     `tile_entry_submission`.`entry_id`,
-                    `tile_entry_submission`.`user_login_id`,
+                    `tile_entry_submission`.`user_id`,
                     `tile_entry_submission`.`grade`,
                     `tile_entry_submission`.`submitted`
         FROM        `tile_entry_submission`
         INNER JOIN  `tile_entry`
             ON      `tile_entry_submission`.`entry_id`=`tile_entry`.`id`
         INNER JOIN  `peer_group`
-            ON      `tile_entry_submission`.`user_login_id`=`peer_group`.`target_login_id`
+            ON      `tile_entry_submission`.`user_id`=`peer_group`.`target_id`
         WHERE       `tile_entry`.`tile_id`={0}
-        AND         `peer_group`.`user_login_id`='{1}'
+        AND         `peer_group`.`user_id`='{1}'
         AND         `peer_group`.`sync_hash`='{2}'
         AND         `tile_entry_submission`.`sync_hash`='{2}';";
 
     public const string QUERY_USER_SUBMISSIONS_FOR_USER =
         @"SELECT    `tile_entry_submission`.`id`,
                     `tile_entry_submission`.`entry_id`,
-                    `tile_entry_submission`.`user_login_id`,
+                    `tile_entry_submission`.`user_id`,
                     `tile_entry_submission`.`grade`,
                     `tile_entry_submission`.`submitted`
         FROM        `tile_entry_submission`
         INNER JOIN  `tile_entry`
             ON      `tile_entry_submission`.`entry_id`=`tile_entry`.`id`
-        WHERE       `tile_entry_submission`.`user_login_id`='{0}'
+        WHERE       `tile_entry_submission`.`user_id`='{0}'
         AND         `tile_entry_submission`.`sync_hash`='{1}';";
 
     public const string QUERY_USER_PEER_GRADES =
@@ -1169,12 +1194,12 @@ public static class DatabaseQueries
         INNER JOIN  `layout_tile_group`
             ON      `layout_tile_group`.`id`=`tile`.`group_id`
         INNER JOIN  `peer_group`
-            ON      `tile_entry_submission`.`user_login_id`=`peer_group`.`target_login_id`
+            ON      `tile_entry_submission`.`user_id`=`peer_group`.`target_id`
 	    WHERE       `tile`.`content_type` != 'PREDICTION'
 	    AND	        `tile`.`content_type` != 'LEARNING_OUTCOMES'
         AND	        `tile`.`tile_type` != 'DISCUSSIONS'
         AND         `layout_tile_group`.`course_id`={0}
-        AND         `peer_group`.`user_login_id`='{1}'
+        AND         `peer_group`.`user_id`='{1}'
         AND         `peer_group`.`sync_hash`='{2}'
         AND         `tile_entry_submission`.`sync_hash`='{2}'
 	    GROUP BY    `tile`.`id`;";
@@ -1203,25 +1228,25 @@ public static class DatabaseQueries
         INNER JOIN  `layout_column`
             ON      `layout_tile_group`.`column_id`=`layout_column`.`id`
         WHERE       `layout_column`.`course_id`={0}
-        AND         `tile_entry_submission`.`user_login_id`='{1}'
+        AND         `tile_entry_submission`.`user_id`='{1}'
         AND         `tile_entry_submission`.`sync_hash`='{2}'
 	    GROUP BY `tile`.`id`;";
 
     public const string QUERY_USER_SUBMISSIONS_FOR_ENTRY_FOR_USER =
         @"SELECT    `id`,
                     `entry_id`,
-                    `user_login_id`,
+                    `user_id`,
                     `grade`,
                     `submitted`
         FROM        `tile_entry_submission`
         WHERE       `entry_id`='{0}'
-        AND         `user_login_id`='{1}'
+        AND         `user_id`='{1}'
         AND         `sync_hash`='{2}';";
 
     public const string QUERY_SUBMISSIONS_FOR_ENTRY =
         @"SELECT    `id`,
                     `entry_id`,
-                    `user_login_id`,
+                    `user_id`,
                     `grade`,
                     `submitted`
         FROM        `tile_entry_submission`
@@ -1240,13 +1265,13 @@ public static class DatabaseQueries
         @"UPDATE    `user_settings`
         SET         `notifications` = {0}
         WHERE       `course_id`={1}
-        AND         `user_login_id`='{2}';";
+        AND         `user_id`='{2}';";
 
     public const string UPDATE_USER_GOAL_GRADE =
         @"UPDATE    `user_settings`
         SET         `goal_grade` = {0}
         WHERE       `course_id`={1}
-        AND         `user_login_id`='{2}';";
+        AND         `user_id`='{2}';";
 
     public const string UPDATE_LAYOUT_COLUMN =
         @"UPDATE    `layout_column`
@@ -1274,7 +1299,7 @@ public static class DatabaseQueries
     public const string UPDATE_ACCEPT_LIST =
         @"UPDATE    `accept_list`
         SET         `accepted`={2}
-        WHERE       `course_id`={0} AND `user_login_id`='{1}';";
+        WHERE       `course_id`={0} AND `user_id`='{1}';";
 
     public const string REQUIRE_ACCEPT_LIST =
         @"UPDATE    `course_settings`
@@ -1397,7 +1422,7 @@ public static class DatabaseQueries
 
 
     public const string INSERT_USER_ACTION =
-    @"INSERT INTO   `user_tracker` (`user_login_id`,`action`)
+    @"INSERT INTO   `user_tracker` (`user_id`,`action`)
           VALUES        ('{0}', '{1}');";
 
     public const string DELETE_OLD_SYNCS_FOR_COURSE =

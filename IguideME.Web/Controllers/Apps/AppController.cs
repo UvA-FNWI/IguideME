@@ -35,6 +35,16 @@ namespace IguideME.Web.Controllers
             _computationJobStatusService = computationJobStatusService;
         }
 
+        [Authorize(Policy = "IsInstructor")]
+        [Route("/app/setup")]
+        [HttpPost]
+        public void SetupCourse() {
+            if (!DatabaseManager.Instance.IsCourseRegistered(GetCourseID()))
+                DatabaseManager.Instance.RegisterCourse(GetCourseID(), GetCourseTitle());
+        }
+
+
+
         [Authorize]
         [Route("/app/self")]
         [HttpGet]
@@ -47,28 +57,24 @@ namespace IguideME.Web.Controllers
              * Returns information of the logged in user.
              */
             return Json(
-                DatabaseManager.Instance.GetUser(GetCourseID(), this.GetUserLoginID())
+                DatabaseManager.Instance.GetUser(GetCourseID(), this.GetUserID())
             );
         }
 
-        [Authorize]
+        [Authorize(Policy = "IsInstructor")]
         [HttpGet]
-        [Route("/app/notification/{userLoginID}")]
+        [Route("/app/notification/{userID}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public ActionResult GetNotificationEnable(string userLoginID)
+        public ActionResult GetNotificationEnable(string userID)
         {
-            // Only instructors may view others.
-            if (this.GetUserLoginID() != userLoginID &&
-                !this.IsAdministrator())
-                return Unauthorized();
 
             return Json(
                 DatabaseManager.Instance.GetNotificationEnable(
                     this.GetCourseID(),
-                    userLoginID));
+                    userID));
         }
 
         [Authorize]
@@ -82,7 +88,7 @@ namespace IguideME.Web.Controllers
             return Json(
                 DatabaseManager.Instance.GetNotificationEnable(
                     this.GetCourseID(),
-                    this.GetUserLoginID()));
+                    this.GetUserID()));
         }
 
         [Authorize]
@@ -92,18 +98,17 @@ namespace IguideME.Web.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public ActionResult UpdateNotificationEnable()
         {
-
             var body = new StreamReader(Request.Body).ReadToEnd();
             DatabaseManager.Instance.UpdateNotificationEnable(
                     this.GetCourseID(),
-                    this.GetUserLoginID(),
+                    this.GetUserID(),
                     (bool) JObject.Parse(body)["enable"]
                     );
 
             return Json(
                 DatabaseManager.Instance.GetNotificationEnable(
                     this.GetCourseID(),
-                    this.GetUserLoginID()));
+                    this.GetUserID()));
         }
 
         [Authorize]
@@ -121,13 +126,12 @@ namespace IguideME.Web.Controllers
              * won't be able to accept or decline the terms, and thus nobody
              * is able to use the application.
              */
+
             PublicInformedConsent consent = DatabaseManager.Instance
                 .GetPublicInformedConsent(GetCourseID());
 
             // Check if consent exists
-            if (consent == null) return BadRequest();
-
-            return Json(consent);
+            return consent == null ? BadRequest() : Json(consent);
         }
 
         [Authorize(Policy = "IsInstructor")]
@@ -202,7 +206,7 @@ namespace IguideME.Web.Controllers
             string action = (string) JObject.Parse(body)["action"];
 
             DatabaseManager.Instance.TrackUserAction(
-                    this.GetUserLoginID(),
+                    this.GetUserID(),
                     action
                     );
 

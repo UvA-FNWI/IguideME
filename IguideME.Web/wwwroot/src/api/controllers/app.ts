@@ -61,12 +61,12 @@ export default class AppController extends Controller {
     ).then(response => response.data);
   }
 
-  static getNotificationEnable(studentLoginId?: string): Promise<boolean> {
+  static getNotificationEnable(userID?: string): Promise<boolean> {
     if (debug()) return Promise.resolve(true);
 
     return this.client.get(
-      studentLoginId ?
-      `app/notification/${studentLoginId}` :
+      userID ?
+      `app/notification/${userID}` :
       `app/notification`
     ).then(response => response.data);
   }
@@ -87,12 +87,12 @@ export default class AppController extends Controller {
     )
   }
 
-  static getGoalGrade(studentLoginId?: string): Promise<number> {
+  static getGoalGrade(userID?: string): Promise<number> {
     if (debug()) return Promise.resolve(8);
 
     return this.client.get(
-      studentLoginId ?
-      `goal-grade/${studentLoginId}` :
+      userID ?
+      `goal-grade/${userID}` :
       `goal-grade`
     ).then(response => response.data);
   }

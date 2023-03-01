@@ -14,18 +14,22 @@ import { Tile } from "../../../../models/app/Tile";
 import {CheckCircleOutlined, CloseCircleOutlined} from "@ant-design/icons";
 import AppController from "../../../../api/controllers/app";
 
+import RRuleGeneratorTS, { translations } from "react-rrule-generator-ts";
+import "react-rrule-generator-ts/dist/index.css";
+
 
 export default class NotificationCentre extends Component {
   state = {
     students: [],
     notifications: [],
-    tiles: []
+    tiles: [],
+    rrule: ''
   }
 
   componentDidMount(): void {
     StudentController.getStudents().then(async (students: CanvasStudent[]) => {
       for (let i = 0; i < students.length; i++) {
-        let enabled = await AppController.getNotificationEnable(students[i].login_id)
+        let enabled = await AppController.getNotificationEnable(students[i].userID)
         students[i].notifications = enabled
       }
       this.setState({
@@ -51,14 +55,14 @@ export default class NotificationCentre extends Component {
       student = students[i];
       console.log("notifications", student.notifications!)
 
-      data.set(student.login_id, new Data(student.login_id, student.name, student.notifications!));
+      data.set(student.userID, new Data(student.userID, student.name, student.notifications!));
     }
 
     let notification;
     let entry;
     for (let i = 0; i < notifications.length; i++) {
       notification = notifications[i];
-      entry = data.get(notification.user_login_id)!;
+      entry = data.get(notification.userID)!;
 
       if (!entry) {
         continue;
@@ -159,6 +163,20 @@ export default class NotificationCentre extends Component {
 
         <Divider />
 
+        {/* <RRuleGeneratorTS
+          onChange={(rrule: any) => console.log(rrule)}
+          config={{
+            repeat: ["Yearly", "Monthly", "Weekly"],
+            yearly: "on",
+            monthly: "on",
+            end: ["Never", "On date"],
+            weekStartsOnSunday: true,
+            hideError: true
+          }}
+          value={this.state.rrule}
+          translations={translations.english}
+        /> */}
+
         <div id={"NotificationsTable"} style={{position: 'relative', overflow: 'visible'}}>
           <Table scroll={{ x: 900 }}
                 bordered
@@ -166,6 +184,7 @@ export default class NotificationCentre extends Component {
                 columns={columns}
                 dataSource={this.getData(students, notifications)}
           />
+
         </div>
 
       </Admin>

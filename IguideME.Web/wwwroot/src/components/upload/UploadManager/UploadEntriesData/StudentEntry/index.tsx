@@ -16,7 +16,7 @@ export default class StudentEntry extends Component<IProps> {
     const { menuOpen, key, value } = this.state;
 
     const metaKeys = studentRecord ?
-      Object.keys(studentRecord).filter(k => !['studentloginid', 'grade'].includes(k)) :
+      Object.keys(studentRecord).filter(k => !['userID', 'grade'].includes(k)) :
       []
 
     return (
@@ -32,7 +32,7 @@ export default class StudentEntry extends Component<IProps> {
                            max={10}
                            onChange={(e) => {
                              this.props.updateStudent(
-                               student.login_id, {...studentRecord, studentloginid: student.login_id, grade: e }
+                               student.userID, {...studentRecord, userID: student.userID, grade: e }
                              );
                            }}
                            value={studentRecord ? studentRecord['grade'] : undefined} />
@@ -61,7 +61,7 @@ export default class StudentEntry extends Component<IProps> {
                                     let record = JSON.parse(JSON.stringify(studentRecord));
                                     delete record[k];
                                     this.props.updateStudent(
-                                      student.login_id,record
+                                      student.userID,record
                                     );
                                   }}
                           />
@@ -87,10 +87,10 @@ export default class StudentEntry extends Component<IProps> {
                                   disabled={key.length === 0 || value.length === 0}
                                   onClick={() => {
                                     this.props.updateStudent(
-                                      student.login_id,
+                                      student.userID,
                                       {...studentRecord,
                                         [key]: value,
-                                        studentloginid: student.login_id,
+                                        userID: student.userID,
                                       });
                                     this.setState({ key: "", value: "" });
                                   }}>

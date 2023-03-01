@@ -7,8 +7,6 @@ import {CanvasStudent} from "../../models/canvas/Student";
 import UserController from "../../api/controllers/app";
 import {RootState} from "../../store";
 import {connect, ConnectedProps} from "react-redux";
-import Loading from "../../components/utils/Loading";
-import { Redirect } from "react-router-dom";
 
 const mapState = (state: RootState) => ({
   user: state.user,

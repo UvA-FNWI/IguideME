@@ -18,9 +18,9 @@ export default class UploadBinaryData extends Component<IUploadProps> {
     );
   }
 
-  updateStudent = (loginID: string, record: any) => {
+  updateStudent = (userID: string, record: any) => {
     this.props.setData(
-      [...this.props.data.filter(d => d.studentloginid !== loginID), record]
+      [...this.props.data.filter(d => d.userID !== userID), record]
     );
   }
 
@@ -37,9 +37,9 @@ export default class UploadBinaryData extends Component<IUploadProps> {
             <Checkbox indeterminate={data.filter(d => d.grade > 0).length !== students.length && data.filter(d => d.grade > 0).length > 0}
                       onChange={() => {
                         if (data.filter(d => d.grade > 0).length < students.length) {
-                          this.props.setData(students.map(s => ({studentloginid: s.login_id, grade: 1})));
+                          this.props.setData(students.map(s => ({userID: s.userID, grade: 1})));
                         } else {
-                          this.props.setData(students.map(s => ({studentloginid: s.login_id, grade: 0})));
+                          this.props.setData(students.map(s => ({userID: s.userID, grade: 0})));
                         }
                       }}
                       checked={data.filter(d => d.grade > 0).length === students.length}>
@@ -68,7 +68,7 @@ export default class UploadBinaryData extends Component<IUploadProps> {
             <StudentEntry student={s}
                           query={query}
                           updateStudent={this.updateStudent}
-                          studentRecord={data.find(d => d.studentloginid === s.login_id)}
+                          studentRecord={data.find(d => d.userID === s.userID)}
             />
           ))}
         </Row>

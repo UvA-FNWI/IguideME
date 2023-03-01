@@ -32,7 +32,7 @@ class UserProfile extends Component<Props, IState> {
   }
 
   componentWillReceiveProps(nextProps: Readonly<Props>, nextContext: any): void {
-    if (nextProps.student?.login_id !== this.props.student?.login_id) {
+    if (nextProps.student?.userID !== this.props.student?.userID) {
       this.loadNotifications(nextProps);
     }
   }
@@ -45,7 +45,7 @@ class UserProfile extends Component<Props, IState> {
     const { student } = props;
     if (!student) return;
 
-    DataMartController.getNotifications(student.login_id).then(notifications => {
+    DataMartController.getNotifications(student.userID).then(notifications => {
       // TODO: I think this may be a race condition, try to do away with the isMounted flag and resolve the console error. If noone complains about missing functionality by 2023, remove this todo.
       this._isMounted && this.setState({ notifications });
     });

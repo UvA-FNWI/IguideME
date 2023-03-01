@@ -18,7 +18,7 @@ export const createScatterData = (mergedData: MergedData[]) => {
         pointHoverBorderWidth: 2,
         pointRadius: 5,
         pointHitRadius: 7,
-        data: mergedData.map((p: any) => ({ x: p.grade1, y: p.grade2, name: p.user_login_id })),
+        data: mergedData.map((p: any) => ({ x: p.grade1, y: p.grade2, name: p.userID })),
         borderWidth: 4
       }
     ]

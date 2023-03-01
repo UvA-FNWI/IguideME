@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 public class PredictedGrade
 {
     [JsonIgnore]
-    public string UserLoginID { get; set; }
+    public string UserID { get; set; }
 
     [JsonProperty("date")]
     public string Date { get; set; }
@@ -12,11 +12,11 @@ public class PredictedGrade
     public float Grade { get; set; }
 
     public PredictedGrade(
-        string userLoginID,
+        string userID,
         string date,
         float grade)
     {
-        this.UserLoginID = userLoginID;
+        this.UserID = userID;
         this.Date = date;
         this.Grade = grade;
     }

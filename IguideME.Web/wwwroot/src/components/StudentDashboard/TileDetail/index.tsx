@@ -64,8 +64,24 @@ export default class TileDetail extends Component<{
     }
   }
 
+  leave = (): void => {
+    AppController.trackAction("Close tile");
+    window.dispatchEvent(new CustomEvent('selectTile', { detail: undefined }))
+  }
+
+  keyHandler(event: KeyboardEvent): void {
+    if (event.key === "Escape") {
+        this.leave();
+    }
+  }
+
   componentDidMount(): void {
+    window.addEventListener("keydown", this.keyHandler.bind(this), false);
     AppController.trackAction(`Load tile: ${this.props.tile.title}`)
+  }
+
+  componentWillUnmount(){
+    document.removeEventListener("keydown", this.keyHandler.bind(this), false);
   }
 
   render(): React.ReactNode {
@@ -76,8 +92,7 @@ export default class TileDetail extends Component<{
         <Button type={"ghost"}
                 icon={<ArrowLeftOutlined />}
                 onClick={() => {
-                  AppController.trackAction("Close tile");
-                  window.dispatchEvent(new CustomEvent('selectTile', { detail: undefined }))
+                  this.leave()
                 }}
         >
           Return to dashboard

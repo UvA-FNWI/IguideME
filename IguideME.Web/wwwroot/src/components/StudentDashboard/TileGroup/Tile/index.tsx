@@ -19,7 +19,7 @@ export default class Tile extends Component<IProps, IState> {
     switch (tile.type) {
       case "DISCUSSIONS":
         let disc_grade = 0;
-        discussions.map(discussion => {
+        discussions.forEach(discussion => {
           if (discussion.type === discussionType.topic ){
             if (discussion.posted_by === student.name)
               disc_grade++;
@@ -45,7 +45,6 @@ export default class Tile extends Component<IProps, IState> {
       case "PREDICTION":
         return <GradeStatistic grade={avg ? avg!.toString() : "-"} />;
       case "BINARY":
-        // TODO: this needs to be handled more systematically with types of grades etc and also test to see if/how prediction treats this.
         return (
           <>
             { !!avg && <Progress percent={getProgression(tile, tileEntries, submissions)} /> }

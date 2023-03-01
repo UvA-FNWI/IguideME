@@ -37,7 +37,7 @@ class AcceptList extends Component<PropsFromRedux & IProps, IState> {
     StudentController.getStudents().then(students => this.setState({ students, loaded: true }));
 
     DataMartController.getAcceptList().then(acceptList => {
-      this.setState({ accepted: acceptList.filter(x => x.accepted).map(x => x.student_login_id) });
+      this.setState({ accepted: acceptList.filter(x => x.accepted).map(x => x.userID) });
     });
 
     const { course } = this.props;
@@ -46,8 +46,8 @@ class AcceptList extends Component<PropsFromRedux & IProps, IState> {
     }
   }
 
-  isAccepted = (loginId: string) => {
-    return (this.state.accepted as string[]).includes(loginId);
+  isAccepted = (userID: string) => {
+    return (this.state.accepted as string[]).includes(userID);
   }
 
   render(): React.ReactNode {
@@ -126,7 +126,7 @@ class AcceptList extends Component<PropsFromRedux & IProps, IState> {
                           const percentage = parseInt(result.value as unknown as string);
                           const n = Math.ceil(students.length * (percentage / 100));
                           const _a = students.sort(() => 0.5 - Math.random()).slice(0, n);
-                          this.setState({ accepted: _a.map((s: CanvasStudent) => s.login_id) });
+                          this.setState({ accepted: _a.map((s: CanvasStudent) => s.userID) });
 
                           Swal.fire('Task completed!', '', 'success')
                         }
@@ -140,12 +140,12 @@ class AcceptList extends Component<PropsFromRedux & IProps, IState> {
                     onClick={() => {
                       DataMartController.createAcceptList(students.map(s => {
                         return {
-                          student_login_id: s.login_id,
-                          accepted: accepted.includes(s.login_id)
+                          userID: s.userID,
+                          accepted: accepted.includes(s.userID)
                         }
                       })).then(list => {
                         this.setState({
-                          accepted: list.filter(x => x.accepted).map(x => x.student_login_id)
+                          accepted: list.filter(x => x.accepted).map(x => x.userID)
                         });
                         Swal.fire('Configuration saved!', '', 'success')
                       })
@@ -161,16 +161,16 @@ class AcceptList extends Component<PropsFromRedux & IProps, IState> {
             <Row>
               { students.sort((a, b) => a.name.localeCompare(b.name)).map((student: CanvasStudent) => (
                 <Col xs={12} md={8} lg={6} xl={4}>
-                  <div className={`student ${this.isAccepted(student.login_id) && "accepted"}`}
+                  <div className={`student ${this.isAccepted(student.userID) && "accepted"}`}
                        onClick={() => {
-                         this.isAccepted(student.login_id) ?
-                           this.setState({ accepted: accepted.filter(s => s !== student.login_id) }) :
-                           this.setState({ accepted: [...accepted, student.login_id] })
+                         this.isAccepted(student.userID) ?
+                           this.setState({ accepted: accepted.filter(s => s !== student.userID) }) :
+                           this.setState({ accepted: [...accepted, student.userID] })
                        }}
                   >
                     <span>{ student.name }</span>
                     <br />
-                    <small>{ student.login_id }</small>
+                    <small>{ student.userID }</small>
                   </div>
                 </Col>
               ))}

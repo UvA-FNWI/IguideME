@@ -32,39 +32,33 @@ namespace IguideME.Web.Controllers
 
         // -------------------- Helper functions --------------------
 
-        protected string GetUserLoginID()
+        protected string GetUserID()
         {
             // returns the logged in user
-            return ((ClaimsIdentity)User.Identity).FindFirst("user").Value;
+            return canvasTest.GetUser(this.GetCourseID(), (User.Identity as ClaimsIdentity).FindFirst("userid").Value).LoginID;
         }
 
         protected string GetUserName()
         {
             // returns the name of the logged in user
-            return ((ClaimsIdentity)User.Identity).FindFirst("user_name").Value;
-        }
-
-        protected Int32 GetUserID()
-        {
-            // returns the ID of the logged in user
-            return Int32.Parse(((ClaimsIdentity)User.Identity).FindFirst("user_id").Value);
-        }
-
-        protected string GetUserRole()
-        {
-            // returns the ID of the logged in user
-            return ((ClaimsIdentity)User.Identity).FindFirst("roles").Value.ToLower();
+            return (User.Identity as ClaimsIdentity).FindFirst("user_name").Value;
         }
 
         protected bool IsAdministrator()
         {
-            return this.GetUserRole() == "instructor" || this.GetUserLoginID() == "evvliet1";
+            return User.IsInRole("Teacher");
         }
 
-        protected Int32 GetCourseID()
+        protected int GetCourseID()
         {
             // returns the ID of course in which the IguideME instance is loaded
-            return Int32.Parse(((ClaimsIdentity)User.Identity).FindFirst("course").Value);
+            return int.Parse((User.Identity as ClaimsIdentity).FindFirst("courseid").Value);
+        }
+
+        protected string GetCourseTitle()
+        {
+            _logger.LogInformation("testestests");
+            return (User.Identity as ClaimsIdentity).FindFirst("courseName").Value;
         }
     }
 }

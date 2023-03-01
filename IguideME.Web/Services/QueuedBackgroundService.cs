@@ -27,8 +27,8 @@ namespace IguideME.Web.Services
 
 		private readonly IComputationJobStatusService _jobStatusService;
 
-        private static readonly ConcurrentQueue<JobQueueItem> Queue = new ConcurrentQueue<JobQueueItem>();
-        private static readonly SemaphoreSlim Signal = new SemaphoreSlim(0);
+        private static readonly ConcurrentQueue<JobQueueItem> Queue = new();
+        private static readonly SemaphoreSlim Signal = new(0);
 
 		public QueuedBackgroundService(
 			ICanvasSyncService workService,
@@ -88,7 +88,7 @@ namespace IguideME.Web.Services
 				{
 					try
 					{
-                        _logger.LogError($"Error caugh, setting the job as errored: {ex.Message}, {ex.StackTrace}");
+                        _logger.LogError($"Error caught, setting the job as errored: {ex.Message}, {ex.StackTrace}");
 						// something went wrong. Put the job in to an errored state and continue on
 						// application will use latest successful state
 						await _jobStatusService.StoreJobResultAsync(jobQueueItem.JobId, new JobResultModel
