@@ -41,28 +41,34 @@ public static class DatabaseQueries
                 DROP TABLE tmp;"
             },
             {
-                "0005_rename_and_remove_user_id_in_peer_group",
+                "0005_change_sis_to_login_in_user_settings",
+                @"
+                UPDATE user_settings SET `user_id` = (SELECT login_id FROM canvas_users WHERE `canvas_users`.`sis_id` = `user_settings`.`user_id`
+                );"
+            },
+            {
+                "0006_rename_and_remove_user_id_in_peer_group",
                 @"
                 ALTER TABLE peer_group RENAME COLUMN `user_login_id` TO `user_id`;
                 ALTER TABLE peer_group RENAME COLUMN `target_login_id` TO `target_id`;"
             },
             {
-                "0006_rename_and_remove_user_id_in_notifications",
+                "0007_rename_and_remove_user_id_in_notifications",
                 @"
                 ALTER TABLE notifications RENAME COLUMN `user_login_id` TO `user_id`;"
             },
             {
-                "0007_rename_and_remove_user_id_in_predicted_grade",
+                "0008_rename_and_remove_user_id_in_predicted_grade",
                 @"
                 ALTER TABLE predicted_grade RENAME COLUMN `user_login_id` TO `user_id`;"
             },
             {
-                "0008_rename_and_remove_user_id_in_external_data",
+                "0009_rename_and_remove_user_id_in_external_data",
                 @"
                 ALTER TABLE external_data RENAME COLUMN `user_login_id` TO `user_id`;"
             },
             {
-                "0009_rename_and_remove_user_id_in_canvas_users",
+                "0010_rename_and_remove_user_id_in_canvas_users",
                 @"
                 ALTER TABLE canvas_users RENAME COLUMN `user_id` TO `studentnumber`;
                 ALTER TABLE canvas_users DROP COLUMN `sis_id`;
