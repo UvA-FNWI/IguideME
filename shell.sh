@@ -13,7 +13,7 @@ fi
 
 alias build-frontend-watch='yarn --cwd $PROJECT_ROOT/IguideME.Web/wwwroot/ start';
 alias build-frontend-prod='yarn --cwd $PROJECT_ROOT/IguideME.Web/wwwroot/ build';
-alias build-backend-watch='dotnet watch --project $PROJECT_ROOT/IguideME.Web/ run';
+alias build-backend-watch='dotnet watch --project $PROJECT_ROOT/IguideME.Web/ --no-hot-reload';
 alias build-backend-prod='dotnet build --project $PROJECT_ROOT/IguideME.Web/';
 alias enter-db='litecli $PROJECT_ROOT/IguideME.Web/db.sqlite';
 alias logs='kubectl logs $KUBECTL_PROJ_ID -n iguideme';

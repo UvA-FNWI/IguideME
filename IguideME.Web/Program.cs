@@ -15,10 +15,16 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 
-var key = "blawlaekltjwelkrjtwlkejlekwjrklwejr32423";
-var signingKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(key));
+// Key for LTI authorization.
+string key = "blawlaekltjwelkrjtwlkejlekwjrklwejr32423";
+
+// Key for own authorization using JWTs.
+SymmetricSecurityKey signingKey = new(Encoding.ASCII.GetBytes(key));
 
 // //======================== Builder configuration =========================//
+
+
+//    /------------------------- Create builder --------------------------/
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(
     new WebApplicationOptions{
@@ -30,6 +36,7 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(
 
 bool useRedisCache = bool.Parse(builder.Configuration.GetSection(
     "UnsecureApplicationSettings:UseRedisCache").Value);
+
 string redisCacheConnectionString = builder.Configuration.GetSection(
     "UnsecureApplicationSettings:RedisCacheConnectionString").Value;
 
@@ -53,6 +60,7 @@ if (useRedisCache && !string.IsNullOrWhiteSpace(redisCacheConnectionString))
     // setup redis cache for horizontally scaled services
     builder.Services.AddSingleton<IConnectionMultiplexer>(
         ConnectionMultiplexer.Connect(redisCacheConnectionString));
+
     // job status service, CRUD operations on jobs stored in redis cache.
     builder.Services.AddTransient<IJobStorageService, RedisCacheJobStorageService>();
 }
@@ -62,6 +70,7 @@ else
     builder.Services.AddTransient<IJobStorageService, MemoryCacheJobStorageService>();
 }
 
+// Add authorization (validating the jwt)
 builder.Services
     .AddAuthorization()
     .AddAuthentication(opt => opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme)
@@ -72,8 +81,8 @@ builder.Services
         opt.TokenValidationParameters.IssuerSigningKey = signingKey;
     });
 
+// Add a policy that checks whether a user is an admin.
 builder.Services.AddAuthorization(options =>
-    // allow all instructors to access the admin panel of their course
     options.AddPolicy("IsInstructor",
             policy => policy.RequireRole("Teacher")));
 

@@ -50,8 +50,13 @@ namespace IguideME.Web.Services
 
         public User GetUser(int courseID, string userID)
         {
-            User[] users = _connector.FindCourseById(courseID).UserEnrollments.Select(x => x.User).ToArray();
-            return users.First(x => x.LoginID == userID);
+            List<Enrollment> users = _connector.FindCourseById(courseID).Enrollments;
+            return users.First(x => x.UserID == userID).User;
+        }
+
+        public string GetLoginID(int courseID, string SISID) {
+            List<Enrollment> users = _connector.FindCourseById(courseID).Enrollments;
+            return users.First(x => x.User.SISUserID == SISID).User.LoginID;
         }
 
         public User[] GetStudents(int courseID)

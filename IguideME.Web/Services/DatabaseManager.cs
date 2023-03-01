@@ -517,7 +517,6 @@ namespace IguideME.Web.Services
                 }
             }
 
-            _logger.LogInformation($"Getting user: {userID} for course{courseID} with name {user} ");
             return user;
         }
 

@@ -35,7 +35,7 @@ namespace IguideME.Web.Controllers
         protected string GetUserID()
         {
             // returns the logged in user
-            return (User.Identity as ClaimsIdentity).FindFirst("userid").Value;
+            return canvasTest.GetUser(this.GetCourseID(), (User.Identity as ClaimsIdentity).FindFirst("userid").Value).LoginID;
         }
 
         protected string GetUserName()
