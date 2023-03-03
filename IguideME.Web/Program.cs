@@ -15,11 +15,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 
-// Key for LTI authorization.
-string key = "blawlaekltjwelkrjtwlkejlekwjrklwejr32423";
-
-// Key for own authorization using JWTs.
-SymmetricSecurityKey signingKey = new(Encoding.ASCII.GetBytes(key));
 
 // //======================== Builder configuration =========================//
 
@@ -32,6 +27,7 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(
       WebRootPath = "wwwroot/build"
     });
 
+
 //    /------------------------ Read appsettings -------------------------/
 
 bool useRedisCache = bool.Parse(builder.Configuration.GetSection(
@@ -39,6 +35,12 @@ bool useRedisCache = bool.Parse(builder.Configuration.GetSection(
 
 string redisCacheConnectionString = builder.Configuration.GetSection(
     "UnsecureApplicationSettings:RedisCacheConnectionString").Value;
+
+// Key for LTI authentication, also used to generate our own key.
+string key = builder.Configuration.GetSection("LTI:SigningKey").Value;
+
+// Key for own authorization using JWTs.
+SymmetricSecurityKey signingKey = new(Encoding.ASCII.GetBytes(key));
 
 
 //    /----------------------- Configure services ------------------------/
@@ -113,13 +115,14 @@ builder.Services.AddControllers().AddNewtonsoftJson();
 
 // //========================== App configuration ===========================//
 
+
 WebApplication app = builder.Build();
 
 app.UseLti(new LtiOptions
 {
-    ClientId = "104410000000000150",
-    AuthenticateUrl = "https://uvadlo-dev.instructure.com/api/lti/authorize_redirect",
-    JwksUrl = "https://canvas.instructure.com/api/lti/security/jwks",
+    ClientId = builder.Configuration.GetSection("LTI:ClientId").Value,
+    AuthenticateUrl = builder.Configuration.GetSection("LTI:AuthenticateUrl").Value,
+    JwksUrl = builder.Configuration.GetSection("LTI:JwksUrl").Value,
     SigningKey = key,
     ClaimsMapping = p => new Dictionary<string, object>
     {
@@ -166,5 +169,6 @@ app.MapControllerRoute(
 
 
 // //=============================== Run app ================================//
+
 
 app.Run();
