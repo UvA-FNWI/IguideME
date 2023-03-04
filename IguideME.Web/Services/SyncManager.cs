@@ -59,8 +59,8 @@ namespace IguideME.Web.Services
                 List<int> course_ids = DatabaseManager.Instance.GetCourseIds();
 
                 foreach (int id in course_ids) {
-                    JobParametersModel parameters = new JobParametersModel
-                        {
+                    JobParametersModel parameters = new()
+                    {
                             CourseID = id,
                             Notifications_bool = true
                         };

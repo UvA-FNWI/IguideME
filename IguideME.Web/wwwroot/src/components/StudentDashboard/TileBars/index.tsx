@@ -58,12 +58,11 @@ export default class GradeBar extends Component<IProps> {
     let datadict = new Map<number, Data>();
 
     for (let i = 0; i < tiles.length; i++) {
-      // TODO: Very ugly but everything is hardcoded so that discussions and learning_outcomes are only on 1 tile.
       let grade = 0
       if (tiles[i].content === "LEARNING_OUTCOMES") {
         grade = learningOutcomes.filter(lo => lo.success).length;
       } else if (tiles[i].type === "DISCUSSIONS") {
-        discussions.map(discussion => {
+        discussions.forEach(discussion => {
           if (discussion.type === discussionType.topic ){
             if (discussion.posted_by === student.name)
               grade++;
@@ -81,10 +80,9 @@ export default class GradeBar extends Component<IProps> {
       let entry = datadict.get(tilesGradeSummary[i].tile.id)!;
       if (tilesGradeSummary[i].tile.content === "BINARY"){
         entry.max = 100
-        grade = grade * 100 //TODO: this fixes the bars atm, but something is going wrong earlier I think
+        grade = grade * 100
       }
 
-      // TODO:
       grade = grade * 10 / entry.max;
 
       entry.grade = grade;

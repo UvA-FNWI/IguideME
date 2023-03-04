@@ -41,9 +41,9 @@ namespace IguideME.Web.Services.Workers
 
         private void ProcessStudent(User student)
         {
-            _logger.LogInformation($"Processing student: {student.LoginID}");
+            _logger.LogInformation($"Processing student: {student.UserID}");
             var submissions = DatabaseManager.Instance.GetCourseSubmissionsForStudent(this.CourseID,
-                                                                                      student.LoginID,
+                                                                                      student.UserID,
                                                                                       this.SyncHash);
             var tileEntries = DatabaseManager.Instance.GetEntries(this.CourseID);
 
@@ -71,7 +71,7 @@ namespace IguideME.Web.Services.Workers
             }
 
             DatabaseManager.Instance.CreatePredictedGrade(this.CourseID,
-                                                          student.LoginID,
+                                                          student.UserID,
                                                           (float)wGrade);
         }
     }

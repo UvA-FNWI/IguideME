@@ -4,8 +4,8 @@ import {TilesGradeSummary} from "../types";
 
 const compute = require( 'compute.io' );
 
-export const getTileAverage = async (tile: Tile, studentLoginId: string): Promise<number> => {
-  const submissions = await TileController.getTileSubmissions(tile.id, studentLoginId).then(s => s);
+export const getTileAverage = async (tile: Tile, userID: string): Promise<number> => {
+  const submissions = await TileController.getTileSubmissions(tile.id, userID).then(s => s);
 
   // For binary content types return the percentage of true values
   if (tile.content === "BINARY") {

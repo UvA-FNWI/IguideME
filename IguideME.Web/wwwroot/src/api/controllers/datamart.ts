@@ -83,7 +83,7 @@ export default class DataMartController extends Controller {
     ).then(response => response.data);
   }
 
-  static getPredictions(userLoginID: string): Promise<PredictedGrade[]> {
+  static getPredictions(userID: string): Promise<PredictedGrade[]> {
     if (debug()) return delay([
       { date: "12/01/2022", grade: 5 } as PredictedGrade,
       { date: "12/01/2022", grade: 7 } as PredictedGrade,
@@ -95,18 +95,18 @@ export default class DataMartController extends Controller {
     ]);
 
     return this.client.get(
-      `/datamart/predictions/${userLoginID}`
+      `/datamart/predictions/${userID}`
     ).then(response => response.data);
   }
 
-  static getNotifications(userLoginID: string): Promise<PerformanceNotification[]> {
+  static getNotifications(userID: string): Promise<PerformanceNotification[]> {
     if (debug()) return delay([
-      { user_login_id: userLoginID, tile_id: 2, status: "outperforming peers" },
-      { user_login_id: userLoginID, tile_id: 4, status: "closing the gap" }
+      { userID: userID, tile_id: 2, status: "outperforming peers" },
+      { userID: userID, tile_id: 4, status: "closing the gap" }
     ]);
 
     return this.client.get(
-      `/datamart/notifications/${userLoginID}`
+      `/datamart/notifications/${userID}`
     ).then(response => response.data);
   }
 

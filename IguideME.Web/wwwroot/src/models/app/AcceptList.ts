@@ -1,4 +1,4 @@
 export interface AppAcceptList {
-  student_login_id: string;
+  userID: string;
   accepted: boolean;
 }

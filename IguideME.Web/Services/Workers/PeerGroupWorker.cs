@@ -44,7 +44,7 @@ namespace IguideME.Web.Services.Workers
         //     return peerGroup;
         // }
 
-        List<String>[] sortUsersByGoalGrade() {
+        List<String>[] GetUsersSortedByGoalGrade() {
             List<String>[] usersWithSameGoalGrade = new List<String>[11];
 
             for (int goalGradeClass = 1; goalGradeClass <= 10; goalGradeClass++)
@@ -52,14 +52,14 @@ namespace IguideME.Web.Services.Workers
                 usersWithSameGoalGrade[goalGradeClass] = new List<string>();
                 //TODO: get only those with consent!!!
                 List<User> sameGraders = DatabaseManager.Instance.GetUsersWithGoalGrade(this.CourseID,goalGradeClass, this.Hash);
-                sameGraders.ForEach(x => usersWithSameGoalGrade[goalGradeClass].Add(x.LoginID));
+                sameGraders.ForEach(x => usersWithSameGoalGrade[goalGradeClass].Add(x.UserID));
             }
 
             return usersWithSameGoalGrade;
         }
 
-        List<String> createPeerGroup(List<String>[] usersWithSameGoalGrade, int goalGradeClass, int minPeerGroupSize) {
-            List<String> peerGroup = new List<string>(usersWithSameGoalGrade[goalGradeClass]);
+        List<string> CreatePeerGroup(List<string>[] usersWithSameGoalGrade, int goalGradeClass, int minPeerGroupSize) {
+            List<String> peerGroup = new(usersWithSameGoalGrade[goalGradeClass]);
 
             for (int offset = 1; peerGroup.Count < minPeerGroupSize && offset < 10; offset++)
             {
@@ -84,7 +84,7 @@ namespace IguideME.Web.Services.Workers
         }
 
         Dictionary<int,List<float>> calculateGrades(List<String> peerGroup){
-            Dictionary<int,List<float>> grades = new Dictionary<int,List<float>>();
+            Dictionary<int,List<float>> grades = new();
 
             // We run the following process for each individual peer in the group
             foreach(string peerID in peerGroup)
@@ -108,7 +108,7 @@ namespace IguideME.Web.Services.Workers
         void CreatePeerGroupsOfCourse()
         {
             // We find all students of the course and classify them according to their goal grade
-            List<String>[] usersWithSameGoalGrade = this.sortUsersByGoalGrade();
+            List<String>[] usersWithSameGoalGrade = this.GetUsersSortedByGoalGrade();
 
             int minPeerGroupSize = DatabaseManager.Instance.GetMinimumPeerGroupSize(this.CourseID);
 
@@ -117,9 +117,9 @@ namespace IguideME.Web.Services.Workers
             {
 
                 // We initiallize the peer group by filling it with the users of the same goal grade
-                List<String> peerGroup = createPeerGroup(usersWithSameGoalGrade, goalGradeClass, minPeerGroupSize);
+                List<String> peerGroup = CreatePeerGroup(usersWithSameGoalGrade, goalGradeClass, minPeerGroupSize);
 
-                // Since we have the loginIds of all members in the peer-group, 
+                // Since we have the loginIds of all members in the peer-group,
                 // we will calculate their minimum, maximum and average grade.
 
                 Dictionary<int, List<float>> grades = calculateGrades(peerGroup);
@@ -133,7 +133,7 @@ namespace IguideME.Web.Services.Workers
                     {
                         DatabaseManager.Instance.CreateUserPeer(
                         this.CourseID,
-                        goalGradeClass, 
+                        goalGradeClass,
                         peerGroup,
                         entry.Key,
                         entry.Value.Average(),
@@ -148,7 +148,7 @@ namespace IguideME.Web.Services.Workers
         void CreateNotifications() {
 
             // for each student, we do the following:
-            
+
             // foreach (var tile in tilesWithNotifications)
             // {
             //     var peerGrade = peerGrades1.FirstOrDefault(
@@ -275,6 +275,6 @@ namespace IguideME.Web.Services.Workers
             //     }
             // }
         }
-    
+
     }
 }

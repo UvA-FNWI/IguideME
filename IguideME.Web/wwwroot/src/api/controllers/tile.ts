@@ -21,50 +21,50 @@ export default class TileController extends Controller {
     ).then(response => response.data);
   }
 
-  static getDiscussions(tileId: number, studentLoginId: string): Promise<CanvasDiscussion[]> {
+  static getDiscussions(tileId: number, userID: string): Promise<CanvasDiscussion[]> {
     if (debug()) {
       return Promise.resolve(MOCK_CANVAS_DISCUSSION);
     }
 
     return this.client.get(
-      `tiles/${tileId}/discussions/${studentLoginId}`
+      `tiles/${tileId}/discussions/${userID}`
     ).then(response => response.data).catch(_ => []);
   }
 
-  static getUserGoals(tileId: number, studentLoginId: string): Promise<LearningOutcome[]> {
+  static getUserGoals(tileId: number, userID: string): Promise<LearningOutcome[]> {
     if (debug()) {
       return Promise.resolve(MOCK_LEARNING_OUTCOMES);
     }
 
     return this.client.get(
-      `tiles/${tileId}/learning-outcomes/${studentLoginId}`
+      `tiles/${tileId}/learning-outcomes/${userID}`
     ).then(response => response.data);
   }
 
-  static getSubmissions(studentLoginId: string): Promise<TileEntrySubmission[]> {
+  static getSubmissions(userID: string): Promise<TileEntrySubmission[]> {
     if (debug()) {
         return Promise.resolve(MOCK_SUBMISSIONS.filter(x => {
-          return (x.user_login_id === studentLoginId)
+          return (x.userID === userID)
         })).then(x => x.flat());
     }
 
     return this.client.get(
-      `tiles/grade-summary/${studentLoginId}`
+      `tiles/grade-summary/${userID}`
     ).then(response => response.data);
   }
 
-  static getTileSubmissions(tileId: number, studentLoginId?: string): Promise<TileEntrySubmission[]> {
+  static getTileSubmissions(tileId: number, userID?: string): Promise<TileEntrySubmission[]> {
     if (debug()) {
       return this.getTileEntries(tileId).then(entries => {
         const entryIds = entries.map(e => e.id);
         return Promise.resolve(MOCK_SUBMISSIONS.filter(x =>
-          entryIds.includes(x.entry_id) && (x.user_login_id === studentLoginId)
+          entryIds.includes(x.entry_id) && (x.userID === userID)
         ));
       });
     }
 
     return this.client.get(
-      studentLoginId? `tiles/${tileId}/submissions/${studentLoginId}` :
+      userID? `tiles/${tileId}/submissions/${userID}` :
       `tiles/${tileId}/submissions`
     ).then(response => response.data);
   }
@@ -228,7 +228,7 @@ export default class TileController extends Controller {
   }
 
   // TODO: wth is going on with case 3 (and 9)?
-  static getPeerResults(studentLoginId: string): Promise<{ min: number, max: number, avg: number, tileID: number }[]> {
+  static getPeerResults(userID: string): Promise<{ min: number, max: number, avg: number, tileID: number }[]> {
     if (debug()) {
       return this.getTiles().then(tiles => {
         return Promise.resolve(tiles.map(t => {
@@ -258,19 +258,19 @@ export default class TileController extends Controller {
     }
 
     return this.client.get(
-      `peer-comparison/${studentLoginId}`
+      `peer-comparison/${userID}`
     ).then(response => response.data);
   }
 
-  static getEntrySubmissions(entryId: number | string, studentLoginId?: string): Promise<TileEntrySubmission[]> {
+  static getEntrySubmissions(entryId: number | string, userID?: string): Promise<TileEntrySubmission[]> {
     if (debug())
       return Promise.resolve(MOCK_SUBMISSIONS.filter(x =>
-        x.entry_id.toString() === entryId.toString() && (studentLoginId ? x.user_login_id === studentLoginId : true)
+        x.entry_id.toString() === entryId.toString() && (userID ? x.userID === userID : true)
       ));
 
     return this.client.get(
-      studentLoginId ?
-        `entries/${entryId}/submissions/${studentLoginId}` :
+      userID ?
+        `entries/${entryId}/submissions/${userID}` :
         `entries/${entryId}/submissions`
     ).then(response => response.data);
   }

@@ -46,10 +46,10 @@ class AdminHeader extends Component<Props, IState> {
                 isLoading={!loaded}
                 options={students.sort(
                   (a: CanvasStudent, b: CanvasStudent) => a.name.localeCompare(b.name)
-                ).map((s: CanvasStudent) => ({ label: s.name, value: s.login_id}))}
+                ).map((s: CanvasStudent) => ({ label: s.name, value: s.userID}))}
                 placeholder={"Choose a student"}
                 onChange={(e) => this.props.setStudent!(
-                  e ? students.find((s: CanvasStudent) => s.login_id === e!.value)! : null
+                  e ? students.find((s: CanvasStudent) => s.userID === e!.value)! : null
                 )}
                 isClearable={true}
                 styles={{

@@ -2,7 +2,7 @@ import { TileEntrySubmission } from "../../models/app/Tile";
 
 export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
   {
-    "user_login_id":"22976781",
+    "userID":"22976781",
     "grade":"9.4",
     "meta":{
       "grade":"9.4",
@@ -17,7 +17,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":5
   },
   {
-    "user_login_id":"43754947",
+    "userID":"43754947",
     "grade":"7.8",
     "meta":{
       "grade":"7.8",
@@ -32,7 +32,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":5
   },
   {
-    "user_login_id":"95366984",
+    "userID":"95366984",
     "grade":"2.4",
     "meta":{
       "grade":"2.4",
@@ -47,7 +47,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":5
   },
   {
-    "user_login_id":"70805720",
+    "userID":"70805720",
     "grade":"10.0",
     "meta":{
       "grade":"10",
@@ -62,7 +62,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":5
   },
   {
-    "user_login_id":"74114284",
+    "userID":"74114284",
     "grade":"10.0",
     "meta":{
       "grade":"10",
@@ -77,7 +77,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":5
   },
   {
-    "user_login_id":"97222205",
+    "userID":"97222205",
     "grade":"1.0",
     "meta":{
       "grade":"1",
@@ -92,7 +92,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":5
   },
   {
-    "user_login_id":"66889858",
+    "userID":"66889858",
     "grade":"10.0",
     "meta":{
       "grade":"10",
@@ -107,7 +107,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":5
   },
   {
-    "user_login_id":"96600883",
+    "userID":"96600883",
     "grade":"7.3",
     "meta":{
       "grade":"7.3",
@@ -122,7 +122,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":5
   },
   {
-    "user_login_id":"32324131",
+    "userID":"32324131",
     "grade":"9.3",
     "meta":{
       "grade":"9.3",
@@ -137,7 +137,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":5
   },
   {
-    "user_login_id":"41803722",
+    "userID":"41803722",
     "grade":"8.1",
     "meta":{
       "grade":"8.1",
@@ -152,7 +152,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":5
   },
   {
-    "user_login_id":"81005245",
+    "userID":"81005245",
     "grade":"10.0",
     "meta":{
       "grade":"10",
@@ -167,7 +167,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":5
   },
   {
-    "user_login_id":"35251913",
+    "userID":"35251913",
     "grade":"1.0",
     "meta":{
       "grade":"1",
@@ -182,7 +182,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":5
   },
   {
-    "user_login_id":"43219917",
+    "userID":"43219917",
     "grade":"7.5",
     "meta":{
       "grade":"7.5",
@@ -197,7 +197,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":5
   },
   {
-    "user_login_id":"59540503",
+    "userID":"59540503",
     "grade":"9.2",
     "meta":{
       "grade":"9.2",
@@ -212,7 +212,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":5
   },
   {
-    "user_login_id":"52682411",
+    "userID":"52682411",
     "grade":"10.0",
     "meta":{
       "grade":"10",
@@ -227,7 +227,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":5
   },
   {
-    "user_login_id":"29376337",
+    "userID":"29376337",
     "grade":"6.8",
     "meta":{
       "grade":"6.8",
@@ -242,7 +242,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":5
   },
   {
-    "user_login_id":"74886921",
+    "userID":"74886921",
     "grade":"1.0",
     "meta":{
       "grade":"1",
@@ -257,7 +257,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":5
   },
   {
-    "user_login_id":"55571292",
+    "userID":"55571292",
     "grade":"7.5",
     "meta":{
       "grade":"7.5",
@@ -272,7 +272,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":5
   },
   {
-    "user_login_id":"45844627",
+    "userID":"45844627",
     "grade":"10.0",
     "meta":{
       "grade":"10",
@@ -287,7 +287,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":5
   },
   {
-    "user_login_id":"53036575",
+    "userID":"53036575",
     "grade":"10.0",
     "meta":{
       "grade":"10",
@@ -302,7 +302,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":5
   },
   {
-    "user_login_id":"16967126",
+    "userID":"16967126",
     "grade":"10.0",
     "meta":{
       "grade":"10",
@@ -317,7 +317,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":5
   },
   {
-    "user_login_id":"50326251",
+    "userID":"50326251",
     "grade":"10.0",
     "meta":{
       "grade":"10",
@@ -332,7 +332,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":5
   },
   {
-    "user_login_id":"23744275",
+    "userID":"23744275",
     "grade":"10.0",
     "meta":{
       "grade":"10",
@@ -347,7 +347,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":5
   },
   {
-    "user_login_id":"24585559",
+    "userID":"24585559",
     "grade":"5.0",
     "meta":{
       "grade":"5",
@@ -362,7 +362,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":5
   },
   {
-    "user_login_id":"54264654",
+    "userID":"54264654",
     "grade":"10.0",
     "meta":{
       "grade":"10",
@@ -377,7 +377,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":5
   },
   {
-    "user_login_id":"31665008",
+    "userID":"31665008",
     "grade":"4.7",
     "meta":{
       "grade":"4.7",
@@ -392,7 +392,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":5
   },
   {
-    "user_login_id":"28624178",
+    "userID":"28624178",
     "grade":"1.0",
     "meta":{
       "grade":"1",
@@ -407,7 +407,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":5
   },
   {
-    "user_login_id":"45476233",
+    "userID":"45476233",
     "grade":"8.8",
     "meta":{
       "grade":"8.8",
@@ -422,7 +422,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":5
   },
   {
-    "user_login_id":"23400528",
+    "userID":"23400528",
     "grade":"10.0",
     "meta":{
       "grade":"10",
@@ -437,7 +437,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":5
   },
   {
-    "user_login_id":"86899376",
+    "userID":"86899376",
     "grade":"10.0",
     "meta":{
       "grade":"10",
@@ -452,7 +452,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":5
   },
   {
-    "user_login_id":"28332183",
+    "userID":"28332183",
     "grade":"10.0",
     "meta":{
       "grade":"10",
@@ -467,7 +467,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":5
   },
   {
-    "user_login_id":"20380320",
+    "userID":"20380320",
     "grade":"5.3",
     "meta":{
       "grade":"5.3",
@@ -482,7 +482,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":5
   },
   {
-    "user_login_id":"21276717",
+    "userID":"21276717",
     "grade":"10.0",
     "meta":{
       "grade":"10",
@@ -497,7 +497,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":5
   },
   {
-    "user_login_id":"46666218",
+    "userID":"46666218",
     "grade":"8.1",
     "meta":{
       "grade":"8.1",
@@ -512,7 +512,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":5
   },
   {
-    "user_login_id":"35683215",
+    "userID":"35683215",
     "grade":"7.1",
     "meta":{
       "grade":"7.1",
@@ -527,7 +527,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":5
   },
   {
-    "user_login_id":"42345728",
+    "userID":"42345728",
     "grade":"10.0",
     "meta":{
       "grade":"10",
@@ -542,7 +542,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":5
   },
   {
-    "user_login_id":"46647543",
+    "userID":"46647543",
     "grade":"7.0",
     "meta":{
       "grade":"7",
@@ -557,7 +557,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":5
   },
   {
-    "user_login_id":"77161172",
+    "userID":"77161172",
     "grade":"10.0",
     "meta":{
       "grade":"10",
@@ -572,7 +572,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":5
   },
   {
-    "user_login_id":"41149744",
+    "userID":"41149744",
     "grade":"1.0",
     "meta":{
       "grade":"1",
@@ -587,7 +587,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":5
   },
   {
-    "user_login_id":"48905367",
+    "userID":"48905367",
     "grade":"10.0",
     "meta":{
       "grade":"10",
@@ -602,7 +602,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":5
   },
   {
-    "user_login_id":"41393783",
+    "userID":"41393783",
     "grade":"9.6",
     "meta":{
       "grade":"9.6",
@@ -617,7 +617,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":5
   },
   {
-    "user_login_id":"55249485",
+    "userID":"55249485",
     "grade":"8.0",
     "meta":{
       "grade":"8",
@@ -632,7 +632,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":5
   },
   {
-    "user_login_id":"81888190",
+    "userID":"81888190",
     "grade":"10.0",
     "meta":{
       "grade":"10",
@@ -647,7 +647,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":5
   },
   {
-    "user_login_id":"38152009",
+    "userID":"38152009",
     "grade":"4.6",
     "meta":{
       "grade":"4.6",
@@ -662,7 +662,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":5
   },
   {
-    "user_login_id":"48470625",
+    "userID":"48470625",
     "grade":"8.2",
     "meta":{
       "grade":"8.2",
@@ -677,7 +677,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":5
   },
   {
-    "user_login_id":"20936679",
+    "userID":"20936679",
     "grade":"4.2",
     "meta":{
       "grade":"4.2",
@@ -692,7 +692,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":5
   },
   {
-    "user_login_id":"96955357",
+    "userID":"96955357",
     "grade":"5.8",
     "meta":{
       "grade":"5.8",
@@ -707,7 +707,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":5
   },
   {
-    "user_login_id":"18298956",
+    "userID":"18298956",
     "grade":"8.0",
     "meta":{
       "grade":"8",
@@ -722,7 +722,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":5
   },
   {
-    "user_login_id":"27034712",
+    "userID":"27034712",
     "grade":"10.0",
     "meta":{
       "grade":"10",
@@ -737,7 +737,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":5
   },
   {
-    "user_login_id":"90434281",
+    "userID":"90434281",
     "grade":"7.6",
     "meta":{
       "grade":"7.6",
@@ -752,7 +752,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":5
   },
   {
-    "user_login_id":"27817769",
+    "userID":"27817769",
     "grade":"7.5",
     "meta":{
       "viewing_time":"6 hours, 58 minutes",
@@ -766,7 +766,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":5
   },
   {
-    "user_login_id":"41898388",
+    "userID":"41898388",
     "grade":"10.0",
     "meta":{
       "grade":"10",
@@ -781,7 +781,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":5
   },
   {
-    "user_login_id":"76262947",
+    "userID":"76262947",
     "grade":"7.4",
     "meta":{
       "grade":"7.4",
@@ -796,7 +796,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":5
   },
   {
-    "user_login_id":"22976781",
+    "userID":"22976781",
     "grade":"10.0",
     "meta":{
       "grade":"10",
@@ -811,7 +811,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":6
   },
   {
-    "user_login_id":"43754947",
+    "userID":"43754947",
     "grade":"8.0",
     "meta":{
       "grade":"8",
@@ -826,7 +826,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":6
   },
   {
-    "user_login_id":"95366984",
+    "userID":"95366984",
     "grade":"5.6",
     "meta":{
       "grade":"5.6",
@@ -841,7 +841,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":6
   },
   {
-    "user_login_id":"70805720",
+    "userID":"70805720",
     "grade":"9.9",
     "meta":{
       "grade":"9.9",
@@ -856,7 +856,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":6
   },
   {
-    "user_login_id":"74114284",
+    "userID":"74114284",
     "grade":"8.4",
     "meta":{
       "grade":"8.4",
@@ -871,7 +871,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":6
   },
   {
-    "user_login_id":"97222205",
+    "userID":"97222205",
     "grade":"4.1",
     "meta":{
       "grade":"4.1",
@@ -886,7 +886,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":6
   },
   {
-    "user_login_id":"66889858",
+    "userID":"66889858",
     "grade":"10.0",
     "meta":{
       "grade":"10",
@@ -901,7 +901,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":6
   },
   {
-    "user_login_id":"96600883",
+    "userID":"96600883",
     "grade":"8.4",
     "meta":{
       "grade":"8.4",
@@ -916,7 +916,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":6
   },
   {
-    "user_login_id":"32324131",
+    "userID":"32324131",
     "grade":"8.9",
     "meta":{
       "grade":"8.9",
@@ -931,7 +931,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":6
   },
   {
-    "user_login_id":"41803722",
+    "userID":"41803722",
     "grade":"6.9",
     "meta":{
       "grade":"6.9",
@@ -946,7 +946,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":6
   },
   {
-    "user_login_id":"81005245",
+    "userID":"81005245",
     "grade":"9.6",
     "meta":{
       "grade":"9.6",
@@ -961,7 +961,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":6
   },
   {
-    "user_login_id":"35251913",
+    "userID":"35251913",
     "grade":"3.7",
     "meta":{
       "grade":"3.7",
@@ -976,7 +976,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":6
   },
   {
-    "user_login_id":"43219917",
+    "userID":"43219917",
     "grade":"9.0",
     "meta":{
       "grade":"9",
@@ -991,7 +991,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":6
   },
   {
-    "user_login_id":"59540503",
+    "userID":"59540503",
     "grade":"7.2",
     "meta":{
       "grade":"7.2",
@@ -1006,7 +1006,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":6
   },
   {
-    "user_login_id":"52682411",
+    "userID":"52682411",
     "grade":"10.0",
     "meta":{
       "grade":"10",
@@ -1021,7 +1021,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":6
   },
   {
-    "user_login_id":"29376337",
+    "userID":"29376337",
     "grade":"4.1",
     "meta":{
       "grade":"4.1",
@@ -1036,7 +1036,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":6
   },
   {
-    "user_login_id":"74886921",
+    "userID":"74886921",
     "grade":"6.7",
     "meta":{
       "grade":"6.7",
@@ -1051,7 +1051,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":6
   },
   {
-    "user_login_id":"55571292",
+    "userID":"55571292",
     "grade":"10.0",
     "meta":{
       "grade":"10",
@@ -1066,7 +1066,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":6
   },
   {
-    "user_login_id":"45844627",
+    "userID":"45844627",
     "grade":"10.0",
     "meta":{
       "grade":"10",
@@ -1081,7 +1081,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":6
   },
   {
-    "user_login_id":"53036575",
+    "userID":"53036575",
     "grade":"10.0",
     "meta":{
       "grade":"10",
@@ -1096,7 +1096,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":6
   },
   {
-    "user_login_id":"16967126",
+    "userID":"16967126",
     "grade":"8.5",
     "meta":{
       "grade":"8.5",
@@ -1111,7 +1111,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":6
   },
   {
-    "user_login_id":"50326251",
+    "userID":"50326251",
     "grade":"10.0",
     "meta":{
       "grade":"10",
@@ -1126,7 +1126,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":6
   },
   {
-    "user_login_id":"23744275",
+    "userID":"23744275",
     "grade":"10.0",
     "meta":{
       "grade":"10",
@@ -1141,7 +1141,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":6
   },
   {
-    "user_login_id":"24585559",
+    "userID":"24585559",
     "grade":"8.9",
     "meta":{
       "grade":"8.9",
@@ -1156,7 +1156,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":6
   },
   {
-    "user_login_id":"54264654",
+    "userID":"54264654",
     "grade":"10.0",
     "meta":{
       "grade":"10",
@@ -1171,7 +1171,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":6
   },
   {
-    "user_login_id":"31665008",
+    "userID":"31665008",
     "grade":"9.1",
     "meta":{
       "grade":"9.1",
@@ -1186,7 +1186,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":6
   },
   {
-    "user_login_id":"28624178",
+    "userID":"28624178",
     "grade":"1.0",
     "meta":{
       "grade":"1",
@@ -1201,7 +1201,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":6
   },
   {
-    "user_login_id":"45476233",
+    "userID":"45476233",
     "grade":"9.3",
     "meta":{
       "grade":"9.3",
@@ -1216,7 +1216,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":6
   },
   {
-    "user_login_id":"23400528",
+    "userID":"23400528",
     "grade":"10.0",
     "meta":{
       "grade":"10",
@@ -1231,7 +1231,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":6
   },
   {
-    "user_login_id":"86899376",
+    "userID":"86899376",
     "grade":"10.0",
     "meta":{
       "grade":"10",
@@ -1246,7 +1246,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":6
   },
   {
-    "user_login_id":"28332183",
+    "userID":"28332183",
     "grade":"10.0",
     "meta":{
       "grade":"10",
@@ -1261,7 +1261,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":6
   },
   {
-    "user_login_id":"20380320",
+    "userID":"20380320",
     "grade":"8.5",
     "meta":{
       "grade":"8.5",
@@ -1276,7 +1276,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":6
   },
   {
-    "user_login_id":"21276717",
+    "userID":"21276717",
     "grade":"10.0",
     "meta":{
       "grade":"10",
@@ -1291,7 +1291,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":6
   },
   {
-    "user_login_id":"46666218",
+    "userID":"46666218",
     "grade":"7.5",
     "meta":{
       "grade":"7.5",
@@ -1306,7 +1306,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":6
   },
   {
-    "user_login_id":"35683215",
+    "userID":"35683215",
     "grade":"9.9",
     "meta":{
       "grade":"9.9",
@@ -1321,7 +1321,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":6
   },
   {
-    "user_login_id":"42345728",
+    "userID":"42345728",
     "grade":"10.0",
     "meta":{
       "grade":"10",
@@ -1336,7 +1336,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":6
   },
   {
-    "user_login_id":"46647543",
+    "userID":"46647543",
     "grade":"8.3",
     "meta":{
       "grade":"8.3",
@@ -1351,7 +1351,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":6
   },
   {
-    "user_login_id":"77161172",
+    "userID":"77161172",
     "grade":"10.0",
     "meta":{
       "grade":"10",
@@ -1366,7 +1366,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":6
   },
   {
-    "user_login_id":"41149744",
+    "userID":"41149744",
     "grade":"1.0",
     "meta":{
       "grade":"1",
@@ -1381,7 +1381,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":6
   },
   {
-    "user_login_id":"48905367",
+    "userID":"48905367",
     "grade":"9.9",
     "meta":{
       "grade":"9.9",
@@ -1396,7 +1396,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":6
   },
   {
-    "user_login_id":"41393783",
+    "userID":"41393783",
     "grade":"10.0",
     "meta":{
       "grade":"10",
@@ -1411,7 +1411,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":6
   },
   {
-    "user_login_id":"55249485",
+    "userID":"55249485",
     "grade":"5.7",
     "meta":{
       "grade":"5.7",
@@ -1426,7 +1426,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":6
   },
   {
-    "user_login_id":"81888190",
+    "userID":"81888190",
     "grade":"10.0",
     "meta":{
       "grade":"10",
@@ -1441,7 +1441,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":6
   },
   {
-    "user_login_id":"38152009",
+    "userID":"38152009",
     "grade":"1.0",
     "meta":{
       "grade":"1",
@@ -1456,7 +1456,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":6
   },
   {
-    "user_login_id":"48470625",
+    "userID":"48470625",
     "grade":"1.0",
     "meta":{
       "grade":"1",
@@ -1471,7 +1471,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":6
   },
   {
-    "user_login_id":"20936679",
+    "userID":"20936679",
     "grade":"8.2",
     "meta":{
       "grade":"8.2",
@@ -1486,7 +1486,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":6
   },
   {
-    "user_login_id":"96955357",
+    "userID":"96955357",
     "grade":"9.3",
     "meta":{
       "grade":"9.3",
@@ -1501,7 +1501,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":6
   },
   {
-    "user_login_id":"18298956",
+    "userID":"18298956",
     "grade":"9.6",
     "meta":{
       "grade":"9.6",
@@ -1516,7 +1516,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":6
   },
   {
-    "user_login_id":"27034712",
+    "userID":"27034712",
     "grade":"10.0",
     "meta":{
       "grade":"10",
@@ -1531,7 +1531,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":6
   },
   {
-    "user_login_id":"90434281",
+    "userID":"90434281",
     "grade":"8.2",
     "meta":{
       "grade":"8.2",
@@ -1546,7 +1546,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":6
   },
   {
-    "user_login_id":"27817769",
+    "userID":"27817769",
     "grade":"7.5",
     "meta":{
       "grade":"7.5",
@@ -1561,7 +1561,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":6
   },
   {
-    "user_login_id":"41898388",
+    "userID":"41898388",
     "grade":"10.0",
     "meta":{
       "grade":"10",
@@ -1576,7 +1576,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":6
   },
   {
-    "user_login_id":"76262947",
+    "userID":"76262947",
     "grade":"6.2",
     "meta":{
       "grade":"6.2",
@@ -1591,7 +1591,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":6
   },
   {
-    "user_login_id":"22976781",
+    "userID":"22976781",
     "grade":"7.6",
     "meta":{
       "grade":"7.6",
@@ -1606,7 +1606,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":7
   },
   {
-    "user_login_id":"43754947",
+    "userID":"43754947",
     "grade":"8.2",
     "meta":{
       "grade":"8.2",
@@ -1621,7 +1621,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":7
   },
   {
-    "user_login_id":"95366984",
+    "userID":"95366984",
     "grade":"5.9",
     "meta":{
       "grade":"5.9",
@@ -1636,7 +1636,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":7
   },
   {
-    "user_login_id":"70805720",
+    "userID":"70805720",
     "grade":"8.8",
     "meta":{
       "grade":"8.8",
@@ -1651,7 +1651,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":7
   },
   {
-    "user_login_id":"74114284",
+    "userID":"74114284",
     "grade":"4.8",
     "meta":{
       "grade":"4.8",
@@ -1666,7 +1666,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":7
   },
   {
-    "user_login_id":"97222205",
+    "userID":"97222205",
     "grade":"1.0",
     "meta":{
       "grade":"1",
@@ -1681,7 +1681,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":7
   },
   {
-    "user_login_id":"66889858",
+    "userID":"66889858",
     "grade":"9.8",
     "meta":{
       "grade":"9.8",
@@ -1696,7 +1696,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":7
   },
   {
-    "user_login_id":"96600883",
+    "userID":"96600883",
     "grade":"5.2",
     "meta":{
       "grade":"5.2",
@@ -1711,7 +1711,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":7
   },
   {
-    "user_login_id":"32324131",
+    "userID":"32324131",
     "grade":"1.0",
     "meta":{
       "grade":"1",
@@ -1726,7 +1726,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":7
   },
   {
-    "user_login_id":"41803722",
+    "userID":"41803722",
     "grade":"8.4",
     "meta":{
       "grade":"8.4",
@@ -1741,7 +1741,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":7
   },
   {
-    "user_login_id":"81005245",
+    "userID":"81005245",
     "grade":"9.3",
     "meta":{
       "grade":"9.3",
@@ -1756,7 +1756,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":7
   },
   {
-    "user_login_id":"35251913",
+    "userID":"35251913",
     "grade":"2.4",
     "meta":{
       "grade":"2.4",
@@ -1771,7 +1771,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":7
   },
   {
-    "user_login_id":"43219917",
+    "userID":"43219917",
     "grade":"8.7",
     "meta":{
       "grade":"8.7",
@@ -1786,7 +1786,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":7
   },
   {
-    "user_login_id":"59540503",
+    "userID":"59540503",
     "grade":"8.5",
     "meta":{
       "grade":"8.5",
@@ -1801,7 +1801,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":7
   },
   {
-    "user_login_id":"52682411",
+    "userID":"52682411",
     "grade":"10.0",
     "meta":{
       "grade":"10",
@@ -1816,7 +1816,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":7
   },
   {
-    "user_login_id":"29376337",
+    "userID":"29376337",
     "grade":"10.0",
     "meta":{
       "grade":"10",
@@ -1831,7 +1831,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":7
   },
   {
-    "user_login_id":"74886921",
+    "userID":"74886921",
     "grade":"9.0",
     "meta":{
       "grade":"9",
@@ -1846,7 +1846,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":7
   },
   {
-    "user_login_id":"55571292",
+    "userID":"55571292",
     "grade":"10.0",
     "meta":{
       "grade":"10",
@@ -1861,7 +1861,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":7
   },
   {
-    "user_login_id":"45844627",
+    "userID":"45844627",
     "grade":"10.0",
     "meta":{
       "grade":"10",
@@ -1876,7 +1876,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":7
   },
   {
-    "user_login_id":"53036575",
+    "userID":"53036575",
     "grade":"10.0",
     "meta":{
       "grade":"10",
@@ -1891,7 +1891,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":7
   },
   {
-    "user_login_id":"16967126",
+    "userID":"16967126",
     "grade":"8.9",
     "meta":{
       "grade":"8.9",
@@ -1906,7 +1906,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":7
   },
   {
-    "user_login_id":"50326251",
+    "userID":"50326251",
     "grade":"10.0",
     "meta":{
       "grade":"10",
@@ -1921,7 +1921,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":7
   },
   {
-    "user_login_id":"23744275",
+    "userID":"23744275",
     "grade":"10.0",
     "meta":{
       "grade":"10",
@@ -1936,7 +1936,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":7
   },
   {
-    "user_login_id":"24585559",
+    "userID":"24585559",
     "grade":"8.1",
     "meta":{
       "grade":"8.1",
@@ -1951,7 +1951,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":7
   },
   {
-    "user_login_id":"54264654",
+    "userID":"54264654",
     "grade":"7.9",
     "meta":{
       "grade":"7.9",
@@ -1966,7 +1966,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":7
   },
   {
-    "user_login_id":"31665008",
+    "userID":"31665008",
     "grade":"10.0",
     "meta":{
       "grade":"10",
@@ -1981,7 +1981,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":7
   },
   {
-    "user_login_id":"28624178",
+    "userID":"28624178",
     "grade":"1.0",
     "meta":{
       "grade":"1",
@@ -1996,7 +1996,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":7
   },
   {
-    "user_login_id":"45476233",
+    "userID":"45476233",
     "grade":"8.7",
     "meta":{
       "grade":"8.7",
@@ -2011,7 +2011,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":7
   },
   {
-    "user_login_id":"23400528",
+    "userID":"23400528",
     "grade":"9.3",
     "meta":{
       "grade":"9.3",
@@ -2026,7 +2026,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":7
   },
   {
-    "user_login_id":"86899376",
+    "userID":"86899376",
     "grade":"10.0",
     "meta":{
       "grade":"10",
@@ -2041,7 +2041,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":7
   },
   {
-    "user_login_id":"28332183",
+    "userID":"28332183",
     "grade":"9.9",
     "meta":{
       "grade":"9.9",
@@ -2056,7 +2056,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":7
   },
   {
-    "user_login_id":"20380320",
+    "userID":"20380320",
     "grade":"9.8",
     "meta":{
       "grade":"9.8",
@@ -2071,7 +2071,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":7
   },
   {
-    "user_login_id":"21276717",
+    "userID":"21276717",
     "grade":"10.0",
     "meta":{
       "grade":"10",
@@ -2086,7 +2086,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":7
   },
   {
-    "user_login_id":"46666218",
+    "userID":"46666218",
     "grade":"7.8",
     "meta":{
       "grade":"7.8",
@@ -2101,7 +2101,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":7
   },
   {
-    "user_login_id":"35683215",
+    "userID":"35683215",
     "grade":"7.9",
     "meta":{
       "grade":"7.9",
@@ -2116,7 +2116,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":7
   },
   {
-    "user_login_id":"42345728",
+    "userID":"42345728",
     "grade":"9.2",
     "meta":{
       "grade":"9.2",
@@ -2131,7 +2131,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":7
   },
   {
-    "user_login_id":"46647543",
+    "userID":"46647543",
     "grade":"8.0",
     "meta":{
       "grade":"8",
@@ -2146,7 +2146,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":7
   },
   {
-    "user_login_id":"77161172",
+    "userID":"77161172",
     "grade":"7.2",
     "meta":{
       "grade":"7.2",
@@ -2161,7 +2161,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":7
   },
   {
-    "user_login_id":"41149744",
+    "userID":"41149744",
     "grade":"1.0",
     "meta":{
       "grade":"1",
@@ -2176,7 +2176,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":7
   },
   {
-    "user_login_id":"48905367",
+    "userID":"48905367",
     "grade":"10.0",
     "meta":{
       "grade":"10",
@@ -2191,7 +2191,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":7
   },
   {
-    "user_login_id":"41393783",
+    "userID":"41393783",
     "grade":"9.0",
     "meta":{
       "grade":"9",
@@ -2206,7 +2206,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":7
   },
   {
-    "user_login_id":"55249485",
+    "userID":"55249485",
     "grade":"9.1",
     "meta":{
       "grade":"9.1",
@@ -2221,7 +2221,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":7
   },
   {
-    "user_login_id":"81888190",
+    "userID":"81888190",
     "grade":"10.0",
     "meta":{
       "grade":"10",
@@ -2236,7 +2236,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":7
   },
   {
-    "user_login_id":"38152009",
+    "userID":"38152009",
     "grade":"4.0",
     "meta":{
       "grade":"4",
@@ -2251,7 +2251,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":7
   },
   {
-    "user_login_id":"48470625",
+    "userID":"48470625",
     "grade":"7.6",
     "meta":{
       "grade":"7.6",
@@ -2266,7 +2266,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":7
   },
   {
-    "user_login_id":"20936679",
+    "userID":"20936679",
     "grade":"5.7",
     "meta":{
       "grade":"5.7",
@@ -2281,7 +2281,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":7
   },
   {
-    "user_login_id":"96955357",
+    "userID":"96955357",
     "grade":"5.0",
     "meta":{
       "grade":"5",
@@ -2296,7 +2296,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":7
   },
   {
-    "user_login_id":"18298956",
+    "userID":"18298956",
     "grade":"8.8",
     "meta":{
       "grade":"8.8",
@@ -2311,7 +2311,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":7
   },
   {
-    "user_login_id":"27034712",
+    "userID":"27034712",
     "grade":"10.0",
     "meta":{
       "grade":"10",
@@ -2326,7 +2326,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":7
   },
   {
-    "user_login_id":"90434281",
+    "userID":"90434281",
     "grade":"9.5",
     "meta":{
       "grade":"9.5",
@@ -2341,7 +2341,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":7
   },
   {
-    "user_login_id":"27817769",
+    "userID":"27817769",
     "grade":"7.0",
     "meta":{
       "grade":"7",
@@ -2356,7 +2356,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":7
   },
   {
-    "user_login_id":"41898388",
+    "userID":"41898388",
     "grade":"9.5",
     "meta":{
       "grade":"9.5",
@@ -2371,7 +2371,7 @@ export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
     "entry_id":7
   },
   {
-    "user_login_id":"76262947",
+    "userID":"76262947",
     "grade":"7.8",
     "meta":{
       "grade":"7.8",

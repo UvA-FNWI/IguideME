@@ -29,6 +29,7 @@ namespace IguideME.Web.Services.Workers
 			var entries = DatabaseManager.Instance.GetEntries(this._courseID);
 
 			_logger.LogInformation("Starting assignment registry...");
+
 			foreach (var assignment in assignments)
 			{
 				if (assignment == null) continue;
@@ -48,11 +49,10 @@ namespace IguideME.Web.Services.Workers
 					_hashCode
 				);
 
-				var submissions = assignment.Submissions;
-				foreach (var submission in submissions)
+				foreach (var submission in assignment.Submissions)
 				{
 					// don't register data from students that did not give consent
-					if (DatabaseManager.Instance.GetConsent(this._courseID, submission.User.SISUserID) != 1) {
+					if (DatabaseManager.Instance.GetConsent(this._courseID, submission.User.LoginID) != 1) {
 						continue;
 					}
 
@@ -63,24 +63,25 @@ namespace IguideME.Web.Services.Workers
 					var entry = entries.Find(e => e.Title == assignment.Name);
 					if (entry != null)
                     {
-							float grade;
+						float grade;
 
-							switch (assignment.GradingType) {
-								case UvA.DataNose.Connectors.Canvas.GradingType.Points:
-									grade = float.Parse(submission.Grade);
-									break;
-								case UvA.DataNose.Connectors.Canvas.GradingType.Percentage:
-									grade = float.Parse(submission.Grade)/10;
-									break;
-								default:
-									grade = -1; // TODO: handle the letter grading options etc
-									_logger.LogError($"Grade format {assignment.GradingType} is not supported, grade = {submission.Grade}");
-									break;
-							}
-							DatabaseManager.Instance.CreateUserSubmission(
+						switch (assignment.GradingType) {
+							case UvA.DataNose.Connectors.Canvas.GradingType.Points:
+								grade = float.Parse(submission.Grade);
+								break;
+							case UvA.DataNose.Connectors.Canvas.GradingType.Percentage:
+								grade = float.Parse(submission.Grade)/10;
+								break;
+							default:
+								grade = -1; // TODO: handle the letter grading options etc
+								_logger.LogError($"Grade format {assignment.GradingType} is not supported, grade = {submission.Grade}");
+								break;
+						}
+
+                        DatabaseManager.Instance.CreateUserSubmission(
 								this._courseID,
 								entry.ID,
-								submission.User.SISUserID,
+								submission.User.LoginID,
 								grade,
 								"",//submission.SubmittedAt.Value.ToShortDateString(),
 								_hashCode);

@@ -27,14 +27,14 @@ namespace IguideME.Web.Services
             this._connector = new CanvasApiConnector(config["Canvas:Url"], config["Canvas:AccessToken"]);
         }
 
-        public void SendMessage(int studentID, string subject, string body)
+        public void SendMessage(string userID, string subject, string body)
         {
             try {
-                var conv = new Conversation(this._connector)
+                Conversation conv = new(this._connector)
                 {
                     Subject = subject,
                     Body = body,
-                    Recipients = new string[1] { studentID.ToString() }
+                    Recipients = new string[1] { userID }
                 };
                 _logger.LogInformation("Created conversation " + conv + " " + conv.Recipients[0]);
 
@@ -48,19 +48,28 @@ namespace IguideME.Web.Services
             }
         }
 
-        public User GetUser(int courseID, string sisLoginID)
+        public User GetUser(int courseID, string userID)
         {
-            var users = _connector.FindCourseById(courseID).UserEnrollments.Select(x => x.User).ToArray();
-            return users.First(x => x.SISUserID == sisLoginID);
+            List<Enrollment> users = _connector.FindCourseById(courseID).Enrollments;
+            return users.First(x => x.UserID == userID).User;
+        }
+
+        public string GetLoginID(int courseID, string SISID) {
+            List<Enrollment> users = _connector.FindCourseById(courseID).Enrollments;
+            return users.First(x => x.User.SISUserID == SISID).User.LoginID;
         }
 
         public User[] GetStudents(int courseID)
         {
             _logger.LogInformation("Finding course by id, id = " + courseID);
-            _logger.LogInformation("Course = " + _connector.FindCourseById(courseID));
-            _logger.LogInformation("Getting users " + _connector.FindCourseById(courseID).GetUsersByType(EnrollmentType.Student).ToArray());
 
-            return _connector.FindCourseById(courseID).GetUsersByType(EnrollmentType.Student).ToArray();
+            Course course = _connector.FindCourseById(courseID);
+            _logger.LogInformation("Course = " + course);
+
+            User[] students = course.GetUsersByType(EnrollmentType.Student).ToArray();
+            _logger.LogInformation("Getting users " + students);
+
+            return students;
         }
 
         public User[] GetAdministrators(int courseID)
@@ -102,7 +111,7 @@ namespace IguideME.Web.Services
 
         public Submission[] GetSubmissions(int courseID, int userID)
         {
-            var whitelist = DatabaseManager.Instance.GetGrantedConsents(courseID).Select(x => x.UserID.ToString());
+            IEnumerable<string> whitelist = DatabaseManager.Instance.GetGrantedConsents(courseID).Select(x => x.UserID);
 
             // Returns all submissions of type 'on_paper' for a specified user.
             Submission[] submissions = _connector
@@ -140,17 +149,17 @@ namespace IguideME.Web.Services
                 .Discussions;
         }
 
-        public Submission[] GetAssignmentSubmissions(int courseID, string userLoginID, string name)
+        public Submission[] GetAssignmentSubmissions(int courseID, string userID, string name)
         {
-            var assignment = _connector
+            Assignment assignment = _connector
                 .FindCourseById(courseID)
                 .Assignments.Find(a => a.Name == name);
 
-            var userSubmissions = userLoginID != null ?
-                assignment.Submissions.Where(x => x.User.LoginID == userLoginID) :
+            IEnumerable<Submission> userSubmissions = userID != null ?
+                assignment.Submissions.Where(x => x.User.LoginID == userID) :
                 assignment.Submissions;
 
-            var submissions = _connector
+            IEnumerable<Submission> submissions = _connector
                 .FindCourseById(courseID)
                 .Assignments
                 .Where(a => a.Name == name)

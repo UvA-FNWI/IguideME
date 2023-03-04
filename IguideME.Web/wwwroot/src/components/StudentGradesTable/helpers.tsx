@@ -151,7 +151,7 @@ export function getColumns(tiles: Tile[], tileEntries: TileEntry[], averaged: bo
     defaultSortOrder: 'ascend',
     render: (text: string, record: any) => {
       return (
-        <span>{ text }<br /><small>{ record.student.login_id}</small></span>
+        <span>{ text }<br /><small>{ record.student.userID}</small></span>
       )
     }
   }];
@@ -174,6 +174,40 @@ function getEntryKey(entry: TileEntry, tiles: Tile[]): string {
   }
 }
 
+function tileToColumnData(t: Tile,
+                          entries: TileEntry[],
+                          submissions: TileEntrySubmission[],
+                          student: CanvasStudent,
+                          discussions: CanvasDiscussion[],
+                          tiles: Tile[]) {
+  const tileEntries = entries.filter(e => e.tile_id === t.id);
+
+  if (t.content === "BINARY") {
+    let grade = submissions.filter(
+      s => s.userID === student.userID &&
+        tileEntries.map(e => e.id).includes(s.entry_id)
+    ).map(s => parseInt(s.grade)).filter(s => s === 1).length.toString();
+    return [[t.id, grade]];
+  }
+
+  if (t.type === "DISCUSSIONS") {
+    return tileEntries.map(e => {
+
+      const entry_discussions = discussions.filter(disc => {
+        return disc.title === e.title && ( disc.posted_by === student.name || disc.posted_by === student.userID.toString())});
+
+      return [getEntryKey(e, tiles), entry_discussions.length];
+    })
+  }
+
+  return tileEntries.map(e => {
+    const submission = submissions.find(
+      s => s.entry_id === e.id && s.userID === student.userID
+    )!;
+    return [getEntryKey(e, tiles), submission ? submission.grade : ""];
+  })
+}
+
 export function getData(students: CanvasStudent[],
                         tiles: Tile[],
                         entries: TileEntry[],
@@ -184,33 +218,6 @@ export function getData(students: CanvasStudent[],
     student,
     key: student.id,
     name: student.name,
-    ...Object.fromEntries(tiles.map(t => {
-      const tileEntries = entries.filter(e => e.tile_id === t.id);
-
-      if (t.content === "BINARY") {
-        let grade = submissions.filter(
-          s => s.user_login_id === student.login_id &&
-            tileEntries.map(e => e.id).includes(s.entry_id)
-        ).map(s => parseInt(s.grade)).filter(s => s === 1).length.toString();
-        return [[t.id, grade]];
-      }
-
-      if (t.type === "DISCUSSIONS") {
-        return tileEntries.map(e => {
-
-          const entry_discussions = discussions.filter(disc => {
-            return disc.title === e.title && ( disc.posted_by === student.name || disc.posted_by === student.user_id.toString())});
-
-          return [getEntryKey(e, tiles), entry_discussions.length];
-        })
-      }
-
-      return tileEntries.map(e => {
-        const submission = submissions.find(
-          s => s.entry_id === e.id && s.user_login_id === student.login_id
-        )!;
-        return [getEntryKey(e, tiles), submission ? submission.grade : ""];
-      })
-    }).flat()),
+    ...Object.fromEntries(tiles.map(t => tileToColumnData(t, entries, submissions, student, discussions, tiles)).flat()),
   }));
 }

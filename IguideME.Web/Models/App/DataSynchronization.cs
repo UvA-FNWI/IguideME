@@ -42,7 +42,7 @@ namespace IguideME.Web.Models.App
             this.Status = status;
             this.Hash = hash;
 
-            this.Duration = endTimestamp != null && startTimestamp != null ? (int) Math.Floor((endTimestamp - startTimestamp).TotalSeconds) : -1;
+            this.Duration = (int) Math.Floor((endTimestamp - startTimestamp).TotalSeconds);
         }
 
 

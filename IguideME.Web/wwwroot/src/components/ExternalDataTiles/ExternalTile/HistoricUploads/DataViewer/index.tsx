@@ -50,7 +50,7 @@ export default class DataViewer extends Component<{
             <label>Find student by name</label>
             <Input size={"large"}
                    value={query}
-                   placeholder={"Student name or login id"}
+                   placeholder={"Student name or id"}
                    onChange={e => this.setState({ query: e.target.value })}
             />
 
@@ -61,20 +61,20 @@ export default class DataViewer extends Component<{
             ]}
                    dataSource={submissions.filter(
                      s => {
-                       const student = students.find(st => s.user_login_id === st.login_id);
+                       const student = students.find(st => s.userID === st.userID);
                        return student ? (
                          student.name.toLowerCase().includes(query.toLowerCase()) ||
-                           student.login_id.toLowerCase().includes(query.toLowerCase())
+                           student.userID.toLowerCase().includes(query.toLowerCase())
                        ) : false
                      }
                    ).sort(
                      (a, b) => parseFloat(b.grade) - parseFloat(a.grade)
                    ).map((s, i) => {
-                     const student = students.find(st => s.user_login_id === st.login_id);
+                     const student = students.find(st => s.userID === st.userID);
                       return {
                         key: i,
                         student_name: student ? student.name : "???",
-                        student_id: student ? student.login_id : "???",
+                        student_id: student ? student.userID : "???",
                         grade: s.grade
                       }
                    })}

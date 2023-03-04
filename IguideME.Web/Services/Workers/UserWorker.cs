@@ -1,6 +1,8 @@
 ﻿using System;
 using Microsoft.Extensions.Logging;
 
+using UvA.DataNose.Connectors.Canvas;
+
 namespace IguideME.Web.Services.Workers
 {
     public class UserWorker
@@ -26,21 +28,20 @@ namespace IguideME.Web.Services.Workers
         {
             _logger.LogInformation("Starting user sync...");
 
-            var students = this._canvasTest.GetStudents(this._courseID);
+            User[] students = this._canvasTest.GetStudents(this._courseID);
 
             _logger.LogInformation($"Starting student registry, about to process {students.Length} students...");
 
-            foreach (var student in students)
+            foreach (User student in students)
             {
                 _logger.LogInformation("Processing student " + student.ID.ToString() + "...");
                 try {
-                    DatabaseManager.Instance.RegisterUserSettings(new Models.ConsentData(_courseID, student.ID.Value, student.SISUserID, student.Name, -1));
+                    DatabaseManager.Instance.RegisterUserSettings(new Models.ConsentData(_courseID, student.LoginID, student.Name, -1));
 
                     DatabaseManager.Instance.RegisterUser(
                         _courseID,
                         student.ID,
-                        student.SISUserID,
-                        student.SISUserID,
+                        student.LoginID,
                         student.Name,
                         student.SortableName,
                         "student",
@@ -62,8 +63,7 @@ namespace IguideME.Web.Services.Workers
                 DatabaseManager.Instance.RegisterUser(
                     _courseID,
                     instructor.ID,
-                    instructor.SISUserID,
-                    instructor.SISUserID,
+                    instructor.LoginID,
                     instructor.Name,
                     instructor.SortableName,
                     "instructor",

@@ -1,7 +1,6 @@
 export interface ConsentData {
     courseID: number;
-    userID: number;
-    userLoginID: string;
+    userID: string;
     userName: string;
     granted: number;
 }

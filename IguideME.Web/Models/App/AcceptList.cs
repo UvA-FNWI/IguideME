@@ -4,17 +4,17 @@ namespace IguideME.Web.Models.App
 {
     public class AcceptList
     {
-        [JsonProperty("student_login_id")]
-        public string StudentLoginID { get; set; }
+        [JsonProperty("userID")]
+        public string UserID { get; set; }
 
         [JsonProperty("accepted")]
         public bool Accepted { get; set; }
 
         public AcceptList(
-            string studentLoginID,
+            string userID,
             bool accepted)
         {
-            this.StudentLoginID = studentLoginID;
+            this.UserID = userID;
             this.Accepted = accepted;
         }
     }

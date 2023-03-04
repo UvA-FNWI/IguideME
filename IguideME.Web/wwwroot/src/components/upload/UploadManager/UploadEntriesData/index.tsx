@@ -17,9 +17,9 @@ export default class UploadEntriesData extends Component<IUploadProps> {
     );
   }
 
-  updateStudent = (loginID: string, record: any) => {
+  updateStudent = (userID: string, record: any) => {
     this.props.setData(
-      [...this.props.data.filter(d => d.studentloginid !== loginID), record]
+      [...this.props.data.filter(d => d.userID !== userID), record]
     );
   }
 
@@ -33,10 +33,10 @@ export default class UploadEntriesData extends Component<IUploadProps> {
       <div id={"uploadEntriesData"}>
         <Row gutter={[10, 10]} style={{margin: '20px 0'}}>
          { students.map(s =>
-           <StudentEntry key={s.login_id}
+           <StudentEntry key={s.userID}
                          student={s}
                          updateStudent={this.updateStudent}
-                         studentRecord={data.find(d => d.studentloginid === s.login_id)}
+                         studentRecord={data.find(d => d.userID === s.userID)}
            />) }
         </Row>
       </div>
