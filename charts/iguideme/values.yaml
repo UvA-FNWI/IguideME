@@ -4,6 +4,9 @@ image: fnwicr.azurecr.io/iguideme
 tag: latest
 
 canvasUrl: canvas.instructure.com
+clientId: 104410000000000150
+authenticateUrl: https://uvadlo-dev.instructure.com/api/lti/authorize_redirect
+jwksUrl: https://canvas.instructure.com/api/lti/security/jwks
 
 azure:
   keyvaultName: keyvaultName
@@ -15,5 +18,7 @@ azure:
   secrets:
     - name: iguideme-lti-key
       key: LtiKey
+    - name: iguideme-jwt-key
+      key: LTI__SigningKey
     - name: iguideme-canvas-token
       key: Canvas__AccessToken

@@ -28,6 +28,12 @@ spec:
               value: "{{ .Chart.AppVersion }}"
             - name: Canvas__Url
               value: "{{ .Values.canvasUrl }}"
+            - name: LTI__ClientId
+              value: "{{ .Values.clientId }}"
+            - name: LTI__AuthenticateUrl
+              value: "{{ .Values.authenticateUrl }}"
+            - name: LTI__JwksUrl
+              value: "{{ .Values.jwksUrl }}"
           envFrom:
             - secretRef:
                 name: iguideme-secret
