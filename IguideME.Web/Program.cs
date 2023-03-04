@@ -119,6 +119,7 @@ builder.Services.AddControllers().AddNewtonsoftJson();
 WebApplication app = builder.Build();
 
 var ltiConfig = builder.Configuration.GetSection("LTI");
+app.UseForwardedHeaders();
 
 app.UseLti(new LtiOptions
 {
@@ -157,8 +158,6 @@ DatabaseManager.Initialize(app.Environment.IsDevelopment());
 
 app.UseDefaultFiles();
 app.UseStaticFiles();
-
-app.UseForwardedHeaders();
 
 app.UseRouting();
 
