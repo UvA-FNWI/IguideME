@@ -12,6 +12,7 @@ import LearningOutcomes from "./LearningOutcomes";
 import { LearningOutcome } from "../../../models/app/LearningGoal";
 import { CanvasStudent } from "../../../models/canvas/Student";
 import AppController from "../../../api/controllers/app";
+import TileHistoricGraph from "../TileHistoricGraph"
 
 export default class TileDetail extends Component<{
   tile: Tile,
@@ -83,8 +84,11 @@ export default class TileDetail extends Component<{
           Return to dashboard
         </Button>
 
+
         <h1 style={{margin: '10px 0'}}>{ tile.title }</h1>
         { this.content() }
+
+        <TileHistoricGraph/>
       </div>
     )
   }

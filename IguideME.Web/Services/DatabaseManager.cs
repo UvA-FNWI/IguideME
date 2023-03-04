@@ -331,8 +331,19 @@ namespace IguideME.Web.Services
 
         public int GetMinimumPeerGroupSize(int courseID)
         {
-            // TODO: what's the plan here?
-            return 1;
+            string query = String.Format(
+                DatabaseQueries.QUERY_PEER_GROUP_FOR_COURSE, courseID);
+
+            int size = 1;
+
+            using(SQLiteDataReader r = Query(query)) {
+                if (r.Read())
+                {
+                    size = r.GetInt32(0);
+                }
+            }
+
+            return size;
         }
 
         public bool HasPersonalizedPeers(int courseID)
@@ -1332,7 +1343,8 @@ namespace IguideME.Web.Services
             string query2 = String.Format(
                 DatabaseQueries.QUERY_USER_DISCUSSION_COUNTER,
                 courseID,
-                GetUserId(courseID,loginID));
+                GetUserId(courseID,loginID),
+                activeHash);
 
             using(SQLiteDataReader r2 = Query(query2)) {
                 while (r2.Read()) {
@@ -1584,7 +1596,7 @@ namespace IguideME.Web.Services
                         }
                         else if (comparisson_history[r1.GetInt32(0)].Last() != entry)
                         {
-                            // If this entry is different than the lst, we add it
+                            // If this entry is different than the last, we add it
                             comparisson_history[r1.GetInt32(0)].Add(entry);
                         }
                     }

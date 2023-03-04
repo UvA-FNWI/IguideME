@@ -1264,10 +1264,10 @@ public static class DatabaseQueries
 	    GROUP BY    `tile_entry`.`id`;";
 
     public const string QUERY_USER_DISCUSSION_COUNTER = 
-        @"SELECT        `discussion_id`,
+        @"SELECT        `canvas_discussion`.`tile_id`,
                         SUM(`counter`)         
         FROM(SELECT     `canvas_discussion_entry`.`discussion_id` 
-                AS      `discussion_id`,
+                AS      `disc_id`,
             COUNT(*) 
                 AS      `counter`
             FROM        `canvas_discussion_entry`
@@ -1279,13 +1279,16 @@ public static class DatabaseQueries
             UNION ALL 
             
             SELECT      `canvas_discussion_entry`.`discussion_id` 
-                AS      `discussion_id`,
+                AS      `disc_id`,
             COUNT(*) 
                 AS      `counter` 
-            FROM `canvas_discussion_entry` 
-            WHERE `course_id` = '{0}'
-            AND `posted_by` ='{1}')
-        WHERE `discussion_id` IS NOT NULL;";
+            FROM        `canvas_discussion_entry` 
+            WHERE       `course_id` = '{0}'
+            AND         `posted_by` ='{1}') 
+        LEFT JOIN       `canvas_discussion` 
+            ON          `disc_id` = `canvas_discussion`.`discussion_id` 
+        WHERE           `disc_id` IS NOT NULL
+        AND             `canvas_discussion`.`sync_hash` = '{2}';";
 
 
     public const string QUERY_USER_ID_FROM_LOGIN_ID = 
