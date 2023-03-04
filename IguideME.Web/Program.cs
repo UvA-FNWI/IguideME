@@ -118,15 +118,17 @@ builder.Services.AddControllers().AddNewtonsoftJson();
 
 WebApplication app = builder.Build();
 
+var ltiConfig = builder.Configuration.GetSection("LTI");
+
 app.UseLti(new LtiOptions
 {
-    ClientId = builder.Configuration.GetSection("LTI:ClientId").Value,
-    AuthenticateUrl = builder.Configuration.GetSection("LTI:AuthenticateUrl").Value,
-    JwksUrl = builder.Configuration.GetSection("LTI:JwksUrl").Value,
+    ClientId = ltiConfig["ClientId"] ?? throw new Exception("Client id not set"),
+    AuthenticateUrl = ltiConfig["AuthenticateUrl"] ?? throw new Exception("Authenticate url not set"),
+    JwksUrl = ltiConfig["JwksUrl"] ?? throw new Exception("Jwks url not set"),
     SigningKey = key,
     ClaimsMapping = p => new Dictionary<string, object>
     {
-        [ClaimTypes.NameIdentifier] = p.NameIdentifier.Split("_").Last(),
+        [ClaimTypes.NameIdentifier] = p.NameIdentifier!.Split("_").Last(),
         ["contextLabel"] = p.Context.Label,
         ["courseName"] = p.Context.Title,
         ["user_name"] = p.Name,
