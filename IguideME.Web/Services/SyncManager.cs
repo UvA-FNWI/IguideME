@@ -63,7 +63,7 @@ namespace IguideME.Web.Services
                     {
                             CourseID = id,
                             Notifications_bool = true
-                        };
+                    };
                     await this._queuedBackgroundService.PostWorkItemAsync(parameters).ConfigureAwait(false);
                     _logger.LogInformation("Execute");
                 }

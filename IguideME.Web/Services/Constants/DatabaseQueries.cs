@@ -47,12 +47,6 @@ public static class DatabaseQueries
                 );"
             },
             {
-                "0006_rename_and_remove_user_id_in_peer_group",
-                @"
-                ALTER TABLE peer_group RENAME COLUMN `user_login_id` TO `user_id`;
-                ALTER TABLE peer_group RENAME COLUMN `target_login_id` TO `target_id`;"
-            },
-            {
                 "0007_rename_and_remove_user_id_in_notifications",
                 @"
                 ALTER TABLE notifications RENAME COLUMN `user_login_id` TO `user_id`;"
@@ -73,7 +67,13 @@ public static class DatabaseQueries
                 ALTER TABLE canvas_users RENAME COLUMN `user_id` TO `studentnumber`;
                 ALTER TABLE canvas_users DROP COLUMN `sis_id`;
                 ALTER TABLE canvas_users RENAME COLUMN `login_id` TO `user_id`;"
-            }
+            },
+            {
+                "0011_drop_old_peer_group_table",
+                @"
+                DROP TABLE peer_group
+                ;"
+            },
         };
 
 // //================================ Tables ================================//

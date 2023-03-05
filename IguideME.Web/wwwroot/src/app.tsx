@@ -22,7 +22,6 @@ const AdminNotificationCentre = React.lazy(() => import('./common/Admin/sections
 const AdminDataWizard = React.lazy(() => import('./common/Admin/sections/DataWizard'));
 const AdminGradeAnalyzer = React.lazy(() => import('./common/Admin/sections/grades/GradeAnalyzer'));
 const AdminGradePredictor = React.lazy(() => import('./common/Admin/sections/grades/GradePredictor'));
-const AdminGradePredictorOld = React.lazy(() => import('./common/Admin/sections/grades/GradePredictorOld'));
 const AdminSettings = React.lazy(() => import('./common/Admin/sections/Settings'));
 
 const mapStateToProps = (state: RootState) => ({
@@ -82,7 +81,6 @@ class IGuideME extends React.Component<Props> {
                             <Route path="/admin/student-overview" component={AdminStudentOverview} />
                             <Route path="/admin/data-wizard" component={AdminDataWizard} />
                             <Route path="/admin/grade-analyzer" component={AdminGradeAnalyzer} />
-                            <Route path="/admin/grade-predictor-old" component={AdminGradePredictorOld} />
                             <Route path="/admin/grade-predictor" component={AdminGradePredictor} />
                             <Route path="/admin/settings" component={AdminSettings} />
                             <Route path="/admin/tiles" component={AdminTiles} />

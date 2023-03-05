@@ -43,8 +43,6 @@ namespace IguideME.Web.Controllers
                 DatabaseManager.Instance.RegisterCourse(GetCourseID(), GetCourseTitle());
         }
 
-
-
         [Authorize]
         [Route("/app/self")]
         [HttpGet]

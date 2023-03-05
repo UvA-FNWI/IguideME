@@ -36,7 +36,7 @@ namespace IguideME.Web.Services
             CancellationToken cancellationToken)
         {
             // TODO: what is result?
-            var result = new JobResultModel();
+            JobResultModel result = new();
             var courseID = work.CourseID;
 
             // TODO: check course dates

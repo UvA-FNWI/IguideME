@@ -139,7 +139,6 @@ app.UseLti(new LtiOptions
             ? "Teacher" : "Student",
         [ClaimTypes.Email] = p.Email,
     }
-
 });
 
 
