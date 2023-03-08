@@ -1154,28 +1154,6 @@ namespace IguideME.Web.Services
                     personalizedPeers));
         }
 
-    public int GetUserId(
-        int courseID,
-        string loginID)
-    {
-        string query = String.Format(
-            DatabaseQueries.QUERY_USER_ID_FROM_LOGIN_ID,
-            courseID,
-            loginID);
-
-        int userID = 0;
-        using(SQLiteDataReader r = Query(query)) {
-            while (r.Read()) {
-                try {
-                    userID = r.GetInt32(0);
-                } catch (Exception e) {
-                    PrintQueryError("GetUserId", 3, r, e);
-                }
-            }
-        }
-        return userID;
-    }
-
     public Dictionary<int,List<float>> GetUserGrades(
             int courseID,
             string userID,
@@ -1216,7 +1194,7 @@ namespace IguideME.Web.Services
             string query2 = String.Format(
                 DatabaseQueries.QUERY_USER_DISCUSSION_COUNTER,
                 courseID,
-                GetUserId(courseID, userID),
+                userID,
                 activeHash);
 
             using(SQLiteDataReader r2 = Query(query2)) {
@@ -1379,7 +1357,7 @@ namespace IguideME.Web.Services
 
 
 
-        public new Dictionary <int,List<float[]>> GetHistoricComparison(
+        public Dictionary <int,List<float[]>> GetHistoricComparison(
             int courseID,
             string userID,
             string hash = null)
@@ -1394,7 +1372,7 @@ namespace IguideME.Web.Services
                 userID);
 
 
-            Dictionary<int, List<float[]>> comparisson_history = new Dictionary<int, List<float[]>>();
+            Dictionary<int, List<float[]>> comparisson_history = new();
 
             using(SQLiteDataReader r1 = Query(query1)) {
                 try
