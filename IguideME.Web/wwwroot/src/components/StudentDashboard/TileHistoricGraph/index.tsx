@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { IProps, IState } from "./types";
 import { Line } from "react-chartjs-2";
 import { borderRadius } from "react-select/src/theme";
+import getHistory from "../../../api/controllers/tile";
 
 export default class TileHistoricGraph extends Component<IProps, IState> {
 

@@ -646,6 +646,24 @@ namespace IguideME.Web.Controllers
 
         [Authorize]
         [HttpGet]
+        [Route("/tiles/grade-history/{userID}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public ActionResult GetTileHistory(string userID)
+        {
+            User user = DatabaseManager.Instance.GetUser(
+                this.GetCourseID(), userID);
+
+            return user == null
+                ? BadRequest()
+                : (ActionResult)Json(
+                DatabaseManager.Instance.GetHistoricComparison(
+                    this.GetCourseID(), userID));
+                    
+        }
+
+        [Authorize]
+        [HttpGet]
         [Route("/peer-comparison/{userID}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]

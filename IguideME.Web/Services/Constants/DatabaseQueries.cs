@@ -651,7 +651,8 @@ public static class DatabaseQueries
                             `consent`   )
             VALUES({0}, '{1}', '{2}', {3})
             ON CONFLICT (   `user_id`, course_id   )
-                DO UPDATE SET `consent` = {4}
+                DO UPDATE SET `consent` = {3}
+                {4}
         ;";
 
     public const string REGISTER_SUBMISSION_META =

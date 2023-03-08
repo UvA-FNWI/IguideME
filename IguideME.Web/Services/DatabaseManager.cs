@@ -2375,23 +2375,9 @@ namespace IguideME.Web.Services
             NonQuery(String.Format(
                 DatabaseQueries.SET_USER_CONSENT,
                 data.CourseID, data.UserID, data.UserName.Replace("'", ""), data.Granted,
-                data.Granted == -1 ? "DO NOTHING" : "DO UPDATE SET `consent` = {4}"
+                data.Granted == 0 ? ", `goal_grade` = '-1' " : ""
             ));
-        }
-
-        public int GetConsent(int courseID, int userID)
-        {
-            string query = String.Format(
-                "SELECT `user_id`, `consent` from `user_settings` WHERE `course_id`={0} AND `user_id`={1}",
-                courseID, userID
-            );
-
-            int consent = -1;
-            using(SQLiteDataReader r = Query(query)){
-                if (r.Read())
-                    consent = Convert.ToInt32(r["consent"]);
-            }
-            return consent;
+            
         }
 
         public int GetConsent(int courseID, string userID)

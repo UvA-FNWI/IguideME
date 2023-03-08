@@ -53,6 +53,18 @@ export default class TileController extends Controller {
     ).then(response => response.data);
   }
 
+  static getHistory(userID: string): Promise<Map <number,number[][]>> {
+    if (debug()) {
+        // return Promise.resolve(MOCK_SUBMISSIONS.filter(x => {
+        //   return (x.userID === userID)
+        // })).then(x => x.flat());
+    }
+
+    return this.client.get(
+      `tiles/grade-history/${userID}`
+    ).then(response => response.data);
+  }
+
   static getTileSubmissions(tileId: number, userID?: string): Promise<TileEntrySubmission[]> {
     if (debug()) {
       return this.getTileEntries(tileId).then(entries => {
