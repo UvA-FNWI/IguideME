@@ -49,8 +49,11 @@ export default class GradeBar extends Component<IProps> {
     if (!element[0]) return;
     let tile = data.tiles[element[0]._index]
 
+    console.log("element", element);
+    console.log("data", data);
+    console.log("evt", evt);
+
     window.dispatchEvent(new CustomEvent('selectTile', { detail: {tile} }))
-    // TODO: fsr the chart does not like it when we go to another page like this.
 
   }
 
