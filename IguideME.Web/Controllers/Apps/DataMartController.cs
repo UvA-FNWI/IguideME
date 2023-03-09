@@ -43,6 +43,16 @@ namespace IguideME.Web.Controllers
         // -------------------- Synchronization managers --------------------
 
         [Authorize(Policy = "IsInstructor")]
+        [HttpPost, Route("/datamart/test")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public void LogDBTable()
+        {
+            var body = new StreamReader(Request.Body).ReadToEnd();
+
+            DatabaseManager.Instance.LogTable(JObject.Parse(body)["name"].ToString());
+        }
+
+        [Authorize(Policy = "IsInstructor")]
         [HttpPost, Route("/datamart/start-sync")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status202Accepted, Type = typeof(JobCreatedModel))]

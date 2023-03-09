@@ -117,6 +117,30 @@ namespace IguideME.Web.Services
             }
         }
 
+        public void LogTable(string name) {
+            _logger.LogInformation($"Logging table {name}");
+
+            string query = $"select * from `{name}`";
+            string table = "";
+            using (SQLiteDataReader r = Query(query))
+            {
+                for (int i = 0; i < r.FieldCount; i++)
+                {
+                    table += r.GetName(i) + "\t";
+                }
+                table += "\n\n";
+                while (r.Read()) {
+                    for (int i = 0; i < r.FieldCount; i++) {
+                        table += r.GetValue(i).ToString() + "\t";
+                    }
+                    table += "\n";
+                }
+            }
+
+            _logger.LogInformation(table);
+
+        }
+
         private void CreateTables()
         {
             // collection of all table creation queries

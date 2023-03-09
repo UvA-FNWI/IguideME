@@ -16,6 +16,13 @@ import { MOCK_NOTIFICATIONS } from "../../mocks/students";
 
 export default class DataMartController extends Controller {
 
+  static logDBTable(name: string) {
+
+    return this.client.post(
+      `datamart/test`, {name: name}
+      ).then(response => response.data);
+  }
+
   static startNewSync() {
     // when in debug mode always accept the handshake
     if (debug()) {
