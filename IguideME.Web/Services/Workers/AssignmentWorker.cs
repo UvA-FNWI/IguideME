@@ -71,21 +71,17 @@ namespace IguideME.Web.Services.Workers
         /// </summary>
         /// <param name="assignment">the assignment the submissions are associated to.</param>
         /// <param name="entries">a list of all the entries in the course.</param>
-		private void RegisterSubmissions(Assignment assignment, List<TileEntry> entries) {
+		private void RegisterSubmissions(Assignment assignment, TileEntry entry) {
 
 			// Filter out students that did not give consent and that don't have a grade.
             IEnumerable<Submission> submissions = assignment.Submissions
                 .Where(submission =>
 					submission.Grade != null &&
-					DatabaseManager.Instance.GetConsent(this._courseID, submission.User.LoginID) != 1
+					DatabaseManager.Instance.GetConsent(this._courseID, submission.User.LoginID) == 1
 				);
 
             foreach (Submission submission in submissions)
 			{
-				// Don't register submissions that aren't assigned to tiles (as entries).
-				TileEntry entry = entries.Find(e => e.Title == assignment.Name);
-				if (entry == null) continue;
-
 				double grade;
 
 				switch (assignment.GradingType) {
@@ -111,7 +107,7 @@ namespace IguideME.Web.Services.Workers
 						_logger.LogError("Grade format {Type} is not supported, grade = {Grade}", assignment.GradingType, submission.Grade);
 						break;
 				}
-
+                _logger.LogInformation("loginid {ID}", submission.User.LoginID);
 				DatabaseManager.Instance.CreateUserSubmission(
 						this._courseID,
 						entry.ID,
@@ -150,9 +146,14 @@ namespace IguideME.Web.Services.Workers
                     _hashCode
                 );
 
-                this.RegisterSubmissions(assignment, entries);
+                // Don't register submissions that aren't assigned to tiles (as entries).
+                TileEntry entry = entries.Find(e => e.Title == assignment.Name);
+                if (entry == null) continue;
+
+                this.RegisterSubmissions(assignment, entry);
 
             }
         }
+
     }
 }
