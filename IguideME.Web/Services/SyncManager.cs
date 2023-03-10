@@ -11,7 +11,7 @@ namespace IguideME.Web.Services
     public class SyncManager : IHostedService, IDisposable
     {
         private int _executionCount = 0;
-        private readonly CanvasTest _canvasTest;
+        private readonly CanvasHandler _canvasTest;
         private readonly ILogger<SyncManager> _logger;
         private readonly IComputationJobStatusService _computationJobStatus;
         private readonly IQueuedBackgroundService _queuedBackgroundService;
@@ -23,7 +23,7 @@ namespace IguideME.Web.Services
             IComputationJobStatusService computationJobStatus,
             IQueuedBackgroundService queuedBackgroundService,
             IComputationJobStatusService computationJobStatusService,
-            CanvasTest canvasTest)
+            CanvasHandler canvasTest)
         {
             _logger = logger;
             this._canvasTest = canvasTest;

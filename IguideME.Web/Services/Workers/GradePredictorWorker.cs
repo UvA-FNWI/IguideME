@@ -1,78 +1,96 @@
-﻿using IguideME.Web.Models.App;
+﻿using System.Collections.Generic;
+
+using IguideME.Web.Models;
+using IguideME.Web.Models.App;
 using IguideME.Web.Models.Impl;
 using Microsoft.Extensions.Logging;
 
 namespace IguideME.Web.Services.Workers
 {
+    /// <summary>
+    /// Class <a>GradePredictorWorker</a> models a worker that handle making grade predictions for users.
+    /// </summary>
 	public class GradePredictorWorker
 	{
-        private readonly ILogger<SyncManager> _logger;
+        readonly private ILogger<SyncManager> _logger;
+		readonly private int _courseID;
+        readonly private string _hashCode;
+        readonly private GradePredictionModel _model;
 
-		private int CourseID { get; set; }
-
-        private string SyncHash { get; set; }
-
-        private GradePredictionModel Model { get; set; }
-
-		public GradePredictorWorker(int courseID, string syncHash, ILogger<SyncManager> logger)
+        /// <summary>
+        /// This constructor initializes the new GradePredictorWorker to
+        /// (<paramref name="courseID"/>, <paramref name="hashCode"/>, <paramref name="logger"/>).
+        /// </summary>
+        /// <param name="courseID">the id of the course.</param>
+        /// <param name="hashCode">the hash code associated to the current sync.</param>
+        /// <param name="logger">a reference to the logger used for the sync.</param>
+		public GradePredictorWorker(int courseID, string hashCode, ILogger<SyncManager> logger)
         {
             _logger = logger;
-            this.CourseID = courseID;
-            this.SyncHash = syncHash;
-            this.Model = DatabaseManager.Instance.GetGradePredictionModel(courseID);
+            this._courseID = courseID;
+            this._hashCode = hashCode;
+            this._model = DatabaseManager.Instance.GetGradePredictionModel(courseID);
         }
 
-        public void MakePredictions()
+        /// <summary>
+        /// Starts the grade prediction worker.
+        /// </summary>
+        public void Start()
         {
             _logger.LogInformation("Making grade predictions");
-            if (this.Model == null)
+            if (this._model == null)
             {
-                _logger.LogInformation($"No suitible grade prediction model found for courseID {this.CourseID}");
+                _logger.LogInformation("No suitible grade prediction model found for courseID {ID}", this._courseID);
                 return;
             }
 
-            var students = DatabaseManager.Instance.GetUsers(this.CourseID, "student", this.SyncHash);
+            List<User> students = DatabaseManager.Instance.GetUsers(this._courseID, "student", this._hashCode);
 
-            foreach (var student in students)
+            foreach (User student in students)
             {
-                this.ProcessStudent(student);
+                this.PredictGradesForStudent(student);
             }
         }
 
-        private void ProcessStudent(User student)
+        /// <summary>
+        /// Make predictions for a student
+        /// </summary>
+        /// <param name="student">the student to make predictions for.</param>
+        private void PredictGradesForStudent(User student)
         {
-            _logger.LogInformation($"Processing student: {student.UserID}");
-            var submissions = DatabaseManager.Instance.GetCourseSubmissionsForStudent(this.CourseID,
+            _logger.LogInformation("Processing student: {ID}", student.UserID);
+            List<TileEntrySubmission> submissions = DatabaseManager.Instance.GetCourseSubmissionsForStudent(this._courseID,
                                                                                       student.UserID,
-                                                                                      this.SyncHash);
-            var tileEntries = DatabaseManager.Instance.GetEntries(this.CourseID);
+                                                                                      this._hashCode);
 
-            var wGrade = 0.0;
+            List<TileEntry> tileEntries = DatabaseManager.Instance.GetEntries(this._courseID);
 
-            foreach (GradePredictionModelParameter modelParameter in this.Model.Parameters)
+            double wGrade = 0.0;
+
+            foreach (GradePredictionModelParameter modelParameter in this._model.Parameters)
             {
-                var submission = submissions.Find(sub => sub.EntryID == modelParameter.ParameterID);
+                TileEntrySubmission submission = submissions.Find(sub => sub.EntryID == modelParameter.ParameterID);
                 if (submission == null)
                 {
-                    _logger.LogInformation($"Student {student.UserID} has no submission for EntryID {modelParameter.ParameterID}");
+                    _logger.LogInformation("Student {UserID} has no submission for EntryID {ParamID}", student.UserID, modelParameter.ParameterID);
                     continue;
                 }
 
                 if (!double.TryParse(submission.Grade, out double partialGrade))
                 {
-                    _logger.LogInformation($"Error parsing submission grade as double: {submission.Grade}");
+                    _logger.LogInformation("Error parsing submission grade as double: {Grade}", submission.Grade);
                     _logger.LogInformation("Aborting.");
                     return;
                 }
 
-                _logger.LogInformation($"grade += {partialGrade} * {modelParameter.Weight}");
+                _logger.LogInformation("grade += {partialGrade} * {Weight}", partialGrade, modelParameter.Weight);
 
                 wGrade += partialGrade * modelParameter.Weight;
             }
 
-            DatabaseManager.Instance.CreatePredictedGrade(this.CourseID,
+            DatabaseManager.Instance.CreatePredictedGrade(this._courseID,
                                                           student.UserID,
-                                                          (float)wGrade);
+                                                          wGrade);
         }
     }
 }

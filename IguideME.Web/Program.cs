@@ -101,7 +101,7 @@ builder.Services.Configure<KestrelServerOptions>(options => options.AllowSynchro
 builder.Services.Configure<IISServerOptions>(options => options.AllowSynchronousIO = true);
 
 builder.Services.AddControllersWithViews();
-builder.Services.AddSingleton<CanvasTest>();
+builder.Services.AddSingleton<CanvasHandler>();
 
 builder.Services.AddHttpClient();
 

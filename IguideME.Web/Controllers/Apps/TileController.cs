@@ -20,13 +20,13 @@ namespace IguideME.Web.Controllers
     public class TileController : DataController
     {
         private readonly ILogger<DataController> _logger;
-        private readonly CanvasTest canvasTest;
+        private readonly CanvasHandler canvasTest;
         private readonly IQueuedBackgroundService _queuedBackgroundService;
         private readonly IComputationJobStatusService _computationJobStatusService;
 
         public TileController(
             ILogger<DataController> logger,
-            CanvasTest canvasTest,
+            CanvasHandler canvasTest,
             IQueuedBackgroundService queuedBackgroundService,
             IComputationJobStatusService computationJobStatusService) : base(
                 logger, canvasTest, queuedBackgroundService, computationJobStatusService)

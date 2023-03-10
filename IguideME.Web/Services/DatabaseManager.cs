@@ -684,7 +684,7 @@ namespace IguideME.Web.Services
         public void CreatePredictedGrade(
             int courseID,
             string userID,
-            float grade)
+            double grade)
         {
             try {
                 NonQuery(
@@ -843,7 +843,7 @@ namespace IguideME.Web.Services
             int courseID,
             int entryID,
             string userID,
-            float grade,
+            double grade,
             string submitted,
             string hash = null)
         {
