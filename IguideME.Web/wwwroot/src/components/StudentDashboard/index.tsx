@@ -22,6 +22,7 @@ import {LearningOutcome} from "../../models/app/LearningGoal";
 import DataMartController from "../../api/controllers/datamart";
 import AppController from "../../api/controllers/app";
 import UserSettings from "../../common/UserSettings";
+import { HistoricTileGrades } from "./TileHistoricGraph/types";
 
 const mapState = (state: RootState) => ({
   dashboardColumns: state.dashboardColumns,
@@ -52,7 +53,8 @@ class StudentDashboard extends Component<Props, IState> {
     viewType: "bar" as ViewTypes,
     predictions: [],
     goalGrade: 0,
-    settings_view: false
+    settings_view: false,
+    historicGrades: new Map<number, HistoricTileGrades>()
   }
 
   componentDidMount(): void {
@@ -144,6 +146,7 @@ class StudentDashboard extends Component<Props, IState> {
     let goals = (await Promise.all(p_goals)).flat();
 
     let goalGrade = await AppController.getGoalGrade(student.userID);
+    let historicGrades = await TileController.getHistory(student.userID);
 
     this.setState({
       discussions,
@@ -151,7 +154,8 @@ class StudentDashboard extends Component<Props, IState> {
       tilesGradeSummary: data,
       userSubmissions: submissions,
       predictions: predictions,
-      goalGrade: goalGrade
+      goalGrade: goalGrade,
+      historicGrades: historicGrades
     }, () => {
       TileController.getPeerResults(student!.userID).then(peerGrades =>
         this.setState({ peerGrades, loaded: true })
@@ -171,10 +175,11 @@ class StudentDashboard extends Component<Props, IState> {
       learningOutcomes,
       predictions,
       goalGrade,
-      settings_view
+      settings_view,
+      historicGrades
     } = this.state;
 
-    const { tiles, tileGroups, dashboardColumns, tileEntries, student } = this.props;
+    const { tiles, tileGroups, dashboardColumns, tileEntries, student} = this.props;
 
     if (!loaded || !student) return (<Loading small={true} />);
 
@@ -190,6 +195,7 @@ class StudentDashboard extends Component<Props, IState> {
                          submissions={userSubmissions.get((displayTile as any).tile.id)!}
                          learningOutcomes={learningOutcomes}
                          student={student}
+                         historicGrades={historicGrades.get((displayTile as any).tile.id)}
       />
     }
 

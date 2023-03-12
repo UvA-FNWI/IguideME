@@ -3,6 +3,7 @@ import {Tile, TileEntrySubmission} from "../../models/app/Tile";
 import {CanvasDiscussion} from "../../models/canvas/Discussion";
 import {LearningOutcome} from "../../models/app/LearningGoal";
 import { PredictedGrade } from "../../models/app/PredictiveModel";
+import { HistoricTileGrades } from "./TileHistoricGraph/types";
 
 export interface IProps {
   student: CanvasStudent | undefined;
@@ -23,6 +24,7 @@ export interface IState {
   predictions: PredictedGrade[];
   goalGrade: number;
   settings_view: boolean;
+  historicGrades: Map <number,HistoricTileGrades>;
 }
 
 export interface TilesGradeSummary {

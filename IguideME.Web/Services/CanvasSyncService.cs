@@ -87,7 +87,7 @@ namespace IguideME.Web.Services
                 jobId, $"tasks.grade-predictor", 0
             ).ConfigureAwait(false);
 
-            new PeerGroupWorker(courseID, hashCode, _logger).Create();
+            new PeerGroupWorker(courseID, hashCode, _logger).Start();
             await _computationJobStatus.UpdateJobProgressInformationAsync(
                 jobId, $"tasks.peer-groups", 0
             ).ConfigureAwait(false);

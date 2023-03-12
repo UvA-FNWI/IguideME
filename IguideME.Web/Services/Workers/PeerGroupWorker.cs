@@ -7,21 +7,37 @@ using Microsoft.Extensions.Logging;
 
 namespace IguideME.Web.Services.Workers
 {
+    /// <summary>
+    /// Class <a>PeerGroupWorker</a> models a worker that handles the creation of peer groups and their stats.
+    /// </summary>
+    ///
     public class PeerGroupWorker
     {
-        private readonly ILogger<SyncManager> _logger;
-        private int CourseID { get; set; }
-        private string Hash { get; set; }
+        readonly private ILogger<SyncManager> _logger;
+        readonly private int _courseID;
+        readonly private string _hashCode;
 
-        public PeerGroupWorker(int courseID, string hash,
-        ILogger<SyncManager> logger)
+        /// <summary>
+        /// This constructor initializes the new PeerGroupWorker to
+        /// (<paramref name="courseID"/>, <paramref name="hashCode"/>, <paramref name="logger"/>).
+        /// </summary>
+        /// <param name="courseID">the id of the course.</param>
+        /// <param name="hashCode">the hash code associated to the current sync.</param>
+        /// <param name="logger">a reference to the logger used for the sync.</param>
+        public PeerGroupWorker(
+            int courseID,
+            string hash,
+            ILogger<SyncManager> logger)
         {
             _logger = logger;
-            this.CourseID = courseID;
-            this.Hash = hash;
+            this._courseID = courseID;
+            this._hashCode = hash;
         }
 
-        public void Create()
+        /// <summary>
+        /// Starts the peer group worker.
+        /// </summary>
+        public void Start()
         {
 
             CreatePeerGroupsOfCourse();
@@ -51,7 +67,7 @@ namespace IguideME.Web.Services.Workers
             {
                 usersWithSameGoalGrade[goalGradeClass] = new List<string>();
                 //TODO: get only those with consent!!!
-                List<User> sameGraders = DatabaseManager.Instance.GetUsersWithGoalGrade(this.CourseID,goalGradeClass, this.Hash);
+                List<User> sameGraders = DatabaseManager.Instance.GetUsersWithGoalGrade(this._courseID,goalGradeClass, this._hashCode);
                 sameGraders.ForEach(x => usersWithSameGoalGrade[goalGradeClass].Add(x.UserID));
             }
 
@@ -90,7 +106,7 @@ namespace IguideME.Web.Services.Workers
             foreach(string peerID in peerGroup)
             {
                 // We query all the grades of each peer
-                Dictionary<int,List<float>> temp = DatabaseManager.Instance.GetUserGrades(this.CourseID,peerID,this.Hash);
+                Dictionary<int,List<float>> temp = DatabaseManager.Instance.GetUserGrades(this._courseID,peerID,this._hashCode);
 
                 // And we merge the temporary dictionary with the grades dictionary
                 List<float> value;
@@ -110,7 +126,7 @@ namespace IguideME.Web.Services.Workers
             // We find all students of the course and classify them according to their goal grade
             List<String>[] usersWithSameGoalGrade = this.GetUsersSortedByGoalGrade();
 
-            int minPeerGroupSize = DatabaseManager.Instance.GetMinimumPeerGroupSize(this.CourseID);
+            int minPeerGroupSize = DatabaseManager.Instance.GetMinimumPeerGroupSize(this._courseID);
 
             // We create the peer groups for each goal grade classification
             for (int goalGradeClass = 1; goalGradeClass <= 10; goalGradeClass++)
@@ -132,14 +148,14 @@ namespace IguideME.Web.Services.Workers
                     if ((entry.Value != null) && (entry.Value.Any()))
                     {
                         DatabaseManager.Instance.CreateUserPeer(
-                        this.CourseID,
+                        this._courseID,
                         goalGradeClass,
                         peerGroup,
                         entry.Key,
                         entry.Value.Average(),
                         entry.Value.Min(),
                         entry.Value.Max(),
-                        this.Hash);
+                        this._hashCode);
                     }
                 }
             }

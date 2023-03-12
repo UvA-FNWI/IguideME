@@ -4,7 +4,6 @@ import {Divider, Space} from "antd";
 import RequireConsent from "../../../../components/settings/RequireConsent";
 import AcceptList from "../../../../components/settings/AcceptList";
 import PeerGroups from "../../../../components/settings/PeerGroups";
-import { Button } from "ui-neumorphism";
 import DataMartController from "../../../../api/controllers/datamart";
 
 export default class Settings extends Component {

@@ -13,6 +13,7 @@ import { LearningOutcome } from "../../../models/app/LearningGoal";
 import { CanvasStudent } from "../../../models/canvas/Student";
 import AppController from "../../../api/controllers/app";
 import TileHistoricGraph from "../TileHistoricGraph"
+import { HistoricTileGrades } from "../TileHistoricGraph/types";
 
 export default class TileDetail extends Component<{
   tile: Tile,
@@ -21,7 +22,8 @@ export default class TileDetail extends Component<{
   tileEntries: TileEntry[],
   predictions: PredictedGrade[],
   learningOutcomes: LearningOutcome[],
-  student: CanvasStudent
+  student: CanvasStudent,
+  historicGrades: HistoricTileGrades | undefined
 }> {
 
   content = () => {
@@ -103,7 +105,9 @@ export default class TileDetail extends Component<{
         <h1 style={{margin: '10px 0'}}>{ tile.title }</h1>
         { this.content() }
 
-        <TileHistoricGraph/>
+        <TileHistoricGraph
+          historicGrades={this.props.historicGrades}
+          />
       </div>
     )
   }

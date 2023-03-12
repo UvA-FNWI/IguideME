@@ -1,24 +1,27 @@
 import React, { Component } from "react";
 import { IProps, IState } from "./types";
 import { Line } from "react-chartjs-2";
-import { borderRadius } from "react-select/src/theme";
-import getHistory from "../../../api/controllers/tile";
+// import { borderRadius } from "react-select/src/theme";
 
 export default class TileHistoricGraph extends Component<IProps, IState> {
 
     render(): React.ReactNode {
-        
-        let a = 5;
 
-        const dates = ["1","2","3","4","5","6","7"];
-        const user_avg =      [6,5,7,8,6,7,7];
-        const peergroup_avg = [5.5,6.3,7,8,6,5,5];
-        const peergroup_max = [8,9,8,9,7,8,9];
-        const peergroup_min = [3,1,4,5,3,4,3];
+        // Don't show a graph if the tile doesn't have historic grades.
+        if (this.props.historicGrades === undefined) {
+            return (<div></div>);
+        }
 
+        const {
+            dates,
+            user_avg,
+            peer_avg,
+            peer_max,
+            peer_min
+        } =  this.props.historicGrades;
 
         return (
-            
+
             <div>
                 hello there
                 <Line
@@ -36,7 +39,7 @@ export default class TileHistoricGraph extends Component<IProps, IState> {
                             },
                         {
                             label: "Peer Group average",
-                            data: peergroup_avg,
+                            data: peer_avg,
                             fill: false,
                             borderWidth:3,
                             backgroundColor: "rgb(101,154,176)",
@@ -45,7 +48,7 @@ export default class TileHistoricGraph extends Component<IProps, IState> {
                             },
                         {
                             label: "Peer Group maximum",
-                            data: peergroup_max,
+                            data: peer_max,
                             fill: 3,
                             borderWidth:3,
                             backgroundColor: "rgb(135,206,235,0.1)",
@@ -53,7 +56,7 @@ export default class TileHistoricGraph extends Component<IProps, IState> {
                             },
                         {
                             label: "Peer Group minimum",
-                            data: peergroup_min,
+                            data: peer_min,
                             fill: 2,
                             borderWidth:3,
                             backgroundColor: "rgb(135,206,235,0.1)",

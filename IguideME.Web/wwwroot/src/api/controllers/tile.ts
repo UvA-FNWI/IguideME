@@ -2,6 +2,7 @@ import Controller from "../controller";
 import { debug } from "../../config/config";
 import { Tile, TileEntry, TileEntrySubmission, TileGroup } from "../../models/app/Tile";
 import { MOCK_SUBMISSIONS } from "../../mocks/submissions";
+import { MOCK_GRADE_HISTORY } from "../../mocks/historicGrades";
 import { MOCK_LEARNING_OUTCOMES } from "../../mocks/learningOutcomes";
 import { MOCK_CANVAS_DISCUSSION } from "../../mocks/canvas/discussion";
 import { MOCK_TILES } from "../../mocks/tile/tile";
@@ -10,6 +11,7 @@ import { MOCK_TILE_ENTRIES } from "../../mocks/tile/tileEntry";
 import { delay } from "../../utils/mockRequest";
 import { LearningGoal, LearningOutcome } from "../../models/app/LearningGoal";
 import { CanvasDiscussion } from "../../models/canvas/Discussion";
+import { HistoricTileGrades } from "../../components/StudentDashboard/TileHistoricGraph/types";
 
 export default class TileController extends Controller {
 
@@ -53,11 +55,9 @@ export default class TileController extends Controller {
     ).then(response => response.data);
   }
 
-  static getHistory(userID: string): Promise<Map <number,number[][]>> {
+  static getHistory(userID: string): Promise<Map <number, HistoricTileGrades>> {
     if (debug()) {
-        // return Promise.resolve(MOCK_SUBMISSIONS.filter(x => {
-        //   return (x.userID === userID)
-        // })).then(x => x.flat());
+        return Promise.resolve(MOCK_GRADE_HISTORY);
     }
 
     return this.client.get(
