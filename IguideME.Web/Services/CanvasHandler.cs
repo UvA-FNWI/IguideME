@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 
 namespace IguideME.Web.Services
 {
-    public class CanvasTest
+    public class CanvasHandler
     {
         private readonly ILogger<SyncManager> _logger;
         readonly CanvasApiConnector _connector;
@@ -19,12 +19,13 @@ namespace IguideME.Web.Services
         public string AccessToken;
         private static readonly HttpClient Client = new HttpClient();
 
-        public CanvasTest(IConfiguration config, ILogger<SyncManager> logger)
+        public CanvasHandler(IConfiguration config, ILogger<SyncManager> logger)
         {
             _logger = logger;
             this.AccessToken = config["Canvas:AccessToken"];
             this.BaseUrl = config["Canvas:Url"];
             this._connector = new CanvasApiConnector(config["Canvas:Url"], config["Canvas:AccessToken"]);
+            _logger.LogInformation("creating canvas connection");
         }
 
         public void SendMessage(string userID, string subject, string body)
@@ -50,6 +51,7 @@ namespace IguideME.Web.Services
 
         public User GetUser(int courseID, string userID)
         {
+            _logger.LogInformation($"Trying to get user\ncourseID: {courseID}, userID: {userID}");
             List<Enrollment> users = _connector.FindCourseById(courseID).Enrollments;
             return users.First(x => x.UserID == userID).User;
         }
@@ -93,12 +95,17 @@ namespace IguideME.Web.Services
                 .Discussions.ToArray();
         }
 
-        public Assignment[] GetAssignments(int courseID)
+        /// <summary>
+        /// Get's all the non null assignemnts for a course from canvas.
+        /// </summary>
+        /// <param name="courseID">the id of the course the assignment are from.</param>
+        /// <returns></returns>
+        public IEnumerable<Assignment> GetAssignments(int courseID)
         {
             return _connector
                 .FindCourseById(courseID)
                 .Assignments
-                .OrderBy(a => a.Position).ToArray();
+                .OrderBy(a => a.Position).Where(assignment => assignment != null);
         }
 
         public Assignment[] GetAssignments(int courseID, params string[] titles)

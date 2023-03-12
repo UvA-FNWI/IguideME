@@ -20,11 +20,11 @@ namespace IguideME.Web.Services
     {
         private readonly ILogger<SyncManager> _logger;
         private readonly IComputationJobStatusService _computationJobStatus;
-        private readonly CanvasTest _canvasTest;
+        private readonly CanvasHandler _canvasTest;
 
         public CanvasSyncService(
             IComputationJobStatusService computationJobStatus,
-            CanvasTest canvasTest,
+            CanvasHandler canvasTest,
             ILogger<SyncManager> logger)
         {
             _logger = logger;
@@ -62,27 +62,27 @@ namespace IguideME.Web.Services
             var sw = new Stopwatch();
             sw.Start();
 
-            new UserWorker(courseID, hashCode, _canvasTest, _logger).Register();
+            new UserWorker(courseID, hashCode, _canvasTest, _logger).Start();
             await _computationJobStatus.UpdateJobProgressInformationAsync(
                 jobId, $"tasks.students", 0
             ).ConfigureAwait(false);
 
-            new QuizWorker(courseID, hashCode, _canvasTest, _logger).Register();
+            new QuizWorker(courseID, hashCode, _canvasTest, _logger).Start();
             await _computationJobStatus.UpdateJobProgressInformationAsync(
                 jobId, $"tasks.quizzes", 0
             ).ConfigureAwait(false);
 
-            new DiscussionWorker(courseID, hashCode, this._canvasTest, _logger).Load();
+            new DiscussionWorker(courseID, hashCode, this._canvasTest, _logger).Start();
             await _computationJobStatus.UpdateJobProgressInformationAsync(
                 jobId, $"tasks.discussions", 0
             ).ConfigureAwait(false);
 
-            new AssignmentWorker(courseID, hashCode, _canvasTest, _logger).Register();
+            new AssignmentWorker(courseID, hashCode, _canvasTest, _logger).Start();
             await _computationJobStatus.UpdateJobProgressInformationAsync(
                 jobId, $"tasks.assignments", 0
             ).ConfigureAwait(false);
 
-            new GradePredictorWorker(courseID, hashCode, _logger).MakePredictions();
+            new GradePredictorWorker(courseID, hashCode, _logger).Start();
             await _computationJobStatus.UpdateJobProgressInformationAsync(
                 jobId, $"tasks.grade-predictor", 0
             ).ConfigureAwait(false);
@@ -92,7 +92,7 @@ namespace IguideME.Web.Services
                 jobId, $"tasks.peer-groups", 0
             ).ConfigureAwait(false);
 
-            new NotificationsWorker(courseID, hashCode, _canvasTest, notifications_bool, _logger).Register();
+            new NotificationsWorker(courseID, hashCode, _canvasTest, notifications_bool, _logger).Start();
             await _computationJobStatus.UpdateJobProgressInformationAsync(
                 jobId, $"tasks.notifications", 0
             ).ConfigureAwait(false);

@@ -44,13 +44,19 @@ export default class GradeBar extends Component<IProps> {
     }
   }
 
-  click = (evt: any, element: any, data: any) => {
+  click = (evt: any, element: any, data: any, chartref: React.RefObject<HorizontalBar>) => {
 
     if (!element[0]) return;
     let tile = data.tiles[element[0]._index]
 
+
+    console.log("element", element);
+    console.log("data", data);
+    console.log("evt", evt);
+
+    // chartref.current;
+
     window.dispatchEvent(new CustomEvent('selectTile', { detail: {tile} }))
-    // TODO: fsr the chart does not like it when we go to another page like this.
 
   }
 
@@ -139,11 +145,14 @@ export default class GradeBar extends Component<IProps> {
   render(): React.ReactNode {
     const { tiles, tilesGradeSummary, peerGrades, discussions, learningOutcomes, student} = this.props;
     let data = this.createBarData(tiles, tilesGradeSummary, peerGrades, discussions, learningOutcomes, student)
+
+    const chartref = React.createRef<HorizontalBar>();
     return (
       <div>
-        <HorizontalBar height={300}
+        <HorizontalBar ref={chartref}
+                       height={300}
                        data={data}
-                       options={{...this.bar_options, onClick: (evt: any, e: any) => this.click(evt, e, data) }} />
+                       options={{...this.bar_options, onClick: (evt: any, e: any) => this.click(evt, e, data, chartref) }} />
       </div>
     );
   }

@@ -13,13 +13,13 @@ namespace IguideME.Web.Controllers
     public class DataController : Controller
     {
         private readonly ILogger<DataController> _logger;
-        private readonly CanvasTest canvasTest;
+        private readonly CanvasHandler canvasTest;
         private readonly IQueuedBackgroundService _queuedBackgroundService;
         private readonly IComputationJobStatusService _computationJobStatusService;
 
         public DataController(
             ILogger<DataController> logger,
-            CanvasTest canvasTest,
+            CanvasHandler canvasTest,
             IQueuedBackgroundService queuedBackgroundService,
             IComputationJobStatusService computationJobStatusService)
         {
