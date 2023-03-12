@@ -23,43 +23,43 @@ export default class TileHistoricGraph extends Component<IProps, IState> {
                 hello there
                 <Line
                 data={{
-                labels: dates,
-                datasets: [
-                    {
-                        label: "Your average",
-                        data: user_avg,
-                        fill: false,
-                        borderWidth:3,
-                        backgroundColor: "rgb(188,132,108)",
-                        borderColor:'rgb(188,132,108)',
-                        responsive:true
-                        },
-                    {
-                        label: "Peer Group average",
-                        data: peergroup_avg,
-                        fill: false,
-                        borderWidth:3,
-                        backgroundColor: "rgb(101,154,176)",
-                        borderColor:'rgb(101,154,176)',///68,93,118
-                        responsive:true
-                        },
-                    {
-                        label: "Peer Group maximum",
-                        data: peergroup_max,
-                        fill: 3,
-                        borderWidth:3,
-                        backgroundColor: "rgb(135,206,235,0.1)",
-                        borderColor:'rgb(135,206,235)',
-                        },
-                    {
-                        label: "Peer Group minimum",
-                        data: peergroup_min,
-                        fill: 2,
-                        borderWidth:3,
-                        backgroundColor: "rgb(135,206,235,0.1)",
-                        borderColor:'rgb(135,206,235)'
-                        }
-                    ],
+                    labels: dates,
+                    datasets: [
+                        {
+                            label: "Your average",
+                            data: user_avg,
+                            fill: false,
+                            borderWidth:3,
+                            backgroundColor: "rgb(188,132,108)",
+                            borderColor:'rgb(188,132,108)',
+                            responsive:true
+                            },
+                        {
+                            label: "Peer Group average",
+                            data: peergroup_avg,
+                            fill: false,
+                            borderWidth:3,
+                            backgroundColor: "rgb(101,154,176)",
+                            borderColor:'rgb(101,154,176)',///68,93,118
+                            responsive:true
+                            },
+                        {
+                            label: "Peer Group maximum",
+                            data: peergroup_max,
+                            fill: 3,
+                            borderWidth:3,
+                            backgroundColor: "rgb(135,206,235,0.1)",
+                            borderColor:'rgb(135,206,235)'
+                            },
+                        {
+                            label: "Peer Group minimum",
+                            data: peergroup_min,
+                            fill: 2,
+                            borderWidth:3,
+                            backgroundColor: "rgb(135,206,235,0.1)",
+                            borderColor:'rgb(135,206,235)'
+                            }
+                        ]
                     }}
                 />
             </div>
