@@ -9,6 +9,28 @@ export default class GradePrediction extends Component<{
   predictions: PredictedGrade[],
   tileEntries: TileEntry[]
 }> {
+  options = {
+    legend: {
+      display: true
+    },
+    scales: {
+      x: {
+        // id: 'x',
+        type: 'category'
+      },
+      y: {
+        // id: 'y',
+        type: 'linear',
+        beginAtZero: true,
+        min: 0,
+        max: 10,
+        position: "left"
+        // ticks: {
+        // }
+      }
+    }
+  }
+
   render(): React.ReactNode {
     const { predictions, tileEntries } = this.props;
     const tiles = store.getState().tiles;
@@ -34,80 +56,65 @@ export default class GradePrediction extends Component<{
       );
     }
 
-    const data = (canvas: any) => {
-      const ctx = canvas.getContext("2d")
-      const gradient1 = ctx.createLinearGradient(0,0,0,350);
-      gradient1.addColorStop(0, "#FFF");
-      gradient1.addColorStop(1, "rgb(90, 50, 255)");
+    const data = {
+      // const ctx = canvas.getContext("2d")
+      // const gradient1 = ctx.createLinearGradient(0,0,0,350);
+      // gradient1.addColorStop(0, "#FFF");
+      // gradient1.addColorStop(1, "rgb(90, 50, 255)");
 
-      const gradient2 = ctx.createLinearGradient(0,0,0,350);
-      gradient2.addColorStop(1, "#FFF");
-      gradient2.addColorStop(0, "rgb(90, 50, 255)");
+      // const gradient2 = ctx.createLinearGradient(0,0,0,350);
+      // gradient2.addColorStop(1, "#FFF");
+      // gradient2.addColorStop(0, "rgb(90, 50, 255)");
 
-      return {
+      // return {
         labels: predictions.map((pg) => pg.date),
         datasets: [
           {
             label: "Predicted grade",
-            type: "line",
+            // type: "line",
             backgroundColor: "rgb(90, 50, 255)",
             borderColor: "rgb(90, 50, 255)",
             hoverBorderColor: "rgb(90, 50, 255)",
             fill: false,
             tension: 0,
             data: predictions.map(sp => round(sp.grade)),
-            yAxisID: 'y',
-            xAxisID: 'x'
+            // yAxisID: 'y',
+            // xAxisID: 'x'
           },
           {
             label: "UpperConfidence",
-            type: "line",
-            backgroundColor: gradient1,
+            // type: "line",
+            // backgroundColor: gradient1,
             borderColor: "transparent",
             pointRadius: 0,
             fill: 0,
             tension: 0,
             data: predictions.map((sp, i) => sp.grade + errors[i + 3]),
-            yAxisID: 'y',
-            xAxisID: 'x'
+            // yAxisID: 'y',
+            // xAxisID: 'x'
           },
           {
             label: "LowerConfidence",
-            type: "line",
-            backgroundColor: gradient2,
+            // type: "line",
+            // backgroundColor: gradient2,
             borderColor: "transparent",
             pointRadius: 0,
             fill: 0,
             tension: 0,
             data: predictions.map((sp, i) => sp.grade - errors[i + 3]),
-            yAxisID: 'y',
-            xAxisID: 'x'
+            // yAxisID: 'y',
+            // xAxisID: 'x'
           }
         ]
-      }
+      // }
     };
 
     return (
       <div id={"gradePrediction"}>
         <h3>Your predicted grade is a <strong>{round(predictions[predictions.length - 1].grade)}</strong></h3>
 
-        <Bar options={{   legend: { display: false },
-                          scales: {
-                            xAxes: [{
-                              id: 'x',
-                              type: 'category'
-                            }],
-                            yAxes: [{
-                              id: 'y',
-                              type: 'linear',
-                              position: "left",
-                              ticks: {
-                                beginAtZero: true,
-                                min: 0,
-                                max: 10
-                              }
-                            }]
-                          }}}
+        <Bar 
+              // options={this.options}
               width={500}
               data={data} />
 

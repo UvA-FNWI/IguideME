@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 // import {createBarData, getBarOptions} from "../helpers";
-import {HorizontalBar} from "react-chartjs-2";
+import {Bar} from "react-chartjs-2";
 import {Tile} from "../../../models/app/Tile"
 import { CanvasDiscussion, discussionType } from "../../../models/canvas/Discussion";
 import { LearningOutcome } from "../../../models/app/LearningGoal";
@@ -8,17 +8,36 @@ import { PeerGrades, TilesGradeSummary } from "../types";
 import {Data} from "./types"
 import { IProps } from "./types";
 import { CanvasStudent } from "../../../models/canvas/Student";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+);  
 
 export default class GradeBar extends Component<IProps> {
 
   bar_options = {
+    indexAxis: 'y' as const,
     maintainAspectRatio: true,
     legend: {
       display: true
     },
     scales: {
-      xAxes: [{
-        gridLines : {
+      x: {
+        grid : {
           display : false
         },
         scaleLabel: {
@@ -29,8 +48,8 @@ export default class GradeBar extends Component<IProps> {
           display: false
         },
         stacked: false,
-      }],
-      yAxes: [{
+      },
+      y: {
         barPercentage: .95,
         categoryPercentage: .95,
         gridLines : {
@@ -40,14 +59,14 @@ export default class GradeBar extends Component<IProps> {
           display: false
         },
         stacked: false
-      }]
+      }
     }
   }
 
-  click = (evt: any, element: any, data: any, chartref: React.RefObject<HorizontalBar>) => {
+  click = (evt: any, element: any, data: any) => {
 
     if (!element[0]) return;
-    let tile = data.tiles[element[0]._index]
+    let tile = data.tiles[element[0].index]
 
 
     console.log("element", element);
@@ -146,13 +165,12 @@ export default class GradeBar extends Component<IProps> {
     const { tiles, tilesGradeSummary, peerGrades, discussions, learningOutcomes, student} = this.props;
     let data = this.createBarData(tiles, tilesGradeSummary, peerGrades, discussions, learningOutcomes, student)
 
-    const chartref = React.createRef<HorizontalBar>();
     return (
       <div>
-        <HorizontalBar ref={chartref}
+        <Bar
                        height={300}
                        data={data}
-                       options={{...this.bar_options, onClick: (evt: any, e: any) => this.click(evt, e, data, chartref) }} />
+                       options={{...this.bar_options, onClick: (evt: any, e: any) => this.click(evt, e, data) }} />
       </div>
     );
   }

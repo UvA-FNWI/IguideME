@@ -1,6 +1,9 @@
 import React, { Component } from "react";
 import { IProps, IState } from "./types";
 import { Line } from "react-chartjs-2";
+// import { Chart, PointElement } from "chart.js";
+// Chart.register(PointElement);
+import 'chart.js/auto'
 // import { borderRadius } from "react-select/src/theme";
 
 export default class TileHistoricGraph extends Component<IProps, IState> {
@@ -33,24 +36,25 @@ export default class TileHistoricGraph extends Component<IProps, IState> {
                             data: user_avg,
                             fill: false,
                             borderWidth:3,
+                            tension:0,
                             backgroundColor: "rgb(188,132,108)",
-                            borderColor:'rgb(188,132,108)',
-                            responsive:true
+                            borderColor:'rgb(188,132,108)'
                             },
                         {
                             label: "Peer Group average",
                             data: peer_avg,
                             fill: false,
                             borderWidth:3,
+                            tension:0,
                             backgroundColor: "rgb(101,154,176)",
-                            borderColor:'rgb(101,154,176)',///68,93,118
-                            responsive:true
+                            borderColor:'rgb(101,154,176)'///68,93,118
                             },
                         {
                             label: "Peer Group maximum",
                             data: peer_max,
                             fill: 3,
                             borderWidth:3,
+                            tension:0,
                             backgroundColor: "rgb(135,206,235,0.1)",
                             borderColor:'rgb(135,206,235)'
                             },
@@ -59,6 +63,7 @@ export default class TileHistoricGraph extends Component<IProps, IState> {
                             data: peer_min,
                             fill: 2,
                             borderWidth:3,
+                            tension:0,
                             backgroundColor: "rgb(135,206,235,0.1)",
                             borderColor:'rgb(135,206,235)'
                             }

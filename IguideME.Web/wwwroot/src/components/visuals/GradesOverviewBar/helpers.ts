@@ -69,20 +69,20 @@ export const getLineOptions = () => {
       display: false
     },
     scales: {
-      xAxes: [{
-        gridLines : {
+      x: {
+        grid : {
           display : false
         },
         ticks: {
           display: false
         }
-      }],
-      yAxes: [{
-        scaleLabel: {
+      },
+      y: {
+        title: {
           display: true,
-          labelString: 'Grade'
+          text: 'Grade'
         }
-      }]
+      }
     }
   }
 }
@@ -94,7 +94,7 @@ export const getBarOptions = (withLegend: boolean) => {
       display: false
     },
     scales: {
-      xAxes: [{
+      x: {
         gridLines : {
           display : false
         },
@@ -103,14 +103,14 @@ export const getBarOptions = (withLegend: boolean) => {
           labelString: 'Grade'
         },
         stacked: true,
-      }],
-      yAxes: [{
+      },
+      y: {
         scaleLabel: {
           display: withLegend,
           labelString: '# of students'
         },
         stacked: true
-      }]
+      }
     }
   }
 }

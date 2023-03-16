@@ -1,6 +1,6 @@
-import { ChartData } from "react-chartjs-2";
 import { TileEntry } from "../../../models/app/Tile";
 import {MergedData} from "./types";
+import { ChartData } from "chart.js";
 
 export const createScatterData = (mergedData: MergedData[]) => {
   return {
@@ -39,26 +39,22 @@ export const getScatterOptions = (entryOne: TileEntry, entryTwo: TileEntry, merg
       }
     },
     scales: {
-      yAxes: [{
-        scaleLabel: {
+      y: {
+        title: {
           display: true,
-          labelString: entryOne.title
+          text: entryOne.title
         },
-        ticks: {
-          suggestedMin: Math.min(...mergedData.map((p: any) => p.grade1)),
-          suggestedMax: Math.max(...mergedData.map((p: any) => p.grade1)),
-        }
-      }],
-      xAxes: [{
-        scaleLabel: {
+        suggestedMin: Math.min(...mergedData.map((p: any) => p.grade1)),
+        suggestedMax: Math.max(...mergedData.map((p: any) => p.grade1)),
+      },
+      x: {
+        title: {
           display: true,
-          labelString: entryTwo.title
+          text: entryTwo.title
         },
-        ticks: {
-          suggestedMin: Math.min(...mergedData.map((p: any) => p.grade2)),
-          suggestedMax: Math.max(...mergedData.map((p: any) => p.grade2)),
-        }
-      }]
+        suggestedMin: Math.min(...mergedData.map((p: any) => p.grade2)),
+        suggestedMax: Math.max(...mergedData.map((p: any) => p.grade2)),
+      }
     }
   }
 }

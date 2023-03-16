@@ -12,6 +12,14 @@ export default class EntriesList extends Component<{
   discussions: CanvasDiscussion[],
   tile: Tile
 }> {
+
+  barOptions = {
+    maintainAspectRatio: true, ///// THIS WASN'T HERE BEFORE
+    legend: { 
+      display: false 
+    }
+  }
+
   render(): React.ReactNode {
     const { tile, tileEntries, submissions } = this.props;
 
@@ -34,7 +42,7 @@ export default class EntriesList extends Component<{
       return (
         <div id={"tileEntriesGraph"} style={{minHeight: '60vh'}}>
           <div>
-            <Bar options={{ legend: { display: false }}}
+            <Bar  options={this.barOptions}
                   width={500}
                   data={data} />
           </div>
