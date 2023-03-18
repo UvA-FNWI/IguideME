@@ -146,7 +146,7 @@ class StudentDashboard extends Component<Props, IState> {
     let goals = (await Promise.all(p_goals)).flat();
 
     let goalGrade = await AppController.getGoalGrade(student.userID);
-    let historicGrades = await TileController.getHistory(student.userID);
+    let historicGrades = await TileController.getHistory(student.userID);    
 
     this.setState({
       discussions,
@@ -179,6 +179,9 @@ class StudentDashboard extends Component<Props, IState> {
       historicGrades
     } = this.state;
 
+    let mappedHistoricGrades = new Map(Object.entries(historicGrades));
+    // console.log(mappedHistoricGrades);
+
     const { tiles, tileGroups, dashboardColumns, tileEntries, student} = this.props;
 
     if (!loaded || !student) return (<Loading small={true} />);
@@ -188,6 +191,21 @@ class StudentDashboard extends Component<Props, IState> {
     }
 
     if (displayTile) {
+      
+      var tileHistory: HistoricTileGrades;
+      let currentTile = mappedHistoricGrades.get((displayTile as any).tile.id.toString());
+      if (currentTile != undefined)
+      {
+        tileHistory = {
+          dates: Object.values(currentTile)[0] as Array<string>,
+          user_avg: Object.values(currentTile)[1] as Array<number>,
+          peer_avg: Object.values(currentTile)[2] as Array<number>,
+          peer_max: Object.values(currentTile)[3] as Array<number>,
+          peer_min: Object.values(currentTile)[4] as Array<number> };
+      }
+      // console.log(tileHistory);
+
+
       return <TileDetail tile={(displayTile as any).tile}
                          tileEntries={tileEntries}
                          discussions={discussions}
@@ -195,7 +213,7 @@ class StudentDashboard extends Component<Props, IState> {
                          submissions={userSubmissions.get((displayTile as any).tile.id)!}
                          learningOutcomes={learningOutcomes}
                          student={student}
-                         historicGrades={historicGrades.get((displayTile as any).tile.id)}
+                         historicGrades={tileHistory!}
       />
     }
 

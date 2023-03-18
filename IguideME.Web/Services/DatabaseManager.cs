@@ -1381,13 +1381,13 @@ namespace IguideME.Web.Services
 
 
 
-        public Dictionary <int,List<float[]>> GetHistoricComparison(
+        public Dictionary <int,List<List<object>>> GetHistoricComparison(
             int courseID,
             string userID,
             string hash = null)
         {
             string activeHash = hash ?? this.GetCurrentHash(courseID);
-            if (activeHash == null) return new Dictionary<int, List<float[]>>();
+            if (activeHash == null) return new Dictionary<int, List<List<object>>>();
 
             string query1 = String.Format(
                 DatabaseQueries.QUERY_GRADE_COMPARISSON_HISTORY,
@@ -1396,37 +1396,61 @@ namespace IguideME.Web.Services
                 userID);
 
 
-            Dictionary<int, List<float[]>> comparisson_history = new();
+            Dictionary<int, List<List<object>>> comparisson_history = new();
 
             using(SQLiteDataReader r1 = Query(query1)) {
                 try
                 {
+                    // Initialize last elements
+                    float last_user_avg = -1;  //user
+                    float last_peer_avg = -1;  //avg
+                    float last_peer_max = -1;  //max
+                    float last_peer_min = -1;  //min
+
                     while (r1.Read())
                     {
-                        // Initialize an array with values to put inside list
-                            float[] entry = new float[4];
-                            entry[0] = r1.GetFloat(1);
-                            entry[1] = r1.GetFloat(2);
-                            entry[2] = r1.GetFloat(3);
-                            entry[3] = r1.GetFloat(4);
+                        // Initialize varaibles with the values to be put inside the lists
+                        int tile_id = r1.GetInt32(0);  //tile
+                        float user_avg = r1.GetFloat(1);  //user
+                        float peer_avg = r1.GetFloat(2);  //avg
+                        float peer_max = r1.GetFloat(3);  //max
+                        float peer_min = r1.GetFloat(4);  //min
+                        string label = r1.GetString(5); //sync_hash
 
-                        // If we have gone in a new tile, we create new pair
-                        if (!comparisson_history.ContainsKey(r1.GetInt32(0)))
-                        {
-                            // Use tile id as key and create new list to add the entry
-                            comparisson_history[r1.GetInt32(0)] = new List<float[]>();
-                            comparisson_history[r1.GetInt32(0)].Add(entry);
-                        }
-                        else if (comparisson_history[r1.GetInt32(0)].Last() != entry)
-                        {
-                            // If this entry is different than the last, we add it
-                            comparisson_history[r1.GetInt32(0)].Add(entry);
+                        // If this entry is different than the last, we add it
+                        if (last_user_avg != user_avg || last_peer_avg != peer_avg 
+                            || last_peer_max != peer_max || last_peer_min != peer_min) {
+
+                            // If we have gone in a new tile, we create new pair
+                            if (!comparisson_history.ContainsKey(tile_id)) {
+                                // Use tile id as key and create new list to add the values
+                                comparisson_history[tile_id] = new List<List<object>>();
+                                comparisson_history[tile_id].Add(new List<object>{label});
+                                comparisson_history[tile_id].Add(new List<object>{user_avg});
+                                comparisson_history[tile_id].Add(new List<object>{peer_avg});
+                                comparisson_history[tile_id].Add(new List<object>{peer_max});
+                                comparisson_history[tile_id].Add(new List<object>{peer_min});
+                            }
+                            else {
+                                comparisson_history[tile_id][0].Add(label);
+                                comparisson_history[tile_id][1].Add(user_avg);
+                                comparisson_history[tile_id][2].Add(peer_avg);
+                                comparisson_history[tile_id][3].Add(peer_max);
+                                comparisson_history[tile_id][4].Add(peer_min);
+                            }
+
+                            // Update last values
+                            last_user_avg = user_avg;
+                            last_peer_avg = peer_avg;
+                            last_peer_max = peer_max;
+                            last_peer_min = peer_min;
                         }
                     }
-                } catch (Exception e) {
-                        _logger.LogInformation(activeHash);
-                        PrintQueryError("GetHistoricComparison", 3, r1, e);
-                    }
+                } 
+                catch (Exception e) {
+                    _logger.LogInformation(activeHash);
+                    PrintQueryError("GetHistoricComparison", 3, r1, e);
+                }
             }
             return comparisson_history;
         }

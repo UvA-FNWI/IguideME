@@ -1223,10 +1223,11 @@ public static class DatabaseQueries
 
     public const string QUERY_GRADE_COMPARISSON_HISTORY =
         @"SELECT    `peer_group`.`tile_id`,
+                    avg(`tile_entry_submission`.`grade`),
                     `peer_group`.`avg_grade`,
-                    `peer_group`.`min_grade`,
                     `peer_group`.`max_grade`,
-                    avg(`tile_entry_submission`.`grade`)
+                    `peer_group`.`min_grade`,
+                    `peer_group`.`sync_hash`
         FROM        `peer_group`
         INNER JOIN  `tile_entry_submission`
             ON      `tile_entry_submission`.`sync_hash` = `peer_group`.`sync_hash`
