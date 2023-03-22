@@ -51,17 +51,17 @@ namespace IguideME.Web.Services.Workers
             return grade switch
             {
                 "A"  => 100,
-                "A-" => 94,
-                "B+" => 90,
-                "B"  => 87,
-                "B-" => 84,
-                "C+" => 80,
-                "C"  => 77,
-                "C-" => 74,
-                "D+" => 70,
-                "D"  => 67,
-                "D-" => 64,
-                "F"  => 61,
+                "A-" => 93,
+                "B+" => 89,
+                "B"  => 86,
+                "B-" => 83,
+                "C+" => 79,
+                "C"  => 76,
+                "C-" => 73,
+                "D+" => 69,
+                "D"  => 66,
+                "D-" => 63,
+                "F"  => 60,
                 _    => 0.00,
             };
         }
@@ -86,7 +86,8 @@ namespace IguideME.Web.Services.Workers
 
 				switch (assignment.GradingType) {
 					case GradingType.Points:
-						grade = (double.Parse(submission.Grade) - 1)/0.09;
+						// grade = (double.Parse(submission.Grade) - 1)/0.09; // should switch to this
+						grade = double.Parse(submission.Grade);
 						break;
 					case GradingType.Percentage:
 						grade = double.Parse(submission.Grade);

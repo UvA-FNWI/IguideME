@@ -17,7 +17,7 @@ namespace IguideME.Web.Services
         readonly CanvasApiConnector _connector;
         public string BaseUrl;
         public string AccessToken;
-        private static readonly HttpClient Client = new HttpClient();
+        private static readonly HttpClient Client = new();
 
         public CanvasHandler(IConfiguration config, ILogger<SyncManager> logger)
         {
@@ -37,39 +37,45 @@ namespace IguideME.Web.Services
                     Body = body,
                     Recipients = new string[1] { userID }
                 };
-                _logger.LogInformation("Created conversation " + conv + " " + conv.Recipients[0]);
+                _logger.LogInformation("Created conversation {Conversation} {Recipients}", conv, conv.Recipients[0]);
 
                 conv.Save();
             }
             catch (System.Net.WebException e) {
-                _logger.LogError(e.ToString());
-                _logger.LogError( ((System.Net.HttpWebResponse) e.Response).StatusDescription);
-                _logger.LogError(new System.IO.StreamReader(((System.Net.HttpWebResponse) e.Response).GetResponseStream()).ReadToEnd());
-                _logger.LogError( ((System.Net.HttpWebResponse) e.Response).ToString());
+                _logger.LogError("{Error}", e.ToString());
+                _logger.LogError("{Error}", ((System.Net.HttpWebResponse) e.Response).StatusDescription);
+                _logger.LogError("{Error}", new System.IO.StreamReader(((System.Net.HttpWebResponse) e.Response).GetResponseStream()).ReadToEnd());
+                _logger.LogError("{Error}", ((System.Net.HttpWebResponse) e.Response).ToString());
             }
         }
 
         public User GetUser(int courseID, string userID)
         {
-            _logger.LogInformation($"Trying to get user\ncourseID: {courseID}, userID: {userID}");
-            List<Enrollment> users = _connector.FindCourseById(courseID).Enrollments;
+            _logger.LogInformation("Trying to get user\ncourseID: {CourseID}, userID: {UserID}", courseID, userID);
+            Course course = _connector.FindCourseById(courseID);
+
+            _logger.LogInformation("Found course {Course} for user", course);
+            List<Enrollment> users = course.Enrollments;
+
+            _logger.LogInformation("Found users");
+
             return users.First(x => x.UserID == userID).User;
         }
 
-        public string GetLoginID(int courseID, string SISID) {
+        public string GetLoginID(int courseID, string sisID) {
             List<Enrollment> users = _connector.FindCourseById(courseID).Enrollments;
-            return users.First(x => x.User.SISUserID == SISID).User.LoginID;
+            return users.First(x => x.User.SISUserID == sisID).User.LoginID;
         }
 
         public User[] GetStudents(int courseID)
         {
-            _logger.LogInformation("Finding course by id, id = " + courseID);
+            _logger.LogInformation("Finding course by id, id = {CourseId}", courseID);
 
             Course course = _connector.FindCourseById(courseID);
-            _logger.LogInformation("Course = " + course);
+            _logger.LogInformation("Course = {Course}", course);
 
             User[] students = course.GetUsersByType(EnrollmentType.Student).ToArray();
-            _logger.LogInformation("Getting users " + students);
+            _logger.LogInformation("Getting users {Students}", students);
 
             return students;
         }
