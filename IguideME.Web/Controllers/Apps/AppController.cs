@@ -17,19 +17,19 @@ namespace IguideME.Web.Controllers
     public class AppController : DataController
     {
         private readonly ILogger<DataController> _logger;
-        private readonly CanvasHandler canvasTest;
+        private readonly CanvasHandler canvasHandler;
         private readonly IQueuedBackgroundService _queuedBackgroundService;
         private readonly IComputationJobStatusService _computationJobStatusService;
 
         public AppController(
             ILogger<DataController> logger,
-            CanvasHandler canvasTest,
+            CanvasHandler canvasHandler,
             IQueuedBackgroundService queuedBackgroundService,
             IComputationJobStatusService computationJobStatusService) : base(
-                logger, canvasTest, queuedBackgroundService, computationJobStatusService)
+                logger, canvasHandler, queuedBackgroundService, computationJobStatusService)
         {
             this._logger = logger;
-            this.canvasTest = canvasTest;
+            this.canvasHandler = canvasHandler;
 
             _queuedBackgroundService = queuedBackgroundService;
             _computationJobStatusService = computationJobStatusService;

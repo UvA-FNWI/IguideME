@@ -20,64 +20,62 @@ namespace IguideME.Web.Services
     {
         private readonly ILogger<SyncManager> _logger;
         private readonly IComputationJobStatusService _computationJobStatus;
-        private readonly CanvasHandler _canvasTest;
+        private readonly CanvasHandler _canvasHandler;
 
         public CanvasSyncService(
             IComputationJobStatusService computationJobStatus,
-            CanvasHandler canvasTest,
+            CanvasHandler canvasHandler,
             ILogger<SyncManager> logger)
         {
             _logger = logger;
             _computationJobStatus = computationJobStatus;
-            _canvasTest = canvasTest;
+            _canvasHandler = canvasHandler;
         }
 
         public async Task<JobResultModel> DoWorkAsync(string jobId, JobParametersModel work,
             CancellationToken cancellationToken)
         {
-            // TODO: what is result?
             JobResultModel result = new();
-            var courseID = work.CourseID;
+            int courseID = work.CourseID;
 
-            // TODO: check course dates
-            var notifications_bool = work.Notifications_bool && (DateTime.Now.DayOfWeek == DayOfWeek.Monday || DateTime.Now.DayOfWeek == DayOfWeek.Friday);
+            bool notifications_bool = work.Notifications_bool && (DateTime.Now.DayOfWeek == DayOfWeek.Monday || DateTime.Now.DayOfWeek == DayOfWeek.Friday);
 
-            _logger.LogInformation($"{DateTime.Now}: Starting sync of course {courseID}");
+            _logger.LogInformation("{Time}: Starting sync of course {CourseID}", DateTime.Now, courseID);
 
-            string characters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-            StringBuilder _result = new StringBuilder(10);
-            Random random = new Random();
-            for (int i = 0; i < 10; i++)
-            {
-                _result.Append(characters[random.Next(characters.Length)]);
-            }
-            string hashCode = _result.ToString().ToUpper();
+            // string characters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+            // StringBuilder _result = new(10);
+            // for (int i = 0; i < 10; i++)
+            // {
+            //     _result.Append(characters[new Random().Next(characters.Length)]);
+            // }
+            // string hashCode = _result.ToString().ToUpper();
+            string hashCode = DateTime.Now.ToString();
 
             DatabaseManager.Instance.CleanupSync(courseID);
 
             DatabaseManager.Instance.RegisterSync(courseID, hashCode);
-            _logger.LogInformation("Sync hash: " + hashCode);
-            _logger.LogInformation("Course: " + work.CourseID);
+            _logger.LogInformation("Sync hash: {Hash}", hashCode);
+            _logger.LogInformation("Course: {Course}", work.CourseID);
 
             var sw = new Stopwatch();
             sw.Start();
 
-            new UserWorker(courseID, hashCode, _canvasTest, _logger).Start();
+            new UserWorker(courseID, hashCode, _canvasHandler, _logger).Start();
             await _computationJobStatus.UpdateJobProgressInformationAsync(
                 jobId, $"tasks.students", 0
             ).ConfigureAwait(false);
 
-            new QuizWorker(courseID, hashCode, _canvasTest, _logger).Start();
+            new QuizWorker(courseID, hashCode, _canvasHandler, _logger).Start();
             await _computationJobStatus.UpdateJobProgressInformationAsync(
                 jobId, $"tasks.quizzes", 0
             ).ConfigureAwait(false);
 
-            new DiscussionWorker(courseID, hashCode, this._canvasTest, _logger).Start();
+            new DiscussionWorker(courseID, hashCode, this._canvasHandler, _logger).Start();
             await _computationJobStatus.UpdateJobProgressInformationAsync(
                 jobId, $"tasks.discussions", 0
             ).ConfigureAwait(false);
 
-            new AssignmentWorker(courseID, hashCode, _canvasTest, _logger).Start();
+            new AssignmentWorker(courseID, hashCode, _canvasHandler, _logger).Start();
             await _computationJobStatus.UpdateJobProgressInformationAsync(
                 jobId, $"tasks.assignments", 0
             ).ConfigureAwait(false);
@@ -92,7 +90,7 @@ namespace IguideME.Web.Services
                 jobId, $"tasks.peer-groups", 0
             ).ConfigureAwait(false);
 
-            new NotificationsWorker(courseID, hashCode, _canvasTest, notifications_bool, _logger).Start();
+            new NotificationsWorker(courseID, hashCode, _canvasHandler, notifications_bool, _logger).Start();
             await _computationJobStatus.UpdateJobProgressInformationAsync(
                 jobId, $"tasks.notifications", 0
             ).ConfigureAwait(false);

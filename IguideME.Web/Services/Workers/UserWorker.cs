@@ -56,7 +56,7 @@ namespace IguideME.Web.Services.Workers
                         this._hashCode
                     );
                 } catch (Exception e) {
-                    _logger.LogError($"{e} {e.StackTrace}");
+                    _logger.LogError("Error registering student: {Error} {StackTrace}", e, e.StackTrace);
                 }
             }
         }

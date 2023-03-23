@@ -15,7 +15,7 @@ namespace IguideME.Web.Services.Workers
     public class NotificationsWorker
     {
         readonly private ILogger<SyncManager> _logger;
-        readonly private CanvasHandler _canvasTest;
+        readonly private CanvasHandler _canvasHandler;
         readonly private int _courseID;
         readonly private string _hashCode;
 
@@ -40,7 +40,7 @@ namespace IguideME.Web.Services.Workers
             _logger = logger;
             this._courseID = courseID;
             this._hashCode = hashCode;
-            this._canvasTest = canvasHandler;
+            this._canvasHandler = canvasHandler;
             this._send_notifications = send_notifications;
         }
 
@@ -87,7 +87,7 @@ namespace IguideME.Web.Services.Workers
             if (!string.IsNullOrEmpty(body)) {
                 body = "You are using IguideME, please find your personal feedback below. Visit IguideME in your course for more detailed information.\n\n" + body;
                 _logger.LogInformation("Sending notification to {ID}: {Body}", student.UserID, body);
-                _canvasTest.SendMessage(student.UserID,
+                _canvasHandler.SendMessage(student.UserID,
                 "IGuideME",
                 body
                 );

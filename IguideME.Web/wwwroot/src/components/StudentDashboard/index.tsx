@@ -146,7 +146,7 @@ class StudentDashboard extends Component<Props, IState> {
     let goals = (await Promise.all(p_goals)).flat();
 
     let goalGrade = await AppController.getGoalGrade(student.userID);
-    let historicGrades = await TileController.getHistory(student.userID);    
+    let historicGrades = await TileController.getHistory(student.userID);
     console.log(historicGrades)
 
     this.setState({
@@ -192,10 +192,10 @@ class StudentDashboard extends Component<Props, IState> {
     }
 
     if (displayTile) {
-      
+
       var tileHistory: HistoricTileGrades;
       let currentTileHistory = mappedHistoricGrades.get((displayTile as any).tile.id.toString());
-      if (currentTileHistory != undefined)
+      if (currentTileHistory !== undefined)
       {
         tileHistory = {
           dates: Object.values(currentTileHistory)[0] as Array<string>,

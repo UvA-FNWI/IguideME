@@ -23,12 +23,11 @@ display_help () {
   echo "You can use the following assist commands:";
   echo "                                          ";
   echo "  ---frontend-----------------------------";
-  echo "  build-frontend-watch    build the frontend (watch for changes)";
-  echo "  build-frontend-prod     build the frontend for production";
+  echo "  frontend-watch          build the frontend (watch for changes)";
+  echo "  build-frontend          build the frontend for production";
   echo "                                          ";
   echo "  ---backend------------------------------";
-  echo "  build-backend-watch     build the backend (watch for changes)";
-  echo "  build-backend-prod      build the backend for production";
+  echo "  backend-watch 	      build the backend (watch for changes)";
   echo "                                          ";
   echo "  ---administrative-----------------------";
   echo "  kill-process            kill a process by name";

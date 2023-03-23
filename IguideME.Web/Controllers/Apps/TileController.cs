@@ -20,19 +20,19 @@ namespace IguideME.Web.Controllers
     public class TileController : DataController
     {
         private readonly ILogger<DataController> _logger;
-        private readonly CanvasHandler canvasTest;
+        private readonly CanvasHandler canvasHandler;
         private readonly IQueuedBackgroundService _queuedBackgroundService;
         private readonly IComputationJobStatusService _computationJobStatusService;
 
         public TileController(
             ILogger<DataController> logger,
-            CanvasHandler canvasTest,
+            CanvasHandler canvasHandler,
             IQueuedBackgroundService queuedBackgroundService,
             IComputationJobStatusService computationJobStatusService) : base(
-                logger, canvasTest, queuedBackgroundService, computationJobStatusService)
+                logger, canvasHandler, queuedBackgroundService, computationJobStatusService)
         {
             this._logger = logger;
-            this.canvasTest = canvasTest;
+            this.canvasHandler = canvasHandler;
 
             this._queuedBackgroundService = queuedBackgroundService;
             this._computationJobStatusService = computationJobStatusService;
@@ -656,10 +656,10 @@ namespace IguideME.Web.Controllers
 
             return user == null
                 ? BadRequest()
-                : (ActionResult)Json(
+                : Json(
                 DatabaseManager.Instance.GetHistoricComparison(
                     this.GetCourseID(), userID));
-                    
+
         }
 
         [Authorize]

@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import {Tile, TileEntry, TileEntrySubmission} from "../../../models/app/Tile";
 import BinaryGrades from "./BinaryGrades";
-import {Button} from "antd";
+import {Button, Col, Radio, Row} from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 import EntriesList from "./EntriesList";
 import GradePrediction from "./GradePrediction";
@@ -14,6 +14,11 @@ import { CanvasStudent } from "../../../models/canvas/Student";
 import AppController from "../../../api/controllers/app";
 import TileHistoricGraph from "../TileHistoricGraph"
 import { HistoricTileGrades } from "../TileHistoricGraph/types";
+import { AppstoreOutlined, BarChartOutlined } from "@ant-design/icons";
+
+
+export type ViewTypes = "grid" | "graph";
+
 
 export default class TileDetail extends Component<{
   tile: Tile,
@@ -24,7 +29,13 @@ export default class TileDetail extends Component<{
   learningOutcomes: LearningOutcome[],
   student: CanvasStudent,
   historicGrades: HistoricTileGrades | undefined
+}, {
+  viewType: ViewTypes;
 }> {
+
+  state = {
+    viewType: "grid" as ViewTypes
+  }
 
   content = () => {
     const { tile, submissions, tileEntries, predictions, discussions, learningOutcomes, student } = this.props;
@@ -78,6 +89,11 @@ export default class TileDetail extends Component<{
     }
   }
 
+  setTileView = (view: any) => {
+    AppController.trackAction(`Change tile view to ${view}`)
+    this.setState({ viewType: view })
+  }
+
   componentDidMount(): void {
     window.addEventListener("keydown", this.keyHandler.bind(this), false);
     AppController.trackAction(`Load tile: ${this.props.tile.title}`)
@@ -90,24 +106,45 @@ export default class TileDetail extends Component<{
   render(): React.ReactNode {
     const { tile } = this.props;
 
+    const { viewType } = this.state;
+
     return (
       <div style={{padding: 20}}>
-        <Button type={"ghost"}
-                icon={<ArrowLeftOutlined />}
-                onClick={() => {
-                  this.leave()
-                }}
-        >
-          Return to dashboard
-        </Button>
-
+        <Row justify={"space-between"}>
+          <Col span={3}>
+            <Button type={"ghost"}
+                    icon={<ArrowLeftOutlined />}
+                    onClick={() => {
+                      this.leave()
+                    }}
+                    >
+              Return to dashboard
+            </Button>
+          </Col>
+          <Col span={10} >
+            <div style={{float: "right"}}>
+              <Radio.Group value={viewType}
+                        buttonStyle="solid"
+                        onChange={e => this.setTileView(e.target.value)}
+                        >
+                <Radio.Button value="grid"><AppstoreOutlined /> Grid</Radio.Button>
+                <Radio.Button value="graph"><BarChartOutlined /> Graph</Radio.Button>
+              </Radio.Group>
+            </div>
+          </Col>
+        </Row>
 
         <h1 style={{margin: '10px 0'}}>{ tile.title }</h1>
-        { this.content() }
 
-        <TileHistoricGraph
-          historicGrades={this.props.historicGrades}
-          />
+        { viewType === "grid" ?
+
+          this.content() :
+
+          <TileHistoricGraph
+            historicGrades={this.props.historicGrades}
+            />
+        }
+
       </div>
     )
   }

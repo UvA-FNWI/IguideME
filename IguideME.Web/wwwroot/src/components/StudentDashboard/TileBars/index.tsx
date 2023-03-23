@@ -25,7 +25,7 @@ ChartJS.register(
   Title,
   Tooltip,
   Legend
-);  
+);
 
 export default class GradeBar extends Component<IProps> {
 

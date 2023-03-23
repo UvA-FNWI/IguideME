@@ -1187,7 +1187,7 @@ namespace IguideME.Web.Services
             if (activeHash == null)
                 return new System.Collections.Generic.Dictionary<int,List<float>>();
 
-            Dictionary<int,List<float>> grades = new System.Collections.Generic.Dictionary<int,List<float>>();
+            Dictionary<int,List<float>> grades = new();
 
             string query = String.Format(
                 DatabaseQueries.QUERY_USER_RESULTS2,
@@ -1200,15 +1200,12 @@ namespace IguideME.Web.Services
                     try {
                         // We save all the retrieved grades in a dictionary with
                         // the tile.id as key and a list of grades as value
-                        List<float> value = null;
-                        if (!grades.TryGetValue(r.GetInt32(0), out value))
+                        if (!grades.TryGetValue(r.GetInt32(0), out List<float> value))
                         {
                             grades[r.GetInt32(0)] = new List<float>();
                         }
                         grades[r.GetInt32(0)].Add(r.GetFloat(2));
-
                     } catch (Exception e) {
-                        _logger.LogInformation(activeHash);
                         PrintQueryError("GetUserPeerComparison2", 3, r, e);
                     }
                 }
@@ -1229,12 +1226,10 @@ namespace IguideME.Web.Services
                         if (!r2.IsDBNull(0))
                         {
                             int discID = r2.GetInt32(0);
-                            grades[discID] = new List<float>();
-                            grades[discID].Add((float)r2.GetInt32(1));
+                            grades[discID] = new List<float> { r2.GetInt32(1) };
                         }
 
                     } catch (Exception e) {
-                        _logger.LogInformation(activeHash);
                         PrintQueryError("GetUserGrades", 3, r2, e);
                     }
                 }
@@ -1252,10 +1247,10 @@ namespace IguideME.Web.Services
             string activeHash = hash ?? this.GetCurrentHash(courseID);
             if (activeHash == null)
                 return new PeerComparisonData[] {
-                    PeerComparisonData.FromGrades(0, new float[] { })
+                    PeerComparisonData.FromGrades(0, Array.Empty<float>())
                 };
 
-            List<PeerComparisonData> submissions = new List<PeerComparisonData>();
+            List<PeerComparisonData> submissions = new();
 
             // First we need to find the user's goal grade to find their peer-group
             int goalGrade = GetUserGoalGrade(courseID,loginID);
@@ -1269,16 +1264,15 @@ namespace IguideME.Web.Services
             using(SQLiteDataReader r = Query(query)) {
                 while (r.Read()) {
                     try {
-                        PeerComparisonData submission = new PeerComparisonData(
+                        PeerComparisonData submission = new(
                             r.GetInt32(0),
                             r.GetFloat(1),
                             r.GetFloat(2),
                             r.GetFloat(3)
                         );
-            submissions.Add(submission);
+                        submissions.Add(submission);
 
                     } catch (Exception e) {
-                        _logger.LogInformation(activeHash);
                         PrintQueryError("GetUserPeerComparison2", 3, r, e);
                     }
                 }
@@ -1418,7 +1412,7 @@ namespace IguideME.Web.Services
                         string label = r1.GetString(5); //sync_hash
 
                         // If this entry is different than the last, we add it
-                        if (last_user_avg != user_avg || last_peer_avg != peer_avg 
+                        if (last_user_avg != user_avg || last_peer_avg != peer_avg
                             || last_peer_max != peer_max || last_peer_min != peer_min) {
 
                             // If we have gone in a new tile, we create new pair
@@ -1446,9 +1440,8 @@ namespace IguideME.Web.Services
                             last_peer_min = peer_min;
                         }
                     }
-                } 
+                }
                 catch (Exception e) {
-                    _logger.LogInformation(activeHash);
                     PrintQueryError("GetHistoricComparison", 3, r1, e);
                 }
             }
@@ -2425,7 +2418,7 @@ namespace IguideME.Web.Services
                 data.CourseID, data.UserID, data.UserName.Replace("'", ""), data.Granted,
                 data.Granted == 0 ? ", `goal_grade` = '-1' " : ""
             ));
-            
+
         }
 
         public int GetConsent(int courseID, string userID)

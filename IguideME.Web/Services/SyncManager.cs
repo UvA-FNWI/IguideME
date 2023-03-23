@@ -11,7 +11,7 @@ namespace IguideME.Web.Services
     public class SyncManager : IHostedService, IDisposable
     {
         private int _executionCount = 0;
-        private readonly CanvasHandler _canvasTest;
+        private readonly CanvasHandler _canvasHandler;
         private readonly ILogger<SyncManager> _logger;
         private readonly IComputationJobStatusService _computationJobStatus;
         private readonly IQueuedBackgroundService _queuedBackgroundService;
@@ -23,10 +23,10 @@ namespace IguideME.Web.Services
             IComputationJobStatusService computationJobStatus,
             IQueuedBackgroundService queuedBackgroundService,
             IComputationJobStatusService computationJobStatusService,
-            CanvasHandler canvasTest)
+            CanvasHandler canvasHandler)
         {
             _logger = logger;
-            this._canvasTest = canvasTest;
+            this._canvasHandler = canvasHandler;
             this._computationJobStatus = computationJobStatus;
             this._queuedBackgroundService = queuedBackgroundService;
             this._computationJobStatusService = computationJobStatusService;
@@ -52,7 +52,7 @@ namespace IguideME.Web.Services
             {
                 new CanvasSyncService(
                     this._computationJobStatus,
-                    this._canvasTest,
+                    this._canvasHandler,
                     _logger
                 );
 
