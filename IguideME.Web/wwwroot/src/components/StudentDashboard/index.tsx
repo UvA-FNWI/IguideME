@@ -147,6 +147,7 @@ class StudentDashboard extends Component<Props, IState> {
 
     let goalGrade = await AppController.getGoalGrade(student.userID);
     let historicGrades = await TileController.getHistory(student.userID);    
+    console.log(historicGrades)
 
     this.setState({
       discussions,
@@ -193,15 +194,15 @@ class StudentDashboard extends Component<Props, IState> {
     if (displayTile) {
       
       var tileHistory: HistoricTileGrades;
-      let currentTile = mappedHistoricGrades.get((displayTile as any).tile.id.toString());
-      if (currentTile != undefined)
+      let currentTileHistory = mappedHistoricGrades.get((displayTile as any).tile.id.toString());
+      if (currentTileHistory != undefined)
       {
         tileHistory = {
-          dates: Object.values(currentTile)[0] as Array<string>,
-          user_avg: Object.values(currentTile)[1] as Array<number>,
-          peer_avg: Object.values(currentTile)[2] as Array<number>,
-          peer_max: Object.values(currentTile)[3] as Array<number>,
-          peer_min: Object.values(currentTile)[4] as Array<number> };
+          dates: Object.values(currentTileHistory)[0] as Array<string>,
+          user_avg: Object.values(currentTileHistory)[1] as Array<number>,
+          peer_avg: Object.values(currentTileHistory)[2] as Array<number>,
+          peer_max: Object.values(currentTileHistory)[3] as Array<number>,
+          peer_min: Object.values(currentTileHistory)[4] as Array<number> };
       }
       // console.log(tileHistory);
 

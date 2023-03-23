@@ -26,7 +26,6 @@ export default class TileHistoricGraph extends Component<IProps, IState> {
         return (
 
             <div>
-                hello there
                 <Line
                 data={{
                     labels: dates,
@@ -37,8 +36,8 @@ export default class TileHistoricGraph extends Component<IProps, IState> {
                             fill: false,
                             borderWidth:3,
                             tension:0,
-                            backgroundColor: "rgb(188,132,108)",
-                            borderColor:'rgb(188,132,108)'
+                            backgroundColor: "rgb(255, 50, 50, 0.5)",
+                            borderColor:'rgb(255,50,50, 0.5)'
                             },
                         {
                             label: "Peer Group average",
