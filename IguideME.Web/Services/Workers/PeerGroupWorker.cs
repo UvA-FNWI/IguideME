@@ -173,7 +173,7 @@ namespace IguideME.Web.Services.Workers
                         goalGradeClass,
                         peerGroup,
                         entry.Key,
-                        entry.Value.Average(),
+                        entry.Value.Sum() / peerGroup.Count(),
                         entry.Value.Min(),
                         entry.Value.Max(),
                         this._hashCode);

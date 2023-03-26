@@ -1186,6 +1186,7 @@ public static class DatabaseQueries
     public const string QUERY_USER_DISCUSSION_COUNTER =
         @"SELECT        `canvas_discussion`.`tile_id`,
                         SUM(`counter`)
+
         FROM(SELECT     `canvas_discussion_entry`.`discussion_id`
                 AS      `disc_id`,
             COUNT(*)
@@ -1204,7 +1205,22 @@ public static class DatabaseQueries
                 AS      `counter`
             FROM        `canvas_discussion_entry`
             WHERE       `course_id` = '{0}'
-            AND         `posted_by` ='{1}')
+            AND         `posted_by` ='{1}'
+            
+            UNION ALL
+
+            SELECT      `canvas_discussion`.`discussion_id`
+                AS      `disc_id`,
+            COUNT(*)
+                AS      `counter`
+            FROM        `canvas_discussion`
+            INNER JOIN  `canvas_users`
+                ON      `canvas_discussion`.`posted_by` = `canvas_users`.`name`
+            WHERE       `canvas_discussion`.`course_id` = '{0}'
+            AND         `canvas_users`.`user_id` ='{1}'
+            AND         `canvas_discussion`.`sync_hash` = '{2}'
+            AND         `canvas_users`.`sync_hash` = '{2}')
+
         LEFT JOIN       `canvas_discussion`
             ON          `disc_id` = `canvas_discussion`.`discussion_id`
         WHERE           `disc_id` IS NOT NULL
@@ -1231,12 +1247,14 @@ public static class DatabaseQueries
         FROM        `peer_group`
         INNER JOIN  `tile_entry_submission`
             ON      `tile_entry_submission`.`sync_hash` = `peer_group`.`sync_hash`
+        INNER JOIN  `tile_entry`
+            ON      `tile_entry_submission`.`entry_id` = `tile_entry`.`id` 
+            AND     `peer_group`.`tile_id` = `tile_entry`.`tile_id`      
         WHERE       `peer_group`.`course_id`='{0}'
         AND         `peer_group`.`goal_grade`='{1}'
         AND         `tile_entry_submission`.`user_id` = '{2}'
-        GROUP BY    `peer_group`.`id`
+        GROUP BY    `peer_group`.`tile_id`, `peer_group`.`sync_hash`
         ORDER BY    `peer_group`.`tile_id`;";
-
 
 
     public const string QUERY_USER_RESULTS =
