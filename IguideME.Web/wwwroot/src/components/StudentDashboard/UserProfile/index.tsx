@@ -95,7 +95,7 @@ class UserProfile extends Component<Props, IState> {
         <br />
         <div style={{textAlign: 'center'}}>
           <small>
-            IGuideME is a product by the University of Amsterdam.
+            IguideME is a product by the University of Amsterdam.
           </small>
         </div>
       </div>

@@ -9,7 +9,7 @@ import {standardConsent} from "../../components/settings/RequireConsent/ConsentE
 export default class AppController extends Controller {
 
   static getCourse(): Promise<Course> {
-    if (debug()) return delay({ course_name: "Testcourse IGuideME", require_consent: true, text: standardConsent });
+    if (debug()) return delay({ course_name: "Testcourse IguideME", require_consent: true, text: standardConsent });
 
     return this.client.get(
       `app/course`

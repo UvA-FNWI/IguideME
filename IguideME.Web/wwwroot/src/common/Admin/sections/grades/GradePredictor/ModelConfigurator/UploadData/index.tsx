@@ -78,7 +78,6 @@ export default class UploadData extends Component<IProps, IState> implements ISt
                 continue
             }
             let datesetName = filenameForFile(files[i])
-            // TODO: I don't think that the async is doing anything?
             let studentGrade = await this.readStudentGradesFromFile(files[i])
             gradesDatasets[datesetName] = studentGrade
         }
@@ -170,7 +169,7 @@ export default class UploadData extends Component<IProps, IState> implements ISt
                                 <p>Please provide this data through one .csv file per graded assignment (e.g. mini-test, quiz, etc.); The files must contain the following two columns: "studentID" and "grade". Furthermore, please take note of which file contains the final grades.</p>
                                 <p>You can select multiple files at once.</p>
 
-                                <Alert message="Student data is only ever kept on your local device, and never uploaded to IGuideME. Once the model is trained, all identifying information is erased." />
+                                <Alert message="Student data is only ever kept on your local device, and never uploaded to IuideME. Once the model is trained, all identifying information is erased." />
 
                             </Col>
                         </Row>

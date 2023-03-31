@@ -95,7 +95,7 @@ class AdminHeader extends Component<Props, IState> {
           <div id={"navbarContent"}>
             <div id={"brand"}>
               <Link to={'/'}>
-                <h1>IGuideME</h1>
+                <h1>IguideME</h1>
               </Link>
             </div>
 
