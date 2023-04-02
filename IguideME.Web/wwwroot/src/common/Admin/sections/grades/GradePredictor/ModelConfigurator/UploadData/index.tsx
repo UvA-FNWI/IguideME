@@ -82,7 +82,8 @@ export default class UploadData extends Component<IProps, IState> implements ISt
             gradesDatasets[datesetName] = studentGrade
         }
 
-        this.setState({ gradesDatasets })
+        // TODO: test if this actually works
+        this.setState({ gradesDatasets: {...this.state.gradesDatasets, ...gradesDatasets} })
 
         this.onGradesDatasetsLoaded()
     }

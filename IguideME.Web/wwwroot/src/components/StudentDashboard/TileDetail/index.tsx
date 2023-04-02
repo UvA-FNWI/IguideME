@@ -14,10 +14,10 @@ import { CanvasStudent } from "../../../models/canvas/Student";
 import AppController from "../../../api/controllers/app";
 import TileHistoricGraph from "../TileHistoricGraph"
 import { HistoricTileGrades } from "../TileHistoricGraph/types";
-import { AppstoreOutlined, BarChartOutlined } from "@ant-design/icons";
+import { SearchOutlined, HistoryOutlined } from "@ant-design/icons";
 
 
-export type ViewTypes = "grid" | "graph";
+export type ViewTypes = "grid" | "history";
 
 
 export default class TileDetail extends Component<{
@@ -127,8 +127,8 @@ export default class TileDetail extends Component<{
                         buttonStyle="solid"
                         onChange={e => this.setTileView(e.target.value)}
                         >
-                <Radio.Button value="grid"><AppstoreOutlined /> Grid</Radio.Button>
-                <Radio.Button value="graph"><BarChartOutlined /> Graph</Radio.Button>
+                <Radio.Button value="grid"><SearchOutlined /> Details</Radio.Button>
+                <Radio.Button value="history"><HistoryOutlined /> Progress</Radio.Button>
               </Radio.Group>
             </div>
           </Col>
