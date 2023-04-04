@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import {IProps, IState} from "./types";
-import {Table, Tooltip} from "antd";
+import {Col, Row, Table, Tooltip} from "antd";
 import { EllipsisOutlined } from "@ant-design/icons";
 import StudentController from "../../api/controllers/student";
 import {ConsentData} from "../../models/app/ConsentData";
@@ -30,6 +30,15 @@ export default class StudentConsentTable extends Component<IProps, IState> {
 
       return (
         <div id={"studentsConsentTable"} style={{position: 'relative', overflow: 'visible'}}>
+          <Row justify={"space-between"} align={"bottom"} style={{paddingBottom: '10px'}}>
+            <Col>
+              <h2>Consent & Goal Grades Overview</h2>
+            </Col>
+            <Col>
+              Consent Given: &ensp; {consents.filter((consent: ConsentData) => consent.granted !== 0).length}/{consents.length}
+            </Col>
+          </Row>
+
           <Table columns={this.getColumns()}
                  dataSource={this.getData(consents, goals)}
                  scroll={{ x: 900 }}

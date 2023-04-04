@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import {IProps, IState} from "./types";
 import TileController from "../../api/controllers/tile";
-import {Table} from "antd";
+import {Col, Row, Switch, Table} from "antd";
 import {getColumns, getData} from "./helpers";
 import StudentController from "../../api/controllers/student";
 import CanvasController from "../../api/controllers/canvas";
@@ -9,6 +9,7 @@ import CanvasController from "../../api/controllers/canvas";
 export default class StudentGradesTable extends Component<IProps, IState> {
 
   state = {
+    averaged: false,
     loaded: false,
     tiles: [],
     tileGroups: [],
@@ -42,11 +43,20 @@ export default class StudentGradesTable extends Component<IProps, IState> {
   }
 
   render(): React.ReactNode {
-    const { averaged } = this.props;
-    const { tiles, tileEntries, discussions, students, submissions } = this.state;
+    const { averaged, tiles, tileEntries, discussions, students, submissions } = this.state;
 
     return (
       <div id={"studentsGradeTable"} style={{position: 'relative', overflow: 'visible'}}>
+
+        <Row justify={"space-between"} align={"bottom"} style={{paddingBottom: '10px'}}>
+          <Col>
+              <h2>Grades Overview</h2>
+          </Col>
+          <Col  >
+              Averaged: &ensp; <Switch onClick={e => this.setState({ averaged: e })} checked={averaged} />
+          </Col>
+        </Row>
+
         <Table columns={getColumns(tiles, tileEntries, averaged)}
                dataSource={getData(students, tiles, tileEntries, submissions, discussions)}
                scroll={{ x: 900 }}
