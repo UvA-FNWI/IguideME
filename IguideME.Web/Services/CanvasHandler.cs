@@ -57,7 +57,14 @@ namespace IguideME.Web.Services
             _logger.LogInformation("Found course {Course} for user", course);
             List<Enrollment> users = course.Enrollments;
 
-            _logger.LogInformation("Found users");
+            _logger.LogInformation("Found enrolments:");
+            foreach (Enrollment e in users) {
+                _logger.LogInformation(" - {enrolment}", e);
+            }
+            _logger.LogInformation("Found users:");
+            foreach (Enrollment e in users) {
+                _logger.LogInformation(" - {user} {uid} {login}", e.User, e.UserID, e.User.LoginID);
+            }
 
             return users.First(x => x.UserID == userID).User;
         }
