@@ -25,5 +25,7 @@ export const syncStates = [
     id: SyncProvider.GRADE_PREDICTOR, title: "Grade Prediction", description: "Predict grade per student."
   }, {
     id: SyncProvider.PEER_GROUPS, title: "Peer Groups", description: "Assign student peer groups."
+  }, {
+    id: SyncProvider.NOTIFICATIONS, title: "Notifications", description: "Send performance notifications to the students."
   }
 ]

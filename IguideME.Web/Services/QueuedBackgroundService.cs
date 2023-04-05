@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace IguideME.Web.Services
 {
+    // Not strictly necessary since we only have 1 class but apparently good practice for DI and testing.
     public interface IQueuedBackgroundService
     {
         Task<JobCreatedModel> PostWorkItemAsync(JobParametersModel jobParameters);
@@ -43,7 +44,7 @@ namespace IguideME.Web.Services
         // Transient method via IQueuedBackgroundService
         public async Task<JobCreatedModel> PostWorkItemAsync(JobParametersModel jobParameters)
         {
-            var jobId = await _jobStatusService.CreateJobAsync(jobParameters).ConfigureAwait(false);
+            string jobId = await _jobStatusService.CreateJobAsync(jobParameters).ConfigureAwait(false);
             Queue.Enqueue(new JobQueueItem { JobId = jobId, JobParameters = jobParameters });
             Signal.Release(); // signal for background service to start working on the job
             return new JobCreatedModel { JobId = jobId, QueuePosition = Queue.Count };
@@ -52,6 +53,7 @@ namespace IguideME.Web.Services
         // Long running task via BackgroundService
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            _logger.LogInformation("Test if this method (ExecuteAsync) is used somehow");
             while (!stoppingToken.IsCancellationRequested)
             {
                 JobQueueItem jobQueueItem = null;
@@ -70,7 +72,7 @@ namespace IguideME.Web.Services
                             jobQueueItem.JobId, JobStatus.Processing).ConfigureAwait(false);
 
                         // the heavy lifting is done here...
-                        var result = await _workService.DoWorkAsync(
+                        JobResultModel result = await _workService.DoWorkAsync(
                             jobQueueItem.JobId, jobQueueItem.JobParameters,
                             stoppingToken).ConfigureAwait(false);
 
@@ -81,14 +83,14 @@ namespace IguideME.Web.Services
 				}
 				catch (TaskCanceledException ex)
 				{
-					_logger.LogError("Task canceled: " + ex.StackTrace );
+					_logger.LogError("Task canceled: {exception}", ex.StackTrace );
 					break;
 				}
 				catch (Exception ex)
 				{
 					try
 					{
-                        _logger.LogError($"Error caught, setting the job as errored: {ex.Message}, {ex.StackTrace}");
+                        _logger.LogError("Error caught, setting the job as errored: {message}, {trace}", ex.Message, ex.StackTrace);
 						// something went wrong. Put the job in to an errored state and continue on
 						// application will use latest successful state
 						await _jobStatusService.StoreJobResultAsync(jobQueueItem.JobId, new JobResultModel
@@ -98,7 +100,7 @@ namespace IguideME.Web.Services
 					}
 					catch (Exception e)
 					{
-						_logger.LogError(e.StackTrace);
+						_logger.LogError("Something went wrong while moving job to errored state: {error}", e.StackTrace);
 					}
 				}
 			}

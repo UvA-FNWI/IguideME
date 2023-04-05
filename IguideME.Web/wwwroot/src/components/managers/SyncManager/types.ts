@@ -1,7 +1,7 @@
 import moment from "moment";
 
 export interface IProps {
-  
+  prevsuccess: boolean,
 }
 
 export interface IState {

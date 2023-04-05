@@ -1,27 +1,36 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using IguideME.Web.Models.Service;
 using IguideME.Web.Services.Workers;
-using UvA.DataNose.Connectors.Canvas;
 using Microsoft.Extensions.Logging;
 
 namespace IguideME.Web.Services
 {
+    // Not strictly necessary since we only have 1 class but apparently good practice for DI and testing.
     public interface ICanvasSyncService
     {
         Task<JobResultModel> DoWorkAsync(string jobId, JobParametersModel work,
             CancellationToken cancellationToken);
     }
 
+    /// <summary>
+    /// Class <a>CanvasSyncService</a> implements ICanvasSyncService and is a service that manages syncs. .
+    /// </summary>
     public sealed class CanvasSyncService : ICanvasSyncService
     {
         private readonly ILogger<SyncManager> _logger;
         private readonly IComputationJobStatusService _computationJobStatus;
         private readonly CanvasHandler _canvasHandler;
 
+        /// <summary>
+        /// This constructor initializes the new CanvasSyncService to
+        /// (<paramref name="computationJobStatus"/>, <paramref name="canvasHandler"/>, <paramref name="logger"/>).
+        /// </summary>
+        /// <param name="computationJobStatus"></param>
+        /// <param name="canvasHandler"></param>
+        /// <param name="logger"></param>
         public CanvasSyncService(
             IComputationJobStatusService computationJobStatus,
             CanvasHandler canvasHandler,
@@ -32,6 +41,13 @@ namespace IguideME.Web.Services
             _canvasHandler = canvasHandler;
         }
 
+        /// <summary>
+        /// Performs the sync with camvas.
+        /// </summary>
+        /// <param name="jobId">The id of the job in storage.</param>
+        /// <param name="work">Data for the service.</param>
+        /// <param name="cancellationToken">Token used to cancel the sync.</param>
+        /// <returns>A task containging the result of the sync</returns>
         public async Task<JobResultModel> DoWorkAsync(string jobId, JobParametersModel work,
             CancellationToken cancellationToken)
         {
@@ -40,24 +56,23 @@ namespace IguideME.Web.Services
 
             bool notifications_bool = work.Notifications_bool && (DateTime.Now.DayOfWeek == DayOfWeek.Monday || DateTime.Now.DayOfWeek == DayOfWeek.Friday);
 
-            _logger.LogInformation("{Time}: Starting sync of course {CourseID}", DateTime.Now, courseID);
+            _logger.LogInformation("{Time}: Starting sync for course {CourseID}", DateTime.Now, courseID);
 
-            // string characters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-            // StringBuilder _result = new(10);
-            // for (int i = 0; i < 10; i++)
-            // {
-            //     _result.Append(characters[new Random().Next(characters.Length)]);
-            // }
-            // string hashCode = _result.ToString().ToUpper();
             string hashCode = DateTime.Now.ToString();
 
+            // Renew the connection with canvas.
+            _canvasHandler.CreateConnection();
+
+            // Don't keep ancient syncs in the database.
             DatabaseManager.Instance.CleanupSync(courseID);
 
+            // Register the new sync in the database.
             DatabaseManager.Instance.RegisterSync(courseID, hashCode);
             _logger.LogInformation("Sync hash: {Hash}", hashCode);
             _logger.LogInformation("Course: {Course}", work.CourseID);
 
-            var sw = new Stopwatch();
+            // Time how long the sync takes.
+            Stopwatch sw = new();
             sw.Start();
 
             new UserWorker(courseID, hashCode, _canvasHandler, _logger).Start();
@@ -70,7 +85,7 @@ namespace IguideME.Web.Services
                 jobId, $"tasks.quizzes", 0
             ).ConfigureAwait(false);
 
-            new DiscussionWorker(courseID, hashCode, this._canvasHandler, _logger).Start();
+            new DiscussionWorker(courseID, hashCode, _canvasHandler, _logger).Start();
             await _computationJobStatus.UpdateJobProgressInformationAsync(
                 jobId, $"tasks.discussions", 0
             ).ConfigureAwait(false);
@@ -95,7 +110,7 @@ namespace IguideME.Web.Services
                 jobId, $"tasks.notifications", 0
             ).ConfigureAwait(false);
 
-            _logger.LogInformation("Starting jobprogressinformation worker");
+            _logger.LogInformation("Finishing sync");
             await _computationJobStatus.UpdateJobProgressInformationAsync(
                 jobId, $"tasks.done", 0
             ).ConfigureAwait(false);

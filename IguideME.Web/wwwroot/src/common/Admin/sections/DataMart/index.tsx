@@ -70,7 +70,7 @@ export default class DataMart extends Component<IProps, IState> {
 
                     <Divider dense style={{ margin: '10px 0' }} />
 
-                    <SyncManager />
+                    <SyncManager prevsuccess={synchronizations && synchronizations[0] ? synchronizations[0].status === "COMPLETE" : false}/>
 
                     {loaded &&
                         <React.Fragment>

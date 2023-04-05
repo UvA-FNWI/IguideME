@@ -45,7 +45,7 @@ namespace IguideME.Web.Services.Workers
         /// Convert letter grading systems to our internal system of grades between 0 and 100.
         /// </summary>
         /// <param name="grade">the grade as a letter that should be converted.</param>
-        /// <returns></returns>
+        /// <returns>The grade as a percentage.</returns>
 		static private double LetterToGrade(string grade){
 
             return grade switch

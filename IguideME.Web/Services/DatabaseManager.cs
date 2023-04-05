@@ -1185,11 +1185,11 @@ namespace IguideME.Web.Services
         {
             string activeHash = hash ?? this.GetCurrentHash(courseID);
             if (activeHash == null)
-                return new System.Collections.Generic.Dictionary<int,List<float>>();
+                return new Dictionary<int, List<float>>();
 
             Dictionary<int,List<float>> grades = new();
 
-            string query = String.Format(
+            string query = string.Format(
                 DatabaseQueries.QUERY_USER_RESULTS2,
                 courseID,
                 userID,
