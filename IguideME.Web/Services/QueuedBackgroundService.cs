@@ -11,11 +11,22 @@ namespace IguideME.Web.Services
     // Not strictly necessary since we only have 1 class but apparently good practice for DI and testing.
     public interface IQueuedBackgroundService
     {
+        /// <summary>
+        /// Posts a job to the queue and returns a model containing the job ID and queue position.
+        /// </summary>
+        /// <param name="jobParameters">The parameters for the job.</param>
+        /// <returns>A <see cref="JobCreatedModel"/> containing the job ID and queue position.</returns>
         Task<JobCreatedModel> PostWorkItemAsync(JobParametersModel jobParameters);
     }
 
+    /// <summary>
+    /// A background service that processes queued jobs.
+    /// </summary>
     public sealed class QueuedBackgroundService : BackgroundService, IQueuedBackgroundService
     {
+        /// <summary>
+        /// Represents a job in the queue.
+        /// </summary>
         private sealed class JobQueueItem
         {
             public string JobId { get; set; }
@@ -28,9 +39,23 @@ namespace IguideME.Web.Services
 
 		private readonly IComputationJobStatusService _jobStatusService;
 
+        /// <summary>
+        /// The queue of jobs waiting to be processed.
+        /// </summary>
         private static readonly ConcurrentQueue<JobQueueItem> Queue = new();
+
+        /// <summary>
+        /// The signal used to indicate that there is work to be done.
+        /// </summary>
         private static readonly SemaphoreSlim Signal = new(0);
 
+        /// <summary>
+        /// Initializes the new <see cref="QueuedBackgroundService"/> to
+        /// (<paramref name="workService"/>, <paramref name="jobStatusService"/>, <paramref name="logger"/>).
+        /// </summary>
+        /// <param name="workService">The service used to perform the work for each job.</param>
+        /// <param name="jobStatusService">The service used to manage the status of computation jobs.</param>
+        /// <param name="logger">The logger used to log events for this service.</param>
 		public QueuedBackgroundService(
 			ICanvasSyncService workService,
 			IComputationJobStatusService jobStatusService,
@@ -41,7 +66,7 @@ namespace IguideME.Web.Services
 			_logger = logger;
 		}
 
-        // Transient method via IQueuedBackgroundService
+        /// <inheritdoc />
         public async Task<JobCreatedModel> PostWorkItemAsync(JobParametersModel jobParameters)
         {
             string jobId = await _jobStatusService.CreateJobAsync(jobParameters).ConfigureAwait(false);
@@ -50,7 +75,14 @@ namespace IguideME.Web.Services
             return new JobCreatedModel { JobId = jobId, QueuePosition = Queue.Count };
         }
 
-        // Long running task via BackgroundService
+        /// <summary>
+        /// Executes the job processing loop.
+        /// </summary>
+        /// <param name="stoppingToken">The token used to stop the service.</param>
+        /// <returns>A task representing the background job processing.</returns>
+        /// <remark>
+        /// Long running task via BackgroundService
+        /// </remark>
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             _logger.LogInformation("Test if this method (ExecuteAsync) is used somehow");

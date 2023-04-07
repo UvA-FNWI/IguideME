@@ -99,7 +99,7 @@ namespace IguideME.Web.Services
                 }
             } catch (Exception e) {
                 // Close connection before rethrowing
-                _logger.LogError(e.Message + e.StackTrace);
+                _logger.LogError("Exception encountered while creating query: {message}\n {trace}", e.Message, e.StackTrace);
                 connection.Close();
                 throw;
             }
@@ -112,14 +112,14 @@ namespace IguideME.Web.Services
                 for (int i = 0; i <= rows; i++)
                     error += $"{r.GetName(i)} {r.GetDataTypeName(i)} {r.GetValue(i)} {r.GetValue(i).GetType()}\n";
 
-                _logger.LogError( error + e.Message + e.StackTrace);
+                _logger.LogError("Error reading from the query: {error} \n\n {message} \n {trace}", error, e.Message, e.StackTrace);
             } catch (Exception ex) {
-                _logger.LogError($"{ex.Message} {ex.StackTrace}\n\nOriginal error:\n{e.Message} {e.StackTrace}");
+                _logger.LogError("Error in printquerryerror: {message} {trace}\n\nOriginal error:\n{original} {originaltrace}", ex.Message, ex.StackTrace, e.Message, e.StackTrace);
             }
         }
 
         public void LogTable(string name) {
-            _logger.LogInformation($"Logging table {name}");
+            _logger.LogInformation("Logging table {name}", name);
 
             string query = $"select * from `{name}`";
             string table = "";
@@ -138,7 +138,7 @@ namespace IguideME.Web.Services
                 }
             }
 
-            _logger.LogInformation(table);
+            _logger.LogInformation("contents:\n {table}", table);
 
         }
 
@@ -241,7 +241,7 @@ namespace IguideME.Web.Services
                     try {
                         hashes.Add(r.GetValue(0).ToString());
                     } catch (Exception e) {
-                        _logger.LogError($"Unable to get old sync: {r.GetValue(0)}\n" + e.Message + e.StackTrace);
+                        _logger.LogError("Unable to get old sync: {sync}\nError: {message}\n{trace}", r.GetValue(0), e.Message, e.StackTrace);
                     }
                 }
             }
@@ -298,7 +298,7 @@ namespace IguideME.Web.Services
                     )
                 );
             } catch (Exception e) {
-                _logger.LogError(e.ToString() + "\n" + e.StackTrace);
+                _logger.LogError("Error removing syncs: {message}\n{trace}", e.Message, e.StackTrace);
             }
         }
 
@@ -526,6 +526,27 @@ namespace IguideME.Web.Services
             return users;
         }
 
+        public string GetUserID(int courseID, int id) {
+            string hash = this.GetCurrentHash(courseID);
+            if (hash == null) return null;
+
+            string query = String.Format(
+                DatabaseQueries.QUERY_USER_ID,
+                courseID,
+                id,
+                hash);
+
+            string userid = null;
+            using (SQLiteDataReader r = Query(query)) {
+                if (r.Read())
+                {
+                    userid = r.GetValue(0).ToString();
+                }
+            }
+
+            return userid;
+        }
+
         public User GetUser(int courseID, string userID, string hash = null)
         {
             string activeHash = hash ?? this.GetCurrentHash(courseID);
@@ -707,7 +728,7 @@ namespace IguideME.Web.Services
                         grade
                     ));
             } catch (Exception e) {
-                _logger.LogError(e.Message + e.StackTrace);
+                _logger.LogError("Error storing predicted grade: {message}\n{trace}", e.Message, e.StackTrace);
             }
         }
 
@@ -810,7 +831,7 @@ namespace IguideME.Web.Services
 
         public void CreateUserPeer(
             int courseID,
-            int GoalGrade,
+            int goalGrade,
             List<string> userIDs,
             int tileID,
             float avgGrade,
@@ -823,7 +844,7 @@ namespace IguideME.Web.Services
                 String.Format(
                     DatabaseQueries.REGISTER_USER_PEER,
                     courseID,
-                    GoalGrade,
+                    goalGrade,
                     combinedIDs,
                     tileID,
                     avgGrade,
@@ -841,9 +862,9 @@ namespace IguideME.Web.Services
             string hash = null)
         {
             string activeHash = hash ?? this.GetCurrentHash(courseID);
-            if (activeHash == null) new List<String> { };
+            if (activeHash == null) return new List<string> { };
 
-            List<String> peers = new List<String>();
+            List<String> peers = new();
             string query = String.Format(
                 DatabaseQueries.QUERY_GROUP_PEERS,
                 courseID,
@@ -1418,12 +1439,14 @@ namespace IguideME.Web.Services
                             // If we have gone in a new tile, we create new pair
                             if (!comparisson_history.ContainsKey(tile_id)) {
                                 // Use tile id as key and create new list to add the values
-                                comparisson_history[tile_id] = new List<List<object>>();
-                                comparisson_history[tile_id].Add(new List<object>{label});
-                                comparisson_history[tile_id].Add(new List<object>{user_avg});
-                                comparisson_history[tile_id].Add(new List<object>{peer_avg});
-                                comparisson_history[tile_id].Add(new List<object>{peer_max});
-                                comparisson_history[tile_id].Add(new List<object>{peer_min});
+                                comparisson_history[tile_id] = new List<List<object>>
+                                {
+                                    new List<object> { label },
+                                    new List<object> { user_avg },
+                                    new List<object> { peer_avg },
+                                    new List<object> { peer_max },
+                                    new List<object> { peer_min }
+                                };
                             }
                             else {
                                 comparisson_history[tile_id][0].Add(label);
@@ -2139,24 +2162,20 @@ namespace IguideME.Web.Services
             string activeHash = hash ?? this.GetCurrentHash(course_id);
             if (activeHash == null) return new List<AppDiscussion>() { };
 
-            string query;
-            if (user_id == null) {
-                query = String.Format(
+            string query = user_id == null
+                ? String.Format(
                     DatabaseQueries.QUERY_DISCUSSION_ENTRIES,
                     course_id,
                     discussion_id,
                     activeHash
-                );
-            } else {
-                query = String.Format(
+                )
+                : String.Format(
                     DatabaseQueries.QUERY_DISCUSSION_ENTRIES_FOR_USER,
                     course_id,
                     discussion_id,
                     activeHash,
                     user_id
                 );
-            }
-
             List<AppDiscussion> entries = new();
             using(SQLiteDataReader r = Query(query)) {
                 while (r.Read()) {
@@ -2181,24 +2200,20 @@ namespace IguideME.Web.Services
             string activeHash = hash ?? this.GetCurrentHash(course_id);
             if (activeHash == null) return new List<AppDiscussion>() { };
 
-            string query;
-            if (user_id == null) {
-                query = String.Format(
+            string query = user_id == null
+                ? String.Format(
                     DatabaseQueries.QUERY_DISCUSSION_REPLIES,
                     course_id,
                     discussion_id,
                     activeHash
-                );
-            } else {
-                query = String.Format(
+                )
+                : String.Format(
                     DatabaseQueries.QUERY_DISCUSSION_REPLIES_FOR_USER,
                     course_id,
                     discussion_id,
                     activeHash,
                     user_id
                 );
-            }
-
             List<AppDiscussion> entries = new();
             using(SQLiteDataReader r = Query(query)) {
                 while (r.Read()) {

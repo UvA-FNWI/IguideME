@@ -2,40 +2,45 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Security.Claims;
 
 namespace IguideME.Web.Controllers
 {
     [Authorize]
-    [ApiControllerAttribute]
+    [ApiController]
     [Route("[controller]")]
     public class DataController : Controller
     {
         private readonly ILogger<DataController> _logger;
-        private readonly CanvasHandler canvasHandler;
-        private readonly IQueuedBackgroundService _queuedBackgroundService;
-        private readonly IComputationJobStatusService _computationJobStatusService;
+        private readonly CanvasHandler _canvasHandler;
 
         public DataController(
             ILogger<DataController> logger,
-            CanvasHandler canvasHandler,
-            IQueuedBackgroundService queuedBackgroundService,
-            IComputationJobStatusService computationJobStatusService)
+            CanvasHandler canvasHandler
+            )
         {
             this._logger = logger;
-            this.canvasHandler = canvasHandler;
+            this._canvasHandler = canvasHandler;
 
-            this._queuedBackgroundService = queuedBackgroundService;
-            this._computationJobStatusService = computationJobStatusService;
         }
 
         // -------------------- Helper functions --------------------
 
         protected string GetUserID()
         {
-            // returns the logged in user
-            return canvasHandler.GetUser(this.GetCourseID(), (User.Identity as ClaimsIdentity).FindFirst("userid").Value).LoginID;
+
+            if (int.TryParse((User.Identity as ClaimsIdentity).FindFirst("userid").Value, out int id)) {
+
+                string user = DatabaseManager.Instance.GetUserID(this.GetCourseID(), id);
+                if (user != null) {
+                    return user;
+                }
+
+            }
+
+            _logger.LogInformation("Could not find user {user} in database.", id);
+            // Try's to find the user in canvas.
+            return _canvasHandler.GetUser(this.GetCourseID(), (User.Identity as ClaimsIdentity).FindFirst("userid").Value).LoginID;
         }
 
         protected string GetUserName()

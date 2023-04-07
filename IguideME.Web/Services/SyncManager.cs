@@ -15,21 +15,18 @@ namespace IguideME.Web.Services
         private readonly ILogger<SyncManager> _logger;
         private readonly IComputationJobStatusService _computationJobStatus;
         private readonly IQueuedBackgroundService _queuedBackgroundService;
-        private readonly IComputationJobStatusService _computationJobStatusService;
         private Timer _timer;
 
         public SyncManager(
             ILogger<SyncManager> logger,
             IComputationJobStatusService computationJobStatus,
             IQueuedBackgroundService queuedBackgroundService,
-            IComputationJobStatusService computationJobStatusService,
             CanvasHandler canvasHandler)
         {
             _logger = logger;
             this._canvasHandler = canvasHandler;
             this._computationJobStatus = computationJobStatus;
             this._queuedBackgroundService = queuedBackgroundService;
-            this._computationJobStatusService = computationJobStatusService;
         }
 
         public Task StartAsync(CancellationToken stoppingToken)

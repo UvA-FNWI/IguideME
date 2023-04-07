@@ -21,7 +21,7 @@ namespace IguideME.Web.Controllers
     public class DataMartController : DataController
     {
         private readonly ILogger<DataController> _logger;
-        private readonly CanvasHandler canvasHandler;
+        private readonly CanvasHandler _canvasHandler;
         private readonly IQueuedBackgroundService _queuedBackgroundService;
         private readonly IComputationJobStatusService _computationJobStatusService;
 
@@ -30,10 +30,10 @@ namespace IguideME.Web.Controllers
             CanvasHandler canvasHandler,
             IQueuedBackgroundService queuedBackgroundService,
             IComputationJobStatusService computationJobStatusService) : base(
-                logger, canvasHandler, queuedBackgroundService, computationJobStatusService)
+                logger, canvasHandler)
         {
             this._logger = logger;
-            this.canvasHandler = canvasHandler;
+            this._canvasHandler = canvasHandler;
 
             this._queuedBackgroundService = queuedBackgroundService;
             this._computationJobStatusService = computationJobStatusService;
@@ -123,10 +123,9 @@ namespace IguideME.Web.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public ActionResult GetUserPredictions(string userID)
         {
-            if (!this.IsAdministrator() && "self" != userID && userID != GetUserID())
-                return Unauthorized();
-
-            return Json(
+            return !this.IsAdministrator() && "self" != userID && userID != GetUserID()
+                ? Unauthorized()
+                : Json(
                 DatabaseManager.Instance
                     .GetPredictedGrades(
                         GetCourseID(),
@@ -140,9 +139,9 @@ namespace IguideME.Web.Controllers
         [Route("/datamart/consent")]
         public JsonResult GetConsent()
         {
-            if (this.IsAdministrator()) return Json(1);
-
-            return Json(
+            return this.IsAdministrator()
+                ? Json(1)
+                : Json(
                 DatabaseManager.Instance.GetConsent(
                     GetCourseID(), GetUserID()));
         }
@@ -155,7 +154,7 @@ namespace IguideME.Web.Controllers
         public JsonResult PostConsent()
         {
             var body = new StreamReader(Request.Body).ReadToEnd();
-            ConsentData consent = new ConsentData(
+            ConsentData consent = new(
                 GetCourseID(),
                 GetUserID(),
                 GetUserName(),
@@ -320,10 +319,9 @@ namespace IguideME.Web.Controllers
         [Route("/datamart/notifications/{userID}")]
         public ActionResult GetNotifications(string userID)
         {
-            if (!this.IsAdministrator() && userID != GetUserID())
-                return Unauthorized();
-
-            return Json(
+            return !this.IsAdministrator() && userID != GetUserID()
+                ? Unauthorized()
+                : Json(
                 DatabaseManager.Instance.GetPendingNotifications(
                     GetCourseID(), userID)
             );
