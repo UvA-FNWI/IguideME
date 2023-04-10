@@ -220,8 +220,8 @@ class StudentDashboard extends Component<Props, IState> {
 
     return (
       <div id={"studentDashboard"}>
-        <Row>
-        <Col span={6}>
+        <Row justify={"space-between"}>
+        <Col>
 
         <Radio.Group value={viewType}
                      buttonStyle="solid"
@@ -231,7 +231,7 @@ class StudentDashboard extends Component<Props, IState> {
           <Radio.Button value="grid"><AppstoreOutlined /> Grid</Radio.Button>
         </Radio.Group>
         </Col>
-        <Col span={4} offset={14}>
+        <Col >
           <div style={{margin: 10}}>
               Goal Grade: { goalGrade }
           </div>
@@ -270,13 +270,7 @@ class StudentDashboard extends Component<Props, IState> {
             </div>
           </FadeIn>
           :
-          // <TileRadar tiles={tiles}
-          //            tileEntries={tileEntries}
-          //            student={student}
-          //            tilesGradeSummary={tilesGradeSummary}
-          //            peerGrades={peerGrades}
-          // />
-          <div style={{ padding: '0 8%'}}>
+          <Row justify={'center'}>
             <TileBars tiles={tiles}
                       tilesGradeSummary = {tilesGradeSummary}
                       peerGrades = {peerGrades}
@@ -284,7 +278,7 @@ class StudentDashboard extends Component<Props, IState> {
                       learningOutcomes={learningOutcomes}
                       student={student}
             />
-          </div>
+          </Row>
         }
       <br />
       <br />

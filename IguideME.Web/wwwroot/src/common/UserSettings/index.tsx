@@ -91,42 +91,42 @@ export default class UserSettings extends Component<IProps, IState> {
 
         return (
             <div>
-            <Row>
-            <Col span={6}>
-                <div style={{padding: 20}}>
+            <Row justify={"space-between"} align={"middle"}>
+                <Col >
+                    <div style={{padding: 20}}>
+                        <Button type={"ghost"}
+                            icon={<ArrowLeftOutlined />}
+                            onClick={() => this.checkLeave()}
+                            shape="circle"
+                        >
+                        </Button>
+                    </div>
+                </Col>
+                <Col >
+                    <div style={{padding: 20, textAlign: 'center'}}>
+                    <Tooltip key={`tooltip`}
+                            title={<span>Notifications are turned <strong>{ notifications ? "on" : "off"}</strong>.</span>}>
                     <Button type={"ghost"}
-                        icon={<ArrowLeftOutlined />}
-                        onClick={() => this.checkLeave()}
-                    >
-                    Return to dashboard
-                    </Button>
-                </div>
-            </Col>
-            <Col span={4} offset={14}>
-                <div style={{padding: 20, textAlign: 'center'}}>
-                <Tooltip key={`tooltip`}
-                         title={<span>Notifications are turned <strong>{ notifications ? "on" : "off"}</strong>.</span>}>
-                  <Button type={"ghost"}
-                          key={`toggleNotifications`}
-                          loading={updatingNotifications}
-                          size={'large'}
-                          shape="circle"
-                          icon={<BellTwoTone twoToneColor={notifications ? "rgb(0, 185, 120)" : "rgb(255, 110, 90)"} />}
-                          onClick={() => this.toggleNotifications()}
-                  />
-                </Tooltip>
-                </div>
-            </Col>
+                            key={`toggleNotifications`}
+                            loading={updatingNotifications}
+                            size={'large'}
+                            shape="circle"
+                            icon={<BellTwoTone twoToneColor={notifications ? "rgb(0, 185, 120)" : "rgb(255, 110, 90)"} />}
+                            onClick={() => this.toggleNotifications()}
+                    />
+                    </Tooltip>
+                    </div>
+                </Col>
             </Row>
-            <Row>
-            <Col span={24}>
-                <DesiredGrade/>
-            </Col>
+            <Row justify={"center"}>
+                <Col >
+                    <DesiredGrade/>
+                </Col>
             </Row>
-            <Row>
-            <Col span={24}>
-                <Consent text={this.props.consent}/>
-            </Col>
+            <Row justify={"center"}>
+                <Col >
+                    <Consent text={this.props.consent}/>
+                </Col>
             </Row>
             </div>
         )

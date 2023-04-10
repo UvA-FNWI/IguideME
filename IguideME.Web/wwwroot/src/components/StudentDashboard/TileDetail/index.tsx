@@ -111,17 +111,17 @@ export default class TileDetail extends Component<{
     return (
       <div style={{padding: 20}}>
         <Row justify={"space-between"}>
-          <Col span={3}>
+          <Col >
             <Button type={"ghost"}
                     icon={<ArrowLeftOutlined />}
                     onClick={() => {
                       this.leave()
                     }}
                     >
-              Return to dashboard
             </Button>
           </Col>
-          <Col span={10} >
+          { this.props.historicGrades &&
+          <Col >
             <div style={{float: "right"}}>
               <Radio.Group value={viewType}
                         buttonStyle="solid"
@@ -132,6 +132,7 @@ export default class TileDetail extends Component<{
               </Radio.Group>
             </div>
           </Col>
+          }
         </Row>
 
         <h1 style={{margin: '10px 0'}}>{ tile.title }</h1>

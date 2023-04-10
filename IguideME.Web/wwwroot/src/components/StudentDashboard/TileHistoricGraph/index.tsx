@@ -1,10 +1,7 @@
 import React, { Component } from "react";
 import { IProps, IState } from "./types";
 import { Line } from "react-chartjs-2";
-// import { Chart, PointElement } from "chart.js";
-// Chart.register(PointElement);
 import 'chart.js/auto'
-// import { borderRadius } from "react-select/src/theme";
 
 export default class TileHistoricGraph extends Component<IProps, IState> {
 
@@ -12,7 +9,7 @@ export default class TileHistoricGraph extends Component<IProps, IState> {
 
         // Don't show a graph if the tile doesn't have historic grades.
         if (this.props.historicGrades === undefined) {
-            return (<div></div>);
+            return (<></>);
         }
 
         const {

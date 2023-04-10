@@ -1,9 +1,10 @@
 import React, { Component } from "react";
 import {PredictedGrade} from "../../../../models/app/PredictiveModel";
-import {Bar} from "react-chartjs-2";
+import {Line} from "react-chartjs-2";
 import {TileEntry} from "../../../../models/app/Tile";
 import "./style.scss";
 import {store} from "../../../../utils/configureStore";
+import { ScriptableContext } from "chart.js";
 
 export default class GradePrediction extends Component<{
   predictions: PredictedGrade[],
@@ -15,18 +16,10 @@ export default class GradePrediction extends Component<{
     },
     scales: {
       x: {
-        // id: 'x',
-        type: 'category'
       },
       y: {
-        // id: 'y',
-        type: 'linear',
-        beginAtZero: true,
         min: 0,
         max: 10,
-        position: "left"
-        // ticks: {
-        // }
       }
     }
   }
@@ -57,53 +50,46 @@ export default class GradePrediction extends Component<{
     }
 
     const data = {
-      // const ctx = canvas.getContext("2d")
-      // const gradient1 = ctx.createLinearGradient(0,0,0,350);
-      // gradient1.addColorStop(0, "#FFF");
-      // gradient1.addColorStop(1, "rgb(90, 50, 255)");
-
-      // const gradient2 = ctx.createLinearGradient(0,0,0,350);
-      // gradient2.addColorStop(1, "#FFF");
-      // gradient2.addColorStop(0, "rgb(90, 50, 255)");
-
-      // return {
         labels: predictions.map((pg) => pg.date),
         datasets: [
           {
             label: "Predicted grade",
-            // type: "line",
             backgroundColor: "rgb(90, 50, 255)",
             borderColor: "rgb(90, 50, 255)",
             hoverBorderColor: "rgb(90, 50, 255)",
             fill: false,
             tension: 0,
             data: predictions.map(sp => round(sp.grade)),
-            // yAxisID: 'y',
-            // xAxisID: 'x'
           },
           {
             label: "UpperConfidence",
-            // type: "line",
-            // backgroundColor: gradient1,
+            backgroundColor: (context: ScriptableContext<"line">) => {
+              const ctx = context.chart.ctx;
+              const gradient = ctx.createLinearGradient(0,0,0,350);
+              gradient.addColorStop(0, "#FFF");
+              gradient.addColorStop(1, "rgb(90, 50, 255)");
+              return gradient;
+            },
             borderColor: "transparent",
             pointRadius: 0,
             fill: 0,
             tension: 0,
             data: predictions.map((sp, i) => sp.grade + errors[i + 3]),
-            // yAxisID: 'y',
-            // xAxisID: 'x'
           },
           {
             label: "LowerConfidence",
-            // type: "line",
-            // backgroundColor: gradient2,
+            backgroundColor: (context: ScriptableContext<"line">) => {
+              const ctx = context.chart.ctx;
+              const gradient = ctx.createLinearGradient(0,0,0,350);
+              gradient.addColorStop(1, "#FFF");
+              gradient.addColorStop(0, "rgb(90, 50, 255)");
+              return gradient;
+            },
             borderColor: "transparent",
             pointRadius: 0,
             fill: 0,
             tension: 0,
             data: predictions.map((sp, i) => sp.grade - errors[i + 3]),
-            // yAxisID: 'y',
-            // xAxisID: 'x'
           }
         ]
       // }
@@ -113,8 +99,8 @@ export default class GradePrediction extends Component<{
       <div id={"gradePrediction"}>
         <h3>Your predicted grade is a <strong>{round(predictions[predictions.length - 1].grade)}</strong></h3>
 
-        <Bar 
-              // options={this.options}
+        <Line
+              options={this.options}
               width={500}
               data={data} />
 
