@@ -73,7 +73,7 @@ export default class QuizzesTutorial extends Component<{ open: boolean, setOpen:
 
           <Col xs={24}>
             <h2>We're done!</h2>
-            <p>That's it, students should now be able to take the quiz and IGuideME is able to extract the rewarded points per student.</p>
+            <p>That's it, students should now be able to take the quiz and IguideME is able to extract the rewarded points per student.</p>
           </Col>
         </Row>
       </Modal>

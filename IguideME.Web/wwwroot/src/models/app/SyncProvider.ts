@@ -7,6 +7,7 @@ export enum SyncProvider {
   'SUBMISSIONS' = 'tasks.submissions',
   'GRADE_PREDICTOR' = 'tasks.grade-predictor',
   'PEER_GROUPS' = 'tasks.peer-groups',
+  'NOTIFICATIONS' = 'tasks.notifications',
   'DONE' = 'tasks.done'
 }
 

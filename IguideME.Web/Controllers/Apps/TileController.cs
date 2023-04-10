@@ -20,22 +20,15 @@ namespace IguideME.Web.Controllers
     public class TileController : DataController
     {
         private readonly ILogger<DataController> _logger;
-        private readonly CanvasHandler canvasHandler;
-        private readonly IQueuedBackgroundService _queuedBackgroundService;
-        private readonly IComputationJobStatusService _computationJobStatusService;
+        private readonly CanvasHandler _canvasHandler;
 
         public TileController(
             ILogger<DataController> logger,
-            CanvasHandler canvasHandler,
-            IQueuedBackgroundService queuedBackgroundService,
-            IComputationJobStatusService computationJobStatusService) : base(
-                logger, canvasHandler, queuedBackgroundService, computationJobStatusService)
+            CanvasHandler canvasHandler) : base(
+                logger, canvasHandler)
         {
             this._logger = logger;
-            this.canvasHandler = canvasHandler;
-
-            this._queuedBackgroundService = queuedBackgroundService;
-            this._computationJobStatusService = computationJobStatusService;
+            this._canvasHandler = canvasHandler;
         }
 
 
@@ -115,7 +108,7 @@ namespace IguideME.Web.Controllers
         public ActionResult DeleteTileGroup(string groupID)
         {
             // Removes a tile group
-            bool success = Int32.TryParse(groupID, out int id);
+            bool success = int.TryParse(groupID, out int id);
 
             if (success)
             {
@@ -145,13 +138,13 @@ namespace IguideME.Web.Controllers
         [Route("/tiles/{tileID}/goals")]
         public ActionResult GetTileGoals(string tileID)
         {
-            bool success = Int32.TryParse(tileID, out int id);
+            bool success = int.TryParse(tileID, out int id);
 
             return success
                 ? Json(
                     DatabaseManager.Instance.GetGoals(GetCourseID(), id)
                 )
-                : (ActionResult)BadRequest();
+                : BadRequest();
         }
 
         [Authorize(Policy = "IsInstructor")]
@@ -161,13 +154,13 @@ namespace IguideME.Web.Controllers
         [Route("/tiles/goals")]
         public ActionResult CreateTileGoal([FromBody] LearningGoal goal)
         {
-            LearningGoal _goal = DatabaseManager.Instance.CreateGoal(
+            LearningGoal stored_goal = DatabaseManager.Instance.CreateGoal(
                 GetCourseID(), goal.TileID, goal.Title);
 
             foreach (GoalRequirement requirement in goal.Requirements)
             {
                 DatabaseManager.Instance.CreateGoalRequirement(
-                    _goal.ID,
+                    stored_goal.ID,
                     requirement.TileID,
                     requirement.EntryID,
                     requirement.MetaKey,
@@ -176,8 +169,8 @@ namespace IguideME.Web.Controllers
             }
 
             // load newly registered requirements into object
-            _goal.FetchRequirements();
-            return Json(_goal);
+            stored_goal.FetchRequirements();
+            return Json(stored_goal);
         }
 
         [Authorize(Policy = "IsInstructor")]
@@ -228,7 +221,7 @@ namespace IguideME.Web.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public ActionResult DeleteTileGoal(string goalID)
         {
-            bool success = Int32.TryParse(goalID, out int id);
+            bool success = int.TryParse(goalID, out int id);
             _logger.LogInformation("deleting goal");
 
             if (success)
@@ -259,13 +252,13 @@ namespace IguideME.Web.Controllers
         [Route("/tiles/entries/{entryID}/meta-keys")]
         public ActionResult GetTileEntryMetaKeys(string entryID)
         {
-            bool success = Int32.TryParse(entryID, out int id);
+            bool success = int.TryParse(entryID, out int id);
 
             return success
                 ? Json(
                     DatabaseManager.Instance
                         .GetEntryMetaKeys(id).ToArray())
-                : (ActionResult)BadRequest();
+                : BadRequest();
         }
 
         [Authorize]
@@ -276,13 +269,13 @@ namespace IguideME.Web.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public ActionResult GetTile(string tileID)
         {
-            bool success = Int32.TryParse(tileID, out int id);
+            bool success = int.TryParse(tileID, out int id);
 
             return success
                 ? Json(
                     DatabaseManager.Instance
                     .GetTile(GetCourseID(), id))
-                : (ActionResult)BadRequest();
+                : BadRequest();
         }
 
         [Authorize]
@@ -293,13 +286,13 @@ namespace IguideME.Web.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public ActionResult GetTileEntries(string tileID)
         {
-            bool success = Int32.TryParse(tileID, out int id);
+            bool success = int.TryParse(tileID, out int id);
 
             return success
                 ? Json(
                     DatabaseManager.Instance
                     .GetTileEntries(id).ToArray())
-                : (ActionResult)BadRequest();
+                : BadRequest();
         }
 
         //  TODO: refactor to own class
@@ -335,7 +328,7 @@ namespace IguideME.Web.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public ActionResult PatchTile(string tileID, [FromBody] JSONRequest obj)
         {
-            bool success = Int32.TryParse(tileID, out int id);
+            bool success = int.TryParse(tileID, out int id);
             if (success)
             {
                 Tile tile = DatabaseManager.Instance.GetTile(GetCourseID(), id);
@@ -344,7 +337,7 @@ namespace IguideME.Web.Controllers
                     tile.GroupID = (int) obj.GroupID;
 
                 if (obj.Title != null)
-                    tile.Title = (string) obj.Title;
+                    tile.Title = obj.Title;
 
                 if (obj.Notifications != null)
                     tile.Notifications = (bool) obj.Notifications;
@@ -378,7 +371,7 @@ namespace IguideME.Web.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public ActionResult DeleteTile(string tileID)
         {
-            bool success = Int32.TryParse(tileID, out int id);
+            bool success = int.TryParse(tileID, out int id);
 
             if (success)
             {
@@ -402,13 +395,13 @@ namespace IguideME.Web.Controllers
                 !this.IsAdministrator())
                 return Unauthorized();
 
-            bool success = Int32.TryParse(tileID, out int id);
+            bool success = int.TryParse(tileID, out int id);
 
             return success
                 ? Json(
                     DatabaseManager.Instance.GetTileSubmissionsForUser(
                         this.GetCourseID(), id, userID))
-                : (ActionResult)BadRequest();
+                : BadRequest();
         }
 
         [Authorize]
@@ -423,13 +416,13 @@ namespace IguideME.Web.Controllers
             if (!this.IsAdministrator())
                 return Unauthorized();
 
-            bool success = Int32.TryParse(tileID, out int id);
+            bool success = int.TryParse(tileID, out int id);
 
             return success
                 ? Json(
                     DatabaseManager.Instance.GetTileSubmissions(
                         this.GetCourseID(), id))
-                : (ActionResult)BadRequest();
+                : BadRequest();
         }
 
         [Authorize]
@@ -447,10 +440,10 @@ namespace IguideME.Web.Controllers
                 (DatabaseManager.Instance.GetConsent(course_id, userID) != 1))
                 return Unauthorized();
 
-            bool success = Int32.TryParse(tileID, out int id);
+            bool success = int.TryParse(tileID, out int id);
 
             if (!success) {
-                return (ActionResult)BadRequest();
+                return BadRequest();
             }
 
             User user = DatabaseManager.Instance.GetUser(course_id, userID);
@@ -480,7 +473,7 @@ namespace IguideME.Web.Controllers
                 !this.IsAdministrator())
                 return Unauthorized();
 
-            bool success = Int32.TryParse(tileID, out int id);
+            bool success = int.TryParse(tileID, out int id);
 
             if (success)
             {
@@ -561,7 +554,7 @@ namespace IguideME.Web.Controllers
         public ActionResult DeleteEntry(string entryID)
         {
 
-            bool success = Int32.TryParse(entryID, out int id);
+            bool success = int.TryParse(entryID, out int id);
 
             if (success)
             {
@@ -580,7 +573,7 @@ namespace IguideME.Web.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public ActionResult UploadTileData(string entryID, JArray input)
         {
-            bool success = Int32.TryParse(entryID, out int id);
+            bool success = int.TryParse(entryID, out int id);
             int courseID = this.GetCourseID();
 
             if (!success) return BadRequest();
@@ -617,16 +610,16 @@ namespace IguideME.Web.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public ActionResult GetEntrySubmissions(string entryID, string userID)
+        public ActionResult GetEntrySubmissions(string entryID)
         {
             // TODO: check userID?
-            bool success = Int32.TryParse(entryID, out int entry_id);
+            bool success = int.TryParse(entryID, out int entry_id);
 
             return success
                 ? Json(
                     DatabaseManager.Instance.GetTileEntrySubmissions(
                         this.GetCourseID(), entry_id))
-                : (ActionResult)BadRequest();
+                : BadRequest();
         }
 
         [Authorize]
@@ -639,7 +632,7 @@ namespace IguideME.Web.Controllers
             // Only instructors may view submissions of other students
             return this.GetUserID() != userID && !this.IsAdministrator()
                 ? Unauthorized()
-                : (ActionResult)Json(
+                : Json(
                 DatabaseManager.Instance.GetTileSubmissionsForUser(
                     this.GetCourseID(), userID));
         }
@@ -678,7 +671,7 @@ namespace IguideME.Web.Controllers
 
             return user == null
                 ? BadRequest()
-                : (ActionResult)Json(
+                : Json(
                 DatabaseManager.Instance.GetUserPeerComparison(
                 GetCourseID(), user.UserID));
         }
@@ -699,7 +692,7 @@ namespace IguideME.Web.Controllers
 
             return user == null
                 ? BadRequest()
-                : (ActionResult)Json(
+                : Json(
                 DatabaseManager.Instance.GetUserResults(
                     GetCourseID(), user.UserID));
         }
@@ -739,17 +732,16 @@ namespace IguideME.Web.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public ActionResult UpdateLayoutColumn(string columnID, [FromBody] LayoutColumn layoutColumn)
         {
-            bool success = Int32.TryParse(columnID, out int id);
+            bool success = int.TryParse(columnID, out int id);
 
-            if (success)
-                return Json(
+            return success
+                ? Json(
                     DatabaseManager.Instance.UpdateLayoutColumn(
                         GetCourseID(),
                         id,
                         layoutColumn.ContainerSize,
-                        layoutColumn.Position));
-
-            return BadRequest();
+                        layoutColumn.Position))
+                : BadRequest();
         }
 
         [Authorize(Policy = "IsInstructor")]
@@ -759,7 +751,7 @@ namespace IguideME.Web.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public ActionResult DeleteLayoutColumn(string columnID)
         {
-            bool success = Int32.TryParse(columnID, out int id);
+            bool success = int.TryParse(columnID, out int id);
 
             if (success)
             {
@@ -777,17 +769,17 @@ namespace IguideME.Web.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public ActionResult UpdateTileGroup(string groupID, [FromBody] LayoutTileGroup tileGroup)
         {
-            bool success = Int32.TryParse(groupID, out int id);
+            bool success = int.TryParse(groupID, out int id);
 
-            if (success)
-                return Json(
+            return success
+                ? Json(
                     DatabaseManager.Instance.UpdateTileGroup(
                         GetCourseID(),
                         id,
                         tileGroup.ColumnID,
                         tileGroup.Title,
-                        tileGroup.Position));
-            else return BadRequest();
+                        tileGroup.Position))
+                : BadRequest();
         }
     }
 }

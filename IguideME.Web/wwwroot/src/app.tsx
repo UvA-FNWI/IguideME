@@ -51,7 +51,7 @@ type PropsFromRedux = ConnectedProps<typeof connector>;
 
 type Props = PropsFromRedux;
 
-class IGuideME extends React.Component<Props> {
+class IguideME extends React.Component<Props> {
 
     componentDidMount(): void {
         const { tiles, tileEntries, tileGroups, user, course, predictions, dashboardColumns } = this.props as any;
@@ -94,4 +94,4 @@ class IGuideME extends React.Component<Props> {
     }
 }
 
-export default connector(IGuideME);
+export default connector(IguideME);

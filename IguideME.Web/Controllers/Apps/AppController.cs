@@ -17,22 +17,16 @@ namespace IguideME.Web.Controllers
     public class AppController : DataController
     {
         private readonly ILogger<DataController> _logger;
-        private readonly CanvasHandler canvasHandler;
-        private readonly IQueuedBackgroundService _queuedBackgroundService;
-        private readonly IComputationJobStatusService _computationJobStatusService;
+        private readonly CanvasHandler _canvasHandler;
 
         public AppController(
             ILogger<DataController> logger,
-            CanvasHandler canvasHandler,
-            IQueuedBackgroundService queuedBackgroundService,
-            IComputationJobStatusService computationJobStatusService) : base(
-                logger, canvasHandler, queuedBackgroundService, computationJobStatusService)
+            CanvasHandler canvasHandler) : base(
+                logger, canvasHandler)
         {
             this._logger = logger;
-            this.canvasHandler = canvasHandler;
+            this._canvasHandler = canvasHandler;
 
-            _queuedBackgroundService = queuedBackgroundService;
-            _computationJobStatusService = computationJobStatusService;
         }
 
         [Authorize(Policy = "IsInstructor")]
@@ -165,9 +159,7 @@ namespace IguideME.Web.Controllers
                 .GetPeerGroup(GetCourseID());
 
             // Check if consent exists
-            if (peerGroup == null) return NotFound();
-
-            return Json(peerGroup);
+            return peerGroup != null ? Json(peerGroup) : NotFound();
         }
 
         [Authorize(Policy = "IsInstructor")]

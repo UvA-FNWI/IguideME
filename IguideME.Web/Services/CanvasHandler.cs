@@ -1,180 +1,159 @@
-﻿using IguideME.Web.Models;
-using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
+﻿using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
-using System.Text.Json;
 using UvA.DataNose.Connectors.Canvas;
 using Microsoft.Extensions.Logging;
 
 namespace IguideME.Web.Services
 {
+    /// <summary>
+    /// Class <a>CanvasHandler</a> models a singelton service that handles the communication with Canvas LMS..
+    /// </summary>
     public class CanvasHandler
     {
         private readonly ILogger<SyncManager> _logger;
-        readonly CanvasApiConnector _connector;
+        public CanvasApiConnector Connector;
         public string BaseUrl;
         public string AccessToken;
-        private static readonly HttpClient Client = new HttpClient();
 
+        /// <summary>
+        /// This constructor initializes the new CanvasHandler to
+        /// (<paramref name="config"/>, <paramref name="logger"/>).
+        /// </summary>
+        /// <param name="config">The configuration for the instance.</param>
+        /// <param name="logger">A reference to the logger used for this service.</param>
         public CanvasHandler(IConfiguration config, ILogger<SyncManager> logger)
         {
             _logger = logger;
             this.AccessToken = config["Canvas:AccessToken"];
             this.BaseUrl = config["Canvas:Url"];
-            this._connector = new CanvasApiConnector(config["Canvas:Url"], config["Canvas:AccessToken"]);
-            _logger.LogInformation("creating canvas connection");
+            this.CreateConnection();
         }
 
+        /// <summary>
+        /// Creates or renews a connection with canvas. We always initialize and keep one because we communicate with canvas outside of syncs as well.
+        /// </summary>
+        public void CreateConnection() {
+            this.Connector = new CanvasApiConnector(this.BaseUrl, this.AccessToken);
+        }
+
+        /// <summary>
+        /// Sends a message to a user.
+        /// </summary>
+        /// <param name="userID">The id of the user to send the message to.</param>
+        /// <param name="subject">The subject of the conversation.</param>
+        /// <param name="body">The message to be send.</param>
         public void SendMessage(string userID, string subject, string body)
         {
             try {
-                Conversation conv = new(this._connector)
+                Conversation conv = new(this.Connector)
                 {
                     Subject = subject,
                     Body = body,
                     Recipients = new string[1] { userID }
                 };
-                _logger.LogInformation("Created conversation " + conv + " " + conv.Recipients[0]);
+                _logger.LogInformation("Created conversation {title} for {recipients}", conv, conv.Recipients[0]);
 
                 conv.Save();
             }
             catch (System.Net.WebException e) {
-                _logger.LogError(e.ToString());
-                _logger.LogError( ((System.Net.HttpWebResponse) e.Response).StatusDescription);
-                _logger.LogError(new System.IO.StreamReader(((System.Net.HttpWebResponse) e.Response).GetResponseStream()).ReadToEnd());
-                _logger.LogError( ((System.Net.HttpWebResponse) e.Response).ToString());
+                _logger.LogError("Error sending message: {error}", e);
+                _logger.LogError("Status description: {status}", ((System.Net.HttpWebResponse) e.Response).StatusDescription);
+                _logger.LogError("Response: {response}", new System.IO.StreamReader(((System.Net.HttpWebResponse) e.Response).GetResponseStream()).ReadToEnd());
             }
         }
 
+        /// <summary>
+        /// Get a user for a course.
+        /// </summary>
+        /// <param name="courseID">The course to get the user from.</param>
+        /// <param name="userID">The id of the user.</param>
+        /// <returns>The requested user if found.</returns>
         public User GetUser(int courseID, string userID)
         {
-            _logger.LogInformation($"Trying to get user\ncourseID: {courseID}, userID: {userID}");
-            List<Enrollment> users = _connector.FindCourseById(courseID).Enrollments;
+            _logger.LogInformation("Trying to get user\ncourseID: {courseID}, userID: {userID}", courseID, userID);
+            List<Enrollment> users = Connector.FindCourseById(courseID).Enrollments;
             return users.First(x => x.UserID == userID).User;
         }
 
-        public string GetLoginID(int courseID, string SISID) {
-            List<Enrollment> users = _connector.FindCourseById(courseID).Enrollments;
-            return users.First(x => x.User.SISUserID == SISID).User.LoginID;
+        /// <summary>
+        /// Translate the sisID to the loginID. We use the latter throughout IguideME.
+        /// </summary>
+        /// <param name="courseID">The course the student is a part of.</param>
+        /// <param name="sisID">The sisID of the user.</param>
+        /// <returns>The loginID of the user.</returns>
+        public string TranslateSISToLoginID(int courseID, string sisID) {
+            List<Enrollment> users = Connector.FindCourseById(courseID).Enrollments;
+            return users.First(x => x.User.SISUserID == sisID).User.LoginID;
         }
 
+// TODO: change many of these arrays to Enumerables.
+
+        /// <summary>
+        /// Get all the users with the student role for a course.
+        /// </summary>
+        /// <param name="courseID">The id of the course.</param>
+        /// <returns>A list of students for the course.</returns>
         public User[] GetStudents(int courseID)
         {
-            _logger.LogInformation("Finding course by id, id = " + courseID);
+            _logger.LogInformation("Finding course by id, id = {ID}", courseID);
 
-            Course course = _connector.FindCourseById(courseID);
-            _logger.LogInformation("Course = " + course);
+            Course course = Connector.FindCourseById(courseID);
+            _logger.LogInformation("Course = {course}", course);
 
             User[] students = course.GetUsersByType(EnrollmentType.Student).ToArray();
-            _logger.LogInformation("Getting users " + students);
+            _logger.LogInformation("Getting users {students}", students);
 
             return students;
         }
 
+        /// <summary>
+        /// Get all the users with the admin role for a course.
+        /// </summary>
+        /// <param name="courseID">The id of the course.</param>
+        /// <returns>A list of administrators for the course.</returns>
         public User[] GetAdministrators(int courseID)
         {
-            return _connector.FindCourseById(courseID).GetUsersByType(EnrollmentType.Teacher).ToArray();
-        }
-
-        public Assignment[] GetCanvasAssignments(int courseID)
-        {
-            return _connector
-                .FindCourseById(courseID)
-                .Assignments
-                .OrderBy(a => a.Position).ToArray();
-        }
-
-
-        public Discussion[] GetCanvasDiscussions(int courseID)
-        {
-            return _connector
-                .FindCourseById(courseID)
-                .Discussions.ToArray();
+            return Connector.FindCourseById(courseID).GetUsersByType(EnrollmentType.Teacher).ToArray();
         }
 
         /// <summary>
-        /// Get's all the non null assignemnts for a course from canvas.
+        /// Gets all the non null assignemnts for a course from canvas.
         /// </summary>
-        /// <param name="courseID">the id of the course the assignment are from.</param>
-        /// <returns></returns>
+        /// <param name="courseID">The id of the course the assignments are from.</param>
+        /// <returns>An iterable with assignments for the course.</returns>
         public IEnumerable<Assignment> GetAssignments(int courseID)
         {
-            return _connector
+            return Connector
                 .FindCourseById(courseID)
                 .Assignments
-                .OrderBy(a => a.Position).Where(assignment => assignment != null);
+                .Where(assignment => assignment != null)
+                .OrderBy(a => a.Position);
         }
 
-        public Assignment[] GetAssignments(int courseID, params string[] titles)
-        {
-            return _connector
-                .FindCourseById(courseID)
-                .Assignments.Where(a => titles.Contains(a.Name.ToLower()))
-                .OrderBy(a => a.Position).ToArray();
-        }
-
-        public Submission[] GetSubmissions(int courseID, int userID)
-        {
-            IEnumerable<string> whitelist = DatabaseManager.Instance.GetGrantedConsents(courseID).Select(x => x.UserID);
-
-            // Returns all submissions of type 'on_paper' for a specified user.
-            Submission[] submissions = _connector
-                .FindCourseById(courseID)
-                .Assignments.Where(a => a.SubmissionTypes.ToList().Contains(SubmissionType.OnPaper))
-                .Select(a => a.Submissions.Where(s => s.UserID == userID.ToString()))
-                .SelectMany(i => i).Where(x => whitelist.Contains(x.UserID)).ToArray();
-
-            return submissions;
-        }
-
-        public float[] GetAllSubmissionGrades(int courseID)
-        {
-            float[] grades = _connector
-                .FindCourseById(courseID)
-                .Assignments
-                .Select(a => a.Submissions).SelectMany(i => i)
-                .Where(x => x.Grade != null)
-                .Select(x => float.Parse(x.Grade)).ToArray();
-
-            return grades;
-        }
-
+        /// <summary>
+        /// Gets all the quizzes for a course.
+        /// </summary>
+        /// <param name="courseID">The id of the course the quizzes are from.</param>
+        /// <returns>A list of quizzes.</returns>
         public List<Quiz> GetQuizzes(int courseID)
         {
-            return _connector
+            return Connector
                 .FindCourseById(courseID)
                 .Quizzes;
         }
 
+        /// <summary>
+        /// Gets all the Discussions for a course.
+        /// </summary>
+        /// <param name="courseID">The id of the course the quizzes are from.</param>
+        /// <returns>A list of discussions.</returns>
         public List<Discussion> GetDiscussions(int courseID)
         {
-            return _connector
+            return Connector
                 .FindCourseById(courseID)
                 .Discussions;
-        }
-
-        public Submission[] GetAssignmentSubmissions(int courseID, string userID, string name)
-        {
-            Assignment assignment = _connector
-                .FindCourseById(courseID)
-                .Assignments.Find(a => a.Name == name);
-
-            IEnumerable<Submission> userSubmissions = userID != null ?
-                assignment.Submissions.Where(x => x.User.LoginID == userID) :
-                assignment.Submissions;
-
-            IEnumerable<Submission> submissions = _connector
-                .FindCourseById(courseID)
-                .Assignments
-                .Where(a => a.Name == name)
-                .Select(x => userSubmissions.Where(
-                    y => y.AssignmentID == x.ID
-                )).SelectMany(i => i);
-
-            return submissions.ToArray();
         }
     }
 }

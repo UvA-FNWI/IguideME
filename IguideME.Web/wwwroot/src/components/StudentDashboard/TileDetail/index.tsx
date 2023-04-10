@@ -14,10 +14,10 @@ import { CanvasStudent } from "../../../models/canvas/Student";
 import AppController from "../../../api/controllers/app";
 import TileHistoricGraph from "../TileHistoricGraph"
 import { HistoricTileGrades } from "../TileHistoricGraph/types";
-import { AppstoreOutlined, BarChartOutlined } from "@ant-design/icons";
+import { SearchOutlined, HistoryOutlined } from "@ant-design/icons";
 
 
-export type ViewTypes = "grid" | "graph";
+export type ViewTypes = "grid" | "history";
 
 
 export default class TileDetail extends Component<{
@@ -111,27 +111,28 @@ export default class TileDetail extends Component<{
     return (
       <div style={{padding: 20}}>
         <Row justify={"space-between"}>
-          <Col span={3}>
+          <Col >
             <Button type={"ghost"}
                     icon={<ArrowLeftOutlined />}
                     onClick={() => {
                       this.leave()
                     }}
                     >
-              Return to dashboard
             </Button>
           </Col>
-          <Col span={10} >
+          { this.props.historicGrades &&
+          <Col >
             <div style={{float: "right"}}>
               <Radio.Group value={viewType}
                         buttonStyle="solid"
                         onChange={e => this.setTileView(e.target.value)}
                         >
-                <Radio.Button value="grid"><AppstoreOutlined /> Grid</Radio.Button>
-                <Radio.Button value="graph"><BarChartOutlined /> Graph</Radio.Button>
+                <Radio.Button value="grid"><SearchOutlined /> Details</Radio.Button>
+                <Radio.Button value="history"><HistoryOutlined /> Progress</Radio.Button>
               </Radio.Group>
             </div>
           </Col>
+          }
         </Row>
 
         <h1 style={{margin: '10px 0'}}>{ tile.title }</h1>

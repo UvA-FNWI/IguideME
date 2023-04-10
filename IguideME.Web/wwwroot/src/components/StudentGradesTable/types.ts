@@ -3,10 +3,10 @@ import { CanvasDiscussion } from "../../models/canvas/Discussion";
 import {CanvasStudent} from "../../models/canvas/Student";
 
 export interface IProps {
-  averaged: boolean;
 }
 
 export interface IState {
+  averaged: boolean;
   loaded: boolean;
   tiles: Tile[];
   tileGroups: TileGroup[];

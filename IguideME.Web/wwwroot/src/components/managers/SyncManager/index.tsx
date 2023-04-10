@@ -35,6 +35,12 @@ export default class SyncManager extends Component<IProps, IState> {
         const { currentTask } = this.state;
         const idx = syncStates.findIndex(ss => ss.id === task);
         const currentIdx = syncStates.findIndex(ss => ss.id === currentTask);
+        console.log("state:", this.state )
+        console.log("task:", task )
+
+        if (this.props.prevsuccess && this.state.start === undefined) {
+            return { color: 'success', text: "Completed" }
+        }
 
         if (idx < currentIdx) {
             return { color: 'success', text: "Completed" }
@@ -59,7 +65,6 @@ export default class SyncManager extends Component<IProps, IState> {
     pollSync = () => {
         // start interval updating the admin's UI every second
         this.interval = setInterval(async () => {
-            //export const MOCK_DATAMART_STATUS = MOCK_DATAMART_STATUS_BUSY;
             await DataMartController.getStatus().then(data => {
                 const keys = Object.keys(data);
                 const current = keys.find(k => data[k].progressInformation !== SyncProvider.DONE);
@@ -99,9 +104,9 @@ export default class SyncManager extends Component<IProps, IState> {
                     {datamartError &&
                         <Alert type='error' outlined style={{ marginTop: 20 }}>
                             Failed to reach datamart. Try again later!
-          </Alert>
-                    }
+                        </Alert>}
                 </Col>
+
                 <Col xs={24} md={12} lg={15}>
                     <Card elevation={1} style={{ padding: 10, backgroundColor: 'rgb(246, 248, 250)' }}>
                         <Row gutter={[10, 10]}>

@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import {Button, Checkbox, message} from "antd";
+import {Button, Checkbox, Row, message} from "antd";
 import ConsentController from "../../api/controllers/consent";
 import {store} from "../../utils/configureStore";
 
@@ -59,7 +59,7 @@ export default class Consent extends Component<{
         <div style={{ backgroundColor: '#eaeaea', padding: 20, borderRadius: 10 }}
              dangerouslySetInnerHTML={{__html: consentText}} />
 
-        <div style={{marginTop: 20}}>
+        <Row justify={"center"} style={{margin: "15px", textAlign: 'center'}}>
           <Checkbox
             checked={hasRead}
             onChange={e => this.setState({ hasRead: e.target.checked })}
@@ -67,20 +67,21 @@ export default class Consent extends Component<{
             I have read and understood the informed consent
           </Checkbox>
 
-          <br/>
-          <br/>
+        </Row>
 
-          <Button style={{ background: color1, borderColor: color1 }} type={"primary"} disabled={!hasRead} onClick={this.handleAccept}>
+        <Row justify={"center"}>
+
+          <Button style={{ background: color1, borderColor: color1, marginRight: '5px'}} type={"primary"} disabled={!hasRead} onClick={this.handleAccept}>
             Accept
           </Button>
-          {' '}
-          <Button style={{ background: color2, borderColor: color2 }} disabled={!hasRead} danger onClick={() => {
+
+          <Button style={{ background: color2, borderColor: color2, marginLeft: '5px' }} disabled={!hasRead} danger onClick={() => {
             this.handleDecline();
             this.setState({ hasRead: false });
           }}>
             Decline
           </Button>
-        </div>
+        </Row>
       </div>
     )
   }

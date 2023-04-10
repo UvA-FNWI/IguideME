@@ -69,6 +69,8 @@ export default class UploadData extends Component<IProps, IState> implements ISt
         for (let i = 0; i < files.length; i++) {
             let header = await headerForCsvFile(files[i])
 
+            console.log(header);
+
             if (!header)
                 continue
 
@@ -78,12 +80,11 @@ export default class UploadData extends Component<IProps, IState> implements ISt
                 continue
             }
             let datesetName = filenameForFile(files[i])
-            // TODO: I don't think that the async is doing anything?
             let studentGrade = await this.readStudentGradesFromFile(files[i])
             gradesDatasets[datesetName] = studentGrade
         }
 
-        this.setState({ gradesDatasets })
+        this.setState({ gradesDatasets: {...this.state.gradesDatasets, ...gradesDatasets} })
 
         this.onGradesDatasetsLoaded()
     }
@@ -117,8 +118,6 @@ export default class UploadData extends Component<IProps, IState> implements ISt
                 .filter(sID => !(sID in gradesDatasets[k]))
                 .forEach(sID => gradesDatasets[k][sID] = 1)
             })
-
-            console.log("after", JSON.parse(JSON.stringify(gradesDatasets)));
 
         this.setState({ gradesDatasets: gradesDatasets })
     }
@@ -165,12 +164,15 @@ export default class UploadData extends Component<IProps, IState> implements ISt
 
                                 <Divider />
 
-                                <p>This configuration screen lets you train a model that once trained, will be able to roughly predict a student's final grade. The model should be trained on the results of a past academic year.
-                    </p>
-                                <p>Please provide this data through one .csv file per graded assignment (e.g. mini-test, quiz, etc.); The files must contain the following two columns: "studentID" and "grade". Furthermore, please take note of which file contains the final grades.</p>
+                                <p>This configuration screen lets you train a model that once trained,
+                                   will be able to roughly predict a student's final grade.
+                                   The model should be trained on the results of a past academic year.</p>
+                                <p>Please provide this data through one .csv file per graded assignment (e.g. mini-test, quiz, etc.);
+                                   The files must contain the following two columns: "studentID" and "grade".
+                                   Furthermore, please take note of which file contains the final grades.</p>
                                 <p>You can select multiple files at once.</p>
 
-                                <Alert message="Student data is only ever kept on your local device, and never uploaded to IGuideME. Once the model is trained, all identifying information is erased." />
+                                <Alert message="Student data is only ever kept on your local device, and never uploaded to IuideME. Once the model is trained, all identifying information is erased." />
 
                             </Col>
                         </Row>

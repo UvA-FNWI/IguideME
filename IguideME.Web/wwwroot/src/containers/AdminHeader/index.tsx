@@ -83,19 +83,20 @@ class AdminHeader extends Component<Props, IState> {
               <h3>Admin Panel</h3>
             </Link> :
             <div style={{float: 'right', padding: 20}}>
-              <Tooltip title={"Reload data"}>
+              {/* <Tooltip title={"Reload data"}>
                 <Button id={"reload"}
                         shape="circle"
                         style={{backgroundColor: 'rgba(255, 255, 255, 0.5)', color: 'white'}}
-                        icon={<SyncOutlined />} />
-              </Tooltip>
+                        icon={<SyncOutlined />}
+                        onClick={() => window.location.reload()} />
+              </Tooltip> */}
             </div>
           }
 
           <div id={"navbarContent"}>
             <div id={"brand"}>
               <Link to={'/'}>
-                <h1>IGuideME</h1>
+                <h1>IguideME</h1>
               </Link>
             </div>
 

@@ -66,36 +66,32 @@ class UserProfile extends Component<Props, IState> {
 
     return (
       <div id={"userProfile"}>
-        <Row>
-          <Col span={6}>
-            <div style={{margin: "10"}}>
+        <Row justify={"space-around"} gutter={[0, 20]}>
+          <Col >
+            <div >
             <h3>{ student && student.name }</h3>
             <strong>{ course && course.course_name }</strong>
             </div>
           </Col>
 
-          <Col span={13} >
-            <div style={{display: "table", margin: "0 auto"}}>
+          <Col >
               <PerformanceNotifications outperforming = {outperforming}
                                       closing = {closing}
                                       moreEffort = {moreEffort}
                                       tiles = {tiles}
             />
-            </div>
           </Col>
-          <Col span={5}>
-            <div style={{display: "table", margin: "0 auto"}}>
+          <Col >
             <Button size={"large"} onClick={() => settings(true)} color={"primary"} icon={<SettingOutlined />}>
               Settings
             </Button>
-            </div>
           </Col>
 
         </Row>
         <br />
         <div style={{textAlign: 'center'}}>
           <small>
-            IGuideME is a product by the University of Amsterdam.
+            IguideME is a product by the University of Amsterdam.
           </small>
         </div>
       </div>

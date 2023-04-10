@@ -31,18 +31,17 @@ export default class GradeBar extends Component<IProps> {
 
   bar_options = {
     indexAxis: 'y' as const,
-    maintainAspectRatio: true,
+    maintainAspectRatio: false,
     legend: {
       display: true
     },
     scales: {
       x: {
-        grid : {
+        border : {
           display : false
         },
-        scaleLabel: {
-          display: false
-          // labelString: 'Grade'
+        grid : {
+          display : false
         },
         ticks: {
           display: false
@@ -52,11 +51,11 @@ export default class GradeBar extends Component<IProps> {
       y: {
         barPercentage: .95,
         categoryPercentage: .95,
-        gridLines : {
-          display : false
+        border : {
+          display : false,
         },
-        scaleLabel: {
-          display: false
+        grid : {
+          display : false,
         },
         stacked: false
       }
@@ -166,11 +165,12 @@ export default class GradeBar extends Component<IProps> {
     let data = this.createBarData(tiles, tilesGradeSummary, peerGrades, discussions, learningOutcomes, student)
 
     return (
-      <div>
+      <div style={{ height: '100vh', width: '80vw', position: 'relative'}}>
         <Bar
-                       height={300}
+                       height={100}
                        data={data}
-                       options={{...this.bar_options, onClick: (evt: any, e: any) => this.click(evt, e, data) }} />
+                       options={{...this.bar_options, onClick: (evt: any, e: any) => this.click(evt, e, data) }}
+                       />
       </div>
     );
   }

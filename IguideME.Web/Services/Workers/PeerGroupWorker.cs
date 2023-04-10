@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using IguideME.Web.Models;
 using IguideME.Web.Models.App;
@@ -48,25 +47,10 @@ namespace IguideME.Web.Services.Workers
             // CreateNotifications();
         }
 
-
-        // List<String> RetrievePeerGroupOfUser (int courseID, string loginID)
-        // {
-        //     // First we retrieve the user's goal grade
-        //     int goalGrade = DatabaseManager.Instance.GetUserGoalGrade(courseID, loginID);
-
-        //     // And then we query all the users that belong in this peer group
-        //     List<String> peerGroup = DatabaseManager.Instance.GetPeersFromGroup(courseID, goalGrade, Hash);
-
-        //     // Optionally, we remove themselves
-        //     if (peerGroup.Any()) peerGroup.Remove(loginID);
-
-        //     return peerGroup;
-        // }
-
         /// <summary>
         /// Creates an array of lists of users, where the array is indexed by the goal grade of the users.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>A list of users per goal grade.</returns>
         List<string>[] GetUsersSortedByGoalGrade() {
             List<string>[] usersWithSameGoalGrade = new List<string>[11];
 
@@ -91,22 +75,23 @@ namespace IguideME.Web.Services.Workers
         static List<string> CreatePeerGroup(List<string>[] sortedUsers, int goalGrade, int minPeerGroupSize) {
             List<string> peerGroup = new(sortedUsers[goalGrade]);
 
+            // Look for peers until minimum size is reached or untill the offset exceeds the range of valid grades.
             for (int offset = 1; peerGroup.Count < minPeerGroupSize && offset < 10; offset++)
             {
-                // Check if there are valid upward peers
+                // Check if there are peers with higher grades.
                 if (goalGrade + offset <= 10)
                 {
-                    // Fill with upward peers
+                    // Fill with found peers
                     peerGroup.AddRange(sortedUsers[goalGrade + offset]);
                 }
 
                 // Check if no more peers are required
                 if (peerGroup.Count >= minPeerGroupSize) break;
 
-                // Check if there are valid downward peers
+                // Check if there are peers with lower grades.
                 if (goalGrade - offset >= 1)
                 {
-                    // Fill with downward peers
+                    // Fill with found peers
                     peerGroup.AddRange(sortedUsers[goalGrade - offset]);
                 }
             }
@@ -114,10 +99,10 @@ namespace IguideME.Web.Services.Workers
         }
 
         /// <summary>
-        ///
+        /// Calculate the minimum, average, and maximum for a peergroup for each tile.
         /// </summary>
         /// <param name="peerGroup"></param>
-        /// <returns></returns>
+        /// <returns>A dictionary with the tileID as key and the statistics as a list.</returns>
         Dictionary<int,List<float>> CalculateGrades(List<string> peerGroup){
             Dictionary<int,List<float>> grades = new();
 
@@ -174,7 +159,7 @@ namespace IguideME.Web.Services.Workers
                         goalGradeClass,
                         peerGroup,
                         entry.Key,
-                        entry.Value.Sum() / peerGroup.Count(),
+                        entry.Value.Sum() / peerGroup.Count,
                         entry.Value.Min(),
                         entry.Value.Max(),
                         this._hashCode);
@@ -235,7 +220,6 @@ namespace IguideME.Web.Services.Workers
                     }
                 }
             }
-
 
             // for each student, we do the following:
 

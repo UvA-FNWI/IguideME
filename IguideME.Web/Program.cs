@@ -21,25 +21,29 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 //    /------------------------- Create builder --------------------------/
 
+// Create a new WebApplicationBuilder for setting up the application.
 WebApplicationBuilder builder = WebApplication.CreateBuilder(
     new WebApplicationOptions{
-      Args = args,
-      WebRootPath = "wwwroot/build"
-    });
+        Args = args, // command-line arguments passed to the app
+        WebRootPath = "wwwroot/build" // specifies the path to the web root directory
+    }
+);
 
 
-//    /------------------------ Read appsettings -------------------------/
+//    /------------------------ Read appsettings.json -------------------------/
 
+// "UnsecureApplicationSettings:UseRedisCache" - indicates whether to use Redis cache or not.
 bool useRedisCache = bool.Parse(builder.Configuration.GetSection(
     "UnsecureApplicationSettings:UseRedisCache").Value);
 
+// "UnsecureApplicationSettings:RedisCacheConnectionString" - contains the Redis cache connection string.
 string redisCacheConnectionString = builder.Configuration.GetSection(
-    "UnsecureApplicationSettings:RedisCacheConnectionString").Value;
+"UnsecureApplicationSettings:RedisCacheConnectionString").Value;
 
-// Key for LTI authentication, also used to generate our own key.
+// "LTI:SigningKey" - is the key used for LTI authentication and to generate own key.
 string key = builder.Configuration.GetSection("LTI:SigningKey").Value;
 
-// Key for own authorization using JWTs.
+// Use the specified key to create a symmetric security key for own authorization using JWTs.
 SymmetricSecurityKey signingKey = new(Encoding.ASCII.GetBytes(key));
 
 
@@ -72,7 +76,7 @@ else
     builder.Services.AddTransient<IJobStorageService, MemoryCacheJobStorageService>();
 }
 
-// Add authorization (validating the jwt)
+// Add authorization (validating the JWT)
 builder.Services
     .AddAuthorization()
     .AddAuthentication(opt => opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme)
@@ -169,6 +173,5 @@ app.MapControllerRoute(
 
 
 // //=============================== Run app ================================//
-
 
 app.Run();

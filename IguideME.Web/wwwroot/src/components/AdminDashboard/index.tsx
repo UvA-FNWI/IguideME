@@ -15,7 +15,7 @@ export default class AdminDashboard extends Component<IProps> {
             title={
               <div>
                 <h2>Pick a student to start!</h2>
-                <h1 id={"brand"}>IGuideME</h1>
+                <h1 id={"brand"}>IguideME</h1>
               </div>
             }
           />

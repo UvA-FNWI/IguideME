@@ -7,7 +7,7 @@ public static class DatabaseQueries
      * unique name and a sqlite query and is only run once.
      */
     public static readonly Dictionary<string, string> MIGRATIONS =
-        new Dictionary<string, string>()
+        new()
         {
             // {
             //     "0001_rename_user_id_in_user_tracker",
@@ -1037,6 +1037,15 @@ public static class DatabaseQueries
         AND         `sync_hash`='{2}'
         ORDER BY    `name` ASC;";
 
+    public const string QUERY_USER_ID =
+        @"SELECT    `user_id`
+        FROM        `canvas_users`
+        WHERE       `course_id`={0}
+        AND         `studentnumber`='{1}'
+        AND         `sync_hash`='{2}'
+        ORDER BY    `name` ASC
+        LIMIT       1;";
+
     public const string QUERY_USER_FOR_COURSE =
         @"SELECT    `id`,
                     `studentnumber`,
@@ -1206,7 +1215,7 @@ public static class DatabaseQueries
             FROM        `canvas_discussion_entry`
             WHERE       `course_id` = '{0}'
             AND         `posted_by` ='{1}'
-            
+
             UNION ALL
 
             SELECT      `canvas_discussion`.`discussion_id`
@@ -1248,8 +1257,8 @@ public static class DatabaseQueries
         INNER JOIN  `tile_entry_submission`
             ON      `tile_entry_submission`.`sync_hash` = `peer_group`.`sync_hash`
         INNER JOIN  `tile_entry`
-            ON      `tile_entry_submission`.`entry_id` = `tile_entry`.`id` 
-            AND     `peer_group`.`tile_id` = `tile_entry`.`tile_id`      
+            ON      `tile_entry_submission`.`entry_id` = `tile_entry`.`id`
+            AND     `peer_group`.`tile_id` = `tile_entry`.`tile_id`
         WHERE       `peer_group`.`course_id`='{0}'
         AND         `peer_group`.`goal_grade`='{1}'
         AND         `tile_entry_submission`.`user_id` = '{2}'

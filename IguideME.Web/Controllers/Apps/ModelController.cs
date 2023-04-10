@@ -14,21 +14,14 @@ namespace IguideME.Web.Controllers
     {
         private readonly ILogger<DataController> _logger;
         private readonly CanvasHandler canvasHandler;
-        private readonly IQueuedBackgroundService _queuedBackgroundService;
-        private readonly IComputationJobStatusService _computationJobStatusService;
 
         public ModelController(
             ILogger<DataController> logger,
-            CanvasHandler canvasHandler,
-            IQueuedBackgroundService queuedBackgroundService,
-            IComputationJobStatusService computationJobStatusService) : base(
-                logger, canvasHandler, queuedBackgroundService, computationJobStatusService)
+            CanvasHandler canvasHandler) : base(
+                logger, canvasHandler)
         {
             this._logger = logger;
             this.canvasHandler = canvasHandler;
-
-            this._queuedBackgroundService = queuedBackgroundService;
-            this._computationJobStatusService = computationJobStatusService;
         }
 
         [Authorize(Policy = "IsInstructor")]
@@ -43,7 +36,7 @@ namespace IguideME.Web.Controllers
 
             int modelID = DatabaseManager.Instance.CreateGradePredictionModel(GetCourseID(), model.Intercept);
 
-            _logger.LogInformation($"{model.Intercept}, {model.Parameters}");
+            _logger.LogInformation("Uploading model: {intercept}, {parameters}", model.Intercept, model.Parameters);
             foreach (var parameter in model.Parameters)
             {
                 DatabaseManager.Instance.CreateGradePredictionModelParameter(
@@ -73,7 +66,7 @@ namespace IguideME.Web.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public ActionResult DeleteModel()
         {
-            // TODO implement
+            // TODO: implement
             return NoContent();
         }
 

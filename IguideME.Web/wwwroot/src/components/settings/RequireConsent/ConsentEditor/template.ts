@@ -1,8 +1,8 @@
 export const standardConsent: string =
-   `<h1>IGuideME</h1>
+   `<h1>IguideME</h1>
     <strong>This is a sample consent, be sure to fill in the blanks!</strong>
     <h2>INFORMED CONSENT</h2>
-    
+
     <p>
       Dear participant,<br/>
       We ask for your cooperation in an evaluation study into educational improvement. In this document, the so-called "informed consent", we explain this study and you can indicate whether you want to cooperate. Read the text below carefully.
