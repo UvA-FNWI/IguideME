@@ -12,6 +12,7 @@ using DiscussionReply = UvA.DataNose.Connectors.Canvas.DiscussionReply;
 
 namespace IguideME.Web.Services
 {
+
     public sealed class DatabaseManager
     {
         private static DatabaseManager instance;
@@ -41,7 +42,7 @@ namespace IguideME.Web.Services
 
         private SQLiteConnection GetConnection() => new(_connection_string);
 
-        private void NonQuery(string query)
+        private void NonQuery(string query, params SQLiteParameter[] parameters)
         {
             SQLiteConnection connection = GetConnection();
             try {
@@ -49,6 +50,9 @@ namespace IguideME.Web.Services
                 using(SQLiteCommand command = connection.CreateCommand())
                 {
                     command.CommandText = query;
+                    foreach (SQLiteParameter param in parameters) {
+                        command.Parameters.Add(param);
+                    }
                     command.ExecuteNonQuery();
                 }
                 connection.Close();
@@ -59,7 +63,7 @@ namespace IguideME.Web.Services
             }
         }
 
-        private int IDNonQuery(string query)
+        private int IDNonQuery(string query, params SQLiteParameter[] parameters)
         {
             int id = 0;
             SQLiteConnection connection = GetConnection();
@@ -68,6 +72,9 @@ namespace IguideME.Web.Services
                 using(SQLiteCommand command = connection.CreateCommand())
                 {
                     command.CommandText = query;
+                    foreach (SQLiteParameter param in parameters) {
+                        command.Parameters.Add(param);
+                    }
                     command.ExecuteNonQuery();
                 }
 
@@ -86,7 +93,7 @@ namespace IguideME.Web.Services
             return id;
         }
 
-        private SQLiteDataReader Query(string query)
+        private SQLiteDataReader Query(string query, params SQLiteParameter[] parameters)
         {
             SQLiteConnection connection = GetConnection();
             try {
@@ -94,6 +101,9 @@ namespace IguideME.Web.Services
                 using(SQLiteCommand command = connection.CreateCommand())
                 {
                     command.CommandText = query;
+                    foreach (SQLiteParameter param in parameters) {
+                        command.Parameters.Add(param);
+                    }
                     return command.ExecuteReader(CommandBehavior.CloseConnection);
                 }
             } catch (Exception e) {
@@ -373,11 +383,15 @@ namespace IguideME.Web.Services
             string role,
             string syncHash)
         {
-            NonQuery(
-                String.Format(
-                    DatabaseQueries.REGISTER_USER_FOR_COURSE,
-                    courseID, studentnumber, userID, name, sortableName, role, syncHash
-                    ));
+            NonQuery(DatabaseQueries.REGISTER_USER_FOR_COURSE,
+                    new SQLiteParameter("courseID", courseID),
+                    new SQLiteParameter("studentnumber", studentnumber),
+                    new SQLiteParameter("userID", userID),
+                    new SQLiteParameter("name", name),
+                    new SQLiteParameter("sortableName", sortableName),
+                    new SQLiteParameter("role", role),
+                    new SQLiteParameter("syncHash", syncHash)
+                    );
         }
 
         public void RegisterAssignment(

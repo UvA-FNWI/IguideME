@@ -610,8 +610,16 @@ public static class DatabaseQueries
                             `name`,
                             `sortable_name`,
                             `role`,
-                            `sync_hash`) " +
-                "VALUES({0}, {1}, '{2}', '{3}', '{4}', '{5}', '{6}');";
+                            `sync_hash`)
+                VALUES(
+                    @courseID,
+                    @studentnumber,
+                    @userID,
+                    @name,
+                    @sortableName,
+                    @role,
+                    @syncHash
+                );";
 
     public const string REGISTER_USER_SUBMISSION =
         @"INSERT INTO   `tile_entry_submission`

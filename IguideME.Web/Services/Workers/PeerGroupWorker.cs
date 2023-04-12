@@ -35,11 +35,11 @@ namespace IguideME.Web.Services.Workers
                 // don't register data from students that did not give consent
                 if (DatabaseManager.Instance.GetConsent(this.CourseID, student.UserID) != 1)
                 {
-                    _logger.LogInformation($"Skipping user with userID {student.UserID} as they did not give consent.");
+                    // _logger.LogInformation($"Skipping user with userID {student.UserID} as they did not give consent.");
                     continue;
                 }
 
-                _logger.LogInformation("Processing student with userID " + student.UserID);
+                // _logger.LogInformation("Processing student with userID " + student.UserID);
 
                 var user = new UserWithPeerGroup(
                                     0,
@@ -58,11 +58,11 @@ namespace IguideME.Web.Services.Workers
                 // Peers may be null, if null no peer comparison will be given
                 if (peers == null)
                 {
-                    _logger.LogInformation($"Student {student.ID} has no peers, so no peer comparison will be made.");
+                    // _logger.LogInformation($"Student {student.ID} has no peers, so no peer comparison will be made.");
                     continue;
                 }
 
-                _logger.LogInformation($"Student {student.ID} with userID {user.UserID} has {peers.Count} peers.");
+                // _logger.LogInformation($"Student {student.ID} with userID {user.UserID} has {peers.Count} peers.");
 
                 foreach (var peer in peers)
                 {

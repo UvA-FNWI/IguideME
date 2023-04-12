@@ -51,20 +51,20 @@ namespace IguideME.Web.Services
 
         public User GetUser(int courseID, string userID)
         {
-            _logger.LogInformation("Trying to get user\ncourseID: {CourseID}, userID: {UserID}", courseID, userID);
+            // _logger.LogInformation("Trying to get user\ncourseID: {CourseID}, userID: {UserID}", courseID, userID);
             Course course = _connector.FindCourseById(courseID);
 
-            _logger.LogInformation("Found course {Course} for user", course);
+            // _logger.LogInformation("Found course {Course} for user", course);
             List<Enrollment> users = course.Enrollments;
 
-            _logger.LogInformation("Found enrolments:");
-            foreach (Enrollment e in users) {
-                _logger.LogInformation(" - {enrolment}", e);
-            }
-            _logger.LogInformation("Found users:");
-            foreach (Enrollment e in users) {
-                _logger.LogInformation(" - {user} {uid} {login}", e.User, e.UserID, e.User.LoginID);
-            }
+            // _logger.LogInformation("Found enrolments:");
+            // foreach (Enrollment e in users) {
+            //     _logger.LogInformation(" - {enrolment}", e);
+            // }
+            // _logger.LogInformation("Found users:");
+            // foreach (Enrollment e in users) {
+            //     _logger.LogInformation(" - {user} {uid} {login}", e.User, e.UserID, e.User.LoginID);
+            // }
 
             return users.First(x => x.UserID == userID).User;
         }

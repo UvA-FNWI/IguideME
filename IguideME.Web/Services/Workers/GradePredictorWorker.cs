@@ -58,7 +58,7 @@ namespace IguideME.Web.Services.Workers
         /// <param name="student">the student to make predictions for.</param>
         private void PredictGradesForStudent(User student)
         {
-            _logger.LogInformation("Processing student: {ID}", student.UserID);
+            // _logger.LogInformation("Processing student: {ID}", student.UserID);
             List<TileEntrySubmission> submissions = DatabaseManager.Instance.GetCourseSubmissionsForStudent(this._courseID,
                                                                                       student.UserID,
                                                                                       this._hashCode);
