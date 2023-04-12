@@ -1663,7 +1663,7 @@ namespace IguideME.Web.Services
             int courseID,
             string userID,
             int tileID,
-            string status,
+            int status,
             string hash = null)
         {
             Console.WriteLine("Registering notification to " + userID + ": " + status);
@@ -1700,7 +1700,7 @@ namespace IguideME.Web.Services
                         notifications.Add(new Notification(
                             r.GetValue(0).ToString(),
                             r.GetInt32(1),
-                            r.GetValue(2).ToString(),
+                            r.GetInt32(2),
                             r.GetBoolean(3)
                         ));
                     } catch (Exception e) {
@@ -1733,7 +1733,7 @@ namespace IguideME.Web.Services
                     notifications.Add(new Notification(
                         userID,
                         r.GetInt32(0),
-                        r.GetValue(1).ToString(),
+                        r.GetInt32(1),
                         r.GetBoolean(2)
                     ));
                 }
@@ -1764,7 +1764,7 @@ namespace IguideME.Web.Services
                     notifications.Add(new Notification(
                         userID,
                         r.GetInt32(0),
-                        r.GetValue(1).ToString(),
+                        r.GetInt32(1),
                         false
                     ));
                 }

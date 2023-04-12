@@ -7,6 +7,15 @@ using Microsoft.Extensions.Logging;
 
 namespace IguideME.Web.Services.Workers
 {
+
+    public enum Notification_Types
+    {
+        outperforming,
+        closing_gap,
+        falling_behind,
+        more_effort
+    }
+
     /// <summary>
     /// Class <a>PeerGroupWorker</a> models a worker that handles the creation of peer groups and their stats.
     /// </summary>
@@ -159,7 +168,7 @@ namespace IguideME.Web.Services.Workers
                         goalGradeClass,
                         peerGroup,
                         entry.Key,
-                        entry.Value.Sum() / peerGroup.Count,
+                        entry.Value.Sum() / peerGroup.Count(),
                         entry.Value.Min(),
                         entry.Value.Max(),
                         this._hashCode);
@@ -188,8 +197,8 @@ namespace IguideME.Web.Services.Workers
 
                     
                     // Create one list with all the submission grades and one more without the most recent submission
-                    List<float> currentSubmissionGrades = new List<float>();
-                    List<float> lastSubmissionGrades = new List<float>();
+                    List<float> currentSubmissionGrades = new();
+                    List<float> lastSubmissionGrades = new();
                     foreach (TileEntrySubmission submission in userTileSubmissions)
                     {
                         currentSubmissionGrades.Add(float.Parse(submission.Grade));
@@ -202,21 +211,53 @@ namespace IguideME.Web.Services.Workers
                     float lastAverage = lastSubmissionGrades.Average();
                     float peerAverage = entry.Value.Sum() / peerGroupSize;
 
-                    if (currentAverage >= peerAverage)
+                    if (currentAverage >= peerAverage) // +1)
                     {
                         // outperform
+                        DatabaseManager.Instance.RegisterNotification(
+                            this._courseID,
+                            user,
+                            entry.Key,
+                            (int) Notification_Types.outperforming,
+                            this._hashCode
+                        );
                     }
+                    // else if (currentAverage >= peerAverage)
+                    // {
+                    //     // do nothing 
+                    // }
                     else if (currentAverage - lastAverage > 0)
                     {
                         // closing the gap
+                        DatabaseManager.Instance.RegisterNotification(
+                            this._courseID,
+                            user,
+                            entry.Key,
+                            (int) Notification_Types.closing_gap,
+                            this._hashCode
+                        );
                     }
                     else if ((currentAverage - lastAverage <= 0) && (peerAverage - currentAverage <= 1))
                     {
                         // falling behind
+                        DatabaseManager.Instance.RegisterNotification(
+                            this._courseID,
+                            user,
+                            entry.Key,
+                            (int) Notification_Types.falling_behind,
+                            this._hashCode
+                        );
                     }
                     else if ((currentAverage - lastAverage <= 0) && (peerAverage - currentAverage > 1))
                     {
                         // put more effort
+                        DatabaseManager.Instance.RegisterNotification(
+                            this._courseID,
+                            user,
+                            entry.Key,
+                            (int) Notification_Types.more_effort,
+                            this._hashCode
+                        );
                     }
                 }
             }

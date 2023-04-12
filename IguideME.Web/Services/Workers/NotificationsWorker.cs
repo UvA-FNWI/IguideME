@@ -57,19 +57,23 @@ namespace IguideME.Web.Services.Workers
             // Create lists of tiles where the student is outperformin/closing the gap/more effort is required.
             string outperforming = "";
             string closing = "";
+            string falling = "";
             string moreEffort = "";
             foreach (Notification notification in notifications)
             {
                 Tile tile = DatabaseManager.Instance.GetTile(this._courseID, notification.TileID);
                 switch (notification.Status)
                 {
-                    case "outperforming peers":
+                    case (int) Notification_Types.outperforming:
                         outperforming += $"    - {tile.Title}\n";
                         break;
-                    case "closing the gap":
+                    case (int) Notification_Types.closing_gap:
                         closing += $"    - {tile.Title}\n";
+                        break;                    
+                    case (int) Notification_Types.falling_behind:
+                        falling += $"    - {tile.Title}\n";
                         break;
-                    case "more effort required":
+                    case (int) Notification_Types.more_effort:
                         moreEffort += $"    - {tile.Title}\n";
                         break;
                 }
@@ -81,6 +85,8 @@ namespace IguideME.Web.Services.Workers
                 body += "You are outperforming your peers in:\n" + outperforming + "\n";
             if (!string.IsNullOrEmpty(closing))
                 body += "You are closing the gap to your peers in:\n" + closing + "\n";
+            if (!string.IsNullOrEmpty(falling))
+                body += "You are falling behind your peers in:\n" + falling + "\n";
             if (!string.IsNullOrEmpty(moreEffort))
                 body += "You have to put more effort in:\n" + moreEffort + "\n";
 

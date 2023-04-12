@@ -318,7 +318,7 @@ public static class DatabaseQueries
             `course_id`           INTEGER,
             `user_id`             STRING,
             `tile_id`             INTEGER,
-            `status`              STRING,
+            `status`              INTEGER,
             `sync_hash`           STRING,
             `sent`                BOOLEAN
         );";
