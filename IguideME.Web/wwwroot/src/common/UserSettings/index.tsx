@@ -125,7 +125,7 @@ export default class UserSettings extends Component<IProps, IState> {
             </Row>
             <Row>
             <Col span={24}>
-                <Consent text={this.props.consent}/>
+                <Consent text={this.props.consent} handle_accept={() => this.checkLeave()}/>
             </Col>
             </Row>
             </div>

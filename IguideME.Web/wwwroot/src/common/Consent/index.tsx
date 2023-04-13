@@ -5,6 +5,7 @@ import {store} from "../../utils/configureStore";
 
 export default class Consent extends Component<{
   text?: string | null,
+  handle_accept: () => void
 }> {
 
   state = {
@@ -15,6 +16,7 @@ export default class Consent extends Component<{
   handleAccept = () => {
     ConsentController.setConsent(true).then(() => {
       message.success("Consent Accepted!");
+      this.props.handle_accept();
     });
   }
 

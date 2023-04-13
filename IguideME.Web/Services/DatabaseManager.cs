@@ -2305,10 +2305,10 @@ namespace IguideME.Web.Services
 
         public void SetConsent(ConsentData data)
         {
-            NonQuery(String.Format(
+             NonQuery(String.Format(
                 DatabaseQueries.SET_USER_CONSENT,
                 data.CourseID, data.UserID, data.UserName.Replace("'", ""), data.Granted,
-                data.Granted == -1 ? "DO NOTHING" : "DO UPDATE SET `consent` = {4}"
+                data.Granted == -1 ? ", `goal_grade` = '-1' " : ""
             ));
         }
 
