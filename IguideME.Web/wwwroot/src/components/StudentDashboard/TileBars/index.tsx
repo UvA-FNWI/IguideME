@@ -100,12 +100,9 @@ export default class GradeBar extends Component<IProps> {
       console.log("pgrade", pgrade);
       console.log("entry", entry);
 
-      if (entry.max) {
+      if (entry !== undefined) {
         entry.peergrade = pgrade * 10/ entry.max;
-      } else {
-        entry.peergrade = undefined
       }
-
     }
 
     let data_tiles: Tile[] = [];
