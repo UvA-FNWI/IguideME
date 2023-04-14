@@ -89,19 +89,23 @@ export default class GradeBar extends Component<IProps> {
         grade = grade * 100
       }
 
-      grade = grade * 10 / entry.max;
-
-      entry.grade = grade;
+      entry.grade = grade * 10 / entry.max;
 
     }
 
     for (let i = 0; i < peerGrades.length; i++) {
+      console.log("peergrades", peerGrades);
       let pgrade = peerGrades[i].avg;
       let entry = datadict.get(peerGrades[i].tileID)!;
+      console.log("pgrade", pgrade);
+      console.log("entry", entry);
 
-      pgrade = pgrade * 10/ entry.max;
+      if (entry.max) {
+        entry.peergrade = pgrade * 10/ entry.max;
+      } else {
+        entry.peergrade = undefined
+      }
 
-      entry.peergrade = pgrade;
     }
 
     let data_tiles: Tile[] = [];
