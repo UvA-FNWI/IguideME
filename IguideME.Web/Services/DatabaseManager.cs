@@ -16,21 +16,22 @@ namespace IguideME.Web.Services
 
     public sealed class DatabaseManager
     {
-        private static DatabaseManager instance;
+        private static DatabaseManager s_instance;
         private readonly string _connection_string;
         private readonly ILogger _logger;
 
         DatabaseManager(bool isDev = false) {
-            DatabaseManager.instance = this;
+            DatabaseManager.s_instance = this;
             _connection_string = isDev ? "Data Source=db.sqlite;Version=3;New=False;Compress=True;"
                                       : "Data Source=/data/IguideME.db;Version=3;New=False;Compress=True;";
 
-            DatabaseManager.instance.CreateTables();
-            DatabaseManager.instance.RunMigrations();
+            DatabaseManager.s_instance.CreateTables();
+            DatabaseManager.s_instance.RunMigrations();
             ILoggerFactory factory = LoggerFactory.Create(builder => builder.AddConsole());
             _logger = factory.CreateLogger("DatabaseManager");
         }
 
+        // TODO: I think we want the database manager to just be a singleton that we add using dependency injection just like canvashandler (although that one maybe shouldn't be singleton probably)
         public static void Initialize(bool isDev = false)
         {
             new DatabaseManager(isDev);
@@ -38,7 +39,7 @@ namespace IguideME.Web.Services
 
         public static DatabaseManager Instance
         {
-            get { return instance; }
+            get { return s_instance; }
         }
 
         private SQLiteConnection GetConnection() => new(_connection_string);
@@ -131,9 +132,8 @@ namespace IguideME.Web.Services
         public void LogTable(string name) {
             _logger.LogInformation("Logging table {name}", name);
 
-            string query = $"select * from `{name}`";
             string table = "";
-            using (SQLiteDataReader r = Query(query))
+            using (SQLiteDataReader r = Query("select * from @name", new SQLiteParameter("name", name)))
             {
                 for (int i = 0; i < r.FieldCount; i++)
                 {
@@ -212,13 +212,13 @@ namespace IguideME.Web.Services
              * Retrieve latest complete synchronization for course. If no
              * historic synchronization was found then null is returned.
              */
-            string query = String.Format(DatabaseQueries.QUERY_LATEST_SYNCS_FOR_COURSE, courseID, 1);
-            string result = null;
-            using (SQLiteDataReader r = Query(query))
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_LATEST_SYNCS_FOR_COURSE,
+                                              new SQLiteParameter("courseID", courseID),
+                                              new SQLiteParameter("limit", 1)))
                 if (r.Read())
-                    result = r.GetValue(0).ToString();
+                    return r.GetValue(0).ToString();
 
-            return result;
+            return null;
         }
 
         private List<string> GetRecentHashes(int courseID, int number_of_hashes)
@@ -228,10 +228,11 @@ namespace IguideME.Web.Services
              * historic synchronization was found then null is returned.
              */
 
-            string query = String.Format(DatabaseQueries.QUERY_LATEST_SYNCS_FOR_COURSE, courseID, number_of_hashes);
             List<string> hashes = new();
 
-            using (SQLiteDataReader r = Query(query))
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_LATEST_SYNCS_FOR_COURSE,
+                                              new SQLiteParameter("courseID", courseID),
+                                              new SQLiteParameter("limit", number_of_hashes)))
                 while (r.Read()) {
                     hashes.Add(r.GetValue(0).ToString());
                 }
@@ -242,11 +243,11 @@ namespace IguideME.Web.Services
         public void CleanupSync(int courseID) {
             RemoveSyncsWithStatus(courseID, "BUSY");
 
-            string query = String.Format(DatabaseQueries.QUERY_OLD_HASHES_FOR_COURSE, courseID, 15);
-            string query2;
             List<string> hashes = new();
 
-            using (SQLiteDataReader r = Query(query)) {
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_OLD_HASHES_FOR_COURSE,
+                                              new SQLiteParameter("courseID", courseID),
+                                              new  SQLiteParameter("offset", 15))) {
                 while (r.Read()) {
                     try {
                         hashes.Add(r.GetValue(0).ToString());
@@ -256,20 +257,14 @@ namespace IguideME.Web.Services
                 }
             }
             foreach (string hash in hashes) {
-                query2 = String.Format(DatabaseQueries.DELETE_OLD_SYNCS_FOR_COURSE, courseID, hash);
-                NonQuery(query2);
+                NonQuery(DatabaseQueries.DELETE_OLD_SYNCS_FOR_COURSE, new SQLiteParameter("courseID", courseID), new SQLiteParameter("hash", hash));
             }
         }
 
         public bool IsCourseRegistered(int courseID)
         {
-            bool result;
-            using (SQLiteDataReader r = Query(
-                String.Format(
-                    DatabaseQueries.QUERY_DOES_COURSE_EXIST, courseID)))
-                result = (bool)r.Read();
-
-            return result;
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_DOES_COURSE_EXIST, new SQLiteParameter("courseID", courseID)))
+                return r.Read();
         }
 
         public void RegisterCourse(int courseID, string courseName)
@@ -277,9 +272,9 @@ namespace IguideME.Web.Services
             /**
              * Create a new course.
              */
-            NonQuery(String.Format(DatabaseQueries.REGISTER_COURSE,
-                courseID,
-                courseName));
+            NonQuery(DatabaseQueries.REGISTER_COURSE,
+                new SQLiteParameter("courseID", courseID),
+                new SQLiteParameter("courseName", courseName));
         }
 
         public List<int> GetCourseIds()
@@ -303,9 +298,9 @@ namespace IguideME.Web.Services
             _logger.LogInformation("Starting cleanup of sync hystory ");
             try {
                 NonQuery(
-                    String.Format(
-                        DatabaseQueries.DELETE_INCOMPLETE_SYNCS, courseID, status
-                    )
+                    DatabaseQueries.DELETE_INCOMPLETE_SYNCS,
+                    new SQLiteParameter("courseID", courseID),
+                    new SQLiteParameter("status", status)
                 );
             } catch (Exception e) {
                 _logger.LogError("Error removing syncs: {message}\n{trace}", e.Message, e.StackTrace);
@@ -320,8 +315,10 @@ namespace IguideME.Web.Services
              * Create a new synchronization record.
              */
             NonQuery(
-                String.Format(
-                    DatabaseQueries.REGISTER_NEW_SYNC, courseID, hashCode));
+                DatabaseQueries.REGISTER_NEW_SYNC,
+                new SQLiteParameter("courseID", courseID),
+                new SQLiteParameter("hash", hashCode)
+            );
         }
 
         public void CompleteSync(string hashCode)
@@ -330,8 +327,9 @@ namespace IguideME.Web.Services
              * Update synchronization record state to completed.
              */
             NonQuery(
-                String.Format(
-                    DatabaseQueries.COMPLETE_NEW_SYNC, hashCode));
+                DatabaseQueries.COMPLETE_NEW_SYNC,
+                new SQLiteParameter("hash", hashCode)
+            );
         }
 
         public List<DataSynchronization> GetSyncHashes(int courseID)
@@ -341,11 +339,10 @@ namespace IguideME.Web.Services
              */
             List<DataSynchronization> hashes = new();
 
-            using (SQLiteDataReader r = Query(String.Format(
-                    DatabaseQueries.QUERY_SYNC_HASHES_FOR_COURSE, courseID))) {
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_SYNC_HASHES_FOR_COURSE, new SQLiteParameter("courseID", courseID))) {
                 while (r.Read()) {
                     try {
-                        DateTime endtime = r.GetValue(3).GetType() != typeof(DBNull) ? (r.GetDateTime(3)) : new DateTime();
+                        DateTime endtime = r.GetValue(3).GetType() != typeof(DBNull) ? r.GetDateTime(3) : new DateTime();
 
                         hashes.Add(new DataSynchronization(
                             r.GetInt32(0),
@@ -353,7 +350,8 @@ namespace IguideME.Web.Services
                             r.GetDateTime(2),
                             endtime,
                             r.GetValue(4).ToString(),
-                            r.GetValue(5).ToString()));
+                            r.GetValue(5).ToString())
+                        );
                     } catch (Exception e) {
                         PrintQueryError("GetSyncHashes", 5, r, e);
                     }
@@ -365,24 +363,22 @@ namespace IguideME.Web.Services
 
         public int GetMinimumPeerGroupSize(int courseID)
         {
-            string query = String.Format(
-                DatabaseQueries.QUERY_PEER_GROUP_FOR_COURSE, courseID);
 
-            int size = 1;
-
-            using(SQLiteDataReader r = Query(query)) {
+            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_PEER_GROUP_FOR_COURSE, new SQLiteParameter("courseID", courseID))) {
                 if (r.Read())
-                {
-                    size = r.GetInt32(0);
-                }
+                    return r.GetInt32(0);
             }
 
-            return size;
+            return 1;
         }
 
+        // TODO: do we need this function?
         public bool HasPersonalizedPeers(int courseID)
         {
-            // TODO: what's the plan here?
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_PERSONALIZED_PEERS_FOR_COURSE, new SQLiteParameter("courseID", courseID)))
+                if (r.Read())
+                    return r.GetBoolean(0);
+
             return true;
         }
 
@@ -420,69 +416,62 @@ namespace IguideME.Web.Services
             string syncHash)
         {
             NonQuery(
-                String.Format(
-                    DatabaseQueries.REGISTER_CANVAS_ASSIGNMENT,
-                    assignmentID.ToString(),
-                    courseID,
-                    name,
-                    published,
-                    muted,
-                    dueDate,
-                    pointsPossible,
-                    position,
-                    gradingType,
-                    submissionType,
-                    syncHash));
+                DatabaseQueries.REGISTER_CANVAS_ASSIGNMENT,
+                new SQLiteParameter("assignmentID", assignmentID.ToString()),
+                new SQLiteParameter("courseID", courseID),
+                new SQLiteParameter("name", name),
+                new SQLiteParameter("published", published),
+                new SQLiteParameter("muted", muted),
+                new SQLiteParameter("dueDate", dueDate),
+                new SQLiteParameter("pointsPossible", pointsPossible),
+                new SQLiteParameter("position", position),
+                new SQLiteParameter("gradingType", gradingType),
+                new SQLiteParameter("submissionType", submissionType),
+                new SQLiteParameter("hash", syncHash)
+            );
         }
 
         public void RegisterDiscussion(Discussion discussion, string syncHash)
         {
-            IDNonQuery(
-                String.Format(
-                    DatabaseQueries.REGISTER_CANVAS_DISCUSSION,
-                    discussion.ID,
-                    discussion.CourseID,
-                    discussion.Title,
-                    discussion.UserName,
-                    discussion.PostedAt,
-                    discussion.Message.Replace("'", "''"),
-                    syncHash));
+            NonQuery(
+                DatabaseQueries.REGISTER_CANVAS_DISCUSSION,
+                new SQLiteParameter("id", discussion.ID),
+                new SQLiteParameter("courseID", discussion.CourseID),
+                new SQLiteParameter("title", discussion.Title),
+                new SQLiteParameter("userName", discussion.UserName),
+                new SQLiteParameter("postedAt", discussion.PostedAt),
+                new SQLiteParameter("message", discussion.Message),
+                // new SQLiteParameter("message", discussion.Message.Replace("'", "''")), // TODO: remove if didn't break
+                new SQLiteParameter("hash", syncHash)
+            );
         }
 
         public void UpdateDiscussion(Discussion discussion, int tileID, string hash) {
             NonQuery(
-                String.Format(
-                    DatabaseQueries.UPDATE_CANVAS_DISCUSSION,
-                    discussion.ID,
-                    discussion.CourseID,
-                    discussion.Title,
-                    discussion.UserName,
-                    discussion.PostedAt,
-                    discussion.Message.Replace("'", "''"),
-                    tileID,
-                    hash
-                )
+                DatabaseQueries.UPDATE_CANVAS_DISCUSSION,
+                new SQLiteParameter("id", discussion.ID),
+                new SQLiteParameter("courseID", discussion.CourseID),
+                new SQLiteParameter("title", discussion.Title),
+                new SQLiteParameter("userName", discussion.UserName),
+                new SQLiteParameter("postedAt", discussion.PostedAt),
+                new SQLiteParameter("message", discussion.Message),
+                // new SQLiteParameter("message", discussion.Message.Replace("'", "''")),
+                new SQLiteParameter("tileID", tileID),
+                new SQLiteParameter("hash", hash)
             );
         }
 
         public int RegisterDiscussionEntry(DiscussionEntry entry, string userID)
         {
-            NonQuery(
-                String.Format(
+            return IDNonQuery(
                     DatabaseQueries.REGISTER_CANVAS_DISCUSSION_ENTRY,
-                    entry.CourseID,
-                    entry.TopicID,
-                    userID,
-    				entry.CreatedAt,
-                    entry.Message.Replace("'", "''")));
-
-            using (SQLiteDataReader r = Query($@"SELECT `id` FROM `canvas_discussion_entry`
-                        WHERE  `course_id`={entry.CourseID}
-                        AND    `discussion_id`={entry.TopicID}
-                        AND    `posted_by`='{userID}'
-                        AND    `posted_at`='{entry.CreatedAt}';")) {
-                return r.Read() ? r.GetInt32(0) : -1;
-            }
+                    new SQLiteParameter("courseID", entry.CourseID),
+                    new SQLiteParameter("topicID", entry.TopicID),
+    				new SQLiteParameter("postedAt", entry.CreatedAt),
+                    new SQLiteParameter("message", entry.Message),
+                    // new SQLiteParameter("message", entry.Message.Replace("'", "''")),
+                    new SQLiteParameter("postedBy", userID)
+            );
         }
 
         public void RegisterDiscussionReply(DiscussionReply reply, int entry_id, string userID)
@@ -492,35 +481,30 @@ namespace IguideME.Web.Services
             }
 
             NonQuery(
-                String.Format(
-                    DatabaseQueries.REGISTER_CANVAS_DISCUSSION_REPLY,
-                    entry_id,
-                    userID,
-    				reply.CreatedAt,
-                    reply.Message.Replace("'", "''")));
+                DatabaseQueries.REGISTER_CANVAS_DISCUSSION_REPLY,
+                new SQLiteParameter("entryID", entry_id),
+                new SQLiteParameter("userID", userID),
+                new SQLiteParameter("postedAt", reply.CreatedAt),
+                new SQLiteParameter("message", reply.Message)
+            );
         }
 
-        public List<User> GetUsers(int courseID, string role = null, string hash = null)
+        public List<User> GetUsers(int courseID, string role = "*", string hash = null)
         {
             string activeHash = hash ?? this.GetCurrentHash(courseID);
             if (activeHash == null)
             {
-                Console.WriteLine("Hash is null, returning empty user list.");
+                _logger.LogInformation("Hash is null, returning empty user list.");
                 return new List<User>() { };
             }
 
-            string query = role == null ?
-                String.Format(DatabaseQueries.QUERY_USERS_FOR_COURSE,
-                    courseID,
-                    activeHash) :
-                String.Format(DatabaseQueries.QUERY_USERS_WITH_ROLE_FOR_COURSE,
-                    courseID,
-                    role,
-                    activeHash);
-
             List<User> users = new();
 
-            using (SQLiteDataReader r = Query(query)) {
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_USERS_WITH_ROLE_FOR_COURSE,
+                    new SQLiteParameter("courseID", courseID),
+                    new SQLiteParameter("role", role),
+                    new SQLiteParameter("hash", activeHash)
+                )) {
                 // collect all users
                 while (r.Read())
                 {
@@ -542,23 +526,21 @@ namespace IguideME.Web.Services
 
         public string GetUserID(int courseID, int id) {
             string hash = this.GetCurrentHash(courseID);
+
             if (hash == null) return null;
 
-            string query = String.Format(
-                DatabaseQueries.QUERY_USER_ID,
-                courseID,
-                id,
-                hash);
-
-            string userid = null;
-            using (SQLiteDataReader r = Query(query)) {
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_USER_ID,
+                    new SQLiteParameter("courseID", courseID),
+                    new SQLiteParameter("id", id),
+                    new SQLiteParameter("hash", hash)
+                )) {
                 if (r.Read())
                 {
-                    userid = r.GetValue(0).ToString();
+                    return r.GetValue(0).ToString();
                 }
             }
 
-            return userid;
+            return null;
         }
 
         public User GetUser(int courseID, string userID, string hash = null)
@@ -566,14 +548,12 @@ namespace IguideME.Web.Services
             string activeHash = hash ?? this.GetCurrentHash(courseID);
             if (activeHash == null) return null;
 
-            string query = String.Format(
-                DatabaseQueries.QUERY_USER_FOR_COURSE,
-                courseID,
-                userID,
-                activeHash);
-
             User user = null;
-            using (SQLiteDataReader r = Query(query)) {
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_USER_FOR_COURSE,
+                    new SQLiteParameter("courseID", courseID),
+                    new SQLiteParameter("userID", userID),
+                    new SQLiteParameter("hash", activeHash)
+                )) {
                 if (r.Read())
                 {
                     user = new User(
@@ -597,18 +577,15 @@ namespace IguideME.Web.Services
             string hash = null)
         {
             string activeHash = hash ?? this.GetCurrentHash(courseID);
-            if (activeHash == null)
-                return new List<User> { };
-
-            string query = String.Format(
-                DatabaseQueries.QUERY_USERS_WITH_GOAL_GRADE,
-                courseID,
-                activeHash,
-                goalGrade);
+            if (activeHash == null) return new List<User> { };
 
             List<User> users = new();
 
-            using(SQLiteDataReader r = Query(query)) {
+            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_USERS_WITH_GOAL_GRADE,
+                    new SQLiteParameter("courseID", courseID),
+                    new SQLiteParameter("hash", activeHash),
+                    new SQLiteParameter("goalGrade", goalGrade)
+                )) {
                 // collect all users
                 while (r.Read())
                 {
@@ -632,35 +609,30 @@ namespace IguideME.Web.Services
         {
             NonQuery($"UPDATE `grade_prediction_model` SET `enabled`=False"); // TODO: Choose model in a UI.
             return IDNonQuery(
-                String.Format(
                     DatabaseQueries.REGISTER_GRADE_PREDICTION_MODEL,
-                    courseID,
-                    intercept
-                ));
+                    new SQLiteParameter("courseID", courseID),
+                    new SQLiteParameter("intercept", intercept)
+                );
         }
 
         public int CreateGradePredictionModelParameter(int modelID, int parameterID, float weight)
         {
             return IDNonQuery(
-                String.Format(
                     DatabaseQueries.REGISTER_GRADE_PREDICTION_MODEL_PARAMETER,
-                    modelID,
-                    parameterID,
-                    weight
-                ));
+                    new SQLiteParameter("modelID", modelID),
+                    new SQLiteParameter("parameterID", parameterID),
+                    new SQLiteParameter("weight", weight)
+                );
         }
 
         public List<GradePredictionModel> GetGradePredictionModels(int courseID)
         {
-
-            string query = String.Format(
-                                   DatabaseQueries.QUERY_GRADE_PREDICTION_MODELS_FOR_COURSE,
-                                   courseID);
-
             List<GradePredictionModel> models = new();
             GradePredictionModel model;
 
-            using(SQLiteDataReader r = Query(query)) {
+            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_GRADE_PREDICTION_MODELS_FOR_COURSE,
+                    new SQLiteParameter("courseID", courseID)
+                )) {
                 while (r.Read())
                 {
                     try {
@@ -683,13 +655,12 @@ namespace IguideME.Web.Services
 
         public GradePredictionModel GetGradePredictionModel(int courseID)
         {
-            string query = String.Format(
-                                   DatabaseQueries.QUERY_GRADE_PREDICTION_MODEL_FOR_COURSE,
-                                   courseID);
 
             GradePredictionModel model = null;
 
-            using(SQLiteDataReader r = Query(query)) {
+            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_GRADE_PREDICTION_MODEL_FOR_COURSE,
+                new SQLiteParameter("courseID", courseID)
+                )) {
                 if (r.Read()) {
                     model = new GradePredictionModel(
                             r.GetInt32(0),
@@ -706,13 +677,12 @@ namespace IguideME.Web.Services
 
         public List<GradePredictionModelParameter> GetGradePredictionModelParameters(int modelID)
         {
-            string query = String.Format(
-                                   DatabaseQueries.QUERY_GRADE_PREDICTION_MODEL_PARAMETERS_FOR_MODEL,
-                                   modelID);
 
             List<GradePredictionModelParameter> parameters = new();
 
-            using(SQLiteDataReader r = Query(query)) {
+            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_GRADE_PREDICTION_MODEL_PARAMETERS_FOR_MODEL,
+                new SQLiteParameter("modelID", modelID)
+            )) {
                 while (r.Read())
                 {
                     GradePredictionModelParameter parameter = new(
@@ -734,13 +704,11 @@ namespace IguideME.Web.Services
             double grade)
         {
             try {
-                NonQuery(
-                    String.Format(
-                        DatabaseQueries.REGISTER_PREDICTED_GRADE,
-                        courseID,
-                        userID,
-                        grade
-                    ));
+                NonQuery(DatabaseQueries.REGISTER_PREDICTED_GRADE,
+                    new SQLiteParameter("courseID", courseID),
+                    new SQLiteParameter("userID", userID),
+                    new SQLiteParameter("grade", grade)
+                );
             } catch (Exception e) {
                 _logger.LogError("Error storing predicted grade: {message}\n{trace}", e.Message, e.StackTrace);
             }
@@ -748,31 +716,31 @@ namespace IguideME.Web.Services
 
         public void RegisterUserSettings(ConsentData data)
         {
-             NonQuery(String.Format(
-                DatabaseQueries.REGISTER_USER_SETTINGS,
-                data.CourseID, data.UserID, data.UserName.Replace("'", ""), data.Granted
-            ));
+             NonQuery(DatabaseQueries.REGISTER_USER_SETTINGS,
+                new SQLiteParameter("CourseID", data.CourseID),
+                new SQLiteParameter("UserID", data.UserID),
+                new SQLiteParameter("UserName", data.UserName),
+                new SQLiteParameter("Granted", data.Granted)
+            );
         }
 
         public void UpdateNotificationEnable(int courseID, string userID, bool enable)
         {
-            NonQuery(
-                String.Format(
-                    DatabaseQueries.UPDATE_NOTIFICATION_ENABLE,
-                    enable,
-                    courseID,
-                    userID));
+            NonQuery(DatabaseQueries.UPDATE_NOTIFICATION_ENABLE,
+                    new SQLiteParameter("enable", enable),
+                    new SQLiteParameter("courseID", courseID),
+                    new SQLiteParameter("userID", userID)
+            );
         }
 
         public bool GetNotificationEnable(int courseID, string userID)
         {
-            string query = String.Format(
-                DatabaseQueries.QUERY_NOTIFICATIONS_ENABLE,
-                courseID,
-                userID);
 
             bool result = true;
-            using(SQLiteDataReader r = Query(query)) {
+            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_NOTIFICATIONS_ENABLE,
+                    new SQLiteParameter("courseID", courseID),
+                    new SQLiteParameter("userID", userID)
+                )) {
                 if (r.Read())
                 {
                     try{
@@ -788,23 +756,20 @@ namespace IguideME.Web.Services
 
         public void UpdateUserGoalGrade(int courseID, string userID, int grade)
         {
-            NonQuery(
-                String.Format(
-                    DatabaseQueries.UPDATE_USER_GOAL_GRADE,
-                    grade,
-                    courseID,
-                    userID));
+            NonQuery(DatabaseQueries.UPDATE_USER_GOAL_GRADE,
+                new SQLiteParameter("grade", grade),
+                new SQLiteParameter("courseID", courseID),
+                new SQLiteParameter("userID", userID)
+            );
         }
 
         public int GetUserGoalGrade(int courseID, string userID)
         {
-            string query = String.Format(
-                DatabaseQueries.QUERY_USER_GOAL_GRADE,
-                courseID,
-                userID);
-
             int result = -1;
-            using(SQLiteDataReader r = Query(query)) {
+            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_USER_GOAL_GRADE,
+                    new SQLiteParameter("courseID", courseID),
+                    new SQLiteParameter("userID", userID)
+                )) {
                 if (r.Read())
                 {
                     try{
@@ -820,13 +785,11 @@ namespace IguideME.Web.Services
 
         public GoalData[] GetGoalGrades(int courseID)
         {
-            string query = String.Format(
-                DatabaseQueries.QUERY_GOAL_GRADES,
-                courseID);
-
             List<GoalData> goals = new();
 
-            using(SQLiteDataReader r = Query(query)) {
+            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_GOAL_GRADES,
+                    new SQLiteParameter("courseID", courseID)
+                )) {
                 while (r.Read())
                 {
                     try
@@ -854,18 +817,15 @@ namespace IguideME.Web.Services
             string syncHash)
         {
             string combinedIDs = string.Join( ",", userIDs);
-            NonQuery(
-                String.Format(
-                    DatabaseQueries.REGISTER_USER_PEER,
-                    courseID,
-                    goalGrade,
-                    combinedIDs,
-                    tileID,
-                    avgGrade,
-                    minGrade,
-                    maxGrade,
-                    syncHash
-                )
+            NonQuery(DatabaseQueries.REGISTER_USER_PEER,
+                new SQLiteParameter("courseID", courseID),
+                new SQLiteParameter("goalGrade", goalGrade),
+                new SQLiteParameter("combinedIDs", combinedIDs),
+                new SQLiteParameter("tileID", tileID),
+                new SQLiteParameter("avgGrade", avgGrade),
+                new SQLiteParameter("minGrade", minGrade),
+                new SQLiteParameter("maxGrade", maxGrade),
+                new SQLiteParameter("hash", syncHash)
             );
         }
 
@@ -879,14 +839,12 @@ namespace IguideME.Web.Services
             if (activeHash == null) return new List<string> { };
 
             List<String> peers = new();
-            string query = String.Format(
-                DatabaseQueries.QUERY_GROUP_PEERS,
-                courseID,
-                goalGrade,
-                activeHash
-            );
 
-            using(SQLiteDataReader r = Query(query)) {
+            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_GROUP_PEERS,
+                    new SQLiteParameter("courseID", courseID),
+                    new SQLiteParameter("goalGrade", goalGrade),
+                    new SQLiteParameter("hash", activeHash)
+                )) {
                 while (r.Read())
                 {
                     peers.Add(r.GetValue(0).ToString());
@@ -906,14 +864,13 @@ namespace IguideME.Web.Services
             string activeHash = hash ?? this.GetCurrentHash(courseID);
             return activeHash == null
                 ? -1
-                : IDNonQuery(
-                String.Format(
-                    DatabaseQueries.REGISTER_USER_SUBMISSION,
-                    entryID,
-                    userID,
-                    grade,
-                    submitted,
-                    activeHash));
+                : IDNonQuery(DatabaseQueries.REGISTER_USER_SUBMISSION,
+                    new SQLiteParameter("entryID", entryID),
+                    new SQLiteParameter("userID", userID),
+                    new SQLiteParameter("grade", grade),
+                    new SQLiteParameter("submitted", submitted),
+                    new SQLiteParameter("hash", activeHash)
+                );
         }
 
         public int CreateSubmissionMeta(
@@ -924,13 +881,12 @@ namespace IguideME.Web.Services
             string hash=null)
         {
             string activeHash = hash ?? this.GetCurrentHash(courseID);
-            return IDNonQuery(
-                String.Format(
-                    DatabaseQueries.REGISTER_SUBMISSION_META,
-                    submissionID,
-                    key,
-                    value,
-                    activeHash));
+            return IDNonQuery(DatabaseQueries.REGISTER_SUBMISSION_META,
+                new SQLiteParameter("submissionID", submissionID),
+                new SQLiteParameter("key", key),
+                new SQLiteParameter("value", value),
+                new SQLiteParameter("hash", activeHash)
+            );
         }
 
         public List<TileEntrySubmission> GetTileEntrySubmissions(
@@ -941,14 +897,12 @@ namespace IguideME.Web.Services
             string activeHash = hash ?? this.GetCurrentHash(courseID);
             if (activeHash == null) return new List<TileEntrySubmission>() { };
 
-            string query = String.Format(
-                DatabaseQueries.QUERY_SUBMISSIONS_FOR_ENTRY,
-                entryID,
-                activeHash);
-
             List<TileEntrySubmission> submissions = new();
 
-            using(SQLiteDataReader r = Query(query)) {
+            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_SUBMISSIONS_FOR_ENTRY,
+                    new SQLiteParameter("entryID", entryID),
+                    new SQLiteParameter("hash", activeHash)
+                )) {
                 while (r.Read())
                 {
                     TileEntrySubmission submission = new(
@@ -973,14 +927,12 @@ namespace IguideME.Web.Services
             string activeHash = hash ?? this.GetCurrentHash(courseID);
             if (activeHash == null) return new List<TileEntrySubmission>() { };
 
-            string query = String.Format(
-                DatabaseQueries.QUERY_COURSE_SUBMISSIONS,
-                courseID,
-                activeHash);
-
             List<TileEntrySubmission> submissions = new();
 
-            using(SQLiteDataReader r = Query(query)) {
+            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_COURSE_SUBMISSIONS,
+                    new SQLiteParameter("courseID", courseID),
+                    new SQLiteParameter("hash", activeHash)
+                )) {
                 while (r.Read())
                 {
                     try {
@@ -1012,15 +964,13 @@ namespace IguideME.Web.Services
             string activeHash = hash ?? this.GetCurrentHash(courseID);
             if (activeHash == null) return new List<TileEntrySubmission>() { };
 
-            string query = String.Format(
-                DatabaseQueries.QUERY_COURSE_SUBMISSIONS_FOR_STUDENT,
-                courseID,
-                userID,
-                activeHash);
-
             List<TileEntrySubmission> submissions = new();
 
-            using(SQLiteDataReader r = Query(query)) {
+            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_COURSE_SUBMISSIONS_FOR_STUDENT,
+                    new SQLiteParameter("courseID", courseID),
+                    new SQLiteParameter("userID", userID),
+                    new SQLiteParameter("hash", activeHash)
+                )) {
                 while (r.Read())
                 {
                     TileEntrySubmission submission = new(
@@ -1048,15 +998,13 @@ namespace IguideME.Web.Services
             string activeHash = hash ?? this.GetCurrentHash(courseID);
             if (activeHash == null) return new List<TileEntrySubmission>() { };
 
-            string query = String.Format(
-                DatabaseQueries.QUERY_USER_SUBMISSIONS_FOR_ENTRY_FOR_USER,
-                entryID,
-                userID,
-                activeHash);
-
             List<TileEntrySubmission> submissions = new();
 
-            using(SQLiteDataReader r = Query(query)) {
+            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_USER_SUBMISSIONS_FOR_ENTRY_FOR_USER,
+                    new SQLiteParameter("entryID", entryID),
+                    new SQLiteParameter("userID", userID),
+                    new SQLiteParameter("hash", activeHash)
+                )) {
                 while (r.Read())
                 {
                     TileEntrySubmission submission = new(
@@ -1077,14 +1025,12 @@ namespace IguideME.Web.Services
             string activeHash = hash ?? this.GetCurrentHash(courseID);
             if (activeHash == null) return new List<TileEntrySubmission>() { };
 
-            string query = String.Format(
-                DatabaseQueries.QUERY_USER_SUBMISSIONS_FOR_TILE,
-                tileID,
-                activeHash);
-
             List<TileEntrySubmission> submissions = new();
 
-            using(SQLiteDataReader r = Query(query)) {
+            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_USER_SUBMISSIONS_FOR_TILE,
+                    new SQLiteParameter("tileID", tileID),
+                    new SQLiteParameter("hash", activeHash)
+                )) {
                 while (r.Read())
                 {
                     TileEntrySubmission submission = new(
@@ -1112,15 +1058,13 @@ namespace IguideME.Web.Services
             string activeHash = hash ?? this.GetCurrentHash(courseID);
             if (activeHash == null) return new List<TileEntrySubmission>() { };
 
-            string query = String.Format(
-                DatabaseQueries.QUERY_USER_SUBMISSIONS_FOR_TILE_FOR_USER,
-                tileID,
-                userID,
-                activeHash);
-
             List<TileEntrySubmission> submissions = new();
 
-            using(SQLiteDataReader r = Query(query)) {
+            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_USER_SUBMISSIONS_FOR_TILE_FOR_USER,
+                    new SQLiteParameter("tileID", tileID),
+                    new SQLiteParameter("userID", userID),
+                    new SQLiteParameter("hash", activeHash)
+                )) {
                 while (r.Read())
                 {
                     TileEntrySubmission submission = new(
@@ -1140,12 +1084,11 @@ namespace IguideME.Web.Services
 
         public PeerGroup GetPeerGroup(int courseID)
         {
-            string query = String.Format(
-                DatabaseQueries.QUERY_PEER_GROUP_FOR_COURSE, courseID);
-
             PeerGroup group = null;
 
-            using(SQLiteDataReader r = Query(query)) {
+            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_PEER_GROUP_FOR_COURSE,
+                    new SQLiteParameter("courseID", courseID)
+                )) {
                 if (r.Read())
                 {
                     group = new PeerGroup(
@@ -1161,12 +1104,11 @@ namespace IguideME.Web.Services
         public PublicInformedConsent GetPublicInformedConsent(
             int courseID)
         {
-            string query = String.Format(
-                DatabaseQueries.QUERY_CONSENT_FOR_COURSE, courseID);
-
             PublicInformedConsent consent = null;
 
-            using(SQLiteDataReader r = Query(query)) {
+            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_CONSENT_FOR_COURSE,
+                    new SQLiteParameter("courseID", courseID)
+                )) {
                 if (r.Read())
                 {
                     consent = new PublicInformedConsent(
@@ -1186,18 +1128,19 @@ namespace IguideME.Web.Services
             bool requireConsent,
             string text)
         {
-            NonQuery(
-                String.Format(
-                    DatabaseQueries.UPDATE_CONSENT_FOR_COURSE,
-                    courseID,
-                    requireConsent,
-                    text));
+            NonQuery(DatabaseQueries.UPDATE_CONSENT_FOR_COURSE,
+                new SQLiteParameter("courseID", courseID),
+                new SQLiteParameter("requireConsent", requireConsent),
+                new SQLiteParameter("text", text)
+            );
         }
 
         public void RecycleExternalData(int courseID, string hash)
         {
-            NonQuery(String.Format(
-                DatabaseQueries.RECYCLE_EXTERNAL_DATA, courseID, hash));
+            NonQuery(DatabaseQueries.RECYCLE_EXTERNAL_DATA,
+                new SQLiteParameter("courseID", courseID),
+                new SQLiteParameter("hash", hash)
+            );
         }
 
         public void UpdateCoursePeerGroups(
@@ -1205,12 +1148,11 @@ namespace IguideME.Web.Services
             int groupSize,
             bool personalizedPeers)
         {
-            NonQuery(
-                String.Format(
-                    DatabaseQueries.UPDATE_PEER_GROUP_FOR_COURSE,
-                    courseID,
-                    groupSize,
-                    personalizedPeers));
+            NonQuery(DatabaseQueries.UPDATE_PEER_GROUP_FOR_COURSE,
+                new SQLiteParameter("courseID", courseID),
+                new SQLiteParameter("groupSize", groupSize),
+                new SQLiteParameter("personalizedPeers", personalizedPeers)
+            );
         }
 
     public Dictionary<int,List<float>> GetUserGrades(
@@ -1224,13 +1166,11 @@ namespace IguideME.Web.Services
 
             Dictionary<int,List<float>> grades = new();
 
-            string query = string.Format(
-                DatabaseQueries.QUERY_USER_RESULTS2,
-                courseID,
-                userID,
-                activeHash);
-
-            using(SQLiteDataReader r = Query(query)) {
+            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_USER_RESULTS2,
+                    new SQLiteParameter("courseID", courseID),
+                    new SQLiteParameter("userID", userID),
+                    new SQLiteParameter("hash", activeHash)
+                )) {
                 while (r.Read()) {
                     try {
                         // We save all the retrieved grades in a dictionary with
@@ -1246,14 +1186,11 @@ namespace IguideME.Web.Services
                 }
             }
 
-            // In the same way, we get discussions
-            string query2 = String.Format(
-                DatabaseQueries.QUERY_USER_DISCUSSION_COUNTER,
-                courseID,
-                userID,
-                activeHash);
-
-            using(SQLiteDataReader r2 = Query(query2)) {
+            using(SQLiteDataReader r2 = Query(DatabaseQueries.QUERY_USER_DISCUSSION_COUNTER,
+                    new SQLiteParameter("courseID", courseID),
+                    new SQLiteParameter("userID", userID),
+                    new SQLiteParameter("hash", activeHash)
+                )) {
                 while (r2.Read()) {
                     try {
                         // We save the sum of discussion entriess and replies in a dictionary with
@@ -1290,13 +1227,11 @@ namespace IguideME.Web.Services
             // First we need to find the user's goal grade to find their peer-group
             int goalGrade = GetUserGoalGrade(courseID,loginID);
 
-            string query = String.Format(
-                DatabaseQueries.QUERY_PEER_GROUP_RESULTS,
-                courseID,
-                goalGrade,
-                activeHash);
-
-            using(SQLiteDataReader r = Query(query)) {
+            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_PEER_GROUP_RESULTS,
+                    new SQLiteParameter("courseID", courseID),
+                    new SQLiteParameter("goalGrade", goalGrade),
+                    new SQLiteParameter("hash", activeHash)
+                )) {
                 while (r.Read()) {
                     try {
                         PeerComparisonData submission = new(
@@ -1317,15 +1252,12 @@ namespace IguideME.Web.Services
 
         public List<PredictedGrade> GetPredictedGrades(int courseID, string userID)
         {
-
-            string query = String.Format(
-                DatabaseQueries.QUERY_PREDICTED_GRADES_FOR_USER,
-                courseID,
-                userID);
-
             List<PredictedGrade> predictions = new();
 
-            using(SQLiteDataReader r = Query(query)) {
+            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_PREDICTED_GRADES_FOR_USER,
+                    new SQLiteParameter("courseID", courseID),
+                    new SQLiteParameter("userID", userID)
+                )) {
                 while (r.Read())
                 {
                     PredictedGrade prediction = new(
@@ -1351,15 +1283,13 @@ namespace IguideME.Web.Services
                     PeerComparisonData.FromGrades(0, Array.Empty<float>())
                 };
 
-            string query1 = String.Format(
-                DatabaseQueries.QUERY_USER_RESULTS,
-                courseID,
-                userID,
-                activeHash);
-
             List<PeerComparisonData> submissions = new();
 
-            using(SQLiteDataReader r1 = Query(query1)) {
+            using(SQLiteDataReader r1 = Query(DatabaseQueries.QUERY_USER_RESULTS,
+                    new SQLiteParameter("courseID", courseID),
+                    new SQLiteParameter("userID", userID),
+                    new SQLiteParameter("hash", activeHash)
+                )) {
                 while (r1.Read()) {
                     PeerComparisonData submission = new(
                         r1.GetInt32(0),
@@ -1377,20 +1307,18 @@ namespace IguideME.Web.Services
 
         public List<TileEntrySubmission> GetTileSubmissionsForUser(
             int courseID,
-            string userLoginID,
+            string userID,
             string hash = null)
         {
             string activeHash = hash ?? this.GetCurrentHash(courseID);
             if (activeHash == null) return new List<TileEntrySubmission>() { };
 
-            string query1 = String.Format(
-                DatabaseQueries.QUERY_USER_SUBMISSIONS_FOR_USER,
-                userLoginID,
-                activeHash);
-
             List<TileEntrySubmission> submissions = new();
 
-            using(SQLiteDataReader r1 = Query(query1)) {
+            using(SQLiteDataReader r1 = Query(DatabaseQueries.QUERY_USER_SUBMISSIONS_FOR_USER,
+                    new SQLiteParameter("userID", userID),
+                    new SQLiteParameter("hash", activeHash)
+                )) {
                 while (r1.Read())
                 {
                     TileEntrySubmission submission = new(
@@ -1418,16 +1346,13 @@ namespace IguideME.Web.Services
             string activeHash = hash ?? this.GetCurrentHash(courseID);
             if (activeHash == null) return new Dictionary<int, List<List<object>>>();
 
-            string query1 = String.Format(
-                DatabaseQueries.QUERY_GRADE_COMPARISSON_HISTORY,
-                courseID,
-                GetUserGoalGrade(courseID,userID),
-                userID);
-
-
             Dictionary<int, List<List<object>>> comparisson_history = new();
 
-            using(SQLiteDataReader r1 = Query(query1)) {
+            using(SQLiteDataReader r1 = Query(DatabaseQueries.QUERY_GRADE_COMPARISSON_HISTORY,
+                    new SQLiteParameter("courseID", courseID),
+                    new SQLiteParameter("grade", GetUserGoalGrade(courseID,userID)),
+                    new SQLiteParameter("userID", userID)
+                )) {
                 try
                 {
                     // Initialize last elements

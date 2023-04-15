@@ -168,14 +168,14 @@ namespace IguideME.Web.Services.Workers
                         goalGradeClass,
                         peerGroup,
                         entry.Key,
-                        entry.Value.Sum() / peerGroup.Count(),
+                        entry.Value.Sum() / peerGroup.Count,
                         entry.Value.Min(),
                         entry.Value.Max(),
                         this._hashCode);
                     }
                 }
 
-                CreateNotifications(sortedUsers[goalGradeClass], peerGroup.Count(), grades);
+                CreateNotifications(sortedUsers[goalGradeClass], peerGroup.Count, grades);
             }
         }
 

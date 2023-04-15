@@ -69,7 +69,7 @@ namespace IguideME.Web.Services.Workers
                         break;
                     case (int) Notification_Types.closing_gap:
                         closing += $"    - {tile.Title}\n";
-                        break;                    
+                        break;
                     case (int) Notification_Types.falling_behind:
                         falling += $"    - {tile.Title}\n";
                         break;
@@ -117,7 +117,7 @@ namespace IguideME.Web.Services.Workers
                 return;
             }
 
-            List<User> students = DatabaseManager.Instance.GetUsers(this._courseID, "student", this._hashCode);
+            List<User> students = DatabaseManager.Instance.GetStudents(this._courseID, "student", this._hashCode);
 
             foreach (User student in students)
             {
