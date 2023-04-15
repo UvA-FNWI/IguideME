@@ -178,8 +178,8 @@ namespace IguideME.Web.Services.Workers
                 CreateNotifications(sortedUsers[goalGradeClass], peerGroup.Count(), grades);
             }
         }
-        
-        
+
+
         void CreateNotifications(List<string> users, int peerGroupSize, Dictionary<int, List<float>> grades) {
 
             foreach(string user in users)
@@ -188,14 +188,14 @@ namespace IguideME.Web.Services.Workers
                 foreach (KeyValuePair<int, List<float>> entry in grades)
                 {
                     List<TileEntrySubmission> userTileSubmissions = DatabaseManager.Instance.GetTileSubmissionsForUser(entry.Key, user, this._hashCode);
-                    
+
                     // Find the submission with the highest ID, as it is the most recent
                     int lastSubmissionID = -1;
                     foreach (TileEntrySubmission submission in userTileSubmissions)
                         if (submission.ID > lastSubmissionID)
                             lastSubmissionID = submission.ID;
 
-                    
+
                     // Create one list with all the submission grades and one more without the most recent submission
                     List<float> currentSubmissionGrades = new();
                     List<float> lastSubmissionGrades = new();
@@ -224,7 +224,7 @@ namespace IguideME.Web.Services.Workers
                     }
                     // else if (currentAverage >= peerAverage)
                     // {
-                    //     // do nothing 
+                    //     // do nothing
                     // }
                     else if (currentAverage - lastAverage > 0)
                     {

@@ -42,7 +42,7 @@ namespace IguideME.Web.Services.Workers
 
             foreach (User student in students)
             {
-                _logger.LogInformation("Processing student {ID}...", student.ID);
+                // _logger.LogInformation("Processing student {ID}...", student.ID);
                 try {
                     DatabaseManager.Instance.RegisterUserSettings(new Models.ConsentData(_courseID, student.LoginID, student.Name, -1));
 
