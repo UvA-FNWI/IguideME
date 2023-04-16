@@ -755,7 +755,7 @@ namespace IguideME.Web.Controllers
 
             if (success)
             {
-                DatabaseManager.Instance.DeleteLayoutColumn(id);
+                DatabaseManager.Instance.DeleteLayoutColumn(GetCourseID(), id);
                 return NoContent();
             }
 
