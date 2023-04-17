@@ -207,57 +207,60 @@ namespace IguideME.Web.Services.Workers
                     }
 
                     // Store the three important Averages in variables
-                    float currentAverage = currentSubmissionGrades.Average();
-                    float lastAverage = lastSubmissionGrades.Average();
+                    float currentAverage = currentSubmissionGrades != null ? currentSubmissionGrades.Average():0;
+                    float lastAverage = lastSubmissionGrades != null ? lastSubmissionGrades.Average():0;
                     float peerAverage = entry.Value.Sum() / peerGroupSize;
 
-                    if (currentAverage >= peerAverage) // +1)
+                    if (currentAverage != 0)
                     {
-                        // outperform
-                        DatabaseManager.Instance.RegisterNotification(
-                            this._courseID,
-                            user,
-                            entry.Key,
-                            (int) Notification_Types.outperforming,
-                            this._hashCode
-                        );
-                    }
-                    // else if (currentAverage >= peerAverage)
-                    // {
-                    //     // do nothing
-                    // }
-                    else if (currentAverage - lastAverage > 0)
-                    {
-                        // closing the gap
-                        DatabaseManager.Instance.RegisterNotification(
-                            this._courseID,
-                            user,
-                            entry.Key,
-                            (int) Notification_Types.closing_gap,
-                            this._hashCode
-                        );
-                    }
-                    else if ((currentAverage - lastAverage <= 0) && (peerAverage - currentAverage <= 1))
-                    {
-                        // falling behind
-                        DatabaseManager.Instance.RegisterNotification(
-                            this._courseID,
-                            user,
-                            entry.Key,
-                            (int) Notification_Types.falling_behind,
-                            this._hashCode
-                        );
-                    }
-                    else if ((currentAverage - lastAverage <= 0) && (peerAverage - currentAverage > 1))
-                    {
-                        // put more effort
-                        DatabaseManager.Instance.RegisterNotification(
-                            this._courseID,
-                            user,
-                            entry.Key,
-                            (int) Notification_Types.more_effort,
-                            this._hashCode
-                        );
+                        if (currentAverage >= peerAverage) // +1)
+                        {
+                            // outperform
+                            DatabaseManager.Instance.RegisterNotification(
+                                this._courseID,
+                                user,
+                                entry.Key,
+                                (int) Notification_Types.outperforming,
+                                this._hashCode
+                            );
+                        }
+                        // else if (currentAverage >= peerAverage)
+                        // {
+                        //     // do nothing
+                        // }
+                        else if (currentAverage - lastAverage > 0)
+                        {
+                            // closing the gap
+                            DatabaseManager.Instance.RegisterNotification(
+                                this._courseID,
+                                user,
+                                entry.Key,
+                                (int) Notification_Types.closing_gap,
+                                this._hashCode
+                            );
+                        }
+                        else if ((currentAverage - lastAverage <= 0) && (peerAverage - currentAverage <= 1))
+                        {
+                            // falling behind
+                            DatabaseManager.Instance.RegisterNotification(
+                                this._courseID,
+                                user,
+                                entry.Key,
+                                (int) Notification_Types.falling_behind,
+                                this._hashCode
+                            );
+                        }
+                        else if ((currentAverage - lastAverage <= 0) && (peerAverage - currentAverage > 1))
+                        {
+                            // put more effort
+                            DatabaseManager.Instance.RegisterNotification(
+                                this._courseID,
+                                user,
+                                entry.Key,
+                                (int) Notification_Types.more_effort,
+                                this._hashCode
+                            );
+                        }
                     }
                 }
             }
