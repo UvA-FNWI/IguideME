@@ -52,7 +52,8 @@ class App extends Component<Props, { student: CanvasStudent | null, goalGrade: n
         { isAdmin ?
           <AdminDashboard student={student} /> :
           student === null ?
-            <h1>Your account has not yet been processed, try again tomorrow!</h1>:
+            <h1>Your account has not yet been processed, try again tomorrow!</h1>
+            :
             <StudentDashboard consent= {this.props.consent} student={student || undefined} />
         }
       </div>

@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import Select from "react-select";
-import {Button, Tooltip} from "antd";
-import {SyncOutlined} from "@ant-design/icons";
+// import {Button, Tooltip} from "antd";
+// import {SyncOutlined} from "@ant-design/icons";
 import { Link } from "react-router-dom";
 import {IProps, IState} from "./types";
 import StudentController from "../../api/controllers/student";

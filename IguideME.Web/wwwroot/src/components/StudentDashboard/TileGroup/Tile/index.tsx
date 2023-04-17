@@ -16,17 +16,16 @@ export default class Tile extends Component<IProps, IState> {
     const { tile, tileEntries, submissions, userGrades, discussions, learningOutcomes, student } = this.props;
     const avg: number | null = getAverageGrade(userGrades);
 
-    switch (tile.type) {
-      case "DISCUSSIONS":
-        let disc_grade = 0;
-        discussions.forEach(discussion => {
-          if (discussion.type === discussionType.topic ){
-            if (discussion.posted_by === student.name)
-              disc_grade++;
-          } else {
+    if (tile.type === "DISCUSSIONS") {
+      let disc_grade = 0;
+      discussions.forEach(discussion => {
+        if (discussion.type === discussionType.topic ){
+          if (discussion.posted_by === student.name)
             disc_grade++;
-          }
-        })
+        } else {
+          disc_grade++;
+        }
+      })
       return (
         <span style={{textAlign: 'center'}}>
           <strong>{ disc_grade }</strong> discussion{discussions.length !== 1 && "s"}
@@ -43,19 +42,19 @@ export default class Tile extends Component<IProps, IState> {
           </span>
         );
       case "PREDICTION":
-        return <GradeStatistic grade={avg ? avg!.toString() : "-"} />;
+        return <GradeStatistic grade={avg !== null ? avg!.toString() : "-"} />;
       case "BINARY":
         return (
           <>
             { !!avg && <Progress percent={getProgression(tile, tileEntries, submissions)} /> }
-            <GradeStatistic grade={avg ? (avg * 10).toString() : "-"} />
+            <GradeStatistic grade={avg !== null ? (avg * 10).toString() : "-"} />
           </>
         );
       case "ENTRIES":
         return (
           <>
             { !!avg && <Progress percent={getProgression(tile, tileEntries, submissions)} /> }
-            <GradeStatistic grade={avg ? avg!.toString() : "-"} />
+            <GradeStatistic grade={avg !== null ? avg!.toString() : "-"} />
           </>
         );
       default:

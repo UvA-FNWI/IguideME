@@ -1377,7 +1377,7 @@ public static class DatabaseQueries
             ON      `tile_entry_submission`.`entry_id`=`tile_entry`.`id`
         WHERE       `tile_entry`.`tile_id`=@tileID
         AND         `tile_entry_submission`.`user_id`=@userID
-        AND         `tile_entry_submission`.`sync_hash`='@hash;";
+        AND         `tile_entry_submission`.`sync_hash`=@hash;";
 
     public const string QUERY_USER_SUBMISSIONS_FOR_USER =
         @"SELECT    `tile_entry_submission`.`id`,

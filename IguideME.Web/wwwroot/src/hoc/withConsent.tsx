@@ -39,10 +39,8 @@ export const withConsent = <P extends object>(Component: React.ComponentType<P>)
 
       if (!consentLoaded || !course) return <Loading />;
 
-      // TODO: instead of loading consent, load the student view with the settings open
       if (!consentGranted && course.require_consent) {
         return <App consent={course.text} />;
-        // return <Consent text={course.text} />;
       }
 
       if (!accepted) {

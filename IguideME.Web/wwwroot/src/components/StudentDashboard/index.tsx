@@ -59,6 +59,7 @@ class StudentDashboard extends Component<Props, IState> {
 
   componentDidMount(): void {
     AppController.trackAction("Load home")
+
     if (this.props.consent !== null && this.props.consent !== undefined) {
       AppController.trackAction("No consent")
       this.setState({settings_view: true});
@@ -181,7 +182,6 @@ class StudentDashboard extends Component<Props, IState> {
     } = this.state;
 
     let mappedHistoricGrades = new Map(Object.entries(historicGrades));
-    // console.log(mappedHistoricGrades);
 
     const { tiles, tileGroups, dashboardColumns, tileEntries, student} = this.props;
 
@@ -204,8 +204,6 @@ class StudentDashboard extends Component<Props, IState> {
           peer_max: Object.values(currentTileHistory)[3] as Array<number>,
           peer_min: Object.values(currentTileHistory)[4] as Array<number> };
       }
-      // console.log(tileHistory);
-
 
       return <TileDetail tile={(displayTile as any).tile}
                          tileEntries={tileEntries}
