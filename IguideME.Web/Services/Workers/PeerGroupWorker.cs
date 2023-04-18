@@ -206,12 +206,16 @@ namespace IguideME.Web.Services.Workers
                             lastSubmissionGrades.Add(float.Parse(submission.Grade));
                     }
 
+                    float currentAverage = -1;
+                    float lastAverage = -1;
                     // Store the three important Averages in variables
-                    float currentAverage = currentSubmissionGrades != null ? currentSubmissionGrades.Average():0;
-                    float lastAverage = lastSubmissionGrades != null ? lastSubmissionGrades.Average():0;
+                    if (currentSubmissionGrades.Count != 0) 
+                        currentAverage = currentSubmissionGrades.Average();
+                    if (lastSubmissionGrades.Count != 0)
+                        lastAverage =lastSubmissionGrades.Average();
                     float peerAverage = entry.Value.Sum() / peerGroupSize;
 
-                    if (currentAverage != 0)
+                    if (currentAverage != -1)
                     {
                         if (currentAverage >= peerAverage) // +1)
                         {
