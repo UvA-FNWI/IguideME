@@ -12,7 +12,7 @@ fi
 #KUBECTL_PROJ_ID=$(kubectl get pods -n iguideme | grep Running | awk '{print $1}')
 
 alias frontend-watch='npm start --prefix $PROJECT_ROOT/IguideME.Web/wwwroot/';
-alias build-frontend='npm run build --prefix $PROJECT_ROOT/IguideME.Web/wwwroot/';
+alias frontend-build='npm run build --prefix $PROJECT_ROOT/IguideME.Web/wwwroot/';
 alias backend-watch='dotnet watch --project $PROJECT_ROOT/IguideME.Web/ --no-hot-reload';
 alias enter-db='litecli $PROJECT_ROOT/IguideME.Web/db.sqlite';
 alias logs='kubectl logs $KUBECTL_PROJ_ID -n iguideme';
