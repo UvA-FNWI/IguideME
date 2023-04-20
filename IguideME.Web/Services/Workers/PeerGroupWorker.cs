@@ -168,19 +168,19 @@ namespace IguideME.Web.Services.Workers
                         goalGradeClass,
                         peerGroup,
                         entry.Key,
-                        entry.Value.Sum() / peerGroup.Count,
+                        entry.Value.Average(),
                         entry.Value.Min(),
                         entry.Value.Max(),
                         this._hashCode);
                     }
                 }
 
-                CreateNotifications(sortedUsers[goalGradeClass], peerGroup.Count, grades);
+                CreateNotifications(sortedUsers[goalGradeClass], grades);
             }
         }
 
 
-        void CreateNotifications(List<string> users, int peerGroupSize, Dictionary<int, List<float>> grades) {
+        void CreateNotifications(List<string> users, Dictionary<int, List<float>> grades) {
 
             foreach(string user in users)
             {
@@ -208,12 +208,14 @@ namespace IguideME.Web.Services.Workers
 
                     float currentAverage = -1;
                     float lastAverage = -1;
+                    float peerAverage = -1;
                     // Store the three important Averages in variables
                     if (currentSubmissionGrades.Count != 0) 
                         currentAverage = currentSubmissionGrades.Average();
                     if (lastSubmissionGrades.Count != 0)
                         lastAverage =lastSubmissionGrades.Average();
-                    float peerAverage = entry.Value.Sum() / peerGroupSize;
+                    if (entry.Value != null)
+                        peerAverage = entry.Value.Average();
 
                     if (currentAverage != -1)
                     {

@@ -1286,7 +1286,7 @@ public static class DatabaseQueries
 
     public const string QUERY_CONSENTS =
         @"SELECT    `user_id`,
-                    `user_name
+                    `user_name,
                     `consent`
         FROM        `user_settings`
         WHERE       `course_id`=@courseID
