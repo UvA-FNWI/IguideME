@@ -33,8 +33,8 @@ export default class TileHistoricGraph extends Component<IProps, IState> {
                             fill: false,
                             borderWidth:3,
                             tension:0,
-                            backgroundColor: "rgb(255, 50, 50, 0.5)",
-                            borderColor:'rgb(255,50,50, 0.5)'
+                            backgroundColor: "rgba(47,44,232, 0.5)",
+                            borderColor:'rgba(0,0,255, 1)'
                             },
                         {
                             label: "Peer Group average",
@@ -42,8 +42,8 @@ export default class TileHistoricGraph extends Component<IProps, IState> {
                             fill: false,
                             borderWidth:3,
                             tension:0,
-                            backgroundColor: "rgb(101,154,176)",
-                            borderColor:'rgb(101,154,176)'///68,93,118
+                            backgroundColor: "rgba(255, 50, 50, .5)",
+                            borderColor:'rgba(255,0,0, 1)'
                             },
                         {
                             label: "Peer Group maximum",
@@ -51,8 +51,8 @@ export default class TileHistoricGraph extends Component<IProps, IState> {
                             fill: 3,
                             borderWidth:3,
                             tension:0,
-                            backgroundColor: "rgb(135,206,235,0.1)",
-                            borderColor:'rgb(135,206,235)'
+                            backgroundColor: "rgba(255, 50, 50, .5)",
+                            borderColor:'rgba(255,0,0, 1)'
                             },
                         {
                             label: "Peer Group minimum",
@@ -60,8 +60,8 @@ export default class TileHistoricGraph extends Component<IProps, IState> {
                             fill: 2,
                             borderWidth:3,
                             tension:0,
-                            backgroundColor: "rgb(135,206,235,0.1)",
-                            borderColor:'rgb(135,206,235)'
+                            backgroundColor: "rgba(255, 50, 50, .5)",
+                            borderColor:'rgba(255,0,0, 1)'
                             }
                         ]
                     }}
