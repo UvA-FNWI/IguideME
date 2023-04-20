@@ -12,6 +12,7 @@ import DiscussionManager from "./DiscussionManager";
 import {message} from "antd";
 import LearningGoalsManager from "./LearningGoalsManager";
 import "./style.scss";
+import { discussionType } from '../../../models/canvas/Discussion';
 
 const mapState = (state: RootState) => ({
   assignments: state.assignments,
@@ -134,7 +135,7 @@ class TileCreateEntries extends Component<Props, IState> {
                                    wildcard={this.props.wildcard}
                                    setWildcard={this.props.setWildcard}
                                    activeDiscussions={activeEntries}
-                                   canvasDiscussions={this.props.discussions} />);
+                                   canvasDiscussions={this.props.discussions.filter(disc => disc.type === discussionType.topic)} />);
       case "EXTERNAL_DATA":
         return (<ExternalDataManager />);
       default:

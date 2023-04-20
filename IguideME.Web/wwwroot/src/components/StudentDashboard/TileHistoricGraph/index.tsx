@@ -24,6 +24,13 @@ export default class TileHistoricGraph extends Component<IProps, IState> {
 
             <div>
                 <Line
+                options= {{
+                    scales: {
+                        y: {
+                          min: 0
+                        }
+                      }
+                }}
                 data={{
                     labels: dates,
                     datasets: [

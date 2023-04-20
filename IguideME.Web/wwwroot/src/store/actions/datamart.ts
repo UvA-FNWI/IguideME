@@ -27,7 +27,6 @@ export class DataMartActions {
 
   static loadDiscussions = async () => {
     const discussions = await CanvasController.getDiscussions();
-
     if (discussions)
       return {
         type: DataMartActions.SET_DISCUSSIONS_SUCCESS,

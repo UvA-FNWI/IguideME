@@ -9,71 +9,18 @@ public static class DatabaseQueries
     public static readonly Dictionary<string, string> MIGRATIONS =
         new()
         {
-            // {
-            //     "0001_rename_user_id_in_user_tracker",
-            //     @"ALTER TABLE user_tracker RENAME COLUMN `user_login_id` TO `user_id`;"
-            // },
-            // {
-            //     "0002_rename_user_id_in_accept_list",
-            //     @"ALTER TABLE accept_list RENAME COLUMN `user_login_id` TO `user_id`;"
-            // },
-            // {
-            //     "0003_rename_user_id_in_tile_entry_submission",
-            //     @"ALTER TABLE tile_entry_submission RENAME COLUMN `user_login_id` TO `user_id`;"
-            // },
-            // {
-            //     "0004_rename_and_remove_user_id_in_user_settings",
-            //     @"
-            //     ALTER TABLE user_settings RENAME TO tmp;
-            //     CREATE TABLE IF NOT EXISTS user_settings (
-            //                 id              INTEGER PRIMARY KEY AUTOINCREMENT,
-            //                 course_id       INTEGER,
-            //                 user_id         STRING,
-            //                 user_name       STRING,
-            //                 consent         INTEGER,
-            //                 goal_grade      INTEGER,
-            //                 notifications   BOOLEAN DEFAULT true,
-            //                 UNIQUE(course_id, user_id)
-            //             );
-            //     INSERT INTO user_settings (`id`, `course_id`, `user_id`, `user_name`, `consent`, `goal_grade`, `notifications`)
-            //     SELECT `id`, `course_id`, `user_login_id`, `user_name`, `consent`, `goal_grade`, `notifications` FROM tmp
-            //     ;
-            //     DROP TABLE tmp;"
-            // },
-            // {
-            //     "0005_change_sis_to_login_in_user_settings",
-            //     @"
-            //     UPDATE user_settings SET `user_id` = (SELECT login_id FROM canvas_users WHERE `canvas_users`.`sis_id` = `user_settings`.`user_id`
-            //     );"
-            // },
-            // {
-            //     "0007_rename_and_remove_user_id_in_notifications",
-            //     @"
-            //     ALTER TABLE notifications RENAME COLUMN `user_login_id` TO `user_id`;"
-            // },
-            // {
-            //     "0008_rename_and_remove_user_id_in_predicted_grade",
-            //     @"
-            //     ALTER TABLE predicted_grade RENAME COLUMN `user_login_id` TO `user_id`;"
-            // },
-            // {
-            //     "0009_rename_and_remove_user_id_in_external_data",
-            //     @"
-            //     ALTER TABLE external_data RENAME COLUMN `user_login_id` TO `user_id`;"
-            // },
-            // {
-            //     "0010_rename_and_remove_user_id_in_canvas_users",
-            //     @"
-            //     ALTER TABLE canvas_users RENAME COLUMN `user_id` TO `studentnumber`;
-            //     ALTER TABLE canvas_users DROP COLUMN `sis_id`;
-            //     ALTER TABLE canvas_users RENAME COLUMN `login_id` TO `user_id`;"
-            // },
-            // {
-            //     "0011_drop_old_peer_group_table",
-            //     @"
-            //     DROP TABLE peer_group
-            //     ;"
-            // },
+            {
+                "001_drop_old_peer_group_table",
+                @"
+                DROP TABLE peer_group
+                ;"
+            },
+            {
+                "002_drop_old_notification_table",
+                @"
+                DROP TABLE notifications
+                ;"
+            }
         };
 
 // //================================ Tables ================================//
@@ -1286,7 +1233,7 @@ public static class DatabaseQueries
 
     public const string QUERY_CONSENTS =
         @"SELECT    `user_id`,
-                    `user_name,
+                    `user_name`,
                     `consent`
         FROM        `user_settings`
         WHERE       `course_id`=@courseID

@@ -25,8 +25,8 @@ namespace IguideME.Web.Services
             _connection_string = isDev ? "Data Source=db.sqlite;Version=3;New=False;Compress=True;"
                                       : "Data Source=/data/IguideME.db;Version=3;New=False;Compress=True;";
 
-            DatabaseManager.s_instance.CreateTables();
             DatabaseManager.s_instance.RunMigrations();
+            DatabaseManager.s_instance.CreateTables();
             ILoggerFactory factory = LoggerFactory.Create(builder => builder.AddConsole());
             _logger = factory.CreateLogger("DatabaseManager");
         }
@@ -198,7 +198,9 @@ namespace IguideME.Web.Services
                     if (r.HasRows)
                         continue;
 
-                _logger.LogInformation("Migration {id} not yet applied, proceeding to apply...", migration_id);
+                // _logger.LogInformation("Migration {id} not yet applied, proceeding to apply...", migration_id);
+
+                Console.WriteLine($"Migration {migration_id} not yet applied, proceeding to apply...");
 
                 string migration_sql = entry.Value;
                 NonQuery(migration_sql);
@@ -1599,8 +1601,6 @@ namespace IguideME.Web.Services
             int status,
             string hash = null)
         {
-            _logger.LogInformation("Registering notification to {user}: {status}", userID, status);
-
             string activeHash = hash ?? this.GetCurrentHash(courseID);
 
             NonQuery(DatabaseQueries.REGISTER_USER_NOTIFICATIONS,
