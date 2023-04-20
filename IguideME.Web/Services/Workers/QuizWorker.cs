@@ -65,6 +65,15 @@ namespace IguideME.Web.Services.Workers
 					"online",
 					this._hashCode
 				);
+				foreach (QuizSubmission sub in quiz.Submissions) {
+					foreach (QuizSubmissionQuestion q in sub.Answers ) {
+						if (q.AnswerData == null) {
+							_logger.LogInformation("Answerdata is null");
+						} else {
+							_logger.LogInformation("Answerdata {q}", q.AnswerData.ToString());
+						}
+					}
+				}
 			}
 		}
 	}

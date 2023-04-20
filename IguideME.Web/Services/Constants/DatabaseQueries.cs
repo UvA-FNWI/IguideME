@@ -1286,7 +1286,7 @@ public static class DatabaseQueries
 
     public const string QUERY_CONSENTS =
         @"SELECT    `user_id`,
-                    `user_name
+                    `user_name,
                     `consent`
         FROM        `user_settings`
         WHERE       `course_id`=@courseID
@@ -1718,7 +1718,7 @@ public static class DatabaseQueries
     public const string INSERT_USER_ACTION =
     @"INSERT INTO   `user_tracker` (`user_id`,`action`)
           VALUES        (
-            @userID
+            @userID,
             @action
           );";
 

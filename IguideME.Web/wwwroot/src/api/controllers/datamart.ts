@@ -9,7 +9,7 @@ import {
 import { Synchronization } from "../../models/app/SyncProvider";
 import { PredictedGrade, PredictiveModel } from "../../models/app/PredictiveModel";
 
-import { PerformanceNotification } from "../../models/app/Notification";
+import { NotificationStatus, PerformanceNotification } from "../../models/app/Notification";
 import { AppAcceptList } from "../../models/app/AcceptList";
 import { GradePredictionModel } from "../../common/Admin/sections/grades/GradePredictor/ModelConfigurator/interfaces";
 import { MOCK_NOTIFICATIONS } from "../../mocks/students";
@@ -108,8 +108,8 @@ export default class DataMartController extends Controller {
 
   static getNotifications(userID: string): Promise<PerformanceNotification[]> {
     if (debug()) return delay([
-      { userID: userID, tile_id: 2, status: "outperforming peers" },
-      { userID: userID, tile_id: 4, status: "closing the gap" }
+      { userID: userID, tile_id: 2, status: NotificationStatus.outperforming },
+      { userID: userID, tile_id: 4, status: NotificationStatus.closing_gap }
     ]);
 
     return this.client.get(

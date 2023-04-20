@@ -1,4 +1,9 @@
-export type NotificationStatus = "outperforming peers" | "closing the gap" | "more effort required";
+export enum NotificationStatus {
+  outperforming,
+  closing_gap,
+  falling_behind,
+  more_effort
+}
 
 export interface PerformanceNotification {
   userID: string;

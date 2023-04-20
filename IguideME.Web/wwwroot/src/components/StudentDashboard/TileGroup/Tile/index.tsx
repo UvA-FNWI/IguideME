@@ -47,14 +47,14 @@ export default class Tile extends Component<IProps, IState> {
         return (
           <>
             { !!avg && <Progress percent={getProgression(tile, tileEntries, submissions)} /> }
-            <GradeStatistic grade={avg !== null ? (avg * 10).toString() : "-"} />
+            <GradeStatistic grade={avg !== null ? (avg * 10).toFixed(2) : "-"} />
           </>
         );
       case "ENTRIES":
         return (
           <>
             { !!avg && <Progress percent={getProgression(tile, tileEntries, submissions)} /> }
-            <GradeStatistic grade={avg !== null ? avg!.toString() : "-"} />
+            <GradeStatistic grade={avg !== null ? avg!.toFixed(2) : "-"} />
           </>
         );
       default:

@@ -4,7 +4,7 @@ import { Divider, Table } from "antd";
 import type { ColumnsType} from 'antd/es/table';
 import DataMartController from "../../../../api/controllers/datamart";
 import StudentController from "../../../../api/controllers/student";
-import {PerformanceNotification, Notifications, Data} from "../../../../models/app/Notification"
+import {PerformanceNotification, Notifications, Data, NotificationStatus} from "../../../../models/app/Notification"
 import PerformanceNotifications from "../../../../components/visuals/Notifications"
 import {CanvasStudent} from "../../../../models/canvas/Student"
 import { IState } from "./types";
@@ -69,21 +69,21 @@ export default class NotificationCentre extends Component {
       }
 
       switch (notification.status) {
-        case "outperforming peers":
+        case NotificationStatus.outperforming:
           if (notification.sent) {
             entry.previous.outperforming.push(notification)
           } else {
             entry.current.outperforming.push(notification)
           }
           break;
-        case "closing the gap":
+        case NotificationStatus.closing_gap:
           if (notification.sent) {
             entry.previous.closing.push(notification)
           } else {
             entry.current.closing.push(notification)
           }
           break;
-        case "more effort required":
+        case NotificationStatus.more_effort:
           if (notification.sent) {
             entry.previous.more_effort.push(notification)
           } else {
@@ -115,9 +115,9 @@ export default class NotificationCentre extends Component {
           render: (value: Notifications) => {
             return (
               <PerformanceNotifications outperforming = {value.outperforming}
-              closing = {value.closing}
-              moreEffort = {value.more_effort}
-              tiles = {tiles}
+                closing = {value.closing}
+                moreEffort = {value.more_effort}
+                tiles = {tiles}
               />
             )
           }
@@ -128,9 +128,9 @@ export default class NotificationCentre extends Component {
           render: (value: Notifications) => {
             return (
               <PerformanceNotifications outperforming = {value.outperforming}
-              closing = {value.closing}
-              moreEffort = {value.more_effort}
-              tiles = {tiles}
+                closing = {value.closing}
+                moreEffort = {value.more_effort}
+                tiles = {tiles}
               />
             )
           }

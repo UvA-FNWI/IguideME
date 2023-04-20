@@ -4,7 +4,7 @@ import {RootState} from "../../../store";
 import {connect, ConnectedProps} from "react-redux";
 import {CanvasStudent} from "../../../models/canvas/Student";
 import DataMartController from "../../../api/controllers/datamart";
-import {PerformanceNotification} from "../../../models/app/Notification";
+import {NotificationStatus, PerformanceNotification} from "../../../models/app/Notification";
 import PerformanceNotifications from "../../../components/visuals/Notifications";
 import { SettingOutlined } from "@ant-design/icons";
 
@@ -56,13 +56,15 @@ class UserProfile extends Component<Props, IState> {
     const { notifications }: IState = this.state;
 
     const outperforming = notifications
-      .filter(n => n.status === "outperforming peers");
+      .filter(n => n.status === NotificationStatus.outperforming);
 
     const closing = notifications
-      .filter(n => n.status === "closing the gap");
+      .filter(n => n.status === NotificationStatus.closing_gap);
 
     const moreEffort = notifications
-      .filter(n => n.status === "more effort required");
+      .filter(n => n.status === NotificationStatus.more_effort);
+
+      // TODO: falling behind?
 
     return (
       <div id={"userProfile"}>
