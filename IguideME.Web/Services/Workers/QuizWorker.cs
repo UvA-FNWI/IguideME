@@ -1,7 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+
+using IguideME.Web.Models;
 
 using Microsoft.Extensions.Logging;
+
+using Newtonsoft.Json;
 
 using UvA.DataNose.Connectors.Canvas;
 
@@ -39,6 +44,33 @@ namespace IguideME.Web.Services.Workers
         }
 
 		/// <summary>
+        /// Register submissions associated to a quiz in the database.
+        /// </summary>
+        /// <param name="quiz">the quiz the submissions are associated to.</param>
+        /// <param name="entry">the tile entry the submissions are associated to.</param>
+        public void RegisterSubmissions(Quiz quiz, TileEntry entry)
+        {
+			IEnumerable<QuizSubmission> submissions = quiz.Submissions
+                .Where(submission =>
+					submission.Score != null &&
+					DatabaseManager.Instance.GetConsent(this._courseID,
+						DatabaseManager.Instance.GetUserID(this._courseID, submission.UserID)) == 1
+				);
+
+			foreach (QuizSubmission sub in quiz.Submissions) {
+				DatabaseManager.Instance.CreateUserSubmission(
+					this._courseID,
+					entry.ID,
+					DatabaseManager.Instance.GetUserID(this._courseID, sub.UserID),
+					sub.Score.Value,
+					// sub.Score.Value/quiz.PointsPossible * 100, Should change to this.
+					"",
+					this._hashCode
+				);
+			}
+        }
+
+        /// <summary>
         /// Starts the quiz worker.
         /// </summary>
         public void Start()
@@ -47,11 +79,16 @@ namespace IguideME.Web.Services.Workers
 
 			// Get the quizzes from canvas.
 			List<Quiz> quizzes = this._canvasHandler.GetQuizzes(_courseID);
+			List<TileEntry> entries = DatabaseManager.Instance.GetEntries(this._courseID);
 
 			// Register the quizzes in the database.
 			foreach (Quiz quiz in quizzes)
 			{
-				_logger.LogInformation("Processing quiz: {Name}", quiz.Name);
+				// Graded quizzes (assignment quizzes) are treated as assignments by canvas and will be handled in the assignment worker.
+				if (quiz.Type == QuizType.Assignment)
+                    continue;
+
+                _logger.LogInformation("Processing quiz: {Name}", quiz.Name);
 				DatabaseManager.Instance.RegisterAssignment(
 					quiz.ID,
 					quiz.CourseID,
@@ -59,21 +96,19 @@ namespace IguideME.Web.Services.Workers
 					quiz.IsPublished,
 					false,
 					quiz.DueDate.HasValue ? quiz.DueDate.Value.ToShortDateString() : "",
-					0,
+					quiz.PointsPossible,
 					0,
 					(int) GradingType.Points,
-					"online",
+					JsonConvert.SerializeObject(quiz.Type),
+					// "",
 					this._hashCode
 				);
-				// foreach (QuizSubmission sub in quiz.Submissions) {
-				// 	foreach (QuizSubmissionQuestion q in sub.Answers ) {
-				// 		if (q.AnswerData == null) {
-				// 			_logger.LogInformation("Answerdata is null");
-				// 		} else {
-				// 			_logger.LogInformation("Answerdata {q}", q.AnswerData.ToString());
-				// 		}
-				// 	}
-				// }
+
+				// Don't register submissions that aren't assigned to tiles (as entries).
+                TileEntry entry = entries.Find(e => e.Title == quiz.Name);
+                if (entry == null) continue;
+
+                this.RegisterSubmissions(quiz, entry);
 			}
 		}
 	}
