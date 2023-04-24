@@ -96,7 +96,7 @@ namespace IguideME.Web.Services.Workers
 					quiz.IsPublished,
 					false,
 					quiz.DueDate.HasValue ? quiz.DueDate.Value.ToShortDateString() : "",
-					quiz.PointsPossible,
+					quiz.PointsPossible ?? 0,
 					0,
 					(int) GradingType.Points,
 					JsonConvert.SerializeObject(quiz.Type),
