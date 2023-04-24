@@ -101,6 +101,23 @@ export default class NotificationCentre extends Component {
   }
 
   render(): React.ReactNode {
+    const { RRule } = require('rrule');
+
+    const weeklyRule = new RRule({
+      freq: RRule.WEEKLY,
+      byweekday: RRule.MO,
+      //Month and Date start from 0, so January is 0, Feb is 1, etc.
+      //                YYYY,M-1,D-1,HH,MM,SS, GMT?
+      dtstart: new Date(2023, 3, 17, 10, 1, 0, 0),
+      count: 10,
+    });
+
+    const weekly = weeklyRule.all();
+    // console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+    // console.log(weeklyRule.toString());
+    console.log("iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii");
+    console.log(weekly.toString());
+
     const { students, notifications, tiles }: IState = this.state;
     const columns: ColumnsType<Data> = [
         {
