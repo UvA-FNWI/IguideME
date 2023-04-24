@@ -1988,19 +1988,24 @@ namespace IguideME.Web.Services
                 )) {
                 while (r.Read())
                 {
-                    AppAssignment row = new(
-                        r.GetInt32(0),
-                        r.GetValue(1).ToString(),
-                        r.GetInt32(2),
-                        r.GetValue(3).ToString(),
-                        r.GetBoolean(4),
-                        r.GetBoolean(5),
-                        r.GetValue(6).ToString(),
-                        r.GetFloat(7),
-                        r.GetInt32(8),
-                        r.GetValue(9).ToString()
-                    );
-                    assignments.Add(row);
+                    try {
+                        AppAssignment row = new(
+                            r.GetInt32(0),
+                            r.GetValue(1).ToString(),
+                            r.GetInt32(2),
+                            r.GetValue(3).ToString(),
+                            r.GetBoolean(4),
+                            r.GetBoolean(5),
+                            r.GetValue(6).ToString(),
+                            r.GetFloat(7),
+                            r.GetInt32(8),
+                            r.GetValue(9).ToString()
+                        );
+                        assignments.Add(row);
+                    } catch (Exception e)
+                    {
+                        PrintQueryError("GetAssignments", 9, r, e);
+                    }
                 }
             }
 

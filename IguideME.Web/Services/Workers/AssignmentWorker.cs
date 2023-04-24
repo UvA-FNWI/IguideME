@@ -70,7 +70,7 @@ namespace IguideME.Web.Services.Workers
         /// Register submissions associated to an assignment in the database.
         /// </summary>
         /// <param name="assignment">the assignment the submissions are associated to.</param>
-        /// <param name="entries">a list of all the entries in the course.</param>
+        /// <param name="entry">the tile entry the submissions are associated to.</param>
 		private void RegisterSubmissions(Assignment assignment, TileEntry entry) {
 
 			// Filter out students that did not give consent and that don't have a grade.
