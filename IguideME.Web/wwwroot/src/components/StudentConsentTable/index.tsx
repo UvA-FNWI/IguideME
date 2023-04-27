@@ -35,7 +35,7 @@ export default class StudentConsentTable extends Component<IProps, IState> {
               <h2>Consent & Goal Grades Overview</h2>
             </Col>
             <Col>
-              Consent Given: &ensp; {consents.filter((consent: ConsentData) => consent.granted !== 0).length}/{consents.length}
+              Consent Given: &ensp; {consents.filter((consent: ConsentData) => consent.granted === 1).length}/{consents.length}
             </Col>
           </Row>
 
