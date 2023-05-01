@@ -6,4 +6,6 @@ export interface IState {
   students: CanvasStudent[]
   notifications: PerformanceNotification[]
   tiles: Tile[]
+  dates: Date[]
+  rangeBool: boolean
 }

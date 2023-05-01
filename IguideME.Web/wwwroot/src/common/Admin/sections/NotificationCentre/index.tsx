@@ -14,16 +14,18 @@ import { Tile } from "../../../../models/app/Tile";
 import {CheckCircleOutlined, CloseCircleOutlined} from "@ant-design/icons";
 import AppController from "../../../../api/controllers/app";
 
-import RRuleGeneratorTS, { translations } from "react-rrule-generator-ts";
-import "react-rrule-generator-ts/dist/index.css";
+import DatePicker from "react-multi-date-picker";
+import { Switch } from "antd";
 
 
 export default class NotificationCentre extends Component {
+  
   state = {
     students: [],
     notifications: [],
     tiles: [],
-    rrule: ''
+    dates: [],
+    rangeBool : false
   }
 
   componentDidMount(): void {
@@ -101,24 +103,7 @@ export default class NotificationCentre extends Component {
   }
 
   render(): React.ReactNode {
-    const { RRule } = require('rrule');
-
-    const weeklyRule = new RRule({
-      freq: RRule.WEEKLY,
-      byweekday: RRule.MO,
-      //Month and Date start from 0, so January is 0, Feb is 1, etc.
-      //                YYYY,M-1,D-1,HH,MM,SS, GMT?
-      dtstart: new Date(2023, 3, 17, 10, 1, 0, 0),
-      count: 10,
-    });
-
-    const weekly = weeklyRule.all();
-    // console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-    // console.log(weeklyRule.toString());
-    console.log("iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii");
-    console.log(weekly.toString());
-
-    const { students, notifications, tiles }: IState = this.state;
+    const { students, notifications, tiles, dates, rangeBool }: IState = this.state;
     const columns: ColumnsType<Data> = [
         {
           title: 'Student',
@@ -180,19 +165,21 @@ export default class NotificationCentre extends Component {
 
         <Divider />
 
-        {/* <RRuleGeneratorTS
-          onChange={(rrule: any) => console.log(rrule)}
-          config={{
-            repeat: ["Yearly", "Monthly", "Weekly"],
-            yearly: "on",
-            monthly: "on",
-            end: ["Never", "On date"],
-            weekStartsOnSunday: true,
-            hideError: true
-          }}
-          value={this.state.rrule}
-          translations={translations.english}
-        /> */}
+        Range?
+
+        <Switch
+          onClick={(value:any)=>{this.setState({rangeBool:!rangeBool, dates:[]})}}
+          checked={rangeBool}
+        />
+
+        <DatePicker 
+          multiple = {true}
+          range = {rangeBool}
+          // rangeHover = {true}
+          value={this.state.dates} 
+          onChange={dateObject=>{this.setState({dates: dateObject})}} 
+        />
+
 
         <div id={"NotificationsTable"} style={{position: 'relative', overflow: 'visible'}}>
           <Table scroll={{ x: 900 }}
