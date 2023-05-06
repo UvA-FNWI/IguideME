@@ -168,7 +168,9 @@ export default class NotificationCentre extends Component {
         Range?
 
         <Switch
-          onClick={(value:any)=>{this.setState({rangeBool:!rangeBool, dates:[]})}}
+          onClick={(value:any)=>{
+            this.setState({rangeBool:!rangeBool, dates:[]});
+          }}
           checked={rangeBool}
         />
 
@@ -177,7 +179,13 @@ export default class NotificationCentre extends Component {
           range = {rangeBool}
           // rangeHover = {true}
           value={this.state.dates} 
-          onChange={dateObject=>{this.setState({dates: dateObject})}} 
+          onChange={dateObject=>{
+            this.setState({dates: dateObject})
+            console.log("HEEEEEEEEEEEEEEEEEEEEEERE");
+            console.log(dateObject?.toString());
+            AppController.setNotificationDates((dateObject?.toString())!)
+            // .then(notificationDates => this.setState({dates: notificationDates}));
+          }} 
         />
 
 

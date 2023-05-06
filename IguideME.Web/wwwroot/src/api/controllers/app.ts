@@ -79,6 +79,14 @@ export default class AppController extends Controller {
     ).then(response => response.data);
   }
 
+  static setNotificationDates(dates: string): Promise<void> {
+    if (debug()) return Promise.resolve();
+    
+    return this.client.patch(
+      'app/notifications', { dates }
+    )
+  }
+
   static trackAction(action: string): Promise<void>{
     if (debug()) return Promise.resolve();
 

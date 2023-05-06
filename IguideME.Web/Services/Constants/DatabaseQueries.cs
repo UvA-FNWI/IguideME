@@ -20,6 +20,13 @@ public static class DatabaseQueries
                 @"
                 DROP TABLE notifications
                 ;"
+            },
+            {
+                "003_add_column_to_course_settings_table",
+                @"
+                ALTER TABLE course_settings 
+                    notification_dates TEXT
+                ;"
             }
         };
 
@@ -49,7 +56,8 @@ public static class DatabaseQueries
             `require_consent`     BOOLEAN DEFAULT true,
             `informed_consent`    TEXT NULL,
             `personalized_peers`  BOOLEAN DEAULT true,
-            `peer_group_size`     INTEGER DEFAULT 5
+            `peer_group_size`     INTEGER DEFAULT 5,
+            `notification_dates`  TEXT NULL
         );";
 
     public const string CREATE_TABLE_USER_TRACKER =
@@ -877,6 +885,13 @@ public static class DatabaseQueries
         LIMIT       1;
         ";
 
+    public const string QUERY_NOTIFICATION_DATES_FOR_COURSE =
+    @"SELECT    `notification_dates`
+    FROM        `course_settings`
+    WHERE       `course_id`=@courseID
+    LIMIT       1;
+    ";
+
     public const string QUERY_ACCEPT_LIST =
         @"SELECT    `user_id`, `accepted`
         FROM        `accept_list`
@@ -1528,6 +1543,10 @@ public static class DatabaseQueries
         @"UPDATE    `course_settings`
         SET         `peer_group_size`=@groupSize,
                     `personalized_peers`=@personalizedPeers
+        WHERE       `course_id`=@courseID;";
+    public const string UPDATE_NOTIFICATION_DATES_FOR_COURSE =
+        @"UPDATE    `course_settings`
+        SET         `notification_dates`=@notificationDates
         WHERE       `course_id`=@courseID;";
 
     public const string RELEASE_TILE_GROUPS_FROM_COLUMN =

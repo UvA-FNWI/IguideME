@@ -384,6 +384,16 @@ namespace IguideME.Web.Services
             return true;
         }
 
+        public List<string> GetNotificationDates(int courseID)
+        {
+            List<string> dates = new();
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_NOTIFICATION_DATES_FOR_COURSE, new SQLiteParameter("courseID", courseID)))
+                if (r.Read())
+                    return r.GetValue(0).ToString().Split(",").ToList();
+
+            return dates;
+        }
+
         public void RegisterUser(
             int courseID,
             int? studentnumber,
@@ -1134,6 +1144,16 @@ namespace IguideME.Web.Services
                 new SQLiteParameter("courseID", courseID),
                 new SQLiteParameter("requireConsent", requireConsent),
                 new SQLiteParameter("text", text)
+            );
+        }
+
+        public void UpdateNotificationDates(
+            int courseID,
+            string notificationDates)
+        {
+            NonQuery(DatabaseQueries.UPDATE_CONSENT_FOR_COURSE,
+                new SQLiteParameter("courseID", courseID),
+                new SQLiteParameter("notificationDates", notificationDates)
             );
         }
 
