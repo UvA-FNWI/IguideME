@@ -206,8 +206,7 @@ namespace IguideME.Web.Controllers
 
 
 
-        // [Authorize(Policy = "IsInstructor")]
-        [Authorize]
+        [Authorize(Policy = "IsInstructor")]
         [Route("/app/notifications")]
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -219,13 +218,11 @@ namespace IguideME.Web.Controllers
             var body = new StreamReader(Request.Body).ReadToEnd();
             string dates = (string) JObject.Parse(body)["dates"];
 
-            _logger.LogInformation("HEEEEEERE",dates);
-
             DatabaseManager.Instance.UpdateNotificationDates(
                 courseID,
                 dates);
 
-            return Json("");            
+            return Json("");
             // return Json(
             //     DatabaseManager.Instance
             //     .GetNotificationDates(GetCourseID()));

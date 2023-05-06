@@ -81,9 +81,9 @@ export default class AppController extends Controller {
 
   static setNotificationDates(dates: string): Promise<void> {
     if (debug()) return Promise.resolve();
-    
-    return this.client.patch(
-      'app/notifications', { dates }
+
+    return this.client.post(
+      'app/notifications', { dates: dates }
     )
   }
 

@@ -24,8 +24,8 @@ public static class DatabaseQueries
             {
                 "003_add_column_to_course_settings_table",
                 @"
-                ALTER TABLE course_settings 
-                    notification_dates TEXT
+                ALTER TABLE course_settings
+                    ADD notification_dates TEXT
                 ;"
             }
         };
