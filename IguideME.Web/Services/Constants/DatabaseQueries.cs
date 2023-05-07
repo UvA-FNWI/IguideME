@@ -9,25 +9,25 @@ public static class DatabaseQueries
     public static readonly Dictionary<string, string> MIGRATIONS =
         new()
         {
-            {
-                "001_drop_old_peer_group_table",
-                @"
-                DROP TABLE peer_group
-                ;"
-            },
-            {
-                "002_drop_old_notification_table",
-                @"
-                DROP TABLE notifications
-                ;"
-            },
-            {
-                "003_add_column_to_course_settings_table",
-                @"
-                ALTER TABLE course_settings
-                    ADD notification_dates TEXT
-                ;"
-            }
+            // {
+            //     "001_drop_old_peer_group_table",
+            //     @"
+            //     DROP TABLE peer_group
+            //     ;"
+            // },
+            // {
+            //     "002_drop_old_notification_table",
+            //     @"
+            //     DROP TABLE notifications
+            //     ;"
+            // },
+            // {
+            //     "003_add_column_to_course_settings_table",
+            //     @"
+            //     ALTER TABLE course_settings
+            //         ADD notification_dates TEXT
+            //     ;"
+            // }
         };
 
 // //================================ Tables ================================//

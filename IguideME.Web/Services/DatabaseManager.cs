@@ -1151,7 +1151,7 @@ namespace IguideME.Web.Services
             int courseID,
             string notificationDates)
         {
-            NonQuery(DatabaseQueries.UPDATE_CONSENT_FOR_COURSE,
+            NonQuery(DatabaseQueries.UPDATE_NOTIFICATION_DATES_FOR_COURSE,
                 new SQLiteParameter("courseID", courseID),
                 new SQLiteParameter("notificationDates", notificationDates)
             );

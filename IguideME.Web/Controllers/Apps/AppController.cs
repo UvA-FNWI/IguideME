@@ -227,5 +227,19 @@ namespace IguideME.Web.Controllers
             //     DatabaseManager.Instance
             //     .GetNotificationDates(GetCourseID()));
         }
+
+
+        [Authorize(Policy = "IsInstructor")]
+        [Route("/app/notifications")]
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public ActionResult GetNotificationDates()
+        {
+            List<string> allDates = DatabaseManager.Instance.GetNotificationDates(GetCourseID());
+
+            return allDates != null ? Json(allDates) : NotFound();
+        }
     }
 }

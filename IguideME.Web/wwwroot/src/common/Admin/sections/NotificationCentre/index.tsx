@@ -48,6 +48,11 @@ export default class NotificationCentre extends Component {
         tiles: tiles
       })
     })
+    AppController.getNotificationDates().then(async (notificationDates: Date[]) => 
+        this.setState({ 
+          dates: notificationDates 
+      })
+    )
   }
 
   getData(students: CanvasStudent[], notifications: PerformanceNotification[]): Data[] {
@@ -181,8 +186,8 @@ export default class NotificationCentre extends Component {
           value={this.state.dates} 
           onChange={dateObject=>{
             this.setState({dates: dateObject})
-            console.log("HEEEEEEEEEEEEEEEEEEEEEERE");
-            console.log(dateObject?.toString());
+            // console.log("HEEEEEEEEEEEEEEEEEEEEEERE");
+            // console.log(dateObject?.toString());
             AppController.setNotificationDates((dateObject?.toString())!)
             // .then(notificationDates => this.setState({dates: notificationDates}));
           }} 
