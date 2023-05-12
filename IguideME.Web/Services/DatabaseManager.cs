@@ -736,6 +736,25 @@ namespace IguideME.Web.Services
             );
         }
 
+        public bool GetTileNotificationState(int tileID)
+        {
+            bool result = false;
+            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_TILE_NOTIFICATIONS_STATE,
+                    new SQLiteParameter("tileID", tileID)
+                )) {
+                if (r.Read())
+                {
+                    try{
+                        result = r.GetBoolean(0);
+                    }
+                    catch (Exception e) {
+                        PrintQueryError("GetUserGoalGrade", 0, r, e);
+                    }
+                }
+                return result;
+            }
+        }
+
         public void UpdateNotificationEnable(int courseID, string userID, bool enable)
         {
             NonQuery(DatabaseQueries.UPDATE_NOTIFICATION_ENABLE,

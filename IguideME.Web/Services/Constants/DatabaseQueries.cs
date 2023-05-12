@@ -949,6 +949,11 @@ public static class DatabaseQueries
         WHERE       `layout_tile_group`.`course_id`=@courseID
         ORDER BY    `tile`.`position` ASC;";
 
+    public const string QUERY_TILE_NOTIFICATIONS_STATE =
+        @"SELECT    `notifications`
+        FROM        `tile`
+        WHERE       `id`=@tileID;";
+
     public const string QUERY_LEARNING_GOALS =
         @"SELECT    `id`,
                     `tile_id`,
