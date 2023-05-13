@@ -184,88 +184,91 @@ namespace IguideME.Web.Services.Workers
 
             foreach(string user in users)
             {
-                ////////// TODO: Get only tiles with notifications      How?????
                 foreach (KeyValuePair<int, List<float>> entry in grades)
                 {
-                    List<TileEntrySubmission> userTileSubmissions = DatabaseManager.Instance.GetTileSubmissionsForUser(entry.Key, user, this._hashCode);
-
-                    // Find the submission with the highest ID, as it is the most recent
-                    int lastSubmissionID = -1;
-                    foreach (TileEntrySubmission submission in userTileSubmissions)
-                        if (submission.ID > lastSubmissionID)
-                            lastSubmissionID = submission.ID;
-
-
-                    // Create one list with all the submission grades and one more without the most recent submission
-                    List<float> currentSubmissionGrades = new();
-                    List<float> lastSubmissionGrades = new();
-                    foreach (TileEntrySubmission submission in userTileSubmissions)
+                    // Get only tiles with notifications
+                    if (DatabaseManager.Instance.GetTileNotificationState(entry.Key))
                     {
-                        currentSubmissionGrades.Add(float.Parse(submission.Grade));
-                        if (submission.ID != lastSubmissionID)
-                            lastSubmissionGrades.Add(float.Parse(submission.Grade));
-                    }
+                        List<TileEntrySubmission> userTileSubmissions = DatabaseManager.Instance.GetTileSubmissionsForUser(entry.Key, user, this._hashCode);
 
-                    float currentAverage = -1;
-                    float lastAverage = -1;
-                    float peerAverage = -1;
-                    // Store the three important Averages in variables
-                    if (currentSubmissionGrades.Count != 0) 
-                        currentAverage = currentSubmissionGrades.Average();
-                    if (lastSubmissionGrades.Count != 0)
-                        lastAverage =lastSubmissionGrades.Average();
-                    if (entry.Value != null)
-                        peerAverage = entry.Value.Average();
+                        // Find the submission with the highest ID, as it is the most recent
+                        int lastSubmissionID = -1;
+                        foreach (TileEntrySubmission submission in userTileSubmissions)
+                            if (submission.ID > lastSubmissionID)
+                                lastSubmissionID = submission.ID;
 
-                    if (currentAverage != -1)
-                    {
-                        if (currentAverage >= peerAverage) // +1)
+
+                        // Create one list with all the submission grades and one more without the most recent submission
+                        List<float> currentSubmissionGrades = new();
+                        List<float> lastSubmissionGrades = new();
+                        foreach (TileEntrySubmission submission in userTileSubmissions)
                         {
-                            // outperform
-                            DatabaseManager.Instance.RegisterNotification(
-                                this._courseID,
-                                user,
-                                entry.Key,
-                                (int) Notification_Types.outperforming,
-                                this._hashCode
-                            );
+                            currentSubmissionGrades.Add(float.Parse(submission.Grade));
+                            if (submission.ID != lastSubmissionID)
+                                lastSubmissionGrades.Add(float.Parse(submission.Grade));
                         }
-                        // else if (currentAverage >= peerAverage)
-                        // {
-                        //     // do nothing
-                        // }
-                        else if (currentAverage - lastAverage > 0)
+
+                        float currentAverage = -1;
+                        float lastAverage = -1;
+                        float peerAverage = -1;
+                        // Store the three important Averages in variables
+                        if (currentSubmissionGrades.Count != 0) 
+                            currentAverage = currentSubmissionGrades.Average();
+                        if (lastSubmissionGrades.Count != 0)
+                            lastAverage =lastSubmissionGrades.Average();
+                        if (entry.Value != null)
+                            peerAverage = entry.Value.Average();
+
+                        if (currentAverage != -1 && peerAverage != 0)
                         {
-                            // closing the gap
-                            DatabaseManager.Instance.RegisterNotification(
-                                this._courseID,
-                                user,
-                                entry.Key,
-                                (int) Notification_Types.closing_gap,
-                                this._hashCode
-                            );
-                        }
-                        else if ((currentAverage - lastAverage <= 0) && (peerAverage - currentAverage <= 1))
-                        {
-                            // falling behind
-                            DatabaseManager.Instance.RegisterNotification(
-                                this._courseID,
-                                user,
-                                entry.Key,
-                                (int) Notification_Types.falling_behind,
-                                this._hashCode
-                            );
-                        }
-                        else if ((currentAverage - lastAverage <= 0) && (peerAverage - currentAverage > 1))
-                        {
-                            // put more effort
-                            DatabaseManager.Instance.RegisterNotification(
-                                this._courseID,
-                                user,
-                                entry.Key,
-                                (int) Notification_Types.more_effort,
-                                this._hashCode
-                            );
+                            if (currentAverage >= peerAverage) // +1)
+                            {
+                                // outperform
+                                DatabaseManager.Instance.RegisterNotification(
+                                    this._courseID,
+                                    user,
+                                    entry.Key,
+                                    (int) Notification_Types.outperforming,
+                                    this._hashCode
+                                );
+                            }
+                            // else if (currentAverage >= peerAverage)
+                            // {
+                            //     // do nothing
+                            // }
+                            else if (currentAverage - lastAverage > 0)
+                            {
+                                // closing the gap
+                                DatabaseManager.Instance.RegisterNotification(
+                                    this._courseID,
+                                    user,
+                                    entry.Key,
+                                    (int) Notification_Types.closing_gap,
+                                    this._hashCode
+                                );
+                            }
+                            else if ((currentAverage - lastAverage <= 0) && (peerAverage - currentAverage <= 1))
+                            {
+                                // falling behind
+                                DatabaseManager.Instance.RegisterNotification(
+                                    this._courseID,
+                                    user,
+                                    entry.Key,
+                                    (int) Notification_Types.falling_behind,
+                                    this._hashCode
+                                );
+                            }
+                            else if ((currentAverage - lastAverage <= 0) && (peerAverage - currentAverage > 1))
+                            {
+                                // put more effort
+                                DatabaseManager.Instance.RegisterNotification(
+                                    this._courseID,
+                                    user,
+                                    entry.Key,
+                                    (int) Notification_Types.more_effort,
+                                    this._hashCode
+                                );
+                            }
                         }
                     }
                 }

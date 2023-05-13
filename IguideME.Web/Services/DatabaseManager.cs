@@ -384,6 +384,16 @@ namespace IguideME.Web.Services
             return true;
         }
 
+        public List<string> GetNotificationDates(int courseID)
+        {
+            List<string> dates = new();
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_NOTIFICATION_DATES_FOR_COURSE, new SQLiteParameter("courseID", courseID)))
+                if (r.Read())
+                    return r.GetValue(0).ToString().Split(",").ToList();
+
+            return dates;
+        }
+
         public void RegisterUser(
             int courseID,
             int? studentnumber,
@@ -724,6 +734,25 @@ namespace IguideME.Web.Services
                 new SQLiteParameter("UserName", data.UserName),
                 new SQLiteParameter("Granted", data.Granted)
             );
+        }
+
+        public bool GetTileNotificationState(int tileID)
+        {
+            bool result = false;
+            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_TILE_NOTIFICATIONS_STATE,
+                    new SQLiteParameter("tileID", tileID)
+                )) {
+                if (r.Read())
+                {
+                    try{
+                        result = r.GetBoolean(0);
+                    }
+                    catch (Exception e) {
+                        PrintQueryError("GetUserGoalGrade", 0, r, e);
+                    }
+                }
+                return result;
+            }
         }
 
         public void UpdateNotificationEnable(int courseID, string userID, bool enable)
@@ -1134,6 +1163,16 @@ namespace IguideME.Web.Services
                 new SQLiteParameter("courseID", courseID),
                 new SQLiteParameter("requireConsent", requireConsent),
                 new SQLiteParameter("text", text)
+            );
+        }
+
+        public void UpdateNotificationDates(
+            int courseID,
+            string notificationDates)
+        {
+            NonQuery(DatabaseQueries.UPDATE_NOTIFICATION_DATES_FOR_COURSE,
+                new SQLiteParameter("courseID", courseID),
+                new SQLiteParameter("notificationDates", notificationDates)
             );
         }
 

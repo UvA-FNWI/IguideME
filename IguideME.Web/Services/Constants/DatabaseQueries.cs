@@ -9,18 +9,25 @@ public static class DatabaseQueries
     public static readonly Dictionary<string, string> MIGRATIONS =
         new()
         {
-            {
-                "001_drop_old_peer_group_table",
-                @"
-                DROP TABLE peer_group
-                ;"
-            },
-            {
-                "002_drop_old_notification_table",
-                @"
-                DROP TABLE notifications
-                ;"
-            }
+            // {
+            //     "001_drop_old_peer_group_table",
+            //     @"
+            //     DROP TABLE peer_group
+            //     ;"
+            // },
+            // {
+            //     "002_drop_old_notification_table",
+            //     @"
+            //     DROP TABLE notifications
+            //     ;"
+            // },
+            // {
+            //     "003_add_column_to_course_settings_table",
+            //     @"
+            //     ALTER TABLE course_settings
+            //         ADD notification_dates TEXT
+            //     ;"
+            // }
         };
 
 // //================================ Tables ================================//
@@ -49,7 +56,8 @@ public static class DatabaseQueries
             `require_consent`     BOOLEAN DEFAULT true,
             `informed_consent`    TEXT NULL,
             `personalized_peers`  BOOLEAN DEAULT true,
-            `peer_group_size`     INTEGER DEFAULT 5
+            `peer_group_size`     INTEGER DEFAULT 5,
+            `notification_dates`  TEXT NULL
         );";
 
     public const string CREATE_TABLE_USER_TRACKER =
@@ -877,6 +885,13 @@ public static class DatabaseQueries
         LIMIT       1;
         ";
 
+    public const string QUERY_NOTIFICATION_DATES_FOR_COURSE =
+    @"SELECT    `notification_dates`
+    FROM        `course_settings`
+    WHERE       `course_id`=@courseID
+    LIMIT       1;
+    ";
+
     public const string QUERY_ACCEPT_LIST =
         @"SELECT    `user_id`, `accepted`
         FROM        `accept_list`
@@ -933,6 +948,11 @@ public static class DatabaseQueries
             ON      `layout_tile_group`.`id`=`tile`.`group_id`
         WHERE       `layout_tile_group`.`course_id`=@courseID
         ORDER BY    `tile`.`position` ASC;";
+
+    public const string QUERY_TILE_NOTIFICATIONS_STATE =
+        @"SELECT    `notifications`
+        FROM        `tile`
+        WHERE       `id`=@tileID;";
 
     public const string QUERY_LEARNING_GOALS =
         @"SELECT    `id`,
@@ -1528,6 +1548,10 @@ public static class DatabaseQueries
         @"UPDATE    `course_settings`
         SET         `peer_group_size`=@groupSize,
                     `personalized_peers`=@personalizedPeers
+        WHERE       `course_id`=@courseID;";
+    public const string UPDATE_NOTIFICATION_DATES_FOR_COURSE =
+        @"UPDATE    `course_settings`
+        SET         `notification_dates`=@notificationDates
         WHERE       `course_id`=@courseID;";
 
     public const string RELEASE_TILE_GROUPS_FROM_COLUMN =

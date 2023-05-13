@@ -12,6 +12,8 @@ import { delay } from "../../utils/mockRequest";
 import { LearningGoal, LearningOutcome } from "../../models/app/LearningGoal";
 import { CanvasDiscussion } from "../../models/canvas/Discussion";
 import { HistoricTileGrades } from "../../components/StudentDashboard/TileHistoricGraph/types";
+import TileHistoricGraph from "../../components/StudentDashboard/TileHistoricGraph";
+
 
 export default class TileController extends Controller {
 
@@ -55,14 +57,43 @@ export default class TileController extends Controller {
     ).then(response => response.data);
   }
 
-  static getHistory(userID: string): Promise<Map <number, HistoricTileGrades>> {
+  static getHistory(userID: string): Promise<Map<number,HistoricTileGrades>|any> {
     if (debug()) {
         return Promise.resolve(MOCK_GRADE_HISTORY);
     }
 
     return this.client.get(
       `tiles/grade-history/${userID}`
-    ).then(response => response.data);
+    ).then(response => {
+
+      let returnValue: Map<number,HistoricTileGrades>;
+      returnValue = new Map();
+
+      let mappedHistoricGrades: Map<string,HistoricTileGrades>;
+      mappedHistoricGrades = new Map(Object.entries(response.data));
+      console.log(mappedHistoricGrades);
+      
+      if(mappedHistoricGrades != null)
+      {
+        mappedHistoricGrades.forEach((value, key) => {        
+          var tileHistory: HistoricTileGrades;
+          if (value != undefined && value != null)
+          {        
+            tileHistory = {
+              dates: Object.values(value)[0] as Array<string>,
+              user_avg: Object.values(value)[1] as Array<number>,
+              peer_avg: Object.values(value)[2] as Array<number>,
+              peer_max: Object.values(value)[3] as Array<number>,
+              peer_min: Object.values(value)[4] as Array<number> 
+            };
+            returnValue.set(parseInt(key),tileHistory);}
+        });
+      }
+
+      console.log(returnValue);
+
+      return returnValue!;
+    });
   }
 
   static getTileSubmissions(tileId: number, userID?: string): Promise<TileEntrySubmission[]> {

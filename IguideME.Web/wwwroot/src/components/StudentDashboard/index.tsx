@@ -181,8 +181,6 @@ class StudentDashboard extends Component<Props, IState> {
       historicGrades
     } = this.state;
 
-    let mappedHistoricGrades = new Map(Object.entries(historicGrades));
-
     const { tiles, tileGroups, dashboardColumns, tileEntries, student} = this.props;
 
     if (!loaded || !student) return (<Loading small={true} />);
@@ -193,18 +191,6 @@ class StudentDashboard extends Component<Props, IState> {
 
     if (displayTile) {
 
-      var tileHistory: HistoricTileGrades;
-      let currentTileHistory = mappedHistoricGrades.get((displayTile as any).tile.id.toString());
-      if (currentTileHistory !== undefined)
-      {
-        tileHistory = {
-          dates: Object.values(currentTileHistory)[0] as Array<string>,
-          user_avg: Object.values(currentTileHistory)[1] as Array<number>,
-          peer_avg: Object.values(currentTileHistory)[2] as Array<number>,
-          peer_max: Object.values(currentTileHistory)[3] as Array<number>,
-          peer_min: Object.values(currentTileHistory)[4] as Array<number> };
-      }
-
       return <TileDetail tile={(displayTile as any).tile}
                          tileEntries={tileEntries}
                          discussions={discussions}
@@ -212,7 +198,7 @@ class StudentDashboard extends Component<Props, IState> {
                          submissions={userSubmissions.get((displayTile as any).tile.id)!}
                          learningOutcomes={learningOutcomes}
                          student={student}
-                         historicGrades={tileHistory!}
+                         historicGrades={historicGrades.get((displayTile as any).tile.id)!}
       />
     }
 

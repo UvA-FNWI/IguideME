@@ -5,6 +5,8 @@ import {MOCK_STUDENTS} from "../../mocks/students";
 import {delay} from "../../utils/mockRequest";
 import {Course} from "../../models/app/Course";
 import {standardConsent} from "../../components/settings/RequireConsent/ConsentEditor/template";
+import DateObject from "react-date-object";
+
 
 export default class AppController extends Controller {
 
@@ -77,6 +79,22 @@ export default class AppController extends Controller {
     return this.client.post(
       `app/notification`, { enable: enable }
     ).then(response => response.data);
+  }
+
+  static setNotificationDates(dates: string): Promise<void> {
+    if (debug()) return Promise.resolve();
+
+    return this.client.post(
+      'app/notifications', { dates: dates }
+    )
+  }
+
+  static getNotificationDates(): Promise<Date[]> {
+    if (debug()) return Promise.resolve([]);
+
+    return this.client.get(
+      'app/notifications'
+    ).then(response => response.data.map( (values: string) => Date.parse(values)));
   }
 
   static trackAction(action: string): Promise<void>{
