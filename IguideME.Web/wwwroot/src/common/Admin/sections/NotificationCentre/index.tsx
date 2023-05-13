@@ -19,7 +19,7 @@ import { Switch } from "antd";
 
 
 export default class NotificationCentre extends Component {
-  
+
   state = {
     students: [],
     notifications: [],
@@ -48,9 +48,9 @@ export default class NotificationCentre extends Component {
         tiles: tiles
       })
     })
-    AppController.getNotificationDates().then(async (notificationDates: Date[]) => 
-        this.setState({ 
-          dates: notificationDates 
+    AppController.getNotificationDates().then(async (notificationDates: Date[]) =>
+        this.setState({
+          dates: notificationDates
       })
     )
   }
@@ -108,7 +108,7 @@ export default class NotificationCentre extends Component {
   }
 
   render(): React.ReactNode {
-    const { students, notifications, tiles, dates, rangeBool }: IState = this.state;
+    const { students, notifications, tiles, rangeBool }: IState = this.state;
     const columns: ColumnsType<Data> = [
         {
           title: 'Student',
@@ -179,18 +179,18 @@ export default class NotificationCentre extends Component {
           checked={rangeBool}
         />
 
-        <DatePicker 
+        <DatePicker
           multiple = {true}
           range = {rangeBool}
           // rangeHover = {true}
-          value={this.state.dates} 
+          value={this.state.dates}
           onChange={dateObject=>{
             this.setState({dates: dateObject})
             // console.log("HEEEEEEEEEEEEEEEEEEEEEERE");
             // console.log(dateObject?.toString());
             AppController.setNotificationDates((dateObject?.toString())!)
             // .then(notificationDates => this.setState({dates: notificationDates}));
-          }} 
+          }}
         />
 
 

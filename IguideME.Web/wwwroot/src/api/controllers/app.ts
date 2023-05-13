@@ -5,8 +5,6 @@ import {MOCK_STUDENTS} from "../../mocks/students";
 import {delay} from "../../utils/mockRequest";
 import {Course} from "../../models/app/Course";
 import {standardConsent} from "../../components/settings/RequireConsent/ConsentEditor/template";
-import DateObject from "react-date-object";
-
 
 export default class AppController extends Controller {
 
