@@ -29,11 +29,10 @@ export default class UploadManager extends Component<IProps, IState> {
   }
 
   handleFileUpload = (data: any[]) => {
-    if (!ExternalDataController.validateData(data)) {
-      message.error("Invalid data!");
-      return;
-    }
-
+    // if (!ExternalDataController.validateData(data)) {
+    //   message.error("Invalid data!");
+    //   return;
+    // }
     this.setState({ data });
   }
 
@@ -79,7 +78,7 @@ export default class UploadManager extends Component<IProps, IState> {
                            inputStyle={{ display: 'none' }}
                            onError={() => alert("error")}
                            parserOptions={{
-                             header: true,
+                             header: false,
                              dynamicTyping: false,
                              skipEmptyLines: true,
                              transformHeader: (header: any) =>
