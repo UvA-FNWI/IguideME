@@ -578,6 +578,12 @@ namespace IguideME.Web.Controllers
 
             if (!success) return BadRequest();
 
+            _logger.LogInformation("input {inp}", input);
+            foreach (JObject row in input.Cast<JObject>()) {
+                _logger.LogInformation("row {row}", row);
+
+            }
+
             foreach (JObject row in input.Children().Cast<JObject>())
             {
                 // register submission
