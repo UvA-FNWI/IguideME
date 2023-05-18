@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
@@ -54,7 +55,8 @@ namespace IguideME.Web.Services
             JobResultModel result = new();
             int courseID = work.CourseID;
 
-            bool notifications_bool = work.Notifications_bool && (DateTime.Now.DayOfWeek == DayOfWeek.Monday || DateTime.Now.DayOfWeek == DayOfWeek.Friday);
+            List<string> notificationDates = DatabaseManager.Instance.GetNotificationDates(courseID);
+            bool notifications_bool = work.Notifications_bool && notificationDates.Contains(String.Format("{0:yyyy/MM/dd}", DateTime.Now));
 
             _logger.LogInformation("{Time}: Starting sync for course {CourseID}", DateTime.Now, courseID);
 
