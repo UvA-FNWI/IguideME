@@ -352,28 +352,21 @@ namespace IguideME.Web.Services
                         DateTime endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
 
                         if (r.GetValue(3).GetType() != typeof(DBNull)) {
-                            endTime = endTime.AddMilliseconds(long.Parse(r.GetValue(3).ToString()));
+                            endTime = endTime.AddMilliseconds(long.Parse(r.GetValue(3).ToString())); //.ToLocalTime()
                             status = "COMPLETE";
                         }
                         else {
                             status = "INCOMPLETE";
                         }
 
-                        // // Unix timestamp is seconds past epoch
-                        // DateTime dateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
-                        // dateTime = dateTime.AddMilliseconds(long.Parse(timestamp)).ToLocalTime();
-                        // _logger.LogInformation("This is the times of the Sync: {Time}",dateTime.ToString());
-
                         hashes.Add(new DataSynchronization(
                             r.GetInt32(0),
                             r.GetInt32(1),
-                            startTime.AddMilliseconds(long.Parse(r.GetValue(2).ToString())),
+                            startTime.AddMilliseconds(long.Parse(r.GetValue(2).ToString())), //.ToLocalTime()
                             endTime,
                             status
                             )
                         );
-
-                        _logger.LogInformation("HEEEEEEEEEEEEEEEEEEEEEEE {H}",String.Format("{0:d/M/yyyy HH:mm:ss}",endTime));
                     } catch (Exception e) {
                         PrintQueryError("GetSyncHashes", 5, r, e);
                     }
