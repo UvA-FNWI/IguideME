@@ -15,7 +15,6 @@ export interface Synchronization {
   key: string,
   start_timestamp: string,
   end_timestamp: string | null,
-  hash: string,
   duration: string,
   invoked: string,
   status: string

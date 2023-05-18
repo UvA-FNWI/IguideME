@@ -243,7 +243,7 @@ namespace IguideME.Web.Services
         }
 
         public void CleanupSync(int courseID) {
-            RemoveSyncsWithStatus(courseID, "BUSY");
+            RemoveSyncsWithNoEndTimestamp(courseID);
 
             List<string> hashes = new();
 
@@ -259,7 +259,7 @@ namespace IguideME.Web.Services
                 }
             }
             foreach (string hash in hashes) {
-                NonQuery(DatabaseQueries.DELETE_OLD_SYNCS_FOR_COURSE, new SQLiteParameter("courseID", courseID), new SQLiteParameter("hash", hash));
+                NonQuery(DatabaseQueries.DELETE_OLD_SYNCS_FOR_COURSE, new SQLiteParameter("courseID", courseID), new SQLiteParameter("startTimestamp", hash));
             }
         }
 
@@ -296,13 +296,12 @@ namespace IguideME.Web.Services
         }
 
 
-        public void RemoveSyncsWithStatus(int courseID, string status) {
+        public void RemoveSyncsWithNoEndTimestamp(int courseID) {
             _logger.LogInformation("Starting cleanup of sync hystory ");
             try {
                 NonQuery(
                     DatabaseQueries.DELETE_INCOMPLETE_SYNCS,
-                    new SQLiteParameter("courseID", courseID),
-                    new SQLiteParameter("status", status)
+                    new SQLiteParameter("courseID", courseID)
                 );
             } catch (Exception e) {
                 _logger.LogError("Error removing syncs: {message}\n{trace}", e.Message, e.StackTrace);
@@ -319,18 +318,22 @@ namespace IguideME.Web.Services
             NonQuery(
                 DatabaseQueries.REGISTER_NEW_SYNC,
                 new SQLiteParameter("courseID", courseID),
-                new SQLiteParameter("hash", hashCode)
+                new SQLiteParameter("startTimestamp", hashCode)
             );
         }
 
+        /**
+         * Update synchronization record state to completed.
+         */
         public void CompleteSync(string hashCode)
         {
-            /**
-             * Update synchronization record state to completed.
-             */
+            
+        string currentTimestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
+
             NonQuery(
                 DatabaseQueries.COMPLETE_NEW_SYNC,
-                new SQLiteParameter("hash", hashCode)
+                new SQLiteParameter("currentTimestamp", currentTimestamp),
+                new SQLiteParameter("startTimestamp", hashCode)
             );
         }
 
@@ -344,16 +347,33 @@ namespace IguideME.Web.Services
             using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_SYNC_HASHES_FOR_COURSE, new SQLiteParameter("courseID", courseID))) {
                 while (r.Read()) {
                     try {
-                        DateTime endtime = r.GetValue(3).GetType() != typeof(DBNull) ? r.GetDateTime(3) : new DateTime();
+                        string status;
+                        DateTime startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+                        DateTime endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+
+                        if (r.GetValue(3).GetType() != typeof(DBNull)) {
+                            endTime = endTime.AddMilliseconds(long.Parse(r.GetValue(3).ToString()));
+                            status = "COMPLETE";
+                        }
+                        else {
+                            status = "INCOMPLETE";
+                        }
+
+                        // // Unix timestamp is seconds past epoch
+                        // DateTime dateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+                        // dateTime = dateTime.AddMilliseconds(long.Parse(timestamp)).ToLocalTime();
+                        // _logger.LogInformation("This is the times of the Sync: {Time}",dateTime.ToString());
 
                         hashes.Add(new DataSynchronization(
                             r.GetInt32(0),
                             r.GetInt32(1),
-                            r.GetDateTime(2),
-                            endtime,
-                            r.GetValue(4).ToString(),
-                            r.GetValue(5).ToString())
+                            startTime.AddMilliseconds(long.Parse(r.GetValue(2).ToString())),
+                            endTime,
+                            status
+                            )
                         );
+
+                        _logger.LogInformation("HEEEEEEEEEEEEEEEEEEEEEEE {H}",String.Format("{0:d/M/yyyy HH:mm:ss}",endTime));
                     } catch (Exception e) {
                         PrintQueryError("GetSyncHashes", 5, r, e);
                     }

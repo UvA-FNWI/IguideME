@@ -20,9 +20,6 @@ namespace IguideME.Web.Models.App
         [JsonProperty("status")]
         public string Status { get; set; }
 
-        [JsonProperty("hash")]
-        public string Hash { get; set; }
-
         // duration of synchronization in seconds
         [JsonProperty("duration")]
         public int Duration { get; set; }
@@ -32,15 +29,13 @@ namespace IguideME.Web.Models.App
             int courseID,
             DateTime startTimestamp,
             DateTime endTimestamp,
-            string status,
-            string hash)
+            string status)
         {
             this.Id = id;
             this.CourseID = courseID;
-            this.StartTimestamp = startTimestamp.ToString();
-            this.EndTimestamp = endTimestamp.ToString();
+            this.StartTimestamp = String.Format("{0:M/d/yyyy HH:mm:ss}",startTimestamp);
+            this.EndTimestamp = String.Format("{0:M/d/yyyy HH:mm:ss}",endTimestamp);
             this.Status = status;
-            this.Hash = hash;
 
             this.Duration = (int) Math.Floor((endTimestamp - startTimestamp).TotalSeconds);
         }

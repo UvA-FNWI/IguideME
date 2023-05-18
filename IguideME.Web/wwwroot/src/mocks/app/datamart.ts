@@ -26,7 +26,7 @@ export const MOCK_DATAMART_SYNCHRONIZATIONS = [
     hash: `${moment.utc().subtract(3, 'hours').format('MM/DD/YY [10:27:15]')}`,
     duration: "291",
     invoked: 'Demo Account',
-    status: "Aborted"
+    status: "INCOMPLETE"
   }
 ]
 

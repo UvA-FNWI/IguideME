@@ -61,7 +61,7 @@ export default class DataMart extends Component<IProps, IState> {
                             <p>
                                 The latest successful synchronization took place on
                                 <b> {moment.utc(latestSuccessful.start_timestamp, timeFormat).format(timeFormat)} </b>
-                                    <small>({moment.utc(latestSuccessful.start_timestamp, timeFormat).fromNow()})</small>.
+                                    <small>({moment.utc(latestSuccessful.start_timestamp, timeFormat).local().fromNow()})</small>.
                                 Synchronizations run automatically at 03:00AM (UTC time).
                             </p> :
                             <p>No historic synchronizations available.</p>) :
@@ -93,16 +93,17 @@ export default class DataMart extends Component<IProps, IState> {
                                     dataIndex: 'duration',
                                     key: 'duration',
                                 },
-                                {
-                                    title: 'Hash',
-                                    dataIndex: 'hash',
-                                    key: 'hash',
-                                    render: (val, row) => <code>{val}</code>
-                                },
+                                // {
+                                //     title: 'Hash',
+                                //     dataIndex: 'hash',
+                                //     key: 'hash',
+                                //     render: (val, row) => <code>{val}</code>
+                                // },
                                 {
                                     title: 'Status',
                                     dataIndex: 'status',
                                     key: 'status',
+                                    render: (val, row) => <code>{val}</code>
                                 },
                             ]} />
                         </React.Fragment>

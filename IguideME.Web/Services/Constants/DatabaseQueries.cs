@@ -28,6 +28,12 @@ public static class DatabaseQueries
             //         ADD notification_dates TEXT
             //     ;"
             // }
+            // {
+            //     "004_drop_old_sync_history_table",
+            //     @"
+            //     DROP TABLE sync_history
+            //     ;"
+            // }
         };
 
 // //================================ Tables ================================//
@@ -386,10 +392,8 @@ public static class DatabaseQueries
         @"CREATE TABLE IF NOT EXISTS `sync_history` (
             `id`              INTEGER PRIMARY KEY AUTOINCREMENT,
             `course_id`       INTEGER,
-            `start_timestamp` DATETIME default CURRENT_TIMESTAMP,
-            `end_timestamp`   DATETIME NULL,
-            `status`          STRING default 'BUSY',
-            `hash`            STRING
+            `start_timestamp` STRING,
+            `end_timestamp`   STRING NULL
         );";
 
 
@@ -574,8 +578,8 @@ public static class DatabaseQueries
         );";
 
     public const string REGISTER_NEW_SYNC =
-        @"INSERT INTO   `sync_history` (`course_id`, `hash`)
-          VALUES        (@courseID, @hash);";
+        @"INSERT INTO   `sync_history` (`course_id`, `start_timestamp`)
+          VALUES        (@courseID, @startTimestamp);";
 
     public const string REGISTER_CANVAS_ASSIGNMENT =
         @"INSERT INTO   `canvas_assignment`
@@ -1150,25 +1154,23 @@ public static class DatabaseQueries
         @"SELECT    `id`,
                     `course_id`,
                     `start_timestamp`,
-                    `end_timestamp`,
-                    `status`,
-                    `hash`
+                    `end_timestamp`
         FROM        `sync_history`
         WHERE       `course_id`=@courseID
         ORDER BY    `end_timestamp` DESC;";
 
     public const string QUERY_LATEST_SYNCS_FOR_COURSE =
-        @"SELECT    `hash`
+        @"SELECT    `start_timestamp`
         FROM        `sync_history`
-        WHERE       `status`='COMPLETE'
+        WHERE       `end_timestamp` IS NOT NULL
         AND         `course_id`=@courseID
         ORDER BY    `end_timestamp` DESC
         LIMIT       @limit;";
 
     public const string QUERY_OLD_HASHES_FOR_COURSE =
-        @"SELECT    `hash`
+        @"SELECT    `start_timestamp`
         FROM        `sync_history`
-        WHERE       `status`='COMPLETE'
+        WHERE       `end_timestamp` IS NOT NULL
         AND         `course_id`=@courseID
         ORDER BY    `end_timestamp` DESC
         LIMIT       -1
@@ -1615,9 +1617,8 @@ public static class DatabaseQueries
 
     public const string COMPLETE_NEW_SYNC =
         @"UPDATE    `sync_history`
-        SET         `end_timestamp`=CURRENT_TIMESTAMP,
-                    `status`='COMPLETE'
-        WHERE       `hash`=@hash;";
+        SET         `end_timestamp`=@currentTimestamp
+        WHERE       `start_timestamp`=@startTimestamp;";
 
     public const string UPDATE_CANVAS_DISCUSSION =
         @"UPDATE        `canvas_discussion`
@@ -1682,8 +1683,7 @@ public static class DatabaseQueries
         @"DELETE
           FROM          `sync_history`
           WHERE         `course_id` = @courseID
-          AND           `status`   = @status
-          ;";
+          AND           `end_timestamp` IS NULL;";
 
 
     public const string INSERT_USER_ACTION =
@@ -1725,6 +1725,6 @@ public static class DatabaseQueries
         DELETE
         FROM        `sync_history`
         WHERE       `course_id`=@courseID
-        AND         `hash`=@hash;
+        AND         `start_timestamp`=@startTimestamp;
         ";
 }
