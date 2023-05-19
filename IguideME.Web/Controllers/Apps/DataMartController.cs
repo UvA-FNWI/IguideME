@@ -98,16 +98,6 @@ namespace IguideME.Web.Controllers
         // -------------------- Synchronization registry --------------------
 
         [Authorize(Policy = "IsInstructor")]
-        [HttpGet, Route("/datamart/hashes")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public JsonResult GetSyncHashes()
-        {
-            return Json(
-                DatabaseManager.Instance.GetSyncHashes(this.GetCourseID()));
-        }
-
-        [Authorize(Policy = "IsInstructor")]
         [HttpGet, Route("/datamart/users")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]

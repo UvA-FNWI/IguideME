@@ -3,28 +3,22 @@ import moment from "moment";
 export const MOCK_DATAMART_SYNCHRONIZATIONS = [
   {
     key: '1',
-    start_timestamp: `${moment.utc().subtract(1, 'days').format('MM/DD/YY [03:00:20]')}`,
-    end_timestamp: `${moment.utc().subtract(1, 'days').format('MM/DD/YY [03:06:02]')}`,
-    hash: `${moment.utc().subtract(1, 'days').format('MM/DD/YY [03:00:20]')}`,
-    duration: "349",
+    start_timestamp: 1684499453123,
+    end_timestamp: 1684499553123,
     invoked: 'IGUIDEME SYSTEM',
     status: "COMPLETE"
   },
   {
     key: '2',
-    start_timestamp: `${moment.utc().format('MM/DD/YY [03:00:20]')}`,
-    end_timestamp: `${moment.utc().format('MM/DD/YY [03:06:02]')}`,
-    hash: `${moment.utc().format('MM/DD/YY [03:00:20]')}`,
-    duration: "372",
+    start_timestamp: 1684459453123,
+    end_timestamp: 1684459653123,
     invoked: 'IGUIDEME SYSTEM',
     status: "COMPLETE"
   },
   {
     key: '3',
-    start_timestamp: `${moment.utc().subtract(3, 'hours').format('MM/DD/YY [10:27:15]')}`,
-    end_timestamp: `${moment.utc().subtract(3, 'hours').add(5, 'minutes').format('MM/DD/YY [10:32:20]')}`,
-    hash: `${moment.utc().subtract(3, 'hours').format('MM/DD/YY [10:27:15]')}`,
-    duration: "291",
+    start_timestamp: 1684359453213,
+    end_timestamp: null,
     invoked: 'Demo Account',
     status: "INCOMPLETE"
   }

@@ -327,7 +327,7 @@ namespace IguideME.Web.Services
          */
         public void CompleteSync(string hashCode)
         {
-            
+
         string currentTimestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
 
             NonQuery(
@@ -348,11 +348,10 @@ namespace IguideME.Web.Services
                 while (r.Read()) {
                     try {
                         string status;
-                        DateTime startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
-                        DateTime endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+                        long? endTime = null;
 
                         if (r.GetValue(3).GetType() != typeof(DBNull)) {
-                            endTime = endTime.AddMilliseconds(long.Parse(r.GetValue(3).ToString())); //.ToLocalTime()
+                            endTime = long.Parse(r.GetValue(3).ToString()); //.ToLocalTime()
                             status = "COMPLETE";
                         }
                         else {
@@ -362,7 +361,7 @@ namespace IguideME.Web.Services
                         hashes.Add(new DataSynchronization(
                             r.GetInt32(0),
                             r.GetInt32(1),
-                            startTime.AddMilliseconds(long.Parse(r.GetValue(2).ToString())), //.ToLocalTime()
+                            long.Parse(r.GetValue(2).ToString()),
                             endTime,
                             status
                             )
@@ -1423,9 +1422,9 @@ namespace IguideME.Web.Services
                         float peer_avg = r1.GetFloat(2);  //avg
                         float peer_max = r1.GetFloat(3);  //max
                         float peer_min = r1.GetFloat(4);  //min
-                        
+
                         DateTime labelDate = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
-                        labelDate = labelDate.AddMilliseconds(long.Parse(r1.GetValue(5).ToString())); 
+                        labelDate = labelDate.AddMilliseconds(long.Parse(r1.GetValue(5).ToString()));
                         string label = String.Format("{0:dd/MM/yyyy}",labelDate); //sync_hash
 
                         // If this entry is different than the last, we add it
