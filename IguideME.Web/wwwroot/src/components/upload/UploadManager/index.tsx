@@ -2,9 +2,9 @@ import React, { Component } from "react";
 import {IProps, IState} from "./types";
 import UploadBinaryData from "./UploadBinaryData";
 import UploadEntriesData from "./UploadEntriesData";
-import {Button, Col, Input, message, Row, Space} from "antd";
+import {Button, Col, Input, InputNumber, message, Row, Space} from "antd";
 import CSVReader from "react-csv-reader";
-import ExternalDataController from "../../../api/controllers/externalData";
+// import ExternalDataController from "../../../api/controllers/externalData"; TODO: move communication with backend to this controller or remove it.
 import StudentController from "../../../api/controllers/student";
 import TileController from "../../../api/controllers/tile";
 import "./style.scss";
@@ -17,7 +17,9 @@ export default class UploadManager extends Component<IProps, IState> {
     uploading: false,
     students: [],
     data: [],
-    title: ""
+    title: "",
+    id_column: 0,
+    grade_column: 1
   }
 
   componentDidMount(): void {
@@ -29,11 +31,21 @@ export default class UploadManager extends Component<IProps, IState> {
   }
 
   handleFileUpload = (data: any[]) => {
-    // if (!ExternalDataController.validateData(data)) {
-    //   message.error("Invalid data!");
-    //   return;
-    // }
+    console.log("data", data);
     this.setState({ data });
+  }
+
+  changeTitle = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const title = event.target.value;
+    this.setState({title});
+  }
+
+  changeIDColumn = (nr: number | null) => {
+    this.setState({id_column: nr ? nr : 0});
+  }
+
+  changeGradeColumn = (nr: number | null) => {
+    this.setState({grade_column: nr ? nr : 0});
   }
 
   upload = () => {
@@ -48,7 +60,7 @@ export default class UploadManager extends Component<IProps, IState> {
         title,
         type: "ASSIGNMENT"
       }).then(entry => {
-        TileController.uploadData(entry.id, data).then(() => {
+        TileController.uploadData(entry.id, 0, 1, data).then(() => {
           setTimeout(() => {
             message.success("Data uploaded!");
             this.props.closeUploadMenu();
@@ -61,7 +73,7 @@ export default class UploadManager extends Component<IProps, IState> {
 
   render(): React.ReactNode {
     const { tile } = this.props;
-    const { students, data, title, uploading } = this.state;
+    const { students, data, title, uploading, id_column, grade_column} = this.state;
 
     return (
       <div id={"uploadManager"}>
@@ -91,13 +103,15 @@ export default class UploadManager extends Component<IProps, IState> {
             </Col>
             <Col xs={19}>
               <label>Entry title</label>
-              <Input placeholder={"Title"} value={title} onChange={e => this.setState({ title: e.target.value })} />
-            </Col>
-            <Col xs={24}>
-              <strong id={"notice"}>Notice: each upload <u>must</u> contain a column named <i>StudentID</i> specifying the student's login id. There must also be a column named <i>Grade</i>. All other columns will be stored as meta attributes to the submission.</strong>
+              <Input placeholder={"Title"} value={title} onChange={this.changeTitle} />
             </Col>
           </Row>
-
+          <Row>
+            <Col>
+             Column with student ids: <InputNumber min={0} value={id_column} onChange={this.changeIDColumn}/>
+             Column with grads<InputNumber min={0} value={grade_column} onChange={this.changeGradeColumn}/>
+            </Col>
+          </Row>
           <div>
             { tile.content === "BINARY" ?
               <UploadBinaryData data={data}

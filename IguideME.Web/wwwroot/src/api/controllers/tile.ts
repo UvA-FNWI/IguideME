@@ -132,12 +132,13 @@ export default class TileController extends Controller {
     ).then(response => response.data );
   }
 
-  static uploadData(entryID: number, data: any[]): Promise<any[]> {
+  static uploadData(entryID: number, id_column: number, grade_column: number, data: any[]): Promise<any[]> {
     if (debug()) return delay([], 2500);
 
+    console.log("data", data)
     return this.client.post(
-      `/entries/${entryID}/upload`,
-      data.map(x => ({ ...x, entry_id: entryID }))).then(
+      `/entries/${entryID}/upload`, {id_column: id_column, grade_column: grade_column, data: data}
+      ).then(
         response => response.data
       );
   }
