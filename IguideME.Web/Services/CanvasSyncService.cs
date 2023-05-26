@@ -54,9 +54,25 @@ namespace IguideME.Web.Services
         {
             JobResultModel result = new();
             int courseID = work.CourseID;
+            bool notifications_bool = false;
+
+            static bool isBetweenDates (DateTime input, DateTime startDate, DateTime endDate){
+                return (input >= startDate && input <= endDate);
+            }
 
             List<string> notificationDates = DatabaseManager.Instance.GetNotificationDates(courseID);
-            bool notifications_bool = work.Notifications_bool && notificationDates.Contains(String.Format("{0:yyyy/MM/dd}", DateTime.Now));
+            if (notificationDates[0].Contains("-")) { 
+                // We are looking in a range of dates
+                foreach(string datepair in notificationDates)
+                {
+                    string[] splittedDates = datepair.Split("-");
+                    if (isBetweenDates(DateTime.Parse(String.Format("{0:yyyy/MM/dd}", DateTime.Now)), DateTime.Parse(splittedDates[0]), DateTime.Parse(splittedDates[1]))) {
+                        notifications_bool = work.Notifications_bool; // What is this bool??
+                        break;
+                    }
+                }
+            } else
+                notifications_bool = work.Notifications_bool && notificationDates.Contains(String.Format("{0:yyyy/MM/dd}", DateTime.Now));
 
             _logger.LogInformation("{Time}: Starting sync for course {CourseID}", DateTime.Now, courseID);
 
