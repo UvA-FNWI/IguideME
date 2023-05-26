@@ -87,12 +87,12 @@ export default class AppController extends Controller {
     )
   }
 
-  static getNotificationDates(): Promise<Date[]> {
+  static getNotificationDates(): Promise<string[]> {
     if (debug()) return Promise.resolve([]);
 
     return this.client.get(
       'app/notifications'
-    ).then(response => response.data.map( (values: string) => Date.parse(values)));
+    ).then(response => response.data);
   }
 
   static trackAction(action: string): Promise<void>{

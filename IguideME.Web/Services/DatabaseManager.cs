@@ -401,7 +401,7 @@ namespace IguideME.Web.Services
             List<string> dates = new();
             using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_NOTIFICATION_DATES_FOR_COURSE, new SQLiteParameter("courseID", courseID)))
                 if (r.Read())
-                    return r.GetValue(0).ToString().Split(new char[] {',','-'}).ToList();
+                    return r.GetValue(0).ToString().Split(',').ToList();
 
             return dates;
         }

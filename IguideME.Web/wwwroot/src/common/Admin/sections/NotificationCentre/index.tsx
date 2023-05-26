@@ -14,7 +14,7 @@ import { Tile } from "../../../../models/app/Tile";
 import {CheckCircleOutlined, CloseCircleOutlined} from "@ant-design/icons";
 import AppController from "../../../../api/controllers/app";
 
-import DatePicker from "react-multi-date-picker";
+import DatePicker, { DateObject } from "react-multi-date-picker";
 import { Switch } from "antd";
 
 
@@ -48,11 +48,17 @@ export default class NotificationCentre extends Component {
         tiles: tiles
       })
     })
-    AppController.getNotificationDates().then(async (notificationDates: Date[]) =>
-        this.setState({
-          dates: notificationDates
+    AppController.getNotificationDates().then(async (notificationDates: string[]) =>{
+      if (notificationDates[0].includes("-"))
+      {
+        var doubleDates : Date[][] = [];
+        notificationDates.forEach(element => doubleDates.push(element.split("-").map(v=> new Date(Date.parse(v)))));
+        this.setState({dates: doubleDates, rangeBool: true})
+      } 
+      else this.setState({
+          dates: notificationDates.map((value) => Date.parse(value))
       })
-    )
+    })
   }
 
   getData(students: CanvasStudent[], notifications: PerformanceNotification[]): Data[] {
