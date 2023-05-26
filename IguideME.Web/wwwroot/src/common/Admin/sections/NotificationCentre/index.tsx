@@ -186,10 +186,21 @@ export default class NotificationCentre extends Component {
           value={this.state.dates} 
           onChange={dateObject=>{
             this.setState({dates: dateObject})
-            // console.log("HEEEEEEEEEEEEEEEEEEEEEERE");
-            // console.log(dateObject?.toString());
-            AppController.setNotificationDates((dateObject?.toString())!)
-            // .then(notificationDates => this.setState({dates: notificationDates}));
+
+            if (rangeBool){
+              var datelist : string[] = [];
+              dateObject?.toString().split(",").map(date => datelist.push(date));
+              var rangedates = "";
+
+              for (let i = 0; i < datelist.length; i = i + 2) {
+                rangedates += datelist[i] + "-"
+                rangedates += datelist[i+1] ? datelist[i+1] : datelist[i];
+                if (datelist[i+2]) rangedates+=",";
+              }
+              AppController.setNotificationDates(rangedates);
+            }
+            else 
+              AppController.setNotificationDates((dateObject?.toString())!)
           }} 
         />
 
