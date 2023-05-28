@@ -14,7 +14,7 @@ import { Tile } from "../../../../models/app/Tile";
 import {CheckCircleOutlined, CloseCircleOutlined} from "@ant-design/icons";
 import AppController from "../../../../api/controllers/app";
 
-import DatePicker from "react-multi-date-picker";
+import DatePicker, { DateObject } from "react-multi-date-picker";
 import { Switch } from "antd";
 
 
@@ -48,11 +48,17 @@ export default class NotificationCentre extends Component {
         tiles: tiles
       })
     })
-    AppController.getNotificationDates().then(async (notificationDates: Date[]) =>
-        this.setState({
-          dates: notificationDates
+    AppController.getNotificationDates().then(async (notificationDates: string[]) =>{
+      if (notificationDates[0].includes("-"))
+      {
+        var doubleDates : Date[][] = [];
+        notificationDates.forEach(element => doubleDates.push(element.split("-").map(v=> new Date(Date.parse(v)))));
+        this.setState({dates: doubleDates, rangeBool: true})
+      } 
+      else this.setState({
+          dates: notificationDates.map((value) => Date.parse(value))
       })
-    )
+    })
   }
 
   getData(students: CanvasStudent[], notifications: PerformanceNotification[]): Data[] {
@@ -186,11 +192,22 @@ export default class NotificationCentre extends Component {
           value={this.state.dates}
           onChange={dateObject=>{
             this.setState({dates: dateObject})
-            // console.log("HEEEEEEEEEEEEEEEEEEEEEERE");
-            // console.log(dateObject?.toString());
-            AppController.setNotificationDates((dateObject?.toString())!)
-            // .then(notificationDates => this.setState({dates: notificationDates}));
-          }}
+
+            if (rangeBool){
+              var datelist : string[] = [];
+              dateObject?.toString().split(",").map(date => datelist.push(date));
+              var rangedates = "";
+
+              for (let i = 0; i < datelist.length; i = i + 2) {
+                rangedates += datelist[i] + "-"
+                rangedates += datelist[i+1] ? datelist[i+1] : datelist[i];
+                if (datelist[i+2]) rangedates+=",";
+              }
+              AppController.setNotificationDates(rangedates);
+            }
+            else 
+              AppController.setNotificationDates((dateObject?.toString())!)
+          }} 
         />
 
 
