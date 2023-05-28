@@ -249,5 +249,6 @@ out
 /.cache
 
 **/*.sqlite
-**/yarn.lock
+
 **/package-lock.json
+**/yarn.lock

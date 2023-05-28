@@ -14,12 +14,18 @@ import { Tile } from "../../../../models/app/Tile";
 import {CheckCircleOutlined, CloseCircleOutlined} from "@ant-design/icons";
 import AppController from "../../../../api/controllers/app";
 
+import DatePicker from "react-multi-date-picker";
+import { Switch } from "antd";
+
+
 export default class NotificationCentre extends Component {
+
   state = {
     students: [],
     notifications: [],
     tiles: [],
-    rrule: ''
+    dates: [],
+    rangeBool : false
   }
 
   componentDidMount(): void {
@@ -42,6 +48,11 @@ export default class NotificationCentre extends Component {
         tiles: tiles
       })
     })
+    AppController.getNotificationDates().then(async (notificationDates: Date[]) =>
+        this.setState({
+          dates: notificationDates
+      })
+    )
   }
 
   getData(students: CanvasStudent[], notifications: PerformanceNotification[]): Data[] {
@@ -97,7 +108,7 @@ export default class NotificationCentre extends Component {
   }
 
   render(): React.ReactNode {
-    const { students, notifications, tiles }: IState = this.state;
+    const { students, notifications, tiles, rangeBool }: IState = this.state;
     const columns: ColumnsType<Data> = [
         {
           title: 'Student',
@@ -159,19 +170,29 @@ export default class NotificationCentre extends Component {
 
         <Divider />
 
-        {/* <RRuleGeneratorTS
-          onChange={(rrule: any) => console.log(rrule)}
-          config={{
-            repeat: ["Yearly", "Monthly", "Weekly"],
-            yearly: "on",
-            monthly: "on",
-            end: ["Never", "On date"],
-            weekStartsOnSunday: true,
-            hideError: true
+        Range?
+
+        <Switch
+          onClick={(value:any)=>{
+            this.setState({rangeBool:!rangeBool, dates:[]});
           }}
-          value={this.state.rrule}
-          translations={translations.english}
-        /> */}
+          checked={rangeBool}
+        />
+
+        <DatePicker
+          multiple = {true}
+          range = {rangeBool}
+          // rangeHover = {true}
+          value={this.state.dates}
+          onChange={dateObject=>{
+            this.setState({dates: dateObject})
+            // console.log("HEEEEEEEEEEEEEEEEEEEEEERE");
+            // console.log(dateObject?.toString());
+            AppController.setNotificationDates((dateObject?.toString())!)
+            // .then(notificationDates => this.setState({dates: notificationDates}));
+          }}
+        />
+
 
         <div id={"NotificationsTable"} style={{position: 'relative', overflow: 'visible'}}>
           <Table scroll={{ x: 900 }}

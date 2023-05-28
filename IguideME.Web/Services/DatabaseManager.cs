@@ -243,7 +243,7 @@ namespace IguideME.Web.Services
         }
 
         public void CleanupSync(int courseID) {
-            RemoveSyncsWithStatus(courseID, "BUSY");
+            RemoveSyncsWithNoEndTimestamp(courseID);
 
             List<string> hashes = new();
 
@@ -259,7 +259,7 @@ namespace IguideME.Web.Services
                 }
             }
             foreach (string hash in hashes) {
-                NonQuery(DatabaseQueries.DELETE_OLD_SYNCS_FOR_COURSE, new SQLiteParameter("courseID", courseID), new SQLiteParameter("hash", hash));
+                NonQuery(DatabaseQueries.DELETE_OLD_SYNCS_FOR_COURSE, new SQLiteParameter("courseID", courseID), new SQLiteParameter("startTimestamp", hash));
             }
         }
 
@@ -296,13 +296,12 @@ namespace IguideME.Web.Services
         }
 
 
-        public void RemoveSyncsWithStatus(int courseID, string status) {
+        public void RemoveSyncsWithNoEndTimestamp(int courseID) {
             _logger.LogInformation("Starting cleanup of sync hystory ");
             try {
                 NonQuery(
                     DatabaseQueries.DELETE_INCOMPLETE_SYNCS,
-                    new SQLiteParameter("courseID", courseID),
-                    new SQLiteParameter("status", status)
+                    new SQLiteParameter("courseID", courseID)
                 );
             } catch (Exception e) {
                 _logger.LogError("Error removing syncs: {message}\n{trace}", e.Message, e.StackTrace);
@@ -319,18 +318,22 @@ namespace IguideME.Web.Services
             NonQuery(
                 DatabaseQueries.REGISTER_NEW_SYNC,
                 new SQLiteParameter("courseID", courseID),
-                new SQLiteParameter("hash", hashCode)
+                new SQLiteParameter("startTimestamp", hashCode)
             );
         }
 
+        /**
+         * Update synchronization record state to completed.
+         */
         public void CompleteSync(string hashCode)
         {
-            /**
-             * Update synchronization record state to completed.
-             */
+
+        string currentTimestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
+
             NonQuery(
                 DatabaseQueries.COMPLETE_NEW_SYNC,
-                new SQLiteParameter("hash", hashCode)
+                new SQLiteParameter("currentTimestamp", currentTimestamp),
+                new SQLiteParameter("startTimestamp", hashCode)
             );
         }
 
@@ -344,15 +347,24 @@ namespace IguideME.Web.Services
             using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_SYNC_HASHES_FOR_COURSE, new SQLiteParameter("courseID", courseID))) {
                 while (r.Read()) {
                     try {
-                        DateTime endtime = r.GetValue(3).GetType() != typeof(DBNull) ? r.GetDateTime(3) : new DateTime();
+                        string status;
+                        long? endTime = null;
+
+                        if (r.GetValue(3).GetType() != typeof(DBNull)) {
+                            endTime = long.Parse(r.GetValue(3).ToString()); //.ToLocalTime()
+                            status = "COMPLETE";
+                        }
+                        else {
+                            status = "INCOMPLETE";
+                        }
 
                         hashes.Add(new DataSynchronization(
                             r.GetInt32(0),
                             r.GetInt32(1),
-                            r.GetDateTime(2),
-                            endtime,
-                            r.GetValue(4).ToString(),
-                            r.GetValue(5).ToString())
+                            long.Parse(r.GetValue(2).ToString()),
+                            endTime,
+                            status
+                            )
                         );
                     } catch (Exception e) {
                         PrintQueryError("GetSyncHashes", 5, r, e);
@@ -382,6 +394,16 @@ namespace IguideME.Web.Services
                     return r.GetBoolean(0);
 
             return true;
+        }
+
+        public List<string> GetNotificationDates(int courseID)
+        {
+            List<string> dates = new();
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_NOTIFICATION_DATES_FOR_COURSE, new SQLiteParameter("courseID", courseID)))
+                if (r.Read())
+                    return r.GetValue(0).ToString().Split(",").ToList();
+
+            return dates;
         }
 
         public void RegisterUser(
@@ -724,6 +746,25 @@ namespace IguideME.Web.Services
                 new SQLiteParameter("UserName", data.UserName),
                 new SQLiteParameter("Granted", data.Granted)
             );
+        }
+
+        public bool GetTileNotificationState(int tileID)
+        {
+            bool result = false;
+            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_TILE_NOTIFICATIONS_STATE,
+                    new SQLiteParameter("tileID", tileID)
+                )) {
+                if (r.Read())
+                {
+                    try{
+                        result = r.GetBoolean(0);
+                    }
+                    catch (Exception e) {
+                        PrintQueryError("GetUserGoalGrade", 0, r, e);
+                    }
+                }
+                return result;
+            }
         }
 
         public void UpdateNotificationEnable(int courseID, string userID, bool enable)
@@ -1137,6 +1178,16 @@ namespace IguideME.Web.Services
             );
         }
 
+        public void UpdateNotificationDates(
+            int courseID,
+            string notificationDates)
+        {
+            NonQuery(DatabaseQueries.UPDATE_NOTIFICATION_DATES_FOR_COURSE,
+                new SQLiteParameter("courseID", courseID),
+                new SQLiteParameter("notificationDates", notificationDates)
+            );
+        }
+
         public void RecycleExternalData(int courseID, string hash)
         {
             NonQuery(DatabaseQueries.RECYCLE_EXTERNAL_DATA,
@@ -1371,7 +1422,10 @@ namespace IguideME.Web.Services
                         float peer_avg = r1.GetFloat(2);  //avg
                         float peer_max = r1.GetFloat(3);  //max
                         float peer_min = r1.GetFloat(4);  //min
-                        string label = r1.GetString(5); //sync_hash
+
+                        DateTime labelDate = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+                        labelDate = labelDate.AddMilliseconds(long.Parse(r1.GetValue(5).ToString()));
+                        string label = String.Format("{0:dd/MM/yyyy}",labelDate); //sync_hash
 
                         // If this entry is different than the last, we add it
                         if (last_user_avg != user_avg || last_peer_avg != peer_avg

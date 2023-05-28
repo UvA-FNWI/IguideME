@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 
 using IguideME.Web.Models.App;
 using IguideME.Web.Services;
@@ -201,6 +202,44 @@ namespace IguideME.Web.Controllers
                     );
 
             return Json("");
+        }
+
+
+
+        [Authorize(Policy = "IsInstructor")]
+        [Route("/app/notifications")]
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public ActionResult UpdateNotificationDates()
+        {
+            int courseID = this.GetCourseID();
+
+            var body = new StreamReader(Request.Body).ReadToEnd();
+            string dates = (string) JObject.Parse(body)["dates"];
+
+            DatabaseManager.Instance.UpdateNotificationDates(
+                courseID,
+                dates);
+
+            return Json("");
+            // return Json(
+            //     DatabaseManager.Instance
+            //     .GetNotificationDates(GetCourseID()));
+        }
+
+
+        [Authorize(Policy = "IsInstructor")]
+        [Route("/app/notifications")]
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public ActionResult GetNotificationDates()
+        {
+            List<string> allDates = DatabaseManager.Instance.GetNotificationDates(GetCourseID());
+
+            return allDates != null ? Json(allDates) : NotFound();
         }
     }
 }

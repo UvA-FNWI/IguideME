@@ -13,10 +13,8 @@ export enum SyncProvider {
 
 export interface Synchronization {
   key: string,
-  start_timestamp: string,
-  end_timestamp: string | null,
-  hash: string,
-  duration: string,
+  start_timestamp: number,
+  end_timestamp: number | null,
   invoked: string,
   status: string
 }

@@ -40,7 +40,7 @@ export default class TileHistoricGraph extends Component<IProps, IState> {
                             fill: false,
                             borderWidth:3,
                             tension:0,
-                            backgroundColor: "rgba(47,44,232, 0.5)",
+                            backgroundColor: "rgba(0,0,255, 1)",
                             borderColor:'rgba(0,0,255, 1)'
                             },
                         {
@@ -49,7 +49,7 @@ export default class TileHistoricGraph extends Component<IProps, IState> {
                             fill: false,
                             borderWidth:3,
                             tension:0,
-                            backgroundColor: "rgba(255, 50, 50, .5)",
+                            backgroundColor: "rgba(255,0,0, 1)",
                             borderColor:'rgba(255,0,0, 1)'
                             },
                         {
@@ -58,8 +58,8 @@ export default class TileHistoricGraph extends Component<IProps, IState> {
                             fill: 3,
                             borderWidth:3,
                             tension:0,
-                            backgroundColor: "rgba(255, 50, 50, .5)",
-                            borderColor:'rgba(255,0,0, 1)'
+                            backgroundColor: "rgba(255, 50, 50, .2)",
+                            borderColor:'rgba(255,102,102, 1)'
                             },
                         {
                             label: "Peer Group minimum",
@@ -67,8 +67,8 @@ export default class TileHistoricGraph extends Component<IProps, IState> {
                             fill: 2,
                             borderWidth:3,
                             tension:0,
-                            backgroundColor: "rgba(255, 50, 50, .5)",
-                            borderColor:'rgba(255,0,0, 1)'
+                            backgroundColor: "rgba(255, 50, 50, .2)",
+                            borderColor:'rgba(255,102,102, 1)'
                             }
                         ]
                     }}
