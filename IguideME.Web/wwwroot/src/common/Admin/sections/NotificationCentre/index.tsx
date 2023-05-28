@@ -14,10 +14,6 @@ import { Tile } from "../../../../models/app/Tile";
 import {CheckCircleOutlined, CloseCircleOutlined} from "@ant-design/icons";
 import AppController from "../../../../api/controllers/app";
 
-import RRuleGeneratorTS, { translations } from "react-rrule-generator-ts";
-import "react-rrule-generator-ts/dist/index.css";
-
-
 export default class NotificationCentre extends Component {
   state = {
     students: [],

@@ -1,14 +1,21 @@
 import React, { Component } from "react";
 import {IProps, IState} from "./types";
-import UploadBinaryData from "./UploadBinaryData";
-import UploadEntriesData from "./UploadEntriesData";
-import {Button, Col, Input, InputNumber, message, Row, Space} from "antd";
-import CSVReader from "react-csv-reader";
+// import UploadBinaryData from "./UploadBinaryData";
+// import UploadEntriesData from "./UploadEntriesData";
+import UploadEditor from "./UploadEditor";
+import {Button, Col, Input, InputNumber, message, Row, Tooltip} from "antd";
+import { QuestionCircleOutlined } from "@ant-design/icons"
+import CSVReader, { IFileInfo } from "react-csv-reader";
 // import ExternalDataController from "../../../api/controllers/externalData"; TODO: move communication with backend to this controller or remove it.
 import StudentController from "../../../api/controllers/student";
 import TileController from "../../../api/controllers/tile";
 import "./style.scss";
 import { editState } from "../../../models/app/Tile";
+import { CanvasStudent } from "../../../models/canvas/Student";
+
+// TODO: couldn't seem to figure out how to do this systematically with css or something.
+const tooltip_bg = "rgb(255,255,255)";
+const tooltip_fg = {color: "black"};
 
 export default class UploadManager extends Component<IProps, IState> {
 
@@ -30,8 +37,42 @@ export default class UploadManager extends Component<IProps, IState> {
     );
   }
 
-  handleFileUpload = (data: any[]) => {
-    console.log("data", data);
+  handleCSVUpload = (data: string[][], title: string) => {
+    // const {students, id_column} = this.state;
+
+    // const headers = data[0];
+    // data = data.filter((row: string[]) => (students as CanvasStudent[]).some(student => student.id.toString() === row[id_column]));
+    if (this.state.title.length < 1)
+      this.setState({ data, title });
+    else
+      this.setState({ data })
+  }
+
+  filterStudents = () => {
+    let { data: d } = this.state;
+    const {students, id_column} = this.state;
+
+    let data = d as string[][]
+
+    const headers = data[0];
+    data = data.filter((row: string[]) => (students as CanvasStudent[]).some(student => student.userID.toString() === row[id_column]));
+
+    this.setState({ data: [headers, ...data] })
+  }
+
+  addMissing = () => {
+    let { data: d } = this.state;
+    const {students, id_column} = this.state;
+
+    let data = d as string[][]
+    (students as CanvasStudent[]).forEach(student => {
+      for (let i = 1; i < data.length; i++) {
+        if (data[i][id_column] === student.userID.toString()) return;
+      }
+      let new_row: string[] = Array(data[0].length).fill("");
+      new_row[id_column] = student.userID.toString();
+      data.push(new_row);
+    })
     this.setState({ data });
   }
 
@@ -50,7 +91,7 @@ export default class UploadManager extends Component<IProps, IState> {
 
   upload = () => {
     const { tile } = this.props;
-    const { data, title } = this.state;
+    const { data, title, id_column, grade_column } = this.state;
 
     this.setState({ uploading: true }, () => {
       TileController.createTileEntry({
@@ -60,7 +101,7 @@ export default class UploadManager extends Component<IProps, IState> {
         title,
         type: "ASSIGNMENT"
       }).then(entry => {
-        TileController.uploadData(entry.id, 0, 1, data).then(() => {
+        TileController.uploadData(entry.id, id_column, grade_column, data).then(() => {
           setTimeout(() => {
             message.success("Data uploaded!");
             this.props.closeUploadMenu();
@@ -72,73 +113,113 @@ export default class UploadManager extends Component<IProps, IState> {
   }
 
   render(): React.ReactNode {
-    const { tile } = this.props;
+    // const { tile } = this.props; TODO: Validate that grades are binary for binary tiles somewhere. Or just remove tile from props
     const { students, data, title, uploading, id_column, grade_column} = this.state;
 
     return (
       <div id={"uploadManager"}>
-        <Space direction={"vertical"} style={{width: '100%'}}>
-          <Row gutter={[10, 10]}>
-            <Col xs={5}>
-              <label>Data Source</label><br />
-              <label
-                className={"uploadSource"}
-                style={{ height: 'fit-content'}}
-              >
-                Upload data source (.CSV)
-                <CSVReader onFileLoaded={(data) => this.handleFileUpload(data)}
-                           inputStyle={{ display: 'none' }}
-                           onError={() => alert("error")}
-                           parserOptions={{
-                             header: false,
-                             dynamicTyping: false,
-                             skipEmptyLines: true,
-                             transformHeader: (header: any) =>
-                               header
-                                 .toLowerCase()
-                                 .replace(/\W/g, '_')
-                           }}
-                />
-              </label>
-            </Col>
-            <Col xs={19}>
-              <label>Entry title</label>
-              <Input placeholder={"Title"} value={title} onChange={this.changeTitle} />
-            </Col>
-          </Row>
-          <Row>
-            <Col>
-             Column with student ids: <InputNumber min={0} value={id_column} onChange={this.changeIDColumn}/>
-             Column with grads<InputNumber min={0} value={grade_column} onChange={this.changeGradeColumn}/>
-            </Col>
-          </Row>
-          <div>
-            { tile.content === "BINARY" ?
-              <UploadBinaryData data={data}
-                                setData={d => this.setState({ data: d })}
-                                students={students} /> :
-              <UploadEntriesData data={data}
-                                 setData={d => this.setState({ data: d })}
-                                 students={students} />
-            }
-          </div>
-        </Space>
+        <Row gutter={[10, 10]} style={{ marginBottom: 8 }}>
+          <Col flex={"0 0 130px"}>
+            <label> Data Source </label>
+            <Tooltip title={<span style={tooltip_fg}>You can upload a CSV column containing at least a column with student id's and a column with their grades. Any remaining columns will be saved as metadata.</span>} color={tooltip_bg}>
+              <QuestionCircleOutlined />
+            </Tooltip>
+            <label className={"uploadSource"}> Upload CSV
+              <CSVReader onFileLoaded={(data: string[][], fileinfo: IFileInfo) => this.handleCSVUpload(data, fileinfo.name)}
+                        inputStyle={{ display: 'none' }}
+                        onError={() => alert("error")}
+                        parserOptions={{
+                          header: false,
+                          dynamicTyping: false,
+                          skipEmptyLines: true,
+                          transformHeader: (header: any) =>
+                            header
+                              .toLowerCase()
+                              .replace(/\W/g, '_')
+                            }}
+                            />
+            </label>
+          </Col>
+          <Col flex={"1 1 200px"}>
+            <label> Entry title </label>
+            <Tooltip title={<span style={tooltip_fg}>Upon upload, the data will be saved as a tile entry, similarly to canvas assignments.</span>} color={tooltip_bg}>
+              <QuestionCircleOutlined />
+            </Tooltip>
+            <Input placeholder={"Title"} value={title} onChange={this.changeTitle} />
+          </Col>
+          <Col flex={" 0 0 120px"}>
+            <label> ID column </label>
+            <Tooltip title={<span style={tooltip_fg}>This indicates the column containing the student id's, which will be highlighted in <em style={{color: "rgb(255, 130, 0)"}}>orange</em> bellow.</span>} color={tooltip_bg}>
+              <QuestionCircleOutlined />
+            </Tooltip>
+            <InputNumber style={{width: "120px"}} min={0} value={id_column} onChange={this.changeIDColumn}/>
+          </Col>
+          <Col flex={"0 0 120px"}>
+            <label> Grade column </label>
+            <Tooltip title={<span style={tooltip_fg}>This indicates the column containing the grades, which will be highlighted in <em style={{color: "rgb(0, 80, 255)"}}>blue</em> bellow.</span>} color={tooltip_bg}>
+              <QuestionCircleOutlined />
+            </Tooltip>
+            <InputNumber style={{width: "120px"}} min={0} value={grade_column} onChange={this.changeGradeColumn}/>
+          </Col>
+        </Row>
 
-        <Space>
-          <Button onClick={this.props.closeUploadMenu}
-                  className={"dangerButtonStyle"}
-          >
-            Cancel
-          </Button>
+        {
+          data.length > 0 ?
+          <>
+            <Row style={{ marginBottom: 8 }}>
+              <UploadEditor data={data}
+                            setData={data => this.setState({data})}
+                            students={students}
+                            columns={{grade: grade_column, id: id_column}}/>
+            </Row>
+            <Row gutter={[10, 10]} style={{ marginBottom: 8 }}>
+              <Col>
+                <Tooltip color={tooltip_bg} title={<span style={tooltip_fg}>Add students from the course that are not in the data.</span>}>
+                <Button onClick={this.addMissing}>Add Missing Students</Button>
+                </Tooltip>
+              </Col>
+              <Col>
+              <Tooltip color={tooltip_bg} title={<span style={tooltip_fg}>Filter out any student that is not part of the course.</span>}>
+                <Button onClick={this.filterStudents}>Filter Students</Button>
+              </Tooltip>
+              </Col>
+            </Row>
+          </>
+          :
+          <Row style={{ marginBottom: 8 }}>
+            <Button style={{width: "120px"}} onClick={() => {this.setState({data: [["id", "grade"], ["", ""]]})}}>Manual Entry</Button>
+          </Row>
+        }
 
-          <Button className={"successButton"}
-                  onClick={this.upload}
-                  loading={uploading}
-                  disabled={title.length < 1}>
-            Upload
-          </Button>
-        </Space>
+        <Row gutter={[10,10]} style={{ marginBottom: 8 }}>
+          <Col>
+            <Button onClick={this.props.closeUploadMenu}
+                    className={"dangerButtonStyle"}
+                    >
+              Cancel
+            </Button>
+          </Col>
+          <Col>
+            <Button className={"successButton"}
+                    onClick={this.upload}
+                    loading={uploading}
+                    disabled={title.length < 1 || data.length < 2 }>
+              Upload
+            </Button>
+          </Col>
+        </Row>
       </div>
     )
   }
 }
+
+          // <div>
+          //   { tile.content === "BINARY" ?
+          //     <UploadBinaryData data={data}
+          //                       setData={d => this.setState({ data: d })}
+          //                       students={students} /> :
+          //     <UploadEntriesData data={data}
+          //                        setData={d => this.setState({ data: d })}
+          //                        students={students} />
+          //   }
+          // </div>

@@ -23,7 +23,7 @@ export default class HistoricUploads extends Component<IProps, IState> {
 
     return (
       <div className={"historicUploads"}>
-        <Drawer width={'100%'} visible={drawerOpen && openEntry} onClose={() => this.setState({ drawerOpen: false })}>
+        <Drawer width={'100%'} open={drawerOpen && openEntry} onClose={() => this.setState({ drawerOpen: false })}>
           { students.length } students
           <DataViewer tileEntry={openEntry}
                       students={students}

@@ -571,42 +571,41 @@ namespace IguideME.Web.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public ActionResult UploadTileData(string entryID, JArray input)
+        public ActionResult UploadTileData(int entryID, JObject data)
         {
-            bool success = int.TryParse(entryID, out int id);
             int courseID = this.GetCourseID();
 
-            if (!success) return BadRequest();
+            int id_column = data["id_column"].ToObject<int>();
+            int grade_column = data["grade_column"].ToObject<int>();
+            JArray table = (JArray) data["data"];
 
-            _logger.LogInformation("input {inp}", input);
-            foreach (JObject row in input.Cast<JObject>()) {
-                _logger.LogInformation("row {row}", row);
+            string[] names = table[0].ToObject<string[]>();
 
-            }
+            IEnumerable<int> range = Enumerable.Range(0, names.Length).Where(i => i != id_column && i != grade_column);
+            foreach (JArray row in table.Cast<JArray>().Skip(1)) {
 
-            foreach (JObject row in input.Children().Cast<JObject>())
-            {
-                // register submission
+                string[] values = row.ToObject<string[]>();
+
+                _ = float.TryParse(values[grade_column], out float grade);
+
                 int submissionID = DatabaseManager.Instance.CreateUserSubmission(
                     courseID,
-                    id,
-                    row.GetValue("studentloginid").ToString(),
-                    float.Parse(row.GetValue("grade").ToString()),
-                    DateTime.Now.ToShortDateString());
+                    entryID,
+                    values[id_column],
+                    grade,
+                    DateTime.Now.ToShortDateString()
+                );
 
-                foreach (JProperty property in row.Properties())
-                {
-                    // don't register the id or grade as a meta attribute
-                    if (property.Name == "studentloginid" ||
-                        property.Name == "grade" ||
-                        property.Name == "entry_id")
-                        continue;
-
-                    // add meta attributes
+                foreach (int i in range) {
                     DatabaseManager.Instance.CreateSubmissionMeta(
-                        submissionID, property.Name, property.Value.ToString(), courseID);
+                        submissionID,
+                        names[i],
+                        values[i],
+                        courseID
+                    );
                 }
             }
+
             return NoContent();
         }
 

@@ -12,7 +12,7 @@ export interface IState {
   title: string;
   uploading: boolean;
   students: CanvasStudent[];
-  data: any[];
+  data: string[][];
   id_column: number;
   grade_column: number;
 }

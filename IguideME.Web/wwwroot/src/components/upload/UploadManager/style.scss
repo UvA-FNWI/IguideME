@@ -1,31 +1,28 @@
 @import "../../../scss/base";
 
 #uploadManager {
-  background-color: #323438;
   padding: 20px;
   box-sizing: border-box;
-  color: white;
   margin: 10px 0;
 
   #notice {
     color: #e83535;
   }
 
-  .studentName {
-    color: white;
-  }
-
   .uploadSource {
-    border: 1px solid #EAEAEA;
+    @extend .successButton;
     display: block;
-    padding: 5px 0;
+    padding: 5px 5px;
     width: 100%;
     text-align: center;
-    background-color: $primary-purple;
-    color: white;
 
     &:hover {
       cursor: pointer;
     }
+  }
+
+  .ant-tooltip-inner {
+    background-color: rgba(0,0,0,.1);
+    color: black;
   }
 }

@@ -31,7 +31,7 @@ export default class UploadEntriesData extends Component<IUploadProps> {
 
     return (
       <div id={"uploadEntriesData"}>
-        <Row gutter={[10, 10]} style={{margin: '20px 0'}}>
+        <Row gutter={[10, 10]} >
          { students.map(s =>
            <StudentEntry key={s.userID}
                          student={s}

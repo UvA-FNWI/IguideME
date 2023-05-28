@@ -135,7 +135,6 @@ export default class TileController extends Controller {
   static uploadData(entryID: number, id_column: number, grade_column: number, data: any[]): Promise<any[]> {
     if (debug()) return delay([], 2500);
 
-    console.log("data", data)
     return this.client.post(
       `/entries/${entryID}/upload`, {id_column: id_column, grade_column: grade_column, data: data}
       ).then(
