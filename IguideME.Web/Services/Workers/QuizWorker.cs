@@ -63,7 +63,7 @@ namespace IguideME.Web.Services.Workers
 					entry.ID,
 					DatabaseManager.Instance.GetUserID(this._courseID, sub.UserID),
 					sub.Score ?? 0,
-					// sub.Score.Value/quiz.PointsPossible * 100, Should change to this.
+					// (sub.Score ?? 0)/quiz.PointsPossible * 100, Should change to this.
 					"",
 					this._hashCode
 				);

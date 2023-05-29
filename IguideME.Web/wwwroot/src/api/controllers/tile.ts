@@ -13,6 +13,7 @@ import { LearningGoal, LearningOutcome } from "../../models/app/LearningGoal";
 import { CanvasDiscussion } from "../../models/canvas/Discussion";
 import { HistoricTileGrades } from "../../components/StudentDashboard/TileHistoricGraph/types";
 
+
 export default class TileController extends Controller {
 
   static getAllSubmissions() {
@@ -55,14 +56,43 @@ export default class TileController extends Controller {
     ).then(response => response.data);
   }
 
-  static getHistory(userID: string): Promise<Map <number, HistoricTileGrades>> {
+  static getHistory(userID: string): Promise<Map<number,HistoricTileGrades>|any> {
     if (debug()) {
         return Promise.resolve(MOCK_GRADE_HISTORY);
     }
 
     return this.client.get(
       `tiles/grade-history/${userID}`
-    ).then(response => response.data);
+    ).then(response => {
+
+      let returnValue: Map<number,HistoricTileGrades>;
+      returnValue = new Map();
+
+      let mappedHistoricGrades: Map<string,HistoricTileGrades>;
+      mappedHistoricGrades = new Map(Object.entries(response.data));
+      console.log(mappedHistoricGrades);
+
+      if(mappedHistoricGrades != null)
+      {
+        mappedHistoricGrades.forEach((value, key) => {
+          var tileHistory: HistoricTileGrades;
+          if (value !== undefined && value !== null)
+          {
+            tileHistory = {
+              dates: Object.values(value)[0] as Array<string>,
+              user_avg: Object.values(value)[1] as Array<number>,
+              peer_avg: Object.values(value)[2] as Array<number>,
+              peer_max: Object.values(value)[3] as Array<number>,
+              peer_min: Object.values(value)[4] as Array<number>
+            };
+            returnValue.set(parseInt(key),tileHistory);}
+        });
+      }
+
+      console.log(returnValue);
+
+      return returnValue!;
+    });
   }
 
   static getTileSubmissions(tileId: number, userID?: string): Promise<TileEntrySubmission[]> {
@@ -132,12 +162,12 @@ export default class TileController extends Controller {
     ).then(response => response.data );
   }
 
-  static uploadData(entryID: number, data: any[]): Promise<any[]> {
+  static uploadData(entryID: number, id_column: number, grade_column: number, data: any[]): Promise<any[]> {
     if (debug()) return delay([], 2500);
 
     return this.client.post(
-      `/entries/${entryID}/upload`,
-      data.map(x => ({ ...x, entry_id: entryID }))).then(
+      `/entries/${entryID}/upload`, {id_column: id_column, grade_column: grade_column, data: data}
+      ).then(
         response => response.data
       );
   }

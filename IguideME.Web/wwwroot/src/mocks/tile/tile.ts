@@ -57,7 +57,7 @@ export const MOCK_TILES: Tile[] = [
     graph_view: false,
   },
   {
-    id: 9,
+    id: 6,
     group_id: 1,
     title: "Preparation Time",
     position: 5,

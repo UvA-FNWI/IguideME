@@ -32,25 +32,33 @@ export default class DataMart extends Component<IProps, IState> {
 
     render(): React.ReactNode {
         const { loaded, synchronizations }: IState = this.state;
-        const backendFormat = 'MM/DD/YYYY HH:mm:ss'
         const timeFormat = 'MMMM Do[,] YYYY [at] HH:mm';
-
-        synchronizations.map(s => {
-            const start = moment.utc(s.start_timestamp, backendFormat).local()
-            const end = moment.utc(s.end_timestamp, backendFormat).local()
-            s.start_timestamp = start.format(timeFormat);
-            if (end.isBefore(start)) {
-                s.end_timestamp = "";
-                s.duration = "";
-            } else {
-                s.end_timestamp = end.format(timeFormat);
-                s.duration = moment.utc(parseInt(s.duration)*1000).format('HH:mm:ss');
-            }
-            return s;
-        });
+        const durationFormat = 'm[m] s[s]'
 
         const successfulSyncs = loaded ? synchronizations.filter(a => a.status === "COMPLETE") : [];
         const latestSuccessful = successfulSyncs.length > 0 ? successfulSyncs[0] : null;
+
+        const syncs = synchronizations.map( (s: Synchronization) => {
+            const start = moment(s.start_timestamp);
+            if (s.end_timestamp === null) {
+                return ({
+                    start_timestamp: start.format(timeFormat),
+                    end_timestamp: null,
+                    duration: null,
+                    status: s.status
+                })
+            }
+
+            const end = moment(s.end_timestamp);
+            const duration = moment(end.diff(start)).format(durationFormat);
+
+            return ({
+                start_timestamp: start.format(timeFormat),
+                end_timestamp: end.format(timeFormat),
+                duration: duration,
+                status: s.status
+            })
+        })
 
         return (
             <Admin menuKey={"datamart"}>
@@ -60,24 +68,24 @@ export default class DataMart extends Component<IProps, IState> {
                         (latestSuccessful ?
                             <p>
                                 The latest successful synchronization took place on
-                                <b> {moment.utc(latestSuccessful.start_timestamp, timeFormat).format(timeFormat)} </b>
-                                    <small>({moment.utc(latestSuccessful.start_timestamp, timeFormat).fromNow()})</small>.
-                                Synchronizations run automatically at 03:00AM (UTC time).
+                                <b> {moment(latestSuccessful.start_timestamp).format(timeFormat)} </b>
+                                    <small>({moment(latestSuccessful.start_timestamp).fromNow()})</small>.
+                                Syncs run automatically at 03:00AM (UTC time).
                             </p> :
-                            <p>No historic synchronizations available.</p>) :
+                            <p>No historic syncs available.</p>) :
                         <div><Spin /> Retrieving latest synchronization...</div>
                     }
 
                     <Divider dense style={{ margin: '10px 0' }} />
 
-                    <SyncManager prevsuccess={synchronizations && synchronizations[0] ? synchronizations[0].status === "COMPLETE" : false}/>
+                    <SyncManager prevsuccess={syncs && syncs[0] ? syncs[0].status === "COMPLETE" : false}/>
 
                     {loaded &&
                         <React.Fragment>
                             <h1 style={{ marginTop: 20 }}>Historic versions</h1>
                             <Divider dense style={{ margin: '10px 0' }} />
 
-                            <Table scroll={{ x: 240 }} dataSource={synchronizations} columns={[
+                            <Table scroll={{ x: 240 }} dataSource={syncs} columns={[
                                 {
                                     title: 'Start timestamp',
                                     dataIndex: 'start_timestamp',
@@ -94,15 +102,10 @@ export default class DataMart extends Component<IProps, IState> {
                                     key: 'duration',
                                 },
                                 {
-                                    title: 'Hash',
-                                    dataIndex: 'hash',
-                                    key: 'hash',
-                                    render: (val, row) => <code>{val}</code>
-                                },
-                                {
                                     title: 'Status',
                                     dataIndex: 'status',
                                     key: 'status',
+                                    render: (val, row) => <code>{val}</code>
                                 },
                             ]} />
                         </React.Fragment>

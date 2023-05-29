@@ -100,13 +100,14 @@ export const getColumns = (viewData: (obj: TileEntry) => any, reload: () => any)
 
 export const formatData = (tile: Tile, entries: TileEntry[], submissions: TileEntrySubmission[]): any => {
 
-  return entries.map(entry => {
+  return entries.map((entry, i) => {
     const s = submissions.filter(x => x.entry_id === entry.id);
     const grades: number[] = s.map(x => parseFloat(x.grade));
 
     return {
       _rawEntry: entry,
       title: entry.title,
+      key: i,
       rows: s.length,
       grades: grades,
       binaryGrades: tile ? tile.content === "BINARY" : false,

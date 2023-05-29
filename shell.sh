@@ -24,7 +24,7 @@ display_help () {
   echo "                                          ";
   echo "  ---frontend-----------------------------";
   echo "  frontend-watch          build the frontend (watch for changes)";
-  echo "  build-frontend          build the frontend for production";
+  echo "  frontend-build          build the frontend for production";
   echo "                                          ";
   echo "  ---backend------------------------------";
   echo "  backend-watch 	      build the backend (watch for changes)";

@@ -12,11 +12,14 @@ export interface IState {
   title: string;
   uploading: boolean;
   students: CanvasStudent[];
-  data: {[key: string]: any, grade: number, userID: string}[];
+  data: string[][];
+  id_column: number;
+  grade_column: number;
+  editor_collapsed: boolean;
 }
 
 export interface IUploadProps {
   students: CanvasStudent[];
-  data: {[key: string]: any, grade: number, userID: string}[];
+  data: any[];
   setData: (data: any) => any;
 }

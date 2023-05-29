@@ -14,16 +14,18 @@ import { Tile } from "../../../../models/app/Tile";
 import {CheckCircleOutlined, CloseCircleOutlined} from "@ant-design/icons";
 import AppController from "../../../../api/controllers/app";
 
-import RRuleGeneratorTS, { translations } from "react-rrule-generator-ts";
-import "react-rrule-generator-ts/dist/index.css";
+import DatePicker, { DateObject } from "react-multi-date-picker";
+import { Switch } from "antd";
 
 
 export default class NotificationCentre extends Component {
+
   state = {
     students: [],
     notifications: [],
     tiles: [],
-    rrule: ''
+    dates: [],
+    rangeBool : false
   }
 
   componentDidMount(): void {
@@ -44,6 +46,17 @@ export default class NotificationCentre extends Component {
     TileController.getTiles().then(async (tiles: Tile[]) => {
       this.setState({
         tiles: tiles
+      })
+    })
+    AppController.getNotificationDates().then(async (notificationDates: string[]) =>{
+      if (notificationDates[0].includes("-"))
+      {
+        var doubleDates : Date[][] = [];
+        notificationDates.forEach(element => doubleDates.push(element.split("-").map(v=> new Date(Date.parse(v)))));
+        this.setState({dates: doubleDates, rangeBool: true})
+      } 
+      else this.setState({
+          dates: notificationDates.map((value) => Date.parse(value))
       })
     })
   }
@@ -101,7 +114,7 @@ export default class NotificationCentre extends Component {
   }
 
   render(): React.ReactNode {
-    const { students, notifications, tiles }: IState = this.state;
+    const { students, notifications, tiles, rangeBool }: IState = this.state;
     const columns: ColumnsType<Data> = [
         {
           title: 'Student',
@@ -163,19 +176,40 @@ export default class NotificationCentre extends Component {
 
         <Divider />
 
-        {/* <RRuleGeneratorTS
-          onChange={(rrule: any) => console.log(rrule)}
-          config={{
-            repeat: ["Yearly", "Monthly", "Weekly"],
-            yearly: "on",
-            monthly: "on",
-            end: ["Never", "On date"],
-            weekStartsOnSunday: true,
-            hideError: true
+        Range?
+
+        <Switch
+          onClick={(value:any)=>{
+            this.setState({rangeBool:!rangeBool, dates:[]});
           }}
-          value={this.state.rrule}
-          translations={translations.english}
-        /> */}
+          checked={rangeBool}
+        />
+
+        <DatePicker
+          multiple = {true}
+          range = {rangeBool}
+          // rangeHover = {true}
+          value={this.state.dates}
+          onChange={dateObject=>{
+            this.setState({dates: dateObject})
+
+            if (rangeBool){
+              var datelist : string[] = [];
+              dateObject?.toString().split(",").map(date => datelist.push(date));
+              var rangedates = "";
+
+              for (let i = 0; i < datelist.length; i = i + 2) {
+                rangedates += datelist[i] + "-"
+                rangedates += datelist[i+1] ? datelist[i+1] : datelist[i];
+                if (datelist[i+2]) rangedates+=",";
+              }
+              AppController.setNotificationDates(rangedates);
+            }
+            else 
+              AppController.setNotificationDates((dateObject?.toString())!)
+          }} 
+        />
+
 
         <div id={"NotificationsTable"} style={{position: 'relative', overflow: 'visible'}}>
           <Table scroll={{ x: 900 }}
