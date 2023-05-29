@@ -15,6 +15,7 @@ export interface IState {
   data: string[][];
   id_column: number;
   grade_column: number;
+  editor_collapsed: boolean;
 }
 
 export interface IUploadProps {

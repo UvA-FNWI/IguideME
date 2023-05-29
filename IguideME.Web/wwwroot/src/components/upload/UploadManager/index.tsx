@@ -4,7 +4,7 @@ import {IProps, IState} from "./types";
 // import UploadEntriesData from "./UploadEntriesData";
 import UploadEditor from "./UploadEditor";
 import {Button, Col, Input, InputNumber, message, Row, Tooltip} from "antd";
-import { QuestionCircleOutlined } from "@ant-design/icons"
+import { QuestionCircleOutlined, DownOutlined, RightOutlined } from "@ant-design/icons"
 import CSVReader, { IFileInfo } from "react-csv-reader";
 // import ExternalDataController from "../../../api/controllers/externalData"; TODO: move communication with backend to this controller or remove it.
 import StudentController from "../../../api/controllers/student";
@@ -26,7 +26,8 @@ export default class UploadManager extends Component<IProps, IState> {
     data: [],
     title: "",
     id_column: 0,
-    grade_column: 1
+    grade_column: 1,
+    editor_collapsed: false
   }
 
   componentDidMount(): void {
@@ -38,10 +39,6 @@ export default class UploadManager extends Component<IProps, IState> {
   }
 
   handleCSVUpload = (data: string[][], title: string) => {
-    // const {students, id_column} = this.state;
-
-    // const headers = data[0];
-    // data = data.filter((row: string[]) => (students as CanvasStudent[]).some(student => student.id.toString() === row[id_column]));
     if (this.state.title.length < 1)
       this.setState({ data, title });
     else
@@ -57,7 +54,7 @@ export default class UploadManager extends Component<IProps, IState> {
     const headers = data[0];
     data = data.filter((row: string[]) => (students as CanvasStudent[]).some(student => student.userID.toString() === row[id_column]));
 
-    this.setState({ data: [headers, ...data] })
+    return [headers, ...data];
   }
 
   addMissing = () => {
@@ -89,9 +86,22 @@ export default class UploadManager extends Component<IProps, IState> {
     this.setState({grade_column: nr ? nr : 0});
   }
 
+  validate = (data: string[][]) => {
+    const { title} = this.state;
+    return title.length > 0 && data.length > 1;
+  }
+
   upload = () => {
     const { tile } = this.props;
-    const { data, title, id_column, grade_column } = this.state;
+    const { title, id_column, grade_column } = this.state;
+
+    const data = this.filterStudents();
+
+    console.log(data);
+    console.log(this.validate(data));
+
+    if (!this.validate(data))
+      return this.setState({ data });
 
     this.setState({ uploading: true }, () => {
       TileController.createTileEntry({
@@ -114,7 +124,7 @@ export default class UploadManager extends Component<IProps, IState> {
 
   render(): React.ReactNode {
     // const { tile } = this.props; TODO: Validate that grades are binary for binary tiles somewhere. Or just remove tile from props
-    const { students, data, title, uploading, id_column, grade_column} = this.state;
+    const { students, data, title, uploading, id_column, grade_column, editor_collapsed} = this.state;
 
     return (
       <div id={"uploadManager"}>
@@ -166,13 +176,10 @@ export default class UploadManager extends Component<IProps, IState> {
         {
           data.length > 0 ?
           <>
-            <Row style={{ marginBottom: 8 }}>
-              <UploadEditor data={data}
-                            setData={data => this.setState({data})}
-                            students={students}
-                            columns={{grade: grade_column, id: id_column}}/>
-            </Row>
             <Row gutter={[10, 10]} style={{ marginBottom: 8 }}>
+              <Col>
+              <Button shape="circle" icon={editor_collapsed ? (<RightOutlined />) : (<DownOutlined />)} onClick={() => this.setState({editor_collapsed: !editor_collapsed})}></Button>
+              </Col>
               <Col>
                 <Tooltip color={tooltip_bg} title={<span style={tooltip_fg}>Add students from the course that are not in the data.</span>}>
                 <Button onClick={this.addMissing}>Add Missing Students</Button>
@@ -180,10 +187,21 @@ export default class UploadManager extends Component<IProps, IState> {
               </Col>
               <Col>
               <Tooltip color={tooltip_bg} title={<span style={tooltip_fg}>Filter out any student that is not part of the course.</span>}>
-                <Button onClick={this.filterStudents}>Filter Students</Button>
+                <Button onClick={() => this.setState({data: this.filterStudents()})}>Filter Students</Button>
               </Tooltip>
               </Col>
             </Row>
+            { !editor_collapsed &&
+            <>
+            <Row style={{ marginBottom: 8 }}>
+              <UploadEditor data={data}
+                            setData={data => this.setState({data})}
+                            students={students}
+                            columns={{grade: grade_column, id: id_column}}/>
+            </Row>
+
+            </>
+            }
           </>
           :
           <Row style={{ marginBottom: 8 }}>
@@ -203,7 +221,7 @@ export default class UploadManager extends Component<IProps, IState> {
             <Button className={"successButton"}
                     onClick={this.upload}
                     loading={uploading}
-                    disabled={title.length < 1 || data.length < 2 }>
+                    disabled={!this.validate(data) }>
               Upload
             </Button>
           </Col>
@@ -212,14 +230,3 @@ export default class UploadManager extends Component<IProps, IState> {
     )
   }
 }
-
-          // <div>
-          //   { tile.content === "BINARY" ?
-          //     <UploadBinaryData data={data}
-          //                       setData={d => this.setState({ data: d })}
-          //                       students={students} /> :
-          //     <UploadEntriesData data={data}
-          //                        setData={d => this.setState({ data: d })}
-          //                        students={students} />
-          //   }
-          // </div>
