@@ -1423,9 +1423,9 @@ namespace IguideME.Web.Services
                         float peer_max = r1.GetFloat(3);  //max
                         float peer_min = r1.GetFloat(4);  //min
 
-                        DateTime labelDate = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+                        DateTime labelDate = new(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
                         labelDate = labelDate.AddMilliseconds(long.Parse(r1.GetValue(5).ToString()));
-                        string label = String.Format("{0:dd/MM/yyyy}",labelDate); //sync_hash
+                        string label = string.Format("{0:dd/MM/yyyy}",labelDate); //sync_hash
 
                         // If this entry is different than the last, we add it
                         if (last_user_avg != user_avg || last_peer_avg != peer_avg

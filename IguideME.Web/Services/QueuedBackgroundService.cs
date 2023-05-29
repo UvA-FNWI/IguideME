@@ -85,7 +85,6 @@ namespace IguideME.Web.Services
         /// </remark>
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            _logger.LogInformation("Test if this method (ExecuteAsync) is used somehow");
             while (!stoppingToken.IsCancellationRequested)
             {
                 JobQueueItem jobQueueItem = null;
