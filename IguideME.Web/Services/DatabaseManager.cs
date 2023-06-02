@@ -157,28 +157,25 @@ namespace IguideME.Web.Services
             // collection of all table creation queries
             string[] queries =
             {
+                DatabaseQueries.CREATE_TABLE_USERS,
                 DatabaseQueries.CREATE_TABLE_COURSE_SETTINGS,
+                DatabaseQueries.CREATE_TABLE_SYNC_HISTORY,
                 DatabaseQueries.CREATE_TABLE_USER_SETTINGS,
                 DatabaseQueries.CREATE_TABLE_USER_TRACKER,
-                DatabaseQueries.CREATE_TABLE_PEER_GROUP,
-                DatabaseQueries.CREATE_TABLE_SYNC_HISTORY,
                 DatabaseQueries.CREATE_TABLE_LAYOUT_COLUMNS,
-                DatabaseQueries.CREATE_TABLE_LAYOUT_TILE_GROUP,
-                DatabaseQueries.CREATE_TABLE_TILE,
-                DatabaseQueries.CREATE_TABLE_TILE_ENTRY,
-                DatabaseQueries.CREATE_TABLE_TILE_ENTRY_SUBMISSION,
-                DatabaseQueries.CREATE_TABLE_TILE_ENTRY_SUBMISSION_META,
-                DatabaseQueries.CREATE_TABLE_EXTERNAL_DATA,
-                DatabaseQueries.CREATE_TABLE_CANVAS_USER,
-                DatabaseQueries.CREATE_TABLE_CANVAS_ASSIGNMENT,
-                DatabaseQueries.CREATE_TABLE_CANVAS_DISCUSSION,
-                DatabaseQueries.CREATE_TABLE_CANVAS_DISCUSSION_ENTRY,
-                DatabaseQueries.CREATE_TABLE_CANVAS_DISCUSSION_REPLY,
+                DatabaseQueries.CREATE_TABLE_LAYOUT_TILE_GROUPS,
+                DatabaseQueries.CREATE_TABLE_TILES,
+                DatabaseQueries.CREATE_TABLE_ASSIGNMENTS,
+                DatabaseQueries.CREATE_TABLE_LEARNING_GOALS,
+                DatabaseQueries.CREATE_TABLE_DISCUSSIONS,
+                DatabaseQueries.CREATE_TABLE_DISCUSSION_REPLIES,
+                DatabaseQueries.CREATE_TABLE_TILE_ENTRIES,
+                DatabaseQueries.CREATE_TABLE_SUBMISSIONS,
+                DatabaseQueries.CREATE_TABLE_SUBMISSIONS_META,
                 DatabaseQueries.CREATE_TABLE_GRADE_PREDICTION_MODEL,
                 DatabaseQueries.CREATE_TABLE_GRADE_PREDICTION_MODEL_PARAMETER,
                 DatabaseQueries.CREATE_TABLE_PREDICTED_GRADE,
-                DatabaseQueries.CREATE_TABLE_LEARNING_GOALS,
-                DatabaseQueries.CREATE_TABLE_GOAL_REQUREMENTS,
+                DatabaseQueries.CREATE_TABLE_PEER_GROUPS,
                 DatabaseQueries.CREATE_TABLE_NOTIFICATIONS,
                 DatabaseQueries.CREATE_TABLE_MIGRATIONS,
             };
@@ -1422,9 +1419,9 @@ namespace IguideME.Web.Services
                         float peer_max = r1.GetFloat(3);  //max
                         float peer_min = r1.GetFloat(4);  //min
 
-                        DateTime labelDate = new(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+                        DateTime labelDate = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
                         labelDate = labelDate.AddMilliseconds(long.Parse(r1.GetValue(5).ToString()));
-                        string label = string.Format("{0:dd/MM/yyyy}",labelDate); //sync_hash
+                        string label = String.Format("{0:dd/MM/yyyy}",labelDate); //sync_hash
 
                         // If this entry is different than the last, we add it
                         if (last_user_avg != user_avg || last_peer_avg != peer_avg

@@ -63,7 +63,8 @@ public static class DatabaseQueries
             `column_id`       INTEGER PRIMARY KEY AUTOINCREMENT,
             `course_id`       INTEGER,
             `size`            STRING,
-            `order`           INTEGER
+            `order`           INTEGER,
+            FOREIGN KEY(`course_id`) REFERENCES `course_settings`(`course_id`)
         );";
 
     /**
@@ -89,16 +90,10 @@ public static class DatabaseQueries
      * Tiles are assigned groups and can be of varying types containing
      * different types of contents.
      *
-     * Content types:
-     * - BINARY
-     * - ENTRIES
-     * - PREDICTION
-     * - LEARNING_OUTCOMES
-     *
      * Tile types:
      * - ASSIGNMENT
      * - DISCUSSION
-     * - EXTERNAL_DATA
+     * - LEARNING_OUTCOMES
      */
     public const string CREATE_TABLE_TILES =
         @"CREATE TABLE IF NOT EXISTS `tiles` (
@@ -109,25 +104,26 @@ public static class DatabaseQueries
             `type`            INTEGER,
             `visible`         BOOLEAN DEFAULT false,
             `notifications`   BOOLEAN DEFAULT false,
-            FOREIGN KEY(`group_id`) REFERENCES `tile_groups`(`group_id`)
+            FOREIGN KEY(`group_id`) REFERENCES `tile_groups`(`group_id`),
+            FOREIGN KEY(`course_id`) REFERENCES `course_settings`(`course_id`)
         );";
 
     /**
      * Tile entries are descendants of tiles.
      *
-     * Entry types:
+     * Content might be an id of:
      * - "ASSIGNMENT"
      * - "DISCUSSION"
      * - "LEARNING_OUTCOMES"
      */
     public const string CREATE_TABLE_TILE_ENTRIES =
         @"CREATE TABLE IF NOT EXISTS `tile_entries` (
-            `tile_id`         INTEGER PRIMARY KEY AUTOINCREMENT,
-            `content_id`      INTEGER PRIMARY KEY,
-            FOREIGN KEY(`group_id`) REFERENCES `tile_groups`(`group_id`)
+            `tile_id`         INTEGER,
+            `content_id`      INTEGER,
+            PRIMARY KEY (`tile_id`,`content_id`),
+            FOREIGN KEY(`tile_id`) REFERENCES `tiles`(`tile_id`)
         );";
 
-        // TODO: is content_id as foreign key possible here??? ^^^
 
     public const string CREATE_TABLE_SUBMISSIONS =
         @"CREATE TABLE IF NOT EXISTS `submissions` (
@@ -145,14 +141,15 @@ public static class DatabaseQueries
         @"CREATE TABLE IF NOT EXISTS `submissions_meta` (
             `submission_id`   INTEGER,
             `key`             STRING,
-            `value`           STRING
+            `value`           STRING,
+            FOREIGN KEY(`submission_id`) REFERENCES `submissions`(`submission_id`)
         );";
 
     public const string CREATE_TABLE_LEARNING_GOALS =
         @"CREATE TABLE IF NOT EXISTS `learning_goals` (
             `goal_id`             INTEGER,
-            `assignment_id`       INTEGER,
             `name`                STRING,
+            `assignment_id`       INTEGER,
             `value`               INTEGER,
             `expression`          INTEGER,
             FOREIGN KEY(`assignment_id`) REFERENCES `assignments`(`assignment_id`)
@@ -185,13 +182,15 @@ public static class DatabaseQueries
      */
     public const string CREATE_TABLE_USER_SETTINGS =
         @"CREATE TABLE IF NOT EXISTS `student_settings` (
-            `user_id`           STRING PRIMARY KEY,
-            `course_id`         INTEGER PRIMARY KEY,
-            `sync_id`           INTEGER PRIMARY KEY,
+            `user_id`           STRING,
+            `course_id`         INTEGER,
             `predicted_grade`   INTEGER DEFAULT 0,
             `goal_grade`        INTEGER DEFAULT -1,
             `notifications`     BOOLEAN DEFAULT true,
+            `sync_id`           INTEGER,
+            PRIMARY KEY (`user_id`,`course_id`,`sync_id`),
             FOREIGN KEY(`user_id`) REFERENCES `users`(`user_id`),
+            FOREIGN KEY(`course_id`) REFERENCES `course_settings`(`course_id`),
             FOREIGN KEY(`sync_id`) REFERENCES `sync_history`(`sync_id`)
         );";
 
@@ -205,12 +204,13 @@ public static class DatabaseQueries
      */
     public const string CREATE_TABLE_PEER_GROUPS =
     @"CREATE TABLE IF NOT EXISTS `peer_groups` (
-        `tile_id`           INTEGER PRIMARY KEY,
-        `goal_grade`        INTEGER PRIMARY KEY,
+        `tile_id`           INTEGER,
+        `goal_grade`        INTEGER,
         `avg_grade`         INTEGER,
         `min_grade`         INTEGER,
         `max_grade`         INTEGER,
-        `sync_id`           INTEGER PRIMARY KEY,
+        `sync_id`           INTEGER,
+        PRIMARY KEY (`tile_id`,`goal_grade`,`sync_id`),
         FOREIGN KEY(`tile_id`) REFERENCES `tiles`(`tile_id`),
         FOREIGN KEY(`sync_id`) REFERENCES `sync_history`(`sync_id`)
 
@@ -230,11 +230,12 @@ public static class DatabaseQueries
      */
     public const string CREATE_TABLE_NOTIFICATIONS =
         @"CREATE TABLE IF NOT EXISTS `notifications` (
-            `user_id`             STRING PRIMARY KEY,
-            `tile_id`             INTEGER PRIMARY KEY,
+            `user_id`             STRING,
+            `tile_id`             INTEGER,
             `message`             TEXT,
             `status`              BOOLEAN,
-            `sync_id`             INTEGER PRIMARY KEY,
+            `sync_id`             INTEGER,
+            PRIMARY KEY (`user_id`,`tile_id`,`sync_id`),
             FOREIGN KEY(`user_id`) REFERENCES `users`(`user_id`),
             FOREIGN KEY(`tile_id`) REFERENCES `tiles`(`tile_id`),
             FOREIGN KEY(`sync_id`) REFERENCES `sync_history`(`sync_id`)
@@ -277,7 +278,7 @@ public static class DatabaseQueries
     public const string CREATE_TABLE_USERS =
         @"CREATE TABLE IF NOT EXISTS `users` (
             `user_id`         STRING PRIMARY KEY,
-            `studentnumber`   INTEGER,
+            `student_number`  INTEGER,
             `name`            STRING,
             `sortable_name`   STRING,
             `role`            INTEGER DEFAULT 0
@@ -309,7 +310,7 @@ public static class DatabaseQueries
 
         );";
 
-    public const string CREATE_TABLE_CANVAS_DISCUSSION_REPLIES =
+    public const string CREATE_TABLE_DISCUSSION_REPLIES =
         @"CREATE TABLE IF NOT EXISTS `discussion_replies` (
             `reply_id`        INTEGER PRIMARY KEY AUTOINCREMENT,
             `discussion_id`   INTEGER,
