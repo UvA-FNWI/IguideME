@@ -162,7 +162,7 @@ namespace IguideME.Web.Services
                 DatabaseQueries.CREATE_TABLE_USER_TRACKER,
                 DatabaseQueries.CREATE_TABLE_PEER_GROUP,
                 DatabaseQueries.CREATE_TABLE_SYNC_HISTORY,
-                DatabaseQueries.CREATE_TABLE_LAYOUT_COLUMN,
+                DatabaseQueries.CREATE_TABLE_LAYOUT_COLUMNS,
                 DatabaseQueries.CREATE_TABLE_LAYOUT_TILE_GROUP,
                 DatabaseQueries.CREATE_TABLE_TILE,
                 DatabaseQueries.CREATE_TABLE_TILE_ENTRY,
@@ -180,7 +180,6 @@ namespace IguideME.Web.Services
                 DatabaseQueries.CREATE_TABLE_LEARNING_GOALS,
                 DatabaseQueries.CREATE_TABLE_GOAL_REQUREMENTS,
                 DatabaseQueries.CREATE_TABLE_NOTIFICATIONS,
-                DatabaseQueries.CREATE_TABLE_ACCEPT_LIST,
                 DatabaseQueries.CREATE_TABLE_MIGRATIONS,
             };
 
