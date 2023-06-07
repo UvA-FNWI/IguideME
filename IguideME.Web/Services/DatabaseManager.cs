@@ -465,7 +465,6 @@ namespace IguideME.Web.Services
                 new SQLiteParameter("userName", discussion.UserName),
                 new SQLiteParameter("postedAt", discussion.PostedAt),
                 new SQLiteParameter("message", discussion.Message),
-                // new SQLiteParameter("message", discussion.Message.Replace("'", "''")), // TODO: remove if didn't break
                 new SQLiteParameter("hash", syncHash)
             );
         }
@@ -479,7 +478,6 @@ namespace IguideME.Web.Services
                 new SQLiteParameter("userName", discussion.UserName),
                 new SQLiteParameter("postedAt", discussion.PostedAt),
                 new SQLiteParameter("message", discussion.Message),
-                // new SQLiteParameter("message", discussion.Message.Replace("'", "''")),
                 new SQLiteParameter("tileID", tileID),
                 new SQLiteParameter("hash", hash)
             );
@@ -493,7 +491,6 @@ namespace IguideME.Web.Services
                     new SQLiteParameter("topicID", entry.TopicID),
     				new SQLiteParameter("postedAt", entry.CreatedAt),
                     new SQLiteParameter("message", entry.Message),
-                    // new SQLiteParameter("message", entry.Message.Replace("'", "''")),
                     new SQLiteParameter("postedBy", userID)
             );
         }
@@ -1892,8 +1889,6 @@ namespace IguideME.Web.Services
 
         public void UpdateTile(int courseID, Tile tile)
         {
-            // TODO: check courseID
-
             NonQuery(DatabaseQueries.UPDATE_TILE,
                 new SQLiteParameter("id", tile.ID),
                 new SQLiteParameter("groupID", tile.GroupID),

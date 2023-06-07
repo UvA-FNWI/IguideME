@@ -4,7 +4,7 @@ import {IProps, IState} from "./types";
 // import UploadEntriesData from "./UploadEntriesData";
 import UploadEditor from "./UploadEditor";
 import {Button, Col, Input, InputNumber, message, Row, Tooltip} from "antd";
-import { QuestionCircleOutlined, DownOutlined, RightOutlined } from "@ant-design/icons"
+import { QuestionCircleOutlined, DownOutlined, RightOutlined , VideoCameraAddOutlined} from "@ant-design/icons"
 import CSVReader, { IFileInfo } from "react-csv-reader";
 // import ExternalDataController from "../../../api/controllers/externalData"; TODO: move communication with backend to this controller or remove it.
 import StudentController from "../../../api/controllers/student";
@@ -12,6 +12,7 @@ import TileController from "../../../api/controllers/tile";
 import "./style.scss";
 import { editState } from "../../../models/app/Tile";
 import { CanvasStudent } from "../../../models/canvas/Student";
+import Presets from "./upload_presets"
 
 // TODO: couldn't seem to figure out how to do this systematically with css or something.
 const tooltip_bg = "rgb(255,255,255)";
@@ -162,14 +163,14 @@ export default class UploadManager extends Component<IProps, IState> {
             <Tooltip title={<span style={tooltip_fg}>This indicates the column containing the student id's, which will be highlighted in <em style={{color: "rgb(255, 130, 0)"}}>orange</em> bellow.</span>} color={tooltip_bg}>
               <QuestionCircleOutlined />
             </Tooltip>
-            <InputNumber style={{width: "120px"}} min={0} value={id_column} onChange={this.changeIDColumn}/>
+            <InputNumber style={{width: "120px"}} min={0} max={data.length > 1 ? (data as string[][])[0].length -1 : undefined} value={id_column} onChange={this.changeIDColumn}/>
           </Col>
           <Col flex={"0 0 120px"}>
             <label> Grade column </label>
             <Tooltip title={<span style={tooltip_fg}>This indicates the column containing the grades, which will be highlighted in <em style={{color: "rgb(0, 80, 255)"}}>blue</em> bellow.</span>} color={tooltip_bg}>
               <QuestionCircleOutlined />
             </Tooltip>
-            <InputNumber style={{width: "120px"}} min={0} value={grade_column} onChange={this.changeGradeColumn}/>
+            <InputNumber style={{width: "120px"}} min={0} max={data.length > 1 ? (data as string[][])[0].length -1 : undefined} value={grade_column} onChange={this.changeGradeColumn}/>
           </Col>
         </Row>
 
@@ -204,8 +205,44 @@ export default class UploadManager extends Component<IProps, IState> {
             }
           </>
           :
-          <Row style={{ marginBottom: 8 }}>
-            <Button style={{width: "120px"}} onClick={() => {this.setState({data: [["id", "grade"], ["", ""]]})}}>Manual Entry</Button>
+          <Row gutter={[10, 10]} style={{ marginBottom: 8 }}>
+            <Col>
+              <Button style={{width: "120px"}} onClick={() => {this.setState({data: [["id", "grade"], ["", ""]]})}}>Manual Entry</Button>
+            </Col>
+            <Col flex={"0 0 130px"}>
+              <label className={"uploadSource"}> <VideoCameraAddOutlined/> Watchtime
+              <CSVReader onFileLoaded={(data: string[][], fileinfo: IFileInfo) => this.handleCSVUpload(Presets.watchtime(data), fileinfo.name)}
+                        inputStyle={{ display: 'none' }}
+                        onError={() => alert("error")}
+                        parserOptions={{
+                          header: false,
+                          dynamicTyping: false,
+                          skipEmptyLines: true,
+                          transformHeader: (header: any) =>
+                            header
+                              .toLowerCase()
+                              .replace(/\W/g, '_')
+                            }}
+                            />
+              </label>
+            </Col>
+            <Col flex={"0 0 130px"}>
+            <label className={"uploadSource"}> <VideoCameraAddOutlined/> Watched
+              <CSVReader onFileLoaded={(data: string[][], fileinfo: IFileInfo) => this.handleCSVUpload(Presets.watched(data), fileinfo.name)}
+                        inputStyle={{ display: 'none' }}
+                        onError={() => alert("error")}
+                        parserOptions={{
+                          header: false,
+                          dynamicTyping: false,
+                          skipEmptyLines: true,
+                          transformHeader: (header: any) =>
+                            header
+                              .toLowerCase()
+                              .replace(/\W/g, '_')
+                            }}
+                            />
+              </label>
+            </Col>
           </Row>
         }
 
