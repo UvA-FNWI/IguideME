@@ -910,7 +910,7 @@ namespace IguideME.Web.Services
             string key,
             string value,
             int courseID,
-            int syncID=null)
+            int syncID = 0)
         {
             int activeSync = syncID == 0 ? this.GetCurrentHash(courseID) : 0;
             return IDNonQuery(DatabaseQueries.REGISTER_SUBMISSION_META,
@@ -1851,7 +1851,7 @@ namespace IguideME.Web.Services
             return keys;
         }
 
-        public Dictionary<string, string> GetEntryMeta(int entryID, string syncID)
+        public Dictionary<string, string> GetEntryMeta(int entryID, int syncID)
         {
             Dictionary<string, string> meta = new();
 

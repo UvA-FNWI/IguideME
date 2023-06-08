@@ -31,7 +31,7 @@ namespace IguideME.Web.Models.App
             string submitted,
             string meta = null,
             bool autoLoadMeta = true,
-            string hash = null)
+            int syncID = 0)
         {
             this.ID = id;
             this.UserID = userID;
@@ -43,7 +43,7 @@ namespace IguideME.Web.Models.App
             if (autoLoadMeta && meta == null)
             {
                 this.Meta = JsonConvert.SerializeObject(
-                    DatabaseManager.Instance.GetEntryMeta(this.ID, hash));
+                    DatabaseManager.Instance.GetEntryMeta(this.ID, syncID));
             }
         }
     }
