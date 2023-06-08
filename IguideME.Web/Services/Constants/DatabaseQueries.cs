@@ -241,7 +241,7 @@ public static class DatabaseQueries
 
     // /------------------------ Grade Prediction ------------------------/
 
-    public const string CREATE_TABLE_GRADE_PREDICTION_MODEL =
+    public const string CREATE_TABLE_GRADE_PREDICTION_MODEL = // NOT DONE
         @"CREATE TABLE IF NOT EXISTS `grade_prediction_model` (
             `id`                  INTEGER PRIMARY KEY AUTOINCREMENT,
             `course_id`           INTEGER,
@@ -249,7 +249,7 @@ public static class DatabaseQueries
             `enabled`             BOOLEAN
         );";
 
-    public const string CREATE_TABLE_PREDICTED_GRADE =
+    public const string CREATE_TABLE_PREDICTED_GRADE = // NOT DONE
         @"CREATE TABLE IF NOT EXISTS `predicted_grade` (
             `id`                  INTEGER PRIMARY KEY AUTOINCREMENT,
             `course_id`           INTEGER,
@@ -259,7 +259,7 @@ public static class DatabaseQueries
             UNIQUE(course_id, user_id, date)
         );";
 
-    public const string CREATE_TABLE_GRADE_PREDICTION_MODEL_PARAMETER =
+    public const string CREATE_TABLE_GRADE_PREDICTION_MODEL_PARAMETER = // NOT DONE
         @"CREATE TABLE IF NOT EXISTS `grade_prediction_model_parameter` (
             `id`                  INTEGER PRIMARY KEY AUTOINCREMENT,
             `model_id`            INTEGER,
@@ -280,7 +280,7 @@ public static class DatabaseQueries
             `role`            INTEGER DEFAULT 0
         );";
 
-    public const string CREATE_TABLE_ASSIGNMENTS =
+    public const string CREATE_TABLE_ASSIGNMENTS = // NOT DONE
         @"CREATE TABLE IF NOT EXISTS `assignments` (
             `assignment_id`   INTEGER PRIMARY KEY,
             `course_id`       INTEGER,
@@ -293,7 +293,7 @@ public static class DatabaseQueries
             FOREIGN KEY(`course_id`) REFERENCES `course_settings`(`course_id`)
         );";
 
-    public const string CREATE_TABLE_DISCUSSIONS =
+    public const string CREATE_TABLE_DISCUSSIONS = // NOT DONE
         @"CREATE TABLE IF NOT EXISTS `discussions` (
             `discussion_id`   INTEGER PRIMARY KEY,
             `course_id`       INTEGER,
@@ -306,7 +306,7 @@ public static class DatabaseQueries
 
         );";
 
-    public const string CREATE_TABLE_DISCUSSION_REPLIES =
+    public const string CREATE_TABLE_DISCUSSION_REPLIES = // NOT DONE
         @"CREATE TABLE IF NOT EXISTS `discussion_replies` (
             `reply_id`        INTEGER PRIMARY KEY AUTOINCREMENT,
             `discussion_id`   INTEGER,
@@ -709,7 +709,7 @@ public static class DatabaseQueries
                         `status`,
                         `sent`
         FROM            `notifications`
-        WHERE           `sync_id` IN ('{0}');";
+        WHERE           `sync_id` IN ({0});";
 
     public const string QUERY_ALL_USER_NOTIFICATIONS =
         @"SELECT        `tile_id`, 
@@ -1063,8 +1063,7 @@ public static class DatabaseQueries
         ;";
 
     public const string QUERY_SYNC_HASHES_FOR_COURSE =
-        @"SELECT    `id`,
-                    `course_id`,
+        @"SELECT    `course_id`,
                     `sync_id`,
                     `end_timestamp`
         FROM        `sync_history`

@@ -214,28 +214,28 @@ namespace IguideME.Web.Services
                                               new SQLiteParameter("courseID", courseID),
                                               new SQLiteParameter("limit", 1)))
                 if (r.Read())
-                    return (int) r.GetValue(0);
+                    return r.GetInt32(0);
 
             return 0;
         }
 
-        private List<string> GetRecentHashes(int courseID, int number_of_hashes)
+        private List<int> GetRecentSyncs(int courseID, int number_of_syncs)
         {
             /**
              * Retrieve latest n complete synchronizations for course. If no
              * historic synchronization was found then null is returned.
              */
 
-            List<string> hashes = new();
+            List<int> syncIDs = new();
 
             using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_LATEST_SYNCS_FOR_COURSE,
                                               new SQLiteParameter("courseID", courseID),
-                                              new SQLiteParameter("limit", number_of_hashes)))
+                                              new SQLiteParameter("limit", number_of_syncs)))
                 while (r.Read()) {
-                    hashes.Add(r.GetValue(0).ToString());
+                    syncIDs.Add(r.GetInt32(0));
                 }
 
-            return hashes;
+            return syncIDs;
         }
 
         public void CleanupSync(int courseID) {
@@ -344,10 +344,10 @@ namespace IguideME.Web.Services
                 while (r.Read()) {
                     try {
                         string status;
-                        long? endTime = null;
+                        int? endTime = null;
 
                         if (r.GetValue(3).GetType() != typeof(DBNull)) {
-                            endTime = long.Parse(r.GetValue(3).ToString()); //.ToLocalTime()
+                            endTime = r.GetInt32(2); //.ToLocalTime()
                             status = "COMPLETE";
                         }
                         else {
@@ -357,7 +357,6 @@ namespace IguideME.Web.Services
                         hashes.Add(new DataSynchronization(
                             r.GetInt32(0),
                             r.GetInt32(1),
-                            long.Parse(r.GetValue(2).ToString()),
                             endTime,
                             status
                             )
@@ -1650,7 +1649,7 @@ namespace IguideME.Web.Services
         public List<Notification> GetAllNotifications(
             int courseID)
         {
-            string activeSync = String.Join("', '", this.GetRecentHashes(courseID, 2));
+            string activeSync = String.Join("', '", this.GetRecentSyncs(courseID, 2));
 
             // TODO: not sure how to write this as sqliteparameters
             string query = String.Format(
