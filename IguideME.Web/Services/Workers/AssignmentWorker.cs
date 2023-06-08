@@ -19,25 +19,25 @@ namespace IguideME.Web.Services.Workers
         readonly private ILogger<SyncManager> _logger;
 		readonly private CanvasHandler _canvasHandler;
 		readonly private int _courseID;
-		readonly private string _hashCode;
+		readonly private int _syncID;
 
 		/// <summary>
         /// This constructor initializes the new AssignmentWorker to:
-        /// (<paramref name="courseID"/>, <paramref name="hashCode"/>, <paramref name="canvasHandler"/>, <paramref name="logger"/>).
+        /// (<paramref name="courseID"/>, <paramref name="syncID"/>, <paramref name="canvasHandler"/>, <paramref name="logger"/>).
         /// </summary>
         /// <param name="courseID">the id of the course.</param>
-        /// <param name="hashCode">the hash code associated to the current sync.</param>
+        /// <param name="syncID">the hash code associated to the current sync.</param>
         /// <param name="canvasHandler">a reference to the class managing the connection with canvas.</param>
         /// <param name="logger">a reference to the logger used for the sync.</param>
         public AssignmentWorker(
 			int courseID,
-			string hashCode,
+			int syncID,
 			CanvasHandler canvasHandler,
             ILogger<SyncManager> logger)
         {
             _logger = logger;
 			this._courseID = courseID;
-			this._hashCode = hashCode;
+			this._syncID = syncID;
 			this._canvasHandler = canvasHandler;
         }
 
@@ -77,7 +77,7 @@ namespace IguideME.Web.Services.Workers
             IEnumerable<Submission> submissions = assignment.Submissions
                 .Where(submission =>
 					submission.Grade != null &&
-					DatabaseManager.Instance.GetConsent(this._courseID, submission.User.LoginID) == 1
+					DatabaseManager.Instance.GetConsent(this._courseID, submission.User.LoginID, _syncID) > 0
 				);
 
             foreach (Submission submission in submissions)
@@ -115,7 +115,7 @@ namespace IguideME.Web.Services.Workers
 						submission.User.LoginID,
 						grade,
 						"",//submission.SubmittedAt.Value.ToShortDateString(),
-						_hashCode);
+						_syncID);
 			}
 		}
 
@@ -144,7 +144,7 @@ namespace IguideME.Web.Services.Workers
                     assignment.Position ??= 0,
               (int) assignment.GradingType,
                     assignment.SubmissionType,
-                    _hashCode
+                    _syncID
                 );
 
                 // Don't register submissions that aren't assigned to tiles (as entries).

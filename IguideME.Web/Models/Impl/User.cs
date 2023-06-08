@@ -6,8 +6,8 @@ namespace IguideME.Web.Models.Impl
 {
     public class User
     {
-        [JsonProperty("id")]
-        public int ID { get; set; }
+        // [JsonProperty("id")]
+        // public int ID { get; set; }
 
         [JsonProperty("course_id")]
         public int CourseID { get; set; }
@@ -25,29 +25,24 @@ namespace IguideME.Web.Models.Impl
         public string SortableName { get; set; }
 
         [JsonProperty("role")]
-        public string Role { get; set; }
-
-        [JsonIgnore]
-        public string Hash { get; set; }
+        public int Role { get; set; }
 
         public User(
-            int id,
+            // int id,
+            string userID,
             int courseID,
             int studentnumber,
-            string userID,
             string name,
             string sortableName,
-            string role,
-            string hash = null)
+            int role)
         {
-            this.ID = id;
+            // this.ID = id;
             this.CourseID = courseID;
             this.StudentNumber = studentnumber;
             this.UserID = userID;
             this.Name = name;
             this.SortableName = sortableName;
             this.Role = role;
-            this.Hash = hash;
         }
 
 

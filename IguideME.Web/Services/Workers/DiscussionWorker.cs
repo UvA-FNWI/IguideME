@@ -16,21 +16,21 @@ namespace IguideME.Web.Services.Workers
         readonly private ILogger<SyncManager> _logger;
 		readonly private CanvasHandler _canvasHandler;
 		readonly private int _courseID;
-		readonly private string _hashCode;
+		readonly private int _syncID;
 
 		/// <summary>
         /// This constructor initializes the new DiscussionWorker to
-        /// (<paramref name="courseID"/>, <paramref name="hashCode"/>, <paramref name="canvasHandler"/>, <paramref name="logger"/>).
+        /// (<paramref name="courseID"/>, <paramref name="syncID"/>, <paramref name="canvasHandler"/>, <paramref name="logger"/>).
         /// </summary>
         /// <param name="courseID">the id of the course.</param>
-        /// <param name="hashCode">the hash code associated to the current sync.</param>
+        /// <param name="syncID">the hash code associated to the current sync.</param>
         /// <param name="canvasHandler">a reference to the class managing the connection with canvas.</param>
         /// <param name="logger">a reference to the logger used for the sync.</param>
-		public DiscussionWorker(int courseID, string hashCode, CanvasHandler canvasHandler, ILogger<SyncManager> logger)
+		public DiscussionWorker(int courseID, int syncID, CanvasHandler canvasHandler, ILogger<SyncManager> logger)
 		{
             _logger = logger;
 			this._courseID = courseID;
-			this._hashCode = hashCode;
+			this._syncID = syncID;
 			this._canvasHandler = canvasHandler;
 		}
 
@@ -55,7 +55,7 @@ namespace IguideME.Web.Services.Workers
 
 			foreach (Canvas.Discussion discussion in discussions)
             {
-				DatabaseManager.Instance.RegisterDiscussion(discussion, this._hashCode);
+				DatabaseManager.Instance.RegisterDiscussion(discussion, this._syncID);
 
 				// Register the entries corresponding to the topic as well.
 				foreach (Canvas.DiscussionEntry entry in discussion.Entries) {
@@ -88,12 +88,12 @@ namespace IguideME.Web.Services.Workers
 			IEnumerable<Canvas.Discussion> postedDiscussions = discussions
 				.Where(d => {
 					User student = students.Find(s => s.Name == d.UserName);
-					return student != null && DatabaseManager.Instance.GetConsent(this._courseID, student.UserID) == 1;
+					return student != null && DatabaseManager.Instance.GetConsent(this._courseID, student.UserID, GetHashCode()) > 0;
 				});
 
 			foreach (Canvas.Discussion discussion in postedDiscussions)
 			{
-				DatabaseManager.Instance.UpdateDiscussion(discussion, tile.ID, this._hashCode);
+				DatabaseManager.Instance.UpdateDiscussion(discussion, tile.ID, this._syncID);
 
 			}
 		}
@@ -110,7 +110,7 @@ namespace IguideME.Web.Services.Workers
 			foreach (Canvas.Discussion discussion in discussions) {
 				foreach (TileEntry entry in tile.Entries) {
 					if (discussion.Title.Equals(entry.Title, StringComparison.OrdinalIgnoreCase)) {
-						DatabaseManager.Instance.UpdateDiscussion(discussion, tile.ID, this._hashCode);
+						DatabaseManager.Instance.UpdateDiscussion(discussion, tile.ID, this._syncID);
 					}
 				}
 			}
@@ -148,7 +148,7 @@ namespace IguideME.Web.Services.Workers
 
 			_logger.LogInformation("Starting discussion registry...");
 
-			List<User> students = DatabaseManager.Instance.GetUsers(this._courseID, "student", this._hashCode);
+			List<User> students = DatabaseManager.Instance.GetUsers(this._courseID, "student", this._syncID);
 			List<Canvas.Discussion> discussions = this._canvasHandler.GetDiscussions(this._courseID);
 
             this.RegisterDiscusions(discussions, students);

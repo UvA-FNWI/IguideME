@@ -133,7 +133,7 @@ namespace IguideME.Web.Controllers
                 ? Json(1)
                 : Json(
                 DatabaseManager.Instance.GetConsent(
-                    GetCourseID(), GetUserID()));
+                    GetCourseID(), GetUserID(), GetHashCode()));
         }
 
         [Authorize]
@@ -147,10 +147,9 @@ namespace IguideME.Web.Controllers
             ConsentData consent = new(
                 GetCourseID(),
                 GetUserID(),
-                GetUserName(),
                 (int)JObject.Parse(body)["granted"]
             );
-            DatabaseManager.Instance.SetConsent(consent);
+            DatabaseManager.Instance.SetConsent(consent, this.GetHashCode());
             return Json(consent.Granted);
         }
 
@@ -184,7 +183,7 @@ namespace IguideME.Web.Controllers
         public ActionResult GetConsents()
         {
             return Json(
-                DatabaseManager.Instance.GetConsents(this.GetCourseID())
+                DatabaseManager.Instance.GetConsents(this.GetCourseID(), GetHashCode())
                 .ToArray());
         }
 
@@ -209,7 +208,8 @@ namespace IguideME.Web.Controllers
             // returns all goal grades
             return Json(
                 DatabaseManager.Instance.GetGoalGrades(
-                    this.GetCourseID()));
+                    this.GetCourseID(),
+                    this.GetHashCode()));
         }
 
         [Authorize]
@@ -227,7 +227,8 @@ namespace IguideME.Web.Controllers
             return Json(
                 DatabaseManager.Instance.GetUserGoalGrade(
                     this.GetCourseID(),
-                    userID));
+                    userID,
+                    this.GetHashCode()));
         }
 
         [Authorize]
@@ -241,7 +242,8 @@ namespace IguideME.Web.Controllers
             return Json(
                 DatabaseManager.Instance.GetUserGoalGrade(
                     this.GetCourseID(),
-                    this.GetUserID()));
+                    this.GetUserID(),
+                    this.GetHashCode()));
         }
 
         [Authorize]
@@ -260,7 +262,8 @@ namespace IguideME.Web.Controllers
             return Json(
                 DatabaseManager.Instance.GetUserGoalGrade(
                     this.GetCourseID(),
-                    this.GetUserID()));
+                    this.GetUserID(),
+                    this.GetHashCode()));
         }
 
         // -------------------- Canvas registry --------------------
@@ -313,7 +316,7 @@ namespace IguideME.Web.Controllers
                 ? Unauthorized()
                 : Json(
                 DatabaseManager.Instance.GetPendingNotifications(
-                    GetCourseID(), userID)
+                    GetCourseID(), userID, GetHashCode())
             );
         }
 
@@ -368,7 +371,8 @@ namespace IguideME.Web.Controllers
         {
             var course = DatabaseManager.Instance.GetPublicInformedConsent(GetCourseID());
 
-            if (!course.AcceptList || IsAdministrator()) return Json(true);
+            // if (!course.AcceptList || IsAdministrator()) return Json(true);
+            if (IsAdministrator()) return Json(true);
 
             AcceptList student = DatabaseManager.Instance
                 .GetAcceptList(GetCourseID())

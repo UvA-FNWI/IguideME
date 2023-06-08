@@ -67,7 +67,8 @@ namespace IguideME.Web.Controllers
             return Json(
                 DatabaseManager.Instance.GetNotificationEnable(
                     this.GetCourseID(),
-                    userID));
+                    userID,
+                    this.GetHashCode()));
         }
 
         [Authorize]
@@ -81,7 +82,8 @@ namespace IguideME.Web.Controllers
             return Json(
                 DatabaseManager.Instance.GetNotificationEnable(
                     this.GetCourseID(),
-                    this.GetUserID()));
+                    this.GetUserID(),
+                    this.GetHashCode()));
         }
 
         [Authorize]
@@ -101,7 +103,8 @@ namespace IguideME.Web.Controllers
             return Json(
                 DatabaseManager.Instance.GetNotificationEnable(
                     this.GetCourseID(),
-                    this.GetUserID()));
+                    this.GetUserID(),
+                    this.GetHashCode()));
         }
 
         [Authorize]
@@ -140,7 +143,7 @@ namespace IguideME.Web.Controllers
              * consent policy for their course.
              */
             DatabaseManager.Instance.UpdateInformedConsent(
-                GetCourseID(), obj.RequireConsent, obj.Text);
+                GetCourseID(), obj.Text);
 
             // return newly fetched consent object
             return Json(
@@ -176,7 +179,7 @@ namespace IguideME.Web.Controllers
              * consent policy for their course.
              */
             DatabaseManager.Instance.UpdateCoursePeerGroups(
-                GetCourseID(), obj.MinSize, obj.PersonalizedPeers);
+                GetCourseID(), obj.MinSize);
 
             // return newly fetched consent object
             return Json(

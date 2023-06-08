@@ -24,23 +24,23 @@ namespace IguideME.Web.Services.Workers
     {
         readonly private ILogger<SyncManager> _logger;
         readonly private int _courseID;
-        readonly private string _hashCode;
+        readonly private int _syncID;
 
         /// <summary>
         /// This constructor initializes the new PeerGroupWorker to
         /// (<paramref name="courseID"/>, <paramref name="hashCode"/>, <paramref name="logger"/>).
         /// </summary>
         /// <param name="courseID">the id of the course.</param>
-        /// <param name="hashCode">the hash code associated to the current sync.</param>
+        /// <param name="syncID">the hash code associated to the current sync.</param>
         /// <param name="logger">a reference to the logger used for the sync.</param>
         public PeerGroupWorker(
             int courseID,
-            string hash,
+            int syncID,
             ILogger<SyncManager> logger)
         {
             _logger = logger;
             this._courseID = courseID;
-            this._hashCode = hash;
+            this._syncID = syncID;
         }
 
         /// <summary>
@@ -67,7 +67,7 @@ namespace IguideME.Web.Services.Workers
             {
                 usersWithSameGoalGrade[goalGradeClass] = new List<string>();
                 //TODO: get only those with consent!!!
-                List<User> sameGraders = DatabaseManager.Instance.GetUsersWithGoalGrade(this._courseID,goalGradeClass, this._hashCode);
+                List<User> sameGraders = DatabaseManager.Instance.GetUsersWithGoalGrade(this._courseID,goalGradeClass, this._syncID);
                 sameGraders.ForEach(x => usersWithSameGoalGrade[goalGradeClass].Add(x.UserID));
             }
 
@@ -119,7 +119,7 @@ namespace IguideME.Web.Services.Workers
             foreach(string peerID in peerGroup)
             {
                 // We query all the grades of each peer
-                Dictionary<int,List<float>> temp = DatabaseManager.Instance.GetUserGrades(this._courseID, peerID, this._hashCode);
+                Dictionary<int,List<float>> temp = DatabaseManager.Instance.GetUserGrades(this._courseID, peerID, this._syncID);
 
                 temp.ToList().ForEach(x =>
                 {
@@ -164,14 +164,13 @@ namespace IguideME.Web.Services.Workers
                     if ((entry.Value != null) && entry.Value.Any())
                     {
                         DatabaseManager.Instance.CreateUserPeer(
-                        this._courseID,
                         goalGradeClass,
                         peerGroup,
                         entry.Key,
                         entry.Value.Average(),
                         entry.Value.Min(),
                         entry.Value.Max(),
-                        this._hashCode);
+                        this._syncID);
                     }
                 }
 
@@ -189,7 +188,7 @@ namespace IguideME.Web.Services.Workers
                     // Get only tiles with notifications
                     if (DatabaseManager.Instance.GetTileNotificationState(entry.Key))
                     {
-                        List<TileEntrySubmission> userTileSubmissions = DatabaseManager.Instance.GetTileSubmissionsForUser(entry.Key, user, this._hashCode);
+                        List<TileEntrySubmission> userTileSubmissions = DatabaseManager.Instance.GetTileSubmissionsForUser(entry.Key, user, this._syncID);
 
                         // Find the submission with the highest ID, as it is the most recent
                         int lastSubmissionID = -1;
@@ -229,7 +228,7 @@ namespace IguideME.Web.Services.Workers
                                     user,
                                     entry.Key,
                                     (int) Notification_Types.outperforming,
-                                    this._hashCode
+                                    this._syncID
                                 );
                             }
                             // else if (currentAverage >= peerAverage)
@@ -244,7 +243,7 @@ namespace IguideME.Web.Services.Workers
                                     user,
                                     entry.Key,
                                     (int) Notification_Types.closing_gap,
-                                    this._hashCode
+                                    this._syncID
                                 );
                             }
                             else if ((currentAverage - lastAverage <= 0) && (peerAverage - currentAverage <= 1))
@@ -255,7 +254,7 @@ namespace IguideME.Web.Services.Workers
                                     user,
                                     entry.Key,
                                     (int) Notification_Types.falling_behind,
-                                    this._hashCode
+                                    this._syncID
                                 );
                             }
                             else if ((currentAverage - lastAverage <= 0) && (peerAverage - currentAverage > 1))
@@ -266,7 +265,7 @@ namespace IguideME.Web.Services.Workers
                                     user,
                                     entry.Key,
                                     (int) Notification_Types.more_effort,
-                                    this._hashCode
+                                    this._syncID
                                 );
                             }
                         }

@@ -51,12 +51,9 @@ namespace IguideME.Web.Controllers
                 tile.GroupID,
                 tile.Title,
                 tilesInGroup + 1,
-                tile.ContentType,
-                tile.TileType,
+                (int) tile.Type,
                 tile.Visible,
-                tile.Notifications,
-                tile.GraphView,
-                tile.Wildcard
+                tile.Notifications
             );
 
             // return newly created tile
@@ -310,14 +307,14 @@ namespace IguideME.Web.Controllers
             [JsonProperty(PropertyName = "visible")]
             public bool? Visible { get; set; }
 
-            [JsonProperty(PropertyName = "position")]
-            public int? Position { get; set; }
+            [JsonProperty(PropertyName = "order")]
+            public int? Order { get; set; }
 
-            [JsonProperty(PropertyName = "graph_view")]
-            public bool? GraphView { get; set; }
+            // [JsonProperty(PropertyName = "graph_view")]
+            // public bool? GraphView { get; set; }
 
-            [JsonProperty(PropertyName = "wildcard")]
-            public bool? Wildcard { get; set; }
+            // [JsonProperty(PropertyName = "wildcard")]
+            // public bool? Wildcard { get; set; }
         }
 
         [Authorize(Policy = "IsInstructor")]
@@ -345,14 +342,14 @@ namespace IguideME.Web.Controllers
                 if (obj.Visible != null)
                     tile.Visible = (bool) obj.Visible;
 
-                if (obj.Position != null)
-                    tile.Position = (int) obj.Position;
+                if (obj.Order != null)
+                    tile.Order = (int) obj.Order;
 
-                if (obj.GraphView != null)
-                    tile.GraphView = (bool) obj.GraphView;
+                // if (obj.GraphView != null)
+                //     tile.GraphView = (bool) obj.GraphView;
 
-                if (obj.Wildcard != null)
-                    tile.Wildcard = (bool) obj.Wildcard;
+                // if (obj.Wildcard != null)
+                //     tile.Wildcard = (bool) obj.Wildcard;
 
                 DatabaseManager.Instance.UpdateTile(GetCourseID(), tile);
 
@@ -437,7 +434,7 @@ namespace IguideME.Web.Controllers
             // Only instructors may view submissions of other students
             if ((this.GetUserID() != userID &&
                 !this.IsAdministrator()) ||
-                (DatabaseManager.Instance.GetConsent(course_id, userID) != 1))
+                (DatabaseManager.Instance.GetConsent(course_id, userID,GetHashCode()) < 1))
                 return Unauthorized();
 
             bool success = int.TryParse(tileID, out int id);

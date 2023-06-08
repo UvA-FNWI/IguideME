@@ -17,29 +17,29 @@ namespace IguideME.Web.Services.Workers
         readonly private ILogger<SyncManager> _logger;
         readonly private CanvasHandler _canvasHandler;
         readonly private int _courseID;
-        readonly private string _hashCode;
+        readonly private int _syncID;
 
         readonly private bool _send_notifications;
 
         /// <summary>
         /// This constructor initializes the new NotificationsWorker to
-        /// (<paramref name="courseID"/>, <paramref name="hashCode"/>, <paramref name="canvasHandler"/>, <paramref name="send_notifications"/>, <paramref name="logger"/>).
+        /// (<paramref name="courseID"/>, <paramref name="syncID"/>, <paramref name="canvasHandler"/>, <paramref name="send_notifications"/>, <paramref name="logger"/>).
         /// </summary>
         /// <param name="courseID">the id of the course.</param>
-        /// <param name="hashCode">the hash code associated to the current sync.</param>
+        /// <param name="syncID">the hash code associated to the current sync.</param>
         /// <param name="canvasHandler">a reference to the class managing the connection with canvas.</param>
         /// <param name="send_notifications">wether or not to send notifications this sync.</param>
         /// <param name="logger">a reference to the logger used for the sync.</param>
         public NotificationsWorker(
             int courseID,
-            string hashCode,
+            int syncID,
             CanvasHandler canvasHandler,
             bool send_notifications,
             ILogger<SyncManager> logger)
         {
             _logger = logger;
             this._courseID = courseID;
-            this._hashCode = hashCode;
+            this._syncID = syncID;
             this._canvasHandler = canvasHandler;
             this._send_notifications = send_notifications;
         }
@@ -50,7 +50,7 @@ namespace IguideME.Web.Services.Workers
         /// <param name="student">the student to send the notification to.</param>
         private void SendNotificationsToStudent(User student)
         {
-            List<Notification> notifications = DatabaseManager.Instance.GetPendingNotifications(this._courseID, student.UserID);
+            List<Notification> notifications = DatabaseManager.Instance.GetPendingNotifications(this._courseID, student.UserID, _syncID);
 
             _logger.LogInformation("Student {ID} has {Count} notifications queued up.", student.UserID, notifications.Count);
 
@@ -117,11 +117,11 @@ namespace IguideME.Web.Services.Workers
                 return;
             }
 
-            List<User> students = DatabaseManager.Instance.GetUsers(this._courseID, "student", this._hashCode);
+            List<User> students = DatabaseManager.Instance.GetUsers(this._courseID, "student", this._syncID);
 
             foreach (User student in students)
             {
-                if (!DatabaseManager.Instance.GetNotificationEnable(this._courseID, student.UserID)) {
+                if (!DatabaseManager.Instance.GetNotificationEnable(this._courseID, student.UserID, this._syncID)) {
                     _logger.LogInformation("Not sending to {ID}, they have notifications disabled", student.UserID);
                 }
                 this.SendNotificationsToStudent(student);

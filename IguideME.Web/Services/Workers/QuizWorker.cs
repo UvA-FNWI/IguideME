@@ -20,26 +20,26 @@ namespace IguideME.Web.Services.Workers
         readonly private ILogger<SyncManager> _logger;
 		readonly private CanvasHandler _canvasHandler;
 		readonly private int _courseID;
-		readonly private string _hashCode;
+		readonly private int _syncID;
 
 		/// <summary>
         /// This constructor initializes the new Quizworker to
-        /// (<paramref name="courseID"/>, <paramref name="hashCode"/>, <paramref name="canvasHandler"/>, <paramref name="logger"/>).
+        /// (<paramref name="courseID"/>, <paramref name="syncID"/>, <paramref name="canvasHandler"/>, <paramref name="logger"/>).
         /// </summary>
         /// <param name="courseID">the id of the course.</param>
-        /// <param name="hashCode">the hash code associated to the current sync.</param>
+        /// <param name="syncID">the hash code associated to the current sync.</param>
         /// <param name="canvasHandler">a reference to the class managing the connection with canvas.</param>
         /// <param name="logger">a reference to the logger used for the sync.</param>
         public QuizWorker(
 			int courseID,
-			string hashCode,
+			int syncID,
 			CanvasHandler canvasHandler,
             ILogger<SyncManager> logger)
 
         {
 			_logger = logger;
 			this._courseID = courseID;
-			this._hashCode = hashCode;
+			this._syncID = syncID;
 			this._canvasHandler = canvasHandler;
         }
 
@@ -54,7 +54,7 @@ namespace IguideME.Web.Services.Workers
                 .Where(submission =>
 					submission.Score != null &&
 					DatabaseManager.Instance.GetConsent(this._courseID,
-						DatabaseManager.Instance.GetUserID(this._courseID, submission.UserID)) == 1
+						DatabaseManager.Instance.GetUserID(this._courseID, submission.UserID), _syncID) > 0
 				);
 
 			foreach (QuizSubmission sub in quiz.Submissions) {
@@ -65,7 +65,7 @@ namespace IguideME.Web.Services.Workers
 					sub.Score ?? 0,
 					// (sub.Score ?? 0)/quiz.PointsPossible * 100, Should change to this.
 					"",
-					this._hashCode
+					this._syncID
 				);
 			}
         }
@@ -101,7 +101,7 @@ namespace IguideME.Web.Services.Workers
 					(int) GradingType.Points,
 					JsonConvert.SerializeObject(quiz.Type),
 					// "",
-					this._hashCode
+					this._syncID
 				);
 
 				// Don't register submissions that aren't assigned to tiles (as entries).

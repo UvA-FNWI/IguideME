@@ -10,9 +10,9 @@ public static class DatabaseQueries
         new()
         {
             {
-                "001_drop_old_peer_group_table",
+                "000_drop_all_old_tables",
                 @"
-                DROP TABLE peer_group
+                DROP TABLE peer_group;
                 ;"
             }
         };
@@ -116,7 +116,7 @@ public static class DatabaseQueries
      * - "DISCUSSION"
      * - "LEARNING_OUTCOMES"
      */
-    public const string CREATE_TABLE_TILE_ENTRIES =
+    public const string CREATE_TABLE_TILE_ENTRIES = // NOT DONE
         @"CREATE TABLE IF NOT EXISTS `tile_entries` (
             `tile_id`         INTEGER,
             `content_id`      INTEGER,
@@ -125,7 +125,7 @@ public static class DatabaseQueries
         );";
 
 
-    public const string CREATE_TABLE_SUBMISSIONS =
+    public const string CREATE_TABLE_SUBMISSIONS = // NOT DONE
         @"CREATE TABLE IF NOT EXISTS `submissions` (
             `submission_id`   INTEGER PRIMARY KEY AUTOINCREMENT,
             `assignment_id`   INTEGER,
@@ -137,7 +137,7 @@ public static class DatabaseQueries
 
         );";
 
-    public const string CREATE_TABLE_SUBMISSIONS_META =
+    public const string CREATE_TABLE_SUBMISSIONS_META = // NOT DONE
         @"CREATE TABLE IF NOT EXISTS `submissions_meta` (
             `submission_id`   INTEGER,
             `key`             STRING,
@@ -145,7 +145,7 @@ public static class DatabaseQueries
             FOREIGN KEY(`submission_id`) REFERENCES `submissions`(`submission_id`)
         );";
 
-    public const string CREATE_TABLE_LEARNING_GOALS =
+    public const string CREATE_TABLE_LEARNING_GOALS = // NOT DONE
         @"CREATE TABLE IF NOT EXISTS `learning_goals` (
             `goal_id`             INTEGER,
             `name`                STRING,
@@ -162,14 +162,10 @@ public static class DatabaseQueries
      * The student_settings table stores the users information and their
      * preferences. These preferences include:
      *
-     *  - consent: whether the student gave permission for the use of data.
-     *      -   1: permission granted
-     *      -   0: user did not submit preferences
-     *      -  -1: permission denied
      *
      *  - goal_grade: target grade of the user for the course. Also used to
                       create the peer groups.
-     *      -   -1: Grade not set yet.
+     *      -   -1: Grade not set yet / No consent given.
      *      -   0-10
      *
      *  - notifications: whether the user wants to receive performance updates.
@@ -223,7 +219,7 @@ public static class DatabaseQueries
      * generate those.
      *
      *
-     * `status` values:
+     * `status` values is an enum of:
      *  - "outperforming peers"
      *  - "closing the gap"
      *  - "more effor required"
@@ -232,8 +228,8 @@ public static class DatabaseQueries
         @"CREATE TABLE IF NOT EXISTS `notifications` (
             `user_id`             STRING,
             `tile_id`             INTEGER,
-            `message`             TEXT,
-            `status`              BOOLEAN,
+            `status`              INTEGER,
+            `sent`              BOOLEAN DEFAULT false,
             `sync_id`             INTEGER,
             PRIMARY KEY (`user_id`,`tile_id`,`sync_id`),
             FOREIGN KEY(`user_id`) REFERENCES `users`(`user_id`),
@@ -288,7 +284,7 @@ public static class DatabaseQueries
         @"CREATE TABLE IF NOT EXISTS `assignments` (
             `assignment_id`   INTEGER PRIMARY KEY,
             `course_id`       INTEGER,
-            `name`            STRING,
+            `title`           STRING,
             `published`       BOOLEAN DEFAULT true,
             `muted`           BOOLEAN DEFAULT false,
             `due_date`        INTEGER DEAFULT NULL,
@@ -301,7 +297,7 @@ public static class DatabaseQueries
         @"CREATE TABLE IF NOT EXISTS `discussions` (
             `discussion_id`   INTEGER PRIMARY KEY,
             `course_id`       INTEGER,
-            `name`            STRING,
+            `title`           STRING,
             `author`          STRING,
             `date`            INTEGER,
             `message`         TEXT DEFAULT NULL,
@@ -341,8 +337,8 @@ public static class DatabaseQueries
 // //=========================== Register Values ============================//
 
     public const string REGISTER_COURSE =
-        @"INSERT INTO   `course_settings` (`course_id`, `course_name`, `personalized_peers`, `peer_group_size`)
-        VALUES (@courseID, @courseName, 0, 5);";
+        @"INSERT INTO   `course_settings` (`course_id`, `name`)
+        VALUES (@courseID, @courseName);";
 
     public const string REGISTER_PREDICTED_GRADE =
         @"INSERT INTO   `predicted_grade` ( `course_id`,
@@ -357,40 +353,34 @@ public static class DatabaseQueries
           )
           ON CONFLICT (`course_id`, `user_id`, `date`) DO UPDATE SET `grade`=`excluded`.`grade`;";
 
-    public const string REGISTER_USER_PEER =
-    @"INSERT INTO   `peer_groups` (  `course_id`,
-                                    `goal_grade`,
+    public const string REGISTER_USER_PEER = // DO WE KEEP THE USER_IDS???????????
+    @"INSERT INTO   `peer_groups` ( `goal_grade`,
                                     `user_ids`,
                                     `tile_id`,
                                     `avg_grade`,
                                     `min_grade`,
                                     `max_grade`,
-                                    `sync_hash`)
+                                    `sync_id`)
         VALUES        (
-            @courseID,
             @goalGrade,
             @combinedIDs,
             @tileID,
             @avgGrade,
             @minGrade,
             @maxGrade,
-            @hash
+            @syncID
         );";
 
     public const string REGISTER_USER_NOTIFICATIONS =
-        @"INSERT INTO   `notifications` (   `course_id`,
-                                            `user_id`,
+        @"INSERT INTO   `notifications` (   `user_id`,
                                             `tile_id`,
                                             `status`,
-                                            `sent`,
-                                            `sync_hash`)
+                                            `sync_id`)
           VALUES        (
-            @courseID,
             @userID,
             @tileID,
             @status,
-            false,
-            @hash
+            @syncID
           );";
 
     public const string REGISTER_GRADE_PREDICTION_MODEL =
@@ -411,12 +401,12 @@ public static class DatabaseQueries
 
     public const string REGISTER_LAYOUT_COLUMN =
         @"INSERT INTO   `layout_columns` (   `course_id`,
-                                            `container_width`,
-                                            `position`)
+                                            `size`,
+                                            `order`)
         VALUES(
             @courseID,
-            @containerWidth,
-            @position
+            @size,
+            @order
         );";
 
     public const string REGISTER_ACCEPTED_STUDENT =
@@ -432,39 +422,32 @@ public static class DatabaseQueries
 
         public const string REGISTER_TILE_GROUP =
         @"INSERT INTO       `tile_groups`
-                            (   `course_id`,
+                            (
                                 `column_id`,
-                                `title`,
-                                `position`  )
+                                `name`,
+                                `order`  )
         VALUES(
-            @courseID,
             @columnID,
-            @title,
-            @position
+            @name,
+            @order
         );";
 
     public const string REGISTER_TILE =
         @"INSERT INTO  `tiles` (
                        `group_id`,
-                       `title`,
-                       `position`,
-                       `content_type`,
-                       `tile_type`,
+                       `name`,
+                       `order`,
+                       `type`,
                        `visible`,
-                       `notifications`,
-                       `graph_view`,
-                       `wildcard`
+                       `notifications`
                     )
         VALUES (
             @groupID,
-            @title,
-            @position,
-            @contentType,
-            @tileType,
+            @name,
+            @order,
+            @type,
             @visible,
-            @notifications,
-            @graph_view,
-            @wildcard
+            @notifications
         );";
 
 
@@ -501,7 +484,7 @@ public static class DatabaseQueries
                             (   `tile_id`,
                                 `title`,
                                 `type`,
-                                `wildcard`  )
+                                `wildcard` )
         VALUES(
             @tileID,
             @title,
@@ -594,22 +577,18 @@ public static class DatabaseQueries
         ;";
 
     public const string REGISTER_USER_FOR_COURSE =
-        @"INSERT INTO   `canvas_users`
-                        (   `course_id`,
-                            `studentnumber`,
+        @"INSERT INTO   `users`
+                        (   `student_number`,
                             `user_id`,
                             `name`,
                             `sortable_name`,
-                            `role`,
-                            `sync_hash`)
+                            `role`)
                 VALUES(
-                    @courseID,
                     @studentnumber,
                     @userID,
                     @name,
                     @sortableName,
-                    @role,
-                    @syncHash
+                    @role
                 );";
 
     public const string REGISTER_USER_SUBMISSION =
@@ -627,35 +606,35 @@ public static class DatabaseQueries
             @hash
         );";
 
+/////// WHAT DO WE DO ON CONFLICT HERE??????? user_name EXISTS NO MORE
     public const string REGISTER_USER_SETTINGS =
         @"  INSERT INTO `student_settings`
                         (   `course_id`,
                             `user_id`,
-                            `user_name`,
-                            `consent`,
-                            `goal_grade`   )
+                            `goal_grade`,
+                            `sync_id`   )
             VALUES(
                 @CourseID,
                 @UserID,
-                @UserName,
-                @Granted,
-                -1
+                @Granted
+                @syncID
             )
-            ON CONFLICT (   `user_id`, course_id   )
-                DO UPDATE SET `user_name` = `excluded`.`user_name`
         ;";
+        //     ON CONFLICT (   `user_id`, course_id   )
+        //         DO UPDATE SET `user_name` = `excluded`.`user_name`
+        // ;";
 
     public const string SET_USER_CONSENT =
         @"  INSERT INTO `student_settings`
                         (   `course_id`,
                             `user_id`,
-                            `user_name`,
-                            `consent`   )
+                            `consent`,
+                            `sync_id`   )
             VALUES(
                 @courseID,
                 @userID,
-                @name,
-                @consent
+                @consent,
+                @syncID
             )
             ON CONFLICT (   `user_id`, course_id   )
                 DO UPDATE SET `consent` = @consent
@@ -717,12 +696,12 @@ public static class DatabaseQueries
         AND         `user_id`=@userID
         ORDER BY    `date` DESC;";
 
-    public const string QUERY_GROUP_PEERS =
+    public const string QUERY_GROUP_PEERS = //// DO WE KEEP THIS???
         @"SELECT        `user_ids`
         FROM            `peer_groups`
         WHERE           `course_id`=@courseID
         AND             `goal_grade`=@goalGrade
-        AND             `sync_hash`=@hash;";
+        AND             `sync_id`=@syncID;";
 
     public const string QUERY_ALL_NOTIFICATIONS =
         @"SELECT        `user_id`,
@@ -730,30 +709,32 @@ public static class DatabaseQueries
                         `status`,
                         `sent`
         FROM            `notifications`
-        WHERE           `course_id`={0}
-        AND             `sync_hash` IN ('{1}');";
+        WHERE           `sync_id` IN ('{0}');";
 
     public const string QUERY_ALL_USER_NOTIFICATIONS =
-        @"SELECT        `tile_id`, `status`, `sent`
+        @"SELECT        `tile_id`, 
+                        `status`, 
+                        `sent`
         FROM            `notifications`
         WHERE           `course_id`=@courseID
         AND             `user_id`=@userID
-        AND             `sync_hash`=@hash;";
+        AND             `sync_id`=@syncID;";
 
     public const string QUERY_PENDING_USER_NOTIFICATIONS =
-        @"SELECT        `tile_id`, `status`
+        @"SELECT        `tile_id`, 
+                        `status`
         FROM            `notifications`
         WHERE           `course_id`=@courseID
         AND             `user_id`=@userID
-        AND             `sync_hash`=@hash
+        AND             `sync_id`=@syncID
         AND             `sent`=false;";
 
     public const string QUERY_MARK_NOTIFICATIONS_SENT =
         @"UPDATE        `notifications`
-        SET             `sent`=true
+        SET             `sent`= true
         WHERE           `course_id`=@courseID
         AND             `user_id`=@userID
-        AND             `sync_hash`=@hash;";
+        AND             `sync_id`=@syncID;";
 
     public const string QUERY_GRADE_PREDICTION_MODELS_FOR_COURSE =
         @"SELECT    `grade_prediction_model`.`id`,
@@ -779,47 +760,41 @@ public static class DatabaseQueries
         WHERE       `grade_prediction_model_parameter`.`model_id`=@modelID;";
 
     public const string QUERY_LAYOUT_COLUMN =
-        @"SELECT    `id`,
-                    `container_width`,
-                    `position`
-        FROM
-            `layout_columns`
-        WHERE
-            `course_id`=@courseID
-        AND
-            `id`=@columnID
-        ORDER BY
-            `position` ASC;";
+        @"SELECT    `column_id`,
+                    `size`,
+                    `order`
+        FROM        `layout_columns`
+        WHERE       `course_id`=@courseID
+        AND         `column_id`=@columnID
+        ORDER BY    `position` ASC;";
 
+    /////// WHY DUPLICATE???????
     public const string QUERY_LAYOUT_COLUMNS =
-        @"SELECT    `id`,
-                    `container_width`,
-                    `position`
-        FROM
-            `layout_columns`
-        WHERE
-            `course_id`=@courseID
-        ORDER BY
-            `position` ASC;";
+        @"SELECT    `column_id`,
+                    `size`,
+                    `order`
+        FROM        `layout_columns`
+        WHERE       `course_id`=@courseID
+        ORDER BY    `position` ASC;";
 
     public const string QUERY_CONSENT_FOR_COURSE =
-        @"SELECT    `course_name`, `require_consent`, `informed_consent`, `accept_list`
+        @"SELECT    `name`, `consent`
         FROM        `course_settings`
         WHERE       `course_id`=@courseID
         LIMIT       1;";
 
     public const string QUERY_PEER_GROUP_FOR_COURSE =
-        @"SELECT    `peer_group_size`, `personalized_peers`
+        @"SELECT    `peer_group_size`
         FROM        `course_settings`
         WHERE       `course_id`=@courseID
         LIMIT       1;";
 
-    public const string QUERY_PERSONALIZED_PEERS_FOR_COURSE =
-        @"SELECT    `personalized_peers`
-        FROM        `course_settings`
-        WHERE       `course_id`=@courseID
-        LIMIT       1;
-        ";
+    // public const string QUERY_PERSONALIZED_PEERS_FOR_COURSE =
+    //     @"SELECT    `personalized_peers`
+    //     FROM        `course_settings`
+    //     WHERE       `course_id`=@courseID
+    //     LIMIT       1;
+    //     ";
 
     public const string QUERY_NOTIFICATION_DATES_FOR_COURSE =
     @"SELECT    `notification_dates`
@@ -834,61 +809,64 @@ public static class DatabaseQueries
         WHERE       `course_id`=@courseID;";
 
     public const string QUERY_TILE_GROUP =
-        @"SELECT    `tile_groups`.`id`,
-                    `tile_groups`.`title`,
+        @"SELECT    `tile_groups`.`group_id`,
+                    `tile_groups`.`name`,
                     `tile_groups`.`column_id`,
-                    `tile_groups`.`position`
+                    `tile_groups`.`order`
         FROM        `tile_groups`
-        WHERE       `tile_groups`.`course_id`=@courseID
-        AND         `tile_groups`.`id`=@id;";
+        INNER JOIN  `layout_columns`
+        USING       (`column_id`)        
+        WHERE       `layout_columns`.`course_id`=@courseID
+        AND         `tile_groups`.`group_id`=@groupID;";
 
+    //// AGAIN, WHY TWO OF THEM????????????????
     public const string QUERY_TILE_GROUPS =
-        @"SELECT    `tile_groups`.`id`,
-                    `tile_groups`.`title`,
+        @"SELECT    `tile_groups`.`group_id`,
+                    `tile_groups`.`name`,
                     `tile_groups`.`column_id`,
-                    `tile_groups`.`position`
+                    `tile_groups`.`order`
         FROM        `tile_groups`
-        WHERE       `tile_groups`.`course_id`=@courseID;";
+        INNER JOIN  `layout_columns`
+        USING       (`column_id`)        
+        WHERE       `layout_columns`.`course_id`=@courseID;";
 
     public const string QUERY_TILE =
-        @"SELECT    `tiles`.`id`,
+        @"SELECT    `tiles`.`tile_id`,
                     `tiles`.`group_id`,
-                    `tiles`.`title`,
-                    `tiles`.`position`,
-                    `tiles`.`tile_type`,
-                    `tiles`.`content_type`,
+                    `tiles`.`name`,
+                    `tiles`.`order`,
+                    `tiles`.`type`,
                     `tiles`.`visible`,
-                    `tiles`.`notifications`,
-                    `tiles`.`graph_view`,
-                    `tiles`.`wildcard`
+                    `tiles`.`notifications`
         FROM        `tiles`
         INNER JOIN  `tile_groups`
-            ON      `tile_groups`.`id`=`tiles`.`group_id`
-        WHERE       `tile_groups`.`course_id`=@courseID
-        AND         `tiles`.`id`=@id
-        ORDER BY    `tiles`.`position` ASC;";
+            USING   (`group_id`)
+        INNER JOIN  `layout_columns`
+            USING   (`column_id`)
+        WHERE       `layout_columns`.`course_id`=@courseID
+        AND         `tiles`.`tile_id`=@tileID
+        ORDER BY    `tiles`.`order` ASC;";
 
     public const string QUERY_TILES =
-        @"SELECT    `tiles`.`id`,
+        @"SSELECT    `tiles`.`tile_id`,
                     `tiles`.`group_id`,
-                    `tiles`.`title`,
-                    `tiles`.`position`,
-                    `tiles`.`tile_type`,
-                    `tiles`.`content_type`,
+                    `tiles`.`name`,
+                    `tiles`.`order`,
+                    `tiles`.`type`,
                     `tiles`.`visible`,
-                    `tiles`.`notifications`,
-                    `tiles`.`graph_view`,
-                    `tiles`.`wildcard`
+                    `tiles`.`notifications`
         FROM        `tiles`
         INNER JOIN  `tile_groups`
-            ON      `tile_groups`.`id`=`tiles`.`group_id`
-        WHERE       `tile_groups`.`course_id`=@courseID
-        ORDER BY    `tiles`.`position` ASC;";
+            USING   (`group_id`)
+        INNER JOIN  `layout_columns`
+            USING   (`column_id`)
+        WHERE       `layout_columns`.`course_id`=@courseID
+        ORDER BY    `tiles`.`order` ASC;";
 
     public const string QUERY_TILE_NOTIFICATIONS_STATE =
         @"SELECT    `notifications`
         FROM        `tiles`
-        WHERE       `id`=@tileID;";
+        WHERE       `tile_id`=@tileID;";
 
     public const string QUERY_LEARNING_GOALS =
         @"SELECT    `id`,
@@ -933,7 +911,7 @@ public static class DatabaseQueries
         WHERE       `tile_id`=@tileID
         ;";
 
-    public const string QUERY_ENTRIES =
+    public const string QUERY_ENTRIES =  // half done
         @"SELECT    `tile_entries`.`id`,
                     `tile_entries`.`tile_id`,
                     `tile_entries`.`title`,
@@ -941,10 +919,12 @@ public static class DatabaseQueries
                     `tile_entries`.`wildcard`
         FROM        `tile_entries`
         INNER JOIN  `tiles`
-            ON      `tiles`.`id`=`tile_entries`.`tile_id`
+            USING   (`tile_id`)
         INNER JOIN  `tile_groups`
-            ON      `tile_groups`.`id`=`tiles`.`group_id`
-        WHERE       `tile_groups`.`course_id`=@courseID
+            USING   (`group_id`)
+        INNER JOIN  `layout_columns`
+            USING   (`column_id`)
+        WHERE       `layout_columns`.`course_id`=@courseID
         ;";
 
     public const string QUERY_TILE_ENTRY_META_KEYS =
@@ -1109,65 +1089,66 @@ public static class DatabaseQueries
         OFFSET      @offset;";
 
     public const string QUERY_USERS_FOR_COURSE =
-        @"SELECT    `id`,
-                    `studentnumber`,
-                    `user_id`,
-                    `name`,
-                    `sortable_name`,
-                    `role`
-        FROM        `canvas_users`
-        WHERE       `course_id`={0}
-        AND         `sync_hash`='{1}'
-        ORDER BY    `name` ASC;";
+        @"SELECT    `users`.`user_id`,
+                    `users`.`student_number`,
+                    `users`.`name`,
+                    `users`.`sortable_name`,
+                    `users`.`role`
+        FROM        `users`
+        INNER JOIN  `student_settings`
+            USING   (`user_id`)
+        WHERE       `student_settings`.`course_id`={0}
+        AND         `student_settings`.`sync_id`='{1}'
+        ORDER BY    `users`.`name` ASC;";
 
     public const string QUERY_USERS_WITH_ROLE_FOR_COURSE =
-        @"SELECT    `id`,
-                    `studentnumber`,
-                    `user_id`,
-                    `name`,
-                    `sortable_name`,
-                    `role`
-        FROM        `canvas_users`
-        WHERE       `course_id`=@courseID
-        AND         `role`=@role
-        AND         `sync_hash`=@hash
-        ORDER BY    `name` ASC;";
+        @"SELECT    `users`.`user_id`,
+                    `users`.`student_number`,
+                    `users`.`name`,
+                    `users`.`sortable_name`,
+                    `users`.`role`
+        FROM        `users`
+        INNER JOIN  `student_settings`
+            USING   (`user_id`)
+        WHERE       `student_settings`.`course_id`={0}
+        AND         `users`.`role`=@role
+        AND         `student_settings`.`sync_id`=@syncID
+        ORDER BY    `users`.`name` ASC;";
 
     public const string QUERY_USER_ID =
         @"SELECT    `user_id`
-        FROM        `canvas_users`
+        FROM        `users`
         WHERE       `course_id`=@courseID
-        AND         `studentnumber`=@id
-        AND         `sync_hash`=@hash
+        AND         `student_number`=@studentNumber
         ORDER BY    `name` ASC
         LIMIT       1;";
 
     public const string QUERY_USER_FOR_COURSE =
-        @"SELECT    `id`,
-                    `studentnumber`,
-                    `user_id`,
-                    `name`,
-                    `sortable_name`,
-                    `role`
-        FROM        `canvas_users`
-        WHERE       `course_id`=@courseID
-        AND         `user_id`=@userID
-        AND         `sync_hash`=@hash
-        ORDER BY    `name` ASC
+        @"SELECT    `users`.`user_id`,
+                    `users`.`student_number`,
+                    `users`.`name`,
+                    `users`.`sortable_name`,
+                    `users`.`role`
+        FROM        `users`
+        INNER JOIN  `student_settings`
+            USING   (`user_id`)
+        WHERE       `student_settings`.`course_id`=@courseID
+        AND         `users`.`user_id`=@userID
+        AND         `student_settings`.`sync_id`=@syncID
+        ORDER BY    `users`.`name` ASC
         LIMIT       1;";
 
     public const string QUERY_USERS_WITH_GOAL_GRADE =
-        @"SELECT    `canvas_users`.`id`,
-                    `canvas_users`.`studentnumber`,
-                    `canvas_users`.`user_id`,
-                    `canvas_users`.`name`,
-                    `canvas_users`.`sortable_name`,
-                    `canvas_users`.`role`
-        FROM        `student_settings`
-        INNER JOIN  `canvas_users`
-            ON      `canvas_users`.`user_id`=`student_settings`.`user_id`
+        @"SELECT    `users`.`user_id`,
+                    `users`.`studentnumber`,
+                    `users`.`name`,
+                    `users`.`sortable_name`,
+                    `users`.`role`
+        FROM        `users`
+        INNER JOIN  `student_settings`
+            USING   (`user_id`)
         WHERE       `student_settings`.`course_id`=@courseID
-        AND         `canvas_users`.`sync_hash`=@hash
+        AND         `student_settings`.`sync_ID`=@syncID
         AND         `student_settings`.`goal_grade`=@goalGrade;";
 
     public const string QUERY_NOTIFICATIONS_ENABLE =
@@ -1175,30 +1156,32 @@ public static class DatabaseQueries
         FROM        `student_settings`
         WHERE       `course_id`=@courseID
         AND         `user_id`=@userID
+        AND         `sync_ID`=@syncID
         ;";
 
     public const string QUERY_USER_CONSENT =
         @"SELECT    `user_id`,
-                    `consent`
+                    `goal_grade`
         FROM        `student_settings`
         WHERE       `course_id`=@courseID
         AND         `user_id`=@userID
+        AND         `sync_ID`=@syncID
         ;";
 
     public const string QUERY_CONSENTS =
         @"SELECT    `user_id`,
-                    `user_name`,
-                    `consent`
+                    `goal_grade`
         FROM        `student_settings`
         WHERE       `course_id`=@courseID
+        AND         `sync_ID`=@syncID
         ;";
 
     public const string QUERY_GRANTED_CONSENTS =
         @"SELECT    `user_id`,
-                    `user_name`
         FROM        `student_settings`
         WHERE       `course_id`=@courseID
-        AND         `consent`=1
+        AND         `goal_grade` > 0
+        AND         `sync_ID`=@syncID
         ;";
 
     public const string QUERY_USER_GOAL_GRADE =
@@ -1206,10 +1189,15 @@ public static class DatabaseQueries
         FROM        `student_settings`
         WHERE       `course_id`=@courseID
         AND         `user_id`=@userID
-        AND         `goal_grade` IS NOT NULL
+        AND         `sync_ID`=@syncID
         ;";
     public const string QUERY_GOAL_GRADES =
-        @"SELECT `goal_grade`, `user_id` from `student_settings` WHERE `course_id`=@courseID;";
+        @"SELECT    `goal_grade`, 
+                    `user_id` 
+        FROM        `student_settings` 
+        WHERE       `course_id`=@courseID
+        AND         `sync_ID`=@syncID
+        ;";
 
     public const string QUERY_USER_SUBMISSIONS_FOR_ENTRY =
         @"SELECT    `id`,
@@ -1221,7 +1209,7 @@ public static class DatabaseQueries
         WHERE       `entry_id`='{0}'
         AND         `sync_hash`='{1}';";
 
-    public const string QUERY_COURSE_SUBMISSIONS =
+    public const string QUERY_COURSE_SUBMISSIONS =  // half done
         @"SELECT    `submissions`.`id`,
                     `submissions`.`entry_id`,
                     `submissions`.`user_id`,
@@ -1231,14 +1219,16 @@ public static class DatabaseQueries
         INNER JOIN  `tile_entries`
             ON      `submissions`.`entry_id`=`tile_entries`.`id`
         INNER JOIN  `tiles`
-            ON      `tiles`.`id`=`tile_entries`.`tile_id`
+            USING   (`tile_id`)
         INNER JOIN  `tile_groups`
-            ON      `tile_groups`.`id`=`tiles`.`group_id`
-        WHERE       `tile_groups`.`course_id`=@courseID
+            USING   (`group_id`)
+        INNER JOIN  `layout_columns`
+            USING   (`column_id`)
+        WHERE       `layout_columns`.`course_id`=@courseID
         AND         `submissions`.`sync_hash`=@hash
         AND         `submissions`.`grade` NOT NULL;";
 
-    public const string QUERY_COURSE_SUBMISSIONS_FOR_STUDENT =
+    public const string QUERY_COURSE_SUBMISSIONS_FOR_STUDENT = //half done
         @"SELECT    `submissions`.`id`,
                     `submissions`.`entry_id`,
                     `submissions`.`user_id`,
@@ -1252,7 +1242,7 @@ public static class DatabaseQueries
         WHERE       `submissions`.`entry_id`=`tile_entries`.`id`
         AND         `submissions`.`user_id`=@userID
         AND         `tiles`.`id`=`tile_entries`.`tile_id`
-        AND         `tile_groups`.`id`=`tiles`.`group_id`
+        AND         `tile_groups`.`group_id`=`tiles`.`group_id`
         AND         `layout_columns`.`course_id`=@courseID
         AND         `submissions`.`sync_hash`=@hash;";
 
@@ -1292,27 +1282,28 @@ public static class DatabaseQueries
         WHERE       `submissions`.`user_id`=@userID
         AND         `submissions`.`sync_hash`=@hash;";
 
-    public const string QUERY_USER_RESULTS2 =
-        @"SELECT   `tiles`.`id`,
-        `tile_entries`.`title`,
-        `submissions`.`grade`,
-        `tiles`.`content_type`
+    public const string QUERY_USER_RESULTS2 = // Half done
+        @"SELECT   `tiles`.`tile_id`,
+                    `tile_entries`.`title`,
+                    `submissions`.`grade`,
+                    `tiles`.`type`
         FROM        `submissions`
         INNER JOIN  `tile_entries`
             ON      `submissions`.`entry_id`=`tile_entries`.`id`
         INNER JOIN  `tiles`
-            ON      `tiles`.`id`=`tile_entries`.`tile_id`
+            USING   (`tile_id`)
         INNER JOIN  `tile_groups`
-            ON      `tile_groups`.`id`=`tiles`.`group_id`
-	    WHERE       `tiles`.`content_type` != 'PREDICTION'
-	    AND	        `tiles`.`content_type` != 'LEARNING_OUTCOMES'
-        AND	        `tiles`.`tile_type` != 'DISCUSSIONS'
-        AND         `tile_groups`.`course_id`=@courseID
+            USING   (`group_id`)
+        INNER JOIN  `layout_columns`
+            USING   (`column_id`)
+        WHERE       `layout_columns`.`course_id`=@courseID
+	    AND         `tiles`.`type` != 1
+        AND	        `tiles`.`type` != 2
         AND         `submissions`.`user_id`=@userID
         AND         `submissions`.`sync_hash`=@hash
 	    GROUP BY    `tile_entries`.`id`;";
 
-    public const string QUERY_USER_DISCUSSION_COUNTER =
+    public const string QUERY_USER_DISCUSSION_COUNTER = // NOT DONE (not even started)
         @"SELECT        `canvas_discussion`.`tile_id`,
                         SUM(`counter`)
 
@@ -1343,12 +1334,12 @@ public static class DatabaseQueries
             COUNT(*)
                 AS      `counter`
             FROM        `canvas_discussion`
-            INNER JOIN  `canvas_users`
-                ON      `canvas_discussion`.`posted_by` = `canvas_users`.`name`
+            INNER JOIN  `users`
+                ON      `canvas_discussion`.`posted_by` = `users`.`name`
             WHERE       `canvas_discussion`.`course_id` = @courseID
-            AND         `canvas_users`.`user_id` =@userID
-            AND         `canvas_discussion`.`sync_hash` = @hash
-            AND         `canvas_users`.`sync_hash` = @hash)
+            AND         `users`.`user_id` =@userID
+            AND         `canvas_discussion`.`sync_id` = @syncID
+            AND         `users`.`sync_id` = @syncID)
 
         LEFT JOIN       `canvas_discussion`
             ON          `disc_id` = `canvas_discussion`.`discussion_id`
@@ -1363,7 +1354,7 @@ public static class DatabaseQueries
         FROM        `peer_groups`
         WHERE       `course_id`=@courseID
         AND         `goal_grade`=@goalGrade
-        AND         `sync_hash`=@hash;";
+        AND         `sync_id`=@syncID;";
 
 
     public const string QUERY_GRADE_COMPARISSON_HISTORY =
@@ -1372,47 +1363,38 @@ public static class DatabaseQueries
                     `peer_groups`.`avg_grade`,
                     `peer_groups`.`max_grade`,
                     `peer_groups`.`min_grade`,
-                    `peer_groups`.`sync_hash`
+                    `peer_groups`.`sync_id`
         FROM        `peer_groups`
         INNER JOIN  `submissions`
-            ON      `submissions`.`sync_hash` = `peer_groups`.`sync_hash`
+            USING   (`sync_id`)
         INNER JOIN  `tile_entries`
-            ON      `submissions`.`entry_id` = `tile_entries`.`id`
-            AND     `peer_groups`.`tile_id` = `tile_entries`.`tile_id`
+            USING   (`entry_id`)
+            AND     (`tile_id`)
         WHERE       `peer_groups`.`course_id`=@courseID
         AND         `peer_groups`.`goal_grade`=@grade
         AND         `submissions`.`user_id` = @userID
-        GROUP BY    `peer_groups`.`tile_id`, `peer_groups`.`sync_hash`
+        GROUP BY    `peer_groups`.`tile_id`, `peer_groups`.`sync_id`
         ORDER BY    `peer_groups`.`tile_id`;";
 
 
-    public const string QUERY_USER_RESULTS =
-        @"SELECT   `tiles`.`id`,
-	    CASE `tiles`.`content_type`
-            WHEN 'BINARY' THEN  AVG(`grade`) * 1
-            ELSE                AVG(`grade`)
-       	END average,
-	    CASE `tiles`.`content_type`
-            WHEN 'BINARY' THEN  MIN(`grade`) * 1
-            ELSE                MIN(`grade`)
-       	END minimum,
-	    CASE `tiles`.`content_type`
-            WHEN 'BINARY' THEN  MAX(`grade`) * 1
-            ELSE                MAX(`grade`)
-       	END maximum
+    public const string QUERY_USER_RESULTS = // half done ?
+        @"SELECT   `tiles`.`tile_id`,
+                    AVG(`grade`),
+                    MIN(`grade`),
+                    MAX(`grade`)
         FROM        `submissions`
         INNER JOIN  `tile_entries`
             ON      `submissions`.`entry_id`=`tile_entries`.`id`
         INNER JOIN  `tiles`
-            ON      `tiles`.`id`=`tile_entries`.`tile_id`
+            USING   (`tile_id`)
         INNER JOIN  `tile_groups`
-            ON      `tile_groups`.`id`=`tiles`.`group_id`
+            USING   (`group_id`)
         INNER JOIN  `layout_columns`
-            ON      `tile_groups`.`column_id`=`layout_columns`.`id`
+            USING   (`column_id`)
         WHERE       `layout_columns`.`course_id`=@courseID
         AND         `submissions`.`user_id`=@userID
         AND         `submissions`.`sync_hash`=@hash
-	    GROUP BY `tiles`.`id`;";
+	    GROUP BY `tiles`.`tile_id`;";
 
     public const string QUERY_USER_SUBMISSIONS_FOR_ENTRY_FOR_USER =
         @"SELECT    `id`,
@@ -1453,13 +1435,14 @@ public static class DatabaseQueries
 
 // //============================ Update Values =============================//
 
-    public const string UPDATE_NOTIFICATION_ENABLE =
+////// WE NEED  TO JOIN THOSE 2 AND INSERT INSTEAD OF UPDATE
+    public const string UPDATE_NOTIFICATION_ENABLE = // NOT DONE 
         @"UPDATE    `student_settings`
         SET         `notifications` = @enable
         WHERE       `course_id`=@courseID
         AND         `user_id`=@userID;";
 
-    public const string UPDATE_USER_GOAL_GRADE =
+    public const string UPDATE_USER_GOAL_GRADE = // NOT DONE
         @"UPDATE    `student_settings`
         SET         `goal_grade` = @grade
         WHERE       `course_id`=@courseID
@@ -1467,21 +1450,19 @@ public static class DatabaseQueries
 
     public const string UPDATE_LAYOUT_COLUMN =
         @"UPDATE    `layout_columns`
-        SET         `container_width`=@containerWidth,
-                    `position`=@position
-        WHERE       `id`=@id
+        SET         `size`=@size,
+                    `order`=@order
+        WHERE       `column_id`=@columnID
         AND         `course_id`=@courseID;";
 
     public const string UPDATE_CONSENT_FOR_COURSE =
         @"UPDATE    `course_settings`
-        SET         `require_consent`=@requireConsent,
-                    `informed_consent`=@text
+                    `consent`=@text
         WHERE       `course_id`=@courseID;";
 
     public const string UPDATE_PEER_GROUP_FOR_COURSE =
         @"UPDATE    `course_settings`
         SET         `peer_group_size`=@groupSize,
-                    `personalized_peers`=@personalizedPeers
         WHERE       `course_id`=@courseID;";
     public const string UPDATE_NOTIFICATION_DATES_FOR_COURSE =
         @"UPDATE    `course_settings`
@@ -1491,25 +1472,24 @@ public static class DatabaseQueries
     public const string RELEASE_TILE_GROUPS_FROM_COLUMN =
         @"UPDATE   `tile_groups`
         SET         `column_id`=-1
-        WHERE       `column_id`=@id
-        AND         `course_id`=@courseID;";
+        WHERE       `column_id`=@columnID;";
 
     public const string UPDATE_ACCEPT_LIST =
         @"UPDATE    `accept_list`
         SET         `accepted`={2}
         WHERE       `course_id`={0} AND `user_id`='{1}';";
 
-    public const string REQUIRE_ACCEPT_LIST =
-        @"UPDATE    `course_settings`
-        SET         `accept_list`=@enabled
-        WHERE       `course_id`=@courseID;";
+    // public const string REQUIRE_ACCEPT_LIST =
+    //     @"UPDATE    `course_settings`
+    //     SET         `accept_list`=@enabled
+    //     WHERE       `course_id`=@courseID;";
 
     public const string UPDATE_TILE_GROUP =
         @"UPDATE    `tile_groups`
         SET         `column_id`=@columnID,
-                    `title`=@title,
-                    `position`=@position
-        WHERE       `id`=@id;";
+                    `name`=@name,
+                    `order`=@order
+        WHERE       `group_id`=@groupID;";
 
     public const string UPDATE_LEARNING_GOAL =
         @"UPDATE    `learning_goals`
@@ -1537,15 +1517,12 @@ public static class DatabaseQueries
         @"UPDATE    `tiles`
         SET
                     `group_id`=@groupID,
-                    `title`=@title,
-                    `position`=@position,
-                    `content_type`=@contentType,
-                    `tile_type`=@tileType,
+                    `name`=@name,
+                    `order`=@order,
+                    `type`=@type,
                     `visible`=@visible,
-                    `notifications`=@notifications,
-                    `graph_view`=@graphView,
-                    `wildcard`=@wildcard
-        WHERE       `tiles`.`id`=@id;";
+                    `notifications`=@notifications
+        WHERE       `tiles`.`tile_id`=@tileID;";
 
     public const string COMPLETE_NEW_SYNC =
         @"UPDATE    `sync_history`
@@ -1563,18 +1540,21 @@ public static class DatabaseQueries
         AND             `message`=@message
         AND             `sync_hash`=@hash;";
 
+///// EXTERNAL DATA EXISTS NO MORE, WHAT DO WE DO HERE?????
     public const string RECYCLE_EXTERNAL_DATA =
         @"UPDATE        `submissions`
           SET           `sync_hash`=@hash
           WHERE         `entry_id` IN (
-            SELECT      `tile_entries`.`id`
+            SELECT      `tile_entries`.`entry_id`
             FROM        `tiles`
             INNER JOIN  `tile_entries`
-                ON      `tiles`.`id`=`tile_entries`.`tile_id`
+                USING   (`tile_id`)
             INNER JOIN  `tile_groups`
-                ON      `tile_groups`.`id`=`tiles`.`group_id`
-            WHERE   `tile_groups`.`course_id`=@courseID
-            AND     `tiles`.`tile_type`='EXTERNAL_DATA'
+                USING   (`group_id`)
+            INNER JOIN  `layout_columns`
+                USING   (`column_id`)
+            WHERE       `layout_columns`.`course_id`=@courseID
+            AND     `tiles`.`type`='EXTERNAL_DATA'
           );";
 
 
@@ -1582,7 +1562,7 @@ public static class DatabaseQueries
 
     public const string DELETE_LAYOUT_COLUMN =
         @"DELETE FROM   `layout_columns`
-        WHERE           `id`=@id
+        WHERE           `column_id`=@columnID
         AND             `course_id`=@courseID;";
 
     public const string RESET_ACCEPT_LIST =
@@ -1591,7 +1571,7 @@ public static class DatabaseQueries
 
     public const string DELETE_TILE_GROUP =
         @"DELETE FROM       `tile_groups`
-          WHERE             `id`=@id;";
+          WHERE             `group_id`=@groupID;";
 
     public const string DELETE_LEARNING_GOAL =
         @"DELETE FROM       `learning_goals`
@@ -1625,38 +1605,41 @@ public static class DatabaseQueries
             @action
           );";
 
-    public const string DELETE_OLD_SYNCS_FOR_COURSE =
+    public const string DELETE_OLD_SYNCS_FOR_COURSE = //half done
         @"DELETE
         FROM        `peer_groups`
-        WHERE       `sync_hash`=@hash;
+        WHERE       `sync_id`=@syncID;
 
         DELETE
         FROM        `submissions`
-        WHERE       `sync_hash`=@hash;
+        WHERE       `sync_id`=@syncID;
 
-        DELETE
-        FROM        `canvas_users`
-        WHERE       `course_id`=@courseID
-        AND         `sync_hash`=@hash;
-
+        "+
+        //@" ///////// Don't we need those data for the historic grade?
+        // DELETE
+        // FROM        `student_settings`
+        // WHERE       `course_id`=@courseID
+        // AND         `sync_id`=@syncID;
+        // "+
+        @"
         DELETE
         FROM        `canvas_assignment`
         WHERE       `course_id`=@courseID
-        AND         `sync_hash`=@hash;
+        AND         `sync_id`=@syncID;
 
         DELETE
         FROM        `canvas_discussion`
         WHERE       `course_id`=@courseID
-        AND         `sync_hash`=@hash;
+        AND         `sync_id`=@syncID;
 
         DELETE
         FROM        `notifications`
         WHERE       `course_id`=@courseID
-        AND         `sync_hash`=@hash;
+        AND         `sync_id`=@syncID;
 
         DELETE
         FROM        `sync_history`
         WHERE       `course_id`=@courseID
-        AND         `sync_id`=@startTimestamp;
+        AND         `sync_id`=@syncID;
         ";
 }

@@ -13,14 +13,13 @@ namespace IguideME.Web.Models
     }
     public class Tile
     {
-        public const string CONTENT_TYPE_BINARY = "BINARY";
-        public const string CONTENT_TYPE_ENTRIES = "ENTRIES";
-        public const string CONTENT_TYPE_PREDICTION = "PREDICTION";
-        public const string CONTENT_TYPE_LEARNING_OUTCOMES = "LEARNING_OUTCOMES";
 
-        public const string TYPE_ASSIGNMENTS = "ASSIGNMENTS";
-        public const string TYPE_DISCUSSIONS = "DISCUSSIONS";
-        public const string TYPE_EXTERNAL_DATA = "EXTERNAL_DATA";
+        public enum Tile_type
+        {
+            assignments,
+            discussions,
+            learning_outcomes
+        }
 
         [JsonProperty(PropertyName = "id")]
         public int ID { get; private set; }
@@ -31,14 +30,11 @@ namespace IguideME.Web.Models
         [JsonProperty(PropertyName = "title")]
         public string Title { get; set; }
 
-        [JsonProperty(PropertyName = "position")]
-        public int Position { get; set; }
-
-        [JsonProperty(PropertyName = "content")]
-        public string ContentType { get; set; }
+        [JsonProperty(PropertyName = "order")]
+        public int Order { get; set; }
 
         [JsonProperty(PropertyName = "type")]
-        public string TileType { get; set; }
+        public Tile_type Type { get; set; }
 
         [JsonProperty(PropertyName = "visible")]
         public bool Visible { get; set; }
@@ -46,11 +42,11 @@ namespace IguideME.Web.Models
         [JsonProperty(PropertyName = "notifications")]
         public bool Notifications { get; set; }
 
-        [JsonProperty(PropertyName = "graph_view")]
-        public bool GraphView { get; set; }
+        // [JsonProperty(PropertyName = "graph_view")]
+        // public bool GraphView { get; set; }
 
-        [JsonProperty(PropertyName = "wildcard")]
-        public bool Wildcard { get; set; }
+        // [JsonProperty(PropertyName = "wildcard")]
+        // public bool Wildcard { get; set; }
 
         [JsonIgnore]
         public List<TileEntry> Entries { get; set; }
@@ -58,26 +54,24 @@ namespace IguideME.Web.Models
         public Tile(
             int id,
             int groupID,
-            string title,
-            int position,
-            string tileType,
-            string contentType,
+            string name,
+            int order,
+            Tile_type type,
             bool visible,
             bool notifications,
-            bool graphView,
-            bool wildcard,
+            // bool graphView,
+            // bool wildcard,
             bool loadEntries = false)
         {
             this.ID = id;
             this.GroupID = groupID;
-            this.Title = title;
-            this.Position = position;
-            this.ContentType = contentType;
-            this.TileType = tileType;
+            this.Title = name;
+            this.Order = order;
+            this.Type = type;
             this.Visible = visible;
             this.Notifications = notifications;
-            this.GraphView = graphView;
-            this.Wildcard = wildcard;
+            // this.GraphView = graphView;
+            // this.Wildcard = wildcard;
 
             if (loadEntries)
                 this.Entries = DatabaseManager.Instance.GetTileEntries(this.ID);
