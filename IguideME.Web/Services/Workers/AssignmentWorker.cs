@@ -141,10 +141,7 @@ namespace IguideME.Web.Services.Workers
                     assignment.IsMuted,
                     assignment.DueDate.HasValue ? assignment.DueDate.Value.ToShortDateString() : "",
                     assignment.PointsPossible ??= 0,
-                    assignment.Position ??= 0,
-              (int) assignment.GradingType,
-                    assignment.SubmissionType,
-                    _syncID
+                    (int) assignment.GradingType
                 );
 
                 // Don't register submissions that aren't assigned to tiles (as entries).

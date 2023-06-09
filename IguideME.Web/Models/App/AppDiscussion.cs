@@ -20,8 +20,8 @@ namespace IguideME.Web.Models.App
         [JsonProperty("type")]
         public Discussion_type Type { get; set; }
 
-        [JsonProperty("discussion_id")]
-        public int DiscussionID { get; set; }
+        // [JsonProperty("discussion_id")]
+        // public int DiscussionID { get; set; }
 
         [JsonProperty("parent_id")]
         public int ParentID { get; set; }
@@ -32,34 +32,34 @@ namespace IguideME.Web.Models.App
         [JsonProperty("title")]
         public string Title { get; set; }
 
-        [JsonProperty("posted_by")]
-        public string PostedBy { get; set; }
+        [JsonProperty("author")]
+        public string Author { get; set; }
 
-        [JsonProperty("posted_at")]
-        public string PostedAt { get; set; }
+        [JsonProperty("date")]
+        public int Date { get; set; }
 
         [JsonProperty("message")]
         public string Message { get; set; }
 
         public AppDiscussion(
-            int id,
+            // int discussionID,
             Discussion_type type,
-            int discussionID,
+            int id,
             int parentID,
             int courseID,
             string title,
-            string postedBy,
-            string postedAt,
+            string author,
+            int date,
             string message)
         {
             this.ID = id;
             this.Type = type;
-            this.DiscussionID = discussionID;
+            // this.DiscussionID = discussionID;
             this.ParentID = parentID;
             this.CourseID = courseID;
             this.Title = title;
-            this.PostedBy = postedBy;
-            this.PostedAt = postedAt;
+            this.Author = author;
+            this.Date = date;
             this.Message = message;
         }
 

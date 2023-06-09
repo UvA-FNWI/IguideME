@@ -445,13 +445,13 @@ namespace IguideME.Web.Controllers
 
             User user = DatabaseManager.Instance.GetUser(course_id, userID);
 
-            List<AppDiscussion> discussions = DatabaseManager.Instance.GetDiscussionsForTile(course_id, id);
+            List<AppDiscussion> discussions = DatabaseManager.Instance.GetDiscussionsForTile(id);
 
             foreach (AppDiscussion discussion in new List<AppDiscussion>(discussions)) {
-                discussions.AddRange(DatabaseManager.Instance.GetDiscussionEntries(course_id,
-                    discussion.DiscussionID, user_id: user.UserID.ToString()));
-                discussions.AddRange(DatabaseManager.Instance.GetDiscussionReplies(course_id,
-                    discussion.DiscussionID, user_id: user.UserID.ToString()));
+                discussions.AddRange(DatabaseManager.Instance.GetDiscussionEntries(
+                    discussion.ID, user_id: user.UserID.ToString()));
+                discussions.AddRange(DatabaseManager.Instance.GetDiscussionReplies(
+                    discussion.ID, user_id: user.UserID.ToString()));
             }
 
             return Json(discussions);
@@ -675,7 +675,7 @@ namespace IguideME.Web.Controllers
                 ? BadRequest()
                 : Json(
                 DatabaseManager.Instance.GetUserPeerComparison(
-                GetCourseID(), user.UserID));
+                GetCourseID(), user.UserID, GetHashCode()));
         }
 
         [Authorize]
@@ -696,7 +696,7 @@ namespace IguideME.Web.Controllers
                 ? BadRequest()
                 : Json(
                 DatabaseManager.Instance.GetUserResults(
-                    GetCourseID(), user.UserID));
+                    GetCourseID(), user.UserID, GetHashCode()));
         }
 
         [Authorize]

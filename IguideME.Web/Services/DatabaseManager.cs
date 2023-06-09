@@ -157,26 +157,33 @@ namespace IguideME.Web.Services
             // collection of all table creation queries
             string[] queries =
             {
+                DatabaseQueries.CREATE_TABLE_SYNC_HISTORY,
                 DatabaseQueries.CREATE_TABLE_USERS,
                 DatabaseQueries.CREATE_TABLE_COURSE_SETTINGS,
-                DatabaseQueries.CREATE_TABLE_SYNC_HISTORY,
+                
                 DatabaseQueries.CREATE_TABLE_USER_SETTINGS,
                 DatabaseQueries.CREATE_TABLE_USER_TRACKER,
+
                 DatabaseQueries.CREATE_TABLE_LAYOUT_COLUMNS,
                 DatabaseQueries.CREATE_TABLE_LAYOUT_TILE_GROUPS,
                 DatabaseQueries.CREATE_TABLE_TILES,
+
                 DatabaseQueries.CREATE_TABLE_ASSIGNMENTS,
                 DatabaseQueries.CREATE_TABLE_LEARNING_GOALS,
                 DatabaseQueries.CREATE_TABLE_DISCUSSIONS,
                 DatabaseQueries.CREATE_TABLE_DISCUSSION_REPLIES,
+
                 DatabaseQueries.CREATE_TABLE_TILE_ENTRIES,
                 DatabaseQueries.CREATE_TABLE_SUBMISSIONS,
                 DatabaseQueries.CREATE_TABLE_SUBMISSIONS_META,
+
                 DatabaseQueries.CREATE_TABLE_GRADE_PREDICTION_MODEL,
                 DatabaseQueries.CREATE_TABLE_GRADE_PREDICTION_MODEL_PARAMETER,
                 DatabaseQueries.CREATE_TABLE_PREDICTED_GRADE,
+
                 DatabaseQueries.CREATE_TABLE_PEER_GROUPS,
                 DatabaseQueries.CREATE_TABLE_NOTIFICATIONS,
+
                 DatabaseQueries.CREATE_TABLE_MIGRATIONS,
             };
 
@@ -420,86 +427,78 @@ namespace IguideME.Web.Services
         public void RegisterAssignment(
             int? assignmentID,
             int courseID,
-            string name,
+            string title,
             bool published,
             bool muted,
-            string dueDate,
-            double? pointsPossible,
-            int? position,
-            int gradingType,
-            string submissionType,
-            int syncID)
+            int dueDate,
+            double? maxGrade,
+            int gradingType)
         {
             NonQuery(
-                DatabaseQueries.REGISTER_CANVAS_ASSIGNMENT,
+                DatabaseQueries.REGISTER_ASSIGNMENT,
                 new SQLiteParameter("assignmentID", assignmentID.ToString()),
                 new SQLiteParameter("courseID", courseID),
-                new SQLiteParameter("name", name),
+                new SQLiteParameter("title", title),
                 new SQLiteParameter("published", published),
                 new SQLiteParameter("muted", muted),
                 new SQLiteParameter("dueDate", dueDate),
-                new SQLiteParameter("pointsPossible", pointsPossible),
-                new SQLiteParameter("position", position),
-                new SQLiteParameter("gradingType", gradingType),
-                new SQLiteParameter("submissionType", submissionType),
-                new SQLiteParameter("syncID", syncID)
+                new SQLiteParameter("maxGrade", maxGrade),
+                new SQLiteParameter("gradingType", gradingType)
             );
         }
 
         public void RegisterDiscussion(Discussion discussion, int syncID)
         {
             NonQuery(
-                DatabaseQueries.REGISTER_CANVAS_DISCUSSION,
-                new SQLiteParameter("id", discussion.ID),
+                DatabaseQueries.REGISTER_DISCUSSION,
+                new SQLiteParameter("discussionID", discussion.ID),
                 new SQLiteParameter("courseID", discussion.CourseID),
                 new SQLiteParameter("title", discussion.Title),
                 new SQLiteParameter("userName", discussion.UserName),
-                new SQLiteParameter("postedAt", discussion.PostedAt),
-                new SQLiteParameter("message", discussion.Message),
+                new SQLiteParameter("date", discussion.PostedAt),
+                new SQLiteParameter("message", discussion.Message)
                 // new SQLiteParameter("message", discussion.Message.Replace("'", "''")), // TODO: remove if didn't break
-                new SQLiteParameter("syncID", syncID)
             );
         }
 
         public void UpdateDiscussion(Discussion discussion, int tileID, int syncID) {
             NonQuery(
-                DatabaseQueries.UPDATE_CANVAS_DISCUSSION,
-                new SQLiteParameter("id", discussion.ID),
+                DatabaseQueries.REGISTER_DISCUSSION,
+                new SQLiteParameter("discussionID", discussion.ID),
                 new SQLiteParameter("courseID", discussion.CourseID),
                 new SQLiteParameter("title", discussion.Title),
-                new SQLiteParameter("userName", discussion.UserName),
-                new SQLiteParameter("postedAt", discussion.PostedAt),
-                new SQLiteParameter("message", discussion.Message),
+                new SQLiteParameter("authorName", discussion.UserName),
+                new SQLiteParameter("date", discussion.PostedAt),
+                new SQLiteParameter("message", discussion.Message)
                 // new SQLiteParameter("message", discussion.Message.Replace("'", "''")),
-                new SQLiteParameter("tileID", tileID),
-                new SQLiteParameter("syncID", syncID)
-            );
+                // new SQLiteParameter("tileID", tileID)            
+                );
         }
 
         public int RegisterDiscussionEntry(DiscussionEntry entry, string userID)
         {
             return IDNonQuery(
-                    DatabaseQueries.REGISTER_CANVAS_DISCUSSION_ENTRY,
-                    new SQLiteParameter("courseID", entry.CourseID),
-                    new SQLiteParameter("topicID", entry.TopicID),
-    				new SQLiteParameter("postedAt", entry.CreatedAt),
-                    new SQLiteParameter("message", entry.Message),
+                    DatabaseQueries.REGISTER_DISCUSSION_REPLY,
+                    new SQLiteParameter("discussionID", entry.TopicID),
+                    new SQLiteParameter("userID", userID),
+    				new SQLiteParameter("date", entry.CreatedAt),
+                    new SQLiteParameter("message", entry.Message)
                     // new SQLiteParameter("message", entry.Message.Replace("'", "''")),
-                    new SQLiteParameter("postedBy", userID)
+                    
             );
         }
 
-        public void RegisterDiscussionReply(DiscussionReply reply, int entry_id, string userID)
+        public void RegisterDiscussionReply(DiscussionReply reply, int discussionID, string userID)
         {
-            if (entry_id == -1) {
+            if (discussionID == -1) {
                 return;
             }
 
             NonQuery(
-                DatabaseQueries.REGISTER_CANVAS_DISCUSSION_REPLY,
-                new SQLiteParameter("entryID", entry_id),
+                DatabaseQueries.REGISTER_DISCUSSION_REPLY,
+                new SQLiteParameter("discussionID", discussionID),
                 new SQLiteParameter("userID", userID),
-                new SQLiteParameter("postedAt", reply.CreatedAt),
+                new SQLiteParameter("date", reply.CreatedAt),
                 new SQLiteParameter("message", reply.Message)
             );
         }
@@ -896,7 +895,7 @@ namespace IguideME.Web.Services
             return activeSync == 0
                 ? -1
                 : IDNonQuery(DatabaseQueries.REGISTER_USER_SUBMISSION,
-                    new SQLiteParameter("entryID", entryID),
+                    new SQLiteParameter("assignmentID", entryID),
                     new SQLiteParameter("userID", userID),
                     new SQLiteParameter("grade", grade),
                     new SQLiteParameter("submitted", submitted),
@@ -2003,31 +2002,26 @@ namespace IguideME.Web.Services
             return tileGroups;
         }
 
-        public List<AppAssignment> GetAssignments(int courseID, int syncID = 0)
+        public List<AppAssignment> GetAssignments(int courseID)
         {
-            int activeSync = syncID == 0 ? this.GetCurrentHash(courseID) : 0;
-            if (activeSync == 0) return new List<AppAssignment>() { };
 
             List<AppAssignment> assignments = new();
 
             using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_COURSE_ASSIGNMENTS,
-                    new SQLiteParameter("courseID", courseID),
-                    new SQLiteParameter("syncID", activeSync)
+                    new SQLiteParameter("courseID", courseID)
                 )) {
                 while (r.Read())
                 {
                     try {
                         AppAssignment row = new(
                             r.GetInt32(0),
-                            r.GetValue(1).ToString(),
-                            r.GetInt32(2),
-                            r.GetValue(3).ToString(),
+                            r.GetInt32(1),
+                            r.GetValue(2).ToString(),
+                            r.GetBoolean(3),
                             r.GetBoolean(4),
-                            r.GetBoolean(5),
-                            r.GetValue(6).ToString(),
-                            r.GetFloat(7),
-                            r.GetInt32(8),
-                            r.GetValue(9).ToString()
+                            r.GetInt32(5),
+                            r.GetFloat(6),
+                            r.GetInt32(7)
                         );
                         assignments.Add(row);
                     } catch (Exception e)
@@ -2040,62 +2034,23 @@ namespace IguideME.Web.Services
             return assignments;
         }
 
-        public List<AppDiscussion> GetDiscussions(int courseID, int syncID = 0)
+        public List<AppDiscussion> GetDiscussions(int courseID)
         {
-            int activeSync = syncID == 0 ? this.GetCurrentHash(courseID) : 0;
-            if (activeSync == 0) return new List<AppDiscussion>() { };
-
             List<AppDiscussion> discussions = new();
 
             using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_COURSE_DISCUSSIONS,
-                    new SQLiteParameter("courseID", courseID),
-                    new SQLiteParameter("syncID", activeSync)
+                    new SQLiteParameter("courseID", courseID)
                 )) {
                 while (r.Read())
                 {
                     AppDiscussion row = new(
-                        r.GetInt32(0),
                         Discussion_type.topic,
-                        r.GetInt32(1),
-                        r.GetInt32(2),
-                        r.GetInt32(3),
-                        r.GetValue(4).ToString(),
-                        r.GetValue(5).ToString(),
-                        r.GetValue(6).ToString(),
-                        r.GetValue(7).ToString()
-                    );
-                    discussions.Add(row);
-                }
-            }
-
-            return discussions;
-        }
-
-        public List<AppDiscussion> GetDiscussionsForTile(
-            int courseID,
-            int tileID,
-            int syncID = 0)
-        {
-            int activeSync = syncID == 0 ? this.GetCurrentHash(courseID) : 0;
-            if (activeSync == 0) return new List<AppDiscussion>() { };
-
-            List<AppDiscussion> discussions = new();
-
-            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_TILE_DISCUSSIONS,
-                    new SQLiteParameter("id", tileID),
-                    new SQLiteParameter("syncID", activeSync)
-                )) {
-                while (r.Read())
-                {
-                    AppDiscussion row = new(
                         r.GetInt32(0),
-                        Discussion_type.topic,
                         r.GetInt32(1),
-                        tileID,
                         r.GetInt32(2),
                         r.GetValue(3).ToString(),
                         r.GetValue(4).ToString(),
-                        r.GetValue(5).ToString(),
+                        r.GetInt32(5),
                         r.GetValue(6).ToString()
                     );
                     discussions.Add(row);
@@ -2105,26 +2060,49 @@ namespace IguideME.Web.Services
             return discussions;
         }
 
-        public List<AppDiscussion> GetDiscussionEntries(int course_id, int discussion_id, int syncID = 0) {
-            int activeSync = syncID == 0 ? this.GetCurrentHash(course_id) : 0;
-            if (activeSync == 0) return new List<AppDiscussion>() { };
+        public List<AppDiscussion> GetDiscussionsForTile(
+            int tileID)
+        {
+
+            List<AppDiscussion> discussions = new();
+
+            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_TILE_DISCUSSIONS,
+                    new SQLiteParameter("tileID", tileID)
+                )) {
+                while (r.Read())
+                {
+                    AppDiscussion row = new(
+                        Discussion_type.topic,
+                        r.GetInt32(0),
+                        tileID,
+                        r.GetInt32(1),
+                        r.GetValue(2).ToString(),
+                        r.GetValue(3).ToString(),
+                        r.GetInt32(4),
+                        r.GetValue(5).ToString()
+                    );
+                    discussions.Add(row);
+                }
+            }
+
+            return discussions;
+        }
+
+        public List<AppDiscussion> GetDiscussionEntries(int discussionID) {
 
             List<AppDiscussion> entries = new();
             using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_DISCUSSION_ENTRIES,
-                    new SQLiteParameter("courseID", course_id),
-                    new SQLiteParameter("discussionID", discussion_id),
-                    new SQLiteParameter("syncID", activeSync)
+                    new SQLiteParameter("discussionID", discussionID)
                 )) {
                 while (r.Read()) {
                     AppDiscussion row = new(
-                        r.GetInt32(0),
                         Discussion_type.entry,
-                        discussion_id,
-                        discussion_id,
-                        course_id,
+                        r.GetInt32(0),
+                        discussionID,
+                        r.GetInt32(5),
                         r.GetValue(4).ToString(),
                         r.GetValue(1).ToString(),
-                        r.GetValue(2).ToString(),
+                        r.GetInt32(2),
                         r.GetValue(3).ToString()
                     );
                     entries.Add(row);
@@ -2133,27 +2111,22 @@ namespace IguideME.Web.Services
             return entries;
         }
 
-        public List<AppDiscussion> GetDiscussionEntries(int course_id, int discussion_id, string user_id, int syncID = 0) {
-            int activeSync = syncID == 0 ? this.GetCurrentHash(course_id) : 0;
-            if (activeSync == 0) return new List<AppDiscussion>() { };
+        public List<AppDiscussion> GetDiscussionEntries(int discussion_id, string user_id) {
 
             List<AppDiscussion> entries = new();
             using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_DISCUSSION_ENTRIES_FOR_USER,
-                    new SQLiteParameter("courseID", course_id),
                     new SQLiteParameter("discussionID", discussion_id),
-                    new SQLiteParameter("syncID", activeSync),
                     new SQLiteParameter("userID", user_id)
                 )) {
                 while (r.Read()) {
                     AppDiscussion row = new(
-                        r.GetInt32(0),
                         Discussion_type.entry,
+                        r.GetInt32(0),
                         discussion_id,
-                        discussion_id,
-                        course_id,
+                        r.GetInt32(5),
                         r.GetValue(4).ToString(),
                         r.GetValue(1).ToString(),
-                        r.GetValue(2).ToString(),
+                        r.GetInt32(2),
                         r.GetValue(3).ToString()
                     );
                     entries.Add(row);
@@ -2163,27 +2136,22 @@ namespace IguideME.Web.Services
         }
 
 
-        public List<AppDiscussion> GetDiscussionReplies(int course_id, int discussion_id, int syncID = 0) {
-            int activeSync = syncID == 0 ? this.GetCurrentHash(course_id) : 0;
-            if (activeSync == 0) return new List<AppDiscussion>() { };
+        public List<AppDiscussion> GetDiscussionReplies(int discussion_id) {
 
             List<AppDiscussion> entries = new();
             using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_DISCUSSION_REPLIES,
-                    new SQLiteParameter("courseID", course_id),
-                    new SQLiteParameter("discussionID", discussion_id),
-                    new SQLiteParameter("syncID", activeSync)
+                    new SQLiteParameter("discussionID", discussion_id)
                 )) {
                 while (r.Read()) {
                     AppDiscussion row = new(
-                        r.GetInt32(0),
                         Discussion_type.reply,
+                        r.GetInt32(0),
                         discussion_id,
-                        r.GetInt32(1),
-                        course_id,
-                        r.GetValue(5).ToString(),
-                        r.GetValue(2).ToString(),
-                        r.GetValue(3).ToString(),
-                        r.GetValue(4).ToString()
+                        r.GetInt32(5),
+                        r.GetValue(4).ToString(),
+                        r.GetValue(1).ToString(),
+                        r.GetInt32(2),
+                        r.GetValue(3).ToString()
                     );
                     entries.Add(row);
                 }
@@ -2191,28 +2159,22 @@ namespace IguideME.Web.Services
             return entries;
         }
 
-        public List<AppDiscussion> GetDiscussionReplies(int course_id, int discussion_id, string user_id, int syncID = 0) {
-            int activeSync = syncID == 0 ? this.GetCurrentHash(course_id) : 0;
-            if (activeSync == 0) return new List<AppDiscussion>() { };
-
+        public List<AppDiscussion> GetDiscussionReplies(int discussion_id, string user_id) {
             List<AppDiscussion> entries = new();
             using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_DISCUSSION_REPLIES_FOR_USER,
-                    new SQLiteParameter("courseID", course_id),
                     new SQLiteParameter("discussionID", discussion_id),
-                    new SQLiteParameter("syncID", activeSync),
                     new SQLiteParameter("userID", user_id)
                 )) {
                 while (r.Read()) {
                     AppDiscussion row = new(
-                        r.GetInt32(0),
                         Discussion_type.reply,
+                        r.GetInt32(0),
                         discussion_id,
-                        r.GetInt32(1),
-                        course_id,
-                        r.GetValue(5).ToString(),
-                        r.GetValue(2).ToString(),
-                        r.GetValue(3).ToString(),
-                        r.GetValue(4).ToString()
+                        r.GetInt32(5),
+                        r.GetValue(4).ToString(),
+                        r.GetValue(1).ToString(),
+                        r.GetInt32(2),
+                        r.GetValue(3).ToString()
                     );
                     entries.Add(row);
                 }

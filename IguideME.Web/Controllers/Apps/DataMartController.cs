@@ -288,10 +288,10 @@ namespace IguideME.Web.Controllers
             List<AppDiscussion> discussions = DatabaseManager.Instance.GetDiscussions(course_id);
 
             foreach (AppDiscussion discussion in new List<AppDiscussion>(discussions)) {
-                discussions.AddRange(DatabaseManager.Instance.GetDiscussionEntries(course_id,
-                    discussion.DiscussionID));
-                discussions.AddRange(DatabaseManager.Instance.GetDiscussionReplies(course_id,
-                    discussion.DiscussionID));
+                discussions.AddRange(DatabaseManager.Instance.GetDiscussionEntries(
+                    discussion.ID));
+                discussions.AddRange(DatabaseManager.Instance.GetDiscussionReplies(
+                    discussion.ID));
             }
             return Json(
                 discussions

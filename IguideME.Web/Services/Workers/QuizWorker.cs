@@ -97,11 +97,7 @@ namespace IguideME.Web.Services.Workers
 					false,
 					quiz.DueDate.HasValue ? quiz.DueDate.Value.ToShortDateString() : "",
 					quiz.PointsPossible ?? 0,
-					0,
-					(int) GradingType.Points,
-					JsonConvert.SerializeObject(quiz.Type),
-					// "",
-					this._syncID
+					(int) GradingType.Points
 				);
 
 				// Don't register submissions that aren't assigned to tiles (as entries).

@@ -114,7 +114,7 @@ public static class DatabaseQueries
      * Content might be an id of:
      * - "ASSIGNMENT"
      * - "DISCUSSION"
-     * - "LEARNING_OUTCOMES"
+     * - "LEARNING_GOAL"
      */
     public const string CREATE_TABLE_TILE_ENTRIES = // NOT DONE
         @"CREATE TABLE IF NOT EXISTS `tile_entries` (
@@ -197,11 +197,14 @@ public static class DatabaseQueries
     /**
      * The peer_group table stores the groups of peers students in each goal
      * grade belong to as well as the grade statistics of that group.
+     *
+     * user_ids should go away, right????????????
      */
     public const string CREATE_TABLE_PEER_GROUPS =
     @"CREATE TABLE IF NOT EXISTS `peer_groups` (
         `tile_id`           INTEGER,
         `goal_grade`        INTEGER,
+        `user_ids`          STRING
         `avg_grade`         INTEGER,
         `min_grade`         INTEGER,
         `max_grade`         INTEGER,
@@ -280,7 +283,7 @@ public static class DatabaseQueries
             `role`            INTEGER DEFAULT 0
         );";
 
-    public const string CREATE_TABLE_ASSIGNMENTS = // NOT DONE
+    public const string CREATE_TABLE_ASSIGNMENTS =
         @"CREATE TABLE IF NOT EXISTS `assignments` (
             `assignment_id`   INTEGER PRIMARY KEY,
             `course_id`       INTEGER,
@@ -293,7 +296,7 @@ public static class DatabaseQueries
             FOREIGN KEY(`course_id`) REFERENCES `course_settings`(`course_id`)
         );";
 
-    public const string CREATE_TABLE_DISCUSSIONS = // NOT DONE
+    public const string CREATE_TABLE_DISCUSSIONS =
         @"CREATE TABLE IF NOT EXISTS `discussions` (
             `discussion_id`   INTEGER PRIMARY KEY,
             `course_id`       INTEGER,
@@ -306,14 +309,14 @@ public static class DatabaseQueries
 
         );";
 
-    public const string CREATE_TABLE_DISCUSSION_REPLIES = // NOT DONE
+    public const string CREATE_TABLE_DISCUSSION_REPLIES =
         @"CREATE TABLE IF NOT EXISTS `discussion_replies` (
             `reply_id`        INTEGER PRIMARY KEY AUTOINCREMENT,
             `discussion_id`   INTEGER,
             `author`          STRING,
             `date`            INTEGER,
             `message`         TEXT DEFAULT NULL,
-            FOREIGN KEY(`course_id`) REFERENCES `course_settings`(`course_id`),
+            FOREIGN KEY(`discussion_id`) REFERENCES `discussions`(`discussion_id`),
             FOREIGN KEY(`author`) REFERENCES `users`(`name`)
         );";
 
@@ -340,7 +343,7 @@ public static class DatabaseQueries
         @"INSERT INTO   `course_settings` (`course_id`, `name`)
         VALUES (@courseID, @courseName);";
 
-    public const string REGISTER_PREDICTED_GRADE =
+    public const string REGISTER_PREDICTED_GRADE =  // NOT DONE , need integrate this in student_settings
         @"INSERT INTO   `predicted_grade` ( `course_id`,
                                             `user_id`,
                                             `grade`,
@@ -496,84 +499,78 @@ public static class DatabaseQueries
         @"INSERT INTO   `sync_history` (`course_id`, `sync_id`)
           VALUES        (@courseID, @startTimestamp);";
 
-    public const string REGISTER_CANVAS_ASSIGNMENT =
-        @"INSERT INTO   `canvas_assignment`
+    public const string REGISTER_ASSIGNMENT =
+        @"INSERT OR REPLACE 
+            INTO   `assignments`
                         (   `assignment_id`,
                             `course_id`,
-                            `name`,
+                            `title`,
                             `published`,
                             `muted`,
                             `due_date`,
-                            `points_possible`,
-                            `position`,
-                            `grading_type`,
-                            `submission_type`,
-                            `sync_hash` )
+                            `max_grade`,
+                            `grading_type`)
         VALUES(
             @assignmentID,
             @courseID,
-            @name,
+            @title,
             @published,
             @muted,
             @dueDate,
-            @pointsPossible,
-            @position,
-            @gradingType,
-            @submissionType,
-            @hash
+            @maxGrade,
+            @gradingType
         );";
 
-    public const string REGISTER_CANVAS_DISCUSSION =
-        @"INSERT INTO   `canvas_discussion`
+    public const string REGISTER_DISCUSSION =
+        @"INSERT OR REPLACE 
+            INTO   `discussions`
                         (   `discussion_id`,
                             `course_id`,
                             `title`,
-                            `posted_by`,
-                            `posted_at`,
-                            `message`,
-                            `sync_hash` )
-        VALUES(
-            @id,
-            @courseID,
-            @title,
-            @userName,
-            @postedAt,
-            @message,
-            @hash
-        );";
-
-    public const string REGISTER_CANVAS_DISCUSSION_ENTRY =
-        @"INSERT INTO   `canvas_discussion_entry`
-                        (   `course_id`,
-                            `discussion_id`,
-                            `posted_by`,
-                            `posted_at`,
+                            `author`,
+                            `date`,
                             `message`)
         VALUES(
+            @discussionID,
             @courseID,
-            @topicID,
-            @postedBy,
-            @postedAt,
+            @title,
+            @authorName,
+            @date,
             @message
-        )
-        ON CONFLICT ( `course_id`, `posted_by`, `discussion_id`, `posted_at` )
-        DO UPDATE SET `message` = '{4}'
-        ;";
+        );";
 
-    public const string REGISTER_CANVAS_DISCUSSION_REPLY =
+    // public const string REGISTER_discussion_replies =
+    //     @"INSERT INTO   `discussion_replies`
+    //                     (   `course_id`,
+    //                         `discussion_id`,
+    //                         `posted_by`,
+    //                         `posted_at`,
+    //                         `message`)
+    //     VALUES(
+    //         @courseID,
+    //         @topicID,
+    //         @postedBy,
+    //         @postedAt,
+    //         @message
+    //     )
+    //     ON CONFLICT ( `course_id`, `posted_by`, `discussion_id`, `posted_at` )
+    //     DO UPDATE SET `message` = '{4}'
+    //     ;";
+
+    public const string REGISTER_DISCUSSION_REPLY =
         @"INSERT INTO   `discussion_replies`
-                        (   `entry_id`,
-                            `posted_by`,
-                            `posted_at`,
+                        (   `discussion_id`,
+                            `author`,
+                            `date`,
                             `message` )
         VALUES(
             @entryID,
             @userID,
-            @postedAt,
+            @date,
             @message
         )
-        ON CONFLICT ( `posted_by`, `entry_id`, `posted_at` )
-        DO UPDATE SET `message` = '{3}'
+        ON CONFLICT ( `discussion_id`, `author`, `date` )
+        DO UPDATE SET `message` = @message
         ;";
 
     public const string REGISTER_USER_FOR_COURSE =
@@ -591,19 +588,18 @@ public static class DatabaseQueries
                     @role
                 );";
 
-    public const string REGISTER_USER_SUBMISSION =
-        @"INSERT INTO   `submissions`
-                        (   `entry_id`,
+    public const string REGISTER_USER_SUBMISSION = // NOT DONE // half done
+        @"INSERT OR REPLACE 
+            INTO   `submissions`
+                        (   `assignment_id`,
                             `user_id`,
                             `grade`,
-                            `submitted`,
-                            `sync_hash` )
+                            `date`,)
         VALUES(
-            @entryID,
+            @assignmentID,
             @userID,
             @grade,
-            @submitted,
-            @hash
+            @date
         );";
 
 /////// WHAT DO WE DO ON CONFLICT HERE??????? user_name EXISTS NO MORE
@@ -636,7 +632,7 @@ public static class DatabaseQueries
                 @consent,
                 @syncID
             )
-            ON CONFLICT (   `user_id`, course_id   )
+            ON CONFLICT (   `user_id`,  `course_id`   )
                 DO UPDATE SET `consent` = @consent
         ;";
 
@@ -946,120 +942,115 @@ public static class DatabaseQueries
         ;";
 
     public const string QUERY_COURSE_ASSIGNMENTS =
-        @"SELECT    `id`,
-                    `assignment_id`,
+        @"SELECT    `assignment_id`,
                     `course_id`,
-                    `name`,
+                    `title`,
                     `published`,
                     `muted`,
                     `due_date`,
-                    `points_possible`,
-                    `position`,
-                    `submission_type`
-        FROM        `canvas_assignment`
+                    `max_grade`,
+                    `grading_type`
+        FROM        `assignments`
         WHERE       `course_id`=@courseID
-        AND         `sync_hash`=@hash;";
-
-    public const string QUERY_COURSE_DISCUSSIONS =
-        @"SELECT    `id`,
-                    `discussion_id`,
-                    `tile_id`,
-                    `course_id`,
-                    `title`,
-                    `posted_by`,
-                    `posted_at`,
-                    `message`
-        FROM        `canvas_discussion`
-        WHERE       `course_id`=@courseID
-        AND         `sync_hash`=@hash;";
-
-    public const string QUERY_TILE_DISCUSSIONS =
-        @"SELECT    `id`,
-                    `discussion_id`,
-                    `course_id`,
-                    `title`,
-                    `posted_by`,
-                    `posted_at`,
-                    `message`
-        FROM        `canvas_discussion`
-        WHERE       `tile_id`=@id
-        AND         `sync_hash`=@hash;";
-
-    public const string QUERY_TILE_DISCUSSIONS_FOR_USER =
-        @"SELECT    `id`,
-                    `discussion_id`,
-                    `course_id`,
-                    `title`,
-                    `posted_by`,
-                    `posted_at`,
-                    `message`
-        FROM        `canvas_discussion`
-        WHERE       `tile_id`=@id
-        AND         `posted_by`=@userID
-        AND         `sync_hash`=@hash;";
-
-    public const string QUERY_DISCUSSION_ENTRIES =
-        @"SELECT    `canvas_discussion_entry`.`id`,
-                    `canvas_discussion_entry`.`posted_by`,
-                    `canvas_discussion_entry`.`posted_at`,
-                    `canvas_discussion_entry`.`message`,
-                    `canvas_discussion`.`title`
-        FROM        `canvas_discussion_entry`
-        INNER JOIN  `canvas_discussion`
-            ON      `canvas_discussion_entry`.`discussion_id` = `canvas_discussion`.`discussion_id`
-        WHERE       `canvas_discussion_entry`.`course_id`=@courseID
-        AND         `canvas_discussion_entry`.`discussion_id`=@discussionID
-        AND         `canvas_discussion`.`sync_hash`=@hash
         ;";
 
-    public const string QUERY_DISCUSSION_ENTRIES_FOR_USER =
-        @"SELECT    `canvas_discussion_entry`.`id`,
-                    `canvas_discussion_entry`.`posted_by`,
-                    `canvas_discussion_entry`.`posted_at`,
-                    `canvas_discussion_entry`.`message`,
-                    `canvas_discussion`.`title`
-        FROM        `canvas_discussion_entry`
-        INNER JOIN  `canvas_discussion`
-            ON      `canvas_discussion_entry`.`discussion_id` = `canvas_discussion`.`discussion_id`
-        WHERE       `canvas_discussion_entry`.`course_id`=@courseID
-        AND         `canvas_discussion_entry`.`discussion_id`=@discussionID
-        AND         `canvas_discussion`.`sync_hash`=@hash
-        AND         `canvas_discussion_entry`.`posted_by`=@userID
+    public const string QUERY_COURSE_DISCUSSIONS = // all done
+        @"SELECT    `discussions`.`discussion_id`,
+                    `tile_entries`.`tile_id`,
+                    `discussions`.`course_id`,
+                    `discussions`.`title`,
+                    `discussions`.`author`,
+                    `discussions`.`date`,
+                    `discussions`.`message`
+        FROM        `discussions`.
+        INNER JOIN  `tile_entries`
+            ON      `tile_entries`.`content_id` == `discussions`.`discussion_id`
+        WHERE       `discussions`.`course_id`=@courseID
         ;";
 
-    public const string QUERY_DISCUSSION_REPLIES =
-        @"SELECT    `discussion_replies`.`id`,
-                    `discussion_replies`.`entry_id`,
-                    `discussion_replies`.`posted_by`,
-                    `discussion_replies`.`posted_at`,
+    public const string QUERY_TILE_DISCUSSIONS = //all done
+        @"SELECT    `discussions`.`discussion_id`,
+                    `discussions`.`course_id`,
+                    `discussions`.`title`,
+                    `discussions`.`author`,
+                    `discussions`.`date`,
+                    `discussions`.`message`
+        FROM        `discussions`
+        INNER JOIN  `tile_entries`
+            ON      `tile_entries`.`content_id` == `discussions`.`discussion_id`
+        WHERE       `tile_entries`.`tile_id`=@tileID
+        ;";
+
+// NOT USED ANYWHERE. DO WE WANT IT????????????
+    // public const string QUERY_TILE_DISCUSSIONS_FOR_USER =
+    //     @"SELECT    `id`,
+    //                 `discussion_id`,
+    //                 `course_id`,
+    //                 `title`,
+    //                 `posted_by`,
+    //                 `posted_at`,
+    //                 `message`
+    //     FROM        `discussions`
+    //     WHERE       `tile_id`=@id
+    //     AND         `posted_by`=@userID
+    //     AND         `sync_hash`=@hash;";
+
+    public const string QUERY_DISCUSSION_ENTRIES = // all done
+        @"SELECT    `discussion_replies`.`reply_id`,
+                    `discussion_replies`.`author`,
+                    `discussion_replies`.`date`,
                     `discussion_replies`.`message`,
-                    `canvas_discussion`.`title`
+                    `discussions`.`title`,
+                    `discussions`.`course_id`
         FROM        `discussion_replies`
-        INNER JOIN  `canvas_discussion_entry`
-            ON      `discussion_replies`.`entry_id`=`canvas_discussion_entry`.`id`
-        INNER JOIN  `canvas_discussion`
-            ON      `canvas_discussion_entry`.`discussion_id` = `canvas_discussion`.`discussion_id`
-        WHERE       `canvas_discussion_entry`.`course_id`=@courseID
-        AND         `canvas_discussion_entry`.`discussion_id`=@discussionID
-        AND         `canvas_discussion`.`sync_hash`=@hash
+        INNER JOIN  `discussions`
+            USING   (`discussion_id`)
+        WHERE       `discussion_replies`.`discussion_id`=@discussionID
         ;";
 
-    public const string QUERY_DISCUSSION_REPLIES_FOR_USER =
-        @"SELECT    `discussion_replies`.`id`,
-                    `discussion_replies`.`entry_id`,
-                    `discussion_replies`.`posted_by`,
-                    `discussion_replies`.`posted_at`,
+    public const string QUERY_DISCUSSION_ENTRIES_FOR_USER = // all done
+        @"SELECT    `discussion_replies`.`reply_id`,
+                    `discussion_replies`.`author`,
+                    `discussion_replies`.`date`,
                     `discussion_replies`.`message`,
-                    `canvas_discussion`.`title`
+                    `discussions`.`title`
+                    `discussions`.`course_id`
         FROM        `discussion_replies`
-        INNER JOIN  `canvas_discussion_entry`
-            ON      `discussion_replies`.`entry_id`=`canvas_discussion_entry`.`id`
-        INNER JOIN  `canvas_discussion`
-            ON      `canvas_discussion_entry`.`discussion_id` = `canvas_discussion`.`discussion_id`
-        WHERE       `canvas_discussion_entry`.`course_id`=@courseID
-        AND         `canvas_discussion_entry`.`discussion_id`=@discussionID
-        AND         `canvas_discussion`.`sync_hash`=@hash
-        AND         `discussion_replies`.`posted_by`=@userID
+        INNER JOIN  `discussions`
+            USING   (`discussion_id`)
+        WHERE       `discussion_replies`.`discussion_id`=@discussionID
+        AND         `discussion_replies`.`author`=@userID
+        ;";
+
+    public const string QUERY_DISCUSSION_REPLIES = // all done
+        @"SELECT    rep.`discussion_replies`.`reply_id`,
+                    rep.`discussion_replies`.`author`,
+                    rep.`discussion_replies`.`date`,
+                    rep.`discussion_replies`.`message`,
+                    `discussions`.`title`,
+                    `discussions`.`course_id`
+        FROM        `discussion_replies` rep
+        INNER JOIN  `discussion_replies` ent
+            ON      rep.`discussion_id` == ent.`reply_id`
+        INNER JOIN  `discussions`
+            ON      `discussions`.`discussion_id` == ent.`discussion_id`
+        WHERE       ent.`discussion_id`=@discussionID
+        ;";
+
+    public const string QUERY_DISCUSSION_REPLIES_FOR_USER = // all done
+        @"SELECT    rep.`discussion_replies`.`reply_id`,
+                    rep.`discussion_replies`.`author`,
+                    rep.`discussion_replies`.`date`,
+                    rep.`discussion_replies`.`message`,
+                    `discussions`.`title`,
+                    `discussions`.`course_id`
+        FROM        `discussion_replies` rep
+        INNER JOIN  `discussion_replies` ent
+            ON      rep.`discussion_id` == ent.`reply_id`
+        INNER JOIN  `discussions`
+            ON      `discussions`.`discussion_id` == ent.`discussion_id`
+        WHERE       ent.`discussion_id`=@discussionID
+        AND         rep.`author`=@userID
         ;";
 
     public const string QUERY_SYNC_HASHES_FOR_COURSE =
@@ -1227,7 +1218,7 @@ public static class DatabaseQueries
         AND         `submissions`.`sync_hash`=@hash
         AND         `submissions`.`grade` NOT NULL;";
 
-    public const string QUERY_COURSE_SUBMISSIONS_FOR_STUDENT = //half done
+    public const string QUERY_COURSE_SUBMISSIONS_FOR_STUDENT = //half done  please reform with inner join, will you??????
         @"SELECT    `submissions`.`id`,
                     `submissions`.`entry_id`,
                     `submissions`.`user_id`,
@@ -1303,47 +1294,47 @@ public static class DatabaseQueries
 	    GROUP BY    `tile_entries`.`id`;";
 
     public const string QUERY_USER_DISCUSSION_COUNTER = // NOT DONE (not even started)
-        @"SELECT        `canvas_discussion`.`tile_id`,
+        @"SELECT        `discussions`.`tile_id`,
                         SUM(`counter`)
 
-        FROM(SELECT     `canvas_discussion_entry`.`discussion_id`
+        FROM(SELECT     `discussion_replies`.`discussion_id`
                 AS      `disc_id`,
             COUNT(*)
                 AS      `counter`
-            FROM        `canvas_discussion_entry`
+            FROM        `discussion_replies`
             LEFT JOIN   `discussion_replies`
-                ON      `canvas_discussion_entry`.`id` = `discussion_replies`.`entry_id`
-            WHERE       `canvas_discussion_entry`.`course_id` = @courseID
+                ON      `discussion_replies`.`id` = `discussion_replies`.`entry_id`
+            WHERE       `discussion_replies`.`course_id` = @courseID
             AND         `discussion_replies`.`posted_by` = @userID
 
             UNION ALL
 
-            SELECT      `canvas_discussion_entry`.`discussion_id`
+            SELECT      `discussion_replies`.`discussion_id`
                 AS      `disc_id`,
             COUNT(*)
                 AS      `counter`
-            FROM        `canvas_discussion_entry`
+            FROM        `discussion_replies`
             WHERE       `course_id` = @courseID
             AND         `posted_by` =@userID
 
             UNION ALL
 
-            SELECT      `canvas_discussion`.`discussion_id`
+            SELECT      `discussions`.`discussion_id`
                 AS      `disc_id`,
             COUNT(*)
                 AS      `counter`
-            FROM        `canvas_discussion`
+            FROM        `discussions`
             INNER JOIN  `users`
-                ON      `canvas_discussion`.`posted_by` = `users`.`name`
-            WHERE       `canvas_discussion`.`course_id` = @courseID
+                ON      `discussions`.`posted_by` = `users`.`name`
+            WHERE       `discussions`.`course_id` = @courseID
             AND         `users`.`user_id` =@userID
-            AND         `canvas_discussion`.`sync_id` = @syncID
+            AND         `discussions`.`sync_id` = @syncID
             AND         `users`.`sync_id` = @syncID)
 
-        LEFT JOIN       `canvas_discussion`
-            ON          `disc_id` = `canvas_discussion`.`discussion_id`
+        INNER JOIN       `discussions`
+            ON          `disc_id` = `discussions`.`discussion_id`
         WHERE           `disc_id` IS NOT NULL
-        AND             `canvas_discussion`.`sync_hash` = @hash;";
+        ;";
 
     public const string QUERY_PEER_GROUP_RESULTS =
         @"SELECT    `tile_id`,
@@ -1376,7 +1367,7 @@ public static class DatabaseQueries
         ORDER BY    `peer_groups`.`tile_id`;";
 
 
-    public const string QUERY_USER_RESULTS = // half done ?
+    public const string QUERY_USER_RESULTS = // half done , does it work though????????
         @"SELECT   `tiles`.`tile_id`,
                     AVG(`grade`),
                     MIN(`grade`),
@@ -1402,7 +1393,7 @@ public static class DatabaseQueries
                     `grade`,
                     `submitted`
         FROM        `submissions`
-        WHERE       `entry_id`=@antryID
+        WHERE       `entry_id`=@entryID
         AND         `user_id`=@userID
         AND         `sync_hash`=@hash;";
 
@@ -1528,16 +1519,16 @@ public static class DatabaseQueries
         SET         `end_timestamp`=@currentTimestamp
         WHERE       `sync_id`=@startTimestamp;";
 
-    public const string UPDATE_CANVAS_DISCUSSION =
-        @"UPDATE        `canvas_discussion`
-        SET             `tile_id`=@tileID
-        WHERE           `discussion_id`=@id
-        AND             `course_id`=@courseID
-        AND             `title`=@title
-        AND             `posted_by`=@userName
-        AND             `posted_at`=@postedAt
-        AND             `message`=@message
-        AND             `sync_hash`=@hash;";
+    // public const string UPDATE_discussions =
+    //     @"UPDATE        `discussions`
+    //     SET             `tile_id`=@tileID
+    //     WHERE           `discussion_id`=@id
+    //     AND             `course_id`=@courseID
+    //     AND             `title`=@title
+    //     AND             `posted_by`=@userName
+    //     AND             `posted_at`=@postedAt
+    //     AND             `message`=@message
+    //     AND             `sync_hash`=@hash;";
 
 ///// EXTERNAL DATA EXISTS NO MORE, WHAT DO WE DO HERE?????
     public const string RECYCLE_EXTERNAL_DATA =
@@ -1620,20 +1611,22 @@ public static class DatabaseQueries
         // WHERE       `course_id`=@courseID
         // AND         `sync_id`=@syncID;
         // "+
+        
+        // /////////// Also these ones shouldn't be gone, right?
+        // DELETE
+        // FROM        `assignments`
+        // WHERE       `course_id`=@courseID
+        // AND         `sync_id`=@syncID;
+        // DELETE
+        // FROM        `discussions`
+        // WHERE       `course_id`=@courseID
+        // AND         `sync_id`=@syncID;
+
         @"
-        DELETE
-        FROM        `canvas_assignment`
-        WHERE       `course_id`=@courseID
-        AND         `sync_id`=@syncID;
-
-        DELETE
-        FROM        `canvas_discussion`
-        WHERE       `course_id`=@courseID
-        AND         `sync_id`=@syncID;
-
         DELETE
         FROM        `notifications`
         WHERE       `course_id`=@courseID
+        AND         `sent`= true
         AND         `sync_id`=@syncID;
 
         DELETE
