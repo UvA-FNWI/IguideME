@@ -49,7 +49,7 @@ namespace IguideME.Web.Services.Workers
                         student.LoginID,
                         student.Name,
                         student.SortableName,
-                        "student"
+                        0 // User.UserRoles.student
                     );
 
                     DatabaseManager.Instance.RegisterUserSettings(new Models.ConsentData(_courseID, student.LoginID, -1), this._syncID);
@@ -74,7 +74,7 @@ namespace IguideME.Web.Services.Workers
                     instructor.LoginID,
                     instructor.Name,
                     instructor.SortableName,
-                    "instructor"
+                    1 // User.UserRoles.instructor
                 );
             }
         }

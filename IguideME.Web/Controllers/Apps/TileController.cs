@@ -39,6 +39,7 @@ namespace IguideME.Web.Controllers
         [Route("/tiles")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        // DBrefTODO: The tile type should be according to the enum
         public JsonResult PostTile([FromBody] Tile tile)
         {
             // Creates a new tile with information posted in the request's body
@@ -242,7 +243,7 @@ namespace IguideME.Web.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        // TODO: [Route("/tiles/entries/{entryID}/meta-keys")]
+        // DBrefTODO: [Route("/tiles/entries/{entryID}/meta-keys")]
         [Route("/tiles/entries/{assignmentID}/meta-keys")]
         public ActionResult GetTileEntryMetaKeys(string assignmentID)
         {
@@ -543,6 +544,7 @@ namespace IguideME.Web.Controllers
         [Route("/entries")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        // DBrefTODO: The entry should be changed into the updated version of it
         public void CreateEntry([FromBody] TileEntry entry)
         {
             DatabaseManager.Instance.CreateTileEntry(entry);
@@ -574,11 +576,13 @@ namespace IguideME.Web.Controllers
 
         [Authorize(Policy = "IsInstructor")]
         [HttpPost]
-        [Route("/entries/{entryID}/upload")]
+        // DBrefTODO: The entry Id should be changed into assignmentID
+        // [Route("/entries/{entryID}/upload")]
+        [Route("/entries/{assignmentID}/upload")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public ActionResult UploadTileData(int entryID, JObject data) ///////The entry Id should be changed into assignmentID
+        public ActionResult UploadTileData(int assignmentID, JObject data)
         {
             int courseID = this.GetCourseID();
 
@@ -596,7 +600,7 @@ namespace IguideME.Web.Controllers
                 _ = float.TryParse(values[grade_column], out float grade);
 
                 int submissionID = DatabaseManager.Instance.CreateUserSubmission(
-                    entryID,
+                    assignmentID,
                     values[id_column],
                     grade,
                     DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
@@ -616,14 +620,16 @@ namespace IguideME.Web.Controllers
 
         [Authorize(Policy = "IsInstructor")]
         [HttpGet]
-        [Route("/entries/{entryID}/submissions")]
+        // DBrefTODO: The entry Id should be changed into assignmentID
+        // [Route("/entries/{entryID}/submissions")]
+        [Route("/entries/{assignmentID}/submissions")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public ActionResult GetEntrySubmissions(string entryID)
+        public ActionResult GetEntrySubmissions(string assignmentID)
         {
             // TODO: check userID?
-            bool success = int.TryParse(entryID, out int entry_id);
+            bool success = int.TryParse(assignmentID, out int entry_id);
 
             return success
                 ? Json(
@@ -726,12 +732,13 @@ namespace IguideME.Web.Controllers
         [Route("/layout/columns")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        // DBrefTODO: the ContainerSize should be an integer, according to the classes enum
         public ActionResult CreateLayoutColumn([FromBody] LayoutColumn column)
         {
             return Json(
                 DatabaseManager.Instance.CreateLayoutColumn(
                     GetCourseID(),
-                    column.ContainerSize,
+                    (int) column.ContainerSize,
                     column.Position));
         }
 
@@ -749,7 +756,7 @@ namespace IguideME.Web.Controllers
                     DatabaseManager.Instance.UpdateLayoutColumn(
                         GetCourseID(),
                         id,
-                        layoutColumn.ContainerSize,
+                        (int) layoutColumn.ContainerSize,
                         layoutColumn.Position))
                 : BadRequest();
         }

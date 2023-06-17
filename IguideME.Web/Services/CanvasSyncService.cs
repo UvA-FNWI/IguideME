@@ -133,8 +133,10 @@ namespace IguideME.Web.Services
                 jobId, $"tasks.done", 0
             ).ConfigureAwait(false);
 
-            _logger.LogInformation("Starting recycleexternaldata");
-            DatabaseManager.Instance.RecycleExternalData(courseID, timestamp);
+            // TODO: COMMENTED OUT CODE THAT SHOULD GO BACK IN ---------------------
+            // _logger.LogInformation("Starting recycleexternaldata");
+            // DatabaseManager.Instance.RecycleExternalData(courseID, timestamp);
+            //----------------------------------------------------------------------
 
             long duration = sw.ElapsedMilliseconds;
             Console.WriteLine("Took: " + duration.ToString() + "ms");

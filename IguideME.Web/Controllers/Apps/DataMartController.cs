@@ -171,7 +171,7 @@ namespace IguideME.Web.Controllers
         public ActionResult GetStudents()
         {
             return Json(
-                DatabaseManager.Instance.GetUsers(this.GetCourseID(), "student")
+                DatabaseManager.Instance.GetUsers(this.GetCourseID(), 0) // 0 == student
                 .ToArray());
         }
 

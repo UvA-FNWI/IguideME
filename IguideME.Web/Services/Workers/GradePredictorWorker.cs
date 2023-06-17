@@ -44,7 +44,7 @@ namespace IguideME.Web.Services.Workers
                 return;
             }
 
-            List<User> students = DatabaseManager.Instance.GetUsers(this._courseID, "student", this._syncID);
+            List<User> students = DatabaseManager.Instance.GetUsers(this._courseID, (int) User.UserRoles.student, this._syncID);
 
             foreach (User student in students)
             {
@@ -67,6 +67,7 @@ namespace IguideME.Web.Services.Workers
 
             double wGrade = 0.0;
 
+            // TODO: COMMENTED OUT CODE THAT SHOULD GO BACK IN ---------------------------------------------------------------------
             // foreach (GradePredictionModelParameter modelParameter in this._model.Parameters)
             // {
             //     AssignmentSubmission submission = submissions.Find(sub => sub.EntryID == modelParameter.ParameterID);
@@ -80,6 +81,7 @@ namespace IguideME.Web.Services.Workers
 
             //     wGrade += submission.Grade * modelParameter.Weight;
             // } TODO: fix
+            //----------------------------------------------------------------------------------------------------------------------
 
             DatabaseManager.Instance.CreatePredictedGrade(this._courseID,
                                                           student.UserID,

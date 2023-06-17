@@ -9,12 +9,12 @@ public static class DatabaseQueries
     public static readonly Dictionary<string, string> MIGRATIONS =
         new()
         {
-            {
-                "000_rename_all_old_tables",
-                @"
-                ALTER TABLE `foo` RENAME TO `bar`;
-                ;"
-            }
+            // {
+                // "000_rename_all_old_tables",
+                // @"
+                // ALTER TABLE `foo` RENAME TO `bar`;
+                // ;"
+            // }
         };
 
 // //================================ Tables ================================//
@@ -101,8 +101,7 @@ public static class DatabaseQueries
             `type`            INTEGER,
             `visible`         BOOLEAN DEFAULT false,
             `notifications`   BOOLEAN DEFAULT false,
-            FOREIGN KEY(`group_id`) REFERENCES `tile_groups`(`group_id`),
-            FOREIGN KEY(`course_id`) REFERENCES `course_settings`(`course_id`)
+            FOREIGN KEY(`group_id`) REFERENCES `tile_groups`(`group_id`)
         );";
 
     /**
@@ -147,7 +146,7 @@ public static class DatabaseQueries
     public const string CREATE_TABLE_LEARNING_GOALS =
         @"CREATE TABLE IF NOT EXISTS `learning_goals` (
             `goal_id`             INTEGER PRIMARY KEY AUTOINCREMENT,
-            `title`               STRING,
+            `title`               STRING
         );";
 
     public const string CREATE_TABLE_GOAL_REQUREMENTS =
@@ -244,7 +243,6 @@ public static class DatabaseQueries
             FOREIGN KEY(`user_id`) REFERENCES `users`(`user_id`),
             FOREIGN KEY(`tile_id`) REFERENCES `tiles`(`tile_id`),
             FOREIGN KEY(`sync_id`) REFERENCES `sync_history`(`sync_id`)
-
         );";
 
 
@@ -312,7 +310,6 @@ public static class DatabaseQueries
             `message`         TEXT DEFAULT NULL,
             FOREIGN KEY(`course_id`) REFERENCES `course_settings`(`course_id`),
             FOREIGN KEY(`author`) REFERENCES `users`(`name`)
-
         );";
 
     public const string CREATE_TABLE_DISCUSSION_REPLIES =
@@ -322,6 +319,7 @@ public static class DatabaseQueries
             `author`          STRING,
             `date`            INTEGER,
             `message`         TEXT DEFAULT NULL,
+            UNIQUE (`discussion_id`,`author`,`date`),
             FOREIGN KEY(`discussion_id`) REFERENCES `discussions`(`discussion_id`),
             FOREIGN KEY(`author`) REFERENCES `users`(`name`)
         );";
@@ -330,7 +328,8 @@ public static class DatabaseQueries
         @"CREATE TABLE IF NOT EXISTS `sync_history` (
             `sync_id`         INTEGER PRIMARY KEY,
             `course_id`       INTEGER,
-            `end_timestamp`   INTEGER DEFAULT NULL
+            `end_timestamp`   INTEGER DEFAULT NULL,
+            FOREIGN KEY(`course_id`) REFERENCES `course_settings`(`course_id`)
         );";
 
 
@@ -556,7 +555,8 @@ public static class DatabaseQueries
     //     ;";
 
     public const string REGISTER_DISCUSSION_REPLY =
-        @"INSERT INTO   `discussion_replies`
+        @"INSERT OR REPLACE 
+            INTO   `discussion_replies`
                         (   `discussion_id`,
                             `author`,
                             `date`,
@@ -572,7 +572,8 @@ public static class DatabaseQueries
         ;";
 
     public const string REGISTER_USER_FOR_COURSE =
-        @"INSERT INTO   `users`
+        @"INSERT OR REPLACE
+        INTO        `users`
                         (   `student_number`,
                             `user_id`,
                             `name`,
@@ -599,9 +600,6 @@ public static class DatabaseQueries
             @grade,
             @date
         )
-        
-        ON CONFLICT ( `assignment_id`, `user_id` )
-            DO UPDATE SET ( `grade` , `date` ) = ( @grade , @date )
         ;";
 
 /////// WHAT DO WE DO ON CONFLICT HERE??????? user_name EXISTS NO MORE
@@ -614,7 +612,7 @@ public static class DatabaseQueries
             VALUES(
                 @CourseID,
                 @UserID,
-                @Granted
+                @GoalGrade,
                 @syncID
             )
         ;";
@@ -762,7 +760,7 @@ public static class DatabaseQueries
         FROM        `layout_columns`
         WHERE       `course_id`=@courseID
         AND         `column_id`=@columnID
-        ORDER BY    `position` ASC;";
+        ORDER BY    `order` ASC;";
 
     /////// WHY DUPLICATE???????
     public const string QUERY_LAYOUT_COLUMNS =
@@ -771,7 +769,7 @@ public static class DatabaseQueries
                     `order`
         FROM        `layout_columns`
         WHERE       `course_id`=@courseID
-        ORDER BY    `position` ASC;";
+        ORDER BY    `order` ASC;";
 
     public const string QUERY_CONSENT_FOR_COURSE =
         @"SELECT    `name`, `consent`
@@ -844,7 +842,7 @@ public static class DatabaseQueries
         ORDER BY    `tiles`.`order` ASC;";
 
     public const string QUERY_TILES =
-        @"SSELECT    `tiles`.`tile_id`,
+        @"SELECT    `tiles`.`tile_id`,
                     `tiles`.`group_id`,
                     `tiles`.`title`,
                     `tiles`.`order`,
@@ -865,25 +863,33 @@ public static class DatabaseQueries
         WHERE       `tile_id`=@tileID;";
 
     public const string QUERY_LEARNING_GOALS =
-        @"SELECT    `id`,
-                    `tile_id`,
-                    `title`
+        @"SELECT    `learning_goals`.`goal_id`,
+                    `learning_goals`.`title`
         FROM        `learning_goals`
-        WHERE       `course_id`=@courseID;";
+        INNER JOIN  `tile_entries`
+            ON      `tile_entries`.`content_id` == `learning_goals`.`goal_id`
+        INNER JOIN  `tiles`
+            USING   (`tile_id`)
+        INNER JOIN  `tile_groups`
+            USING   (`group_id`)
+        INNER JOIN  `layout_columns`
+            USING   (`column_id`)
+        WHERE       `layout_columns`.`course_id`=@courseID
+        ;";
 
     public const string QUERY_TILE_LEARNING_GOALS =
-        @"SELECT    `id`,
-                    `title`
+        @"SELECT    `learning_goals`.`goal_id`,
+                    `learning_goals`.`title`
         FROM        `learning_goals`
-        WHERE       `course_id`=@courseID
-        AND         `tile_id`=@tileID;";
+        INNER JOIN  `tile_entries`
+            ON      `tile_entries`.`content_id` == `learning_goals`.`goal_id`
+        WHERE       `tile_entries`.`tile_id`=@tileID;";
 
     public const string QUERY_LEARNING_GOAL =
         @"SELECT    `tile_id`,
                     `title`
         FROM        `learning_goals`
-        WHERE       `course_id`=@courseID
-        AND         `id`=@id;";
+        AND         `goal_id`=@goalID;";
 
     public const string QUERY_GOAL_REQUIREMENTS =
         @"SELECT    `requirement_id`,
@@ -896,14 +902,14 @@ public static class DatabaseQueries
 
     public const string QUERY_ENTRIES_FOR_TILE =
         @"SELECT    `tile_id`,
-                    `content_id`,
+                    `content_id`
         FROM        `tile_entries`
         WHERE       `tile_id`=@tileID
         ;";
 
     public const string QUERY_ALL_TILE_ENTRIES =
         @"SELECT    `tile_entries`.`tile_id`,
-                    `tile_entries`.`content_id`,
+                    `tile_entries`.`content_id`
         FROM        `tile_entries`
         INNER JOIN  `tiles`
             USING   (`tile_id`)
@@ -948,7 +954,7 @@ public static class DatabaseQueries
                     `discussions`.`author`,
                     `discussions`.`date`,
                     `discussions`.`message`
-        FROM        `discussions`.
+        FROM        `discussions`
         INNER JOIN  `tile_entries`
             ON      `tile_entries`.`content_id` == `discussions`.`discussion_id`
         WHERE       `discussions`.`course_id`=@courseID
@@ -1086,17 +1092,19 @@ public static class DatabaseQueries
         FROM        `users`
         INNER JOIN  `student_settings`
             USING   (`user_id`)
-        WHERE       `student_settings`.`course_id`={0}
+        WHERE       `student_settings`.`course_id`=@courseID
         AND         `users`.`role`=@role
         AND         `student_settings`.`sync_id`=@syncID
         ORDER BY    `users`.`name` ASC;";
 
     public const string QUERY_USER_ID =
-        @"SELECT    `user_id`
+        @"SELECT    `users`.`user_id`
         FROM        `users`
-        WHERE       `course_id`=@courseID
-        AND         `student_number`=@studentNumber
-        ORDER BY    `name` ASC
+        INNER JOIN  `student_settings`
+            USING   (`user_id`)
+        WHERE       `student_settings`.`course_id`=@courseID
+        AND         `users`.`student_number`=@studentNumber
+        ORDER BY    `users`.`name` ASC
         LIMIT       1;";
 
     public const string QUERY_USER_FOR_COURSE =
@@ -1312,7 +1320,7 @@ public static class DatabaseQueries
                     `peer_groups`.`sync_id`
         FROM        `peer_groups`
         INNER JOIN  `submissions`
-            USING   (`sync_id`)
+            ON      `peer_groups`.`sync_id` == `submissions`.`date`
         INNER JOIN  `tile_entries`
             USING   (`tile_id`)
         INNER JOIN  `tile_entries`
@@ -1353,7 +1361,6 @@ public static class DatabaseQueries
         WHERE       `entry_id`=@entryID
         AND         `user_id`=@userID
         ;";
-        // AND         `sync_hash`=@hash
 
     public const string QUERY_SUBMISSIONS_FOR_ENTRY =
         @"SELECT    `id`,
@@ -1442,9 +1449,8 @@ public static class DatabaseQueries
 
     public const string UPDATE_LEARNING_GOAL =
         @"UPDATE    `learning_goals`
-        SET
-                    `title`=@title
-        WHERE       `id`=@id
+        SET         `title`=@title
+        WHERE       `goal_id`=@goalID
         AND         `tile_id`=@tileID
         AND         `course_id`=@courseID;";
 
@@ -1458,9 +1464,8 @@ public static class DatabaseQueries
 
     public const string UPDATE_TILE =
         @"UPDATE    `tiles`
-        SET
-                    `group_id`=@groupID,
-                    `name`=@name,
+        SET         `group_id`=@groupID,
+                    `title`=@title,
                     `order`=@order,
                     `type`=@type,
                     `visible`=@visible,
@@ -1519,8 +1524,7 @@ public static class DatabaseQueries
 
     public const string DELETE_LEARNING_GOAL =
         @"DELETE FROM       `learning_goals`
-          WHERE             `course_id` = @courseID
-          AND               `id` = @id;";
+          WHERE             `goal_id` = @goalID;";
 
     public const string DELETE_GOAL_REQUIREMENTS =
         @"DELETE FROM       `goal_requirements`

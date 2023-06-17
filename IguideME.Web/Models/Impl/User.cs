@@ -6,6 +6,10 @@ namespace IguideME.Web.Models.Impl
 {
     public class User
     {
+        public enum UserRoles {
+            student,
+            instructor
+        }
         // [JsonProperty("id")]
         // public int ID { get; set; }
 
@@ -25,7 +29,7 @@ namespace IguideME.Web.Models.Impl
         public string SortableName { get; set; }
 
         [JsonProperty("role")]
-        public int Role { get; set; }
+        public UserRoles Role { get; set; }
 
         public User(
             // int id,
@@ -42,7 +46,7 @@ namespace IguideME.Web.Models.Impl
             this.UserID = userID;
             this.Name = name;
             this.SortableName = sortableName;
-            this.Role = role;
+            this.Role = (UserRoles) role;
         }
 
 

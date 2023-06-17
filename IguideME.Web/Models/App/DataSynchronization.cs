@@ -12,10 +12,10 @@ namespace IguideME.Web.Models.App
         public int CourseID { get; set; }
 
         [JsonProperty("start_timestamp")]
-        public int StartTimestamp { get; set; }
+        public long StartTimestamp { get; set; }
 
         [JsonProperty("end_timestamp")]
-        public int? EndTimestamp { get; set; }
+        public long? EndTimestamp { get; set; }
 
         [JsonProperty("status")]
         public string Status { get; set; }
@@ -23,8 +23,8 @@ namespace IguideME.Web.Models.App
         public DataSynchronization(
             // int id,
             int courseID,
-            int startTimestamp,
-            int? endTimestamp,
+            long startTimestamp,
+            long? endTimestamp,
             string status)
         {
             // this.Id = id;

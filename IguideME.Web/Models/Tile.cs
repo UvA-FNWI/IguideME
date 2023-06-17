@@ -100,8 +100,8 @@ namespace IguideME.Web.Models
         [JsonProperty(PropertyName = "tile_id")]
         public int TileID { get; set; }
 
-        // [JsonProperty(PropertyName = "title")]
-        // public string Title { get; set; }
+        [JsonProperty(PropertyName = "title")]
+        public string Title { get; set; }
 
         [JsonProperty(PropertyName = "content_id")]
         public int ContentID { get; set; }
@@ -116,8 +116,8 @@ namespace IguideME.Web.Models
             // int id,
             EditState state,
             int tileID,
-            int ContentID)
-            // string title,
+            int ContentID,
+            string title)
             // string type,
             // bool wildcard = false)
         {
@@ -125,7 +125,7 @@ namespace IguideME.Web.Models
             this.State = state;
             this.TileID = tileID;
             this.ContentID = ContentID;
-            // this.Title = title;
+            this.Title = title;
             // this.Type = type;
             // this.Wildcard = wildcard;
         }

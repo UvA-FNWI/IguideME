@@ -4,6 +4,13 @@ namespace IguideME.Web.Models
 {
     public class LayoutColumn
     {
+
+        public enum ColumnSize {
+            small,
+            medium,
+            large,
+            full
+        }
         [JsonProperty(PropertyName = "id")]
         public int ID { get; set; }
 
@@ -11,16 +18,16 @@ namespace IguideME.Web.Models
         public int CourseID { get; set; }
 
         [JsonProperty(PropertyName = "container_width")]
-        public string ContainerSize { get; set; }
+        public ColumnSize ContainerSize { get; set; }
 
         [JsonProperty(PropertyName = "position")]
         public int Position { get; set; }
 
-        public LayoutColumn(int id, int courseID, string containerSize, int position)
+        public LayoutColumn(int id, int courseID, int containerSize, int position)
         {
             this.ID = id;
             this.CourseID = courseID;
-            this.ContainerSize = containerSize;
+            this.ContainerSize = (ColumnSize) containerSize;
             this.Position = position;
         }
     }
