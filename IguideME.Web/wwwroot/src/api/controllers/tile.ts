@@ -1,6 +1,6 @@
 import Controller from "../controller";
 import { debug } from "../../config/config";
-import { Tile, TileEntry, TileEntrySubmission, TileGroup } from "../../models/app/Tile";
+import { Tile, TileEntry, AssignmentSubmission, TileGroup } from "../../models/app/Tile";
 import { MOCK_SUBMISSIONS } from "../../mocks/submissions";
 import { MOCK_GRADE_HISTORY } from "../../mocks/historicGrades";
 import { MOCK_LEARNING_OUTCOMES } from "../../mocks/learningOutcomes";
@@ -44,7 +44,7 @@ export default class TileController extends Controller {
     ).then(response => response.data);
   }
 
-  static getSubmissions(userID: string): Promise<TileEntrySubmission[]> {
+  static getSubmissions(userID: string): Promise<AssignmentSubmission[]> {
     if (debug()) {
         return Promise.resolve(MOCK_SUBMISSIONS.filter(x => {
           return (x.userID === userID)
@@ -95,7 +95,7 @@ export default class TileController extends Controller {
     });
   }
 
-  static getTileSubmissions(tileId: number, userID?: string): Promise<TileEntrySubmission[]> {
+  static getTileSubmissions(tileId: number, userID?: string): Promise<AssignmentSubmission[]> {
     if (debug()) {
       return this.getTileEntries(tileId).then(entries => {
         const entryIds = entries.map(e => e.id);
@@ -304,7 +304,7 @@ export default class TileController extends Controller {
     ).then(response => response.data);
   }
 
-  static getEntrySubmissions(entryId: number | string, userID?: string): Promise<TileEntrySubmission[]> {
+  static getEntrySubmissions(entryId: number | string, userID?: string): Promise<AssignmentSubmission[]> {
     if (debug())
       return Promise.resolve(MOCK_SUBMISSIONS.filter(x =>
         x.entry_id.toString() === entryId.toString() && (userID ? x.userID === userID : true)

@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import {Tile, TileEntry, TileEntrySubmission} from "../../../models/app/Tile";
+import {Tile, TileEntry, AssignmentSubmission} from "../../../models/app/Tile";
 import BinaryGrades from "./BinaryGrades";
 import {Button, Col, Radio, Row} from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
@@ -22,7 +22,7 @@ export type ViewTypes = "grid" | "history";
 
 export default class TileDetail extends Component<{
   tile: Tile,
-  submissions: TileEntrySubmission[],
+  submissions: AssignmentSubmission[],
   discussions: CanvasDiscussion[],
   tileEntries: TileEntry[],
   predictions: PredictedGrade[],

@@ -24,7 +24,7 @@ namespace IguideME.Web.Services.Workers
     {
         readonly private ILogger<SyncManager> _logger;
         readonly private int _courseID;
-        readonly private int _syncID;
+        readonly private long _syncID;
 
         /// <summary>
         /// This constructor initializes the new PeerGroupWorker to
@@ -35,7 +35,7 @@ namespace IguideME.Web.Services.Workers
         /// <param name="logger">a reference to the logger used for the sync.</param>
         public PeerGroupWorker(
             int courseID,
-            int syncID,
+            long syncID,
             ILogger<SyncManager> logger)
         {
             _logger = logger;
@@ -188,11 +188,11 @@ namespace IguideME.Web.Services.Workers
                     // Get only tiles with notifications
                     if (DatabaseManager.Instance.GetTileNotificationState(entry.Key))
                     {
-                        List<TileEntrySubmission> userTileSubmissions = DatabaseManager.Instance.GetTileSubmissionsForUser(entry.Key, user, this._syncID);
+                        List<AssignmentSubmission> userTileSubmissions = DatabaseManager.Instance.GetTileSubmissionsForUser(entry.Key, user, this._syncID);
 
                         // Find the submission with the highest ID, as it is the most recent
                         int lastSubmissionID = -1;
-                        foreach (TileEntrySubmission submission in userTileSubmissions)
+                        foreach (AssignmentSubmission submission in userTileSubmissions)
                             if (submission.ID > lastSubmissionID)
                                 lastSubmissionID = submission.ID;
 
@@ -200,11 +200,11 @@ namespace IguideME.Web.Services.Workers
                         // Create one list with all the submission grades and one more without the most recent submission
                         List<float> currentSubmissionGrades = new();
                         List<float> lastSubmissionGrades = new();
-                        foreach (TileEntrySubmission submission in userTileSubmissions)
+                        foreach (AssignmentSubmission submission in userTileSubmissions)
                         {
-                            currentSubmissionGrades.Add(float.Parse(submission.Grade));
+                            currentSubmissionGrades.Add(submission.Grade);
                             if (submission.ID != lastSubmissionID)
-                                lastSubmissionGrades.Add(float.Parse(submission.Grade));
+                                lastSubmissionGrades.Add(submission.Grade);
                         }
 
                         float currentAverage = -1;
@@ -308,14 +308,14 @@ namespace IguideME.Web.Services.Workers
             //             */
 
             //         var userGrades = DatabaseManager.Instance
-            //             .GetTileEntrySubmissionsForUser(
+            //             .GetAssignmentSubmissionsForUser(
             //                 this.CourseID,
             //                 entry.ID,
             //                 student.LoginID,
             //                 this.Hash);
 
             //         var peerGrades =
-            //             DatabaseManager.Instance.GetTileEntrySubmissions(
+            //             DatabaseManager.Instance.GetAssignmentSubmissions(
             //                     this.CourseID, entry.ID, this.Hash).FindAll(
             //                     s => peerIDs.Contains(s.UserLoginID));
 

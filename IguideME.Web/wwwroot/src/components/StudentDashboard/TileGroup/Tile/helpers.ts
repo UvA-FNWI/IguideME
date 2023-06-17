@@ -1,6 +1,6 @@
-import {Tile, TileEntry, TileEntrySubmission} from "../../../../models/app/Tile";
+import {Tile, TileEntry, AssignmentSubmission} from "../../../../models/app/Tile";
 
-export const getProgression = (tile: Tile, entries: TileEntry[], submissions: TileEntrySubmission[]): number => {
+export const getProgression = (tile: Tile, entries: TileEntry[], submissions: AssignmentSubmission[]): number => {
   if (tile.content === "BINARY") {
     return submissions.length > 0 ?
       Math.round((

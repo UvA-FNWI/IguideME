@@ -12,11 +12,11 @@ namespace IguideME.Web.Services.Workers
         readonly private ILogger<SyncManager> _logger;
         readonly private CanvasHandler _canvasHandler;
         readonly private int _courseID;
-        readonly private int _syncID;
+        readonly private long _syncID;
 
         /// <summary>
         /// This constructor initializes the new UserWorker to:
-        /// (<paramref name="courseID"/>, <paramref name="hashCode"/>, <paramref name="canvasHandler"/>, <paramref name="logger"/>).
+        /// (<paramref name="courseID"/>, <paramref name="syncID"/>, <paramref name="canvasHandler"/>, <paramref name="logger"/>).
         /// </summary>
         /// <param name="courseID">the id of the course.</param>
         /// <param name="syncID">the hash code associated to the current sync.</param>
@@ -24,13 +24,13 @@ namespace IguideME.Web.Services.Workers
         /// <param name="logger">a reference to the logger used for the sync.</param>
         public UserWorker(
             int courseID,
-            int hashCode,
+            long syncID,
             CanvasHandler canvasHandler,
             ILogger<SyncManager> logger)
         {
             _logger = logger;
             this._courseID = courseID;
-            this._syncID = hashCode;
+            this._syncID = syncID;
             this._canvasHandler = canvasHandler;
         }
 

@@ -16,7 +16,7 @@ namespace IguideME.Web.Services.Workers
         readonly private ILogger<SyncManager> _logger;
 		readonly private CanvasHandler _canvasHandler;
 		readonly private int _courseID;
-		readonly private int _syncID;
+		readonly private long _syncID;
 
 		/// <summary>
         /// This constructor initializes the new DiscussionWorker to
@@ -26,7 +26,7 @@ namespace IguideME.Web.Services.Workers
         /// <param name="syncID">the hash code associated to the current sync.</param>
         /// <param name="canvasHandler">a reference to the class managing the connection with canvas.</param>
         /// <param name="logger">a reference to the logger used for the sync.</param>
-		public DiscussionWorker(int courseID, int syncID, CanvasHandler canvasHandler, ILogger<SyncManager> logger)
+		public DiscussionWorker(int courseID, long syncID, CanvasHandler canvasHandler, ILogger<SyncManager> logger)
 		{
             _logger = logger;
 			this._courseID = courseID;
@@ -109,7 +109,7 @@ namespace IguideME.Web.Services.Workers
 
 			foreach (Canvas.Discussion discussion in discussions) {
 				foreach (TileEntry entry in tile.Entries) {
-					if (discussion.Title.Equals(entry.Title, StringComparison.OrdinalIgnoreCase)) {
+					if (discussion.ID == entry.ContentID) {
 						DatabaseManager.Instance.UpdateDiscussion(discussion, tile.ID, this._syncID);
 					}
 				}
@@ -125,18 +125,18 @@ namespace IguideME.Web.Services.Workers
 
 			// Get all the discussion tiles.
 			IEnumerable<Tile> tiles = DatabaseManager.Instance.GetTiles(this._courseID)
-				.Where(tile => tile.TileType == "DISCUSSIONS");
+				.Where(tile => tile.Type == Tile.Tile_type.discussions);
 
             foreach (Tile tile in tiles)
 			{
-				if (tile.Wildcard)
-				{
-                    this.HandleWildcardTile(discussions, students, tile);
-                }
-				else
-				{
+				// if (tile.Wildcard)
+				// {
+                //     this.HandleWildcardTile(discussions, students, tile);
+                // }
+				// else
+				// {
                     this.HandleTile(discussions, tile);
-                }
+                // }
 			}
 		}
 

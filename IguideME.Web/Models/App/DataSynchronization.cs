@@ -12,10 +12,10 @@ namespace IguideME.Web.Models.App
         public int CourseID { get; set; }
 
         [JsonProperty("start_timestamp")]
-        public long StartTimestamp { get; set; }
+        public int StartTimestamp { get; set; }
 
         [JsonProperty("end_timestamp")]
-        public long? EndTimestamp { get; set; }
+        public int? EndTimestamp { get; set; }
 
         [JsonProperty("status")]
         public string Status { get; set; }

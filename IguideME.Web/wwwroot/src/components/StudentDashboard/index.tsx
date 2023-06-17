@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import {IProps, IState, TilesGradeSummary, ViewTypes} from "./types";
 import TileGroup from "./TileGroup";
-import {Tile, TileEntrySubmission, TileGroup as TileGroupModel} from "../../models/app/Tile";
+import {Tile, AssignmentSubmission, TileGroup as TileGroupModel} from "../../models/app/Tile";
 import FadeIn from "react-fade-in";
 import TileController from "../../api/controllers/tile";
 import Loading from "../utils/Loading";
@@ -45,7 +45,7 @@ class StudentDashboard extends Component<Props, IState> {
   state = {
     tilesGradeSummary: [],
     peerGrades: [],
-    userSubmissions: new Map<number, TileEntrySubmission[]>(),
+    userSubmissions: new Map<number, AssignmentSubmission[]>(),
     loaded: true,
     displayTile: null,
     discussions: [] as CanvasDiscussion[],
@@ -102,7 +102,7 @@ class StudentDashboard extends Component<Props, IState> {
 
     this.setState({ loaded: false });
 
-    let submissions = new Map<number, TileEntrySubmission[]>();
+    let submissions = new Map<number, AssignmentSubmission[]>();
 
     let p_discussions: Promise<CanvasDiscussion[]>[] = [];
     let p_goals: Promise<LearningOutcome[]>[] = [];

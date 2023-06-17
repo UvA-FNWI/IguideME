@@ -3,7 +3,7 @@ import {routerReducer, RouterState} from 'react-router-redux';
 import defaultReducer from "./default/reducers";
 import {Course} from "../models/app/Course";
 import {CanvasStudent} from "../models/canvas/Student";
-import {Tile, TileEntry, TileEntrySubmission, TileGroup} from "../models/app/Tile";
+import {Tile, TileEntry, AssignmentSubmission, TileGroup} from "../models/app/Tile";
 import PeerComparison from "../components/StudentDashboard/TileGroup/Tile/PeerComparison";
 import {CanvasAssignment} from "../models/canvas/Assignment";
 import {CanvasDiscussion} from "../models/canvas/Discussion";
@@ -21,7 +21,7 @@ type ExpectedState = {
   tiles: Tile[],
   tileGroups: TileGroup[],
   tileEntries: TileEntry[],
-  submissions: TileEntrySubmission[],
+  submissions: AssignmentSubmission[],
   peerComparisons: PeerComparison[],
   tileGoals: LearningGoal[],
   predictions: PredictedGrade[]
@@ -39,7 +39,7 @@ const rootReducer:  Reducer<CombinedState<ExpectedState>, AnyAction> = combineRe
   tiles: defaultReducer<Tile[]>('TILES', []),
   tileGroups: defaultReducer<TileGroup[]>('TILE_GROUPS', []),
   tileEntries: defaultReducer<TileEntry[]>('TILE_ENTRIES', []),
-  submissions: defaultReducer<TileEntrySubmission[]>('SUBMISSIONS', []),
+  submissions: defaultReducer<AssignmentSubmission[]>('SUBMISSIONS', []),
   peerComparisons: defaultReducer<PeerComparison[]>('PEER_COMPARISONS', []),
   tileGoals: defaultReducer<LearningGoal[]>('GOALS', []),
   predictions: defaultReducer<PredictedGrade[]>('PREDICTIONS', [])

@@ -1,4 +1,4 @@
-import {Tile, TileEntry, TileEntrySubmission, TileGroup} from "../../../models/app/Tile";
+import {Tile, TileEntry, AssignmentSubmission, TileGroup} from "../../../models/app/Tile";
 import {CanvasStudent} from "../../../models/canvas/Student";
 import {PeerGrades, TilesGradeSummary} from "../types";
 import {CanvasDiscussion} from "../../../models/canvas/Discussion";
@@ -13,5 +13,5 @@ export interface IProps {
   student: CanvasStudent;
   tilesGradeSummary: TilesGradeSummary[];
   peerGrades: PeerGrades[];
-  submissions: Map<number, TileEntrySubmission[]>;
+  submissions: Map<number, AssignmentSubmission[]>;
 }

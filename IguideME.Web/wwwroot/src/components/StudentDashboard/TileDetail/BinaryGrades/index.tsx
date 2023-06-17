@@ -1,11 +1,11 @@
 import React, { Component } from "react";
-import { TileEntry, TileEntrySubmission } from "../../../../models/app/Tile";
+import { TileEntry, AssignmentSubmission } from "../../../../models/app/Tile";
 import { Col, Row } from "antd";
 import { CheckOutlined } from "@ant-design/icons";
 import "./style.scss";
 
 export default class BinaryGrades extends Component<{
-    submissions: TileEntrySubmission[],
+    submissions: AssignmentSubmission[],
     tileEntries: TileEntry[]
 }> {
     render(): React.ReactNode {

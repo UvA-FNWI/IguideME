@@ -5,7 +5,7 @@ import FadeIn from "react-fade-in";
 import HistoricUploads from "./HistoricUploads";
 import UploadManager from "../../upload/UploadManager";
 import {RootState} from "../../../store";
-import {TileEntrySubmission} from "../../../models/app/Tile";
+import {AssignmentSubmission} from "../../../models/app/Tile";
 import {TileActions} from "../../../store/actions/tiles";
 import {connect, ConnectedProps} from "react-redux";
 import TileController from "../../../api/controllers/tile";
@@ -44,7 +44,7 @@ class ExternalTile extends Component<Props, IState> {
       StudentController.getStudents().then(async students => {
         const { id } = this.props.tile;
 
-        let tileSubmissions: TileEntrySubmission[] = await TileController.getTileSubmissions(id);
+        let tileSubmissions: AssignmentSubmission[] = await TileController.getTileSubmissions(id);
 
         this.props.loadTiles().then(() => {
           this.props.loadTileEntries().then(() => {

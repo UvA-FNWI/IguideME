@@ -158,11 +158,9 @@ namespace IguideME.Web.Controllers
             {
                 DatabaseManager.Instance.CreateGoalRequirement(
                     stored_goal.ID,
-                    requirement.TileID,
-                    requirement.EntryID,
-                    requirement.MetaKey,
-                    requirement.Value,
-                    requirement.Expression);
+                    requirement.AssignmentID,
+                    (int) requirement.Expression,
+                    requirement.Value);
             }
 
             // load newly registered requirements into object
@@ -187,18 +185,16 @@ namespace IguideME.Web.Controllers
                         case EditState.New:
                             DatabaseManager.Instance.CreateGoalRequirement(
                                 req.GoalID,
-                                req.TileID,
-                                req.EntryID,
-                                req.MetaKey,
-                                req.Value,
-                                req.Expression
+                                req.AssignmentID,
+                                (int) req.Expression,
+                                req.Value
                             );
                             break;
                         case EditState.Updated:
                             DatabaseManager.Instance.UpdateGoalRequirement(req);
                             break;
                         case EditState.Removed:
-                            DatabaseManager.Instance.DeleteGoalRequirement(req.GoalID, req.ID);
+                            DatabaseManager.Instance.DeleteGoalRequirement(req.ID);
                             break;
                     }
                 }
@@ -246,10 +242,11 @@ namespace IguideME.Web.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [Route("/tiles/entries/{entryID}/meta-keys")]
-        public ActionResult GetTileEntryMetaKeys(string entryID)
+        // TODO: [Route("/tiles/entries/{entryID}/meta-keys")]
+        [Route("/tiles/entries/{assignmentID}/meta-keys")]
+        public ActionResult GetTileEntryMetaKeys(string assignmentID)
         {
-            bool success = int.TryParse(entryID, out int id);
+            bool success = int.TryParse(assignmentID, out int id);
 
             return success
                 ? Json(
@@ -478,7 +475,7 @@ namespace IguideME.Web.Controllers
                     .Where(g => g.TileID == id)
                     .ToList();
 
-                List<TileEntrySubmission> submissions =
+                List<AssignmentSubmission> submissions =
                     DatabaseManager.Instance.GetTileSubmissionsForUser(
                         this.GetCourseID(),
                         userID);
@@ -489,8 +486,8 @@ namespace IguideME.Web.Controllers
                     g.FetchRequirements();
                     foreach (GoalRequirement req in g.Requirements)
                     {
-                        TileEntrySubmission submission = submissions.Find(
-                            s => s.EntryID == req.EntryID);
+                        AssignmentSubmission submission = submissions.Find(
+                            s => s.AssignmentID == req.AssignmentID);
 
 
                         if (submission == null)
@@ -500,16 +497,28 @@ namespace IguideME.Web.Controllers
                         {
                             switch (req.Expression)
                             {
-                                case "lte":
-                                    if (float.Parse(submission.Grade) > req.Value)
+                                case GoalRequirement.LogicalExpressions.Less_than:
+                                    if (submission.Grade >= req.Value)
                                         success = false;
                                     break;
-                                case "gte":
-                                    if (float.Parse(submission.Grade) < req.Value)
+                                case GoalRequirement.LogicalExpressions.Less_equal:
+                                    if (submission.Grade > req.Value)
+                                        success = false;
+                                    break;
+                                case GoalRequirement.LogicalExpressions.Equal:
+                                    if (submission.Grade != req.Value)
+                                        success = false;
+                                    break;
+                                case GoalRequirement.LogicalExpressions.Greater_equal:
+                                    if (submission.Grade < req.Value)
+                                        success = false;
+                                    break;
+                                case GoalRequirement.LogicalExpressions.Greater_than:
+                                    if (submission.Grade <= req.Value)
                                         success = false;
                                     break;
                                 default:
-                                    if (float.Parse(submission.Grade) != req.Value)
+                                    if (submission.Grade == req.Value)
                                         success = false;
                                     break;
                             }
@@ -534,12 +543,13 @@ namespace IguideME.Web.Controllers
         [Route("/entries")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public ActionResult CreateEntry([FromBody] TileEntry entry)
+        public void CreateEntry([FromBody] TileEntry entry)
         {
-            int entryID = DatabaseManager.Instance.CreateTileEntry(entry);
-            return Json(DatabaseManager.Instance
-                .GetEntries(this.GetCourseID())
-                .Find(e => e.ID == entryID));
+            DatabaseManager.Instance.CreateTileEntry(entry);
+            
+            // return  Json(DatabaseManager.Instance
+            //     .GetEntries(this.GetCourseID())
+            //     .Find(e => e.ID == entryID));
         }
 
         [Authorize(Policy = "IsInstructor")]
@@ -568,7 +578,7 @@ namespace IguideME.Web.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public ActionResult UploadTileData(int entryID, JObject data)
+        public ActionResult UploadTileData(int entryID, JObject data) ///////The entry Id should be changed into assignmentID
         {
             int courseID = this.GetCourseID();
 
@@ -586,19 +596,17 @@ namespace IguideME.Web.Controllers
                 _ = float.TryParse(values[grade_column], out float grade);
 
                 int submissionID = DatabaseManager.Instance.CreateUserSubmission(
-                    courseID,
                     entryID,
                     values[id_column],
                     grade,
-                    DateTime.Now.ToShortDateString()
+                    DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
                 );
 
                 foreach (int i in range) {
                     DatabaseManager.Instance.CreateSubmissionMeta(
                         submissionID,
                         names[i],
-                        values[i],
-                        courseID
+                        values[i]
                     );
                 }
             }
@@ -619,7 +627,7 @@ namespace IguideME.Web.Controllers
 
             return success
                 ? Json(
-                    DatabaseManager.Instance.GetTileEntrySubmissions(
+                    DatabaseManager.Instance.GetAssignmentSubmissions(
                         this.GetCourseID(), entry_id))
                 : BadRequest();
         }

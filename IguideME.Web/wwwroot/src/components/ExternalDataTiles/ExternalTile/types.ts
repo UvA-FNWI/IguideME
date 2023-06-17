@@ -1,4 +1,4 @@
-import {Tile, TileEntrySubmission, TileGroup} from "../../../models/app/Tile";
+import {Tile, AssignmentSubmission, TileGroup} from "../../../models/app/Tile";
 import {CanvasStudent} from "../../../models/canvas/Student";
 
 export interface IProps {
@@ -10,5 +10,5 @@ export interface IState {
   loaded: boolean;
   uploadMenuOpen: boolean;
   students: CanvasStudent[];
-  submissions: TileEntrySubmission[];
+  submissions: AssignmentSubmission[];
 }

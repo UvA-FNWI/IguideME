@@ -1,11 +1,11 @@
 import React, { Component } from "react";
-import {TileEntry, TileEntrySubmission} from "../../../../../models/app/Tile";
+import {TileEntry, AssignmentSubmission} from "../../../../../models/app/Tile";
 import {CanvasStudent} from "../../../../../models/canvas/Student";
 import {Col, Input, Row, Table} from "antd";
 
 export default class DataViewer extends Component<{
   tileEntry: TileEntry | undefined,
-  submissions: TileEntrySubmission[],
+  submissions: AssignmentSubmission[],
   students: CanvasStudent[]
 }, { query: string }> {
 

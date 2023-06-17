@@ -20,7 +20,7 @@ namespace IguideME.Web.Services.Workers
         readonly private ILogger<SyncManager> _logger;
 		readonly private CanvasHandler _canvasHandler;
 		readonly private int _courseID;
-		readonly private int _syncID;
+		readonly private long _syncID;
 
 		/// <summary>
         /// This constructor initializes the new Quizworker to
@@ -32,7 +32,7 @@ namespace IguideME.Web.Services.Workers
         /// <param name="logger">a reference to the logger used for the sync.</param>
         public QuizWorker(
 			int courseID,
-			int syncID,
+			long syncID,
 			CanvasHandler canvasHandler,
             ILogger<SyncManager> logger)
 
@@ -59,13 +59,10 @@ namespace IguideME.Web.Services.Workers
 
 			foreach (QuizSubmission sub in quiz.Submissions) {
 				DatabaseManager.Instance.CreateUserSubmission(
-					this._courseID,
-					entry.ID,
+					quiz.ID ?? -1, // TODO: handle properly when null
 					DatabaseManager.Instance.GetUserID(this._courseID, sub.UserID),
 					sub.Score ?? 0,
-					// (sub.Score ?? 0)/quiz.PointsPossible * 100, Should change to this.
-					"",
-					this._syncID
+					((DateTimeOffset)sub.FinishedDate.Value).ToUnixTimeMilliseconds()
 				);
 			}
         }
@@ -95,13 +92,13 @@ namespace IguideME.Web.Services.Workers
 					quiz.Name,
 					quiz.IsPublished,
 					false,
-					quiz.DueDate.HasValue ? quiz.DueDate.Value.ToShortDateString() : "",
+					quiz.DueDate.HasValue ?(int) ((DateTimeOffset)quiz.DueDate.Value).ToUnixTimeSeconds() : 0,
 					quiz.PointsPossible ?? 0,
 					(int) GradingType.Points
 				);
 
 				// Don't register submissions that aren't assigned to tiles (as entries).
-                TileEntry entry = entries.Find(e => e.Title == quiz.Name);
+                TileEntry entry = entries.Find(e => e.ContentID == quiz.ID);
                 if (entry == null) continue;
 
                 this.RegisterSubmissions(quiz, entry);

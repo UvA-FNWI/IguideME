@@ -19,7 +19,7 @@ namespace IguideME.Web.Services.Workers
         readonly private ILogger<SyncManager> _logger;
 		readonly private CanvasHandler _canvasHandler;
 		readonly private int _courseID;
-		readonly private int _syncID;
+		readonly private long _syncID;
 
 		/// <summary>
         /// This constructor initializes the new AssignmentWorker to:
@@ -31,7 +31,7 @@ namespace IguideME.Web.Services.Workers
         /// <param name="logger">a reference to the logger used for the sync.</param>
         public AssignmentWorker(
 			int courseID,
-			int syncID,
+			long syncID,
 			CanvasHandler canvasHandler,
             ILogger<SyncManager> logger)
         {
@@ -109,13 +109,13 @@ namespace IguideME.Web.Services.Workers
 						break;
 				}
                 _logger.LogInformation("loginid {ID}", submission.User.LoginID);
+                
 				DatabaseManager.Instance.CreateUserSubmission(
-						this._courseID,
-						entry.ID,
+						assignment.ID ?? -1, // TODO: handle properly
 						submission.User.LoginID,
 						grade,
-						"",//submission.SubmittedAt.Value.ToShortDateString(),
-						_syncID);
+						((DateTimeOffset)submission.SubmittedAt.Value).ToUnixTimeMilliseconds()
+                        );
 			}
 		}
 
@@ -139,13 +139,13 @@ namespace IguideME.Web.Services.Workers
                     assignment.Name ??= "?",
                     assignment.IsPublished,
                     assignment.IsMuted,
-                    assignment.DueDate.HasValue ? assignment.DueDate.Value.ToShortDateString() : "",
+                    assignment.DueDate.HasValue ? (int) ((DateTimeOffset)assignment.DueDate.Value).ToUnixTimeSeconds() : 0,
                     assignment.PointsPossible ??= 0,
                     (int) assignment.GradingType
                 );
 
                 // Don't register submissions that aren't assigned to tiles (as entries).
-                TileEntry entry = entries.Find(e => e.Title == assignment.Name);
+                TileEntry entry = entries.Find(e => e.ContentID == assignment.ID);
                 if (entry == null) continue;
 
                 this.RegisterSubmissions(assignment, entry);

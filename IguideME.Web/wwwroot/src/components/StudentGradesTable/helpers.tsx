@@ -1,6 +1,6 @@
 import React from "react";
 import { EllipsisOutlined } from "@ant-design/icons";
-import {Tile, TileEntry, TileEntrySubmission} from "../../models/app/Tile";
+import {Tile, TileEntry, AssignmentSubmission} from "../../models/app/Tile";
 import {CanvasStudent} from "../../models/canvas/Student";
 import {Col, Progress, Row, Space, Tooltip} from "antd";
 import GradeSpread from "../visuals/GradeSpread";
@@ -176,7 +176,7 @@ function getEntryKey(entry: TileEntry, tiles: Tile[]): string {
 
 function tileToColumnData(t: Tile,
                           entries: TileEntry[],
-                          submissions: TileEntrySubmission[],
+                          submissions: AssignmentSubmission[],
                           student: CanvasStudent,
                           discussions: CanvasDiscussion[],
                           tiles: Tile[]) {
@@ -211,7 +211,7 @@ function tileToColumnData(t: Tile,
 export function getData(students: CanvasStudent[],
                         tiles: Tile[],
                         entries: TileEntry[],
-                        submissions: TileEntrySubmission[],
+                        submissions: AssignmentSubmission[],
                         discussions: CanvasDiscussion[]): object[] {
 
   return students.map(student => ({

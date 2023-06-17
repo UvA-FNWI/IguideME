@@ -1,4 +1,4 @@
-import {Tile, TileEntry, TileEntrySubmission} from "../../../../../models/app/Tile";
+import {Tile, TileEntry, AssignmentSubmission} from "../../../../../models/app/Tile";
 
 export const getGradeEntryOptions = (tiles: Tile[], entries: TileEntry[]) => {
 
@@ -14,7 +14,7 @@ export const getGradeEntryOptions = (tiles: Tile[], entries: TileEntry[]) => {
   });
 }
 
-export const mergeData = (stack1: TileEntrySubmission[], stack2: TileEntrySubmission[]) => {
+export const mergeData = (stack1: AssignmentSubmission[], stack2: AssignmentSubmission[]) => {
   const users = new Set([...stack1.map(s => s.userID), ...stack2.map(s => s.userID)]);
 
   return Array.from(users).filter(u => (

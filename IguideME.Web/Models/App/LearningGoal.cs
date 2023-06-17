@@ -53,6 +53,16 @@ namespace IguideME.Web.Models.App
 
     public class GoalRequirement
     {
+
+        public enum LogicalExpressions {
+        Less_than,
+        Less_equal,
+        Equal,
+        Greater_equal,
+        Greater_than,
+        Different_than
+    }
+
         [JsonProperty("id")]
         public int ID { get; set; }
 
@@ -65,34 +75,46 @@ namespace IguideME.Web.Models.App
         [JsonProperty("tile_id")]
         public int TileID { get; set; }
 
-        [JsonProperty("entry_id")]
-        public int EntryID { get; set; }
+        [JsonProperty("assignment_id")]
+        public int AssignmentID { get; set; }
 
-        [JsonProperty("meta_key")]
-        public string MetaKey { get; set; }
+        // [JsonProperty("meta_key")]
+        // public string MetaKey { get; set; }
 
         [JsonProperty("value")]
         public float Value { get; set; }
 
         [JsonProperty("expression")]
-        public string Expression { get; set; }
+        public LogicalExpressions Expression { get; set; }
 
         public GoalRequirement(
             int id,
             EditState state,
             int goalID,
-            int tileID,
-            int entryID,
-            string metaKey,
-            float value,
-            string expression)
+            int assignmentID,
+            int expression,
+            float value)
         {
             this.ID = id;
             this.State = state;
             this.GoalID = goalID;
-            this.TileID = tileID;
-            this.EntryID = entryID;
-            this.MetaKey = metaKey;
+            this.AssignmentID = assignmentID;
+            this.Value = value;
+            this.Expression = (LogicalExpressions) expression;
+        }
+
+        public GoalRequirement(
+            int id,
+            EditState state,
+            int goalID,
+            int assignmentID,
+            LogicalExpressions expression,
+            float value)
+        {
+            this.ID = id;
+            this.State = state;
+            this.GoalID = goalID;
+            this.AssignmentID = assignmentID;
             this.Value = value;
             this.Expression = expression;
         }

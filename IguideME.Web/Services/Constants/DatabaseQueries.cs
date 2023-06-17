@@ -10,9 +10,9 @@ public static class DatabaseQueries
         new()
         {
             {
-                "000_drop_all_old_tables",
+                "000_rename_all_old_tables",
                 @"
-                DROP TABLE peer_group;
+                ALTER TABLE `foo` RENAME TO `bar`;
                 ;"
             }
         };
@@ -25,10 +25,7 @@ public static class DatabaseQueries
      * The course_settings table stores information about the course such as
      * the id, name, etc, as well as some settings:
      *
-     *  - accept_list: if true only allow accepted students to use the app .
-     *  - require_consent: Whether or not students need to give consent.
-     *  - informed_consent: The text that the students are consenting to.
-     *  - personalized peers: TODO:
+     *  - consent: The text that the students are consenting to.
      *  - peer_group_size: The minimum peer group size.
      *
      */
@@ -74,7 +71,7 @@ public static class DatabaseQueries
     public const string CREATE_TABLE_LAYOUT_TILE_GROUPS =
         @"CREATE TABLE IF NOT EXISTS `tile_groups` (
             `group_id`        INTEGER PRIMARY KEY AUTOINCREMENT,
-            `name`            STRING,
+            `title`           STRING,
             `order`           INTEGER,
             `column_id`       INTEGER,
             FOREIGN KEY(`column_id`) REFERENCES `layout_columns`(`column_id`)
@@ -93,13 +90,13 @@ public static class DatabaseQueries
      * Tile types:
      * - ASSIGNMENT
      * - DISCUSSION
-     * - LEARNING_OUTCOMES
+     * - LEARNING_GOAL
      */
     public const string CREATE_TABLE_TILES =
         @"CREATE TABLE IF NOT EXISTS `tiles` (
             `tile_id`         INTEGER PRIMARY KEY AUTOINCREMENT,
             `group_id`        INTEGER,
-            `name`            STRING,
+            `title`           STRING,
             `order`           INTEGER,
             `type`            INTEGER,
             `visible`         BOOLEAN DEFAULT false,
@@ -116,7 +113,7 @@ public static class DatabaseQueries
      * - "DISCUSSION"
      * - "LEARNING_GOAL"
      */
-    public const string CREATE_TABLE_TILE_ENTRIES = // NOT DONE
+    public const string CREATE_TABLE_TILE_ENTRIES =
         @"CREATE TABLE IF NOT EXISTS `tile_entries` (
             `tile_id`         INTEGER,
             `content_id`      INTEGER,
@@ -125,7 +122,7 @@ public static class DatabaseQueries
         );";
 
 
-    public const string CREATE_TABLE_SUBMISSIONS = // NOT DONE
+    public const string CREATE_TABLE_SUBMISSIONS =
         @"CREATE TABLE IF NOT EXISTS `submissions` (
             `submission_id`   INTEGER PRIMARY KEY AUTOINCREMENT,
             `assignment_id`   INTEGER,
@@ -137,22 +134,31 @@ public static class DatabaseQueries
 
         );";
 
-    public const string CREATE_TABLE_SUBMISSIONS_META = // NOT DONE
+    public const string CREATE_TABLE_SUBMISSIONS_META =
         @"CREATE TABLE IF NOT EXISTS `submissions_meta` (
             `submission_id`   INTEGER,
             `key`             STRING,
             `value`           STRING,
+            PRIMARY KEY (`submission_id`,`key`),
             FOREIGN KEY(`submission_id`) REFERENCES `submissions`(`submission_id`)
         );";
 
-    public const string CREATE_TABLE_LEARNING_GOALS = // NOT DONE
+
+    public const string CREATE_TABLE_LEARNING_GOALS =
         @"CREATE TABLE IF NOT EXISTS `learning_goals` (
+            `goal_id`             INTEGER PRIMARY KEY AUTOINCREMENT,
+            `title`               STRING,
+        );";
+
+    public const string CREATE_TABLE_GOAL_REQUREMENTS =
+        @"CREATE TABLE IF NOT EXISTS `goal_requirements` (
+            `requirement_id`      INTEGER PRIMARY KEY AUTOINCREMENT,
             `goal_id`             INTEGER,
-            `name`                STRING,
             `assignment_id`       INTEGER,
-            `value`               INTEGER,
             `expression`          INTEGER,
-            FOREIGN KEY(`assignment_id`) REFERENCES `assignments`(`assignment_id`)
+            `value`               FLOAT,
+            FOREIGN KEY(`assignment_id`) REFERENCES `assignments`(`assignment_id`),
+            FOREIGN KEY(`goal_id`) REFERENCES `learning_goals`(`goal_id`)
         );";
 
 
@@ -343,7 +349,7 @@ public static class DatabaseQueries
         @"INSERT INTO   `course_settings` (`course_id`, `name`)
         VALUES (@courseID, @courseName);";
 
-    public const string REGISTER_PREDICTED_GRADE =  // NOT DONE , need integrate this in student_settings
+    public const string REGISTER_PREDICTED_GRADE =  // NOT DONE , need to integrate this in student_settings
         @"INSERT INTO   `predicted_grade` ( `course_id`,
                                             `user_id`,
                                             `grade`,
@@ -427,18 +433,18 @@ public static class DatabaseQueries
         @"INSERT INTO       `tile_groups`
                             (
                                 `column_id`,
-                                `name`,
+                                `title`,
                                 `order`  )
         VALUES(
             @columnID,
-            @name,
+            @title,
             @order
         );";
 
     public const string REGISTER_TILE =
         @"INSERT INTO  `tiles` (
                        `group_id`,
-                       `name`,
+                       `title`,
                        `order`,
                        `type`,
                        `visible`,
@@ -446,7 +452,7 @@ public static class DatabaseQueries
                     )
         VALUES (
             @groupID,
-            @name,
+            @title,
             @order,
             @type,
             @visible,
@@ -466,33 +472,25 @@ public static class DatabaseQueries
         );";
 
     public const string REGISTER_GOAL_REQUIREMENT =
-        @"INSERT INTO       `goal_requirement`
+        @"INSERT INTO       `goal_requirements`
                             (   `goal_id`,
-                                `tile_id`,
-                                `entry_id`,
-                                `meta_key`,
-                                `value`,
-                                `expression` )
+                                `assignment_id`,
+                                `expression`,
+                                `value`)
         VALUES(
             @goalID,
-            @tileID,
-            @entryID,
-            @metaKey,
-            @value,
-            @expresson
+            @assignmentID,
+            @expresson,
+            @value
         );";
 
     public const string REGISTER_TILE_ENTRY =
         @"INSERT INTO       `tile_entries`
                             (   `tile_id`,
-                                `title`,
-                                `type`,
-                                `wildcard` )
+                                `content_id`)
         VALUES(
             @tileID,
-            @title,
-            @type,
-            @wildcard
+            @contentID
         );";
 
     public const string REGISTER_NEW_SYNC =
@@ -588,19 +586,23 @@ public static class DatabaseQueries
                     @role
                 );";
 
-    public const string REGISTER_USER_SUBMISSION = // NOT DONE // half done
+    public const string REGISTER_USER_SUBMISSION =
         @"INSERT OR REPLACE 
             INTO   `submissions`
                         (   `assignment_id`,
                             `user_id`,
                             `grade`,
-                            `date`,)
+                            `date`)
         VALUES(
             @assignmentID,
             @userID,
             @grade,
             @date
-        );";
+        )
+        
+        ON CONFLICT ( `assignment_id`, `user_id` )
+            DO UPDATE SET ( `grade` , `date` ) = ( @grade , @date )
+        ;";
 
 /////// WHAT DO WE DO ON CONFLICT HERE??????? user_name EXISTS NO MORE
     public const string REGISTER_USER_SETTINGS =
@@ -656,13 +658,11 @@ public static class DatabaseQueries
         @"INSERT INTO   `submissions_meta`
                         (   `submission_id`,
                             `key`,
-                            `value`,
-                            `sync_hash`)
+                            `value`)
         VALUES (
             @submissionID,
             @key,
-            @value,
-            @hash
+            @value
         );";
 
     public const string REGISTER_MIGRATION =
@@ -806,7 +806,7 @@ public static class DatabaseQueries
 
     public const string QUERY_TILE_GROUP =
         @"SELECT    `tile_groups`.`group_id`,
-                    `tile_groups`.`name`,
+                    `tile_groups`.`title`,
                     `tile_groups`.`column_id`,
                     `tile_groups`.`order`
         FROM        `tile_groups`
@@ -818,7 +818,7 @@ public static class DatabaseQueries
     //// AGAIN, WHY TWO OF THEM????????????????
     public const string QUERY_TILE_GROUPS =
         @"SELECT    `tile_groups`.`group_id`,
-                    `tile_groups`.`name`,
+                    `tile_groups`.`title`,
                     `tile_groups`.`column_id`,
                     `tile_groups`.`order`
         FROM        `tile_groups`
@@ -829,7 +829,7 @@ public static class DatabaseQueries
     public const string QUERY_TILE =
         @"SELECT    `tiles`.`tile_id`,
                     `tiles`.`group_id`,
-                    `tiles`.`name`,
+                    `tiles`.`title`,
                     `tiles`.`order`,
                     `tiles`.`type`,
                     `tiles`.`visible`,
@@ -846,7 +846,7 @@ public static class DatabaseQueries
     public const string QUERY_TILES =
         @"SSELECT    `tiles`.`tile_id`,
                     `tiles`.`group_id`,
-                    `tiles`.`name`,
+                    `tiles`.`title`,
                     `tiles`.`order`,
                     `tiles`.`type`,
                     `tiles`.`visible`,
@@ -886,33 +886,24 @@ public static class DatabaseQueries
         AND         `id`=@id;";
 
     public const string QUERY_GOAL_REQUIREMENTS =
-        @"SELECT
-                    `id`,
+        @"SELECT    `requirement_id`,
                     `goal_id`,
-                    `tile_id`,
-                    `entry_id`,
-                    `meta_key`,
-                    `value`,
-                    `expression`
-        FROM        `goal_requirement`
+                    `assignment_id`,
+                    `expression`,
+                    `value`
+        FROM        `goal_requirements`
         WHERE       `goal_id`=@goalID;";
 
-    public const string QUERY_TILE_ENTRIES =
-        @"SELECT    `id`,
-                    `tile_id`,
-                    `title`,
-                    `type`,
-                    `wildcard`
+    public const string QUERY_ENTRIES_FOR_TILE =
+        @"SELECT    `tile_id`,
+                    `content_id`,
         FROM        `tile_entries`
         WHERE       `tile_id`=@tileID
         ;";
 
-    public const string QUERY_ENTRIES =  // half done
-        @"SELECT    `tile_entries`.`id`,
-                    `tile_entries`.`tile_id`,
-                    `tile_entries`.`title`,
-                    `tile_entries`.`type`,
-                    `tile_entries`.`wildcard`
+    public const string QUERY_ALL_TILE_ENTRIES =
+        @"SELECT    `tile_entries`.`tile_id`,
+                    `tile_entries`.`content_id`,
         FROM        `tile_entries`
         INNER JOIN  `tiles`
             USING   (`tile_id`)
@@ -925,20 +916,15 @@ public static class DatabaseQueries
 
     public const string QUERY_TILE_ENTRY_META_KEYS =
         @"SELECT    DISTINCT(`submissions_meta`.`key`)
-        FROM        `submissions`
-        INNER JOIN  `submissions_meta`
-            ON      `submissions`.`id`=`submissions_meta`.`submission_id`
-        WHERE       `submissions`.`entry_id`=@entryID
-            ;";
+        FROM        `submissions_meta`
+        WHERE       ``submission_id`=@submissionID
+        ;";
 
     public const string QUERY_TILE_ENTRY_SUBMISSION_META =
         @"SELECT    `submissions_meta`.`key`,
                     `submissions_meta`.`value`
-        FROM        `submissions`
-        INNER JOIN  `submissions_meta`
-            ON      `submissions`.`id`=`submissions_meta`.`submission_id`
-        WHERE       `submissions`.`id`=@entryID
-        AND         `submissions_meta`.`sync_hash`=@hash
+        FROM        `submissions_meta`
+        WHERE       ``submission_id`=@submissionID
         ;";
 
     public const string QUERY_COURSE_ASSIGNMENTS =
@@ -954,7 +940,7 @@ public static class DatabaseQueries
         WHERE       `course_id`=@courseID
         ;";
 
-    public const string QUERY_COURSE_DISCUSSIONS = // all done
+    public const string QUERY_COURSE_DISCUSSIONS =
         @"SELECT    `discussions`.`discussion_id`,
                     `tile_entries`.`tile_id`,
                     `discussions`.`course_id`,
@@ -968,7 +954,7 @@ public static class DatabaseQueries
         WHERE       `discussions`.`course_id`=@courseID
         ;";
 
-    public const string QUERY_TILE_DISCUSSIONS = //all done
+    public const string QUERY_TILE_DISCUSSIONS =
         @"SELECT    `discussions`.`discussion_id`,
                     `discussions`.`course_id`,
                     `discussions`.`title`,
@@ -1189,25 +1175,28 @@ public static class DatabaseQueries
         AND         `sync_ID`=@syncID
         ;";
 
-    public const string QUERY_USER_SUBMISSIONS_FOR_ENTRY =
-        @"SELECT    `id`,
-                    `entry_id`,
-                    `user_id`,
-                    `grade`,
-                    `submitted`
-        FROM        `submissions`
-        WHERE       `entry_id`='{0}'
-        AND         `sync_hash`='{1}';";
+// What is this here for without any references?????
+    // public const string QUERY_USER_SUBMISSIONS_FOR_ENTRY =
+    //     @"SELECT    `id`,
+    //                 `entry_id`,
+    //                 `user_id`,
+    //                 `grade`,
+    //                 `submitted`
+    //     FROM        `submissions`
+    //     WHERE       `entry_id`='{0}'
+    //     AND         `sync_hash`='{1}';";
 
-    public const string QUERY_COURSE_SUBMISSIONS =  // half done
-        @"SELECT    `submissions`.`id`,
-                    `submissions`.`entry_id`,
+    public const string QUERY_COURSE_SUBMISSIONS =
+        @"SELECT    `submissions`.`submission_id`,
+                    `submissions`.`assignment_id`,
                     `submissions`.`user_id`,
                     `submissions`.`grade`,
-                    `submissions`.`submitted`
+                    `submissions`.`date`
         FROM        `submissions`
+        INNER JOIN  `assignments`
+            USING   (`assignment_id`)
         INNER JOIN  `tile_entries`
-            ON      `submissions`.`entry_id`=`tile_entries`.`id`
+            ON      `tile_entries`.`content_id`=`assignments`.`assignment_id`
         INNER JOIN  `tiles`
             USING   (`tile_id`)
         INNER JOIN  `tile_groups`
@@ -1215,83 +1204,50 @@ public static class DatabaseQueries
         INNER JOIN  `layout_columns`
             USING   (`column_id`)
         WHERE       `layout_columns`.`course_id`=@courseID
-        AND         `submissions`.`sync_hash`=@hash
         AND         `submissions`.`grade` NOT NULL;";
 
-    public const string QUERY_COURSE_SUBMISSIONS_FOR_STUDENT = //half done  please reform with inner join, will you??????
-        @"SELECT    `submissions`.`id`,
-                    `submissions`.`entry_id`,
+    public const string QUERY_COURSE_SUBMISSIONS_FOR_STUDENT =
+        @"SELECT    `submissions`.`submission_id`,
+                    `submissions`.`assignment_id`,
                     `submissions`.`user_id`,
                     `submissions`.`grade`,
-                    `submissions`.`submitted`
+                    `submissions`.`date`
         FROM        `submissions`,
-                    `tiles`,
-                    `tile_entries`,
-                    `tile_groups`,
-                    `layout_columns`
-        WHERE       `submissions`.`entry_id`=`tile_entries`.`id`
+        INNER JOIN  `assignments`
+            USING   (`assignment_id`)
+        WHERE       `assignments`.`course_id`=@courseID
         AND         `submissions`.`user_id`=@userID
-        AND         `tiles`.`id`=`tile_entries`.`tile_id`
-        AND         `tile_groups`.`group_id`=`tiles`.`group_id`
-        AND         `layout_columns`.`course_id`=@courseID
-        AND         `submissions`.`sync_hash`=@hash;";
+        ;";
 
-    public const string QUERY_USER_SUBMISSIONS_FOR_TILE =
-        @"SELECT    `submissions`.`id`,
-                    `submissions`.`entry_id`,
+    public const string QUERY_ALL_USER_SUBMISSIONS_FOR_TILE =
+        @"SELECT    `submissions`.`submission_id`,
+                    `submissions`.`assignment_id`,
                     `submissions`.`user_id`,
                     `submissions`.`grade`,
-                    `submissions`.`submitted`
+                    `submissions`.`date`
         FROM        `submissions`
+        INNER JOIN  `assignments`
+            USING   (`assignment_id`)
         INNER JOIN  `tile_entries`
-            ON      `submissions`.`entry_id`=`tile_entries`.`id`
+            ON      `assignments`.`assignment_id`=`tile_entries`.`content_id`
         WHERE       `tile_entries`.`tile_id`=@tileID
-        AND         `submissions`.`sync_hash`=@hash;";
-    public const string QUERY_USER_SUBMISSIONS_FOR_TILE_FOR_USER =
-        @"SELECT    `submissions`.`id`,
-                    `submissions`.`entry_id`,
+        ;";
+    public const string QUERY_SUBMISSIONS_FOR_TILE_FOR_USER =
+        @"SELECT    `submissions`.`submission_id`,
+                    `submissions`.`assignment_id`,
                     `submissions`.`user_id`,
                     `submissions`.`grade`,
-                    `submissions`.`submitted`
+                    `submissions`.`date`
         FROM        `submissions`
+        INNER JOIN  `assignments`
+            USING   (`assignment_id`)
         INNER JOIN  `tile_entries`
-            ON      `submissions`.`entry_id`=`tile_entries`.`id`
+            ON      `assignments`.`assignment_id`=`tile_entries`.`content_id`
         WHERE       `tile_entries`.`tile_id`=@tileID
         AND         `submissions`.`user_id`=@userID
-        AND         `submissions`.`sync_hash`=@hash;";
+        ;";
 
-    public const string QUERY_USER_SUBMISSIONS_FOR_USER =
-        @"SELECT    `submissions`.`id`,
-                    `submissions`.`entry_id`,
-                    `submissions`.`user_id`,
-                    `submissions`.`grade`,
-                    `submissions`.`submitted`
-        FROM        `submissions`
-        INNER JOIN  `tile_entries`
-            ON      `submissions`.`entry_id`=`tile_entries`.`id`
-        WHERE       `submissions`.`user_id`=@userID
-        AND         `submissions`.`sync_hash`=@hash;";
 
-    public const string QUERY_USER_RESULTS2 = // Half done
-        @"SELECT   `tiles`.`tile_id`,
-                    `tile_entries`.`title`,
-                    `submissions`.`grade`,
-                    `tiles`.`type`
-        FROM        `submissions`
-        INNER JOIN  `tile_entries`
-            ON      `submissions`.`entry_id`=`tile_entries`.`id`
-        INNER JOIN  `tiles`
-            USING   (`tile_id`)
-        INNER JOIN  `tile_groups`
-            USING   (`group_id`)
-        INNER JOIN  `layout_columns`
-            USING   (`column_id`)
-        WHERE       `layout_columns`.`course_id`=@courseID
-	    AND         `tiles`.`type` != 1
-        AND	        `tiles`.`type` != 2
-        AND         `submissions`.`user_id`=@userID
-        AND         `submissions`.`sync_hash`=@hash
-	    GROUP BY    `tile_entries`.`id`;";
 
     public const string QUERY_USER_DISCUSSION_COUNTER = // NOT DONE (not even started)
         @"SELECT        `discussions`.`tile_id`,
@@ -1347,7 +1303,7 @@ public static class DatabaseQueries
         AND         `sync_id`=@syncID;";
 
 
-    public const string QUERY_GRADE_COMPARISSON_HISTORY =
+    public const string QUERY_GRADE_COMPARISSON_HISTORY = // half done ????? take a look at syncID
         @"SELECT    `peer_groups`.`tile_id`,
                     avg(`submissions`.`grade`),
                     `peer_groups`.`avg_grade`,
@@ -1358,8 +1314,9 @@ public static class DatabaseQueries
         INNER JOIN  `submissions`
             USING   (`sync_id`)
         INNER JOIN  `tile_entries`
-            USING   (`entry_id`)
-            AND     (`tile_id`)
+            USING   (`tile_id`)
+        INNER JOIN  `tile_entries`
+            ON      `tile_entries`.`content_id` == `submissions`.`assignment_id`
         WHERE       `peer_groups`.`course_id`=@courseID
         AND         `peer_groups`.`goal_grade`=@grade
         AND         `submissions`.`user_id` = @userID
@@ -1374,7 +1331,7 @@ public static class DatabaseQueries
                     MAX(`grade`)
         FROM        `submissions`
         INNER JOIN  `tile_entries`
-            ON      `submissions`.`entry_id`=`tile_entries`.`id`
+            ON      `submissions`.`assignment_id`=`tile_entries`.`content_id`
         INNER JOIN  `tiles`
             USING   (`tile_id`)
         INNER JOIN  `tile_groups`
@@ -1395,7 +1352,8 @@ public static class DatabaseQueries
         FROM        `submissions`
         WHERE       `entry_id`=@entryID
         AND         `user_id`=@userID
-        AND         `sync_hash`=@hash;";
+        ;";
+        // AND         `sync_hash`=@hash
 
     public const string QUERY_SUBMISSIONS_FOR_ENTRY =
         @"SELECT    `id`,
@@ -1405,7 +1363,8 @@ public static class DatabaseQueries
                     `submitted`
         FROM        `submissions`
         WHERE       `entry_id`=@entryID
-        AND         `sync_hash`=@hash;";
+        ;";
+        // AND         `sync_hash`=@hash
 
     public const string QUERY_EXTERNALDATA =
         @"SELECT    `user_id`,
@@ -1477,7 +1436,7 @@ public static class DatabaseQueries
     public const string UPDATE_TILE_GROUP =
         @"UPDATE    `tile_groups`
         SET         `column_id`=@columnID,
-                    `name`=@name,
+                    `title`=@title,
                     `order`=@order
         WHERE       `group_id`=@groupID;";
 
@@ -1490,17 +1449,11 @@ public static class DatabaseQueries
         AND         `course_id`=@courseID;";
 
     public const string UPDATE_LEARNING_GOAL_REQUIREMENT =
-        @"UPDATE    `goal_requirement`
-        SET
-                    `tile_id`=@tileID,
-                    `entry_id`=@entryID,
-                    `meta_key`=@metaKey,
+        @"UPDATE    `goal_requirements`
+        SET         `assignment_id`=@assignmentID,
+                    `expression`=@expression,
                     `value`=@value,
-                    `expression`=@expression
-        WHERE
-                    `id`=@id
-        AND
-                    `goal_id`=@goalID
+        WHERE       `requirement_id`=@requirementID
         ;";
 
     public const string UPDATE_TILE =
@@ -1519,6 +1472,7 @@ public static class DatabaseQueries
         SET         `end_timestamp`=@currentTimestamp
         WHERE       `sync_id`=@startTimestamp;";
 
+// I think we should just update it in the tile entry table, right?????
     // public const string UPDATE_discussions =
     //     @"UPDATE        `discussions`
     //     SET             `tile_id`=@tileID
@@ -1569,17 +1523,16 @@ public static class DatabaseQueries
           AND               `id` = @id;";
 
     public const string DELETE_GOAL_REQUIREMENTS =
-        @"DELETE FROM       `goal_requirement`
+        @"DELETE FROM       `goal_requirements`
           WHERE             `goal_id` = @goalID;";
 
     public const string DELETE_GOAL_REQUIREMENT =
-        @"DELETE FROM       `goal_requirement`
-          WHERE             `goal_id` = @goalID
-          AND               `id` = @id;";
+        @"DELETE FROM       `goal_requirements`
+          WHERE             `requirement_id` = @requirementID;";
 
-    public const string DELETE_TILE_ENTRY =
+    public const string DELETE_TILE_ENTRY = ////should this stay like this??????
          @"DELETE FROM       `tile_entries`
-          WHERE             `id`=@entryID;";
+          WHERE              ROWID=@entryID;";
 
     public const string DELETE_INCOMPLETE_SYNCS =
         @"DELETE
@@ -1600,27 +1553,13 @@ public static class DatabaseQueries
         FROM        `peer_groups`
         WHERE       `sync_id`=@syncID;
 
-        DELETE
-        FROM        `submissions`
-        WHERE       `sync_id`=@syncID;
-
         "+
-        //@" ///////// Don't we need those data for the historic grade?
+        //@" ///////// Don't we need those data for the historic grade?????
         // DELETE
         // FROM        `student_settings`
         // WHERE       `course_id`=@courseID
         // AND         `sync_id`=@syncID;
         // "+
-        
-        // /////////// Also these ones shouldn't be gone, right?
-        // DELETE
-        // FROM        `assignments`
-        // WHERE       `course_id`=@courseID
-        // AND         `sync_id`=@syncID;
-        // DELETE
-        // FROM        `discussions`
-        // WHERE       `course_id`=@courseID
-        // AND         `sync_id`=@syncID;
 
         @"
         DELETE

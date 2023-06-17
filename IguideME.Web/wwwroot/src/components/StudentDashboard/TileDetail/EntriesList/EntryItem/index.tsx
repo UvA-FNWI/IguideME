@@ -1,10 +1,10 @@
 import React, { Component } from "react";
-import { TileEntry, TileEntrySubmission } from "../../../../../models/app/Tile";
+import { TileEntry, AssignmentSubmission } from "../../../../../models/app/Tile";
 import { Divider, Table } from "antd";
 import GradeStatistic from "../../../../../containers/GradeStatistic";
 
 export default class EntryItem extends Component<{
-    submission: TileEntrySubmission,
+    submission: AssignmentSubmission,
     tileEntry: TileEntry
 }> {
     render(): React.ReactNode {

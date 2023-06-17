@@ -76,7 +76,7 @@ namespace IguideME.Web.Services
 
             _logger.LogInformation("{Time}: Starting sync for course {CourseID}", DateTime.Now, courseID);
 
-            string timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
+            long timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
             // Renew the connection with canvas.
             _canvasHandler.CreateConnection();

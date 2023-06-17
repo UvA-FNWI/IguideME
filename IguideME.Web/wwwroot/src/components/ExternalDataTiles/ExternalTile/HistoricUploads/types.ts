@@ -1,10 +1,10 @@
-import {Tile, TileEntry, TileEntrySubmission} from "../../../../models/app/Tile";
+import {Tile, TileEntry, AssignmentSubmission} from "../../../../models/app/Tile";
 import {CanvasStudent} from "../../../../models/canvas/Student";
 
 export interface IProps {
   tile: Tile;
   entries: TileEntry[],
-  submissions: TileEntrySubmission[],
+  submissions: AssignmentSubmission[],
   students: CanvasStudent[],
   reload: () => any
 }

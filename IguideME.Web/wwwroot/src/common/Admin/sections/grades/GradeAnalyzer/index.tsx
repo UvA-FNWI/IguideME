@@ -7,7 +7,7 @@ import GradeBar from "../../../../../components/visuals/GradesOverviewBar";
 import { IProps, IState } from "./types";
 import TileController from "../../../../../api/controllers/tile";
 import {mergeData} from "./helpers";
-import {TileEntry, TileEntrySubmission} from "../../../../../models/app/Tile";
+import {TileEntry, AssignmentSubmission} from "../../../../../models/app/Tile";
 
 const compute = require( 'compute.io' );
 
@@ -117,13 +117,13 @@ export default class GradeAnalyzer extends Component<IProps, IState> {
                           <Col xs={24} md={12}>
                             <GradeBar binary={false}
                                       title={entryOne ? (entryOne as TileEntry).title : ""}
-                                      grades={submissionsOne.map((s: TileEntrySubmission) => parseFloat(s.grade))} />
+                                      grades={submissionsOne.map((s: AssignmentSubmission) => parseFloat(s.grade))} />
                           </Col>
 
                           <Col xs={24} md={12}>
                             <GradeBar binary={false}
                                       title={entryTwo? (entryTwo as TileEntry).title : ""}
-                                      grades={submissionsTwo.map((s: TileEntrySubmission) => parseFloat(s.grade))} />
+                                      grades={submissionsTwo.map((s: AssignmentSubmission) => parseFloat(s.grade))} />
                           </Col>
                         </Row>
                       </Tabs.TabPane>

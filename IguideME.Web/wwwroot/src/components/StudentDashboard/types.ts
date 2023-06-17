@@ -1,5 +1,5 @@
 import { CanvasStudent } from "../../models/canvas/Student";
-import {Tile, TileEntrySubmission} from "../../models/app/Tile";
+import {Tile, AssignmentSubmission} from "../../models/app/Tile";
 import {CanvasDiscussion} from "../../models/canvas/Discussion";
 import {LearningOutcome} from "../../models/app/LearningGoal";
 import { PredictedGrade } from "../../models/app/PredictiveModel";
@@ -20,7 +20,7 @@ export interface IState {
   viewType: ViewTypes;
   learningOutcomes: LearningOutcome[];
   discussions: CanvasDiscussion[];
-  userSubmissions: Map<number, TileEntrySubmission[]>;
+  userSubmissions: Map<number, AssignmentSubmission[]>;
   predictions: PredictedGrade[];
   goalGrade: number;
   settings_view: boolean;

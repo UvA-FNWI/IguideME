@@ -37,7 +37,7 @@ export interface TileEntry {
   type: "ASSIGNMENT" | "DISCUSSION" | "LEARNING_OUTCOMES"
 }
 
-export interface TileEntrySubmission {
+export interface AssignmentSubmission {
   userID: string,
   entry_id: number,
   grade: string,

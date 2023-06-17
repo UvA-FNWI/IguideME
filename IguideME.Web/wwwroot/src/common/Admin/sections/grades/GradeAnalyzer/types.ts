@@ -1,4 +1,4 @@
-import {Tile, TileEntry, TileEntrySubmission} from "../../../../../models/app/Tile";
+import {Tile, TileEntry, AssignmentSubmission} from "../../../../../models/app/Tile";
 
 export interface IProps {
 
@@ -9,7 +9,7 @@ export interface IState {
   entryOne: TileEntry | null;
   entryTwo: TileEntry | null;
   allEntries: TileEntry[];
-  allSubmissions: TileEntrySubmission[];
-  submissionsOne: TileEntrySubmission[];
-  submissionsTwo: TileEntrySubmission[];
+  allSubmissions: AssignmentSubmission[];
+  submissionsOne: AssignmentSubmission[];
+  submissionsTwo: AssignmentSubmission[];
 }

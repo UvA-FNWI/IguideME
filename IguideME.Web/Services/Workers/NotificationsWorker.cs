@@ -17,7 +17,7 @@ namespace IguideME.Web.Services.Workers
         readonly private ILogger<SyncManager> _logger;
         readonly private CanvasHandler _canvasHandler;
         readonly private int _courseID;
-        readonly private int _syncID;
+        readonly private long _syncID;
 
         readonly private bool _send_notifications;
 
@@ -32,7 +32,7 @@ namespace IguideME.Web.Services.Workers
         /// <param name="logger">a reference to the logger used for the sync.</param>
         public NotificationsWorker(
             int courseID,
-            int syncID,
+            long syncID,
             CanvasHandler canvasHandler,
             bool send_notifications,
             ILogger<SyncManager> logger)

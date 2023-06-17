@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace IguideME.Web.Models.App
 {
-    public class TileEntrySubmission
+    public class AssignmentSubmission
     {
         [JsonProperty(PropertyName = "id")]
         public int ID { get; set; }
@@ -11,39 +11,39 @@ namespace IguideME.Web.Models.App
         [JsonProperty(PropertyName = "userID")]
         public string UserID { get; set; }
 
-        [JsonProperty(PropertyName = "entry_id")]
-        public int EntryID { get; set; }
+        [JsonProperty(PropertyName = "assignment_id")]
+        public int AssignmentID { get; set; }
 
         [JsonProperty(PropertyName = "grade")]
-        public string Grade { get; set; }
+        public float Grade { get; set; }
 
-        [JsonProperty(PropertyName = "submitted")]
-        public string Submitted { get; set; }
+        [JsonProperty(PropertyName = "date")]
+        public long Date { get; set; }
 
         [JsonProperty(PropertyName = "meta")]
         public string Meta { get; set; }
 
-        public TileEntrySubmission(
+        public AssignmentSubmission(
             int id,
-            int entryID,
+            int assignmentID,
             string userID,
-            string grade,
-            string submitted,
-            string meta = null,
-            bool autoLoadMeta = true,
-            int syncID = 0)
+            float grade,
+            long date,
+            string meta = null)
+            // bool autoLoadMeta = true,
+            // int syncID = 0)
         {
             this.ID = id;
             this.UserID = userID;
-            this.EntryID = entryID;
+            this.AssignmentID = assignmentID;
             this.Grade = grade;
-            this.Submitted = submitted;
+            this.Date = date;
             this.Meta = meta;
 
-            if (autoLoadMeta && meta == null)
+            if (meta == null)
             {
                 this.Meta = JsonConvert.SerializeObject(
-                    DatabaseManager.Instance.GetEntryMeta(this.ID, syncID));
+                    DatabaseManager.Instance.GetEntryMeta(this.ID));
             }
         }
     }

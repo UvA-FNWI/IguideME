@@ -1,6 +1,6 @@
 import React from "react";
 import {ColumnsType} from "antd/lib/table";
-import {Tile, TileEntry, TileEntrySubmission} from "../../../../models/app/Tile";
+import {Tile, TileEntry, AssignmentSubmission} from "../../../../models/app/Tile";
 import GradeBar from "../../../visuals/GradesOverviewBar/GradeBar";
 import {Button, Space} from "antd";
 import Swal from 'sweetalert2';
@@ -98,7 +98,7 @@ export const getColumns = (viewData: (obj: TileEntry) => any, reload: () => any)
   ]
 }
 
-export const formatData = (tile: Tile, entries: TileEntry[], submissions: TileEntrySubmission[]): any => {
+export const formatData = (tile: Tile, entries: TileEntry[], submissions: AssignmentSubmission[]): any => {
 
   return entries.map((entry, i) => {
     const s = submissions.filter(x => x.entry_id === entry.id);

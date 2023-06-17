@@ -1,6 +1,6 @@
-import { TileEntrySubmission } from "../../models/app/Tile";
+import { AssignmentSubmission } from "../../models/app/Tile";
 
-export const MOCK_PERUSALL_SUBMISSIONS: TileEntrySubmission[] = [
+export const MOCK_PERUSALL_SUBMISSIONS: AssignmentSubmission[] = [
   {
     "userID":"22976781",
     "grade":"9.4",

@@ -54,7 +54,7 @@ namespace IguideME.Web.Models
         public Tile(
             int id,
             int groupID,
-            string name,
+            string title,
             int order,
             Tile_type type,
             bool visible,
@@ -65,7 +65,7 @@ namespace IguideME.Web.Models
         {
             this.ID = id;
             this.GroupID = groupID;
-            this.Title = name;
+            this.Title = title;
             this.Order = order;
             this.Type = type;
             this.Visible = visible;
@@ -91,8 +91,8 @@ namespace IguideME.Web.Models
 
     public class TileEntry
     {
-        [JsonProperty(PropertyName = "id")]
-        public int ID { get; set; }
+        // [JsonProperty(PropertyName = "id")]
+        // public int ID { get; set; }
 
         [JsonProperty(PropertyName = "state")]
         public EditState State { get; set; }
@@ -100,29 +100,34 @@ namespace IguideME.Web.Models
         [JsonProperty(PropertyName = "tile_id")]
         public int TileID { get; set; }
 
-        [JsonProperty(PropertyName = "title")]
-        public string Title { get; set; }
+        // [JsonProperty(PropertyName = "title")]
+        // public string Title { get; set; }
 
-        [JsonProperty(PropertyName = "type")]
-        public string Type { get; set; }
+        [JsonProperty(PropertyName = "content_id")]
+        public int ContentID { get; set; }
 
-        [JsonProperty(PropertyName = "wildcard")]
-        public bool Wildcard { get; set; }
+        // [JsonProperty(PropertyName = "type")]
+        // public string Type { get; set; }
+
+        // [JsonProperty(PropertyName = "wildcard")]
+        // public bool Wildcard { get; set; }
 
         public TileEntry(
-            int id,
+            // int id,
             EditState state,
             int tileID,
-            string title,
-            string type,
-            bool wildcard = false)
+            int ContentID)
+            // string title,
+            // string type,
+            // bool wildcard = false)
         {
-            this.ID = id;
+            // this.ID = id;
             this.State = state;
             this.TileID = tileID;
-            this.Title = title;
-            this.Type = type;
-            this.Wildcard = wildcard;
+            this.ContentID = ContentID;
+            // this.Title = title;
+            // this.Type = type;
+            // this.Wildcard = wildcard;
         }
     }
 }

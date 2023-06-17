@@ -14,21 +14,21 @@ namespace IguideME.Web.Services.Workers
 	{
         readonly private ILogger<SyncManager> _logger;
 		readonly private int _courseID;
-        readonly private string _hashCode;
+        readonly private long _syncID;
         readonly private GradePredictionModel _model;
 
         /// <summary>
         /// This constructor initializes the new GradePredictorWorker to
-        /// (<paramref name="courseID"/>, <paramref name="hashCode"/>, <paramref name="logger"/>).
+        /// (<paramref name="courseID"/>, <paramref name="syncID"/>, <paramref name="logger"/>).
         /// </summary>
         /// <param name="courseID">the id of the course.</param>
-        /// <param name="hashCode">the hash code associated to the current sync.</param>
+        /// <param name="syncID">the hash code associated to the current sync.</param>
         /// <param name="logger">a reference to the logger used for the sync.</param>
-		public GradePredictorWorker(int courseID, string hashCode, ILogger<SyncManager> logger)
+		public GradePredictorWorker(int courseID, long syncID, ILogger<SyncManager> logger)
         {
             _logger = logger;
             this._courseID = courseID;
-            this._hashCode = hashCode;
+            this._syncID = syncID;
             this._model = DatabaseManager.Instance.GetGradePredictionModel(courseID);
         }
 
@@ -44,7 +44,7 @@ namespace IguideME.Web.Services.Workers
                 return;
             }
 
-            List<User> students = DatabaseManager.Instance.GetUsers(this._courseID, "student", this._hashCode);
+            List<User> students = DatabaseManager.Instance.GetUsers(this._courseID, "student", this._syncID);
 
             foreach (User student in students)
             {
@@ -59,34 +59,27 @@ namespace IguideME.Web.Services.Workers
         private void PredictGradesForStudent(User student)
         {
             // _logger.LogInformation("Processing student: {ID}", student.UserID);
-            List<TileEntrySubmission> submissions = DatabaseManager.Instance.GetCourseSubmissionsForStudent(this._courseID,
+            List<AssignmentSubmission> submissions = DatabaseManager.Instance.GetCourseSubmissionsForStudent(this._courseID,
                                                                                       student.UserID,
-                                                                                      this._hashCode);
+                                                                                      this._syncID);
 
             List<TileEntry> tileEntries = DatabaseManager.Instance.GetEntries(this._courseID);
 
             double wGrade = 0.0;
 
-            foreach (GradePredictionModelParameter modelParameter in this._model.Parameters)
-            {
-                TileEntrySubmission submission = submissions.Find(sub => sub.EntryID == modelParameter.ParameterID);
-                if (submission == null)
-                {
-                    _logger.LogInformation("Student {UserID} has no submission for EntryID {ParamID}", student.UserID, modelParameter.ParameterID);
-                    continue;
-                }
+            // foreach (GradePredictionModelParameter modelParameter in this._model.Parameters)
+            // {
+            //     AssignmentSubmission submission = submissions.Find(sub => sub.EntryID == modelParameter.ParameterID);
+            //     if (submission == null)
+            //     {
+            //         _logger.LogInformation("Student {UserID} has no submission for EntryID {ParamID}", student.UserID, modelParameter.ParameterID);
+            //         continue;
+            //     }
 
-                if (!double.TryParse(submission.Grade, out double partialGrade))
-                {
-                    _logger.LogInformation("Error parsing submission grade as double: {Grade}", submission.Grade);
-                    _logger.LogInformation("Aborting.");
-                    return;
-                }
+            //     _logger.LogInformation("grade += {grade} * {Weight}", submission.Grade, modelParameter.Weight);
 
-                _logger.LogInformation("grade += {partialGrade} * {Weight}", partialGrade, modelParameter.Weight);
-
-                wGrade += partialGrade * modelParameter.Weight;
-            }
+            //     wGrade += submission.Grade * modelParameter.Weight;
+            // } TODO: fix
 
             DatabaseManager.Instance.CreatePredictedGrade(this._courseID,
                                                           student.UserID,
