@@ -1711,7 +1711,8 @@ namespace IguideME.Web.Services
                         entries.Add(new TileEntry(
                         0,
                         r.GetInt32(0),
-                        r.GetInt32(1)
+                        r.GetInt32(1),
+                        "This is another title"
                     ));
                     } catch (Exception e) {
                         PrintQueryError("GetEntries", 3, r, e);
@@ -2277,7 +2278,8 @@ namespace IguideME.Web.Services
                     entries.Add(new TileEntry(
                         0,
                         r.GetInt32(0),
-                        r.GetInt32(1)
+                        r.GetInt32(1),
+                        "This is the title"
                     ));
                 }
             }
@@ -2288,7 +2290,7 @@ namespace IguideME.Web.Services
         public void DeleteTile(int courseID, int tileID)
         {
             DeleteGoals(courseID, tileID);
-            NonQuery(@"DELETE FROM `tile` WHERE `id` = @tileID;",
+            NonQuery(@"DELETE FROM `tile` WHERE `tile_id` = @tileID;",
                 new SQLiteParameter("tileID", tileID)
             );
         }
