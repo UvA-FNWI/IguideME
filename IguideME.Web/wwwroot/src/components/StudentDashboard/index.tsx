@@ -9,7 +9,6 @@ import {DashboardColumn} from "../../models/app/Layout";
 import TileDetail from "./TileDetail";
 import { Col, Radio, Row } from "antd";
 import { AppstoreOutlined, BarChartOutlined } from "@ant-design/icons";
-// import TileRadar from "./TileRadar";
 import TileBars from "./TileBars";
 import {connect, ConnectedProps} from "react-redux";
 import {RootState} from "../../store";
@@ -159,8 +158,9 @@ class StudentDashboard extends Component<Props, IState> {
       goalGrade: goalGrade,
       historicGrades: historicGrades
     }, () => {
-      TileController.getPeerResults(student!.userID).then(peerGrades =>
+      TileController.getPeerResults(student!.userID).then(peerGrades =>{
         this.setState({ peerGrades, loaded: true })
+      }
       ).catch(() => this.setState({ loaded: true }));
     });
   }

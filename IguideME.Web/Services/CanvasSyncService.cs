@@ -61,7 +61,7 @@ namespace IguideME.Web.Services
             }
 
             List<string> notificationDates = DatabaseManager.Instance.GetNotificationDates(courseID);
-            if (notificationDates[0].Contains("-")) { 
+            if (notificationDates[0].Contains("-")) {
                 // We are looking in a range of dates
                 foreach(string datepair in notificationDates)
                 {
@@ -113,6 +113,9 @@ namespace IguideME.Web.Services
                 jobId, $"tasks.assignments", 0
             ).ConfigureAwait(false);
 
+            _logger.LogInformation("Starting recycleexternaldata");
+            DatabaseManager.Instance.RecycleExternalData(courseID, timestamp);
+
             new GradePredictorWorker(courseID, timestamp, _logger).Start();
             await _computationJobStatus.UpdateJobProgressInformationAsync(
                 jobId, $"tasks.grade-predictor", 0
@@ -132,9 +135,6 @@ namespace IguideME.Web.Services
             await _computationJobStatus.UpdateJobProgressInformationAsync(
                 jobId, $"tasks.done", 0
             ).ConfigureAwait(false);
-
-            _logger.LogInformation("Starting recycleexternaldata");
-            DatabaseManager.Instance.RecycleExternalData(courseID, timestamp);
 
             long duration = sw.ElapsedMilliseconds;
             Console.WriteLine("Took: " + duration.ToString() + "ms");

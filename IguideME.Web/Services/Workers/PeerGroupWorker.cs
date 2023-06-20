@@ -179,7 +179,6 @@ namespace IguideME.Web.Services.Workers
             }
         }
 
-
         void CreateNotifications(List<string> users, Dictionary<int, List<float>> grades) {
 
             foreach(string user in users)
@@ -212,7 +211,7 @@ namespace IguideME.Web.Services.Workers
                         float lastAverage = -1;
                         float peerAverage = -1;
                         // Store the three important Averages in variables
-                        if (currentSubmissionGrades.Count != 0) 
+                        if (currentSubmissionGrades.Count != 0)
                             currentAverage = currentSubmissionGrades.Average();
                         if (lastSubmissionGrades.Count != 0)
                             lastAverage =lastSubmissionGrades.Average();
