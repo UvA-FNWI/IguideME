@@ -58,8 +58,9 @@ namespace IguideME.Web.Services
                     command.ExecuteNonQuery();
                 }
                 connection.Close();
-            } catch {
+            } catch (Exception e) {
                 // Close connection before rethrowing
+                _logger.LogError("Exception encountered while creating query: {message}\n {trace}", e.Message, e.StackTrace);
                 connection.Close();
                 throw;
             }
@@ -86,8 +87,9 @@ namespace IguideME.Web.Services
                     id = int.Parse(command.ExecuteScalar().ToString());
                 }
                 connection.Close();
-            } catch {
+            } catch (Exception e) {
                 // Close connection before rethrowing
+                _logger.LogError("Exception encountered while creating query: {message}\n {trace}", e.Message, e.StackTrace);
                 connection.Close();
                 throw;
             }
@@ -259,6 +261,7 @@ namespace IguideME.Web.Services
                 }
             }
             foreach (string hash in hashes) {
+                _logger.LogInformation("removing hash: {hash} for course {course}", hash, courseID);
                 NonQuery(DatabaseQueries.DELETE_OLD_SYNCS_FOR_COURSE, new SQLiteParameter("courseID", courseID), new SQLiteParameter("startTimestamp", hash));
             }
         }
