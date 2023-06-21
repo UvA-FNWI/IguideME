@@ -1725,6 +1725,6 @@ public static class DatabaseQueries
         DELETE
         FROM        `sync_history`
         WHERE       `course_id`=@courseID
-        AND         `start_timestamp`=@startTimestamp;
+        AND         `start_timestamp`=@hash;
         ";
 }
