@@ -1696,35 +1696,35 @@ public static class DatabaseQueries
     public const string DELETE_OLD_SYNCS_FOR_COURSE =
         @"DELETE
         FROM        `peer_group`
-        WHERE       `sync_hash`=@hash;
+        WHERE       `sync_hash`=@startTimestamp;
 
         DELETE
         FROM        `tile_entry_submission`
-        WHERE       `sync_hash`=@hash;
+        WHERE       `sync_hash`=@startTimestamp;
 
         DELETE
         FROM        `canvas_users`
         WHERE       `course_id`=@courseID
-        AND         `sync_hash`=@hash;
+        AND         `sync_hash`=@startTimestamp;
 
         DELETE
         FROM        `canvas_assignment`
         WHERE       `course_id`=@courseID
-        AND         `sync_hash`=@hash;
+        AND         `sync_hash`=@startTimestamp;
 
         DELETE
         FROM        `canvas_discussion`
         WHERE       `course_id`=@courseID
-        AND         `sync_hash`=@hash;
+        AND         `sync_hash`=@startTimestamp;
 
         DELETE
         FROM        `notifications`
         WHERE       `course_id`=@courseID
-        AND         `sync_hash`=@hash;
+        AND         `sync_hash`=@startTimestamp;
 
         DELETE
         FROM        `sync_history`
         WHERE       `course_id`=@courseID
-        AND         `start_timestamp`=@hash;
+        AND         `start_timestamp`=@startTimestamp;
         ";
 }
