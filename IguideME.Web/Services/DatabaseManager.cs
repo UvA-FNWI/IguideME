@@ -464,6 +464,8 @@ namespace IguideME.Web.Services
         }
 
         public void UpdateDiscussion(Discussion discussion, int tileID, long syncID) {
+            // I think that this is only to tie the discussion to the tile. 
+            // If that's so, then this is the wrong query, we just have to create a tile entry with this discussion id
             NonQuery(
                 DatabaseQueries.REGISTER_DISCUSSION,
                 new SQLiteParameter("discussionID", discussion.ID),
@@ -507,7 +509,7 @@ namespace IguideME.Web.Services
 
         public List<User> GetUsers(int courseID, int role = 0, long syncID = 0)
         {
-            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : 0;
+            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
             if (activeSync == 0)
             {
                 _logger.LogInformation("Hash is null, returning empty user list.");
@@ -559,7 +561,7 @@ namespace IguideME.Web.Services
 
         public User GetUser(int courseID, string userID, long syncID = 0)
         {
-            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : 0;
+            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
             if (activeSync == 0) return null;
 
             User user = null;
@@ -589,7 +591,7 @@ namespace IguideME.Web.Services
             int goalGrade,
             long syncID = 0)
         {
-            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : 0;
+            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
             if (activeSync == 0) return new List<User> { };
 
             List<User> users = new();
@@ -726,14 +728,24 @@ namespace IguideME.Web.Services
             }
         }
 
-        public void RegisterUserSettings(ConsentData data, long syncID)
+        public void InitializeUserSettings(ConsentData data, long syncID)
         {
-             NonQuery(DatabaseQueries.REGISTER_USER_SETTINGS,
-                new SQLiteParameter("CourseID", data.CourseID),
-                new SQLiteParameter("UserID", data.UserID),
-                new SQLiteParameter("GoalGrade", -1),
-                new SQLiteParameter("syncID", syncID)
-            );
+            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_LAST_STUDENT_SETTINGS,
+                    new SQLiteParameter("courseID", data.CourseID),
+                    new SQLiteParameter("userID", data.UserID)
+                )) {
+                    while (r.Read())
+                    {
+                        return; // If the user already exists, we do not initialize them
+                    }
+                }
+
+            NonQuery(DatabaseQueries.INITIALIZE_USER_SETTINGS,
+                            new SQLiteParameter("CourseID", data.CourseID),
+                            new SQLiteParameter("UserID", data.UserID),
+                            new SQLiteParameter("GoalGrade", -1),
+                            new SQLiteParameter("syncID", syncID)
+                        );
         }
 
         public bool GetTileNotificationState(int tileID)
@@ -755,13 +767,24 @@ namespace IguideME.Web.Services
             }
         }
 
-        public void UpdateNotificationEnable(int courseID, string userID, bool enable)
+        public void UpdateNotificationEnable(int courseID, string userID, bool enable, long syncID)
         {
-            NonQuery(DatabaseQueries.UPDATE_NOTIFICATION_ENABLE,
-                    new SQLiteParameter("enable", enable),
+            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_LAST_STUDENT_SETTINGS,
                     new SQLiteParameter("courseID", courseID),
                     new SQLiteParameter("userID", userID)
-            );
+                )) {
+                while (r.Read())
+                {
+                    NonQuery(DatabaseQueries.REGISTER_USER_SETTINGS,
+                        new SQLiteParameter("courseID", courseID),
+                        new SQLiteParameter("userID", userID),
+                        new SQLiteParameter("PredictedGrade", long.Parse(r.GetValue(0).ToString())),
+                        new SQLiteParameter("GoalGrade", r.GetInt32(1)),
+                        new SQLiteParameter("Notifications", enable),
+                        new SQLiteParameter("syncID", syncID)
+                    );
+                }
+            }
         }
 
         public bool GetNotificationEnable(int courseID, string userID, long syncID)
@@ -786,13 +809,24 @@ namespace IguideME.Web.Services
             }
         }
 
-        public void UpdateUserGoalGrade(int courseID, string userID, int grade)
+        public void UpdateUserGoalGrade(int courseID, string userID, int grade, long syncID)
         {
-            NonQuery(DatabaseQueries.UPDATE_USER_GOAL_GRADE,
-                new SQLiteParameter("grade", grade),
-                new SQLiteParameter("courseID", courseID),
-                new SQLiteParameter("userID", userID)
-            );
+            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_LAST_STUDENT_SETTINGS,
+                    new SQLiteParameter("courseID", courseID),
+                    new SQLiteParameter("userID", userID)
+                )) {
+                while (r.Read())
+                {
+                    NonQuery(DatabaseQueries.REGISTER_USER_SETTINGS,
+                        new SQLiteParameter("courseID", courseID),
+                        new SQLiteParameter("userID", userID),
+                        new SQLiteParameter("PredictedGrade", long.Parse(r.GetValue(0).ToString())),
+                        new SQLiteParameter("GoalGrade", grade),
+                        new SQLiteParameter("Notifications", r.GetBoolean(2)),
+                        new SQLiteParameter("syncID", syncID)
+                    );
+                }
+            }
         }
 
         public int GetUserGoalGrade(int courseID, string userID, long syncID)
@@ -867,7 +901,7 @@ namespace IguideME.Web.Services
             int goalGrade,
             long syncID = 0)
         {
-            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : 0;
+            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
             if (activeSync == 0) return new List<string> { };
 
             List<String> peers = new();
@@ -940,7 +974,7 @@ namespace IguideME.Web.Services
             int courseID,
             long syncID = 0)
         {
-            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : 0;
+            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
             if (activeSync == 0) return new List<AssignmentSubmission>() { };
 
             List<AssignmentSubmission> submissions = new();
@@ -975,7 +1009,7 @@ namespace IguideME.Web.Services
             string userID,
             long syncID = 0)
         {
-            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : 0;
+            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
             if (activeSync == 0) return new List<AssignmentSubmission>() { };
 
             List<AssignmentSubmission> submissions = new();
@@ -1028,7 +1062,7 @@ namespace IguideME.Web.Services
         }
 
         public List<AssignmentSubmission> GetTileSubmissions( int courseID, int tileID, long syncID = 0) {
-            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : 0;
+            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
             if (activeSync == 0) return new List<AssignmentSubmission>() { };
 
             List<AssignmentSubmission> submissions = new();
@@ -1059,7 +1093,7 @@ namespace IguideME.Web.Services
             string userID,
             long syncID = 0)
         {
-            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : 0;
+            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
             if (activeSync == 0) return new List<AssignmentSubmission>() { };
 
             List<AssignmentSubmission> submissions = new();
@@ -1165,7 +1199,7 @@ namespace IguideME.Web.Services
             string userID,
             long syncID = 0)
         {
-            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : 0;
+            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
             if (activeSync == 0)
                 return new Dictionary<int, List<float>>();
 
@@ -1220,7 +1254,7 @@ namespace IguideME.Web.Services
             string loginID,
             long syncID = 0)
         {
-            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : 0;
+            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
             if (activeSync == 0)
                 return new PeerComparisonData[] {
                     PeerComparisonData.FromGrades(0, Array.Empty<float>())
@@ -1281,7 +1315,7 @@ namespace IguideME.Web.Services
             string userID,
             long syncID = 0)
         {
-            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : 0;
+            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
             if (activeSync == 0)
                 return new PeerComparisonData[] {
                     PeerComparisonData.FromGrades(0, Array.Empty<float>())
@@ -1344,7 +1378,7 @@ namespace IguideME.Web.Services
             string userID,
             long syncID = 0)
         {
-            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : 0;
+            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
             if (activeSync == 0) return new Dictionary<int, List<List<object>>>();
 
             Dictionary<int, List<List<object>>> comparisson_history = new();
@@ -1590,7 +1624,7 @@ namespace IguideME.Web.Services
             int status,
             long syncID = 0)
         {
-            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : 0;
+            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
 
             NonQuery(DatabaseQueries.REGISTER_USER_NOTIFICATIONS,
                 new SQLiteParameter("userID", userID),
@@ -1636,7 +1670,7 @@ namespace IguideME.Web.Services
             string userID,
             long syncID = 0)
         {
-            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : 0;
+            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
 
             List<Notification> notifications = new();
 
@@ -1664,7 +1698,7 @@ namespace IguideME.Web.Services
             string userID,
             long syncID = 0)
         {
-            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : 0;
+            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
 
             List<Notification> notifications = new();
 
@@ -1689,7 +1723,7 @@ namespace IguideME.Web.Services
 
         public void MarkNotificationsSent(int courseID, string userID, long syncID = 0)
         {
-            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : 0;
+            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
 
             NonQuery(DatabaseQueries.QUERY_MARK_NOTIFICATIONS_SENT,
                 new SQLiteParameter("courseID", courseID),
@@ -1743,7 +1777,7 @@ namespace IguideME.Web.Services
             string studentID,
             bool accepted)
         {
-            // Do we want this?????????????????????
+            // Do we want this?????
             // NonQuery(DatabaseQueries.REGISTER_ACCEPTED_STUDENT,
             //     new SQLiteParameter("courseID", courseID),
             //     new SQLiteParameter("studentID", studentID),
@@ -1753,13 +1787,13 @@ namespace IguideME.Web.Services
 
         public void ResetAcceptList(int courseID)
         {
-            // or this one?????????????????
+            // or this one?????
             // NonQuery(DatabaseQueries.RESET_ACCEPT_LIST,
             //     new SQLiteParameter("courseID", courseID)
             // );
         }
 
-///////         WHAT DO WE DO WITH THIS ONE????????????
+///////         WHAT DO WE DO WITH THIS ONE?????
         public void SetAcceptListRequired(int courseID, bool enabled)
         {
             // NonQuery(DatabaseQueries.REQUIRE_ACCEPT_LIST,
@@ -1772,7 +1806,7 @@ namespace IguideME.Web.Services
         {
             List<AcceptList> keys = new();
 
-// Do we want this?????????????????????
+// Do we want this?????
             // using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_ACCEPT_LIST,
             //         new SQLiteParameter("courseID", courseID)
             //     )) {
@@ -2295,17 +2329,31 @@ namespace IguideME.Web.Services
             );
         }
 
+// IT IS THE SAME AS SET GOAL GRADE, SHOULD WE KEEP IT?????
         public void SetConsent(ConsentData data, long syncID)
         {
-             NonQuery(DatabaseQueries.SET_USER_CONSENT,
-                new SQLiteParameter("courseID", data.CourseID),
-                new SQLiteParameter("userID", data.UserID),
-                new SQLiteParameter("consent", data.Granted),
-                new SQLiteParameter("syncID", syncID)
-            );
+            
+            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_LAST_STUDENT_SETTINGS,
+                    new SQLiteParameter("courseID", data.CourseID),
+                    new SQLiteParameter("userID", data.UserID)
+                )) {
+                while (r.Read())
+                {
+                    NonQuery(DatabaseQueries.REGISTER_USER_SETTINGS,
+                        new SQLiteParameter("courseID", data.CourseID),
+                        new SQLiteParameter("userID", data.UserID),
+                        new SQLiteParameter("PredictedGrade", long.Parse(r.GetValue(0).ToString())),
+                        new SQLiteParameter("GoalGrade", (data.Granted < 1) ? data.Granted : r.GetInt32(1)),
+                        new SQLiteParameter("Notifications", r.GetBoolean(2)),
+                        new SQLiteParameter("syncID", syncID)
+                    );
+                }
+            }
 
-            if (data.Granted == -1)
-                UpdateUserGoalGrade(data.CourseID, data.UserID, -1);
+            
+
+            // if (data.Granted == -1)
+            //     UpdateUserGoalGrade(data.CourseID, data.UserID, -1);
         }
 
         public int GetConsent(int courseID, string userID, long syncID)

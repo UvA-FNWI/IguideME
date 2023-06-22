@@ -203,7 +203,7 @@ public static class DatabaseQueries
      * The peer_group table stores the groups of peers students in each goal
      * grade belong to as well as the grade statistics of that group.
      *
-     * user_ids should go away, right????????????
+     * user_ids should go away, right?????
      */
     public const string CREATE_TABLE_PEER_GROUPS =
     @"CREATE TABLE IF NOT EXISTS `peer_groups` (
@@ -361,7 +361,7 @@ public static class DatabaseQueries
           )
           ON CONFLICT (`course_id`, `user_id`, `date`) DO UPDATE SET `grade`=`excluded`.`grade`;";
 
-    public const string REGISTER_USER_PEER = // DO WE KEEP THE USER_IDS???????????
+    public const string REGISTER_USER_PEER = // DO WE KEEP THE USER_IDS?????
     @"INSERT INTO   `peer_groups` ( `goal_grade`,
                                     `user_ids`,
                                     `tile_id`,
@@ -602,8 +602,7 @@ public static class DatabaseQueries
         )
         ;";
 
-/////// WHAT DO WE DO ON CONFLICT HERE??????? user_name EXISTS NO MORE
-    public const string REGISTER_USER_SETTINGS =
+    public const string INITIALIZE_USER_SETTINGS =
         @"  INSERT INTO `student_settings`
                         (   `course_id`,
                             `user_id`,
@@ -616,24 +615,23 @@ public static class DatabaseQueries
                 @syncID
             )
         ;";
-        //     ON CONFLICT (   `user_id`, course_id   )
-        //         DO UPDATE SET `user_name` = `excluded`.`user_name`
-        // ;";
 
-    public const string SET_USER_CONSENT =
+    public const string REGISTER_USER_SETTINGS =
         @"  INSERT INTO `student_settings`
                         (   `course_id`,
                             `user_id`,
-                            `consent`,
+                            `predicted_grade`,
+                            `goal_grade`,
+                            `notifications`
                             `sync_id`   )
             VALUES(
-                @courseID,
-                @userID,
-                @consent,
+                @CourseID,
+                @UserID,
+                @PredictedGrade,
+                @GoalGrade,
+                @Notifications,
                 @syncID
             )
-            ON CONFLICT (   `user_id`,  `course_id`   )
-                DO UPDATE SET `consent` = @consent
         ;";
 
     public const string REGISTER_EXTERNALDATA =
@@ -690,7 +688,7 @@ public static class DatabaseQueries
         AND         `user_id`=@userID
         ORDER BY    `date` DESC;";
 
-    public const string QUERY_GROUP_PEERS = //// DO WE KEEP THIS???
+    public const string QUERY_GROUP_PEERS = //// DO WE KEEP THIS????????
         @"SELECT        `user_ids`
         FROM            `peer_groups`
         WHERE           `course_id`=@courseID
@@ -762,7 +760,7 @@ public static class DatabaseQueries
         AND         `column_id`=@columnID
         ORDER BY    `order` ASC;";
 
-    /////// WHY DUPLICATE???????
+    /////// WHY DUPLICATE?????
     public const string QUERY_LAYOUT_COLUMNS =
         @"SELECT    `column_id`,
                     `size`,
@@ -813,7 +811,7 @@ public static class DatabaseQueries
         WHERE       `layout_columns`.`course_id`=@courseID
         AND         `tile_groups`.`group_id`=@groupID;";
 
-    //// AGAIN, WHY TWO OF THEM????????????????
+    //// AGAIN, WHY TWO OF THEM?????
     public const string QUERY_TILE_GROUPS =
         @"SELECT    `tile_groups`.`group_id`,
                     `tile_groups`.`title`,
@@ -973,7 +971,7 @@ public static class DatabaseQueries
         WHERE       `tile_entries`.`tile_id`=@tileID
         ;";
 
-// NOT USED ANYWHERE. DO WE WANT IT????????????
+// NOT USED ANYWHERE. DO WE WANT IT?????
     // public const string QUERY_TILE_DISCUSSIONS_FOR_USER =
     //     @"SELECT    `id`,
     //                 `discussion_id`,
@@ -987,7 +985,7 @@ public static class DatabaseQueries
     //     AND         `posted_by`=@userID
     //     AND         `sync_hash`=@hash;";
 
-    public const string QUERY_DISCUSSION_ENTRIES = // all done
+    public const string QUERY_DISCUSSION_ENTRIES =
         @"SELECT    `discussion_replies`.`reply_id`,
                     `discussion_replies`.`author`,
                     `discussion_replies`.`date`,
@@ -1000,7 +998,7 @@ public static class DatabaseQueries
         WHERE       `discussion_replies`.`discussion_id`=@discussionID
         ;";
 
-    public const string QUERY_DISCUSSION_ENTRIES_FOR_USER = // all done
+    public const string QUERY_DISCUSSION_ENTRIES_FOR_USER =
         @"SELECT    `discussion_replies`.`reply_id`,
                     `discussion_replies`.`author`,
                     `discussion_replies`.`date`,
@@ -1014,7 +1012,7 @@ public static class DatabaseQueries
         AND         `discussion_replies`.`author`=@userID
         ;";
 
-    public const string QUERY_DISCUSSION_REPLIES = // all done
+    public const string QUERY_DISCUSSION_REPLIES =
         @"SELECT    rep.`discussion_replies`.`reply_id`,
                     rep.`discussion_replies`.`author`,
                     rep.`discussion_replies`.`date`,
@@ -1029,7 +1027,7 @@ public static class DatabaseQueries
         WHERE       ent.`discussion_id`=@discussionID
         ;";
 
-    public const string QUERY_DISCUSSION_REPLIES_FOR_USER = // all done
+    public const string QUERY_DISCUSSION_REPLIES_FOR_USER =
         @"SELECT    rep.`discussion_replies`.`reply_id`,
                     rep.`discussion_replies`.`author`,
                     rep.`discussion_replies`.`date`,
@@ -1124,7 +1122,7 @@ public static class DatabaseQueries
 
     public const string QUERY_USERS_WITH_GOAL_GRADE =
         @"SELECT    `users`.`user_id`,
-                    `users`.`studentnumber`,
+                    `users`.`student_number`,
                     `users`.`name`,
                     `users`.`sortable_name`,
                     `users`.`role`
@@ -1183,16 +1181,17 @@ public static class DatabaseQueries
         AND         `sync_ID`=@syncID
         ;";
 
-// What is this here for without any references?????
-    // public const string QUERY_USER_SUBMISSIONS_FOR_ENTRY =
-    //     @"SELECT    `id`,
-    //                 `entry_id`,
-    //                 `user_id`,
-    //                 `grade`,
-    //                 `submitted`
-    //     FROM        `submissions`
-    //     WHERE       `entry_id`='{0}'
-    //     AND         `sync_hash`='{1}';";
+    public const string QUERY_LAST_STUDENT_SETTINGS =
+        @"SELECT    `predicted_grade`,
+                    `goal_grade`,
+                    `notifications`
+        FROM        `student_settings` 
+        WHERE       `course_id`=@courseID
+        AND         `user_id`=@userID
+        ORDER BY    `sync_ID` DESC
+        LIMIT       1
+        ;";
+
 
     public const string QUERY_COURSE_SUBMISSIONS =
         @"SELECT    `submissions`.`submission_id`,
@@ -1311,7 +1310,7 @@ public static class DatabaseQueries
         AND         `sync_id`=@syncID;";
 
 
-    public const string QUERY_GRADE_COMPARISSON_HISTORY = // half done ????? take a look at syncID
+    public const string QUERY_GRADE_COMPARISSON_HISTORY = // half done ?????
         @"SELECT    `peer_groups`.`tile_id`,
                     avg(`submissions`.`grade`),
                     `peer_groups`.`avg_grade`,
@@ -1332,7 +1331,7 @@ public static class DatabaseQueries
         ORDER BY    `peer_groups`.`tile_id`;";
 
 
-    public const string QUERY_USER_RESULTS = // half done , does it work though????????
+    public const string QUERY_USER_RESULTS = // half done , does it work though?????
         @"SELECT   `tiles`.`tile_id`,
                     AVG(`grade`),
                     MIN(`grade`),
@@ -1348,7 +1347,7 @@ public static class DatabaseQueries
             USING   (`column_id`)
         WHERE       `layout_columns`.`course_id`=@courseID
         AND         `submissions`.`user_id`=@userID
-        AND         `submissions`.`sync_hash`=@hash
+        AND         `submissions`.`sync_id`=@syncID
 	    GROUP BY `tiles`.`tile_id`;";
 
     public const string QUERY_USER_SUBMISSIONS_FOR_ENTRY_FOR_USER =
@@ -1391,18 +1390,6 @@ public static class DatabaseQueries
 
 // //============================ Update Values =============================//
 
-////// WE NEED  TO JOIN THOSE 2 AND INSERT INSTEAD OF UPDATE
-    public const string UPDATE_NOTIFICATION_ENABLE = // NOT DONE 
-        @"UPDATE    `student_settings`
-        SET         `notifications` = @enable
-        WHERE       `course_id`=@courseID
-        AND         `user_id`=@userID;";
-
-    public const string UPDATE_USER_GOAL_GRADE = // NOT DONE
-        @"UPDATE    `student_settings`
-        SET         `goal_grade` = @grade
-        WHERE       `course_id`=@courseID
-        AND         `user_id`=@userID;";
 
     public const string UPDATE_LAYOUT_COLUMN =
         @"UPDATE    `layout_columns`
@@ -1418,7 +1405,7 @@ public static class DatabaseQueries
 
     public const string UPDATE_PEER_GROUP_FOR_COURSE =
         @"UPDATE    `course_settings`
-        SET         `peer_group_size`=@groupSize,
+        SET         `peer_group_size`=@groupSize
         WHERE       `course_id`=@courseID;";
     public const string UPDATE_NOTIFICATION_DATES_FOR_COURSE =
         @"UPDATE    `course_settings`
@@ -1534,7 +1521,7 @@ public static class DatabaseQueries
         @"DELETE FROM       `goal_requirements`
           WHERE             `requirement_id` = @requirementID;";
 
-    public const string DELETE_TILE_ENTRY = ////should this stay like this??????
+    public const string DELETE_TILE_ENTRY = ////should this stay like this?????
          @"DELETE FROM       `tile_entries`
           WHERE              ROWID=@entryID;";
 

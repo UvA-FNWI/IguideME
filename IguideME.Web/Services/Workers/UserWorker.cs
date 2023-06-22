@@ -38,7 +38,7 @@ namespace IguideME.Web.Services.Workers
         /// Registers the given students and initializes their settings in the database.
         /// </summary>
         /// <param name="students">list of students to be registered.</param>
-        private void RegisterStudents(User[] students) {
+        private void InitializeStudents(User[] students) {
 
             foreach (User student in students)
             {
@@ -52,7 +52,7 @@ namespace IguideME.Web.Services.Workers
                         0 // User.UserRoles.student
                     );
 
-                    DatabaseManager.Instance.RegisterUserSettings(new Models.ConsentData(_courseID, student.LoginID, -1), this._syncID);
+                    DatabaseManager.Instance.InitializeUserSettings(new Models.ConsentData(_courseID, student.LoginID, -1), this._syncID);
 
                 } catch (Exception e) {
                     _logger.LogError("Error registering student: {Error} {StackTrace}", e, e.StackTrace);
@@ -90,7 +90,7 @@ namespace IguideME.Web.Services.Workers
 
             _logger.LogInformation("Starting student registry, about to process {StudentCount} students...", students.Length);
 
-            this.RegisterStudents(students);
+            this.InitializeStudents(students);
 
             var instructors = this._canvasHandler.GetAdministrators(_courseID);
 

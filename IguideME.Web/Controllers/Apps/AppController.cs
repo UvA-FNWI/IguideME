@@ -97,7 +97,8 @@ namespace IguideME.Web.Controllers
             DatabaseManager.Instance.UpdateNotificationEnable(
                     this.GetCourseID(),
                     this.GetUserID(),
-                    (bool) JObject.Parse(body)["enable"]
+                    (bool) JObject.Parse(body)["enable"],
+                    this.GetHashCode()
                     );
 
             return Json(

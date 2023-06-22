@@ -257,7 +257,8 @@ namespace IguideME.Web.Controllers
             DatabaseManager.Instance.UpdateUserGoalGrade(
                     this.GetCourseID(),
                     this.GetUserID(),
-                    (int)JObject.Parse(body)["goal_grade"]);
+                    (int)JObject.Parse(body)["goal_grade"],
+                    this.GetHashCode());
 
             return Json(
                 DatabaseManager.Instance.GetUserGoalGrade(
