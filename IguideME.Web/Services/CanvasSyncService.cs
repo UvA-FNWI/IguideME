@@ -60,7 +60,7 @@ namespace IguideME.Web.Services
                 return (input >= startDate && input <= endDate);
             }
 
-            List<string> notificationDates = DatabaseManager.Instance.GetNotificationDates(courseID);
+            List<string> notificationDates = DatabaseManager.getInstance().GetNotificationDates(courseID);
             if (notificationDates[0].Contains("-")) { 
                 // We are looking in a range of dates
                 foreach(string datepair in notificationDates)
@@ -82,10 +82,10 @@ namespace IguideME.Web.Services
             _canvasHandler.CreateConnection();
 
             // Don't keep ancient syncs in the database.
-            DatabaseManager.Instance.CleanupSync(courseID);
+            DatabaseManager.getInstance().CleanupSync(courseID);
 
             // Register the new sync in the database.
-            DatabaseManager.Instance.RegisterSync(courseID, timestamp);
+            DatabaseManager.getInstance().RegisterSync(courseID, timestamp);
             _logger.LogInformation("Sync hash: {Hash}", timestamp);
             _logger.LogInformation("Course: {Course}", work.CourseID);
 
@@ -135,12 +135,12 @@ namespace IguideME.Web.Services
 
             // TODO: COMMENTED OUT CODE THAT SHOULD GO BACK IN ---------------------
             // _logger.LogInformation("Starting recycleexternaldata");
-            // DatabaseManager.Instance.RecycleExternalData(courseID, timestamp);
+            // DatabaseManager.getInstance().RecycleExternalData(courseID, timestamp);
             //----------------------------------------------------------------------
 
             long duration = sw.ElapsedMilliseconds;
             Console.WriteLine("Took: " + duration.ToString() + "ms");
-            DatabaseManager.Instance.CompleteSync(timestamp);
+            DatabaseManager.getInstance().CompleteSync(timestamp);
 
             return result;
         }

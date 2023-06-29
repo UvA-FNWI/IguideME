@@ -52,7 +52,7 @@ namespace IguideME.Web.Models.App
         }
 
         public void GetParameters() {
-            this.Parameters = DatabaseManager.Instance.GetGradePredictionModelParameters(this.ID);
+            this.Parameters = DatabaseManager.getInstance().GetGradePredictionModelParameters(this.ID);
         }
     }
 }

@@ -74,14 +74,14 @@ namespace IguideME.Web.Models
             // this.Wildcard = wildcard;
 
             if (loadEntries)
-                this.Entries = DatabaseManager.Instance.GetTileEntries(this.ID);
+                this.Entries = DatabaseManager.getInstance().GetTileEntries(this.ID);
         }
 
         public List<TileEntry> GetEntries()
         {
             if (this.Entries == null)
             {
-                this.Entries = DatabaseManager.Instance.GetTileEntries(this.ID);
+                this.Entries = DatabaseManager.getInstance().GetTileEntries(this.ID);
                 return this.Entries;
             }
 

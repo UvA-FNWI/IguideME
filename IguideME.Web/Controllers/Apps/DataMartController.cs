@@ -49,7 +49,7 @@ namespace IguideME.Web.Controllers
         {
             var body = new StreamReader(Request.Body).ReadToEnd();
 
-            DatabaseManager.Instance.LogTable(JObject.Parse(body)["name"].ToString());
+            DatabaseManager.getInstance().LogTable(JObject.Parse(body)["name"].ToString());
         }
 
         [Authorize(Policy = "IsInstructor")]
@@ -92,7 +92,7 @@ namespace IguideME.Web.Controllers
         public JsonResult GetSynchronizations()
         {
             return Json(
-                DatabaseManager.Instance.GetSyncHashes(this.GetCourseID()));
+                DatabaseManager.getInstance().GetSyncHashes(this.GetCourseID()));
         }
 
         // -------------------- Synchronization registry --------------------
@@ -104,7 +104,7 @@ namespace IguideME.Web.Controllers
         public JsonResult GetUsers()
         {
             return Json(
-                DatabaseManager.Instance.GetUsers(this.GetCourseID()));
+                DatabaseManager.getInstance().GetUsers(this.GetCourseID()));
         }
 
         [Authorize]
@@ -116,7 +116,7 @@ namespace IguideME.Web.Controllers
             return !this.IsAdministrator() && "self" != userID && userID != GetUserID()
                 ? Unauthorized()
                 : Json(
-                DatabaseManager.Instance
+                DatabaseManager.getInstance()
                     .GetPredictedGrades(
                         GetCourseID(),
                         userID == "self" ? GetUserID() : userID));
@@ -132,7 +132,7 @@ namespace IguideME.Web.Controllers
             return this.IsAdministrator()
                 ? Json(1)
                 : Json(
-                DatabaseManager.Instance.GetConsent(
+                DatabaseManager.getInstance().GetConsent(
                     GetCourseID(), GetUserID(), GetHashCode()));
         }
 
@@ -149,7 +149,7 @@ namespace IguideME.Web.Controllers
                 GetUserID(),
                 (int)JObject.Parse(body)["granted"]
             );
-            DatabaseManager.Instance.SetConsent(consent, this.GetHashCode());
+            DatabaseManager.getInstance().SetConsent(consent, this.GetHashCode());
             return Json(consent.Granted);
         }
 
@@ -171,7 +171,7 @@ namespace IguideME.Web.Controllers
         public ActionResult GetStudents()
         {
             return Json(
-                DatabaseManager.Instance.GetUsers(this.GetCourseID(), 0) // 0 == student
+                DatabaseManager.getInstance().GetUsers(this.GetCourseID(), 0) // 0 == student
                 .ToArray());
         }
 
@@ -183,7 +183,7 @@ namespace IguideME.Web.Controllers
         public ActionResult GetConsents()
         {
             return Json(
-                DatabaseManager.Instance.GetConsents(this.GetCourseID(), GetHashCode())
+                DatabaseManager.getInstance().GetConsents(this.GetCourseID(), GetHashCode())
                 .ToArray());
         }
 
@@ -195,7 +195,7 @@ namespace IguideME.Web.Controllers
         public ActionResult GetSubmissions()
         {
             return Json(
-                DatabaseManager.Instance.GetCourseSubmissions(GetCourseID()));
+                DatabaseManager.getInstance().GetCourseSubmissions(GetCourseID()));
         }
 
         [Authorize(Policy = "IsInstructor")]
@@ -207,7 +207,7 @@ namespace IguideME.Web.Controllers
         {
             // returns all goal grades
             return Json(
-                DatabaseManager.Instance.GetGoalGrades(
+                DatabaseManager.getInstance().GetGoalGrades(
                     this.GetCourseID(),
                     this.GetHashCode()));
         }
@@ -225,12 +225,13 @@ namespace IguideME.Web.Controllers
 
             // returns the goal grade for the logged in user
             return Json(
-                DatabaseManager.Instance.GetUserGoalGrade(
+                DatabaseManager.getInstance().GetUserGoalGrade(
                     this.GetCourseID(),
                     userID,
                     this.GetHashCode()));
         }
 
+// Again, what is the difference between those two ?????
         [Authorize]
         [HttpGet]
         [Route("/goal-grade")]
@@ -240,7 +241,7 @@ namespace IguideME.Web.Controllers
         {
             // returns the goal grade for the logged in user
             return Json(
-                DatabaseManager.Instance.GetUserGoalGrade(
+                DatabaseManager.getInstance().GetUserGoalGrade(
                     this.GetCourseID(),
                     this.GetUserID(),
                     this.GetHashCode()));
@@ -254,14 +255,14 @@ namespace IguideME.Web.Controllers
         public ActionResult UpdateGoalGrade()
         {
             var body = new StreamReader(Request.Body).ReadToEnd();
-            DatabaseManager.Instance.UpdateUserGoalGrade(
+            DatabaseManager.getInstance().UpdateUserGoalGrade(
                     this.GetCourseID(),
                     this.GetUserID(),
                     (int)JObject.Parse(body)["goal_grade"],
                     this.GetHashCode());
 
             return Json(
-                DatabaseManager.Instance.GetUserGoalGrade(
+                DatabaseManager.getInstance().GetUserGoalGrade(
                     this.GetCourseID(),
                     this.GetUserID(),
                     this.GetHashCode()));
@@ -275,7 +276,7 @@ namespace IguideME.Web.Controllers
         public ActionResult GetCanvasAssignments()
         {
             return Json(
-                DatabaseManager.Instance.GetAssignments(GetCourseID())
+                DatabaseManager.getInstance().GetAssignments(GetCourseID())
             );
         }
 
@@ -286,12 +287,12 @@ namespace IguideME.Web.Controllers
         {
             int course_id = this.GetCourseID();
 
-            List<AppDiscussion> discussions = DatabaseManager.Instance.GetDiscussions(course_id);
+            List<AppDiscussion> discussions = DatabaseManager.getInstance().GetDiscussions(course_id);
 
             foreach (AppDiscussion discussion in new List<AppDiscussion>(discussions)) {
-                discussions.AddRange(DatabaseManager.Instance.GetDiscussionEntries(
+                discussions.AddRange(DatabaseManager.getInstance().GetDiscussionEntries(
                     discussion.ID));
-                discussions.AddRange(DatabaseManager.Instance.GetDiscussionReplies(
+                discussions.AddRange(DatabaseManager.getInstance().GetDiscussionReplies(
                     discussion.ID));
             }
             return Json(
@@ -305,7 +306,7 @@ namespace IguideME.Web.Controllers
         [Route("/datamart/notifications")]
         public ActionResult GetCourseNotifications()
         {
-            return Json(DatabaseManager.Instance.GetAllNotifications(GetCourseID()));
+            return Json(DatabaseManager.getInstance().GetAllNotifications(GetCourseID()));
         }
 
         [Authorize]
@@ -316,7 +317,7 @@ namespace IguideME.Web.Controllers
             return !this.IsAdministrator() && userID != GetUserID()
                 ? Unauthorized()
                 : Json(
-                DatabaseManager.Instance.GetPendingNotifications(
+                DatabaseManager.getInstance().GetPendingNotifications(
                     GetCourseID(), userID, GetHashCode())
             );
         }
@@ -328,18 +329,18 @@ namespace IguideME.Web.Controllers
         [Route("/datamart/accept-list")]
         public ActionResult CreateAcceptList([FromBody] AcceptList[] acceptList)
         {
-            DatabaseManager.Instance.ResetAcceptList(GetCourseID());
+            DatabaseManager.getInstance().ResetAcceptList(GetCourseID());
 
             foreach (AcceptList list in acceptList)
             {
-                DatabaseManager.Instance.RegisterAcceptedStudent(
+                DatabaseManager.getInstance().RegisterAcceptedStudent(
                     GetCourseID(),
                     list.UserID,
                     list.Accepted);
             }
 
             return Json(
-                DatabaseManager.Instance.GetAcceptList(GetCourseID())
+                DatabaseManager.getInstance().GetAcceptList(GetCourseID())
             );
         }
 
@@ -349,7 +350,7 @@ namespace IguideME.Web.Controllers
         public ActionResult UpdateAcceptList()
         {
             var body = new StreamReader(Request.Body).ReadToEnd();
-            DatabaseManager.Instance.SetAcceptListRequired(
+            DatabaseManager.getInstance().SetAcceptListRequired(
                 GetCourseID(),
                 (bool)JObject.Parse(body)["enabled"]);
             return Json((bool)JObject.Parse(body)["enabled"]);
@@ -361,7 +362,7 @@ namespace IguideME.Web.Controllers
         public ActionResult GetAcceptList()
         {
             return Json(
-                DatabaseManager.Instance.GetAcceptList(GetCourseID())
+                DatabaseManager.getInstance().GetAcceptList(GetCourseID())
             );
         }
 
@@ -370,12 +371,12 @@ namespace IguideME.Web.Controllers
         [Route("/datamart/accept-list/{userID}")]
         public ActionResult GetAcceptListByStudent(string userID)
         {
-            var course = DatabaseManager.Instance.GetPublicInformedConsent(GetCourseID());
+            var course = DatabaseManager.getInstance().GetPublicInformedConsent(GetCourseID());
 
             // if (!course.AcceptList || IsAdministrator()) return Json(true);
             if (IsAdministrator()) return Json(true);
 
-            AcceptList student = DatabaseManager.Instance
+            AcceptList student = DatabaseManager.getInstance()
                 .GetAcceptList(GetCourseID())
                 .Find(x => x.UserID == (userID == "self" ? GetUserID() : userID));
 

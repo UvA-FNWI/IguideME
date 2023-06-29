@@ -55,17 +55,17 @@ namespace IguideME.Web.Services.Workers
 
 			foreach (Canvas.Discussion discussion in discussions)
             {
-				DatabaseManager.Instance.RegisterDiscussion(discussion, this._syncID);
+				DatabaseManager.getInstance().RegisterDiscussion(discussion, this._syncID);
 
 				// Register the entries corresponding to the topic as well.
 				foreach (Canvas.DiscussionEntry entry in discussion.Entries) {
-                    int entry_id = DatabaseManager.Instance.RegisterDiscussionEntry(
+                    int entry_id = DatabaseManager.getInstance().RegisterDiscussionEntry(
 						entry,
 						students?.Find(s => s.StudentNumber == entry.UserID)?.UserID);
 
 					// Register the replies corresponding to the entry as well.
 					foreach (Canvas.DiscussionReply reply in entry.Replies) {
-                        DatabaseManager.Instance.RegisterDiscussionReply(
+                        DatabaseManager.getInstance().RegisterDiscussionReply(
 							reply,
 							entry_id,
 							students?.Find(s => s.StudentNumber == reply.UserID)?.UserID);
@@ -88,12 +88,12 @@ namespace IguideME.Web.Services.Workers
 			IEnumerable<Canvas.Discussion> postedDiscussions = discussions
 				.Where(d => {
 					User student = students.Find(s => s.Name == d.UserName);
-					return student != null && DatabaseManager.Instance.GetConsent(this._courseID, student.UserID, GetHashCode()) > 0;
+					return student != null && DatabaseManager.getInstance().GetConsent(this._courseID, student.UserID, GetHashCode()) > 0;
 				});
 
 			foreach (Canvas.Discussion discussion in postedDiscussions)
 			{
-				DatabaseManager.Instance.UpdateDiscussion(discussion, tile.ID, this._syncID);
+				DatabaseManager.getInstance().UpdateDiscussion(discussion, tile.ID, this._syncID);
 
 			}
 		}
@@ -110,7 +110,7 @@ namespace IguideME.Web.Services.Workers
 			foreach (Canvas.Discussion discussion in discussions) {
 				foreach (TileEntry entry in tile.Entries) {
 					if (discussion.ID == entry.ContentID) {
-						DatabaseManager.Instance.UpdateDiscussion(discussion, tile.ID, this._syncID);
+						DatabaseManager.getInstance().UpdateDiscussion(discussion, tile.ID, this._syncID);
 					}
 				}
 			}
@@ -124,7 +124,7 @@ namespace IguideME.Web.Services.Workers
 		private void LinkToTiles(List<Canvas.Discussion> discussions, List<User> students) {
 
 			// Get all the discussion tiles.
-			IEnumerable<Tile> tiles = DatabaseManager.Instance.GetTiles(this._courseID)
+			IEnumerable<Tile> tiles = DatabaseManager.getInstance().GetTiles(this._courseID)
 				.Where(tile => tile.Type == Tile.Tile_type.discussions);
 
             foreach (Tile tile in tiles)
@@ -148,7 +148,7 @@ namespace IguideME.Web.Services.Workers
 
 			_logger.LogInformation("Starting discussion registry...");
 
-			List<User> students = DatabaseManager.Instance.GetUsers(this._courseID, (int) User.UserRoles.student, this._syncID);
+			List<User> students = DatabaseManager.getInstance().GetUsers(this._courseID, (int) User.UserRoles.student, this._syncID);
 			List<Canvas.Discussion> discussions = this._canvasHandler.GetDiscussions(this._courseID);
 
             this.RegisterDiscusions(discussions, students);

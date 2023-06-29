@@ -44,7 +44,7 @@ namespace IguideME.Web.Services.Workers
             {
                 // _logger.LogInformation("Processing student {ID}...", student.ID);
                 try {
-                    DatabaseManager.Instance.RegisterUser(
+                    DatabaseManager.getInstance().RegisterUser(
                         student.ID,
                         student.LoginID,
                         student.Name,
@@ -52,7 +52,7 @@ namespace IguideME.Web.Services.Workers
                         0 // User.UserRoles.student
                     );
 
-                    DatabaseManager.Instance.InitializeUserSettings(new Models.ConsentData(_courseID, student.LoginID, -1), this._syncID);
+                    DatabaseManager.getInstance().InitializeUserSettings(new Models.ConsentData(_courseID, student.LoginID, -1), this._syncID);
 
                 } catch (Exception e) {
                     _logger.LogError("Error registering student: {Error} {StackTrace}", e, e.StackTrace);
@@ -69,7 +69,7 @@ namespace IguideME.Web.Services.Workers
             {
                 _logger.LogInformation("Processing instructor {ID} ...", instructor.ID);
 
-                DatabaseManager.Instance.RegisterUser(
+                DatabaseManager.getInstance().RegisterUser(
                     instructor.ID,
                     instructor.LoginID,
                     instructor.Name,

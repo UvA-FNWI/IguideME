@@ -35,19 +35,19 @@ namespace IguideME.Web.Models.App
 
         public void FetchRequirements()
         {
-            this.Requirements = DatabaseManager.Instance
+            this.Requirements = DatabaseManager.getInstance()
                         .GetGoalRequirements(this.ID);
         }
 
         public void DeleteGoalRequirements()
         {
-            DatabaseManager.Instance.DeleteGoalRequirements(this.ID);
+            DatabaseManager.getInstance().DeleteGoalRequirements(this.ID);
             this.Requirements.Clear();
         }
 
         // public void DeleteGoalRequirement(int tileID)
         // {
-        //     DatabaseManager.Instance.DeleteGoalRequirement(this.ID, tileID);
+        //     DatabaseManager.getInstance().DeleteGoalRequirement(this.ID, tileID);
         // }
     }
 

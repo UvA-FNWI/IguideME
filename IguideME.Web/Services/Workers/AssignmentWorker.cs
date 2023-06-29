@@ -77,7 +77,7 @@ namespace IguideME.Web.Services.Workers
             IEnumerable<Submission> submissions = assignment.Submissions
                 .Where(submission =>
 					submission.Grade != null &&
-					DatabaseManager.Instance.GetConsent(this._courseID, submission.User.LoginID, _syncID) > 0
+					DatabaseManager.getInstance().GetConsent(this._courseID, submission.User.LoginID, _syncID) > 0
 				);
 
             foreach (Submission submission in submissions)
@@ -110,7 +110,7 @@ namespace IguideME.Web.Services.Workers
 				}
                 _logger.LogInformation("loginid {ID}", submission.User.LoginID);
                 
-				DatabaseManager.Instance.CreateUserSubmission(
+				DatabaseManager.getInstance().CreateUserSubmission(
 						assignment.ID ?? -1, // TODO: handle properly
 						submission.User.LoginID,
 						grade,
@@ -127,13 +127,13 @@ namespace IguideME.Web.Services.Workers
 			_logger.LogInformation("Starting assignment registry...");
 
 			IEnumerable<Assignment> assignments = this._canvasHandler.GetAssignments(this._courseID);
-			List<TileEntry> entries = DatabaseManager.Instance.GetEntries(this._courseID);
+			List<TileEntry> entries = DatabaseManager.getInstance().GetEntries(this._courseID);
 
             foreach (Assignment assignment in assignments)
             {
                 _logger.LogInformation("Processing assignment: {Name}", assignment.Name);
 
-                DatabaseManager.Instance.RegisterAssignment(
+                DatabaseManager.getInstance().RegisterAssignment(
                     assignment.ID,
                     assignment.CourseID,
                     assignment.Name ??= "?",

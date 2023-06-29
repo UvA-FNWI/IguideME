@@ -43,9 +43,9 @@
 //         public void LoadPeers()
 //         {
 //             var minPeerGroupSize =
-//                 DatabaseManager.Instance.GetMinimumPeerGroupSize(this.CourseID);
+//                 DatabaseManager.getInstance().GetMinimumPeerGroupSize(this.CourseID);
 //             var courseStudents =
-//                 DatabaseManager.Instance.GetUsers(this.CourseID, "student", this.Hash);
+//                 DatabaseManager.getInstance().GetUsers(this.CourseID, "student", this.Hash);
 
 //             if (courseStudents.Count - 1 < minPeerGroupSize)
 //             {
@@ -53,7 +53,7 @@
 //                 return;
 //             }
 
-//             if (!DatabaseManager.Instance.HasPersonalizedPeers(this.CourseID))
+//             if (!DatabaseManager.getInstance().HasPersonalizedPeers(this.CourseID))
 //             {
 //                 Console.WriteLine("Course " + this.CourseID + " has no personalized peers, considering every student enrolled a peer.");
 //                 // If the course does not have personalized peers consider
@@ -67,7 +67,7 @@
 
 //             // If personalized peers are enabled then assert the student
 //             // provided a goal grade.
-//             var _grade = DatabaseManager.Instance.GetUserGoalGrade(
+//             var _grade = DatabaseManager.getInstance().GetUserGoalGrade(
 //                 this.CourseID, this.LoginID);
 
 //             if (_grade < 0)
@@ -93,7 +93,7 @@
 //             List<User> peers = new List<User>();
 //             _grades.Add(grade);
 
-//             DatabaseManager.Instance
+//             DatabaseManager.getInstance()
 //                 .GetUsersWithGoalGrade(this.CourseID, (int)grade, this.Hash)
 //                 .FindAll(u => u.LoginID != this.LoginID)
 //                 .ForEach(x => peers.Add(x));
@@ -106,7 +106,7 @@
 //                 var requiredPeers = minPeerGroupSize - peers.Count;
 
 //                 // Check upwards peers
-//                 var usersWithGoalGrade = DatabaseManager.Instance
+//                 var usersWithGoalGrade = DatabaseManager.getInstance()
 //                     .GetUsersWithGoalGrade(this.CourseID, (int)grade + offset, this.Hash);
 //                 if (usersWithGoalGrade.Count > 0)
 //                     usersWithGoalGrade
@@ -118,7 +118,7 @@
 //                 if (requiredPeers <= 0) break;
 
 //                 // Check downward peers
-//                 usersWithGoalGrade = DatabaseManager.Instance
+//                 usersWithGoalGrade = DatabaseManager.getInstance()
 //                     .GetUsersWithGoalGrade(this.CourseID, (int)grade - offset, this.Hash);
 //                 if (usersWithGoalGrade.Count > 0)
 //                     usersWithGoalGrade

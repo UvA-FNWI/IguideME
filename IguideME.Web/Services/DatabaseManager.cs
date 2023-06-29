@@ -20,7 +20,7 @@ namespace IguideME.Web.Services
         private readonly string _connection_string;
         private readonly ILogger _logger;
 
-        DatabaseManager(bool isDev = false) {
+        private DatabaseManager(bool isDev = false) {
             DatabaseManager.s_instance = this;
             _connection_string = isDev ? "Data Source=db.sqlite;Version=3;New=False;Compress=True;"
                                       : "Data Source=/data/IguideME.db;Version=3;New=False;Compress=True;";
@@ -32,14 +32,17 @@ namespace IguideME.Web.Services
         }
 
         // TODO: I think we want the database manager to just be a singleton that we add using dependency injection just like canvashandler (although that one maybe shouldn't be singleton probably)
-        public static void Initialize(bool isDev = false)
-        {
-            new DatabaseManager(isDev);
-        }
+        // public static void Initialize(bool isDev = false)
+        // {
+        //     new DatabaseManager(isDev);
+        // }
 
-        public static DatabaseManager Instance
+        public static DatabaseManager getInstance (bool isDev = false)
         {
-            get { return s_instance; }
+            if (s_instance == null)
+                s_instance = new DatabaseManager(isDev);
+        
+            return s_instance;
         }
 
         private SQLiteConnection GetConnection() => new(_connection_string);
@@ -1312,21 +1315,14 @@ namespace IguideME.Web.Services
 
         public PeerComparisonData[] GetUserResults(
             int courseID,
-            string userID,
-            long syncID = 0)
+            string userID)
         {
-            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
-            if (activeSync == 0)
-                return new PeerComparisonData[] {
-                    PeerComparisonData.FromGrades(0, Array.Empty<float>())
-                };
 
             List<PeerComparisonData> submissions = new();
 
             using(SQLiteDataReader r1 = Query(DatabaseQueries.QUERY_USER_RESULTS,
                     new SQLiteParameter("courseID", courseID),
-                    new SQLiteParameter("userID", userID),
-                    new SQLiteParameter("syncID", activeSync)
+                    new SQLiteParameter("userID", userID)
                 )) {
                 while (r1.Read()) {
                     PeerComparisonData submission = new(

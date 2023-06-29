@@ -43,11 +43,11 @@ namespace IguideME.Web.Controllers
         public JsonResult PostTile([FromBody] Tile tile)
         {
             // Creates a new tile with information posted in the request's body
-            int tilesInGroup = DatabaseManager.Instance.GetTiles(GetCourseID())
+            int tilesInGroup = DatabaseManager.getInstance().GetTiles(GetCourseID())
                 .Where(t => t.GroupID == tile.GroupID)
                 .Count();
 
-            Tile newTile = DatabaseManager.Instance.CreateTile(
+            Tile newTile = DatabaseManager.getInstance().CreateTile(
                 GetCourseID(),
                 tile.GroupID,
                 tile.Title,
@@ -70,7 +70,7 @@ namespace IguideME.Web.Controllers
         {
             // return all tiles registered to the course
             return Json(
-                DatabaseManager.Instance.GetTiles(GetCourseID()));
+                DatabaseManager.getInstance().GetTiles(GetCourseID()));
         }
 
         [Authorize]
@@ -82,7 +82,7 @@ namespace IguideME.Web.Controllers
         {
             // return all tiles registered to the course
             return Json(
-                    DatabaseManager.Instance.GetLayoutTileGroups(GetCourseID()));
+                    DatabaseManager.getInstance().GetLayoutTileGroups(GetCourseID()));
         }
 
         [Authorize(Policy = "IsInstructor")]
@@ -92,9 +92,9 @@ namespace IguideME.Web.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public ActionResult PostTileGroup([FromBody] LayoutTileGroup obj)
         {
-            DatabaseManager.Instance.CreateLayoutTileGroup(GetCourseID(), obj.Title, obj.Position);
+            DatabaseManager.getInstance().CreateLayoutTileGroup(GetCourseID(), obj.Title, obj.Position);
             return Json(
-                    DatabaseManager.Instance.GetLayoutTileGroups(GetCourseID()));
+                    DatabaseManager.getInstance().GetLayoutTileGroups(GetCourseID()));
         }
 
         [Authorize(Policy = "IsInstructor")]
@@ -110,9 +110,9 @@ namespace IguideME.Web.Controllers
 
             if (success)
             {
-                DatabaseManager.Instance.DeleteLayoutTileGroup(id);
+                DatabaseManager.getInstance().DeleteLayoutTileGroup(id);
                 return Json(
-                        DatabaseManager.Instance.GetLayoutTileGroups(GetCourseID()));
+                        DatabaseManager.getInstance().GetLayoutTileGroups(GetCourseID()));
             }
 
             return BadRequest();
@@ -125,7 +125,7 @@ namespace IguideME.Web.Controllers
         [Route("/tiles/goals")]
         public ActionResult GetGoals()
         {
-            List<LearningGoal> goals = DatabaseManager.Instance.GetGoals(GetCourseID());
+            List<LearningGoal> goals = DatabaseManager.getInstance().GetGoals(GetCourseID());
             return Json(goals);
         }
 
@@ -140,7 +140,7 @@ namespace IguideME.Web.Controllers
 
             return success
                 ? Json(
-                    DatabaseManager.Instance.GetGoals(GetCourseID(), id)
+                    DatabaseManager.getInstance().GetGoals(GetCourseID(), id)
                 )
                 : BadRequest();
         }
@@ -152,12 +152,12 @@ namespace IguideME.Web.Controllers
         [Route("/tiles/goals")]
         public ActionResult CreateTileGoal([FromBody] LearningGoal goal)
         {
-            LearningGoal stored_goal = DatabaseManager.Instance.CreateGoal(
+            LearningGoal stored_goal = DatabaseManager.getInstance().CreateGoal(
                 GetCourseID(), goal.TileID, goal.Title);
 
             foreach (GoalRequirement requirement in goal.Requirements)
             {
-                DatabaseManager.Instance.CreateGoalRequirement(
+                DatabaseManager.getInstance().CreateGoalRequirement(
                     stored_goal.ID,
                     requirement.AssignmentID,
                     (int) requirement.Expression,
@@ -184,7 +184,7 @@ namespace IguideME.Web.Controllers
                 foreach (GoalRequirement req in goal.Requirements){
                     switch (req.State) {
                         case EditState.New:
-                            DatabaseManager.Instance.CreateGoalRequirement(
+                            DatabaseManager.getInstance().CreateGoalRequirement(
                                 req.GoalID,
                                 req.AssignmentID,
                                 (int) req.Expression,
@@ -192,15 +192,15 @@ namespace IguideME.Web.Controllers
                             );
                             break;
                         case EditState.Updated:
-                            DatabaseManager.Instance.UpdateGoalRequirement(req);
+                            DatabaseManager.getInstance().UpdateGoalRequirement(req);
                             break;
                         case EditState.Removed:
-                            DatabaseManager.Instance.DeleteGoalRequirement(req.ID);
+                            DatabaseManager.getInstance().DeleteGoalRequirement(req.ID);
                             break;
                     }
                 }
                 return Json(
-                    DatabaseManager.Instance.UpdateGoal(GetCourseID(), goal)
+                    DatabaseManager.getInstance().UpdateGoal(GetCourseID(), goal)
                 );
             }
 
@@ -220,7 +220,7 @@ namespace IguideME.Web.Controllers
 
             if (success)
             {
-                DatabaseManager.Instance.DeleteGoal(GetCourseID(), id);
+                DatabaseManager.getInstance().DeleteGoal(GetCourseID(), id);
                 return NoContent();
             }
 
@@ -234,7 +234,7 @@ namespace IguideME.Web.Controllers
         [Route("/tiles/entries")]
         public ActionResult GetTileEntries()
         {
-            List<TileEntry> entries = DatabaseManager.Instance.GetEntries(GetCourseID());
+            List<TileEntry> entries = DatabaseManager.getInstance().GetEntries(GetCourseID());
             return Json(entries);
         }
 
@@ -251,7 +251,7 @@ namespace IguideME.Web.Controllers
 
             return success
                 ? Json(
-                    DatabaseManager.Instance
+                    DatabaseManager.getInstance()
                         .GetEntryMetaKeys(id).ToArray())
                 : BadRequest();
         }
@@ -268,7 +268,7 @@ namespace IguideME.Web.Controllers
 
             return success
                 ? Json(
-                    DatabaseManager.Instance
+                    DatabaseManager.getInstance()
                     .GetTile(GetCourseID(), id))
                 : BadRequest();
         }
@@ -285,7 +285,7 @@ namespace IguideME.Web.Controllers
 
             return success
                 ? Json(
-                    DatabaseManager.Instance
+                    DatabaseManager.getInstance()
                     .GetTileEntries(id).ToArray())
                 : BadRequest();
         }
@@ -326,7 +326,7 @@ namespace IguideME.Web.Controllers
             bool success = int.TryParse(tileID, out int id);
             if (success)
             {
-                Tile tile = DatabaseManager.Instance.GetTile(GetCourseID(), id);
+                Tile tile = DatabaseManager.getInstance().GetTile(GetCourseID(), id);
 
                 if (obj.GroupID != null)
                     tile.GroupID = (int) obj.GroupID;
@@ -349,10 +349,10 @@ namespace IguideME.Web.Controllers
                 // if (obj.Wildcard != null)
                 //     tile.Wildcard = (bool) obj.Wildcard;
 
-                DatabaseManager.Instance.UpdateTile(GetCourseID(), tile);
+                DatabaseManager.getInstance().UpdateTile(GetCourseID(), tile);
 
                 return Json(
-                    DatabaseManager.Instance.GetTile(GetCourseID(), id)
+                    DatabaseManager.getInstance().GetTile(GetCourseID(), id)
                 );
             }
             return BadRequest();
@@ -370,7 +370,7 @@ namespace IguideME.Web.Controllers
 
             if (success)
             {
-                DatabaseManager.Instance.DeleteTile(GetCourseID(), id);
+                DatabaseManager.getInstance().DeleteTile(GetCourseID(), id);
                 return NoContent();
             }
 
@@ -394,7 +394,7 @@ namespace IguideME.Web.Controllers
 
             return success
                 ? Json(
-                    DatabaseManager.Instance.GetTileSubmissionsForUser(
+                    DatabaseManager.getInstance().GetTileSubmissionsForUser(
                         this.GetCourseID(), id, userID))
                 : BadRequest();
         }
@@ -415,7 +415,7 @@ namespace IguideME.Web.Controllers
 
             return success
                 ? Json(
-                    DatabaseManager.Instance.GetTileSubmissions(
+                    DatabaseManager.getInstance().GetTileSubmissions(
                         this.GetCourseID(), id))
                 : BadRequest();
         }
@@ -432,7 +432,7 @@ namespace IguideME.Web.Controllers
             // Only instructors may view submissions of other students
             if ((this.GetUserID() != userID &&
                 !this.IsAdministrator()) ||
-                (DatabaseManager.Instance.GetConsent(course_id, userID,GetHashCode()) < 1))
+                (DatabaseManager.getInstance().GetConsent(course_id, userID,GetHashCode()) < 1))
                 return Unauthorized();
 
             bool success = int.TryParse(tileID, out int id);
@@ -441,14 +441,14 @@ namespace IguideME.Web.Controllers
                 return BadRequest();
             }
 
-            User user = DatabaseManager.Instance.GetUser(course_id, userID);
+            User user = DatabaseManager.getInstance().GetUser(course_id, userID);
 
-            List<AppDiscussion> discussions = DatabaseManager.Instance.GetDiscussionsForTile(id);
+            List<AppDiscussion> discussions = DatabaseManager.getInstance().GetDiscussionsForTile(id);
 
             foreach (AppDiscussion discussion in new List<AppDiscussion>(discussions)) {
-                discussions.AddRange(DatabaseManager.Instance.GetDiscussionEntries(
+                discussions.AddRange(DatabaseManager.getInstance().GetDiscussionEntries(
                     discussion.ID, user_id: user.UserID.ToString()));
-                discussions.AddRange(DatabaseManager.Instance.GetDiscussionReplies(
+                discussions.AddRange(DatabaseManager.getInstance().GetDiscussionReplies(
                     discussion.ID, user_id: user.UserID.ToString()));
             }
 
@@ -472,12 +472,12 @@ namespace IguideME.Web.Controllers
 
             if (success)
             {
-                List<LearningGoal> goals = DatabaseManager.Instance.GetGoals(GetCourseID())
+                List<LearningGoal> goals = DatabaseManager.getInstance().GetGoals(GetCourseID())
                     .Where(g => g.TileID == id)
                     .ToList();
 
                 List<AssignmentSubmission> submissions =
-                    DatabaseManager.Instance.GetTileSubmissionsForUser(
+                    DatabaseManager.getInstance().GetTileSubmissionsForUser(
                         this.GetCourseID(),
                         userID);
 
@@ -547,9 +547,9 @@ namespace IguideME.Web.Controllers
         // DBrefTODO: The entry should be changed into the updated version of it
         public void CreateEntry([FromBody] TileEntry entry)
         {
-            DatabaseManager.Instance.CreateTileEntry(entry);
+            DatabaseManager.getInstance().CreateTileEntry(entry);
             
-            // return  Json(DatabaseManager.Instance
+            // return  Json(DatabaseManager.getInstance()
             //     .GetEntries(this.GetCourseID())
             //     .Find(e => e.ID == entryID));
         }
@@ -567,7 +567,7 @@ namespace IguideME.Web.Controllers
 
             if (success)
             {
-                DatabaseManager.Instance.DeleteTileEntry(id);
+                DatabaseManager.getInstance().DeleteTileEntry(id);
                 return NoContent();
             }
 
@@ -599,7 +599,7 @@ namespace IguideME.Web.Controllers
 
                 _ = float.TryParse(values[grade_column], out float grade);
 
-                int submissionID = DatabaseManager.Instance.CreateUserSubmission(
+                int submissionID = DatabaseManager.getInstance().CreateUserSubmission(
                     assignmentID,
                     values[id_column],
                     grade,
@@ -607,7 +607,7 @@ namespace IguideME.Web.Controllers
                 );
 
                 foreach (int i in range) {
-                    DatabaseManager.Instance.CreateSubmissionMeta(
+                    DatabaseManager.getInstance().CreateSubmissionMeta(
                         submissionID,
                         names[i],
                         values[i]
@@ -633,7 +633,7 @@ namespace IguideME.Web.Controllers
 
             return success
                 ? Json(
-                    DatabaseManager.Instance.GetAssignmentSubmissions(
+                    DatabaseManager.getInstance().GetAssignmentSubmissions(
                         this.GetCourseID(), entry_id))
                 : BadRequest();
         }
@@ -649,7 +649,7 @@ namespace IguideME.Web.Controllers
             return this.GetUserID() != userID && !this.IsAdministrator()
                 ? Unauthorized()
                 : Json(
-                DatabaseManager.Instance.GetTileSubmissionsForUser(
+                DatabaseManager.getInstance().GetTileSubmissionsForUser(
                     this.GetCourseID(), userID));
         }
 
@@ -660,13 +660,13 @@ namespace IguideME.Web.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public ActionResult GetTileHistory(string userID)
         {
-            User user = DatabaseManager.Instance.GetUser(
+            User user = DatabaseManager.getInstance().GetUser(
                 this.GetCourseID(), userID);
 
             return user == null
                 ? BadRequest()
                 : Json(
-                DatabaseManager.Instance.GetHistoricComparison(
+                DatabaseManager.getInstance().GetHistoricComparison(
                     this.GetCourseID(), userID));
 
         }
@@ -682,13 +682,13 @@ namespace IguideME.Web.Controllers
             if (this.GetUserID() != userID && !this.IsAdministrator())
                 return Unauthorized();
 
-            User user = DatabaseManager.Instance.GetUser(
+            User user = DatabaseManager.getInstance().GetUser(
                 this.GetCourseID(), userID);
 
             return user == null
                 ? BadRequest()
                 : Json(
-                DatabaseManager.Instance.GetUserPeerComparison(
+                DatabaseManager.getInstance().GetUserPeerComparison(
                 GetCourseID(), user.UserID, GetHashCode()));
         }
 
@@ -703,14 +703,14 @@ namespace IguideME.Web.Controllers
             if (this.GetUserID() != userID && !this.IsAdministrator())
                 return Unauthorized();
 
-            User user = DatabaseManager.Instance.GetUser(
+            User user = DatabaseManager.getInstance().GetUser(
                 this.GetCourseID(), userID);
 
             return user == null
                 ? BadRequest()
                 : Json(
-                DatabaseManager.Instance.GetUserResults(
-                    GetCourseID(), user.UserID, GetHashCode()));
+                DatabaseManager.getInstance().GetUserResults(
+                    GetCourseID(), user.UserID));
         }
 
         [Authorize]
@@ -724,7 +724,7 @@ namespace IguideME.Web.Controllers
              * Returns all columns registered to the course.
              */
             return Json(
-                DatabaseManager.Instance.GetLayoutColumns(GetCourseID()));
+                DatabaseManager.getInstance().GetLayoutColumns(GetCourseID()));
         }
 
         [Authorize]
@@ -736,7 +736,7 @@ namespace IguideME.Web.Controllers
         public ActionResult CreateLayoutColumn([FromBody] LayoutColumn column)
         {
             return Json(
-                DatabaseManager.Instance.CreateLayoutColumn(
+                DatabaseManager.getInstance().CreateLayoutColumn(
                     GetCourseID(),
                     (int) column.ContainerSize,
                     column.Position));
@@ -753,7 +753,7 @@ namespace IguideME.Web.Controllers
 
             return success
                 ? Json(
-                    DatabaseManager.Instance.UpdateLayoutColumn(
+                    DatabaseManager.getInstance().UpdateLayoutColumn(
                         GetCourseID(),
                         id,
                         (int) layoutColumn.ContainerSize,
@@ -772,7 +772,7 @@ namespace IguideME.Web.Controllers
 
             if (success)
             {
-                DatabaseManager.Instance.DeleteLayoutColumn(GetCourseID(), id);
+                DatabaseManager.getInstance().DeleteLayoutColumn(GetCourseID(), id);
                 return NoContent();
             }
 
@@ -790,7 +790,7 @@ namespace IguideME.Web.Controllers
 
             return success
                 ? Json(
-                    DatabaseManager.Instance.UpdateTileGroup(
+                    DatabaseManager.getInstance().UpdateTileGroup(
                         GetCourseID(),
                         id,
                         tileGroup.ColumnID,

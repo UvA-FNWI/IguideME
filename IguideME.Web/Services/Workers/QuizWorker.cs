@@ -53,14 +53,14 @@ namespace IguideME.Web.Services.Workers
 			IEnumerable<QuizSubmission> submissions = quiz.Submissions
                 .Where(submission =>
 					submission.Score != null &&
-					DatabaseManager.Instance.GetConsent(this._courseID,
-						DatabaseManager.Instance.GetUserID(this._courseID, submission.UserID), _syncID) > 0
+					DatabaseManager.getInstance().GetConsent(this._courseID,
+						DatabaseManager.getInstance().GetUserID(this._courseID, submission.UserID), _syncID) > 0
 				);
 
 			foreach (QuizSubmission sub in quiz.Submissions) {
-				DatabaseManager.Instance.CreateUserSubmission(
+				DatabaseManager.getInstance().CreateUserSubmission(
 					quiz.ID ?? -1, // TODO: handle properly when null
-					DatabaseManager.Instance.GetUserID(this._courseID, sub.UserID),
+					DatabaseManager.getInstance().GetUserID(this._courseID, sub.UserID),
 					sub.Score ?? 0,
 					((DateTimeOffset)sub.FinishedDate.Value).ToUnixTimeMilliseconds()
 				);
@@ -76,7 +76,7 @@ namespace IguideME.Web.Services.Workers
 
 			// Get the quizzes from canvas.
 			List<Quiz> quizzes = this._canvasHandler.GetQuizzes(_courseID);
-			List<TileEntry> entries = DatabaseManager.Instance.GetEntries(this._courseID);
+			List<TileEntry> entries = DatabaseManager.getInstance().GetEntries(this._courseID);
 
 			// Register the quizzes in the database.
 			foreach (Quiz quiz in quizzes)
@@ -86,7 +86,7 @@ namespace IguideME.Web.Services.Workers
                     continue;
 
                 _logger.LogInformation("Processing quiz: {Name}", quiz.Name);
-				DatabaseManager.Instance.RegisterAssignment(
+				DatabaseManager.getInstance().RegisterAssignment(
 					quiz.ID,
 					quiz.CourseID,
 					quiz.Name,

@@ -43,7 +43,7 @@ namespace IguideME.Web.Models.App
             if (meta == null)
             {
                 this.Meta = JsonConvert.SerializeObject(
-                    DatabaseManager.Instance.GetEntryMeta(this.ID));
+                    DatabaseManager.getInstance().GetEntryMeta(this.ID));
             }
         }
     }

@@ -45,7 +45,7 @@ namespace IguideME.Web.Services
             var now = DateTime.UtcNow;
             Console.WriteLine("Time is {0}", now.ToString());
 
-            if (DatabaseManager.Instance != null && now.Hour == 3 && now.Minute <= 30)
+            if (DatabaseManager.getInstance() != null && now.Hour == 3 && now.Minute <= 30)
             {
                 new CanvasSyncService(
                     this._computationJobStatus,
@@ -53,7 +53,7 @@ namespace IguideME.Web.Services
                     _logger
                 );
 
-                List<int> course_ids = DatabaseManager.Instance.GetCourseIds();
+                List<int> course_ids = DatabaseManager.getInstance().GetCourseIds();
 
                 foreach (int id in course_ids) {
                     JobParametersModel parameters = new()

@@ -157,7 +157,7 @@ else
     app.UseExceptionHandler("/Error");
 }
 
-DatabaseManager.Initialize(app.Environment.IsDevelopment());
+DatabaseManager.getInstance(app.Environment.IsDevelopment());
 
 app.UseDefaultFiles();
 app.UseStaticFiles();

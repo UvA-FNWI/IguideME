@@ -29,7 +29,7 @@ namespace IguideME.Web.Services.Workers
             _logger = logger;
             this._courseID = courseID;
             this._syncID = syncID;
-            this._model = DatabaseManager.Instance.GetGradePredictionModel(courseID);
+            this._model = DatabaseManager.getInstance().GetGradePredictionModel(courseID);
         }
 
         /// <summary>
@@ -44,7 +44,7 @@ namespace IguideME.Web.Services.Workers
                 return;
             }
 
-            List<User> students = DatabaseManager.Instance.GetUsers(this._courseID, (int) User.UserRoles.student, this._syncID);
+            List<User> students = DatabaseManager.getInstance().GetUsers(this._courseID, (int) User.UserRoles.student, this._syncID);
 
             foreach (User student in students)
             {
@@ -59,11 +59,11 @@ namespace IguideME.Web.Services.Workers
         private void PredictGradesForStudent(User student)
         {
             // _logger.LogInformation("Processing student: {ID}", student.UserID);
-            List<AssignmentSubmission> submissions = DatabaseManager.Instance.GetCourseSubmissionsForStudent(this._courseID,
+            List<AssignmentSubmission> submissions = DatabaseManager.getInstance().GetCourseSubmissionsForStudent(this._courseID,
                                                                                       student.UserID,
                                                                                       this._syncID);
 
-            List<TileEntry> tileEntries = DatabaseManager.Instance.GetEntries(this._courseID);
+            List<TileEntry> tileEntries = DatabaseManager.getInstance().GetEntries(this._courseID);
 
             double wGrade = 0.0;
 
@@ -83,7 +83,7 @@ namespace IguideME.Web.Services.Workers
             // } TODO: fix
             //----------------------------------------------------------------------------------------------------------------------
 
-            DatabaseManager.Instance.CreatePredictedGrade(this._courseID,
+            DatabaseManager.getInstance().CreatePredictedGrade(this._courseID,
                                                           student.UserID,
                                                           wGrade);
         }

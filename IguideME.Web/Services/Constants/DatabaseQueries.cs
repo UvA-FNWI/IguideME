@@ -688,7 +688,7 @@ public static class DatabaseQueries
         AND         `user_id`=@userID
         ORDER BY    `date` DESC;";
 
-    public const string QUERY_GROUP_PEERS = //// DO WE KEEP THIS????????
+    public const string QUERY_GROUP_PEERS = //// DO WE KEEP THIS ?????
         @"SELECT        `user_ids`
         FROM            `peer_groups`
         WHERE           `course_id`=@courseID
@@ -1347,7 +1347,6 @@ public static class DatabaseQueries
             USING   (`column_id`)
         WHERE       `layout_columns`.`course_id`=@courseID
         AND         `submissions`.`user_id`=@userID
-        AND         `submissions`.`sync_id`=@syncID
 	    GROUP BY `tiles`.`tile_id`;";
 
     public const string QUERY_USER_SUBMISSIONS_FOR_ENTRY_FOR_USER =

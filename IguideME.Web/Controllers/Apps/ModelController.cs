@@ -34,18 +34,18 @@ namespace IguideME.Web.Controllers
         {
 
 
-            int modelID = DatabaseManager.Instance.CreateGradePredictionModel(GetCourseID(), model.Intercept);
+            int modelID = DatabaseManager.getInstance().CreateGradePredictionModel(GetCourseID(), model.Intercept);
 
             _logger.LogInformation("Uploading model: {intercept}, {parameters}", model.Intercept, model.Parameters);
             foreach (var parameter in model.Parameters)
             {
-                DatabaseManager.Instance.CreateGradePredictionModelParameter(
+                DatabaseManager.getInstance().CreateGradePredictionModelParameter(
                     modelID,
                     parameter.ParameterID,
                     parameter.Weight);
             }
 
-            return Json(DatabaseManager.Instance.GetGradePredictionModels(GetCourseID()));
+            return Json(DatabaseManager.getInstance().GetGradePredictionModels(GetCourseID()));
         }
 
         // tip: you can use [AllowAnonymous] for debugging purpuses
@@ -56,7 +56,7 @@ namespace IguideME.Web.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult GetModels()
         {
-            return Json(DatabaseManager.Instance.GetGradePredictionModels(GetCourseID()));
+            return Json(DatabaseManager.getInstance().GetGradePredictionModels(GetCourseID()));
         }
 
         [Authorize(Policy = "IsInstructor")]
