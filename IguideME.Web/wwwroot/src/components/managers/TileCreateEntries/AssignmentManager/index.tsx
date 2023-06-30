@@ -34,6 +34,8 @@ export default class AssignmentManager extends Component<Props, IState> {
 
   render(): React.ReactNode {
     const { activeAssignments, canvasAssignments }: Props = this.props;
+    // console.log("activeAssignments" + activeAssignments);
+    // console.log("canvasAssignments" + canvasAssignments);
 
     return (
       <div id={"assignmentManager"}>

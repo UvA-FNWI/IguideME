@@ -2300,7 +2300,9 @@ namespace IguideME.Web.Services
 
             List<TileEntry> entries = new();
 
-            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_ENTRIES_FOR_TILE,
+            //TODO: Get tile type by tileID and make proper query based on it: ass/disc/goal
+
+            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_ASSIGNGMENT_ENTRIES_FOR_TILE,
                     new SQLiteParameter("tileID", tileID)
                 )) {
                 while (r.Read())
@@ -2309,7 +2311,7 @@ namespace IguideME.Web.Services
                         0,
                         r.GetInt32(0),
                         r.GetInt32(1),
-                        "This is the title"
+                        r.GetValue(2).ToString()
                     ));
                 }
             }

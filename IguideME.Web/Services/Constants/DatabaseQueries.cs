@@ -898,11 +898,15 @@ public static class DatabaseQueries
         FROM        `goal_requirements`
         WHERE       `goal_id`=@goalID;";
 
-    public const string QUERY_ENTRIES_FOR_TILE =
-        @"SELECT    `tile_id`,
-                    `content_id`
+// TODO: create for discussions + learning goals
+    public const string QUERY_ASSIGNGMENT_ENTRIES_FOR_TILE =
+        @"SELECT    `tile_entries`.`tile_id`,
+                    `tile_entries`.`content_id`,
+                    `assignments`.`title`
         FROM        `tile_entries`
-        WHERE       `tile_id`=@tileID
+        INNER JOIN  `assignments`
+            ON      `tile_entries`.`content_id` == `assignments`.`assignment_id`
+        WHERE       `tile_entries`.`tile_id`=@tileID
         ;";
 
     public const string QUERY_ALL_TILE_ENTRIES =
