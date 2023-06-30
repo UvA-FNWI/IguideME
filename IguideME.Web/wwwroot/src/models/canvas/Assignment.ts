@@ -1,7 +1,7 @@
 export interface CanvasAssignment {
   id: number;
   course_id: number;
-  name: string;
+  title: string;
   grading_type: string;
   published: boolean;
   points_possible: number;

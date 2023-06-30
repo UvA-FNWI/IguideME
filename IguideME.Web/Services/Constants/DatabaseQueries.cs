@@ -898,15 +898,31 @@ public static class DatabaseQueries
         FROM        `goal_requirements`
         WHERE       `goal_id`=@goalID;";
 
-// TODO: create for discussions + learning goals
-    public const string QUERY_ASSIGNGMENT_ENTRIES_FOR_TILE =
+    public const string QUERY_ENTRIES_FOR_TILE =
         @"SELECT    `tile_entries`.`tile_id`,
                     `tile_entries`.`content_id`,
-                    `assignments`.`title`
+            CASE `tiles`.`type`
+                WHEN    0   THEN `assignments`.`title`
+                WHEN    1   THEN `discussions`.`title`
+                WHEN    2   THEN `learning_goals`.`title`
+            END title
         FROM        `tile_entries`
-        INNER JOIN  `assignments`
-            ON      `tile_entries`.`content_id` == `assignments`.`assignment_id`
-        WHERE       `tile_entries`.`tile_id`=@tileID
+        INNER JOIN  `tiles`
+            USING   (`tile_id`)
+
+        LEFT JOIN  `assignments` 
+            ON      `tiles`.`type` = 0
+            AND     `tile_entries`.`content_id` = `assignments`.`assignment_id`
+
+        LEFT JOIN  `discussions` 
+            ON      `tiles`.`type` = 1
+            AND     `tile_entries`.`content_id` = `discussions`.`discussion_id`
+
+        LEFT JOIN  `learning_goals` 
+            ON      `tiles`.`type` = 2
+            AND     `tile_entries`.`content_id` = `learning_goals`.`goal_id`
+
+        WHERE       `tiles`.`tile_id`=@tileID
         ;";
 
     public const string QUERY_ALL_TILE_ENTRIES =
@@ -1507,6 +1523,10 @@ public static class DatabaseQueries
     public const string RESET_ACCEPT_LIST =
         @"DELETE FROM   `accept_list`
         WHERE           `course_id`=@courseID;";
+
+    public const string DELETE_TILE =
+        @"DELETE FROM   `tile` 
+        WHERE `tile_id` = @tileID;";
 
     public const string DELETE_TILE_GROUP =
         @"DELETE FROM       `tile_groups`

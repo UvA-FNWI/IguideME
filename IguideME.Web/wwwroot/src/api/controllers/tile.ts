@@ -240,6 +240,7 @@ export default class TileController extends Controller {
     return result;
   }
 
+  
   static createTileEntry(entry: TileEntry): Promise<TileEntry> {
     if (debug()) {
       return delay(entry);

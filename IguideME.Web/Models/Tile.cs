@@ -58,10 +58,7 @@ namespace IguideME.Web.Models
             int order,
             Tile_type type,
             bool visible,
-            bool notifications,
-            // bool graphView,
-            // bool wildcard,
-            bool loadEntries = false)
+            bool notifications)
         {
             this.ID = id;
             this.GroupID = groupID;
@@ -70,21 +67,10 @@ namespace IguideME.Web.Models
             this.Type = type;
             this.Visible = visible;
             this.Notifications = notifications;
-            // this.GraphView = graphView;
-            // this.Wildcard = wildcard;
-
-            if (loadEntries)
-                this.Entries = DatabaseManager.getInstance().GetTileEntries(this.ID);
         }
 
         public List<TileEntry> GetEntries()
         {
-            if (this.Entries == null)
-            {
-                this.Entries = DatabaseManager.getInstance().GetTileEntries(this.ID);
-                return this.Entries;
-            }
-
             return this.Entries;
         }
     }
@@ -106,28 +92,18 @@ namespace IguideME.Web.Models
         [JsonProperty(PropertyName = "content_id")]
         public int ContentID { get; set; }
 
-        // [JsonProperty(PropertyName = "type")]
-        // public string Type { get; set; }
-
-        // [JsonProperty(PropertyName = "wildcard")]
-        // public bool Wildcard { get; set; }
-
         public TileEntry(
             // int id,
             EditState state,
             int tileID,
             int ContentID,
             string title)
-            // string type,
-            // bool wildcard = false)
         {
             // this.ID = id;
             this.State = state;
             this.TileID = tileID;
             this.ContentID = ContentID;
             this.Title = title;
-            // this.Type = type;
-            // this.Wildcard = wildcard;
         }
     }
 }

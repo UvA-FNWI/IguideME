@@ -3,7 +3,7 @@ import {CanvasAssignment} from "../../models/canvas/Assignment";
 export const MOCK_CANVAS_ASSIGNMENTS: CanvasAssignment[] = [
   {
     "course_id": 17320,
-    "name": "Quiz 1: Anatomische termen van positie",
+    "title": "Quiz 1: Anatomische termen van positie",
     "grading_type": "points",
     "published": false,
     "points_possible": 10.0,
@@ -16,7 +16,7 @@ export const MOCK_CANVAS_ASSIGNMENTS: CanvasAssignment[] = [
   },
   {
     "course_id": 17320,
-    "name": "Quiz 3: Neurotransmitter systemen",
+    "title": "Quiz 3: Neurotransmitter systemen",
     "grading_type": "points",
     "published": true,
     "points_possible": 10.0,
@@ -29,7 +29,7 @@ export const MOCK_CANVAS_ASSIGNMENTS: CanvasAssignment[] = [
   },
   {
     "course_id": 17320,
-    "name": "Quiz 2: Macro Anatomie",
+    "title": "Quiz 2: Macro Anatomie",
     "grading_type": "points",
     "published": true,
     "points_possible": 10.0,
@@ -42,7 +42,7 @@ export const MOCK_CANVAS_ASSIGNMENTS: CanvasAssignment[] = [
   },
   {
     "course_id": 17320,
-    "name": "Quiz 4: Micro anatomie",
+    "title": "Quiz 4: Micro anatomie",
     "grading_type": "points",
     "published": true,
     "points_possible": 10.0,
@@ -55,7 +55,7 @@ export const MOCK_CANVAS_ASSIGNMENTS: CanvasAssignment[] = [
   },
   {
     "course_id": 17320,
-    "name": "Cijfers deeltoets 1",
+    "title": "Cijfers deeltoets 1",
     "grading_type": "points",
     "published": true,
     "points_possible": 10.0,
@@ -68,7 +68,7 @@ export const MOCK_CANVAS_ASSIGNMENTS: CanvasAssignment[] = [
   },
   {
     "course_id": 17320,
-    "name": "Cijfers deeltoets 2",
+    "title": "Cijfers deeltoets 2",
     "grading_type": "points",
     "published": true,
     "points_possible": 10.0,
@@ -81,7 +81,7 @@ export const MOCK_CANVAS_ASSIGNMENTS: CanvasAssignment[] = [
   },
   {
     "course_id": 17320,
-    "name": "Cijfer presentatie",
+    "title": "Cijfer presentatie",
     "grading_type": "points",
     "published": true,
     "points_possible": 10.0,
@@ -94,7 +94,7 @@ export const MOCK_CANVAS_ASSIGNMENTS: CanvasAssignment[] = [
   },
   {
     "course_id": 17320,
-    "name": "Cijfer deeltoets 3",
+    "title": "Cijfer deeltoets 3",
     "grading_type": "points",
     "published": true,
     "points_possible": 10.0,
@@ -107,7 +107,7 @@ export const MOCK_CANVAS_ASSIGNMENTS: CanvasAssignment[] = [
   },
   {
     "course_id": 17320,
-    "name": "Perusall assignment 1",
+    "title": "Perusall assignment 1",
     "grading_type": "points",
     "published": true,
     "points_possible": 10.0,
@@ -120,7 +120,7 @@ export const MOCK_CANVAS_ASSIGNMENTS: CanvasAssignment[] = [
   },
   {
     "course_id": 17320,
-    "name": "Perusall assignment 2",
+    "title": "Perusall assignment 2",
     "grading_type": "points",
     "published": true,
     "points_possible": 10.0,
@@ -133,7 +133,7 @@ export const MOCK_CANVAS_ASSIGNMENTS: CanvasAssignment[] = [
   },
   {
     "course_id": 17320,
-    "name": "Perusall assignment 3",
+    "title": "Perusall assignment 3",
     "grading_type": "points",
     "published": true,
     "points_possible": 10.0,
@@ -146,7 +146,7 @@ export const MOCK_CANVAS_ASSIGNMENTS: CanvasAssignment[] = [
   },
   {
     "course_id": 17320,
-    "name": "Artikelen college DSM",
+    "title": "Artikelen college DSM",
     "grading_type": "points",
     "published": true,
     "points_possible": 0.0,
@@ -159,7 +159,7 @@ export const MOCK_CANVAS_ASSIGNMENTS: CanvasAssignment[] = [
   },
   {
     "course_id": 17320,
-    "name": "Artikelen college Alzheimer",
+    "title": "Artikelen college Alzheimer",
     "grading_type": "points",
     "published": true,
     "points_possible": 1.0,
@@ -172,7 +172,7 @@ export const MOCK_CANVAS_ASSIGNMENTS: CanvasAssignment[] = [
   },
   {
     "course_id": 17320,
-    "name": "Artikelen college Migraine",
+    "title": "Artikelen college Migraine",
     "grading_type": "points",
     "published": false,
     "points_possible": 1.0,
@@ -185,7 +185,7 @@ export const MOCK_CANVAS_ASSIGNMENTS: CanvasAssignment[] = [
   },
   {
     "course_id": 17320,
-    "name": "Artikelen college Epilepsie",
+    "title": "Artikelen college Epilepsie",
     "grading_type": "points",
     "published": false,
     "points_possible": 0.0,
@@ -198,7 +198,7 @@ export const MOCK_CANVAS_ASSIGNMENTS: CanvasAssignment[] = [
   },
   {
     "course_id": 17320,
-    "name": "Artikelen college Eetstoornissen",
+    "title": "Artikelen college Eetstoornissen",
     "grading_type": "points",
     "published": false,
     "points_possible": 0.0,
@@ -211,7 +211,7 @@ export const MOCK_CANVAS_ASSIGNMENTS: CanvasAssignment[] = [
   },
   {
     "course_id": 17320,
-    "name": "Artikelen college Pijn en Angst",
+    "title": "Artikelen college Pijn en Angst",
     "grading_type": "points",
     "published": false,
     "points_possible": 0.0,
@@ -224,7 +224,7 @@ export const MOCK_CANVAS_ASSIGNMENTS: CanvasAssignment[] = [
   },
   {
     "course_id": 17320,
-    "name": "Artikel college MS",
+    "title": "Artikel college MS",
     "grading_type": "points",
     "published": false,
     "points_possible": 0.0,
@@ -237,7 +237,7 @@ export const MOCK_CANVAS_ASSIGNMENTS: CanvasAssignment[] = [
   },
   {
     "course_id": 17320,
-    "name": "Artikelen college Depressie",
+    "title": "Artikelen college Depressie",
     "grading_type": "points",
     "published": false,
     "points_possible": 0.0,

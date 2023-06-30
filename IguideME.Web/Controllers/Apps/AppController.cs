@@ -20,13 +20,17 @@ namespace IguideME.Web.Controllers
         private readonly ILogger<DataController> _logger;
         private readonly CanvasHandler _canvasHandler;
 
+        private readonly DatabaseManager _databaseManager;
+
         public AppController(
             ILogger<DataController> logger,
-            CanvasHandler canvasHandler) : base(
-                logger, canvasHandler)
+            CanvasHandler canvasHandler,
+            DatabaseManager databaseManager) : base(
+                logger, canvasHandler, databaseManager)
         {
             this._logger = logger;
             this._canvasHandler = canvasHandler;
+            this._databaseManager = databaseManager;
 
         }
 
@@ -34,8 +38,8 @@ namespace IguideME.Web.Controllers
         [Route("/app/setup")]
         [HttpPost]
         public void SetupCourse() {
-            if (!DatabaseManager.getInstance().IsCourseRegistered(GetCourseID()))
-                DatabaseManager.getInstance().RegisterCourse(GetCourseID(), GetCourseTitle());
+            if (!_databaseManager.IsCourseRegistered(GetCourseID()))
+                _databaseManager.RegisterCourse(GetCourseID(), GetCourseTitle());
         }
 
         [Authorize]
@@ -50,7 +54,7 @@ namespace IguideME.Web.Controllers
              * Returns information of the logged in user.
              */
             return Json(
-                DatabaseManager.getInstance().GetUser(GetCourseID(), this.GetUserID())
+                _databaseManager.GetUser(GetCourseID(), this.GetUserID())
             );
         }
 
@@ -65,7 +69,7 @@ namespace IguideME.Web.Controllers
         {
 
             return Json(
-                DatabaseManager.getInstance().GetNotificationEnable(
+                _databaseManager.GetNotificationEnable(
                     this.GetCourseID(),
                     userID,
                     this.GetHashCode()));
@@ -81,7 +85,7 @@ namespace IguideME.Web.Controllers
         public ActionResult GetNotificationEnable()
         {
             return Json(
-                DatabaseManager.getInstance().GetNotificationEnable(
+                _databaseManager.GetNotificationEnable(
                     this.GetCourseID(),
                     this.GetUserID(),
                     this.GetHashCode()));
@@ -95,7 +99,7 @@ namespace IguideME.Web.Controllers
         public ActionResult UpdateNotificationEnable()
         {
             var body = new StreamReader(Request.Body).ReadToEnd();
-            DatabaseManager.getInstance().UpdateNotificationEnable(
+            _databaseManager.UpdateNotificationEnable(
                     this.GetCourseID(),
                     this.GetUserID(),
                     (bool) JObject.Parse(body)["enable"],
@@ -103,7 +107,7 @@ namespace IguideME.Web.Controllers
                     );
 
             return Json(
-                DatabaseManager.getInstance().GetNotificationEnable(
+                _databaseManager.GetNotificationEnable(
                     this.GetCourseID(),
                     this.GetUserID(),
                     this.GetHashCode()));
@@ -125,7 +129,7 @@ namespace IguideME.Web.Controllers
              * is able to use the application.
              */
 
-            PublicInformedConsent consent = DatabaseManager.getInstance()
+            PublicInformedConsent consent = _databaseManager
                 .GetPublicInformedConsent(GetCourseID());
 
             // Check if consent exists
@@ -144,12 +148,12 @@ namespace IguideME.Web.Controllers
              * Endpoint is used to allow instructors to change the informed
              * consent policy for their course.
              */
-            DatabaseManager.getInstance().UpdateInformedConsent(
+            _databaseManager.UpdateInformedConsent(
                 GetCourseID(), obj.Text);
 
             // return newly fetched consent object
             return Json(
-                DatabaseManager.getInstance()
+                _databaseManager
                 .GetPublicInformedConsent(GetCourseID()));
         }
 
@@ -161,7 +165,7 @@ namespace IguideME.Web.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult GetCoursePeerGroups()
         {
-            PeerGroup peerGroup = DatabaseManager.getInstance()
+            PeerGroup peerGroup = _databaseManager
                 .GetPeerGroup(GetCourseID());
 
             // Check if consent exists
@@ -180,12 +184,12 @@ namespace IguideME.Web.Controllers
              * Endpoint is used to allow instructors to change the informed
              * consent policy for their course.
              */
-            DatabaseManager.getInstance().UpdateCoursePeerGroups(
+            _databaseManager.UpdateCoursePeerGroups(
                 GetCourseID(), obj.MinSize);
 
             // return newly fetched consent object
             return Json(
-               DatabaseManager.getInstance()
+               _databaseManager
                 .GetPeerGroup(GetCourseID()));
         }
 
@@ -201,7 +205,7 @@ namespace IguideME.Web.Controllers
             var body = new StreamReader(Request.Body).ReadToEnd();
             string action = (string) JObject.Parse(body)["action"];
 
-            DatabaseManager.getInstance().TrackUserAction(
+            _databaseManager.TrackUserAction(
                     this.GetUserID(),
                     action
                     );
@@ -223,13 +227,13 @@ namespace IguideME.Web.Controllers
             var body = new StreamReader(Request.Body).ReadToEnd();
             string dates = (string) JObject.Parse(body)["dates"];
 
-            DatabaseManager.getInstance().UpdateNotificationDates(
+            _databaseManager.UpdateNotificationDates(
                 courseID,
                 dates);
 
             return Json("");
             // return Json(
-            //     DatabaseManager.getInstance()
+            //     _databaseManager
             //     .GetNotificationDates(GetCourseID()));
         }
 
@@ -242,7 +246,7 @@ namespace IguideME.Web.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult GetNotificationDates()
         {
-            List<string> allDates = DatabaseManager.getInstance().GetNotificationDates(GetCourseID());
+            List<string> allDates = _databaseManager.GetNotificationDates(GetCourseID());
 
             return allDates != null ? Json(allDates) : NotFound();
         }

@@ -12,6 +12,8 @@ namespace IguideME.Web.Services
     {
         private int _executionCount = 0;
         private readonly CanvasHandler _canvasHandler;
+        private readonly DatabaseManager _databaseManager;
+
         private readonly ILogger<SyncManager> _logger;
         private readonly IComputationJobStatusService _computationJobStatus;
         private readonly IQueuedBackgroundService _queuedBackgroundService;
@@ -21,12 +23,15 @@ namespace IguideME.Web.Services
             ILogger<SyncManager> logger,
             IComputationJobStatusService computationJobStatus,
             IQueuedBackgroundService queuedBackgroundService,
+            DatabaseManager databaseManager,
             CanvasHandler canvasHandler)
         {
             _logger = logger;
-            this._canvasHandler = canvasHandler;
-            this._computationJobStatus = computationJobStatus;
-            this._queuedBackgroundService = queuedBackgroundService;
+            _canvasHandler = canvasHandler;
+            _computationJobStatus = computationJobStatus;
+            _queuedBackgroundService = queuedBackgroundService;
+            _databaseManager = databaseManager;
+
         }
 
         public Task StartAsync(CancellationToken stoppingToken)
@@ -45,15 +50,16 @@ namespace IguideME.Web.Services
             var now = DateTime.UtcNow;
             Console.WriteLine("Time is {0}", now.ToString());
 
-            if (DatabaseManager.getInstance() != null && now.Hour == 3 && now.Minute <= 30)
+            if (_databaseManager != null && now.Hour == 3 && now.Minute <= 30)
             {
                 new CanvasSyncService(
-                    this._computationJobStatus,
-                    this._canvasHandler,
+                    _computationJobStatus,
+                    _canvasHandler,
+                    _databaseManager,
                     _logger
                 );
 
-                List<int> course_ids = DatabaseManager.getInstance().GetCourseIds();
+                List<int> course_ids = _databaseManager.GetCourseIds();
 
                 foreach (int id in course_ids) {
                     JobParametersModel parameters = new()

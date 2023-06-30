@@ -15,13 +15,17 @@ namespace IguideME.Web.Controllers
         private readonly ILogger<DataController> _logger;
         private readonly CanvasHandler canvasHandler;
 
+        private readonly DatabaseManager _databaseManager;
+
         public ModelController(
             ILogger<DataController> logger,
-            CanvasHandler canvasHandler) : base(
-                logger, canvasHandler)
+            CanvasHandler canvasHandler,
+            DatabaseManager databaseManager) : base(
+                logger, canvasHandler, databaseManager)
         {
             this._logger = logger;
             this.canvasHandler = canvasHandler;
+            this._databaseManager = databaseManager;
         }
 
         [Authorize(Policy = "IsInstructor")]
@@ -34,18 +38,18 @@ namespace IguideME.Web.Controllers
         {
 
 
-            int modelID = DatabaseManager.getInstance().CreateGradePredictionModel(GetCourseID(), model.Intercept);
+            int modelID = _databaseManager.CreateGradePredictionModel(GetCourseID(), model.Intercept);
 
             _logger.LogInformation("Uploading model: {intercept}, {parameters}", model.Intercept, model.Parameters);
             foreach (var parameter in model.Parameters)
             {
-                DatabaseManager.getInstance().CreateGradePredictionModelParameter(
+                _databaseManager.CreateGradePredictionModelParameter(
                     modelID,
                     parameter.ParameterID,
                     parameter.Weight);
             }
 
-            return Json(DatabaseManager.getInstance().GetGradePredictionModels(GetCourseID()));
+            return Json(_databaseManager.GetGradePredictionModels(GetCourseID()));
         }
 
         // tip: you can use [AllowAnonymous] for debugging purpuses
@@ -56,7 +60,7 @@ namespace IguideME.Web.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult GetModels()
         {
-            return Json(DatabaseManager.getInstance().GetGradePredictionModels(GetCourseID()));
+            return Json(_databaseManager.GetGradePredictionModels(GetCourseID()));
         }
 
         [Authorize(Policy = "IsInstructor")]

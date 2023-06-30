@@ -665,7 +665,7 @@ namespace IguideME.Web.Services
                 }
             }
 
-            models.ForEach((GradePredictionModel model) => model.GetParameters());
+            models.ForEach((GradePredictionModel model) => model.Parameters = GetGradePredictionModelParameters(model.ID));
 
             return models;
         }
@@ -687,7 +687,8 @@ namespace IguideME.Web.Services
                 }
             }
 
-            model?.GetParameters();
+            if (model != null)
+                model.Parameters = GetGradePredictionModelParameters(model.ID);
             return model;
         }
 
@@ -970,6 +971,10 @@ namespace IguideME.Web.Services
                 }
             }
 
+            foreach (AssignmentSubmission sub in submissions) {
+                sub.Meta = GetEntryMeta(sub.ID);
+            }
+
             return submissions;
         }
 
@@ -1004,6 +1009,10 @@ namespace IguideME.Web.Services
                 }
             }
 
+            foreach (AssignmentSubmission sub in submissions) {
+                sub.Meta = GetEntryMeta(sub.ID);
+            }
+
             return submissions;
         }
 
@@ -1034,6 +1043,10 @@ namespace IguideME.Web.Services
                 }
             }
 
+            foreach (AssignmentSubmission sub in submissions) {
+                sub.Meta = GetEntryMeta(sub.ID);
+            }
+
             return submissions;
         }
 
@@ -1061,6 +1074,11 @@ namespace IguideME.Web.Services
                     submissions.Add(submission);
                 }
             }
+
+            foreach (AssignmentSubmission sub in submissions) {
+                sub.Meta = GetEntryMeta(sub.ID);
+            }
+
             return submissions;
         }
 
@@ -1084,6 +1102,10 @@ namespace IguideME.Web.Services
                     );
                     submissions.Add(submission);
                 }
+            }
+
+            foreach (AssignmentSubmission sub in submissions) {
+                sub.Meta = GetEntryMeta(sub.ID);
             }
 
             return submissions;
@@ -1116,6 +1138,10 @@ namespace IguideME.Web.Services
                     );
                     submissions.Add(submission);
                 }
+            }
+
+            foreach (AssignmentSubmission sub in submissions) {
+                sub.Meta = GetEntryMeta(sub.ID);
             }
 
             return submissions;
@@ -1364,6 +1390,10 @@ namespace IguideME.Web.Services
                 }
             }
 
+            foreach (AssignmentSubmission sub in submissions) {
+                sub.Meta = GetEntryMeta(sub.ID);
+            }
+
             return submissions;
         }
 
@@ -1529,8 +1559,11 @@ namespace IguideME.Web.Services
         }
 
         public void DeleteGoal(int courseID, LearningGoal goal) {
-            goal.FetchRequirements();
-            goal.DeleteGoalRequirements();
+            
+            goal.Requirements = GetGoalRequirements(goal.ID);
+
+            DeleteGoalRequirements(goal.ID);
+            goal.Requirements.Clear();
 
             NonQuery(DatabaseQueries.DELETE_LEARNING_GOAL,
                 new SQLiteParameter("goalID", goal.ID)
@@ -1853,9 +1886,8 @@ namespace IguideME.Web.Services
             return meta;
         }
 
-        public void UpdateTile(int courseID, Tile tile)
+        public void UpdateTile(Tile tile)
         {
-            // TODO: check courseID
 
             NonQuery(DatabaseQueries.UPDATE_TILE,
                 new SQLiteParameter("tileID", tile.ID),
@@ -1885,8 +1917,7 @@ namespace IguideME.Web.Services
                             r.GetInt32(3),
                             (Tile.Tile_type) r.GetInt32(4),
                             r.GetBoolean(5),
-                            r.GetBoolean(6),
-                            autoLoadEntries
+                            r.GetBoolean(6)
                         );
                         tiles.Add(row);
                     }
@@ -1894,6 +1925,11 @@ namespace IguideME.Web.Services
                         PrintQueryError("GetTiles", 9, r, e);
                     }
                 }
+            }
+
+            foreach (Tile t in tiles) {
+                if (autoLoadEntries)
+                    t.Entries = GetTileEntries(t.ID);
             }
 
             return tiles;
@@ -2300,9 +2336,7 @@ namespace IguideME.Web.Services
 
             List<TileEntry> entries = new();
 
-            //TODO: Get tile type by tileID and make proper query based on it: ass/disc/goal
-
-            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_ASSIGNGMENT_ENTRIES_FOR_TILE,
+            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_ENTRIES_FOR_TILE,
                     new SQLiteParameter("tileID", tileID)
                 )) {
                 while (r.Read())
@@ -2322,7 +2356,7 @@ namespace IguideME.Web.Services
         public void DeleteTile(int courseID, int tileID)
         {
             DeleteGoals(courseID, tileID);
-            NonQuery(@"DELETE FROM `tile` WHERE `tile_id` = @tileID;",
+            NonQuery(DatabaseQueries.DELETE_TILE,
                 new SQLiteParameter("tileID", tileID)
             );
         }

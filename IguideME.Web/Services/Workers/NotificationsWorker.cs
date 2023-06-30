@@ -16,6 +16,8 @@ namespace IguideME.Web.Services.Workers
     {
         readonly private ILogger<SyncManager> _logger;
         readonly private CanvasHandler _canvasHandler;
+        private readonly DatabaseManager _databaseManager;
+
         readonly private int _courseID;
         readonly private long _syncID;
 
@@ -34,6 +36,7 @@ namespace IguideME.Web.Services.Workers
             int courseID,
             long syncID,
             CanvasHandler canvasHandler,
+            DatabaseManager databaseManager,
             bool send_notifications,
             ILogger<SyncManager> logger)
         {
@@ -41,6 +44,7 @@ namespace IguideME.Web.Services.Workers
             this._courseID = courseID;
             this._syncID = syncID;
             this._canvasHandler = canvasHandler;
+            this._databaseManager = databaseManager;
             this._send_notifications = send_notifications;
         }
 
@@ -50,7 +54,7 @@ namespace IguideME.Web.Services.Workers
         /// <param name="student">the student to send the notification to.</param>
         private void SendNotificationsToStudent(User student)
         {
-            List<Notification> notifications = DatabaseManager.getInstance().GetPendingNotifications(this._courseID, student.UserID, _syncID);
+            List<Notification> notifications = _databaseManager.GetPendingNotifications(this._courseID, student.UserID, _syncID);
 
             _logger.LogInformation("Student {ID} has {Count} notifications queued up.", student.UserID, notifications.Count);
 
@@ -61,7 +65,7 @@ namespace IguideME.Web.Services.Workers
             string moreEffort = "";
             foreach (Notification notification in notifications)
             {
-                Tile tile = DatabaseManager.getInstance().GetTile(this._courseID, notification.TileID);
+                Tile tile = _databaseManager.GetTile(this._courseID, notification.TileID);
                 switch (notification.Status)
                 {
                     case (int) Notification_Types.outperforming:
@@ -101,7 +105,7 @@ namespace IguideME.Web.Services.Workers
 
             _logger.LogInformation("Marking notifications as sent...");
 
-            DatabaseManager.getInstance().MarkNotificationsSent(this._courseID, student.UserID);
+            _databaseManager.MarkNotificationsSent(this._courseID, student.UserID);
 
         }
 
@@ -117,11 +121,11 @@ namespace IguideME.Web.Services.Workers
                 return;
             }
 
-            List<User> students = DatabaseManager.getInstance().GetUsers(this._courseID, (int) User.UserRoles.student, this._syncID);
+            List<User> students = _databaseManager.GetUsers(this._courseID, (int) User.UserRoles.student, this._syncID);
 
             foreach (User student in students)
             {
-                if (!DatabaseManager.getInstance().GetNotificationEnable(this._courseID, student.UserID, this._syncID)) {
+                if (!_databaseManager.GetNotificationEnable(this._courseID, student.UserID, this._syncID)) {
                     _logger.LogInformation("Not sending to {ID}, they have notifications disabled", student.UserID);
                 }
                 this.SendNotificationsToStudent(student);

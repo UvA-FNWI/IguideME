@@ -106,6 +106,7 @@ builder.Services.Configure<IISServerOptions>(options => options.AllowSynchronous
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddSingleton<CanvasHandler>();
+builder.Services.AddSingleton<DatabaseManager>(_ => DatabaseManager.getInstance());
 
 builder.Services.AddHttpClient();
 
@@ -157,6 +158,7 @@ else
     app.UseExceptionHandler("/Error");
 }
 
+// Set the correct location for the database for prod/dev environments the first time the instance is created.
 DatabaseManager.getInstance(app.Environment.IsDevelopment());
 
 app.UseDefaultFiles();
