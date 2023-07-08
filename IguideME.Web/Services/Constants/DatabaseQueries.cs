@@ -417,17 +417,6 @@ public static class DatabaseQueries
             @order
         );";
 
-    public const string REGISTER_ACCEPTED_STUDENT =
-        @"INSERT INTO       `accept_list`
-                            (   `course_id`,
-                                `user_id`,
-                                `accepted`  )
-        VALUES(
-            @courseID,
-            @studentID,
-            @accepted
-        );";
-
         public const string REGISTER_TILE_GROUP =
         @"INSERT INTO       `tile_groups`
                             (
@@ -794,11 +783,6 @@ public static class DatabaseQueries
     WHERE       `course_id`=@courseID
     LIMIT       1;
     ";
-
-    public const string QUERY_ACCEPT_LIST =
-        @"SELECT    `user_id`, `accepted`
-        FROM        `accept_list`
-        WHERE       `course_id`=@courseID;";
 
     public const string QUERY_TILE_GROUP =
         @"SELECT    `tile_groups`.`group_id`,
@@ -1436,16 +1420,6 @@ public static class DatabaseQueries
         SET         `column_id`=-1
         WHERE       `column_id`=@columnID;";
 
-    public const string UPDATE_ACCEPT_LIST =
-        @"UPDATE    `accept_list`
-        SET         `accepted`={2}
-        WHERE       `course_id`={0} AND `user_id`='{1}';";
-
-    // public const string REQUIRE_ACCEPT_LIST =
-    //     @"UPDATE    `course_settings`
-    //     SET         `accept_list`=@enabled
-    //     WHERE       `course_id`=@courseID;";
-
     public const string UPDATE_TILE_GROUP =
         @"UPDATE    `tile_groups`
         SET         `column_id`=@columnID,
@@ -1520,10 +1494,6 @@ public static class DatabaseQueries
         WHERE           `column_id`=@columnID
         AND             `course_id`=@courseID;";
 
-    public const string RESET_ACCEPT_LIST =
-        @"DELETE FROM   `accept_list`
-        WHERE           `course_id`=@courseID;";
-
     public const string DELETE_TILE =
         @"DELETE FROM   `tile` 
         WHERE `tile_id` = @tileID;";
@@ -1562,20 +1532,11 @@ public static class DatabaseQueries
             @action
           );";
 
-    public const string DELETE_OLD_SYNCS_FOR_COURSE = //half done
+    public const string DELETE_OLD_SYNCS_FOR_COURSE = //half done 
         @"DELETE
         FROM        `peer_groups`
         WHERE       `sync_id`=@syncID;
 
-        "+
-        //@" ///////// Don't we need those data for the historic grade?????
-        // DELETE
-        // FROM        `student_settings`
-        // WHERE       `course_id`=@courseID
-        // AND         `sync_id`=@syncID;
-        // "+
-
-        @"
         DELETE
         FROM        `notifications`
         WHERE       `course_id`=@courseID
@@ -1587,4 +1548,36 @@ public static class DatabaseQueries
         WHERE       `course_id`=@courseID
         AND         `sync_id`=@syncID;
         ";
+
+// //============================ Accept List Queries =============================//
+
+    // public const string REGISTER_ACCEPTED_STUDENT =
+    //     @"INSERT INTO       `accept_list`
+    //                         (   `course_id`,
+    //                             `user_id`,
+    //                             `accepted`  )
+    //     VALUES(
+    //         @courseID,
+    //         @studentID,
+    //         @accepted
+    //     );";
+
+    // public const string QUERY_ACCEPT_LIST =
+    //     @"SELECT    `user_id`, `accepted`
+    //     FROM        `accept_list`
+    //     WHERE       `course_id`=@courseID;";
+
+    // public const string UPDATE_ACCEPT_LIST =
+    //     @"UPDATE    `accept_list`
+    //     SET         `accepted`={2}
+    //     WHERE       `course_id`={0} AND `user_id`='{1}';";
+
+    // public const string REQUIRE_ACCEPT_LIST =
+    //     @"UPDATE    `course_settings`
+    //     SET         `accept_list`=@enabled
+    //     WHERE       `course_id`=@courseID;";
+
+    // public const string RESET_ACCEPT_LIST =
+    //     @"DELETE FROM   `accept_list`
+    //     WHERE           `course_id`=@courseID;";
 }

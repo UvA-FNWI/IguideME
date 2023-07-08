@@ -329,65 +329,65 @@ namespace IguideME.Web.Controllers
 
         // -------------------- Accept List --------------------
 
-        [Authorize(Policy = "IsInstructor")]
-        [HttpPost]
-        [Route("/datamart/accept-list")]
-        public ActionResult CreateAcceptList([FromBody] AcceptList[] acceptList)
-        {
-            _databaseManager.ResetAcceptList(GetCourseID());
+        // [Authorize(Policy = "IsInstructor")]
+        // [HttpPost]
+        // [Route("/datamart/accept-list")]
+        // public ActionResult CreateAcceptList([FromBody] AcceptList[] acceptList)
+        // {
+        //     _databaseManager.ResetAcceptList(GetCourseID());
 
-            foreach (AcceptList list in acceptList)
-            {
-                _databaseManager.RegisterAcceptedStudent(
-                    GetCourseID(),
-                    list.UserID,
-                    list.Accepted);
-            }
+        //     foreach (AcceptList list in acceptList)
+        //     {
+        //         _databaseManager.RegisterAcceptedStudent(
+        //             GetCourseID(),
+        //             list.UserID,
+        //             list.Accepted);
+        //     }
 
-            return Json(
-                _databaseManager.GetAcceptList(GetCourseID())
-            );
-        }
+        //     return Json(
+        //         _databaseManager.GetAcceptList(GetCourseID())
+        //     );
+        // }
 
-        [Authorize(Policy = "IsInstructor")]
-        [HttpPatch]
-        [Route("/datamart/accept-list")]
-        public ActionResult UpdateAcceptList()
-        {
-            var body = new StreamReader(Request.Body).ReadToEnd();
-            _databaseManager.SetAcceptListRequired(
-                GetCourseID(),
-                (bool)JObject.Parse(body)["enabled"]);
-            return Json((bool)JObject.Parse(body)["enabled"]);
-        }
+        // [Authorize(Policy = "IsInstructor")]
+        // [HttpPatch]
+        // [Route("/datamart/accept-list")]
+        // public ActionResult UpdateAcceptList()
+        // {
+        //     var body = new StreamReader(Request.Body).ReadToEnd();
+        //     _databaseManager.SetAcceptListRequired(
+        //         GetCourseID(),
+        //         (bool)JObject.Parse(body)["enabled"]);
+        //     return Json((bool)JObject.Parse(body)["enabled"]);
+        // }
 
-        [Authorize(Policy = "IsInstructor")]
-        [HttpGet]
-        [Route("/datamart/accept-list")]
-        public ActionResult GetAcceptList()
-        {
-            return Json(
-                _databaseManager.GetAcceptList(GetCourseID())
-            );
-        }
+        // [Authorize(Policy = "IsInstructor")]
+        // [HttpGet]
+        // [Route("/datamart/accept-list")]
+        // public ActionResult GetAcceptList()
+        // {
+        //     return Json(
+        //         _databaseManager.GetAcceptList(GetCourseID())
+        //     );
+        // }
 
-        [Authorize]
-        [HttpGet]
-        [Route("/datamart/accept-list/{userID}")]
-        public ActionResult GetAcceptListByStudent(string userID)
-        {
-            var course = _databaseManager.GetPublicInformedConsent(GetCourseID());
+        // [Authorize]
+        // [HttpGet]
+        // [Route("/datamart/accept-list/{userID}")]
+        // public ActionResult GetAcceptListByStudent(string userID)
+        // {
+        //     var course = _databaseManager.GetPublicInformedConsent(GetCourseID());
 
-            // if (!course.AcceptList || IsAdministrator()) return Json(true);
-            if (IsAdministrator()) return Json(true);
+        //     // if (!course.AcceptList || IsAdministrator()) return Json(true);
+        //     if (IsAdministrator()) return Json(true);
 
-            AcceptList student = _databaseManager
-                .GetAcceptList(GetCourseID())
-                .Find(x => x.UserID == (userID == "self" ? GetUserID() : userID));
+        //     AcceptList student = _databaseManager
+        //         .GetAcceptList(GetCourseID())
+        //         .Find(x => x.UserID == (userID == "self" ? GetUserID() : userID));
 
-            return Json(
-                student != null && student.Accepted
-            );
-        }
+        //     return Json(
+        //         student != null && student.Accepted
+        //     );
+        // }
     }
 }

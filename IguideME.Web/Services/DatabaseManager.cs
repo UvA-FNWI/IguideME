@@ -1801,56 +1801,61 @@ namespace IguideME.Web.Services
             );
         }
 
-        public void RegisterAcceptedStudent(
-            int courseID,
-            string studentID,
-            bool accepted)
-        {
-            // Do we want this?????
-            // NonQuery(DatabaseQueries.REGISTER_ACCEPTED_STUDENT,
-            //     new SQLiteParameter("courseID", courseID),
-            //     new SQLiteParameter("studentID", studentID),
-            //     new SQLiteParameter("accepted", accepted)
-            // );
-        }
+/////////////////////////////////////////////////////////////////////////////////
+//////////////////////////         ACCEPT LIST         //////////////////////////
+/////////////////////////////////////////////////////////////////////////////////
 
-        public void ResetAcceptList(int courseID)
-        {
-            // or this one?????
-            // NonQuery(DatabaseQueries.RESET_ACCEPT_LIST,
-            //     new SQLiteParameter("courseID", courseID)
-            // );
-        }
 
-///////         WHAT DO WE DO WITH THIS ONE?????
-        public void SetAcceptListRequired(int courseID, bool enabled)
-        {
-            // NonQuery(DatabaseQueries.REQUIRE_ACCEPT_LIST,
-            //     new SQLiteParameter("courseID", courseID),
-            //     new SQLiteParameter("enabled", enabled)
-            // );
-        }
+        // public void RegisterAcceptedStudent(
+        //     int courseID,
+        //     string studentID,
+        //     bool accepted)
+        // {
+        //     NonQuery(DatabaseQueries.REGISTER_ACCEPTED_STUDENT,
+        //         new SQLiteParameter("courseID", courseID),
+        //         new SQLiteParameter("studentID", studentID),
+        //         new SQLiteParameter("accepted", accepted)
+        //     );
+        // }
 
-        public List<AcceptList> GetAcceptList(int courseID)
-        {
-            List<AcceptList> keys = new();
+        // public void ResetAcceptList(int courseID)
+        // {
+        //     NonQuery(DatabaseQueries.RESET_ACCEPT_LIST,
+        //         new SQLiteParameter("courseID", courseID)
+        //     );
+        // }
 
-// Do we want this?????
-            // using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_ACCEPT_LIST,
-            //         new SQLiteParameter("courseID", courseID)
-            //     )) {
-            //     while (r.Read())
-            //     {
-            //         keys.Add(
-            //             new AcceptList(
-            //                 r.GetValue(0).ToString(),
-            //                 r.GetBoolean(1)
-            //             ));
-            //     }
-            // }
+        // public void SetAcceptListRequired(int courseID, bool enabled)
+        // {
+        //     NonQuery(DatabaseQueries.REQUIRE_ACCEPT_LIST,
+        //         new SQLiteParameter("courseID", courseID),
+        //         new SQLiteParameter("enabled", enabled)
+        //     );
+        // }
 
-            return keys;
-        }
+        // public List<AcceptList> GetAcceptList(int courseID)
+        // {
+        //     List<AcceptList> keys = new();
+
+        //     using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_ACCEPT_LIST,
+        //             new SQLiteParameter("courseID", courseID)
+        //         )) {
+        //         while (r.Read())
+        //         {
+        //             keys.Add(
+        //                 new AcceptList(
+        //                     r.GetValue(0).ToString(),
+        //                     r.GetBoolean(1)
+        //                 ));
+        //         }
+        //     }
+
+        //     return keys;
+        // }
+
+/////////////////////////////////////////////////////////////////////////////////
+//////////////////////////         END OF LIST         //////////////////////////
+/////////////////////////////////////////////////////////////////////////////////
 
         public List<string> GetEntryMetaKeys(int submissionID)
         {
