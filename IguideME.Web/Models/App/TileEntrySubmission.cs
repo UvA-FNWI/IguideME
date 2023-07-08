@@ -1,5 +1,6 @@
 ﻿using IguideME.Web.Services;
 using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace IguideME.Web.Models.App
 {
@@ -21,30 +22,20 @@ namespace IguideME.Web.Models.App
         public long Date { get; set; }
 
         [JsonProperty(PropertyName = "meta")]
-        public string Meta { get; set; }
+        public Dictionary<string, string> Meta { get; set; }
 
         public AssignmentSubmission(
             int id,
             int assignmentID,
             string userID,
             float grade,
-            long date,
-            string meta = null)
-            // bool autoLoadMeta = true,
-            // int syncID = 0)
+            long date)
         {
-            this.ID = id;
-            this.UserID = userID;
-            this.AssignmentID = assignmentID;
-            this.Grade = grade;
-            this.Date = date;
-            this.Meta = meta;
-
-            if (meta == null)
-            {
-                this.Meta = JsonConvert.SerializeObject(
-                    DatabaseManager.getInstance().GetEntryMeta(this.ID));
-            }
+            ID = id;
+            UserID = userID;
+            AssignmentID = assignmentID;
+            Grade = grade;
+            Date = date;
         }
     }
 }

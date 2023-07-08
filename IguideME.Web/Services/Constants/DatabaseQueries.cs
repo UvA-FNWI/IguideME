@@ -417,17 +417,6 @@ public static class DatabaseQueries
             @order
         );";
 
-    public const string REGISTER_ACCEPTED_STUDENT =
-        @"INSERT INTO       `accept_list`
-                            (   `course_id`,
-                                `user_id`,
-                                `accepted`  )
-        VALUES(
-            @courseID,
-            @studentID,
-            @accepted
-        );";
-
         public const string REGISTER_TILE_GROUP =
         @"INSERT INTO       `tile_groups`
                             (
@@ -795,11 +784,6 @@ public static class DatabaseQueries
     LIMIT       1;
     ";
 
-    public const string QUERY_ACCEPT_LIST =
-        @"SELECT    `user_id`, `accepted`
-        FROM        `accept_list`
-        WHERE       `course_id`=@courseID;";
-
     public const string QUERY_TILE_GROUP =
         @"SELECT    `tile_groups`.`group_id`,
                     `tile_groups`.`title`,
@@ -898,15 +882,31 @@ public static class DatabaseQueries
         FROM        `goal_requirements`
         WHERE       `goal_id`=@goalID;";
 
-// TODO: create for discussions + learning goals
-    public const string QUERY_ASSIGNGMENT_ENTRIES_FOR_TILE =
+    public const string QUERY_ENTRIES_FOR_TILE =
         @"SELECT    `tile_entries`.`tile_id`,
                     `tile_entries`.`content_id`,
-                    `assignments`.`title`
+            CASE `tiles`.`type`
+                WHEN    0   THEN `assignments`.`title`
+                WHEN    1   THEN `discussions`.`title`
+                WHEN    2   THEN `learning_goals`.`title`
+            END title
         FROM        `tile_entries`
-        INNER JOIN  `assignments`
-            ON      `tile_entries`.`content_id` == `assignments`.`assignment_id`
-        WHERE       `tile_entries`.`tile_id`=@tileID
+        INNER JOIN  `tiles`
+            USING   (`tile_id`)
+
+        LEFT JOIN  `assignments` 
+            ON      `tiles`.`type` = 0
+            AND     `tile_entries`.`content_id` = `assignments`.`assignment_id`
+
+        LEFT JOIN  `discussions` 
+            ON      `tiles`.`type` = 1
+            AND     `tile_entries`.`content_id` = `discussions`.`discussion_id`
+
+        LEFT JOIN  `learning_goals` 
+            ON      `tiles`.`type` = 2
+            AND     `tile_entries`.`content_id` = `learning_goals`.`goal_id`
+
+        WHERE       `tiles`.`tile_id`=@tileID
         ;";
 
     public const string QUERY_ALL_TILE_ENTRIES =
@@ -1420,16 +1420,6 @@ public static class DatabaseQueries
         SET         `column_id`=-1
         WHERE       `column_id`=@columnID;";
 
-    public const string UPDATE_ACCEPT_LIST =
-        @"UPDATE    `accept_list`
-        SET         `accepted`={2}
-        WHERE       `course_id`={0} AND `user_id`='{1}';";
-
-    // public const string REQUIRE_ACCEPT_LIST =
-    //     @"UPDATE    `course_settings`
-    //     SET         `accept_list`=@enabled
-    //     WHERE       `course_id`=@courseID;";
-
     public const string UPDATE_TILE_GROUP =
         @"UPDATE    `tile_groups`
         SET         `column_id`=@columnID,
@@ -1504,9 +1494,9 @@ public static class DatabaseQueries
         WHERE           `column_id`=@columnID
         AND             `course_id`=@courseID;";
 
-    public const string RESET_ACCEPT_LIST =
-        @"DELETE FROM   `accept_list`
-        WHERE           `course_id`=@courseID;";
+    public const string DELETE_TILE =
+        @"DELETE FROM   `tile` 
+        WHERE `tile_id` = @tileID;";
 
     public const string DELETE_TILE_GROUP =
         @"DELETE FROM       `tile_groups`
@@ -1542,20 +1532,11 @@ public static class DatabaseQueries
             @action
           );";
 
-    public const string DELETE_OLD_SYNCS_FOR_COURSE = //half done
+    public const string DELETE_OLD_SYNCS_FOR_COURSE = //half done 
         @"DELETE
         FROM        `peer_groups`
         WHERE       `sync_id`=@syncID;
 
-        "+
-        //@" ///////// Don't we need those data for the historic grade?????
-        // DELETE
-        // FROM        `student_settings`
-        // WHERE       `course_id`=@courseID
-        // AND         `sync_id`=@syncID;
-        // "+
-
-        @"
         DELETE
         FROM        `notifications`
         WHERE       `course_id`=@courseID
@@ -1567,4 +1548,36 @@ public static class DatabaseQueries
         WHERE       `course_id`=@courseID
         AND         `sync_id`=@syncID;
         ";
+
+// //============================ Accept List Queries =============================//
+
+    // public const string REGISTER_ACCEPTED_STUDENT =
+    //     @"INSERT INTO       `accept_list`
+    //                         (   `course_id`,
+    //                             `user_id`,
+    //                             `accepted`  )
+    //     VALUES(
+    //         @courseID,
+    //         @studentID,
+    //         @accepted
+    //     );";
+
+    // public const string QUERY_ACCEPT_LIST =
+    //     @"SELECT    `user_id`, `accepted`
+    //     FROM        `accept_list`
+    //     WHERE       `course_id`=@courseID;";
+
+    // public const string UPDATE_ACCEPT_LIST =
+    //     @"UPDATE    `accept_list`
+    //     SET         `accepted`={2}
+    //     WHERE       `course_id`={0} AND `user_id`='{1}';";
+
+    // public const string REQUIRE_ACCEPT_LIST =
+    //     @"UPDATE    `course_settings`
+    //     SET         `accept_list`=@enabled
+    //     WHERE       `course_id`=@courseID;";
+
+    // public const string RESET_ACCEPT_LIST =
+    //     @"DELETE FROM   `accept_list`
+    //     WHERE           `course_id`=@courseID;";
 }

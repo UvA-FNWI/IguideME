@@ -16,6 +16,7 @@ namespace IguideME.Web.Services.Workers
 		readonly private int _courseID;
         readonly private long _syncID;
         readonly private GradePredictionModel _model;
+        private readonly DatabaseManager _databaseManager;
 
         /// <summary>
         /// This constructor initializes the new GradePredictorWorker to
@@ -24,12 +25,13 @@ namespace IguideME.Web.Services.Workers
         /// <param name="courseID">the id of the course.</param>
         /// <param name="syncID">the hash code associated to the current sync.</param>
         /// <param name="logger">a reference to the logger used for the sync.</param>
-		public GradePredictorWorker(int courseID, long syncID, ILogger<SyncManager> logger)
+		public GradePredictorWorker(int courseID, long syncID, DatabaseManager databaseManager, ILogger<SyncManager> logger)
         {
             _logger = logger;
-            this._courseID = courseID;
-            this._syncID = syncID;
-            this._model = DatabaseManager.getInstance().GetGradePredictionModel(courseID);
+            _courseID = courseID;
+            _syncID = syncID;
+            _model = _databaseManager.GetGradePredictionModel(courseID);
+            _databaseManager = databaseManager;
         }
 
         /// <summary>
@@ -44,7 +46,7 @@ namespace IguideME.Web.Services.Workers
                 return;
             }
 
-            List<User> students = DatabaseManager.getInstance().GetUsers(this._courseID, (int) UserRoles.student, this._syncID);
+            List<User> students = _databaseManager.GetUsers(this._courseID, (int) User.UserRoles.student, this._syncID);
 
             foreach (User student in students)
             {
@@ -59,11 +61,11 @@ namespace IguideME.Web.Services.Workers
         private void PredictGradesForStudent(User student)
         {
             // _logger.LogInformation("Processing student: {ID}", student.UserID);
-            List<AssignmentSubmission> submissions = DatabaseManager.getInstance().GetCourseSubmissionsForStudent(this._courseID,
+            List<AssignmentSubmission> submissions = _databaseManager.GetCourseSubmissionsForStudent(this._courseID,
                                                                                       student.UserID,
                                                                                       this._syncID);
 
-            List<TileEntry> tileEntries = DatabaseManager.getInstance().GetEntries(this._courseID);
+            List<TileEntry> tileEntries = _databaseManager.GetEntries(this._courseID);
 
             double wGrade = 0.0;
 
@@ -83,7 +85,7 @@ namespace IguideME.Web.Services.Workers
             // } TODO: fix
             //----------------------------------------------------------------------------------------------------------------------
 
-            DatabaseManager.getInstance().CreatePredictedGrade(this._courseID,
+            _databaseManager.CreatePredictedGrade(this._courseID,
                                                           student.UserID,
                                                           wGrade);
         }

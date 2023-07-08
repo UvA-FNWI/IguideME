@@ -12,6 +12,7 @@ namespace IguideME.Web.Services.Workers
     {
         readonly private ILogger<SyncManager> _logger;
         readonly private CanvasHandler _canvasHandler;
+        readonly private DatabaseManager _databaseManager;
         readonly private int _courseID;
         readonly private long _syncID;
 
@@ -27,12 +28,14 @@ namespace IguideME.Web.Services.Workers
             int courseID,
             long syncID,
             CanvasHandler canvasHandler,
+            DatabaseManager databaseManager,
             ILogger<SyncManager> logger)
         {
             _logger = logger;
             this._courseID = courseID;
             this._syncID = syncID;
             this._canvasHandler = canvasHandler;
+            this._databaseManager = databaseManager;
         }
 
         /// <summary>
@@ -45,7 +48,7 @@ namespace IguideME.Web.Services.Workers
             {
                 // _logger.LogInformation("Processing student {ID}...", student.ID);
                 try {
-                    DatabaseManager.getInstance().RegisterUser(
+                    _databaseManager.RegisterUser(
                         student.ID,
                         student.LoginID,
                         student.Name,
@@ -53,7 +56,7 @@ namespace IguideME.Web.Services.Workers
                         (int) UserRoles.student
                     );
 
-                    DatabaseManager.getInstance().InitializeUserSettings(new Models.ConsentData(_courseID, student.LoginID, -1), this._syncID);
+                    _databaseManager.InitializeUserSettings(new Models.ConsentData(_courseID, student.LoginID, -1), this._syncID);
 
                 } catch (Exception e) {
                     _logger.LogError("Error registering student: {Error} {StackTrace}", e, e.StackTrace);
@@ -70,7 +73,7 @@ namespace IguideME.Web.Services.Workers
             {
                 _logger.LogInformation("Processing instructor {ID} ...", instructor.ID);
 
-                DatabaseManager.getInstance().RegisterUser(
+                _databaseManager.RegisterUser(
                     instructor.ID,
                     instructor.LoginID,
                     instructor.Name,

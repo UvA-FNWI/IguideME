@@ -18,6 +18,8 @@ namespace IguideME.Web.Services.Workers
     {
         readonly private ILogger<SyncManager> _logger;
 		readonly private CanvasHandler _canvasHandler;
+        private readonly DatabaseManager _databaseManager;
+
 		readonly private int _courseID;
 		readonly private long _syncID;
 
@@ -33,12 +35,14 @@ namespace IguideME.Web.Services.Workers
 			int courseID,
 			long syncID,
 			CanvasHandler canvasHandler,
+            DatabaseManager databaseManager,
             ILogger<SyncManager> logger)
         {
             _logger = logger;
-			this._courseID = courseID;
-			this._syncID = syncID;
-			this._canvasHandler = canvasHandler;
+			_courseID = courseID;
+			_syncID = syncID;
+			_canvasHandler = canvasHandler;
+			_databaseManager = databaseManager;
         }
 
 		/// <summary>
@@ -77,7 +81,7 @@ namespace IguideME.Web.Services.Workers
             IEnumerable<Submission> submissions = assignment.Submissions
                 .Where(submission =>
 					submission.Grade != null &&
-					DatabaseManager.getInstance().GetConsent(this._courseID, submission.User.LoginID, _syncID) > 0
+					_databaseManager.GetConsent(this._courseID, submission.User.LoginID, _syncID) > 0
 				);
 
             foreach (Submission submission in submissions)
@@ -110,7 +114,7 @@ namespace IguideME.Web.Services.Workers
 				}
                 _logger.LogInformation("loginid {ID}", submission.User.LoginID);
                 
-				DatabaseManager.getInstance().CreateUserSubmission(
+				_databaseManager.CreateUserSubmission(
 						assignment.ID ?? -1, // TODO: handle properly
 						submission.User.LoginID,
 						grade,
@@ -127,13 +131,13 @@ namespace IguideME.Web.Services.Workers
 			_logger.LogInformation("Starting assignment registry...");
 
 			IEnumerable<Assignment> assignments = this._canvasHandler.GetAssignments(this._courseID);
-			List<TileEntry> entries = DatabaseManager.getInstance().GetEntries(this._courseID);
+			List<TileEntry> entries = _databaseManager.GetEntries(this._courseID);
 
             foreach (Assignment assignment in assignments)
             {
                 _logger.LogInformation("Processing assignment: {Name}", assignment.Name);
 
-                DatabaseManager.getInstance().RegisterAssignment(
+                _databaseManager.RegisterAssignment(
                     assignment.ID,
                     assignment.CourseID,
                     assignment.Name ??= "?",

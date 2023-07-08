@@ -15,6 +15,8 @@ namespace IguideME.Web.Services.Workers
 	{
         readonly private ILogger<SyncManager> _logger;
 		readonly private CanvasHandler _canvasHandler;
+        private readonly DatabaseManager _databaseManager;
+
 		readonly private int _courseID;
 		readonly private long _syncID;
 
@@ -26,12 +28,13 @@ namespace IguideME.Web.Services.Workers
         /// <param name="syncID">the hash code associated to the current sync.</param>
         /// <param name="canvasHandler">a reference to the class managing the connection with canvas.</param>
         /// <param name="logger">a reference to the logger used for the sync.</param>
-		public DiscussionWorker(int courseID, long syncID, CanvasHandler canvasHandler, ILogger<SyncManager> logger)
+		public DiscussionWorker(int courseID, long syncID, CanvasHandler canvasHandler, DatabaseManager databaseManager, ILogger<SyncManager> logger)
 		{
             _logger = logger;
-			this._courseID = courseID;
-			this._syncID = syncID;
-			this._canvasHandler = canvasHandler;
+			_courseID = courseID;
+			_syncID = syncID;
+			_canvasHandler = canvasHandler;
+			_databaseManager = databaseManager;
 		}
 
 		/// <summary>
@@ -55,17 +58,17 @@ namespace IguideME.Web.Services.Workers
 
 			foreach (Canvas.Discussion discussion in discussions)
             {
-				DatabaseManager.getInstance().RegisterDiscussion(discussion, this._syncID);
+				_databaseManager.RegisterDiscussion(discussion, this._syncID);
 
 				// Register the entries corresponding to the topic as well.
 				foreach (Canvas.DiscussionEntry entry in discussion.Entries) {
-                    int entry_id = DatabaseManager.getInstance().RegisterDiscussionEntry(
+                    int entry_id = _databaseManager.RegisterDiscussionEntry(
 						entry,
 						students?.Find(s => s.StudentNumber == entry.UserID)?.UserID);
 
 					// Register the replies corresponding to the entry as well.
 					foreach (Canvas.DiscussionReply reply in entry.Replies) {
-                        DatabaseManager.getInstance().RegisterDiscussionReply(
+                        _databaseManager.RegisterDiscussionReply(
 							reply,
 							entry_id,
 							students?.Find(s => s.StudentNumber == reply.UserID)?.UserID);
@@ -88,12 +91,12 @@ namespace IguideME.Web.Services.Workers
 			IEnumerable<Canvas.Discussion> postedDiscussions = discussions
 				.Where(d => {
 					User student = students.Find(s => s.Name == d.UserName);
-					return student != null && DatabaseManager.getInstance().GetConsent(this._courseID, student.UserID, GetHashCode()) > 0;
+					return student != null && _databaseManager.GetConsent(this._courseID, student.UserID, GetHashCode()) > 0;
 				});
 
 			foreach (Canvas.Discussion discussion in postedDiscussions)
 			{
-				DatabaseManager.getInstance().UpdateDiscussion(discussion, tile.ID, this._syncID);
+				_databaseManager.UpdateDiscussion(discussion, tile.ID, this._syncID);
 
 			}
 		}
@@ -105,12 +108,13 @@ namespace IguideME.Web.Services.Workers
         /// <param name="tile">the tile the discussions should link to.</param>
 		private void HandleTile(List<Canvas.Discussion> discussions, Tile tile) {
 
-			tile.GetEntries();
+			if (tile.GetEntries() == null)
+                tile.Entries = _databaseManager.GetTileEntries(tile.ID);
 
 			foreach (Canvas.Discussion discussion in discussions) {
 				foreach (TileEntry entry in tile.Entries) {
 					if (discussion.ID == entry.ContentID) {
-						DatabaseManager.getInstance().UpdateDiscussion(discussion, tile.ID, this._syncID);
+						_databaseManager.UpdateDiscussion(discussion, tile.ID, this._syncID);
 					}
 				}
 			}
@@ -124,7 +128,7 @@ namespace IguideME.Web.Services.Workers
 		private void LinkToTiles(List<Canvas.Discussion> discussions, List<User> students) {
 
 			// Get all the discussion tiles.
-			IEnumerable<Tile> tiles = DatabaseManager.getInstance().GetTiles(this._courseID)
+			IEnumerable<Tile> tiles = _databaseManager.GetTiles(this._courseID)
 				.Where(tile => tile.Type == Tile.Tile_type.discussions);
 
             foreach (Tile tile in tiles)
@@ -148,7 +152,7 @@ namespace IguideME.Web.Services.Workers
 
 			_logger.LogInformation("Starting discussion registry...");
 
-			List<User> students = DatabaseManager.getInstance().GetUsers(this._courseID, (int) UserRoles.student, this._syncID);
+			List<User> students = _databaseManager.GetUsers(this._courseID, (int) User.UserRoles.student, this._syncID);
 			List<Canvas.Discussion> discussions = this._canvasHandler.GetDiscussions(this._courseID);
 
             this.RegisterDiscusions(discussions, students);

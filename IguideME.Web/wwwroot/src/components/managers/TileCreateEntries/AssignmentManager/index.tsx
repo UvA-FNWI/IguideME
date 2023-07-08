@@ -19,13 +19,13 @@ export default class AssignmentManager extends Component<Props, IState> {
 
   addAssignment = (name: string) => {
     const { canvasAssignments, tile }: Props = this.props;
-    const assignment = canvasAssignments.find(a => a.name === name);
+    const assignment = canvasAssignments.find(a => a.title === name);
 
     const entry: TileEntry = {
       id: -1,
       state: editState.new,
       tile_id: tile ? tile.id : -1,
-      title: !assignment ? name : assignment.name,
+      title: !assignment ? name : assignment.title,
       type: "ASSIGNMENT"
     };
 
@@ -34,8 +34,8 @@ export default class AssignmentManager extends Component<Props, IState> {
 
   render(): React.ReactNode {
     const { activeAssignments, canvasAssignments }: Props = this.props;
-    // console.log("activeAssignments" + activeAssignments);
-    // console.log("canvasAssignments" + canvasAssignments);
+    console.log("activeAssignments", activeAssignments);
+    console.log("canvasAssignments", canvasAssignments);
 
     return (
       <div id={"assignmentManager"}>
@@ -75,8 +75,8 @@ export default class AssignmentManager extends Component<Props, IState> {
           <div>
             <CreatableSelect
               options={canvasAssignments
-                .filter(a => !activeAssignments.map(x => x.title).includes(a.name) )
-                .map(a => ({ label: a.name, value: a.id }))}
+                .filter(a => !activeAssignments.map(x => x.title).includes(a.title) )
+                .map(a => ({ label: a.title, value: a.id }))}
               onCreateOption={(name: string) => this.addAssignment(name)}
               onChange={(e) => this.addAssignment(e!.label.toString())}
               value={null}

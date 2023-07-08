@@ -22,33 +22,12 @@ namespace IguideME.Web.Models.App
         public LearningGoal(
             int id,
             int tileID,
-            string title,
-            bool loadRequirements = true)
+            string title)
         {
             this.ID = id;
             this.TileID = tileID;
             this.Title = title;
-
-            if (loadRequirements)
-                this.FetchRequirements();
         }
-
-        public void FetchRequirements()
-        {
-            this.Requirements = DatabaseManager.getInstance()
-                        .GetGoalRequirements(this.ID);
-        }
-
-        public void DeleteGoalRequirements()
-        {
-            DatabaseManager.getInstance().DeleteGoalRequirements(this.ID);
-            this.Requirements.Clear();
-        }
-
-        // public void DeleteGoalRequirement(int tileID)
-        // {
-        //     DatabaseManager.getInstance().DeleteGoalRequirement(this.ID, tileID);
-        // }
     }
 
     public class GoalRequirement

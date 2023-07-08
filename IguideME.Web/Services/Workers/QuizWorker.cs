@@ -19,6 +19,8 @@ namespace IguideME.Web.Services.Workers
     {
         readonly private ILogger<SyncManager> _logger;
 		readonly private CanvasHandler _canvasHandler;
+        private readonly DatabaseManager _databaseManager;
+
 		readonly private int _courseID;
 		readonly private long _syncID;
 
@@ -34,13 +36,15 @@ namespace IguideME.Web.Services.Workers
 			int courseID,
 			long syncID,
 			CanvasHandler canvasHandler,
+			DatabaseManager databaseManager,
             ILogger<SyncManager> logger)
 
         {
 			_logger = logger;
-			this._courseID = courseID;
-			this._syncID = syncID;
-			this._canvasHandler = canvasHandler;
+			_courseID = courseID;
+			_syncID = syncID;
+			_canvasHandler = canvasHandler;
+			_databaseManager = databaseManager;
         }
 
 		/// <summary>
@@ -53,14 +57,14 @@ namespace IguideME.Web.Services.Workers
 			IEnumerable<QuizSubmission> submissions = quiz.Submissions
                 .Where(submission =>
 					submission.Score != null &&
-					DatabaseManager.getInstance().GetConsent(this._courseID,
-						DatabaseManager.getInstance().GetUserID(this._courseID, submission.UserID), _syncID) > 0
+					_databaseManager.GetConsent(this._courseID,
+						_databaseManager.GetUserID(this._courseID, submission.UserID), _syncID) > 0
 				);
 
 			foreach (QuizSubmission sub in quiz.Submissions) {
-				DatabaseManager.getInstance().CreateUserSubmission(
+				_databaseManager.CreateUserSubmission(
 					quiz.ID ?? -1, // TODO: handle properly when null
-					DatabaseManager.getInstance().GetUserID(this._courseID, sub.UserID),
+					_databaseManager.GetUserID(this._courseID, sub.UserID),
 					sub.Score ?? 0,
 					((DateTimeOffset)sub.FinishedDate.Value).ToUnixTimeMilliseconds()
 				);
@@ -76,7 +80,7 @@ namespace IguideME.Web.Services.Workers
 
 			// Get the quizzes from canvas.
 			List<Quiz> quizzes = this._canvasHandler.GetQuizzes(_courseID);
-			List<TileEntry> entries = DatabaseManager.getInstance().GetEntries(this._courseID);
+			List<TileEntry> entries = _databaseManager.GetEntries(this._courseID);
 
 			// Register the quizzes in the database.
 			foreach (Quiz quiz in quizzes)
@@ -86,7 +90,7 @@ namespace IguideME.Web.Services.Workers
                     continue;
 
                 _logger.LogInformation("Processing quiz: {Name}", quiz.Name);
-				DatabaseManager.getInstance().RegisterAssignment(
+				_databaseManager.RegisterAssignment(
 					quiz.ID,
 					quiz.CourseID,
 					quiz.Name,

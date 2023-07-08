@@ -23,6 +23,7 @@ namespace IguideME.Web.Services.Workers
     public class PeerGroupWorker
     {
         readonly private ILogger<SyncManager> _logger;
+        private readonly DatabaseManager _databaseManager;
         readonly private int _courseID;
         readonly private long _syncID;
 
@@ -36,11 +37,13 @@ namespace IguideME.Web.Services.Workers
         public PeerGroupWorker(
             int courseID,
             long syncID,
+            DatabaseManager databaseManager,
             ILogger<SyncManager> logger)
         {
             _logger = logger;
-            this._courseID = courseID;
-            this._syncID = syncID;
+            _courseID = courseID;
+            _syncID = syncID;
+            _databaseManager = databaseManager;
         }
 
         /// <summary>
@@ -67,7 +70,7 @@ namespace IguideME.Web.Services.Workers
             {
                 usersWithSameGoalGrade[goalGradeClass] = new List<string>();
                 //TODO: get only those with consent!!!
-                List<User> sameGraders = DatabaseManager.getInstance().GetUsersWithGoalGrade(this._courseID,goalGradeClass, this._syncID);
+                List<User> sameGraders = _databaseManager.GetUsersWithGoalGrade(this._courseID,goalGradeClass, this._syncID);
                 sameGraders.ForEach(x => usersWithSameGoalGrade[goalGradeClass].Add(x.UserID));
             }
 
@@ -119,7 +122,7 @@ namespace IguideME.Web.Services.Workers
             foreach(string peerID in peerGroup)
             {
                 // We query all the grades of each peer
-                Dictionary<int,List<float>> temp = DatabaseManager.getInstance().GetUserGrades(this._courseID, peerID, this._syncID);
+                Dictionary<int,List<float>> temp = _databaseManager.GetUserGrades(this._courseID, peerID, this._syncID);
 
                 temp.ToList().ForEach(x =>
                 {
@@ -142,7 +145,7 @@ namespace IguideME.Web.Services.Workers
             // We find all students of the course and classify them according to their goal grade
             List<string>[] sortedUsers = this.GetUsersSortedByGoalGrade();
 
-            int minPeerGroupSize = DatabaseManager.getInstance().GetMinimumPeerGroupSize(this._courseID);
+            int minPeerGroupSize = _databaseManager.GetMinimumPeerGroupSize(this._courseID);
 
             // We create the peer groups for each goal grade classification
             for (int goalGradeClass = 1; goalGradeClass <= 10; goalGradeClass++)
@@ -163,7 +166,7 @@ namespace IguideME.Web.Services.Workers
                 {
                     if ((entry.Value != null) && entry.Value.Any())
                     {
-                        DatabaseManager.getInstance().CreateUserPeer(
+                        _databaseManager.CreateUserPeer(
                         goalGradeClass,
                         peerGroup,
                         entry.Key,
@@ -186,9 +189,9 @@ namespace IguideME.Web.Services.Workers
                 foreach (KeyValuePair<int, List<float>> entry in grades)
                 {
                     // Get only tiles with notifications
-                    if (DatabaseManager.getInstance().GetTileNotificationState(entry.Key))
+                    if (_databaseManager.GetTileNotificationState(entry.Key))
                     {
-                        List<AssignmentSubmission> userTileSubmissions = DatabaseManager.getInstance().GetTileSubmissionsForUser(entry.Key, user, this._syncID);
+                        List<AssignmentSubmission> userTileSubmissions = _databaseManager.GetTileSubmissionsForUser(entry.Key, user, this._syncID);
 
                         // Find the submission with the highest ID, as it is the most recent
                         int lastSubmissionID = -1;
@@ -223,7 +226,7 @@ namespace IguideME.Web.Services.Workers
                             if (currentAverage >= peerAverage) // +1)
                             {
                                 // outperform
-                                DatabaseManager.getInstance().RegisterNotification(
+                                _databaseManager.RegisterNotification(
                                     this._courseID,
                                     user,
                                     entry.Key,
@@ -238,7 +241,7 @@ namespace IguideME.Web.Services.Workers
                             else if (currentAverage - lastAverage > 0)
                             {
                                 // closing the gap
-                                DatabaseManager.getInstance().RegisterNotification(
+                                _databaseManager.RegisterNotification(
                                     this._courseID,
                                     user,
                                     entry.Key,
@@ -249,7 +252,7 @@ namespace IguideME.Web.Services.Workers
                             else if ((currentAverage - lastAverage <= 0) && (peerAverage - currentAverage <= 1))
                             {
                                 // falling behind
-                                DatabaseManager.getInstance().RegisterNotification(
+                                _databaseManager.RegisterNotification(
                                     this._courseID,
                                     user,
                                     entry.Key,
@@ -260,7 +263,7 @@ namespace IguideME.Web.Services.Workers
                             else if ((currentAverage - lastAverage <= 0) && (peerAverage - currentAverage > 1))
                             {
                                 // put more effort
-                                DatabaseManager.getInstance().RegisterNotification(
+                                _databaseManager.RegisterNotification(
                                     this._courseID,
                                     user,
                                     entry.Key,
@@ -285,7 +288,7 @@ namespace IguideME.Web.Services.Workers
             //     {
             //         if (userGrade.Average - peerGrade.Average > 0.8)
             //         {
-            //             DatabaseManager.getInstance().RegisterNotification(
+            //             _databaseManager.RegisterNotification(
             //                 CourseID,
             //                 student.LoginID,
             //                 tile.ID,
@@ -307,7 +310,7 @@ namespace IguideME.Web.Services.Workers
             //             * its peers that belong to the current tile entry.
             //             */
 
-            //         var userGrades = DatabaseManager.getInstance()
+            //         var userGrades = _databaseManager
             //             .GetAssignmentSubmissionsForUser(
             //                 this.CourseID,
             //                 entry.ID,
@@ -315,7 +318,7 @@ namespace IguideME.Web.Services.Workers
             //                 this.Hash);
 
             //         var peerGrades =
-            //             DatabaseManager.getInstance().GetAssignmentSubmissions(
+            //             _databaseManager.GetAssignmentSubmissions(
             //                     this.CourseID, entry.ID, this.Hash).FindAll(
             //                     s => peerIDs.Contains(s.UserLoginID));
 
@@ -379,7 +382,7 @@ namespace IguideME.Web.Services.Workers
             //     if ((historicDiff < currentDiff) &&
             //         (historicDiff < 0) && (currentDiff < 0))
             //     {
-            //         DatabaseManager.getInstance().RegisterNotification(
+            //         _databaseManager.RegisterNotification(
             //             CourseID,
             //             student.LoginID,
             //             tile.ID,
@@ -392,7 +395,7 @@ namespace IguideME.Web.Services.Workers
             //     if ((historicDiff > currentDiff) &&
             //         (historicDiff < 0) && (currentDiff < 0))
             //     {
-            //         DatabaseManager.getInstance().RegisterNotification(
+            //         _databaseManager.RegisterNotification(
             //             CourseID,
             //             student.LoginID,
             //             tile.ID,

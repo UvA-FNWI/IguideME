@@ -15,14 +15,17 @@ namespace IguideME.Web.Controllers
     {
         private readonly ILogger<DataController> _logger;
         private readonly CanvasHandler _canvasHandler;
+        private readonly DatabaseManager _databaseManager;
 
         public DataController(
             ILogger<DataController> logger,
-            CanvasHandler canvasHandler
+            CanvasHandler canvasHandler, 
+            DatabaseManager databaseManager
             )
         {
             this._logger = logger;
             this._canvasHandler = canvasHandler;
+            this._databaseManager = databaseManager;
 
         }
 
@@ -32,7 +35,7 @@ namespace IguideME.Web.Controllers
         {
             if (int.TryParse((User.Identity as ClaimsIdentity).FindFirst("userid").Value, out int id)) {
 
-                string user = DatabaseManager.getInstance().GetUserID(this.GetCourseID(), id);
+                string user = _databaseManager.GetUserID(this.GetCourseID(), id);
                 if (user != null) {
                     return user;
                 }

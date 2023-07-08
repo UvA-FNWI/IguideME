@@ -24,6 +24,7 @@ namespace IguideME.Web.Services
         private readonly ILogger<SyncManager> _logger;
         private readonly IComputationJobStatusService _computationJobStatus;
         private readonly CanvasHandler _canvasHandler;
+        private readonly DatabaseManager _databaseManager;
 
         /// <summary>
         /// This constructor initializes the new CanvasSyncService to
@@ -35,11 +36,13 @@ namespace IguideME.Web.Services
         public CanvasSyncService(
             IComputationJobStatusService computationJobStatus,
             CanvasHandler canvasHandler,
+            DatabaseManager databaseManager,
             ILogger<SyncManager> logger)
         {
             _logger = logger;
             _computationJobStatus = computationJobStatus;
             _canvasHandler = canvasHandler;
+            _databaseManager = databaseManager;
         }
 
         /// <summary>
@@ -60,7 +63,7 @@ namespace IguideME.Web.Services
                 return (input >= startDate && input <= endDate);
             }
 
-            List<string> notificationDates = DatabaseManager.getInstance().GetNotificationDates(courseID);
+            List<string> notificationDates = _databaseManager.GetNotificationDates(courseID);
             if (notificationDates[0].Contains("-")) { 
                 // We are looking in a range of dates
                 foreach(string datepair in notificationDates)
@@ -82,10 +85,10 @@ namespace IguideME.Web.Services
             _canvasHandler.CreateConnection();
 
             // Don't keep ancient syncs in the database.
-            DatabaseManager.getInstance().CleanupSync(courseID);
+            _databaseManager.CleanupSync(courseID);
 
             // Register the new sync in the database.
-            DatabaseManager.getInstance().RegisterSync(courseID, timestamp);
+            _databaseManager.RegisterSync(courseID, timestamp);
             _logger.LogInformation("Sync hash: {Hash}", timestamp);
             _logger.LogInformation("Course: {Course}", work.CourseID);
 
@@ -93,37 +96,37 @@ namespace IguideME.Web.Services
             Stopwatch sw = new();
             sw.Start();
 
-            new UserWorker(courseID, timestamp, _canvasHandler, _logger).Start();
+            new UserWorker(courseID, timestamp, _canvasHandler, _databaseManager,_logger).Start();
             await _computationJobStatus.UpdateJobProgressInformationAsync(
                 jobId, $"tasks.students", 0
             ).ConfigureAwait(false);
 
-            new QuizWorker(courseID, timestamp, _canvasHandler, _logger).Start();
+            new QuizWorker(courseID, timestamp, _canvasHandler, _databaseManager, _logger).Start();
             await _computationJobStatus.UpdateJobProgressInformationAsync(
                 jobId, $"tasks.quizzes", 0
             ).ConfigureAwait(false);
 
-            new DiscussionWorker(courseID, timestamp, _canvasHandler, _logger).Start();
+            new DiscussionWorker(courseID, timestamp, _canvasHandler, _databaseManager, _logger).Start();
             await _computationJobStatus.UpdateJobProgressInformationAsync(
                 jobId, $"tasks.discussions", 0
             ).ConfigureAwait(false);
 
-            new AssignmentWorker(courseID, timestamp, _canvasHandler, _logger).Start();
+            new AssignmentWorker(courseID, timestamp, _canvasHandler, _databaseManager, _logger).Start();
             await _computationJobStatus.UpdateJobProgressInformationAsync(
                 jobId, $"tasks.assignments", 0
             ).ConfigureAwait(false);
 
-            new GradePredictorWorker(courseID, timestamp, _logger).Start();
+            new GradePredictorWorker(courseID, timestamp, _databaseManager, _logger).Start();
             await _computationJobStatus.UpdateJobProgressInformationAsync(
                 jobId, $"tasks.grade-predictor", 0
             ).ConfigureAwait(false);
 
-            new PeerGroupWorker(courseID, timestamp, _logger).Start();
+            new PeerGroupWorker(courseID, timestamp, _databaseManager, _logger).Start();
             await _computationJobStatus.UpdateJobProgressInformationAsync(
                 jobId, $"tasks.peer-groups", 0
             ).ConfigureAwait(false);
 
-            new NotificationsWorker(courseID, timestamp, _canvasHandler, notifications_bool, _logger).Start();
+            new NotificationsWorker(courseID, timestamp, _canvasHandler, _databaseManager, notifications_bool, _logger).Start();
             await _computationJobStatus.UpdateJobProgressInformationAsync(
                 jobId, $"tasks.notifications", 0
             ).ConfigureAwait(false);
@@ -135,12 +138,12 @@ namespace IguideME.Web.Services
 
             // TODO: COMMENTED OUT CODE THAT SHOULD GO BACK IN ---------------------
             // _logger.LogInformation("Starting recycleexternaldata");
-            // DatabaseManager.getInstance().RecycleExternalData(courseID, timestamp);
+            // _databaseManager.RecycleExternalData(courseID, timestamp);
             //----------------------------------------------------------------------
 
             long duration = sw.ElapsedMilliseconds;
             Console.WriteLine("Took: " + duration.ToString() + "ms");
-            DatabaseManager.getInstance().CompleteSync(timestamp);
+            _databaseManager.CompleteSync(timestamp);
 
             return result;
         }
