@@ -15,6 +15,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 
+using UserRoles = IguideME.Web.Models.Impl.UserRoles;
+
 
 // //======================== Builder configuration =========================//
 
@@ -90,7 +92,7 @@ builder.Services
 // Add a policy that checks whether a user is an admin.
 builder.Services.AddAuthorization(options =>
     options.AddPolicy("IsInstructor",
-            policy => policy.RequireRole("Teacher")));
+            policy => policy.RequireRole(UserRoles.instructor.ToString())));
 
 builder.Services.Configure<ForwardedHeadersOptions>(opt =>
 {
@@ -140,7 +142,7 @@ app.UseLti(new LtiOptions
         ["courseid"] = p.CustomClaims?.GetProperty("courseid").ToString(),
         ["userid"] = p.CustomClaims?.GetProperty("userid").ToString(),
         [ClaimTypes.Role] = p.Roles.Any(e => e.Contains("http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor"))
-            ? "Teacher" : "Student",
+            ? UserRoles.instructor : UserRoles.student,
         [ClaimTypes.Email] = p.Email,
     }
 });

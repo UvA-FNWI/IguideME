@@ -71,7 +71,7 @@ namespace IguideME.Web.Controllers
                     this.GetHashCode()));
         }
 
-// What is the difference between these two ????? 
+// What is the difference between these two ?????
         [Authorize]
         [HttpGet]
         [Route("/app/notification")]
@@ -189,6 +189,8 @@ namespace IguideME.Web.Controllers
                 .GetPeerGroup(GetCourseID()));
         }
 
+
+        // TODO: check if possible to have separate routes for seperate authorizes.
         [Authorize]
         [Route("/app/track")]
         [HttpPost]

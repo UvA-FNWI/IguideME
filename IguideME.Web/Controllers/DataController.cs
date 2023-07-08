@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Security.Claims;
+using UserRoles = IguideME.Web.Models.Impl.UserRoles;
+
 
 namespace IguideME.Web.Controllers
 {
@@ -28,14 +30,12 @@ namespace IguideME.Web.Controllers
 
         protected string GetUserID()
         {
-
             if (int.TryParse((User.Identity as ClaimsIdentity).FindFirst("userid").Value, out int id)) {
 
                 string user = DatabaseManager.getInstance().GetUserID(this.GetCourseID(), id);
                 if (user != null) {
                     return user;
                 }
-
             }
 
             _logger.LogInformation("Could not find user {user} in database.", id);
@@ -51,7 +51,7 @@ namespace IguideME.Web.Controllers
 
         protected bool IsAdministrator()
         {
-            return User.IsInRole("Teacher");
+            return User.IsInRole(UserRoles.instructor.ToString());
         }
 
         protected int GetCourseID()

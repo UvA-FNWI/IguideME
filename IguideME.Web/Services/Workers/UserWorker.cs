@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.Logging;
 using UvA.DataNose.Connectors.Canvas;
+using UserRoles = IguideME.Web.Models.Impl.UserRoles;
 
 namespace IguideME.Web.Services.Workers
 {
@@ -49,7 +50,7 @@ namespace IguideME.Web.Services.Workers
                         student.LoginID,
                         student.Name,
                         student.SortableName,
-                        0 // User.UserRoles.student
+                        (int) UserRoles.student
                     );
 
                     DatabaseManager.getInstance().InitializeUserSettings(new Models.ConsentData(_courseID, student.LoginID, -1), this._syncID);
@@ -74,7 +75,7 @@ namespace IguideME.Web.Services.Workers
                     instructor.LoginID,
                     instructor.Name,
                     instructor.SortableName,
-                    1 // User.UserRoles.instructor
+                    (int) UserRoles.instructor
                 );
             }
         }

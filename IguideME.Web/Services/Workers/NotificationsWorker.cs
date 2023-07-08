@@ -117,7 +117,7 @@ namespace IguideME.Web.Services.Workers
                 return;
             }
 
-            List<User> students = DatabaseManager.getInstance().GetUsers(this._courseID, (int) User.UserRoles.student, this._syncID);
+            List<User> students = DatabaseManager.getInstance().GetUsers(this._courseID, (int) UserRoles.student, this._syncID);
 
             foreach (User student in students)
             {

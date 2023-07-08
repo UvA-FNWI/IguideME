@@ -4,12 +4,13 @@ using Newtonsoft.Json;
 
 namespace IguideME.Web.Models.Impl
 {
+    public enum UserRoles {
+        student,
+        instructor
+    }
+
     public class User
     {
-        public enum UserRoles {
-            student,
-            instructor
-        }
         // [JsonProperty("id")]
         // public int ID { get; set; }
 
