@@ -588,6 +588,10 @@ namespace IguideME.Web.Controllers
 
                 _ = float.TryParse(values[grade_column], out float grade);
 
+                if (DatabaseManager.Instance.GetConsent(courseID,values[id_column]) != 1) {
+                    continue;
+                }
+
                 int submissionID = DatabaseManager.Instance.CreateUserSubmission(
                     courseID,
                     entryID,
