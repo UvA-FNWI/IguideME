@@ -32,7 +32,7 @@ export default class UploadManager extends Component<IProps, IState> {
   }
 
   componentDidMount(): void {
-    StudentController.getStudents().then(students =>
+    StudentController.getStudentsWithConstent().then(students =>
       this.setState({
         students: students.sort((a, b) => a.name.localeCompare(b.name)),
         loaded: true })

@@ -16,6 +16,14 @@ export default class StudentController extends Controller {
     ).then(response => response.data);
   }
 
+  static getStudentsWithConstent(): Promise<CanvasStudent[]> {
+    if (debug()) return delay(MOCK_STUDENTS);
+
+    return this.client.get(
+      `consent/students`
+    ).then(response => response.data);
+  }
+
   static getConsents(): Promise<ConsentData[]> {
     if (debug()) return delay(MOCK_CONSENTS);
 

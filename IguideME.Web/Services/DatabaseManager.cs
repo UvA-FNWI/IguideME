@@ -548,6 +548,40 @@ namespace IguideME.Web.Services
             return users;
         }
 
+        public List<User> GetStudentsWithConsent(int courseID, string hash = null)
+        {
+            string activeHash = hash ?? this.GetCurrentHash(courseID);
+            if (activeHash == null)
+            {
+                _logger.LogInformation("Hash is null, returning empty user list.");
+                return new List<User>() { };
+            }
+
+            List<User> users = new();
+
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_STUDENTS_WITH_ROLE_FOR_COURSE,
+                    new SQLiteParameter("courseID", courseID),
+                    new SQLiteParameter("hash", activeHash)
+                )) {
+                // collect all users
+                while (r.Read())
+                {
+                    User user = new(
+                        r.GetInt32(0),
+                        courseID,
+                        r.GetInt32(1),
+                        r.GetValue(2).ToString(),
+                        r.GetValue(3).ToString(),
+                        r.GetValue(4).ToString(),
+                        r.GetValue(5).ToString()
+                    );
+                    users.Add(user);
+                }
+            }
+
+            return users;
+        }
+
         public string GetUserID(int courseID, int id) {
             string hash = this.GetCurrentHash(courseID);
 

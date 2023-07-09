@@ -1201,6 +1201,20 @@ public static class DatabaseQueries
         AND         `sync_hash`=@hash
         ORDER BY    `name` ASC;";
 
+    public const string QUERY_STUDENTS_WITH_ROLE_FOR_COURSE =
+        @"SELECT    `id`,
+                    `studentnumber`,
+                    `user_id`,
+                    `name`,
+                    `sortable_name`,
+                    `role`
+        FROM        `canvas_users`
+        WHERE       `course_id`=@courseID
+        AND         `role`=`student`
+        AND         `consent`=1
+        AND         `sync_hash`=@hash
+        ORDER BY    `name` ASC;";
+
     public const string QUERY_USER_ID =
         @"SELECT    `user_id`
         FROM        `canvas_users`

@@ -176,6 +176,18 @@ namespace IguideME.Web.Controllers
                 .ToArray());
         }
 
+                [Authorize(Policy = "IsInstructor")]
+        [HttpGet]
+        [Route("/constent/students")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public ActionResult GetStudentsWithConsent()
+        {
+            return Json(
+                DatabaseManager.Instance.GetStudentsWithConsent(this.GetCourseID())
+                .ToArray());
+        }
+
         [Authorize(Policy = "IsInstructor")]
         [HttpGet]
         [Route("/Consents")]
