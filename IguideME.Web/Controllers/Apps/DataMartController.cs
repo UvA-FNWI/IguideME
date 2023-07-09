@@ -178,7 +178,7 @@ namespace IguideME.Web.Controllers
 
                 [Authorize(Policy = "IsInstructor")]
         [HttpGet]
-        [Route("/constent/students")]
+        [Route("/consent/students")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public ActionResult GetStudentsWithConsent()

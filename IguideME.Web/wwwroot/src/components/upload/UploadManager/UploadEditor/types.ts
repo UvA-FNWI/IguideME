@@ -5,6 +5,7 @@ export interface IProps {
     data: string[][];
     setData: (data: string[][]) => void;
     columns: {grade: number, id: number};
+    collapsed: boolean;
 }
 
 export interface IState {

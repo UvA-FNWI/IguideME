@@ -9,11 +9,11 @@ export default class Presets {
     }
 
     static watched(data: string[][]): string[][] {
-        return this.filter(data, 6, 0, 11);
+        return this.filter(data, 1, 0, 3);
     }
 
     static watchtime(data: string[][]): string[][] {
-        return this.filter(data, 6, 0, 4);
+        return this.filter(data, 1, 0, 4);
     }
 
     static sowiso(data: string[][]): string[][] {

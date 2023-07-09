@@ -1202,18 +1202,20 @@ public static class DatabaseQueries
         ORDER BY    `name` ASC;";
 
     public const string QUERY_STUDENTS_WITH_ROLE_FOR_COURSE =
-        @"SELECT    `id`,
-                    `studentnumber`,
-                    `user_id`,
-                    `name`,
-                    `sortable_name`,
-                    `role`
+        @"SELECT    `canvas_users`.`id`,
+                    `canvas_users`.`studentnumber`,
+                    `canvas_users`.`user_id`,
+                    `canvas_users`.`name`,
+                    `canvas_users`.`sortable_name`,
+                    `canvas_users`.`role`
         FROM        `canvas_users`
-        WHERE       `course_id`=@courseID
-        AND         `role`=`student`
-        AND         `consent`=1
-        AND         `sync_hash`=@hash
-        ORDER BY    `name` ASC;";
+        INNER JOIN  `user_settings`
+            ON      `canvas_users`.`user_id`=`user_settings`.`user_id`
+        WHERE       `canvas_users`.`course_id`=@courseID
+        AND         `canvas_users`.`role`='student'
+        AND         `user_settings`.`consent`=1
+        AND         `canvas_users`.`sync_hash`=@hash
+        ORDER BY    `canvas_users`.`name` ASC;";
 
     public const string QUERY_USER_ID =
         @"SELECT    `user_id`

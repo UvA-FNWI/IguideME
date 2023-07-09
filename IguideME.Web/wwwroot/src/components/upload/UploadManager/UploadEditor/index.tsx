@@ -35,13 +35,18 @@ export default class UploadEditor extends Component<IProps, IState> {
   }
 
   render(): React.ReactNode {
-    const { data, columns } = this.props;
+    const { data, columns, collapsed } = this.props;
 
     return (
       <div>
       <Row>
         <Col>
         {
+          collapsed ?
+          <div key={0}>
+              <UploadEditorRow row_data={data[0]} row_index={0} changeData={this.changeData} columns={columns}/>
+            </div>
+          :
           data.map((row, i) => (
             <div key={i}>
               <UploadEditorRow row_data={row} row_index={i} changeData={this.changeData} columns={columns}/>
@@ -59,18 +64,23 @@ export default class UploadEditor extends Component<IProps, IState> {
         </Col>
       </Row>
       <Row>
-        {
-          data[0].map((_, i) => (
-            <Col key={i}>
-              <Button type={"ghost"}
-                      style={{width: "120px"}}
-                      icon={(<MinusOutlined />)}
-                      onClick={() => this.removeColumn(i)}>
-              </Button>
-            </Col>
-            ))
+      {
+          collapsed ?
+          <div>...</div>
+          :
+
+            data[0].map((_, i) => (
+              <Col key={i}>
+                <Button type={"ghost"}
+                        style={{width: "120px"}}
+                        icon={(<MinusOutlined />)}
+                        onClick={() => this.removeColumn(i)}>
+                </Button>
+              </Col>
+              ))
+
         }
-      </Row>
+        </Row>
       </div>
     )
   }

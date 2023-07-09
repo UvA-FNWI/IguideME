@@ -1,12 +1,9 @@
 import React, { Component } from "react";
 import {IProps, IState} from "./types";
-// import UploadBinaryData from "./UploadBinaryData";
-// import UploadEntriesData from "./UploadEntriesData";
 import UploadEditor from "./UploadEditor";
 import {Button, Col, Input, InputNumber, message, Row, Tooltip} from "antd";
 import { QuestionCircleOutlined, DownOutlined, RightOutlined , VideoCameraAddOutlined} from "@ant-design/icons"
 import CSVReader, { IFileInfo } from "react-csv-reader";
-// import ExternalDataController from "../../../api/controllers/externalData"; TODO: move communication with backend to this controller or remove it.
 import StudentController from "../../../api/controllers/student";
 import TileController from "../../../api/controllers/tile";
 import "./style.scss";
@@ -39,9 +36,9 @@ export default class UploadManager extends Component<IProps, IState> {
     );
   }
 
-  handleCSVUpload = (data: string[][], title: string) => {
+  handleCSVUpload = (data: string[][], file: string) => {
     if (this.state.title.length < 1)
-      this.setState({ data, title });
+      this.setState({ data, title: file.replace(/\.[^/.]+$/, "")});
     else
       this.setState({ data })
   }
@@ -97,9 +94,6 @@ export default class UploadManager extends Component<IProps, IState> {
     const { title, id_column, grade_column } = this.state;
 
     const data = this.filterStudents();
-
-    console.log(data);
-    console.log(this.validate(data));
 
     if (!this.validate(data))
       return this.setState({ data });
@@ -192,16 +186,15 @@ export default class UploadManager extends Component<IProps, IState> {
               </Tooltip>
               </Col>
             </Row>
-            { !editor_collapsed &&
-            <>
+            {
             <Row style={{ marginBottom: 8 }}>
               <UploadEditor data={data}
                             setData={data => this.setState({data})}
                             students={students}
-                            columns={{grade: grade_column, id: id_column}}/>
+                            columns={{grade: grade_column, id: id_column}}
+                            collapsed={editor_collapsed}
+                />
             </Row>
-
-            </>
             }
           </>
           :
