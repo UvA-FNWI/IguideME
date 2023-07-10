@@ -34,7 +34,7 @@ namespace IguideME.Web.Controllers
 
         }
 
-        [Authorize(Policy = "IsInstructor")]
+        // [Authorize(Policy = "IsInstructor")]
         [Route("/app/setup")]
         [HttpPost]
         public void SetupCourse() {
@@ -53,8 +53,10 @@ namespace IguideME.Web.Controllers
             /**
              * Returns information of the logged in user.
              */
+            Models.Impl.User user = _databaseManager.GetUser(this.GetUserID());
+            user.CourseID = GetCourseID();
             return Json(
-                _databaseManager.GetUser(GetCourseID(), this.GetUserID())
+                user
             );
         }
 

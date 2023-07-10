@@ -486,7 +486,7 @@ public static class DatabaseQueries
           VALUES        (@courseID, @startTimestamp);";
 
     public const string REGISTER_ASSIGNMENT =
-        @"INSERT OR REPLACE 
+        @"INSERT OR REPLACE
             INTO   `assignments`
                         (   `assignment_id`,
                             `course_id`,
@@ -508,7 +508,7 @@ public static class DatabaseQueries
         );";
 
     public const string REGISTER_DISCUSSION =
-        @"INSERT OR REPLACE 
+        @"INSERT OR REPLACE
             INTO   `discussions`
                         (   `discussion_id`,
                             `course_id`,
@@ -544,7 +544,7 @@ public static class DatabaseQueries
     //     ;";
 
     public const string REGISTER_DISCUSSION_REPLY =
-        @"INSERT OR REPLACE 
+        @"INSERT OR REPLACE
             INTO   `discussion_replies`
                         (   `discussion_id`,
                             `author`,
@@ -577,7 +577,7 @@ public static class DatabaseQueries
                 );";
 
     public const string REGISTER_USER_SUBMISSION =
-        @"INSERT OR REPLACE 
+        @"INSERT OR REPLACE
             INTO   `submissions`
                         (   `assignment_id`,
                             `user_id`,
@@ -693,8 +693,8 @@ public static class DatabaseQueries
         WHERE           `sync_id` IN ({0});";
 
     public const string QUERY_ALL_USER_NOTIFICATIONS =
-        @"SELECT        `tile_id`, 
-                        `status`, 
+        @"SELECT        `tile_id`,
+                        `status`,
                         `sent`
         FROM            `notifications`
         WHERE           `course_id`=@courseID
@@ -702,7 +702,7 @@ public static class DatabaseQueries
         AND             `sync_id`=@syncID;";
 
     public const string QUERY_PENDING_USER_NOTIFICATIONS =
-        @"SELECT        `tile_id`, 
+        @"SELECT        `tile_id`,
                         `status`
         FROM            `notifications`
         WHERE           `course_id`=@courseID
@@ -791,7 +791,7 @@ public static class DatabaseQueries
                     `tile_groups`.`order`
         FROM        `tile_groups`
         INNER JOIN  `layout_columns`
-        USING       (`column_id`)        
+        USING       (`column_id`)
         WHERE       `layout_columns`.`course_id`=@courseID
         AND         `tile_groups`.`group_id`=@groupID;";
 
@@ -803,7 +803,7 @@ public static class DatabaseQueries
                     `tile_groups`.`order`
         FROM        `tile_groups`
         INNER JOIN  `layout_columns`
-        USING       (`column_id`)        
+        USING       (`column_id`)
         WHERE       `layout_columns`.`course_id`=@courseID;";
 
     public const string QUERY_TILE =
@@ -894,15 +894,15 @@ public static class DatabaseQueries
         INNER JOIN  `tiles`
             USING   (`tile_id`)
 
-        LEFT JOIN  `assignments` 
+        LEFT JOIN  `assignments`
             ON      `tiles`.`type` = 0
             AND     `tile_entries`.`content_id` = `assignments`.`assignment_id`
 
-        LEFT JOIN  `discussions` 
+        LEFT JOIN  `discussions`
             ON      `tiles`.`type` = 1
             AND     `tile_entries`.`content_id` = `discussions`.`discussion_id`
 
-        LEFT JOIN  `learning_goals` 
+        LEFT JOIN  `learning_goals`
             ON      `tiles`.`type` = 2
             AND     `tile_entries`.`content_id` = `learning_goals`.`goal_id`
 
@@ -1109,6 +1109,15 @@ public static class DatabaseQueries
         ORDER BY    `users`.`name` ASC
         LIMIT       1;";
 
+    public const string QUERY_USER =
+        @"SELECT    `user_id`,
+                    `student_number`,
+                    `name`,
+                    `sortable_name`,
+                    `role`
+        FROM        `users`
+        WHERE       `user_id`=@userID";
+
     public const string QUERY_USER_FOR_COURSE =
         @"SELECT    `users`.`user_id`,
                     `users`.`student_number`,
@@ -1178,9 +1187,9 @@ public static class DatabaseQueries
         AND         `sync_ID`=@syncID
         ;";
     public const string QUERY_GOAL_GRADES =
-        @"SELECT    `goal_grade`, 
-                    `user_id` 
-        FROM        `student_settings` 
+        @"SELECT    `goal_grade`,
+                    `user_id`
+        FROM        `student_settings`
         WHERE       `course_id`=@courseID
         AND         `sync_ID`=@syncID
         ;";
@@ -1189,7 +1198,7 @@ public static class DatabaseQueries
         @"SELECT    `predicted_grade`,
                     `goal_grade`,
                     `notifications`
-        FROM        `student_settings` 
+        FROM        `student_settings`
         WHERE       `course_id`=@courseID
         AND         `user_id`=@userID
         ORDER BY    `sync_ID` DESC
@@ -1495,7 +1504,7 @@ public static class DatabaseQueries
         AND             `course_id`=@courseID;";
 
     public const string DELETE_TILE =
-        @"DELETE FROM   `tile` 
+        @"DELETE FROM   `tile`
         WHERE `tile_id` = @tileID;";
 
     public const string DELETE_TILE_GROUP =
@@ -1532,7 +1541,7 @@ public static class DatabaseQueries
             @action
           );";
 
-    public const string DELETE_OLD_SYNCS_FOR_COURSE = //half done 
+    public const string DELETE_OLD_SYNCS_FOR_COURSE = //half done
         @"DELETE
         FROM        `peer_groups`
         WHERE       `sync_id`=@syncID;

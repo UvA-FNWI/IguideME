@@ -152,7 +152,7 @@ namespace IguideME.Web.Services.Workers
 
 			_logger.LogInformation("Starting discussion registry...");
 
-			List<User> students = _databaseManager.GetUsers(this._courseID, (int) User.UserRoles.student, this._syncID);
+			List<User> students = _databaseManager.GetUsers(this._courseID, (int) UserRoles.student, this._syncID);
 			List<Canvas.Discussion> discussions = this._canvasHandler.GetDiscussions(this._courseID);
 
             this.RegisterDiscusions(discussions, students);

@@ -12,6 +12,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
+using UserRoles = IguideME.Web.Models.Impl.UserRoles;
+
 
 namespace IguideME.Web.Controllers
 {
@@ -41,7 +43,7 @@ namespace IguideME.Web.Controllers
 
             this._queuedBackgroundService = queuedBackgroundService;
             this._computationJobStatusService = computationJobStatusService;
-            
+
         }
 
 
@@ -176,7 +178,7 @@ namespace IguideME.Web.Controllers
         public ActionResult GetStudents()
         {
             return Json(
-                _databaseManager.GetUsers(this.GetCourseID(), 0) // 0 == student
+                _databaseManager.GetUsers(this.GetCourseID(), UserRoles.student)
                 .ToArray());
         }
 

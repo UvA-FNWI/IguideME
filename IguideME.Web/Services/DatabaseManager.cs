@@ -31,17 +31,11 @@ namespace IguideME.Web.Services
             _logger = factory.CreateLogger("DatabaseManager");
         }
 
-        // TODO: I think we want the database manager to just be a singleton that we add using dependency injection just like canvashandler (although that one maybe shouldn't be singleton probably)
-        // public static void Initialize(bool isDev = false)
-        // {
-        //     new DatabaseManager(isDev);
-        // }
-
-        public static DatabaseManager getInstance (bool isDev = false)
+        public static DatabaseManager GetInstance (bool isDev = false)
         {
-            if (s_instance == null)
-                s_instance = new DatabaseManager(isDev);
-        
+
+            s_instance ??= new DatabaseManager(isDev);
+
             return s_instance;
         }
 
@@ -164,7 +158,7 @@ namespace IguideME.Web.Services
                 DatabaseQueries.CREATE_TABLE_COURSE_SETTINGS,
 
                 DatabaseQueries.CREATE_TABLE_SYNC_HISTORY,
-                
+
                 DatabaseQueries.CREATE_TABLE_USER_SETTINGS,
                 DatabaseQueries.CREATE_TABLE_USER_TRACKER,
 
@@ -467,7 +461,7 @@ namespace IguideME.Web.Services
         }
 
         public void UpdateDiscussion(Discussion discussion, int tileID, long syncID) {
-            // I think that this is only to tie the discussion to the tile. 
+            // I think that this is only to tie the discussion to the tile.
             // If that's so, then this is the wrong query, we just have to create a tile entry with this discussion id
             NonQuery(
                 DatabaseQueries.REGISTER_DISCUSSION,
@@ -478,7 +472,7 @@ namespace IguideME.Web.Services
                 new SQLiteParameter("date", discussion.PostedAt),
                 new SQLiteParameter("message", discussion.Message)
                 // new SQLiteParameter("message", discussion.Message.Replace("'", "''")),
-                // new SQLiteParameter("tileID", tileID)            
+                // new SQLiteParameter("tileID", tileID)
                 );
         }
 
@@ -491,7 +485,7 @@ namespace IguideME.Web.Services
     				new SQLiteParameter("date", entry.CreatedAt),
                     new SQLiteParameter("message", entry.Message)
                     // new SQLiteParameter("message", entry.Message.Replace("'", "''")),
-                    
+
             );
         }
 
@@ -510,7 +504,7 @@ namespace IguideME.Web.Services
             );
         }
 
-        public List<User> GetUsers(int courseID, int role = 0, long syncID = 0)
+        public List<User> GetUsers(int courseID, UserRoles role = 0, long syncID = 0)
         {
             long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
             if (activeSync == 0)
@@ -523,7 +517,7 @@ namespace IguideME.Web.Services
 
             using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_USERS_WITH_ROLE_FOR_COURSE,
                     new SQLiteParameter("courseID", courseID),
-                    new SQLiteParameter("role", role),
+                    new SQLiteParameter("role", (int) role),
                     new SQLiteParameter("syncID", activeSync)
                 )) {
                 // collect all users
@@ -560,6 +554,27 @@ namespace IguideME.Web.Services
             }
 
             return null;
+        }
+
+        public User GetUser(string userID)
+        {
+            User user = null;
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_USER,
+                new SQLiteParameter("userID", userID)
+                )) {
+                if (r.Read())
+                {
+                    user = new User(
+                        r.GetValue(0).ToString(),
+                        0,
+                        r.GetInt32(1),
+                        r.GetValue(2).ToString(),
+                        r.GetValue(3).ToString(),
+                        r.GetInt32(4)
+                    );
+                }
+            }
+            return user;
         }
 
         public User GetUser(int courseID, string userID, long syncID = 0)
@@ -1559,7 +1574,7 @@ namespace IguideME.Web.Services
         }
 
         public void DeleteGoal(int courseID, LearningGoal goal) {
-            
+
             goal.Requirements = GetGoalRequirements(goal.ID);
 
             DeleteGoalRequirements(goal.ID);
@@ -1967,7 +1982,7 @@ namespace IguideME.Web.Services
                 new SQLiteParameter("columnID", columnID),
                 new SQLiteParameter("title", title),
                 new SQLiteParameter("order", order),
-                new SQLiteParameter("groupID", tileGroupID)                
+                new SQLiteParameter("groupID", tileGroupID)
             );
 
             return GetLayoutTileGroup(courseID, tileGroupID);
@@ -2369,7 +2384,7 @@ namespace IguideME.Web.Services
 // IT IS THE SAME AS SET GOAL GRADE, SHOULD WE KEEP IT?????
         public void SetConsent(ConsentData data, long syncID)
         {
-            
+
             using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_LAST_STUDENT_SETTINGS,
                     new SQLiteParameter("courseID", data.CourseID),
                     new SQLiteParameter("userID", data.UserID)
@@ -2387,7 +2402,7 @@ namespace IguideME.Web.Services
                 }
             }
 
-            
+
 
             // if (data.Granted == -1)
             //     UpdateUserGoalGrade(data.CourseID, data.UserID, -1);

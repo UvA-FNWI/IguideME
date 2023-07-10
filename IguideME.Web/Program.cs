@@ -27,10 +27,9 @@ using UserRoles = IguideME.Web.Models.Impl.UserRoles;
 WebApplicationBuilder builder = WebApplication.CreateBuilder(
     new WebApplicationOptions{
         Args = args, // command-line arguments passed to the app
-        WebRootPath = "wwwroot/build" // specifies the path to the web root directory
+        WebRootPath = "wwwroot/dist" // specifies the path to the web root directory
     }
 );
-
 
 //    /------------------------ Read appsettings.json -------------------------/
 
@@ -50,6 +49,9 @@ SymmetricSecurityKey signingKey = new(Encoding.ASCII.GetBytes(key));
 
 
 //    /----------------------- Configure services ------------------------/
+
+// Add Razor pages (just index.cshtml)
+builder.Services.AddRazorPages();
 
 // work object, where the computations are done.
 builder.Services.AddTransient<ICanvasSyncService, CanvasSyncService>();
@@ -108,7 +110,7 @@ builder.Services.Configure<IISServerOptions>(options => options.AllowSynchronous
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddSingleton<CanvasHandler>();
-builder.Services.AddSingleton<DatabaseManager>(_ => DatabaseManager.getInstance());
+builder.Services.AddSingleton<DatabaseManager>(_ => DatabaseManager.GetInstance());
 
 builder.Services.AddHttpClient();
 
@@ -143,26 +145,15 @@ app.UseLti(new LtiOptions
         ["courseid"] = p.CustomClaims?.GetProperty("courseid").ToString(),
         ["userid"] = p.CustomClaims?.GetProperty("userid").ToString(),
         [ClaimTypes.Role] = p.Roles.Any(e => e.Contains("http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor"))
-            ? UserRoles.instructor : UserRoles.student,
+            ? UserRoles.instructor.ToString() : UserRoles.student.ToString(),
         [ClaimTypes.Email] = p.Email,
     }
 });
 
-
-if (app.Environment.IsDevelopment())
-{
-    Console.WriteLine("In Development.");
-    app.UseDeveloperExceptionPage();
-}
-else
-{
-    Console.WriteLine("In Production.");
-    app.UseExceptionHandler("/Error");
-}
-
 // Set the correct location for the database for prod/dev environments the first time the instance is created.
-DatabaseManager.getInstance(app.Environment.IsDevelopment());
+DatabaseManager.GetInstance(app.Environment.IsDevelopment());
 
+app.UseHttpsRedirection();
 app.UseDefaultFiles();
 app.UseStaticFiles();
 
@@ -171,9 +162,28 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.UseEndpoints(endpoints => endpoints.MapRazorPages());
+
+// app.MapRazorPages();
+
 app.MapControllerRoute(
         name: "default",
         pattern: "{controller}/{action=Index}/{id?}");
+
+if (app.Environment.IsDevelopment())
+{
+    Console.WriteLine("In Development.");
+    app.UseDeveloperExceptionPage();
+    app.UseSpa(spa =>
+    {
+        spa.UseProxyToSpaDevelopmentServer("http://localhost:3000/");
+    });
+}
+else
+{
+    Console.WriteLine("In Production.");
+    app.UseExceptionHandler("/Error");
+}
 
 
 // //=============================== Run app ================================//

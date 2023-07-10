@@ -19,7 +19,7 @@ namespace IguideME.Web.Controllers
 
         public DataController(
             ILogger<DataController> logger,
-            CanvasHandler canvasHandler, 
+            CanvasHandler canvasHandler,
             DatabaseManager databaseManager
             )
         {
