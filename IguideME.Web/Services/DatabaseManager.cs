@@ -159,7 +159,7 @@ namespace IguideME.Web.Services
 
                 DatabaseQueries.CREATE_TABLE_SYNC_HISTORY,
 
-                DatabaseQueries.CREATE_TABLE_USER_SETTINGS,
+                DatabaseQueries.CREATE_TABLE_STUDENT_SETTINGS,
                 DatabaseQueries.CREATE_TABLE_USER_TRACKER,
 
                 DatabaseQueries.CREATE_TABLE_LAYOUT_COLUMNS,
@@ -529,7 +529,43 @@ namespace IguideME.Web.Services
                         r.GetInt32(1),
                         r.GetValue(2).ToString(),
                         r.GetValue(3).ToString(),
-                        r.GetInt32(4)
+                        r.GetInt32(4),
+                        role == UserRoles.student ? r.GetInt32(5) : 1
+                    );
+                    users.Add(user);
+                }
+            }
+
+            return users;
+        }
+
+
+        public List<User> GetUsersWithGrantedConsent(int courseID, UserRoles role = 0, long syncID = 0)
+        {
+            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
+            if (activeSync == 0)
+            {
+                _logger.LogInformation("Hash is null, returning empty user list.");
+                return new List<User>() { };
+            }
+
+            List<User> users = new();
+
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_CONSENTED_USERS_WITH_ROLE_FOR_COURSE,
+                    new SQLiteParameter("courseID", courseID),
+                    new SQLiteParameter("role", (int) role),
+                    new SQLiteParameter("syncID", activeSync)
+                )) {
+                while (r.Read())
+                {
+                    User user = new(
+                        r.GetValue(0).ToString(),
+                        courseID,
+                        r.GetInt32(1),
+                        r.GetValue(2).ToString(),
+                        r.GetValue(3).ToString(),
+                        r.GetInt32(4),
+                        role == UserRoles.student ? r.GetInt32(5) : 1
                     );
                     users.Add(user);
                 }
@@ -564,13 +600,15 @@ namespace IguideME.Web.Services
                 )) {
                 if (r.Read())
                 {
+                    int role = r.GetInt32(4);
                     user = new User(
                         r.GetValue(0).ToString(),
                         0,
                         r.GetInt32(1),
                         r.GetValue(2).ToString(),
                         r.GetValue(3).ToString(),
-                        r.GetInt32(4)
+                        role,
+                        role == (int) UserRoles.student ? r.GetInt32(5) : 1
                     );
                 }
             }
@@ -596,7 +634,8 @@ namespace IguideME.Web.Services
                         r.GetInt32(1),
                         r.GetValue(2).ToString(),
                         r.GetValue(3).ToString(),
-                        r.GetInt32(4)
+                        r.GetInt32(4),
+                        r.GetValue(5) != null ? r.GetInt32(5) : 1
                     );
                 }
             }
@@ -628,7 +667,8 @@ namespace IguideME.Web.Services
                         r.GetInt32(1),
                         r.GetValue(2).ToString(),
                         r.GetValue(3).ToString(),
-                        r.GetInt32(4)
+                        r.GetInt32(4),
+                        goalGrade
                     );
                     users.Add(user);
                 }
@@ -747,11 +787,11 @@ namespace IguideME.Web.Services
             }
         }
 
-        public void InitializeUserSettings(ConsentData data, long syncID)
+        public void InitializeUserSettings(int courseID, string userID, long syncID)
         {
             using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_LAST_STUDENT_SETTINGS,
-                    new SQLiteParameter("courseID", data.CourseID),
-                    new SQLiteParameter("userID", data.UserID)
+                    new SQLiteParameter("courseID", courseID),
+                    new SQLiteParameter("userID", userID)
                 )) {
                     while (r.Read())
                     {
@@ -759,9 +799,9 @@ namespace IguideME.Web.Services
                     }
                 }
 
-            NonQuery(DatabaseQueries.INITIALIZE_USER_SETTINGS,
-                            new SQLiteParameter("CourseID", data.CourseID),
-                            new SQLiteParameter("UserID", data.UserID),
+            NonQuery(DatabaseQueries.INITIALIZE_STUDENT_SETTINGS,
+                            new SQLiteParameter("CourseID", courseID),
+                            new SQLiteParameter("UserID", userID),
                             new SQLiteParameter("GoalGrade", -1),
                             new SQLiteParameter("syncID", syncID)
                         );
@@ -794,7 +834,7 @@ namespace IguideME.Web.Services
                 )) {
                 while (r.Read())
                 {
-                    NonQuery(DatabaseQueries.REGISTER_USER_SETTINGS,
+                    NonQuery(DatabaseQueries.REGISTER_STUDENT_SETTINGS,
                         new SQLiteParameter("courseID", courseID),
                         new SQLiteParameter("userID", userID),
                         new SQLiteParameter("PredictedGrade", long.Parse(r.GetValue(0).ToString())),
@@ -836,7 +876,7 @@ namespace IguideME.Web.Services
                 )) {
                 while (r.Read())
                 {
-                    NonQuery(DatabaseQueries.REGISTER_USER_SETTINGS,
+                    NonQuery(DatabaseQueries.REGISTER_STUDENT_SETTINGS,
                         new SQLiteParameter("courseID", courseID),
                         new SQLiteParameter("userID", userID),
                         new SQLiteParameter("PredictedGrade", long.Parse(r.GetValue(0).ToString())),
@@ -851,7 +891,7 @@ namespace IguideME.Web.Services
         public int GetUserGoalGrade(int courseID, string userID, long syncID)
         {
             int result = -1;
-            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_USER_GOAL_GRADE,
+            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_GOAL_GRADE_FOR_USER,
                     new SQLiteParameter("courseID", courseID),
                     new SQLiteParameter("userID", userID),
                     new SQLiteParameter("syncID", syncID)
@@ -869,28 +909,28 @@ namespace IguideME.Web.Services
             }
         }
 
-        public GoalData[] GetGoalGrades(int courseID, long syncID)
-        {
-            List<GoalData> goals = new();
+        // public GoalData[] GetGoalGrades(int courseID, long syncID)
+        // {
+        //     List<GoalData> goals = new();
 
-            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_GOAL_GRADES,
-                    new SQLiteParameter("courseID", courseID),
-                    new SQLiteParameter("syncID", syncID)
-                )) {
-                while (r.Read())
-                {
-                    try
-                    {
-                        int grade = r.GetValue(0).GetType() != typeof(DBNull) ? (r.GetInt32(0)) : 0;
-                        goals.Add(new GoalData(courseID, grade, r.GetValue(1).ToString()));
-                    } catch (Exception e)
-                    {
-                        PrintQueryError("GetGoalGrades", 0, r, e);
-                    }
-                }
-            }
-            return goals.ToArray();
-        }
+        //     using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_GOAL_GRADES,
+        //             new SQLiteParameter("courseID", courseID),
+        //             new SQLiteParameter("syncID", syncID)
+        //         )) {
+        //         while (r.Read())
+        //         {
+        //             try
+        //             {
+        //                 int grade = r.GetValue(0).GetType() != typeof(DBNull) ? (r.GetInt32(0)) : 0;
+        //                 goals.Add(new GoalData(courseID, grade, r.GetValue(1).ToString()));
+        //             } catch (Exception e)
+        //             {
+        //                 PrintQueryError("GetGoalGrades", 0, r, e);
+        //             }
+        //         }
+        //     }
+        //     return goals.ToArray();
+        // }
 
 
         public void CreateUserPeer(
@@ -2381,85 +2421,79 @@ namespace IguideME.Web.Services
             );
         }
 
-// IT IS THE SAME AS SET GOAL GRADE, SHOULD WE KEEP IT?????
-        public void SetConsent(ConsentData data, long syncID)
+// IT IS THE SAME AS SET GOAL GRADE
+        // public void SetConsent(ConsentData data, long syncID)
+        // {
+
+        //     using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_LAST_STUDENT_SETTINGS,
+        //             new SQLiteParameter("courseID", data.CourseID),
+        //             new SQLiteParameter("userID", data.UserID)
+        //         )) {
+        //         while (r.Read())
+        //         {
+        //             NonQuery(DatabaseQueries.REGISTER_STUDENT_SETTINGS,
+        //                 new SQLiteParameter("courseID", data.CourseID),
+        //                 new SQLiteParameter("userID", data.UserID),
+        //                 new SQLiteParameter("PredictedGrade", long.Parse(r.GetValue(0).ToString())),
+        //                 new SQLiteParameter("GoalGrade", (data.Granted < 1) ? data.Granted : r.GetInt32(1)),
+        //                 new SQLiteParameter("Notifications", r.GetBoolean(2)),
+        //                 new SQLiteParameter("syncID", syncID)
+        //             );
+        //         }
+        //     }
+
+        //     // if (data.Granted == -1)
+        //     //     UpdateUserGoalGrade(data.CourseID, data.UserID, -1);
+        // }
+
+        public bool GetConsent(int courseID, string userID, long syncID)
         {
-
-            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_LAST_STUDENT_SETTINGS,
-                    new SQLiteParameter("courseID", data.CourseID),
-                    new SQLiteParameter("userID", data.UserID)
-                )) {
-                while (r.Read())
-                {
-                    NonQuery(DatabaseQueries.REGISTER_USER_SETTINGS,
-                        new SQLiteParameter("courseID", data.CourseID),
-                        new SQLiteParameter("userID", data.UserID),
-                        new SQLiteParameter("PredictedGrade", long.Parse(r.GetValue(0).ToString())),
-                        new SQLiteParameter("GoalGrade", (data.Granted < 1) ? data.Granted : r.GetInt32(1)),
-                        new SQLiteParameter("Notifications", r.GetBoolean(2)),
-                        new SQLiteParameter("syncID", syncID)
-                    );
-                }
-            }
-
-
-
-            // if (data.Granted == -1)
-            //     UpdateUserGoalGrade(data.CourseID, data.UserID, -1);
-        }
-
-        public int GetConsent(int courseID, string userID, long syncID)
-        {
-            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_USER_CONSENT,
+            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_GOAL_GRADE_FOR_USER,
                     new SQLiteParameter("courseID", courseID),
                     new SQLiteParameter("userID", userID),
                     new SQLiteParameter("syncID", syncID)
                 )){
                 if (r.Read())
-                    return Convert.ToInt32(r["goal_grade"]);
+                    return (Convert.ToInt32(r["goal_grade"]) > 0);
             }
-            return -1;
+            return false;
         }
 
-        public ConsentData[] GetGrantedConsents(int courseID, long syncID)
-        {
+        // public ConsentData[] GetGrantedConsents(int courseID, long syncID)
+        // {
+        //     List<ConsentData> consents = new();
+        //     using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_GRANTED_CONSENTS,
+        //             new SQLiteParameter("courseID", courseID),
+        //             new SQLiteParameter("syncID", syncID)
+        //         )) {
+        //         while (r.Read())
+        //         {
+        //             consents.Add(new ConsentData(courseID, r.GetValue(0).ToString(), 1));
+        //         }
+        //     }
+        //     return consents.ToArray();
+        // }
 
-            List<ConsentData> consents = new();
+        // public ConsentData[] GetConsents(int courseID, long syncID)
+        // {
+        //     List<ConsentData> consents = new();
 
-            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_GRANTED_CONSENTS,
-                    new SQLiteParameter("courseID", courseID),
-                    new SQLiteParameter("syncID", syncID)
-                )) {
-                while (r.Read())
-                {
-                    consents.Add(new ConsentData(courseID, r.GetValue(0).ToString(), 1));
-                }
-            }
+        //     using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_CONSENTS,
+        //             new SQLiteParameter("courseID", courseID),
+        //             new SQLiteParameter("syncID", syncID)
+        //         )) {
+        //         while (r.Read())
+        //         {
+        //             try {
+        //                 consents.Add(new ConsentData(courseID, r.GetValue(0).ToString(), r.GetInt32(1)));
+        //             } catch ( Exception e) {
+        //                 PrintQueryError("GetConsents", 3, r, e);
+        //             }
+        //         }
+        //     }
 
-            return consents.ToArray();
-
-
-        }
-        public ConsentData[] GetConsents(int courseID, long syncID)
-        {
-            List<ConsentData> consents = new();
-
-            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_CONSENTS,
-                    new SQLiteParameter("courseID", courseID),
-                    new SQLiteParameter("syncID", syncID)
-                )) {
-                while (r.Read())
-                {
-                    try {
-                        consents.Add(new ConsentData(courseID, r.GetValue(0).ToString(), r.GetInt32(1)));
-                    } catch ( Exception e) {
-                        PrintQueryError("GetConsents", 3, r, e);
-                    }
-                }
-            }
-
-            return consents.ToArray();
-        }
+        //     return consents.ToArray();
+        // }
 
         public void AddExternalData(int courseID, ExternalData[] entries)
         {

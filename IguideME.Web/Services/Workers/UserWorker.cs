@@ -56,7 +56,7 @@ namespace IguideME.Web.Services.Workers
                         (int) UserRoles.student
                     );
 
-                    _databaseManager.InitializeUserSettings(new Models.ConsentData(_courseID, student.LoginID, -1), this._syncID);
+                    _databaseManager.InitializeUserSettings(_courseID, student.LoginID, this._syncID);
 
                 } catch (Exception e) {
                     _logger.LogError("Error registering student: {Error} {StackTrace}", e, e.StackTrace);

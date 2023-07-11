@@ -58,7 +58,7 @@ namespace IguideME.Web.Services.Workers
                 .Where(submission =>
 					submission.Score != null &&
 					_databaseManager.GetConsent(this._courseID,
-						_databaseManager.GetUserID(this._courseID, submission.UserID), _syncID) > 0
+						_databaseManager.GetUserID(this._courseID, submission.UserID), _syncID)
 				);
 
 			foreach (QuizSubmission sub in quiz.Submissions) {

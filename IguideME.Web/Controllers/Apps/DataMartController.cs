@@ -134,6 +134,7 @@ namespace IguideME.Web.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [Route("/datamart/consent")]
+// DBrefTODO: This was a ConsentData item, now it is just a bool wit the result
         public JsonResult GetConsent()
         {
             return this.IsAdministrator()
@@ -143,22 +144,22 @@ namespace IguideME.Web.Controllers
                     GetCourseID(), GetUserID(), GetHashCode()));
         }
 
-        [Authorize]
-        [HttpPost]
-        [Route("/datamart/consent")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public JsonResult PostConsent()
-        {
-            var body = new StreamReader(Request.Body).ReadToEnd();
-            ConsentData consent = new(
-                GetCourseID(),
-                GetUserID(),
-                (int)JObject.Parse(body)["granted"]
-            );
-            _databaseManager.SetConsent(consent, this.GetHashCode());
-            return Json(consent.Granted);
-        }
+        // [Authorize]
+        // [HttpPost]
+        // [Route("/datamart/consent")]
+        // [ProducesResponseType(StatusCodes.Status200OK)]
+        // [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        // public JsonResult PostConsent()
+        // {
+        //     var body = new StreamReader(Request.Body).ReadToEnd();
+        //     ConsentData consent = new(
+        //         GetCourseID(),
+        //         GetUserID(),
+        //         (int)JObject.Parse(body)["granted"]
+        //     );
+        //     _databaseManager.SetConsent(consent, this.GetHashCode());
+        //     return Json(consent.Granted);
+        // }
 
         [Authorize]
         [HttpGet]
@@ -182,17 +183,18 @@ namespace IguideME.Web.Controllers
                 .ToArray());
         }
 
-        [Authorize(Policy = "IsInstructor")]
-        [HttpGet]
-        [Route("/Consents")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public ActionResult GetConsents()
-        {
-            return Json(
-                _databaseManager.GetConsents(this.GetCourseID(), GetHashCode())
-                .ToArray());
-        }
+        // [Authorize(Policy = "IsInstructor")]
+        // [HttpGet]
+        // [Route("/Consents")]
+        // [ProducesResponseType(StatusCodes.Status200OK)]
+        // [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+// DBrefTODO: This is useless now, we have the GetGoalGrades() that substitutes this
+        // public ActionResult GetConsents()
+        // {
+        //     return Json(
+        //         _databaseManager.GetConsents(this.GetCourseID(), GetHashCode())
+        //         .ToArray());
+        // }
 
         [Authorize(Policy = "IsInstructor")]
         [HttpGet]
@@ -210,13 +212,14 @@ namespace IguideME.Web.Controllers
         [Route("/goal-grades")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        // DBrefTODO: We used to return GoalGrade type, now it's User type entity
         public ActionResult GetGoalGrades()
         {
-            // returns all goal grades
+            // returns all users along with their goal grades
             return Json(
-                _databaseManager.GetGoalGrades(
+                _databaseManager.GetUsers(
                     this.GetCourseID(),
-                    this.GetHashCode()));
+                    UserRoles.student));
         }
 
         [Authorize]

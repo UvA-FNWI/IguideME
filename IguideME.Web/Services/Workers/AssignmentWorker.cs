@@ -81,7 +81,7 @@ namespace IguideME.Web.Services.Workers
             IEnumerable<Submission> submissions = assignment.Submissions
                 .Where(submission =>
 					submission.Grade != null &&
-					_databaseManager.GetConsent(this._courseID, submission.User.LoginID, _syncID) > 0
+					_databaseManager.GetConsent(this._courseID, submission.User.LoginID, _syncID)
 				);
 
             foreach (Submission submission in submissions)

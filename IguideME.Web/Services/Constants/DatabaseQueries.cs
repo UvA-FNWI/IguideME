@@ -181,7 +181,7 @@ public static class DatabaseQueries
      * automatically grant consent.
      *
      */
-    public const string CREATE_TABLE_USER_SETTINGS =
+    public const string CREATE_TABLE_STUDENT_SETTINGS =
         @"CREATE TABLE IF NOT EXISTS `student_settings` (
             `user_id`           STRING,
             `course_id`         INTEGER,
@@ -591,7 +591,7 @@ public static class DatabaseQueries
         )
         ;";
 
-    public const string INITIALIZE_USER_SETTINGS =
+    public const string INITIALIZE_STUDENT_SETTINGS =
         @"  INSERT INTO `student_settings`
                         (   `course_id`,
                             `user_id`,
@@ -605,7 +605,7 @@ public static class DatabaseQueries
             )
         ;";
 
-    public const string REGISTER_USER_SETTINGS =
+    public const string REGISTER_STUDENT_SETTINGS =
         @"  INSERT INTO `student_settings`
                         (   `course_id`,
                             `user_id`,
@@ -1090,12 +1090,29 @@ public static class DatabaseQueries
                     `users`.`student_number`,
                     `users`.`name`,
                     `users`.`sortable_name`,
-                    `users`.`role`
+                    `users`.`role`,
+                    `student_settings`.`goal_grade`
         FROM        `users`
-        INNER JOIN  `student_settings`
+        LEFT JOIN   `student_settings`
             USING   (`user_id`)
         WHERE       `student_settings`.`course_id`=@courseID
         AND         `users`.`role`=@role
+        AND         `student_settings`.`sync_id`=@syncID
+        ORDER BY    `users`.`name` ASC;";
+
+    public const string QUERY_CONSENTED_USERS_WITH_ROLE_FOR_COURSE =
+        @"SELECT    `users`.`user_id`,
+                    `users`.`student_number`,
+                    `users`.`name`,
+                    `users`.`sortable_name`,
+                    `users`.`role`,
+                    `student_settings`.`goal_grade`
+        FROM        `users`
+        LEFT JOIN   `student_settings`
+            USING   (`user_id`)
+        WHERE       `student_settings`.`course_id`=@courseID
+        AND         `users`.`role`=@role
+        AND         `student_settings`.`goal_grade` > 0
         AND         `student_settings`.`sync_id`=@syncID
         ORDER BY    `users`.`name` ASC;";
 
@@ -1110,22 +1127,26 @@ public static class DatabaseQueries
         LIMIT       1;";
 
     public const string QUERY_USER =
-        @"SELECT    `user_id`,
-                    `student_number`,
-                    `name`,
-                    `sortable_name`,
-                    `role`
+        @"SELECT    `users`.`user_id`,
+                    `users`.`student_number`,
+                    `users`.`name`,
+                    `users`.`sortable_name`,
+                    `users`.`role`,
+                    `student_settings`.`goal_grade`
         FROM        `users`
-        WHERE       `user_id`=@userID";
+        LEFT JOIN   `student_settings`
+            USING   (`user_id`)
+        WHERE       `users`.`user_id`=@userID";
 
     public const string QUERY_USER_FOR_COURSE =
         @"SELECT    `users`.`user_id`,
                     `users`.`student_number`,
                     `users`.`name`,
                     `users`.`sortable_name`,
-                    `users`.`role`
+                    `users`.`role`,
+                    `student_settings`.`goal_grade`
         FROM        `users`
-        INNER JOIN  `student_settings`
+        LEFT JOIN   `student_settings`
             USING   (`user_id`)
         WHERE       `student_settings`.`course_id`=@courseID
         AND         `users`.`user_id`=@userID
@@ -1154,32 +1175,7 @@ public static class DatabaseQueries
         AND         `sync_ID`=@syncID
         ;";
 
-    public const string QUERY_USER_CONSENT =
-        @"SELECT    `user_id`,
-                    `goal_grade`
-        FROM        `student_settings`
-        WHERE       `course_id`=@courseID
-        AND         `user_id`=@userID
-        AND         `sync_ID`=@syncID
-        ;";
-
-    public const string QUERY_CONSENTS =
-        @"SELECT    `user_id`,
-                    `goal_grade`
-        FROM        `student_settings`
-        WHERE       `course_id`=@courseID
-        AND         `sync_ID`=@syncID
-        ;";
-
-    public const string QUERY_GRANTED_CONSENTS =
-        @"SELECT    `user_id`,
-        FROM        `student_settings`
-        WHERE       `course_id`=@courseID
-        AND         `goal_grade` > 0
-        AND         `sync_ID`=@syncID
-        ;";
-
-    public const string QUERY_USER_GOAL_GRADE =
+    public const string QUERY_GOAL_GRADE_FOR_USER =
         @"SELECT    `goal_grade`
         FROM        `student_settings`
         WHERE       `course_id`=@courseID
