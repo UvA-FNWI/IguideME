@@ -1,0 +1,13 @@
+@import "@/base.scss";
+
+#user {
+  display: flex;
+  align-content: center;
+  flex-direction: column;
+  justify-content: center;
+  font-family: 'Maitree', serif;
+  padding: 15px;
+  border-bottom: 1px solid $primary-border-color;
+  // margin-bottom: 20px;
+  height: 70px;
+}

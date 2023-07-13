@@ -3,7 +3,6 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp7.0</TargetFramework>
     <UserSecretsId>aspnet-IGuideMETest-76E69165-D027-4A90-BD59-7130FEDA840E</UserSecretsId>
-    <SpaProxyLaunchCommand>yarn dev</SpaProxyLaunchCommand>
     <SpaRoot>wwwroot\</SpaRoot>
   </PropertyGroup>
 

@@ -11,4 +11,5 @@ export type User = {
     sortable_name: string;
     role: UserRoles;
     consent: boolean | null;
+    goal_grade: number;
 };

@@ -2,10 +2,21 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.tsx'
 import { BrowserRouter, Route, Routes } from "react-router-dom"
-import StudentDashboard from "@/components/pages/student-dashboard"
-import AdminDashboard from "@/components/pages/admin-dashboard"
-import ErrorPage from "@/components/pages/error"
+import AdminPanel from "@/components/crystals/admin-panel/admin-panel.tsx"
 import Home from "@/components/pages/home/home.tsx"
+
+import ErrorPage from "@/components/pages/error"
+import Tiles from "@/components/pages/admin/tiles/tiles.tsx"
+import Layout from "@/components/pages/admin/layout/layout.tsx"
+import StudentOverview from "@/components/pages/admin/studentoverview/studentoverview.tsx"
+import GradePredictor from "@/components/pages/admin/predictor/predictor.tsx"
+import GradeAnalyzer from "@/components/pages/admin/analyzer/analyzer.tsx"
+import DataWizard from "@/components/pages/admin/datawizard/datawizard.tsx"
+import Analytics from "@/components/pages/admin/analytics/analytics.tsx"
+import NotificationCentre from "@/components/pages/admin/notificationcentre/notificationcentre.tsx"
+import Settings from "@/components/pages/admin/settings/settings.tsx"
+import Dashboard from "@/components/pages/admin/dashboard/dashboard.tsx"
+import StudentDashboard from "@/components/pages/student-dashboard/student-dashboard.tsx"
 
 import setup from "@/api/setup.tsx"
 
@@ -33,16 +44,17 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           <Route path="/" element={<App />} errorElement={<ErrorPage />}>
             <Route path="" element={<Home />} />
             <Route path=":id" element={<StudentDashboard />} />
-            <Route path="admin" element={<AdminDashboard />} >
-              {/* <Route path="analytics" element={<Analytics />} />
+            <Route path="admin" element={<AdminPanel />} >
+              <Route path="" element={<Dashboard />} />
+              <Route path="tiles" element={<Tiles />} />
               <Route path="layout" element={<Layout />} />
-              <Route path="notification-centre" element={<NotificationCentre />} />
               <Route path="student-overview" element={<StudentOverview />} />
-              <Route path="data-wizard" element={<DataWizard />} />
-              <Route path="grade-analyzer" element={<GradeAnalyzer />} />
               <Route path="grade-predictor" element={<GradePredictor />} />
+              <Route path="grade-analyzer" element={<GradeAnalyzer />} />
+              <Route path="data-wizard" element={<DataWizard />} />
+              <Route path="analytics" element={<Analytics />} />
+              <Route path="notification-centre" element={<NotificationCentre />} />
               <Route path="settings" element={<Settings />} />
-            <Route path="tiles" element={<Tiles />} /> */}
             </Route>
           </Route>
         </Routes>
