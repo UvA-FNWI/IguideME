@@ -23,7 +23,6 @@ namespace IguideME.Web.Controllers
     public class DataMartController : DataController
     {
         private readonly ILogger<DataController> _logger;
-        private readonly CanvasHandler _canvasHandler;
         private readonly DatabaseManager _databaseManager;
 
         private readonly IQueuedBackgroundService _queuedBackgroundService;
@@ -31,14 +30,12 @@ namespace IguideME.Web.Controllers
 
         public DataMartController(
             ILogger<DataController> logger,
-            CanvasHandler canvasHandler,
             DatabaseManager databaseManager,
             IQueuedBackgroundService queuedBackgroundService,
             IComputationJobStatusService computationJobStatusService) : base(
-                logger, canvasHandler, databaseManager)
+                logger)
         {
             this._logger = logger;
-            this._canvasHandler = canvasHandler;
             this._databaseManager = databaseManager;
 
             this._queuedBackgroundService = queuedBackgroundService;

@@ -27,7 +27,7 @@ namespace IguideME.Web.Controllers
             ILogger<DataController> logger,
             CanvasHandler canvasHandler,
             DatabaseManager databaseManager) : base(
-                logger, canvasHandler, databaseManager)
+                logger)
         {
             _logger = logger;
             _canvasHandler = canvasHandler;
@@ -546,7 +546,7 @@ namespace IguideME.Web.Controllers
         public void CreateEntry([FromBody] TileEntry entry)
         {
             _databaseManager.CreateTileEntry(entry);
-            
+
             // return  Json(_databaseManager
             //     .GetEntries(this.GetCourseID())
             //     .Find(e => e.ID == entryID));

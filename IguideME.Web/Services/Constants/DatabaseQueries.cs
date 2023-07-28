@@ -1119,6 +1119,13 @@ public static class DatabaseQueries
     public const string QUERY_USER_ID =
         @"SELECT    `users`.`user_id`
         FROM        `users`
+        WHERE       `users`.`student_number`=@studentNumber
+        ORDER BY    `users`.`name` ASC
+        LIMIT       1;";
+
+    public const string QUERY_STUDENT_ID =
+        @"SELECT    `users`.`user_id`
+        FROM        `users`
         INNER JOIN  `student_settings`
             USING   (`user_id`)
         WHERE       `student_settings`.`course_id`=@courseID

@@ -14,18 +14,10 @@ namespace IguideME.Web.Controllers
     public class DataController : Controller
     {
         private readonly ILogger<DataController> _logger;
-        private readonly CanvasHandler _canvasHandler;
-        private readonly DatabaseManager _databaseManager;
 
-        public DataController(
-            ILogger<DataController> logger,
-            CanvasHandler canvasHandler,
-            DatabaseManager databaseManager
-            )
+        public DataController(ILogger<DataController> logger)
         {
             this._logger = logger;
-            this._canvasHandler = canvasHandler;
-            this._databaseManager = databaseManager;
 
         }
 
@@ -33,17 +25,7 @@ namespace IguideME.Web.Controllers
 
         protected string GetUserID()
         {
-            if (int.TryParse((User.Identity as ClaimsIdentity).FindFirst("userid").Value, out int id)) {
-
-                string user = _databaseManager.GetUserID(this.GetCourseID(), id);
-                if (user != null) {
-                    return user;
-                }
-            }
-
-            _logger.LogInformation("Could not find user {user} in database.", id);
-            // Try's to find the user in canvas.
-            return _canvasHandler.GetUser(this.GetCourseID(), (User.Identity as ClaimsIdentity).FindFirst("userid").Value).LoginID;
+            return (User.Identity as ClaimsIdentity).FindFirst("loginid").Value;
         }
 
         protected string GetUserName()

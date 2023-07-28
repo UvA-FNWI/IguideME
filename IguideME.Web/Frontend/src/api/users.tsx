@@ -6,6 +6,6 @@ export let getusers: Promise<User[]> = apiClient.get(
     `students`
   ).then(response => response.data)
 
-  export let getself: Promise<User> = apiClient.get(
+export let getself: Promise<User> = apiClient.get(
     `app/self`
   ).then(response => response.data)

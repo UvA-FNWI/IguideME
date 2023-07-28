@@ -130,28 +130,48 @@ WebApplication app = builder.Build();
 var ltiConfig = builder.Configuration.GetSection("LTI");
 app.UseForwardedHeaders();
 
+// Set the correct location for the database for prod/dev environments the first time the instance is created.
+DatabaseManager db = DatabaseManager.GetInstance(app.Environment.IsDevelopment());
+
+
+string GetUserID(string userid, string course) {
+    int courseid = int.Parse(course);
+    if (int.TryParse(userid, out int id)) {
+        string user = db.GetUserID(id);
+        if (user != null) {
+            return user;
+        }
+    }
+    // Try's to find the user in canvas.
+    return app.Services.GetService<CanvasHandler>().GetUser(courseid, userid).LoginID;
+
+}
+
 app.UseLti(new LtiOptions
 {
     ClientId = ltiConfig["ClientId"] ?? throw new Exception("Client id not set"),
     AuthenticateUrl = ltiConfig["AuthenticateUrl"] ?? throw new Exception("Authenticate url not set"),
     JwksUrl = ltiConfig["JwksUrl"] ?? throw new Exception("Jwks url not set"),
     SigningKey = key,
-    ClaimsMapping = p => new Dictionary<string, object>
+    ClaimsMapping = p =>
     {
-        [ClaimTypes.NameIdentifier] = p.NameIdentifier!.Split("_").Last(),
-        ["contextLabel"] = p.Context.Label,
-        ["courseName"] = p.Context.Title,
-        ["user_name"] = p.Name,
-        ["courseid"] = p.CustomClaims?.GetProperty("courseid").ToString(),
-        ["userid"] = p.CustomClaims?.GetProperty("userid").ToString(),
-        [ClaimTypes.Role] = p.Roles.Any(e => e.Contains("http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor"))
-            ? UserRoles.instructor.ToString() : UserRoles.student.ToString(),
-        [ClaimTypes.Email] = p.Email,
+        string courseid = p.CustomClaims?.GetProperty("courseid").ToString();
+        string userid = p.CustomClaims?.GetProperty("userid").ToString();
+        return new Dictionary<string, object>
+        {
+            [ClaimTypes.NameIdentifier] = p.NameIdentifier!.Split("_").Last(),
+            ["contextLabel"] = p.Context.Label,
+            ["courseName"] = p.Context.Title,
+            ["user_name"] = p.Name,
+            ["courseid"] = courseid,
+            ["userid"] = userid, //TODO: rename to studentnumber
+            ["loginid"] = GetUserID(userid, courseid), //TODO: rename to userid
+            [ClaimTypes.Role] = p.Roles.Any(e => e.Contains("http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor"))
+        ? UserRoles.instructor.ToString() : UserRoles.student.ToString(),
+            [ClaimTypes.Email] = p.Email,
+        };
     }
 });
-
-// Set the correct location for the database for prod/dev environments the first time the instance is created.
-DatabaseManager.GetInstance(app.Environment.IsDevelopment());
 
 app.UseHttpsRedirection();
 app.UseDefaultFiles();

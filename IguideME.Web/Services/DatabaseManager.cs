@@ -504,14 +504,16 @@ namespace IguideME.Web.Services
             );
         }
 
-        public List<User> GetUsers(int courseID, UserRoles role = 0, long syncID = 0)
+        public List<User> GetUsers(int courseID, UserRoles role = UserRoles.student, long syncID = 0)
         {
+            _logger.LogInformation("test {c} {r} {s]}", courseID, role, syncID);
             long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
             if (activeSync == 0)
             {
                 _logger.LogInformation("Hash is null, returning empty user list.");
                 return new List<User>() { };
             }
+            _logger.LogInformation("test {s]}", activeSync);
 
             List<User> users = new();
 
@@ -523,6 +525,7 @@ namespace IguideME.Web.Services
                 // collect all users
                 while (r.Read())
                 {
+                    _logger.LogInformation("tests {i}", r.GetValue(0));
                     User user = new(
                         r.GetValue(0).ToString(),
                         courseID,
@@ -540,7 +543,7 @@ namespace IguideME.Web.Services
         }
 
 
-        public List<User> GetUsersWithGrantedConsent(int courseID, UserRoles role = 0, long syncID = 0)
+        public List<User> GetUsersWithGrantedConsent(int courseID, UserRoles role = UserRoles.student, long syncID = 0)
         {
             long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
             if (activeSync == 0)
@@ -574,12 +577,28 @@ namespace IguideME.Web.Services
             return users;
         }
 
-        public string GetUserID(int courseID, int studentNumber) {
+        public string GetUserID(int studentNumber) {
+            _logger.LogInformation("Trying db for {u}", studentNumber);
+
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_USER_ID,
+                    new SQLiteParameter("studentNumber", studentNumber)
+                )) {
+                if (r.Read())
+                {
+                    return r.GetValue(0).ToString();
+                }
+            }
+
+            return null;
+        }
+
+
+        public string GetStudentID(int courseID, int studentNumber) {
             long syncID = this.GetCurrentSyncID(courseID);
 
             if (syncID == 0) return null;
 
-            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_USER_ID,
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_STUDENT_ID,
                     new SQLiteParameter("courseID", courseID),
                     new SQLiteParameter("studentNumber", studentNumber)
                 )) {

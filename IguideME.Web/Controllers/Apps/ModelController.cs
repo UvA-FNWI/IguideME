@@ -13,18 +13,15 @@ namespace IguideME.Web.Controllers
     public class ModelController : DataController
     {
         private readonly ILogger<DataController> _logger;
-        private readonly CanvasHandler canvasHandler;
 
         private readonly DatabaseManager _databaseManager;
 
         public ModelController(
             ILogger<DataController> logger,
-            CanvasHandler canvasHandler,
             DatabaseManager databaseManager) : base(
-                logger, canvasHandler, databaseManager)
+                logger)
         {
             this._logger = logger;
-            this.canvasHandler = canvasHandler;
             this._databaseManager = databaseManager;
         }
 
