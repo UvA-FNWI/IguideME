@@ -818,11 +818,13 @@ namespace IguideME.Web.Services
                     }
                 }
 
+            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
+
             NonQuery(DatabaseQueries.INITIALIZE_STUDENT_SETTINGS,
                             new SQLiteParameter("CourseID", courseID),
                             new SQLiteParameter("UserID", userID),
                             new SQLiteParameter("GoalGrade", -1),
-                            new SQLiteParameter("syncID", syncID)
+                            new SQLiteParameter("syncID", activeSync)
                         );
         }
 
@@ -847,6 +849,7 @@ namespace IguideME.Web.Services
 
         public void UpdateNotificationEnable(int courseID, string userID, bool enable, long syncID)
         {
+            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
             using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_LAST_STUDENT_SETTINGS,
                     new SQLiteParameter("courseID", courseID),
                     new SQLiteParameter("userID", userID)
@@ -859,7 +862,7 @@ namespace IguideME.Web.Services
                         new SQLiteParameter("PredictedGrade", long.Parse(r.GetValue(0).ToString())),
                         new SQLiteParameter("GoalGrade", r.GetInt32(1)),
                         new SQLiteParameter("Notifications", enable),
-                        new SQLiteParameter("syncID", syncID)
+                        new SQLiteParameter("syncID", activeSync)
                     );
                 }
             }
@@ -889,6 +892,7 @@ namespace IguideME.Web.Services
 
         public void UpdateUserGoalGrade(int courseID, string userID, int grade, long syncID)
         {
+            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
             using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_LAST_STUDENT_SETTINGS,
                     new SQLiteParameter("courseID", courseID),
                     new SQLiteParameter("userID", userID)
@@ -901,7 +905,7 @@ namespace IguideME.Web.Services
                         new SQLiteParameter("PredictedGrade", long.Parse(r.GetValue(0).ToString())),
                         new SQLiteParameter("GoalGrade", grade),
                         new SQLiteParameter("Notifications", r.GetBoolean(2)),
-                        new SQLiteParameter("syncID", syncID)
+                        new SQLiteParameter("syncID", activeSync)
                     );
                 }
             }
