@@ -1319,14 +1319,14 @@ namespace IguideME.Web.Services
                 while (r.Read()) {
                     try {
                         // We save all the retrieved grades in a dictionary with
-                        // the tile.id as key and a list of grades as value
-                        if (!grades.TryGetValue(r.GetInt32(0), out List<float> value))
+                        // the assignment.id as key and a list of grades as value
+                        if (!grades.TryGetValue(r.GetInt32(1), out List<float> value))
                         {
-                            grades[r.GetInt32(0)] = new List<float>();
+                            grades[r.GetInt32(1)] = new List<float>();
                         }
-                        grades[r.GetInt32(0)].Add(r.GetFloat(2));
+                        grades[r.GetInt32(1)].Add(r.GetFloat(3));
                     } catch (Exception e) {
-                        PrintQueryError("GetUserPeerComparison2", 3, r, e);
+                        PrintQueryError("GetUserGrades", 3, r, e);
                     }
                 }
             }
