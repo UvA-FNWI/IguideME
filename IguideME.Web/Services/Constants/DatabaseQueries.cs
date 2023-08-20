@@ -1544,6 +1544,7 @@ public static class DatabaseQueries
             @action
           );";
 
+// TODO: check if change here was ok
     public const string DELETE_OLD_SYNCS_FOR_COURSE = //half done
         @"DELETE
         FROM        `peer_groups`
@@ -1551,8 +1552,7 @@ public static class DatabaseQueries
 
         DELETE
         FROM        `notifications`
-        WHERE       `course_id`=@courseID
-        AND         `sent`= true
+        WHERE       `sent`= true
         AND         `sync_id`=@syncID;
 
         DELETE

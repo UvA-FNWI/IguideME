@@ -70,6 +70,16 @@ namespace IguideME.Web.Controllers
         }
 
         [Authorize(Policy = "IsInstructor")]
+        [HttpPost, Route("/datamart/stop-sync")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status202Accepted, Type = typeof(JobCreatedModel))]
+        public async Task<IActionResult> stopComputation([FromBody] JobParametersModel obj)
+        {
+            _logger.LogInformation("test");
+            return Accepted();
+        }
+
+        [Authorize(Policy = "IsInstructor")]
         [HttpGet, Route("/datamart/status")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]

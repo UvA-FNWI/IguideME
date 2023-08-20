@@ -12,7 +12,8 @@ fi
 #KUBECTL_PROJ_ID=$(kubectl get pods -n iguideme | grep Running | awk '{print $1}')
 
 alias frontend-dev='yarn --cwd $PROJECT_ROOT/IguideME.Web/Frontend dev'
-alias frontend-update-packages='yarn --cwd $PROJECT_ROOT/IguideME.Web/Frontend install'
+alias iguideme-packages='yarn --cwd $PROJECT_ROOT/IguideME.Web/Frontend install'
+alias iguideme-add-package='yarn --cwd $PROJECT_ROOT/IguideME.Web/Frontend add'
 # alias frontend-prod='yarn --cwd $PROJECT_ROOT/IguideME.Web/Frontend build'
 alias backend-dev='dotnet watch --project $PROJECT_ROOT/IguideME.Web/ --no-hot-reload';
 alias enter-db='litecli $PROJECT_ROOT/IguideME.Web/db.sqlite';
@@ -23,21 +24,21 @@ alias h='display_help';
 display_help () {
   echo "You can use the following assist commands:";
   echo "                                          ";
-  echo "  ---frontend-----------------------------";
-  echo "  frontend-dev              build the frontend (watch for changes)";
-  echo "  frontend-update-packages  update/install node modules for the packages";
+  echo "  ---frontend---------------------------------------------------";
+  echo "  frontend-dev              build and run the frontend (watcher)";
+  echo "  iguideme-packages         update/install node modules";
   echo "                                          ";
-  echo "  ---backend------------------------------";
-  echo "  backend-dev 	            build the backend (watch for changes)";
+  echo "  ---backend----------------------------------------------------";
+  echo "  backend-dev 	            build and run the backend (watcher)";
   echo "                                          ";
-  echo "  ---administrative-----------------------";
+  echo "  ---administrative---------------------------------------------";
   echo "  kill-process              kill a process by name";
   echo "  enter-db                  enter the database";
   echo "  logs                      view production logs";
   echo "  refresh-logs              refresh pod name for logs";
   echo "                                          ";
-  echo "  ---misc---------------------------------";
-  echo "  h                       display this message again";
+  echo "  ---misc-------------------------------------------------------";
+  echo "  h                         display this message again";
   echo "                                          ";
 }
 

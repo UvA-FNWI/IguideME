@@ -1,25 +1,34 @@
-import { Dispatch, FC, ReactElement, SetStateAction, useState } from 'react'
+// /------------------------- Module imports -------------------------/
+import { useQuery } from 'react-query'
+import { Button, Col, ConfigProvider, Row, Select } from 'antd'
 import { NavigateFunction, useNavigate } from 'react-router-dom'
+import { Dispatch, FC, ReactElement, SetStateAction, useState } from 'react'
+
+// /-------------------------- Own imports ---------------------------/
+import { User, UserRoles } from '@/types/user'
+import { getSelf, getUsers } from '@/api/users'
 
 import "./style.scss"
-import { Button, Col, ConfigProvider, Row, Select } from 'antd'
-import { useQuery } from 'react-query'
-import { getself, getusers } from '@/api/users'
-import { User, UserRoles } from '@/types/user'
 
-// TODO: add coursename to header when in admin panel
 
+/**
+ * Helper function for the student selector component.
+ * @param isAdmin - Boolean describing the admin status of the user
+ * @param currentUser - The current user selected in the selector
+ * @param setCurrentUser - Setter function to update the current user in the state
+ * @returns {React.ReactElement} The student selector
+ */
 const selector = (isAdmin: boolean, currentUser: User | undefined, setCurrentUser: Dispatch<SetStateAction<User | undefined>>, navigate: NavigateFunction): ReactElement => {
-  // TODO: check that this actually prevents the call from being made.
-  const { data } = useQuery("users", () => getusers, {enabled: isAdmin });
+  const { data } = useQuery("users", getUsers, {enabled: isAdmin });
   const students = data?.sort((a, b) => a.sortable_name.localeCompare(b.sortable_name)).filter(student => student.userID !== currentUser?.userID);
 
-  const onchange = (userID: string) => {
+  const changeStudent = (userID: string) => {
     setCurrentUser(students?.find(student => student.userID === userID));
     navigate(userID ??"/");
     ;
   }
 
+  // Don't show the selector to students.
   if (!isAdmin) {
     return <></>
   }
@@ -40,7 +49,7 @@ const selector = (isAdmin: boolean, currentUser: User | undefined, setCurrentUse
       }}>
       <Select placeholder={"Choose a student"}
               value={(currentUser?.name)}
-              onChange={onchange}
+              onChange={changeStudent}
               showSearch={true}
               options={students?.map((student) => ({label: student.name, value: student.userID}))}
               allowClear={true}
@@ -50,9 +59,16 @@ const selector = (isAdmin: boolean, currentUser: User | undefined, setCurrentUse
     )
 }
 
+/**
+ * Header component.
+ * @returns {React.ReactElement} The header
+ */
 const Header: FC = (): ReactElement => {
+  // Set up the navigator, used to change the route.
   const navigate = useNavigate();
-  const { data: self } = useQuery("self", () => getself, {onSuccess: (data) => {
+
+  // Get the current user from the backend and updates the route if the user is a student.
+  const { data: self } = useQuery("self", getSelf, {onSuccess: (data) => {
     if (data.role === UserRoles.student) {
       navigate(data.userID ?? "/");
     }
@@ -94,12 +110,11 @@ const Header: FC = (): ReactElement => {
           <div style={{minWidth: "100px"}}>
           {
 
-            isAdmin && inHome ?
-              <Button className='adminButton' type="link" onClick={() => toggleAdmin('/admin')}>
-                <h3>Admin Panel</h3>
+            isAdmin &&
+              <Button className='adminButton' type="link" onClick={() => inHome ? toggleAdmin('/admin') : goHome()}>
+                <h3>{inHome ? "Admin Panel" : "Home"}</h3>
               </Button>
-          :
-          <></>}
+          }
           </div>
         </Col>
       </Row>

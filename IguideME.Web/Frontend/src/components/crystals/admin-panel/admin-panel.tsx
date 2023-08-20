@@ -1,4 +1,4 @@
-import { getself } from '@/api/users'
+import { getSelf } from '@/api/users'
 import { FC, ReactElement, useState } from 'react'
 import { useQuery } from 'react-query'
 import {
@@ -9,18 +9,17 @@ import {
   DotChartOutlined,
   FundProjectionScreenOutlined,
   LaptopOutlined,
-  TrophyOutlined,
   NotificationOutlined,
   DatabaseOutlined,
   UserOutlined,
   TeamOutlined
 } from '@ant-design/icons'
-import { Col, ConfigProvider, Layout, Menu, MenuProps, Row } from 'antd'
+import { ConfigProvider, Layout, Menu, MenuProps } from 'antd'
 import { Link, Outlet } from 'react-router-dom'
 
 import "./style.scss"
 
-const { Header, Content, Footer, Sider } = Layout;
+const { Content,Sider } = Layout;
 
 type MenuItem = Required<MenuProps>['items'][number];
 
@@ -41,7 +40,7 @@ function getItem(
 }
 
 const items: MenuItem[] = [
-  getItem((<Link to={'/admin'}> Datamart </Link>), '1', <DatabaseOutlined />),
+  getItem((<Link to={'/admin'}> Dashboard </Link>), '1', <DatabaseOutlined />),
   getItem(<Link to={'/admin/tiles'}> Tiles </Link>, '2', <AppstoreOutlined />),
   getItem(<Link to={'/admin/layout'}> Layout </Link>, '3', <LaptopOutlined />),
   getItem(<Link to={'/admin/student-overview'}> Student Overview </Link>, '4', <TeamOutlined />),
@@ -55,7 +54,7 @@ const items: MenuItem[] = [
 
 
 const AdminPanel: FC = (): ReactElement => {
-  const { isLoading, data: self } = useQuery("self", () => getself);
+  const { isLoading, data: self } = useQuery("self", getSelf);
   const [collapsed, setCollapsed] = useState(false);
 
   return (
@@ -89,7 +88,9 @@ const AdminPanel: FC = (): ReactElement => {
         </div>
         <Menu defaultSelectedKeys={['1']} mode="inline" items={items} />
       </Sider>
-      <Outlet />
+      <Content style={{backgroundColor: "#f6f8fa", padding: '20px', fontFamily: 'Maitree, serif'}}>
+        <Outlet />
+      </Content>
     </Layout>
     </ConfigProvider>
   )

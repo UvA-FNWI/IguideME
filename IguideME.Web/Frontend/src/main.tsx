@@ -1,25 +1,30 @@
+// /----------------------------- React ------------------------------/
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import App from './App.tsx'
 import { BrowserRouter, Route, Routes } from "react-router-dom"
-import AdminPanel from "@/components/crystals/admin-panel/admin-panel.tsx"
-import Home from "@/components/pages/home/home.tsx"
 
+// /--------------------------- Components ---------------------------/
 import ErrorPage from "@/components/pages/error"
+import Home from "@/components/pages/home/home.tsx"
 import Tiles from "@/components/pages/admin/tiles/tiles.tsx"
 import Layout from "@/components/pages/admin/layout/layout.tsx"
-import StudentOverview from "@/components/pages/admin/studentoverview/studentoverview.tsx"
-import GradePredictor from "@/components/pages/admin/predictor/predictor.tsx"
-import GradeAnalyzer from "@/components/pages/admin/analyzer/analyzer.tsx"
-import DataWizard from "@/components/pages/admin/datawizard/datawizard.tsx"
-import Analytics from "@/components/pages/admin/analytics/analytics.tsx"
-import NotificationCentre from "@/components/pages/admin/notificationcentre/notificationcentre.tsx"
 import Settings from "@/components/pages/admin/settings/settings.tsx"
 import Dashboard from "@/components/pages/admin/dashboard/dashboard.tsx"
+import Analytics from "@/components/pages/admin/analytics/analytics.tsx"
+import GradeAnalyzer from "@/components/pages/admin/analyzer/analyzer.tsx"
+import AdminPanel from "@/components/crystals/admin-panel/admin-panel.tsx"
+import DataWizard from "@/components/pages/admin/datawizard/datawizard.tsx"
+import GradePredictor from "@/components/pages/admin/predictor/predictor.tsx"
 import StudentDashboard from "@/components/pages/student-dashboard/student-dashboard.tsx"
+import StudentOverview from "@/components/pages/admin/studentoverview/studentoverview.tsx"
+import NotificationCentre from "@/components/pages/admin/notificationcentre/notificationcentre.tsx"
 
+// /----------------------------- Misc. ------------------------------/
+import App from './App.tsx'
 import setup from "@/api/setup.tsx"
 
+
+// Loads the base style sheet for the app.
 import './base.scss'
 
 import { QueryClient, QueryClientProvider } from "react-query";
@@ -33,9 +38,12 @@ const queryClient = new QueryClient({
   },
 });
 
-// Sets up the backend.
+// Sets up the backend (registers the course if the course hasn't been registered yet).
 setup.then();
 
+// Routing for the frontend. This is separate from the routing on the backend.
+// Routes that end with /> are endpoints but routes that have other routes listed before </Route>
+// will have those routes render within an Outlet component.
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>

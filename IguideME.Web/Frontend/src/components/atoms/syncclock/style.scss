@@ -1,0 +1,47 @@
+@import "@/base.scss";
+
+.clock {
+    width: 180px;
+    height: 180px;
+    border-radius: 100%;
+    background-color: $sync-gray-background;
+    // position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    box-shadow: 9px 9px 18px #bec8e4;
+}
+
+.clock:before {
+    content: "";
+    background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='112' ry='112' stroke='grey' stroke-width='18' stroke-dasharray='1%2c4.5' stroke-dashoffset='25' stroke-linecap='butt'/%3e%3c/svg%3e") !important;
+    width: "150%";
+    height: "150%";
+    position: absolute;
+    inset: 0px;
+    border-radius: 100%;
+}
+
+.rotating:before {
+    animation: dash-animate 10s linear infinite;
+}
+
+.syncbutton {
+    color: rgb(0, 185, 120);
+    text-transform: uppercase;
+    background-color: $sync-gray-background;
+    box-shadow: 4px 4px 9px #bec8e4;
+    border: none;
+    border-radius: 4px;
+    margin: 10px;
+}
+
+.syncbutton:hover:enabled{
+     box-shadow: 2px 2px 6px #bec8e4;
+}
+
+.syncbutton:disabled{
+    background-color: #ebf0f6;
+    box-shadow: 2px 2px 6px #bec8e4;
+}

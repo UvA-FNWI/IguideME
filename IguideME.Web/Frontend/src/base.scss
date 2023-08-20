@@ -8,6 +8,7 @@ $primary-gray: rgb(246, 248, 250);
 
 $primary-green: rgb(0, 185, 120);
 $primary-red: rgb(255, 110, 90);
+$sync-gray-background: #e4ebf5;
 
 $header-height: 70px;
 $screen-breakpoint-large: 1100px;
@@ -17,16 +18,16 @@ body {
   margin: 0 !important;
   padding: 0 !important;
 
-  h1, h2, h3 {
+  h1, h2, h3, {
     margin: 0;
-    font-family: Roboto,-apple-system,BlinkMacSystemFont,Segoe UI,Oxygen,Ubuntu,Cantarell,Fira Sans,Droid Sans,Helvetica Neue,sans-serif;
+    font-family: Maitree, serif;
   }
 
   h2 {
     font-family: 'Antic Slab', serif;
   }
 
-  font-family: 'Maitree', serif;
+  font-family: Maitree, serif !important;
 }
 
 .ant-tabs {
