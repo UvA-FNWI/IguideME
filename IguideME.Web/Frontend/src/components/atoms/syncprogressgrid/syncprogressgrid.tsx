@@ -31,15 +31,14 @@ const SyncProgressGrid: FC = (): ReactElement => {
                             const description = status === JobStatus.Processing ? stateType.busy_text : stateType.finished_text
 
                             return (
-                                <Col span={12}>
-                                <StatusCard title={stateType.title}
-                                            description={description}
-                                            status={status}
-                                            />
-                            </Col>
-                        )
-                    }
-                    )
+                                <Col span={12} key={name}>
+                                    <StatusCard title={stateType.title}
+                                                description={description}
+                                                status={status}
+                                                />
+                                </Col>
+                            )
+                        })
                     }
             </Row>
         </div>

@@ -26,7 +26,8 @@ display_help () {
   echo "                                          ";
   echo "  ---frontend---------------------------------------------------";
   echo "  frontend-dev              build and run the frontend (watcher)";
-  echo "  iguideme-packages         update/install node modules";
+  echo "  iguideme-packages         update/install required node modules";
+  echo "  iguideme-add-packages     add new node modules";
   echo "                                          ";
   echo "  ---backend----------------------------------------------------";
   echo "  backend-dev 	            build and run the backend (watcher)";

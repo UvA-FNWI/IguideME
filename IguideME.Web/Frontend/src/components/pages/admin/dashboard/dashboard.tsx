@@ -7,6 +7,7 @@ import { FC, ReactElement } from 'react';
 import { getSynchronizations } from '@/api/syncing';
 import SyncManager from '@/components/crystals/syncmanager/syncmanager';
 import { getRelativeTimeString, getRelativeTimeTimer } from '@/helpers/time';
+import AdminTitle from '@/components/atoms/admin-titles/admin-titles';
 import './style.scss';
 
 
@@ -17,7 +18,7 @@ const Dashboard: FC = (): ReactElement => {
 
   // Get the date that the last successful sync was on.
   const latestSuccessful = synchronizations?.filter(a => a.status === "COMPLETE")[0];
-  const format = new Intl.DateTimeFormat(navigator.language, {dateStyle: 'full', timeStyle: 'short'})
+  const format = new Intl.DateTimeFormat(navigator.language, {dateStyle: 'long', timeStyle: 'short'})
   const since = latestSuccessful ? getRelativeTimeString(latestSuccessful.start_timestamp) : "";
 
   const syncs = synchronizations?.map((s, i) => {
@@ -45,23 +46,21 @@ const Dashboard: FC = (): ReactElement => {
 
   return (
     <div className='dashboard'>
-      <h1>Dashboard</h1>
-      {
+      <AdminTitle title='Dashboard' description={(
         loadingSyncs ?
-        <div><Spin /> Retrieving latest synchronization...</div>
+        <><Spin /> Retrieving latest synchronization...</>
         :
         (
           latestSuccessful ?
-          <p>
+          <>
               The latest successful synchronization took place on
               <b> {format.format(latestSuccessful.start_timestamp!)} </b>
                   <small>({since})</small>.
               Syncs run automatically at 03:00AM (UTC time).
-          </p> :
-          <p>No historic syncs available.</p>
+          </> :
+          <>No historic syncs available.</>
         )
-      }
-      <Divider style={{ margin: '5px 0 20px 0' }} />
+      )}/>
 
       <SyncManager />
       <h1 style={{ marginTop: 20 }}>Historic versions</h1>

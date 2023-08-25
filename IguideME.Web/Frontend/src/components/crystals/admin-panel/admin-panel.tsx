@@ -36,7 +36,7 @@ function getItem(
     children,
     label,
     type,
-  } as MenuItem;
+  };
 }
 
 const items: MenuItem[] = [
