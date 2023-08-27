@@ -14,7 +14,7 @@ export let getLayoutColumns: () => Promise<LayoutColumn[]> = () => apiClient.get
     return response.data});
 
 export let postLayoutColumns: (layouts: LayoutColumn[]) => Promise<void> = (layouts: LayoutColumn[]) => apiClient.post(
-  `layout/columns`, {layouts}
+  `layout/columns`, layouts
 );
 
 

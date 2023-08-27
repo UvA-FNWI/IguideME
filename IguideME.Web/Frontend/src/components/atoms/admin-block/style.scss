@@ -1,0 +1,14 @@
+@import '@/base.scss';
+
+.settingBlock {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 1px solid #ebebeb;
+    background-color: white;
+
+    h2 {
+        font-feature-settings: "tnum";
+        font-size: 18px;
+    }
+}

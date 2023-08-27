@@ -4,8 +4,8 @@ import { User } from "@/types/user"
 
 export let getUsers: () => Promise<User[]> = () => apiClient.get(
     `students`
-  ).then(response => response.data)
+).then(response => response.data)
 
 export let getSelf: () => Promise<User> = () => apiClient.get(
     `app/self`
-  ).then(response => response.data)
+).then(response => response.data)
