@@ -164,6 +164,7 @@ namespace IguideME.Web.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult GetCoursePeerGroups()
         {
+            // TODO: change this url and the function names, they aren't very intuitive.
             PeerGroup peerGroup = _databaseManager
                 .GetPeerGroup(GetCourseID());
 
@@ -179,6 +180,7 @@ namespace IguideME.Web.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult PatchCoursePeerGroups([FromBody] PeerGroup obj)
         {
+            _logger.LogInformation("size {s}", obj.MinSize);
             /**
              * Endpoint is used to allow instructors to change the informed
              * consent policy for their course.

@@ -1,5 +1,5 @@
 import { FC, ReactElement} from 'react';
-import TextEditor from '@/components/crystals/text-editor/text-editor';
+import TextEditor from '@/components/atoms/text-editor/text-editor';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { getConsentSettings, postConsentSettings } from '@/api/course_settings';
 import { Button, Form } from 'antd';
