@@ -725,12 +725,12 @@ namespace IguideME.Web.Controllers
                 _databaseManager.GetLayoutColumns(GetCourseID()));
         }
 
+        // TODO: change to accept a list/array and replace the columns in the database
         [Authorize]
         [HttpPost]
         [Route("/layout/columns")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        // DBrefTODO: the ContainerSize should be an integer, according to the classes enum
         public ActionResult CreateLayoutColumn([FromBody] LayoutColumn column)
         {
             return Json(
@@ -740,6 +740,7 @@ namespace IguideME.Web.Controllers
                     column.Position));
         }
 
+// TODO: delete
         [Authorize(Policy = "IsInstructor")]
         [HttpPatch]
         [Route("/layout/columns/{columnID}")]
@@ -759,6 +760,7 @@ namespace IguideME.Web.Controllers
                 : BadRequest();
         }
 
+// TODO: delete
         [Authorize(Policy = "IsInstructor")]
         [HttpDelete]
         [Route("/layout/columns/{columnID}")]

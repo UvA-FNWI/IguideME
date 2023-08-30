@@ -46,15 +46,15 @@ namespace IguideME.Web.Controllers
 
         // -------------------- Synchronization managers --------------------
 
-        [Authorize(Policy = "IsInstructor")]
-        [HttpPost, Route("/datamart/test")]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public void LogDBTable()
-        {
-            var body = new StreamReader(Request.Body).ReadToEnd();
+        // [Authorize(Policy = "IsInstructor")]
+        // [HttpPost, Route("/datamart/test")]
+        // [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        // public void LogDBTable()
+        // {
+        //     var body = new StreamReader(Request.Body).ReadToEnd();
 
-            _databaseManager.LogTable(JObject.Parse(body)["name"].ToString());
-        }
+        //     _databaseManager.LogTable(JObject.Parse(body)["name"].ToString());
+        // }
 
         [Authorize(Policy = "IsInstructor")]
         [HttpPost, Route("/datamart/start-sync")]
@@ -89,15 +89,15 @@ namespace IguideME.Web.Controllers
             return Ok(await _computationJobStatusService.GetAllJobsAsync().ConfigureAwait(false));
         }
 
-        [Authorize(Policy = "IsInstructor")]
-        [HttpDelete, Route("/datamart/clear")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<IActionResult> ClearAllJobsAsync()
-        {
-            await _computationJobStatusService.ClearAllJobsAsync().ConfigureAwait(false);
-            return Ok();
-        }
+        // [Authorize(Policy = "IsInstructor")]
+        // [HttpDelete, Route("/datamart/clear")]
+        // [ProducesResponseType(StatusCodes.Status200OK)]
+        // [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        // public async Task<IActionResult> ClearAllJobsAsync()
+        // {
+        //     await _computationJobStatusService.ClearAllJobsAsync().ConfigureAwait(false);
+        //     return Ok();
+        // }
 
         [Authorize(Policy = "IsInstructor")]
         [HttpGet, Route("/datamart/synchronizations")]
@@ -111,16 +111,17 @@ namespace IguideME.Web.Controllers
 
         // -------------------- Synchronization registry --------------------
 
-        [Authorize(Policy = "IsInstructor")]
-        [HttpGet, Route("/datamart/users")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public JsonResult GetUsers()
-        {
-            return Json(
-                _databaseManager.GetUsers(this.GetCourseID()));
-        }
+        // [Authorize(Policy = "IsInstructor")]
+        // [HttpGet, Route("/datamart/users")]
+        // [ProducesResponseType(StatusCodes.Status200OK)]
+        // [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        // public JsonResult GetUsers()
+        // {
+        //     return Json(
+        //         _databaseManager.GetUsers(this.GetCourseID()));
+        // }
 
+        // TODO: move to different controller + url
         [Authorize]
         [HttpGet, Route("/datamart/predictions/{userID}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -248,7 +249,6 @@ namespace IguideME.Web.Controllers
                     this.GetHashCode()));
         }
 
-// Again, what is the difference between those two ?????
         [Authorize]
         [HttpGet]
         [Route("/goal-grade")]

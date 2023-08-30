@@ -46,7 +46,6 @@ public static class DatabaseQueries
             `user_id`             STRING,
             `action`              STRING,
             FOREIGN KEY(`user_id`) REFERENCES `users`(`user_id`)
-
         );";
 
 
@@ -595,12 +594,10 @@ public static class DatabaseQueries
         @"  INSERT INTO `student_settings`
                         (   `course_id`,
                             `user_id`,
-                            `goal_grade`,
                             `sync_id`   )
             VALUES(
                 @CourseID,
                 @UserID,
-                @GoalGrade,
                 @syncID
             )
         ;";
@@ -1197,15 +1194,32 @@ public static class DatabaseQueries
         AND         `sync_ID`=@syncID
         ;";
 
+    // public const string QUERY_LAST_STUDENT_SETTINGS =
+    //     @"SELECT    `predicted_grade`,
+    //                 `goal_grade`,
+    //                 `notifications`,
+    //                 `sync_ID`
+    //     FROM        `student_settings`
+    //     WHERE       `course_id`=@courseID
+    //     AND         `user_id`=@userID
+    //     ORDER BY    `sync_ID` DESC
+    //     LIMIT       1
+    //     ;";
     public const string QUERY_LAST_STUDENT_SETTINGS =
-        @"SELECT    `predicted_grade`,
-                    `goal_grade`,
-                    `notifications`
+        @"SELECT    `sync_ID`
         FROM        `student_settings`
         WHERE       `course_id`=@courseID
         AND         `user_id`=@userID
         ORDER BY    `sync_ID` DESC
         LIMIT       1
+        ;";
+
+    public const string QUERY_UPDATE_STUDENT_SETTINGS =
+        @"UPDATE    `student_settings`
+        SET         `sync_ID`=@syncID
+        WHERE       `user_id`= @userID
+        AND         `course_id`= @courseID
+        AND         `sync_ID`= @oldSyncID
         ;";
 
 
@@ -1235,7 +1249,7 @@ public static class DatabaseQueries
                     `submissions`.`user_id`,
                     `submissions`.`grade`,
                     `submissions`.`date`
-        FROM        `submissions`,
+        FROM        `submissions`
         INNER JOIN  `assignments`
             USING   (`assignment_id`)
         WHERE       `assignments`.`course_id`=@courseID

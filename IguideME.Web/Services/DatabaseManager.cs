@@ -506,14 +506,13 @@ namespace IguideME.Web.Services
 
         public List<User> GetUsers(int courseID, UserRoles role = UserRoles.student, long syncID = 0)
         {
-            _logger.LogInformation("test {c} {r} {s]}", courseID, role, syncID);
             long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
             if (activeSync == 0)
             {
                 _logger.LogInformation("Hash is null, returning empty user list.");
                 return new List<User>() { };
             }
-            _logger.LogInformation("test {s]}", activeSync);
+            _logger.LogInformation("current sync: {s]}", activeSync);
 
             List<User> users = new();
 
@@ -578,8 +577,6 @@ namespace IguideME.Web.Services
         }
 
         public string GetUserID(int studentNumber) {
-            _logger.LogInformation("Trying db for {u}", studentNumber);
-
             using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_USER_ID,
                     new SQLiteParameter("studentNumber", studentNumber)
                 )) {
@@ -588,7 +585,6 @@ namespace IguideME.Web.Services
                     return r.GetValue(0).ToString();
                 }
             }
-
             return null;
         }
 
@@ -808,24 +804,29 @@ namespace IguideME.Web.Services
 
         public void InitializeUserSettings(int courseID, string userID, long syncID)
         {
+            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
+            long old_sync = 0;
+
             using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_LAST_STUDENT_SETTINGS,
                     new SQLiteParameter("courseID", courseID),
                     new SQLiteParameter("userID", userID)
                 )) {
-                    while (r.Read())
-                    {
-                        return; // If the user already exists, we do not initialize them
-                    }
+                    if (r.Read())
+                        old_sync = r.GetInt64(0);
                 }
 
-            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
-
-            NonQuery(DatabaseQueries.INITIALIZE_STUDENT_SETTINGS,
+            _logger.LogInformation("old {old}", old_sync);
+            if (old_sync != 0)
+                NonQuery(DatabaseQueries.QUERY_UPDATE_STUDENT_SETTINGS,
+                    new SQLiteParameter("courseID", courseID),
+                    new SQLiteParameter("userID", userID),
+                    new SQLiteParameter("oldSyncID", old_sync),
+                    new SQLiteParameter("syncID", activeSync));
+            else
+                NonQuery(DatabaseQueries.INITIALIZE_STUDENT_SETTINGS,
                             new SQLiteParameter("CourseID", courseID),
                             new SQLiteParameter("UserID", userID),
-                            new SQLiteParameter("GoalGrade", -1),
-                            new SQLiteParameter("syncID", activeSync)
-                        );
+                            new SQLiteParameter("syncID", activeSync));
         }
 
         public bool GetTileNotificationState(int tileID)
@@ -1331,26 +1332,27 @@ namespace IguideME.Web.Services
                 }
             }
 
-            using(SQLiteDataReader r2 = Query(DatabaseQueries.QUERY_USER_DISCUSSION_COUNTER,
-                    new SQLiteParameter("courseID", courseID),
-                    new SQLiteParameter("userID", userID),
-                    new SQLiteParameter("syncID", activeSync)
-                )) {
-                while (r2.Read()) {
-                    try {
-                        // We save the sum of discussion entriess and replies in a dictionary with
-                        // the discussion.id as key and the total of their entries/replies as value
-                        if (!r2.IsDBNull(0))
-                        {
-                            int discID = r2.GetInt32(0);
-                            grades[discID] = new List<float> { r2.GetInt32(1) };
-                        }
+            // TODO: implement
+            // using(SQLiteDataReader r2 = Query(DatabaseQueries.QUERY_USER_DISCUSSION_COUNTER,
+            //         new SQLiteParameter("courseID", courseID),
+            //         new SQLiteParameter("userID", userID),
+            //         new SQLiteParameter("syncID", activeSync)
+            //     )) {
+            //     while (r2.Read()) {
+            //         try {
+            //             // We save the sum of discussion entriess and replies in a dictionary with
+            //             // the discussion.id as key and the total of their entries/replies as value
+            //             if (!r2.IsDBNull(0))
+            //             {
+            //                 int discID = r2.GetInt32(0);
+            //                 grades[discID] = new List<float> { r2.GetInt32(1) };
+            //             }
 
-                    } catch (Exception e) {
-                        PrintQueryError("GetUserGrades", 3, r2, e);
-                    }
-                }
-            }
+            //         } catch (Exception e) {
+            //             PrintQueryError("GetUserGrades", 3, r2, e);
+            //         }
+            //     }
+            // }
 
             return grades;
         }

@@ -7,7 +7,6 @@ import { DeleteFilled } from '@ant-design/icons';
 import { getTileGroups } from '@/api/tiles';
 
 import './style.scss';
-import { LayoutColumn } from '@/types/tile';
 
 
 const MIN_WIDTH = 1;

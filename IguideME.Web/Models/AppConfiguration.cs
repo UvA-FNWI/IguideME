@@ -1,34 +1,41 @@
-﻿using Newtonsoft.Json;
+﻿using System.Collections.Generic;
+
+using Newtonsoft.Json;
 
 namespace IguideME.Web.Models
 {
     public class LayoutColumn
     {
 
-        public enum ColumnSize {
-            small,
-            medium,
-            large,
-            full
-        }
+        // public enum ColumnSize {
+        //     small,
+        //     medium,
+        //     large,
+        //     full
+        // }
         [JsonProperty(PropertyName = "id")]
         public int ID { get; set; }
 
         [JsonProperty(PropertyName = "course_id")]
         public int CourseID { get; set; }
 
-        [JsonProperty(PropertyName = "container_width")]
-        public ColumnSize ContainerSize { get; set; }
+        [JsonProperty(PropertyName = "width")]
+        public int ContainerSize { get; set; }
 
         [JsonProperty(PropertyName = "position")]
         public int Position { get; set; }
+
+        [JsonProperty(PropertyName = "tile_groups")]
+        public List<int> TileGroups { get; set; }
 
         public LayoutColumn(int id, int courseID, int containerSize, int position)
         {
             this.ID = id;
             this.CourseID = courseID;
-            this.ContainerSize = (ColumnSize) containerSize;
+            this.ContainerSize = containerSize;
             this.Position = position;
+
+            // ask db to fill with this.TileGroups;
         }
     }
 

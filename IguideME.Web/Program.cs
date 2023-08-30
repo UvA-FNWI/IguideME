@@ -144,7 +144,6 @@ string GetUserID(string userid, string course) {
     }
     // Try's to find the user in canvas.
     return app.Services.GetService<CanvasHandler>().GetUser(courseid, userid).LoginID;
-
 }
 
 app.UseLti(new LtiOptions

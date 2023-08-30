@@ -9,5 +9,4 @@ export type TileGroup = {
     id: number;
     title: string;
     position: number;
-    column_id: number;
 }
