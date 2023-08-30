@@ -1,4 +1,4 @@
-import { Button, Col, Form} from 'antd';
+import { Button, Col, Form, Spin} from 'antd';
 import { FC, ReactElement} from 'react';
 
 import ConfigLayoutColumn from '@/components/atoms/layout-column/layout-column';
@@ -13,7 +13,11 @@ const LayoutConfigurator: FC = (): ReactElement => {
         return (<LayoutColumnForm columns={data}/>)
     }
 
-    return (<>Loading...</>);
+    return (
+        <div style={{display: 'flex', justifyContent: 'center'}}>
+        <Spin tip="Loading" size="large"/>
+        </div>
+    );
 }
 
 type Props = {
