@@ -111,10 +111,10 @@ namespace IguideME.Web.Services.Workers
         }
 
         /// <summary>
-        /// Calculate the minimum, average, and maximum for a peergroup for each tile.
+        /// Calculate the minimum, average, and maximum for a peergroup for each entry (= assigment / discussion).
         /// </summary>
         /// <param name="peerGroup"></param>
-        /// <returns>A dictionary with the tileID as key and the statistics as a list.</returns>
+        /// <returns>A dictionary with the assignmentID/discussionID as key and the collecton of all students' grades as a list.</returns>
         Dictionary<int,List<float>> CalculateGrades(List<string> peerGroup){
             Dictionary<int,List<float>> grades = new();
 
@@ -159,8 +159,8 @@ namespace IguideME.Web.Services.Workers
 
                 Dictionary<int, List<float>> grades = CalculateGrades(peerGroup);
 
-                // Finally, we go through all dictionary (= all tiles)
-                // and we store the title, min, max and average of each list in the database.
+                // Finally, we go through all dictionary (= all assignments/discussions)
+                // and we store the id, min, max and average of each list in the database.
                 // also, we save the user_ids of the peers in said group
                 foreach (KeyValuePair<int, List<float>> entry in grades)
                 {

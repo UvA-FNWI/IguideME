@@ -1415,7 +1415,7 @@ public static class DatabaseQueries
 
     public const string UPDATE_CONSENT_FOR_COURSE =
         @"UPDATE    `course_settings`
-                    `consent`=@text
+        SET         `consent`=@text
         WHERE       `course_id`=@courseID;";
 
     public const string UPDATE_PEER_GROUP_FOR_COURSE =
