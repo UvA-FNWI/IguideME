@@ -135,7 +135,7 @@ namespace IguideME.Web.Services
             _logger.LogInformation("Logging table {name}", name);
 
             string table = "";
-            using (SQLiteDataReader r = Query("select * from `@name`", new SQLiteParameter("name", name)))
+            using (SQLiteDataReader r = Query("SELECT * FROM `@name`", new SQLiteParameter("name", name)))
             {
                 for (int i = 0; i < r.FieldCount; i++)
                 {
