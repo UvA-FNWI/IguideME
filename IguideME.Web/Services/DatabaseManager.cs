@@ -606,7 +606,7 @@ namespace IguideME.Web.Services
             string activeHash = hash ?? this.GetCurrentHash(courseID);
             if (activeHash == null) return null;
 
-            _logger.LogInformation("Trying to get user {u} for course {c} using hash {h}", userID, courseID, hash);
+            _logger.LogInformation("Trying to get user {u} for course {c} using hash {h}, {ah}", userID, courseID, hash, activeHash);
 
             User user = null;
             using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_USER_FOR_COURSE,
