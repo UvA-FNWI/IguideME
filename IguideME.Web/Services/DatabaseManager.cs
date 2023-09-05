@@ -587,6 +587,8 @@ namespace IguideME.Web.Services
 
             if (hash == null) return null;
 
+            _logger.LogInformation("getting id for {u} course {c} hash{h}", id, courseID, hash);
+
             using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_USER_ID,
                     new SQLiteParameter("courseID", courseID),
                     new SQLiteParameter("id", id),
@@ -594,6 +596,7 @@ namespace IguideME.Web.Services
                 )) {
                 if (r.Read())
                 {
+                    _logger.LogInformation("found {u}", r.GetValue(0).ToString());
                     return r.GetValue(0).ToString();
                 }
             }
