@@ -33,6 +33,12 @@ public static class DatabaseQueries
                 @"
                 DROP TABLE sync_history
                 ;"
+            },
+            {
+                "005_drop_empty_ids",
+                @"
+                DELETE FROM canvas_users WHERE user_id IS NULL OR trim(user_id) = '';
+                "
             }
         };
 
