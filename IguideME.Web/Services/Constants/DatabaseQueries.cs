@@ -39,6 +39,12 @@ public static class DatabaseQueries
                 @"
                 DELETE FROM canvas_users WHERE user_id IS NULL OR trim(user_id) = '';
                 "
+            },
+            {
+                "005_drop_users",
+                @"
+                DROP TABLE canvas_users;
+                "
             }
         };
 
