@@ -51,7 +51,7 @@ namespace IguideME.Web.Services.Workers
                     DatabaseManager.Instance.RegisterUser(
                         _courseID,
                         student.ID,
-                        student.LoginID,
+                        student.SISUserID,//TODO: fix
                         student.Name,
                         student.SortableName,
                         "student",
@@ -75,7 +75,7 @@ namespace IguideME.Web.Services.Workers
                 DatabaseManager.Instance.RegisterUser(
                     _courseID,
                     instructor.ID,
-                    instructor.LoginID,
+                    instructor.SISUserID,
                     instructor.Name,
                     instructor.SortableName,
                     "instructor",

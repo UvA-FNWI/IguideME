@@ -41,7 +41,7 @@ namespace IguideME.Web.Controllers
 
             _logger.LogInformation("Could not find user {user} in database.", id);
             // Try's to find the user in canvas.
-            return _canvasHandler.GetUser(this.GetCourseID(), (User.Identity as ClaimsIdentity).FindFirst("userid").Value).LoginID;
+            return _canvasHandler.GetUser(this.GetCourseID(), (User.Identity as ClaimsIdentity).FindFirst("userid").Value).SISUserID; //TODO: fix
         }
 
         protected string GetUserName()
