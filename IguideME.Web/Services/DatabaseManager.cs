@@ -606,6 +606,8 @@ namespace IguideME.Web.Services
             string activeHash = hash ?? this.GetCurrentHash(courseID);
             if (activeHash == null) return null;
 
+            _logger.LogInformation("Trying to get user {u} for course {c} using hash {h}", userID, courseID, hash);
+
             User user = null;
             using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_USER_FOR_COURSE,
                     new SQLiteParameter("courseID", courseID),
@@ -623,8 +625,10 @@ namespace IguideME.Web.Services
                         r.GetValue(4).ToString(),
                         r.GetValue(5).ToString()
                     );
+                    _logger.LogInformation("Found user {u}", user.Name);
                 }
             }
+
 
             return user;
         }
