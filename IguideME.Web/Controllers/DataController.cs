@@ -31,6 +31,7 @@ namespace IguideME.Web.Controllers
 
             if (int.TryParse((User.Identity as ClaimsIdentity).FindFirst("userid").Value, out int id)) {
 
+                _logger.LogInformation("userclaim {u}", id);
                 string user = DatabaseManager.Instance.GetUserID(this.GetCourseID(), id);
                 if (user != null) {
                     return user;
