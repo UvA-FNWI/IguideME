@@ -12,13 +12,19 @@ export const getTileGroups: () => Promise<TileGroup[]> = async () =>
 	await apiClient.get(`tiles/groups`).then((response) => response.data);
 
 export const postTileGroup: (group: TileGroup) => Promise<void> = async (group: TileGroup) => {
-	console.log('group', group);
 	await apiClient.post(`tiles/group`, group);
 };
 
-export const patchTileGroup: (title?: string, position?: number) => Promise<void> = async (
-	title?: string,
-	position?: number,
-) => {
-	await apiClient.patch(`tiles/group`, { title, position });
+export const deleteTileGroup: (id: number) => Promise<void> = async (id: number) => {
+	await apiClient.delete(`tiles/groups/${id}`);
+};
+
+interface GroupPatch {
+	id: number;
+	title?: string;
+	position?: number;
+}
+
+export const patchTileGroup: (group: GroupPatch) => Promise<void> = async (group: GroupPatch) => {
+	await apiClient.patch(`tiles/group`, group);
 };
