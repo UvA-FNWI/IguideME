@@ -1,15 +1,10 @@
-import { FC, ReactElement } from 'react'
-import { useParams } from 'react-router-dom'
+import { type FC, type ReactElement } from 'react';
+import { useParams } from 'react-router-dom';
 
 const StudentDashboard: FC = (): ReactElement => {
-  const { id } = useParams()
+	const { id } = useParams();
 
-  return (
-    <div>
-      Student: {id}
-    </div>
+	return <div>Student: {id}</div>;
+};
 
-  )
-}
-
-export default StudentDashboard
+export default StudentDashboard;

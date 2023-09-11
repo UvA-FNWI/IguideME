@@ -1,13 +1,7 @@
-import { FC, ReactElement } from 'react'
+import { type FC, type ReactElement } from 'react';
 
 const DataWizard: FC = (): ReactElement => {
+	return <div>DataWizard</div>;
+};
 
-  return (
-    <div>
-        DataWizard
-    </div>
-
-  )
-}
-
-export default DataWizard
+export default DataWizard;

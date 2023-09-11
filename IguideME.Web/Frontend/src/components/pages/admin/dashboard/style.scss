@@ -1,9 +1,12 @@
-.dashboard{
-    h4, span {
-        font-family: Maitree, serif;
-    }
+@import '@/base.scss';
+
+.dashboard {
+	h4,
+	span {
+		font-family: Maitree, serif;
+	}
 }
 
 .ant-table {
-    font-feature-settings: "tnum" !important;
+	font-feature-settings: 'tnum' !important;
 }

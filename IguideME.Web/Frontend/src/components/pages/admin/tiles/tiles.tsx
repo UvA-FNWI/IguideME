@@ -1,14 +1,15 @@
-import { FC, ReactElement } from 'react'
-import { useParams } from 'react-router-dom'
+import AdminTitle from '@/components/atoms/admin-titles/admin-titles';
+import { type FC, type ReactElement } from 'react';
+
+import TileGroupBoard from '@/components/crystals/tile-group-board/tile-group-board';
 
 const Tiles: FC = (): ReactElement => {
+	return (
+		<div>
+			<AdminTitle title="Tiles" description="Configure the tiles and tile groups." />
+			<TileGroupBoard />
+		</div>
+	);
+};
 
-  return (
-    <div>
-        Tiles
-    </div>
-
-  )
-}
-
-export default Tiles
+export default Tiles;

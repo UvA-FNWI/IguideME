@@ -1,3 +1,4 @@
-import apiClient from "./axios"
+import apiClient from './axios';
 
-export default apiClient.post('app/setup');
+const setup = apiClient.post('app/setup');
+export default setup;
