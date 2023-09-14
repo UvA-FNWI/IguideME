@@ -47,7 +47,7 @@ public static class DatabaseQueries
                 "
             },
             {
-                "006_clean_settings",
+                "007_clean_settings",
                 @"
                 DELETE FROM user_settings WHERE user_id IS NULL OR trim(user_id) = '';
                 DELETE FROM user_settings WHERE user_name IS NULL OR trim(user_id) = '';
