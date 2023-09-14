@@ -72,7 +72,7 @@ namespace IguideME.Web.Services
         /// <returns>The requested user if found.</returns>
         public User GetUser(int courseID, string userID)
         {
-            _logger.LogInformation("Trying to get user\ncourseID: {courseID}, userID: {userID}", courseID, userID);
+            // _logger.LogInformation("Trying to get user\ncourseID: {courseID}, userID: {userID}", courseID, userID);
             List<Enrollment> users = Connector.FindCourseById(courseID).Enrollments;
             return users.First(x => x.UserID == userID).User;
         }

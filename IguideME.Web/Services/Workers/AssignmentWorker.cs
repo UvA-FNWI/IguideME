@@ -77,7 +77,7 @@ namespace IguideME.Web.Services.Workers
             IEnumerable<Submission> submissions = assignment.Submissions
                 .Where(submission =>
 					submission.Grade != null &&
-					DatabaseManager.Instance.GetConsent(this._courseID, submission.User.LoginID) == 1
+					DatabaseManager.Instance.GetConsent(this._courseID, submission.User.SISUserID) == 1
 				);
 
             foreach (Submission submission in submissions)
@@ -108,11 +108,11 @@ namespace IguideME.Web.Services.Workers
 						_logger.LogError("Grade format {Type} is not supported, grade = {Grade}", assignment.GradingType, submission.Grade);
 						break;
 				}
-                _logger.LogInformation("loginid {ID}", submission.User.LoginID);
+                // _logger.LogInformation("loginid {ID}", submission.User.LoginID);
 				DatabaseManager.Instance.CreateUserSubmission(
 						this._courseID,
 						entry.ID,
-						submission.User.LoginID,
+						submission.User.SISUserID,
 						grade,
 						"",//submission.SubmittedAt.Value.ToShortDateString(),
 						_hashCode);
