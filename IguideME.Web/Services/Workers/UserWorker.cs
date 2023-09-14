@@ -46,7 +46,7 @@ namespace IguideME.Web.Services.Workers
                 try {
                     DatabaseManager.Instance.RegisterUserSettings(new Models.ConsentData(_courseID, student.LoginID, student.Name, -1));
 
-                    _logger.LogInformation("registering student with login {l} sis {s} user {u}", student.LoginID, student.SISUserID, student.ID);
+                    // _logger.LogInformation("registering student with login {l} sis {s} user {u}", student.LoginID, student.SISUserID, student.ID);
 
                     DatabaseManager.Instance.RegisterUser(
                         _courseID,

@@ -45,6 +45,14 @@ public static class DatabaseQueries
                 @"
                 DROP TABLE canvas_users;
                 "
+            },
+            {
+                "006_clean_settings",
+                @"
+                DELETE FROM user_settings WHERE user_id IS NULL OR trim(user_id) = '';
+                DELETE FROM user_settings WHERE user_name IS NULL OR trim(user_id) = '';
+                ;
+                "
             }
         };
 
