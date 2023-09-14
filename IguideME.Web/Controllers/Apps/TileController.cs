@@ -90,7 +90,7 @@ namespace IguideME.Web.Controllers
 
         [Authorize(Policy = "IsInstructor")]
         [HttpPost]
-        [Route("/tiles/groups")]
+        [Route("/tiles/group")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public ActionResult PostTileGroup([FromBody] LayoutTileGroup obj)

@@ -21,9 +21,7 @@ import { createPortal } from 'react-dom';
 
 const TileGroupBoard: FC = (): ReactElement => {
 	const { data: tilegroups } = useQuery('tile-groups', getTileGroups);
-	if (tilegroups === undefined) {
-		return <Loading />;
-	}
+	const [activeGroup, setActiveGroup] = useState<TileGroup | null>(null);
 
 	const queryClient = useQueryClient();
 	const { mutate: postGroup } = useMutation({
@@ -40,8 +38,10 @@ const TileGroupBoard: FC = (): ReactElement => {
 		},
 	});
 
-	const [activeGroup, setActiveGroup] = useState<TileGroup | null>(null);
-	const groupIds = useMemo(() => tilegroups.map((group) => group.position), [tilegroups]);
+	const groupIds = useMemo(
+		() => (tilegroups === undefined ? [] : tilegroups.map((group) => group.position)),
+		[tilegroups],
+	);
 
 	const sensors = useSensors(
 		useSensor(PointerSensor, {
@@ -50,6 +50,10 @@ const TileGroupBoard: FC = (): ReactElement => {
 			},
 		}),
 	);
+
+	if (tilegroups === undefined) {
+		return <Loading />;
+	}
 
 	return (
 		<DndContext onDragStart={onDragStart} onDragEnd={onDragEnd} sensors={sensors}>
@@ -64,7 +68,7 @@ const TileGroupBoard: FC = (): ReactElement => {
 				<Button
 					type="dashed"
 					onClick={() => {
-						postGroup({ title: 'TileGroup', id: -1, position: tilegroups.length });
+						postGroup({ title: 'TileGroup', id: -1, position: tilegroups.length + 1 });
 					}}
 					block
 					icon={<PlusOutlined />}

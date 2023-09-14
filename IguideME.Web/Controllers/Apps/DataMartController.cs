@@ -73,9 +73,8 @@ namespace IguideME.Web.Controllers
         [HttpPost, Route("/datamart/stop-sync")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status202Accepted, Type = typeof(JobCreatedModel))]
-        public async Task<IActionResult> stopComputation([FromBody] JobParametersModel obj)
+        public IActionResult StopComputation([FromBody] JobParametersModel obj)
         {
-            _logger.LogInformation("test");
             return Accepted();
         }
 

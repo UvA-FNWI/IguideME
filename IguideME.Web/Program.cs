@@ -183,8 +183,6 @@ app.UseAuthorization();
 
 app.UseEndpoints(endpoints => endpoints.MapRazorPages());
 
-// app.MapRazorPages();
-
 app.MapControllerRoute(
         name: "default",
         pattern: "{controller}/{action=Index}/{id?}");

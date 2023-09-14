@@ -47,6 +47,7 @@ const TileGroupView: FC<Props> = ({ group }): ReactElement => {
 	if (isDragging) {
 		return <div className="tileGroup" ref={setNodeRef} style={style}></div>;
 	}
+
 	return (
 		<div className="tileGroup" ref={setNodeRef} style={style}>
 			<Row align="middle" justify="space-between" {...attributes} {...listeners} style={{ cursor: 'grab' }}>
@@ -86,8 +87,8 @@ const TileGroupView: FC<Props> = ({ group }): ReactElement => {
 					/>
 				</Col>
 			</Row>
-
 			<Divider style={{ margin: '5px 0px 8px 0px' }} />
+			<Row></Row>
 		</div>
 	);
 };

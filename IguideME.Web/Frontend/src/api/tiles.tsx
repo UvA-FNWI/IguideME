@@ -1,5 +1,5 @@
 import apiClient from './axios';
-import { type LayoutColumn, type TileGroup } from '@/types/tile';
+import { type Tile, type LayoutColumn, type TileGroup } from '@/types/tile';
 
 export const getLayoutColumns: () => Promise<LayoutColumn[]> = async () =>
 	await apiClient.get(`layout/columns`).then((response) => response.data);
@@ -28,3 +28,6 @@ interface GroupPatch {
 export const patchTileGroup: (group: GroupPatch) => Promise<void> = async (group: GroupPatch) => {
 	await apiClient.patch(`tiles/group`, group);
 };
+
+export const getTiles: () => Promise<Tile[]> = async () =>
+	await apiClient.get(`tiles/tiles`).then((response) => response.data);

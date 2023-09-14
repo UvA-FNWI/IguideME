@@ -10,3 +10,9 @@ export interface TileGroup {
 	title: string;
 	position: number;
 }
+
+export interface Tile {
+	id: number;
+	title: string;
+	// TODO:
+}
