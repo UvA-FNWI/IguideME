@@ -53,6 +53,16 @@ public static class DatabaseQueries
                 DELETE FROM user_settings WHERE user_name IS NULL OR trim(user_id) = '';
                 ;
                 "
+            },
+            {
+                "007_clean_submissions_and_tracker",
+                @"
+                DELETE FROM tile_entry_submission WHERE user_id IS NULL OR trim(user_id) = '';
+                DELETE FROM user_tracker WHERE user_id IS NULL OR trim(user_id) = '';
+                DELETE FROM predicted_grade WHERE user_id IS NULL OR trim(user_id) = '';
+                DELETE FROM notifications WHERE user_id IS NULL OR trim(user_id) = '';
+                ;
+                "
             }
         };
 
