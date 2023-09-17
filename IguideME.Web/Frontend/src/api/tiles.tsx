@@ -26,7 +26,7 @@ interface GroupPatch {
 }
 
 export const patchTileGroup: (group: GroupPatch) => Promise<void> = async (group: GroupPatch) => {
-	await apiClient.patch(`tiles/group`, group);
+	await apiClient.patch(`tiles/group/${group.id}`, group);
 };
 
 export const getTiles: () => Promise<Tile[]> = async () =>
