@@ -1521,7 +1521,7 @@ public static class DatabaseQueries
         AND             `course_id`=@courseID;";
 
     public const string DELETE_TILE =
-        @"DELETE FROM   `tile`
+        @"DELETE FROM   `tiles`
         WHERE `tile_id` = @tileID;";
 
     public const string DELETE_TILE_GROUP =

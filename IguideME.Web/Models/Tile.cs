@@ -30,7 +30,7 @@ namespace IguideME.Web.Models
         [JsonProperty(PropertyName = "title")]
         public string Title { get; set; }
 
-        [JsonProperty(PropertyName = "order")]
+        [JsonProperty(PropertyName = "position")]
         public int Order { get; set; }
 
         [JsonProperty(PropertyName = "type")]

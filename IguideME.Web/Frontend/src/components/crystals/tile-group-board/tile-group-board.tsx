@@ -1,11 +1,7 @@
 import { useMemo, type FC, type ReactElement, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
-
-import Loading from '@/components/particles/loading';
-import { getTileGroups, patchTileGroup, postTileGroup } from '@/api/tiles';
-import TileGroupView from '@/components/crystals/tile-group/tile-group';
+import { Button, Drawer } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
-import { Button } from 'antd';
 import {
 	DndContext,
 	type DragEndEvent,
@@ -16,12 +12,21 @@ import {
 	PointerSensor,
 } from '@dnd-kit/core';
 import { SortableContext } from '@dnd-kit/sortable';
-import { type TileGroup } from '@/types/tile';
 import { createPortal } from 'react-dom';
+
+import Loading from '@/components/particles/loading';
+import { type Tile, type TileGroup } from '@/types/tile';
+import EditTile from '@/components/crystals/edit-tile/edit-tile';
+import TileView from '@/components/crystals/tile-view/tile-view';
+import TileGroupView from '@/components/crystals/tile-group/tile-group';
+import { getTileGroups, patchTileGroup, postTileGroup } from '@/api/tiles';
+import { DrawerContext } from './contexts';
 
 const TileGroupBoard: FC = (): ReactElement => {
 	const { data: tilegroups } = useQuery('tile-groups', getTileGroups);
 	const [activeGroup, setActiveGroup] = useState<TileGroup | null>(null);
+	const [activeTile, setActiveTile] = useState<Tile | null>(null);
+	const [editTile, setEditTile] = useState<Tile | null>(null);
 
 	const queryClient = useQueryClient();
 	const { mutate: postGroup } = useMutation({
@@ -56,40 +61,67 @@ const TileGroupBoard: FC = (): ReactElement => {
 	}
 
 	return (
-		<DndContext onDragStart={onDragStart} onDragEnd={onDragEnd} sensors={sensors}>
-			<div>
-				<SortableContext items={groupIds}>
-					{tilegroups.map((group, index) => (
-						<div key={index}>
-							<TileGroupView group={group} />
-						</div>
-					))}
-				</SortableContext>
-				<Button
-					type="dashed"
-					onClick={() => {
-						postGroup({ title: 'TileGroup', id: -1, position: tilegroups.length + 1 });
+		<DrawerContext.Provider value={{ editTile, setEditTile }}>
+			<div className="tileGroupBoard">
+				<Drawer
+					title={'Editing: ' + editTile?.title}
+					placement="right"
+					closable
+					onClose={() => {
+						setEditTile(null);
 					}}
-					block
-					icon={<PlusOutlined />}
+					open={editTile !== null}
+					rootStyle={{ position: 'absolute' }}
+					getContainer={() => {
+						return document.getElementsByClassName('adminContent')[0];
+					}}
 				>
-					Add Group
-				</Button>
+					{editTile === null ? '' : <EditTile tile={editTile} />}
+				</Drawer>
+				<DndContext onDragStart={onDragStart} onDragEnd={onDragEnd} sensors={sensors}>
+					<div>
+						<SortableContext items={groupIds}>
+							{tilegroups.map((group, index) => (
+								<div key={index}>
+									<TileGroupView group={group} />
+								</div>
+							))}
+						</SortableContext>
+						<Button
+							type="dashed"
+							onClick={() => {
+								postGroup({ title: 'TileGroup', id: -1, position: tilegroups.length + 1 });
+							}}
+							block
+							icon={<PlusOutlined />}
+						>
+							New Group
+						</Button>
+					</div>
+					{createPortal(
+						<DragOverlay>
+							{activeGroup !== null && <TileGroupView group={activeGroup} />}
+							{activeTile !== null && <TileView tile={activeTile} />}
+						</DragOverlay>,
+						document.body,
+					)}
+				</DndContext>
 			</div>
-			{createPortal(
-				<DragOverlay>{activeGroup !== null && <TileGroupView group={activeGroup} />}</DragOverlay>,
-				document.body,
-			)}
-		</DndContext>
+		</DrawerContext.Provider>
 	);
 
 	function onDragStart(event: DragStartEvent): void {
 		if (event.active.data.current?.type === 'Group') {
 			setActiveGroup(event.active.data.current.group);
 		}
+		if (event.active.data.current?.type === 'Tile') {
+			setActiveTile(event.active.data.current.tile);
+		}
 	}
 
 	function onDragEnd(event: DragEndEvent): void {
+		setActiveGroup(null);
+		setActiveTile(null);
 		const { active, over } = event;
 		if (over === null) return;
 

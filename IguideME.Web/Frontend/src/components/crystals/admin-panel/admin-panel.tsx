@@ -71,7 +71,9 @@ const AdminPanel: FC = (): ReactElement => {
 					collapsedWidth="80px"
 					collapsible
 					collapsed={collapsed}
-					onCollapse={(value) => { setCollapsed(value); }}
+					onCollapse={(value) => {
+						setCollapsed(value);
+					}}
 					style={{ background: 'white' }}
 				>
 					<div id={'user'}>
@@ -92,7 +94,11 @@ const AdminPanel: FC = (): ReactElement => {
 					</div>
 					<Menu defaultSelectedKeys={['1']} mode="inline" items={items} />
 				</Sider>
-				<Content style={{ backgroundColor: '#f6f8fa', padding: '20px', fontFamily: 'Maitree, serif' }}>
+				<Content
+					className="adminContent"
+					// Classname and position: relative here are necessary for the drawer to be positioned correctly in tiles
+					style={{ position: 'relative', backgroundColor: '#f6f8fa', padding: '20px', fontFamily: 'Maitree, serif' }}
+				>
 					<Outlet />
 				</Content>
 			</Layout>

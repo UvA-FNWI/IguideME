@@ -30,4 +30,12 @@ export const patchTileGroup: (group: GroupPatch) => Promise<void> = async (group
 };
 
 export const getTiles: () => Promise<Tile[]> = async () =>
-	await apiClient.get(`tiles/tiles`).then((response) => response.data);
+	await apiClient.get(`tiles`).then((response) => response.data);
+
+export const postTile: (tile: Tile) => Promise<void> = async (tile: Tile) => {
+	await apiClient.post(`tiles`, tile);
+};
+
+export const deleteTile: (id: number) => Promise<void> = async (id: number) => {
+	await apiClient.delete(`tiles/${id}`);
+};

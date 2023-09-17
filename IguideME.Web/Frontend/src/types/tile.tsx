@@ -11,8 +11,18 @@ export interface TileGroup {
 	position: number;
 }
 
+export enum TileType {
+	assignments,
+	discussions,
+	learning_outcomes,
+}
+
 export interface Tile {
 	id: number;
+	group_id: number;
 	title: string;
-	// TODO:
+	position: number;
+	type: TileType;
+	visible: boolean;
+	notifications: boolean;
 }
