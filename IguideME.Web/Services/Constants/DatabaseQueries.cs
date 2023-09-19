@@ -421,11 +421,13 @@ public static class DatabaseQueries
                             (
                                 `column_id`,
                                 `title`,
-                                `order`  )
+                                `order`,
+                                `course_id`  )
         VALUES(
             @columnID,
             @title,
-            @order
+            @order,
+            @courseID
         );";
 
     public const string REGISTER_TILE =
