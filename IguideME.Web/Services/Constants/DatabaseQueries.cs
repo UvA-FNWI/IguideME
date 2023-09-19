@@ -73,8 +73,8 @@ public static class DatabaseQueries
             `title`           STRING,
             `order`           INTEGER,
             `column_id`       INTEGER,
-            FOREIGN KEY(`column_id`) REFERENCES `layout_columns`(`column_id`)
-
+            `course_id`       INTEGER,
+            FOREIGN KEY(`course_id`) REFERENCES `course_settings`(`course_id`)
         );";
 
 
@@ -736,6 +736,16 @@ public static class DatabaseQueries
                     `grade_prediction_model_parameter`.`weight`
         FROM        `grade_prediction_model_parameter`
         WHERE       `grade_prediction_model_parameter`.`model_id`=@modelID;";
+
+
+    public const string QUERY_ALL_TILE_GROUPS_IN_LAYOUT_COLUMN =
+        @"SELECT    `group_id`
+        FROM        `tile_groups`
+        INNER JOIN  `layout_columns`
+        USING       (`column_id`)
+        WHERE       `column_id`=@columnID
+        ;";
+
 
     public const string QUERY_LAYOUT_COLUMN =
         @"SELECT    `column_id`,
@@ -1441,10 +1451,15 @@ public static class DatabaseQueries
         SET         `notification_dates`=@notificationDates
         WHERE       `course_id`=@courseID;";
 
-    public const string RELEASE_TILE_GROUPS_FROM_COLUMN =
+    public const string TIE_TILE_GROUP_TO_COLUMN =
+        @"UPDATE   `tile_groups`
+        SET         `column_id`=@columnID
+        WHERE       `group_id`=@groupID;";
+
+    public const string RELEASE_ALL_COURSE_TILE_GROUPS_FROM_COLUMNS =
         @"UPDATE   `tile_groups`
         SET         `column_id`=-1
-        WHERE       `column_id`=@columnID;";
+        WHERE       `course_id`=@courseID;";
 
     public const string UPDATE_TILE_GROUP =
         @"UPDATE    `tile_groups`
@@ -1515,10 +1530,9 @@ public static class DatabaseQueries
 
 // //============================ Delete Values =============================//
 
-    public const string DELETE_LAYOUT_COLUMN =
+    public const string DELETE_ALL_LAYOUT_COLUMNS =
         @"DELETE FROM   `layout_columns`
-        WHERE           `column_id`=@columnID
-        AND             `course_id`=@courseID;";
+        WHERE           `course_id`=@courseID;";
 
     public const string DELETE_TILE =
         @"DELETE FROM   `tiles`

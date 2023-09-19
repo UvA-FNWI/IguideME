@@ -75,6 +75,7 @@ namespace IguideME.Web.Controllers
         [ProducesResponseType(StatusCodes.Status202Accepted, Type = typeof(JobCreatedModel))]
         public IActionResult StopComputation([FromBody] JobParametersModel obj)
         {
+            //TODO: ComputationJobStatusSevice.cs
             return Accepted();
         }
 

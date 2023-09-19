@@ -16,11 +16,11 @@ namespace IguideME.Web.Models
         [JsonProperty(PropertyName = "id")]
         public int ID { get; set; }
 
-        [JsonProperty(PropertyName = "course_id")]
-        public int CourseID { get; set; }
+        // [JsonProperty(PropertyName = "course_id")]
+        // public int CourseID { get; set; }
 
         [JsonProperty(PropertyName = "width")]
-        public int ContainerSize { get; set; }
+        public int Width { get; set; }
 
         [JsonProperty(PropertyName = "position")]
         public int Position { get; set; }
@@ -28,14 +28,13 @@ namespace IguideME.Web.Models
         [JsonProperty(PropertyName = "tile_groups")]
         public List<int> TileGroups { get; set; }
 
-        public LayoutColumn(int id, int courseID, int containerSize, int position)
+        public LayoutColumn(int id, int containerSize, int position, List<int> tileGroups)
         {
             this.ID = id;
-            this.CourseID = courseID;
-            this.ContainerSize = containerSize;
+            this.Width = containerSize;
             this.Position = position;
+            this.TileGroups = tileGroups;
 
-            // ask db to fill with this.TileGroups;
         }
     }
 

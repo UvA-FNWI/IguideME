@@ -731,53 +731,23 @@ namespace IguideME.Web.Controllers
         [Route("/layout/columns")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public ActionResult CreateLayoutColumn([FromBody] LayoutColumn column)
+        public ActionResult CreateOrUpdateLayoutColumns([FromBody] List<LayoutColumn> columns)
         {
-            return Json(
-                _databaseManager.CreateLayoutColumn(
-                    GetCourseID(),
-                    (int) column.ContainerSize,
-                    column.Position));
+            //Step 1: Delete pre-existing Layout (if it exists)
+            _databaseManager.DeleteAllLayoutColumns(GetCourseID());
+
+            //Step 2: Save the new Layout
+            _databaseManager.CreateLayoutColumns(columns, GetCourseID());
+            // return Json(
+            //     _databaseManager.CreateLayoutColumn(
+            //         GetCourseID(),
+            //         (int) column.ContainerSize,
+            //         column.Position));
+
+            return Ok();
         }
 
-// TODO: delete
-        [Authorize(Policy = "IsInstructor")]
-        [HttpPatch]
-        [Route("/layout/columns/{columnID}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public ActionResult UpdateLayoutColumn(string columnID, [FromBody] LayoutColumn layoutColumn)
-        {
-            bool success = int.TryParse(columnID, out int id);
 
-            return success
-                ? Json(
-                    _databaseManager.UpdateLayoutColumn(
-                        GetCourseID(),
-                        id,
-                        (int) layoutColumn.ContainerSize,
-                        layoutColumn.Position))
-                : BadRequest();
-        }
-
-// TODO: delete
-        [Authorize(Policy = "IsInstructor")]
-        [HttpDelete]
-        [Route("/layout/columns/{columnID}")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public ActionResult DeleteLayoutColumn(string columnID)
-        {
-            bool success = int.TryParse(columnID, out int id);
-
-            if (success)
-            {
-                _databaseManager.DeleteLayoutColumn(GetCourseID(), id);
-                return NoContent();
-            }
-
-            return BadRequest();
-        }
 
         [Authorize(Policy = "IsInstructor")]
         [HttpPatch]

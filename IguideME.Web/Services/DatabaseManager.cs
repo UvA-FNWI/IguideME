@@ -2286,93 +2286,74 @@ namespace IguideME.Web.Services
             return entries;
         }
 
-        public LayoutColumn CreateLayoutColumn(int courseID, int containerWidth, int position)
-        {
-            int id = IDNonQuery(DatabaseQueries.REGISTER_LAYOUT_COLUMN,
-                new SQLiteParameter("courseID", courseID),
-                new SQLiteParameter("size", containerWidth),
-                new SQLiteParameter("order", position)
-            );
-            return GetLayoutColumn(courseID, id);
-        }
-
-        public LayoutColumn GetLayoutColumn(int courseID, int columnID)
-        {
-            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_LAYOUT_COLUMN,
-                new SQLiteParameter("courseID", courseID),
-                new SQLiteParameter("columnID", columnID)
-                )) {
-                if (r.Read()) {
-                    try {
-                        return new LayoutColumn(
-                            r.GetInt32(0),
-                            courseID,
-                            r.GetInt32(1),
-                            r.GetInt32(2)
-                        );
-                    } catch (Exception e) {
-                        PrintQueryError("GetLayoutColumn", 2, r, e);
-                    }
-
-                }
-            }
-            return null;
-
-        }
 
         public List<LayoutColumn> GetLayoutColumns(int courseID)
         {
-            List<LayoutColumn> columns = new();
+            List<LayoutColumn> layoutList = new List<LayoutColumn>();
 
-            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_LAYOUT_COLUMNS,
-                    new SQLiteParameter("courseID", courseID)
+            using (SQLiteDataReader r2 = Query(DatabaseQueries.QUERY_LAYOUT_COLUMNS,
+                new SQLiteParameter("courseID", courseID)
                 )) {
-                while (r.Read())
-                {
+                if (r2.Read()) {
                     try {
-                        LayoutColumn row = new(
-                            r.GetInt32(0),
-                            courseID,
-                            r.GetInt32(1),
-                            r.GetInt32(2)
-                        );
-                        columns.Add(row);
+                        layoutList.Add(new LayoutColumn(
+                            r2.GetInt32(0),
+                            r2.GetInt32(1),
+                            r2.GetInt32(2),
+                            new List<int>()
+                        ));
                     } catch (Exception e) {
-                        PrintQueryError("GetLayoutColumns", 2, r, e);
+                        PrintQueryError("GetLayoutColumn", 2, r2, e);
                     }
                 }
             }
 
-            return columns;
+            foreach (LayoutColumn lcolumn in layoutList)
+                using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_ALL_TILE_GROUPS_IN_LAYOUT_COLUMN,
+                    new SQLiteParameter("columnID", lcolumn.ID)
+                    )) {
+                    if (r.Read()) {
+                        try {
+                            lcolumn.TileGroups.Add(r.GetInt32(0));
+                        } catch (Exception e) {
+                            PrintQueryError("GetLayoutColumn", 2, r, e);
+                        }
+
+                    }
+                }
+            return layoutList;
+
         }
 
-        public LayoutColumn UpdateLayoutColumn(
-            int courseID,
-            int columnID,
-            int containerWidth,
-            int position)
-        {
-            NonQuery(DatabaseQueries.UPDATE_LAYOUT_COLUMN,
-                new SQLiteParameter("courseID", courseID),
-                new SQLiteParameter("columnID", columnID),
-                new SQLiteParameter("size", containerWidth),
-                new SQLiteParameter("order", position)
-            );
 
-            return GetLayoutColumn(courseID, columnID);
-        }
-
-        public void DeleteLayoutColumn(
-            int courseID,
-            int columnID
+        public void DeleteAllLayoutColumns(
+            int courseID
         ) {
-            NonQuery(DatabaseQueries.DELETE_LAYOUT_COLUMN,
-                new SQLiteParameter("courseID", courseID),
-                new SQLiteParameter("columnID", columnID)
+            NonQuery(DatabaseQueries.RELEASE_ALL_COURSE_TILE_GROUPS_FROM_COLUMNS,
+                new SQLiteParameter("courseID", courseID)
             );
-            NonQuery(DatabaseQueries.RELEASE_TILE_GROUPS_FROM_COLUMN,
-                new SQLiteParameter("columnID", columnID)
+            NonQuery(DatabaseQueries.DELETE_ALL_LAYOUT_COLUMNS,
+                new SQLiteParameter("courseID", courseID)
             );
+        }
+
+
+        public void CreateLayoutColumns(List<LayoutColumn> layoutColumns, int courseID)
+        {
+            foreach (LayoutColumn column in layoutColumns)
+            {
+                int id = IDNonQuery(DatabaseQueries.REGISTER_LAYOUT_COLUMN,
+                    new SQLiteParameter("courseID", courseID),
+                    new SQLiteParameter("size", column.Width),
+                    new SQLiteParameter("order", column.Position));
+
+                foreach (int groupID in column.TileGroups)
+                {
+                    NonQuery(DatabaseQueries.TIE_TILE_GROUP_TO_COLUMN,
+                    new SQLiteParameter("columnID", id),
+                    new SQLiteParameter("groupID", groupID));
+                }
+            }
         }
 
         public Tile GetTile(int courseID, int tileID)
