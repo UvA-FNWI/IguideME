@@ -112,7 +112,7 @@ const LayoutColumnForm: FC<Props> = ({ columns }): ReactElement => {
 		if (over === null) return;
 		if (active.id === over.id) return;
 
-		form.setFieldValue('columns', arrayMove(formColumns, +active.id - 1, +over.id - 1));
+		form.setFieldsValue({ columns: arrayMove(formColumns, +active.id - 1, +over.id - 1) });
 	}
 };
 

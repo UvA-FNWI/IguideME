@@ -811,9 +811,7 @@ public static class DatabaseQueries
                     `tile_groups`.`column_id`,
                     `tile_groups`.`order`
         FROM        `tile_groups`
-        INNER JOIN  `layout_columns`
-        USING       (`column_id`)
-        WHERE       `layout_columns`.`course_id`=@courseID;";
+        WHERE       `tile_groups`.`course_id`=@courseID;";
 
     public const string QUERY_TILE =
         @"SELECT    `tiles`.`tile_id`,

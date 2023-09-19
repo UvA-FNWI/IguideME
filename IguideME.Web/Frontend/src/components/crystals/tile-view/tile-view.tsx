@@ -64,7 +64,9 @@ const TileView: FC<Props> = ({ tile }): ReactElement => {
 			style={style}
 			{...attributes}
 			{...listeners}
-			onClick={() => { setEditTile(tile); }}
+			onClick={() => {
+				setEditTile(tile);
+			}}
 		>
 			<Row align="middle" justify={'space-between'} gutter={[10, 10]} style={{ marginBottom: '25px' }}>
 				<Col>
@@ -81,7 +83,8 @@ const TileView: FC<Props> = ({ tile }): ReactElement => {
 				</Col>
 				<Col>
 					<DeleteFilled
-						onClick={() => {
+						onClick={(event) => {
+							event.stopPropagation();
 							removeTile(tile.id);
 						}}
 						style={{ paddingRight: 5 }}

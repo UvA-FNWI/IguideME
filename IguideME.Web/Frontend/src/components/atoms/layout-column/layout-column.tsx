@@ -43,7 +43,7 @@ const ConfigLayoutColumn: FC<Props> = ({ name, restField, index, remove }): Reac
 		<div className="LayoutColumn" ref={setNodeRef} style={style}>
 			<Row justify={'space-between'} {...attributes} {...listeners} style={{ cursor: 'grab' }}>
 				<Col>
-					<h3>Column {index}</h3>
+					<h3>Column</h3>
 				</Col>
 				<Col>
 					<DeleteFilled onClick={() => remove?.(name)} />
@@ -53,7 +53,9 @@ const ConfigLayoutColumn: FC<Props> = ({ name, restField, index, remove }): Reac
 			<Divider style={{ margin: '10px', marginLeft: 0 }} />
 
 			<Row align="middle" justify="space-between">
-				<Col span={3}>Width:</Col>
+				<Col span={3}>
+					<span>Width:</span>
+				</Col>
 				<Col span={14}>
 					<Form.Item {...restField} name={[name, 'width']} initialValue={50}>
 						<Slider min={MIN_WIDTH} max={MAX_WIDTH} tooltip={{ formatter }} />
@@ -67,6 +69,7 @@ const ConfigLayoutColumn: FC<Props> = ({ name, restField, index, remove }): Reac
 			</Row>
 
 			<Divider style={{ margin: '10px', marginLeft: 0 }} />
+			<div style={{ marginBottom: '10px' }}>Tile Groups:</div>
 
 			<Row justify="center">
 				<Form.Item {...restField} name={[name, 'groups']} trigger="onChange" initialValue={[]}>

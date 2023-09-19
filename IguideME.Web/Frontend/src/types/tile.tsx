@@ -1,8 +1,8 @@
 export interface LayoutColumn {
-	width: number;
 	id: number;
+	width: number;
 	position: number;
-	groups: string[];
+	groups: number[];
 }
 
 export interface TileGroup {

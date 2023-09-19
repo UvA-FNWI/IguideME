@@ -1,10 +1,11 @@
 @import '@/base.scss';
 
 .LayoutColumn {
-    width: 34vw;
-    height: 25vw;
-    padding: 12px;
-    margin: 7px;
-    background-color: white;
-    box-shadow: 2px 2px 6px #bec8e4;
+	border-radius: 6px;
+	width: 450px;
+	height: 360px;
+	padding: 12px;
+	margin: 7px;
+	background-color: white;
+	box-shadow: 2px 2px 6px #bec8e4;
 }

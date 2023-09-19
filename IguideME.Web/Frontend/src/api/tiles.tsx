@@ -2,7 +2,9 @@ import apiClient from './axios';
 import { type Tile, type LayoutColumn, type TileGroup } from '@/types/tile';
 
 export const getLayoutColumns: () => Promise<LayoutColumn[]> = async () =>
-	await apiClient.get(`layout/columns`).then((response) => response.data);
+	await apiClient
+		.get(`layout/columns`)
+		.then((response) => response.data.sort((A: LayoutColumn, B: LayoutColumn) => A.position - B.position));
 
 export const postLayoutColumns: (layouts: LayoutColumn[]) => Promise<void> = async (layouts: LayoutColumn[]) => {
 	await apiClient.post(`layout/columns`, layouts);

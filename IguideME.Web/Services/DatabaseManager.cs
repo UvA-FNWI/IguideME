@@ -2034,7 +2034,7 @@ namespace IguideME.Web.Services
                 new SQLiteParameter("title", title),
                 new SQLiteParameter("order", position),
                 new SQLiteParameter("courseID", courseID )
-                
+
             );
         }
 
@@ -2296,7 +2296,7 @@ namespace IguideME.Web.Services
             using (SQLiteDataReader r2 = Query(DatabaseQueries.QUERY_LAYOUT_COLUMNS,
                 new SQLiteParameter("courseID", courseID)
                 )) {
-                if (r2.Read()) {
+                while (r2.Read()) {
                     try {
                         layoutList.Add(new LayoutColumn(
                             r2.GetInt32(0),
@@ -2314,7 +2314,7 @@ namespace IguideME.Web.Services
                 using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_ALL_TILE_GROUPS_IN_LAYOUT_COLUMN,
                     new SQLiteParameter("columnID", lcolumn.ID)
                     )) {
-                    if (r.Read()) {
+                    while (r.Read()) {
                         try {
                             lcolumn.TileGroups.Add(r.GetInt32(0));
                         } catch (Exception e) {

@@ -23,7 +23,7 @@ import { getTileGroups, patchTileGroup, postTileGroup } from '@/api/tiles';
 import { DrawerContext } from './contexts';
 
 const TileGroupBoard: FC = (): ReactElement => {
-	const { data: tilegroups } = useQuery('tile-groups', getTileGroups);
+	const { data: tilegroups, isFetching } = useQuery('tile-groups', getTileGroups);
 	const [activeGroup, setActiveGroup] = useState<TileGroup | null>(null);
 	const [activeTile, setActiveTile] = useState<Tile | null>(null);
 	const [editTile, setEditTile] = useState<Tile | null>(null);
@@ -56,9 +56,11 @@ const TileGroupBoard: FC = (): ReactElement => {
 		}),
 	);
 
-	if (tilegroups === undefined) {
+	if (tilegroups === undefined || isFetching) {
 		return <Loading />;
 	}
+
+	console.log('groups', tilegroups);
 
 	return (
 		<DrawerContext.Provider value={{ editTile, setEditTile }}>
