@@ -2032,7 +2032,9 @@ namespace IguideME.Web.Services
             NonQuery(DatabaseQueries.REGISTER_TILE_GROUP,
                 new SQLiteParameter("columnID", cols[0].ID),
                 new SQLiteParameter("title", title),
-                new SQLiteParameter("order", position)
+                new SQLiteParameter("order", position),
+                new SQLiteParameter("courseID", courseID )
+                
             );
         }
 
