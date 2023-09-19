@@ -25,7 +25,7 @@ namespace IguideME.Web.Models
         [JsonProperty(PropertyName = "position")]
         public int Position { get; set; }
 
-        [JsonProperty(PropertyName = "tile_groups")]
+        [JsonProperty(PropertyName = "groups")]
         public List<int> TileGroups { get; set; }
 
         public LayoutColumn(int id, int containerSize, int position, List<int> tileGroups)
