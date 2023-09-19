@@ -914,9 +914,7 @@ public static class DatabaseQueries
             USING   (`tile_id`)
         INNER JOIN  `tile_groups`
             USING   (`group_id`)
-        INNER JOIN  `layout_columns`
-            USING   (`column_id`)
-        WHERE       `layout_columns`.`course_id`=@courseID
+        WHERE       `tile_groups`.`course_id`=@courseID
         ;";
 
     public const string QUERY_TILE_ENTRY_META_KEYS =
@@ -1238,9 +1236,7 @@ public static class DatabaseQueries
             USING   (`tile_id`)
         INNER JOIN  `tile_groups`
             USING   (`group_id`)
-        INNER JOIN  `layout_columns`
-            USING   (`column_id`)
-        WHERE       `layout_columns`.`course_id`=@courseID
+        WHERE       `tile_groups`.`course_id`=@courseID
         AND         `submissions`.`grade` NOT NULL;";
 
     public const string QUERY_COURSE_SUBMISSIONS_FOR_STUDENT =
@@ -1373,9 +1369,7 @@ public static class DatabaseQueries
             USING   (`tile_id`)
         INNER JOIN  `tile_groups`
             USING   (`group_id`)
-        INNER JOIN  `layout_columns`
-            USING   (`column_id`)
-        WHERE       `layout_columns`.`course_id`=@courseID
+        WHERE       `tile_groups`.`course_id`=@courseID
         AND         `submissions`.`user_id`=@userID
 	    GROUP BY `tiles`.`tile_id`;";
 
@@ -1511,9 +1505,7 @@ public static class DatabaseQueries
                 USING   (`tile_id`)
             INNER JOIN  `tile_groups`
                 USING   (`group_id`)
-            INNER JOIN  `layout_columns`
-                USING   (`column_id`)
-            WHERE       `layout_columns`.`course_id`=@courseID
+            WHERE       `tile_groups`.`course_id`=@courseID
             AND     `tiles`.`type`='EXTERNAL_DATA'
           );";
 
