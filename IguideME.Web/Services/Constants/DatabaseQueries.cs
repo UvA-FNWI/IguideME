@@ -72,7 +72,7 @@ public static class DatabaseQueries
             `group_id`        INTEGER PRIMARY KEY AUTOINCREMENT,
             `title`           STRING,
             `order`           INTEGER,
-            `column_id`       INTEGER,
+            `column_id`       INTEGER DEFAULT -1,
             `course_id`       INTEGER,
             FOREIGN KEY(`course_id`) REFERENCES `course_settings`(`course_id`)
         );";
@@ -419,12 +419,10 @@ public static class DatabaseQueries
         public const string REGISTER_TILE_GROUP =
         @"INSERT INTO       `tile_groups`
                             (
-                                `column_id`,
                                 `title`,
                                 `order`,
                                 `course_id`  )
         VALUES(
-            @columnID,
             @title,
             @order,
             @courseID
@@ -794,24 +792,22 @@ public static class DatabaseQueries
     ";
 
     public const string QUERY_TILE_GROUP =
-        @"SELECT    `tile_groups`.`group_id`,
-                    `tile_groups`.`title`,
-                    `tile_groups`.`column_id`,
-                    `tile_groups`.`order`
+        @"SELECT    `group_id`,
+                    `title`,
+                    `column_id`,
+                    `order`
         FROM        `tile_groups`
-        INNER JOIN  `layout_columns`
-        USING       (`column_id`)
-        WHERE       `layout_columns`.`course_id`=@courseID
-        AND         `tile_groups`.`group_id`=@groupID;";
+        WHERE       `course_id`=@courseID
+        AND         `group_id`=@groupID;";
 
     //// AGAIN, WHY TWO OF THEM?????
     public const string QUERY_TILE_GROUPS =
-        @"SELECT    `tile_groups`.`group_id`,
-                    `tile_groups`.`title`,
-                    `tile_groups`.`column_id`,
-                    `tile_groups`.`order`
+        @"SELECT    `group_id`,
+                    `title`,
+                    `column_id`,
+                    `order`
         FROM        `tile_groups`
-        WHERE       `tile_groups`.`course_id`=@courseID;";
+        WHERE       `course_id`=@courseID;";
 
     public const string QUERY_TILE =
         @"SELECT    `tiles`.`tile_id`,
@@ -824,9 +820,7 @@ public static class DatabaseQueries
         FROM        `tiles`
         INNER JOIN  `tile_groups`
             USING   (`group_id`)
-        INNER JOIN  `layout_columns`
-            USING   (`column_id`)
-        WHERE       `layout_columns`.`course_id`=@courseID
+        WHERE       `tile_groups`.`course_id`=@courseID
         AND         `tiles`.`tile_id`=@tileID
         ORDER BY    `tiles`.`order` ASC;";
 
@@ -841,9 +835,7 @@ public static class DatabaseQueries
         FROM        `tiles`
         INNER JOIN  `tile_groups`
             USING   (`group_id`)
-        INNER JOIN  `layout_columns`
-            USING   (`column_id`)
-        WHERE       `layout_columns`.`course_id`=@courseID
+        WHERE       `tile_groups`.`course_id`=@courseID
         ORDER BY    `tiles`.`order` ASC;";
 
     public const string QUERY_TILE_NOTIFICATIONS_STATE =
@@ -861,9 +853,7 @@ public static class DatabaseQueries
             USING   (`tile_id`)
         INNER JOIN  `tile_groups`
             USING   (`group_id`)
-        INNER JOIN  `layout_columns`
-            USING   (`column_id`)
-        WHERE       `layout_columns`.`course_id`=@courseID
+        WHERE       `tile_groups`.`course_id`=@courseID
         ;";
 
     public const string QUERY_TILE_LEARNING_GOALS =

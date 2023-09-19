@@ -2025,12 +2025,11 @@ namespace IguideME.Web.Services
             string title,
             int position)
         {
-            List<LayoutColumn> cols = this.GetLayoutColumns(courseID);
-
-            if (cols.Count < 1) return;
+            // List<LayoutColumn> cols = this.GetLayoutColumns(courseID);
+            // if (cols.Count < 1) return;
 
             NonQuery(DatabaseQueries.REGISTER_TILE_GROUP,
-                new SQLiteParameter("columnID", cols[0].ID),
+                // new SQLiteParameter("columnID", cols[0].ID),
                 new SQLiteParameter("title", title),
                 new SQLiteParameter("order", position),
                 new SQLiteParameter("courseID", courseID )
