@@ -2349,12 +2349,13 @@ namespace IguideME.Web.Services
                     new SQLiteParameter("size", column.Width),
                     new SQLiteParameter("order", column.Position));
 
-                foreach (int groupID in column.TileGroups)
-                {
-                    NonQuery(DatabaseQueries.TIE_TILE_GROUP_TO_COLUMN,
-                    new SQLiteParameter("columnID", id),
-                    new SQLiteParameter("groupID", groupID));
-                }
+                if (column.TileGroups != null)
+                    foreach (int groupID in column.TileGroups)
+                    {
+                        NonQuery(DatabaseQueries.TIE_TILE_GROUP_TO_COLUMN,
+                        new SQLiteParameter("columnID", id),
+                        new SQLiteParameter("groupID", groupID));
+                    }
             }
         }
 
