@@ -1,4 +1,4 @@
-import { Col, Divider, Form, InputNumber, Row, Slider, Transfer } from 'antd';
+import { Col, Divider, Form, type FormInstance, InputNumber, Row, Slider, Transfer } from 'antd';
 import { type FC, type ReactElement, useState } from 'react';
 import { useQuery } from 'react-query';
 import { DeleteFilled } from '@ant-design/icons';
@@ -16,8 +16,8 @@ const formatter = (value: number | undefined): string => (value !== undefined ? 
 interface Props {
 	name: number;
 	restField?: { fieldKey?: number | undefined };
-	index: number;
 	remove?: (index: number | number[]) => void;
+	form: FormInstance;
 }
 
 interface RecordType {
@@ -25,9 +25,10 @@ interface RecordType {
 	title: string;
 }
 
-const ConfigLayoutColumn: FC<Props> = ({ name, restField, index, remove }): ReactElement => {
+const ConfigLayoutColumn: FC<Props> = ({ name, restField, form, remove }): ReactElement => {
 	const { setNodeRef, attributes, listeners, transform, transition, isDragging } = useSortable({
-		id: index,
+		id: form.getFieldValue(['columns', name]).id,
+		data: { name, restField },
 	});
 
 	const style = {
@@ -38,6 +39,7 @@ const ConfigLayoutColumn: FC<Props> = ({ name, restField, index, remove }): Reac
 	if (isDragging) {
 		return <div ref={setNodeRef} style={style} className="LayoutColumn"></div>;
 	}
+	console.log('test', name);
 
 	return (
 		<div className="LayoutColumn" ref={setNodeRef} style={style}>

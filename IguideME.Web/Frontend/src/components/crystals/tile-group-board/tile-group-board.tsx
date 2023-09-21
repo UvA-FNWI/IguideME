@@ -134,8 +134,11 @@ const TileGroupBoard: FC = (): ReactElement => {
 		if (active.data.current === undefined) return;
 		if (over.data.current === undefined) return;
 
-		patchGroup({ id: active.data.current.group.id, position: +overGroupId });
-		patchGroup({ id: over.data.current.group.id, position: +activeGroupId });
+		const activegroup = active.data.current.group;
+		const overgroup = over.data.current.group;
+
+		patchGroup({ id: activegroup.id, position: +overGroupId, title: activegroup.title });
+		patchGroup({ id: overgroup.id, position: +activeGroupId, title: overgroup.title });
 	}
 };
 

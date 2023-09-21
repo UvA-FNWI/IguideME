@@ -36,7 +36,7 @@ interface Props {
 const LayoutColumnForm: FC<Props> = ({ columns }): ReactElement => {
 	const [form] = Form.useForm<Props>();
 	const { mutate: saveLayout } = useMutation(postLayoutColumns);
-	const [activeId, setActiveId] = useState<number | null>(null);
+	const [active, setActive] = useState<{ name: number; restfield: { fieldKey?: number | undefined } } | null>(null);
 
 	const sensors = useSensors(
 		useSensor(PointerSensor, {
@@ -52,22 +52,23 @@ const LayoutColumnForm: FC<Props> = ({ columns }): ReactElement => {
 		saveLayout(values.columns);
 	};
 
-	// We add 1 to the index here because sortable doesn't like an id of 0.
-	const columnIndices = useMemo(
-		() => (formColumns !== undefined ? formColumns.map((_, index) => index + 1) : []),
+	const columnIds = useMemo(
+		() => (formColumns !== undefined ? formColumns.map((column) => column.id) : []),
 		[formColumns],
 	);
+
+	console.log('columns', columns);
 
 	return (
 		<DndContext sensors={sensors} onDragStart={onDragStart} onDragEnd={onDragEnd}>
 			<Form name="layout_columns_form" form={form} layout="inline" initialValues={{ columns }} onFinish={save}>
-				<SortableContext items={columnIndices}>
+				<SortableContext items={columnIds}>
 					<Form.List name="columns">
 						{(fields, { add, remove }) => (
 							<>
-								{fields.map(({ key, name, ...restField }, index) => (
+								{fields.map(({ key, name, ...restField }) => (
 									<Col key={key}>
-										<ConfigLayoutColumn name={name} index={index + 1} restField={restField} remove={remove} />
+										<ConfigLayoutColumn name={name} form={form} restField={restField} remove={remove} />
 									</Col>
 								))}
 								<Button
@@ -89,10 +90,10 @@ const LayoutColumnForm: FC<Props> = ({ columns }): ReactElement => {
 				</Form.Item>
 				{createPortal(
 					<DragOverlay>
-						{activeId !== null && (
-							<div>
-								<ConfigLayoutColumn name={activeId - 1} index={activeId} />
-							</div>
+						{active !== null && (
+							<Col>
+								<ConfigLayoutColumn name={active.name} form={form} restField={active.restfield} />
+							</Col>
 						)}
 					</DragOverlay>,
 					document.body,
@@ -102,17 +103,21 @@ const LayoutColumnForm: FC<Props> = ({ columns }): ReactElement => {
 	);
 
 	function onDragStart(event: DragStartEvent): void {
-		if (event.active.data.current !== null) {
-			setActiveId(+event.active.id);
+		if (event.active.data.current !== undefined) {
+			setActive({ name: event.active.data.current.name, restfield: event.active.data.current.restField });
 		}
 	}
 
 	function onDragEnd(event: DragEndEvent): void {
+		setActive(null);
 		const { active, over } = event;
 		if (over === null) return;
 		if (active.id === over.id) return;
 
-		form.setFieldsValue({ columns: arrayMove(formColumns, +active.id - 1, +over.id - 1) });
+		const activeIndex = formColumns.findIndex((column) => column.id === active.id);
+		const overIndex = formColumns.findIndex((column) => column.id === over.id);
+
+		form.setFieldsValue({ columns: arrayMove(formColumns, activeIndex, overIndex) });
 	}
 };
 

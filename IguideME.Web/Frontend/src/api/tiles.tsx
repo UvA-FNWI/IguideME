@@ -21,14 +21,8 @@ export const deleteTileGroup: (id: number) => Promise<void> = async (id: number)
 	await apiClient.delete(`tiles/groups/${id}`);
 };
 
-interface GroupPatch {
-	id: number;
-	title?: string;
-	position?: number;
-}
-
-export const patchTileGroup: (group: GroupPatch) => Promise<void> = async (group: GroupPatch) => {
-	await apiClient.patch(`tiles/group/${group.id}`, group);
+export const patchTileGroup: (group: TileGroup) => Promise<void> = async (group: TileGroup) => {
+	await apiClient.patch(`tiles/groups/${group.id}`, group);
 };
 
 export const getTiles: () => Promise<Tile[]> = async () =>

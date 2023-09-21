@@ -89,7 +89,7 @@ const TileGroupView: FC<Props> = ({ group }): ReactElement => {
 								}}
 								onKeyDown={(e) => {
 									if (e.key !== 'Enter') return;
-									patchGroup({ id: group.id, title });
+									patchGroup({ id: group.id, title, position: group.position });
 									setEditing(false);
 								}}
 							/>
