@@ -1282,46 +1282,90 @@ public static class DatabaseQueries
 
 
 
-    public const string QUERY_USER_DISCUSSION_COUNTER = // NOT DONE (not even started)
-        @"SELECT        `discussions`.`tile_id`,
+    // public const string QUERY_USER_DISCUSSION_COUNTER = // TO BE DELETED
+    //     @"SELECT        `discussions`.`tile_id`,
+    //                     SUM(`counter`)
+
+    //     FROM(SELECT     `discussion_replies`.`discussion_id`
+    //             AS      `disc_id`,
+    //         COUNT(*)
+    //             AS      `counter`
+    //         FROM        `discussion_replies`
+    //         LEFT JOIN   `discussion_replies`
+    //             ON      `discussion_replies`.`id` = `discussion_replies`.`entry_id`
+    //         WHERE       `discussion_replies`.`course_id` = @courseID
+    //         AND         `discussion_replies`.`posted_by` = @userID
+
+    //         UNION ALL
+
+    //         SELECT      `discussion_replies`.`discussion_id`
+    //             AS      `disc_id`,
+    //         COUNT(*)
+    //             AS      `counter`
+    //         FROM        `discussion_replies`
+    //         WHERE       `course_id` = @courseID
+    //         AND         `posted_by` =@userID
+
+    //         UNION ALL
+
+    //         SELECT      `discussions`.`discussion_id`
+    //             AS      `disc_id`,
+    //         COUNT(*)
+    //             AS      `counter`
+    //         FROM        `discussions`
+    //         INNER JOIN  `users`
+    //             ON      `discussions`.`posted_by` = `users`.`name`
+    //         WHERE       `discussions`.`course_id` = @courseID
+    //         AND         `users`.`user_id` =@userID
+    //         AND         `discussions`.`sync_id` = @syncID
+    //         AND         `users`.`sync_id` = @syncID)
+
+    //     INNER JOIN       `discussions`
+    //         ON          `disc_id` = `discussions`.`discussion_id`
+    //     WHERE           `disc_id` IS NOT NULL
+    //     ;";
+
+
+public const string QUERY_DISCUSSION_COUNTER_FOR_USER =
+        @"SELECT        `tile_entries`.`tile_id`,
                         SUM(`counter`)
-
-        FROM(SELECT     `discussion_replies`.`discussion_id`
-                AS      `disc_id`,
-            COUNT(*)
-                AS      `counter`
-            FROM        `discussion_replies`
-            LEFT JOIN   `discussion_replies`
-                ON      `discussion_replies`.`id` = `discussion_replies`.`entry_id`
-            WHERE       `discussion_replies`.`course_id` = @courseID
-            AND         `discussion_replies`.`posted_by` = @userID
-
+        FROM(
+                SELECT      `discussions`.`discussion_id`
+                    AS      `disc_id`,
+                COUNT(*)
+                    AS      `counter`
+                FROM        `discussions`
+                INNER JOIN  `users`
+                    ON      `discussions`.`author` = `users`.`name`
+                WHERE       `discussions`.`course_id` = @courseID
+                AND         `users`.`user_id` = @userID
             UNION ALL
-
-            SELECT      `discussion_replies`.`discussion_id`
-                AS      `disc_id`,
-            COUNT(*)
-                AS      `counter`
-            FROM        `discussion_replies`
-            WHERE       `course_id` = @courseID
-            AND         `posted_by` =@userID
-
+                SELECT      `discussions`.`discussion_id`
+                    AS      `disc_id`,
+                COUNT(*)
+                    AS      `counter`
+                FROM        `discussion_replies`
+                LEFT JOIN   `discussions`
+                    USING   (`discussion_id`)
+                WHERE       `discussions`.`course_id` = @courseID
+                AND         `discussion_replies`.`author` = @userID
             UNION ALL
+                SELECT      `discussions`.`discussion_id`
+                    AS      `disc_id`,
+                COUNT(*)
+                    AS      `counter`
+                FROM        `discussion_replies`
+                LEFT JOIN   `discussion_replies`
+                    AS      `repl2`
+                    ON      `repl2`.`discussion_id` = `discussion_replies`.`reply_id`
+                LEFT JOIN   `discussions`
+                    USING   (`discussion_id`)
+                WHERE       `discussions`.`course_id` = @courseID
+                AND         `repl2`.`author` = @userID
+        )
 
-            SELECT      `discussions`.`discussion_id`
-                AS      `disc_id`,
-            COUNT(*)
-                AS      `counter`
-            FROM        `discussions`
-            INNER JOIN  `users`
-                ON      `discussions`.`posted_by` = `users`.`name`
-            WHERE       `discussions`.`course_id` = @courseID
-            AND         `users`.`user_id` =@userID
-            AND         `discussions`.`sync_id` = @syncID
-            AND         `users`.`sync_id` = @syncID)
-
-        INNER JOIN       `discussions`
-            ON          `disc_id` = `discussions`.`discussion_id`
+        LEFT JOIN   `tile_entries`
+            ON      `disc_id` = `tile_entries`.`content_id`
         WHERE           `disc_id` IS NOT NULL
         ;";
 

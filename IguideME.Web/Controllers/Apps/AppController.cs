@@ -2,6 +2,7 @@
 using System.IO;
 
 using IguideME.Web.Models.App;
+using IguideME.Web.Models.Impl;
 using IguideME.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
