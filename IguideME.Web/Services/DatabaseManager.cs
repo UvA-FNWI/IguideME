@@ -1304,13 +1304,8 @@ namespace IguideME.Web.Services
 
     public Dictionary<int,List<float>> GetUserGrades(
             int courseID,
-            string userID,
-            long syncID = 0)
+            string userID)
         {
-            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
-            if (activeSync == 0)
-                return new Dictionary<int, List<float>>();
-
             Dictionary<int,List<float>> grades = new();
 
             using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_COURSE_SUBMISSIONS_FOR_STUDENT,
@@ -1332,27 +1327,26 @@ namespace IguideME.Web.Services
                 }
             }
 
-            // TODO: implement
-            // using(SQLiteDataReader r2 = Query(DatabaseQueries.QUERY_USER_DISCUSSION_COUNTER,
-            //         new SQLiteParameter("courseID", courseID),
-            //         new SQLiteParameter("userID", userID),
-            //         new SQLiteParameter("syncID", activeSync)
-            //     )) {
-            //     while (r2.Read()) {
-            //         try {
-            //             // We save the sum of discussion entriess and replies in a dictionary with
-            //             // the discussion.id as key and the total of their entries/replies as value
-            //             if (!r2.IsDBNull(0))
-            //             {
-            //                 int discID = r2.GetInt32(0);
-            //                 grades[discID] = new List<float> { r2.GetInt32(1) };
-            //             }
+            // TODO: TEST
+            using(SQLiteDataReader r2 = Query(DatabaseQueries.QUERY_DISCUSSION_COUNTER_FOR_USER,
+                    new SQLiteParameter("courseID", courseID),
+                    new SQLiteParameter("userID", userID)
+                )) {
+                while (r2.Read()) {
+                    try {
+                        // We save the sum of discussion entries and replies in a dictionary with
+                        // the tile_id as key and the total of their entries/replies as value
+                        if (!r2.IsDBNull(0))
+                        {
+                            int discID = r2.GetInt32(0);
+                            grades[discID] = new List<float> { r2.GetInt32(1) };
+                        }
 
-            //         } catch (Exception e) {
-            //             PrintQueryError("GetUserGrades", 3, r2, e);
-            //         }
-            //     }
-            // }
+                    } catch (Exception e) {
+                        PrintQueryError("GetUserGrades", 3, r2, e);
+                    }
+                }
+            }
 
             return grades;
         }

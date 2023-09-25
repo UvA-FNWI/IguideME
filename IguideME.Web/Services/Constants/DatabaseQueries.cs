@@ -1339,6 +1339,7 @@ public const string QUERY_DISCUSSION_COUNTER_FOR_USER =
                     ON      `discussions`.`author` = `users`.`name`
                 WHERE       `discussions`.`course_id` = @courseID
                 AND         `users`.`user_id` = @userID
+                GROUP BY    `disc_id`
             UNION ALL
                 SELECT      `discussions`.`discussion_id`
                     AS      `disc_id`,
@@ -1349,6 +1350,7 @@ public const string QUERY_DISCUSSION_COUNTER_FOR_USER =
                     USING   (`discussion_id`)
                 WHERE       `discussions`.`course_id` = @courseID
                 AND         `discussion_replies`.`author` = @userID
+                GROUP BY    `disc_id`
             UNION ALL
                 SELECT      `discussions`.`discussion_id`
                     AS      `disc_id`,
@@ -1362,11 +1364,13 @@ public const string QUERY_DISCUSSION_COUNTER_FOR_USER =
                     USING   (`discussion_id`)
                 WHERE       `discussions`.`course_id` = @courseID
                 AND         `repl2`.`author` = @userID
+                GROUP BY    `disc_id`
         )
 
         LEFT JOIN   `tile_entries`
             ON      `disc_id` = `tile_entries`.`content_id`
-        WHERE           `disc_id` IS NOT NULL
+        WHERE       `disc_id` IS NOT NULL
+        GROUP BY    `disc_id`
         ;";
 
     public const string QUERY_PEER_GROUP_RESULTS =

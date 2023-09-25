@@ -122,7 +122,7 @@ namespace IguideME.Web.Services.Workers
             foreach(string peerID in peerGroup)
             {
                 // We query all the grades of each peer
-                Dictionary<int,List<float>> temp = _databaseManager.GetUserGrades(this._courseID, peerID, this._syncID);
+                Dictionary<int,List<float>> temp = _databaseManager.GetUserGrades(this._courseID, peerID);
 
                 temp.ToList().ForEach(x =>
                 {
