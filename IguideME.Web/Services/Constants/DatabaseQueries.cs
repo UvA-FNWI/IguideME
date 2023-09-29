@@ -1362,7 +1362,7 @@ public static class DatabaseQueries
         AND         `tile_entry_submission`.`grade` NOT NULL;";
 
     public const string QUERY_COURSE_SUBMISSIONS_FOR_STUDENT =
-        @"SELECT    `tile_entry_submission`.`id`,
+        @"SELECT    `F`.`id`,
                     `tile_entry_submission`.`entry_id`,
                     `tile_entry_submission`.`user_id`,
                     `tile_entry_submission`.`grade`,
