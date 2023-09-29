@@ -1,7 +1,9 @@
 ﻿using IguideME.Web.Services;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+
 using System.Security.Claims;
 
 namespace IguideME.Web.Controllers
@@ -29,11 +31,12 @@ namespace IguideME.Web.Controllers
         protected string GetUserID()
         {
 
-            if (int.TryParse((User.Identity as ClaimsIdentity).FindFirst("userid").Value, out int id)) {
+            if (int.TryParse((User.Identity as ClaimsIdentity).FindFirst("userid").Value, out int id))
+            {
 
-                _logger.LogInformation("userclaim {u}", id);
                 string user = DatabaseManager.Instance.GetUserID(this.GetCourseID(), id);
-                if (user != null) {
+                if (user != null)
+                {
                     return user;
                 }
 

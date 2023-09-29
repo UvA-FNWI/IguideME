@@ -63,10 +63,19 @@ public static class DatabaseQueries
                 DELETE FROM notifications WHERE user_id IS NULL OR trim(user_id) = '';
                 ;
                 "
-            }
+            },
+            {
+                "008_clean_predictor",
+                @"
+                DELETE FROM predicted_grade WHERE course_id = 39195;
+                DELETE FROM grade_prediction_model WHERE course_id = 39195;
+                ;
+                "
+            },
+
         };
 
-// //================================ Tables ================================//
+    // //================================ Tables ================================//
 
     // /------------------------ Course Settings -------------------------/
 
@@ -436,7 +445,7 @@ public static class DatabaseQueries
         );";
 
 
-// //=========================== Register Values ============================//
+    // //=========================== Register Values ============================//
 
     public const string REGISTER_COURSE =
         @"INSERT INTO   `course_settings` (`course_id`, `course_name`, `personalized_peers`, `peer_group_size`)
@@ -528,8 +537,8 @@ public static class DatabaseQueries
             @accepted
         );";
 
-        public const string REGISTER_TILE_GROUP =
-        @"INSERT INTO       `layout_tile_group`
+    public const string REGISTER_TILE_GROUP =
+    @"INSERT INTO       `layout_tile_group`
                             (   `course_id`,
                                 `column_id`,
                                 `title`,
@@ -796,7 +805,7 @@ public static class DatabaseQueries
           );";
 
 
-// //============================= Query Values =============================//
+    // //============================= Query Values =============================//
 
     public const string QUERY_DOES_COURSE_EXIST =
         @"SELECT 1
@@ -1565,7 +1574,7 @@ public static class DatabaseQueries
           WHERE     `migration_id`=@id;";
 
 
-// //============================ Update Values =============================//
+    // //============================ Update Values =============================//
 
     public const string UPDATE_NOTIFICATION_ENABLE =
         @"UPDATE    `user_settings`
@@ -1692,7 +1701,7 @@ public static class DatabaseQueries
           );";
 
 
-// //============================ Delete Values =============================//
+    // //============================ Delete Values =============================//
 
     public const string DELETE_LAYOUT_COLUMN =
         @"DELETE FROM   `layout_column`
