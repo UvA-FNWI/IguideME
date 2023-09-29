@@ -3,6 +3,7 @@
 using IguideME.Web.Models;
 using IguideME.Web.Models.App;
 using IguideME.Web.Models.Impl;
+
 using Microsoft.Extensions.Logging;
 
 namespace IguideME.Web.Services.Workers
@@ -11,9 +12,9 @@ namespace IguideME.Web.Services.Workers
     /// Class <a>GradePredictorWorker</a> models a worker that handle making grade predictions for users.
     /// </summary>
 	public class GradePredictorWorker
-	{
+    {
         readonly private ILogger<SyncManager> _logger;
-		readonly private int _courseID;
+        readonly private int _courseID;
         readonly private string _hashCode;
         readonly private GradePredictionModel _model;
 
@@ -63,6 +64,8 @@ namespace IguideME.Web.Services.Workers
                                                                                       student.UserID,
                                                                                       this._hashCode);
 
+            _logger.LogInformation("Submissions {sub}", submissions);
+            submissions.ForEach(sub => _logger.LogInformation("eid: {eid}, uid: {uid}", sub.EntryID, sub.UserID));
             List<TileEntry> tileEntries = DatabaseManager.Instance.GetEntries(this._courseID);
 
             double wGrade = 0.0;
