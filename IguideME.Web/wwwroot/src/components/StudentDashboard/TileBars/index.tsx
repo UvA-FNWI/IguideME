@@ -112,11 +112,11 @@ export default class GradeBar extends Component<IProps> {
     }
 
     for (let i = 0; i < peerGrades.length; i++) {
-      console.log("peergrades", peerGrades);
+      // console.log("peergrades", peerGrades);
       let pgrade = peerGrades[i].avg;
       let entry = datadict.get(peerGrades[i].tileID)!;
-      console.log("pgrade", pgrade);
-      console.log("entry", entry);
+      // console.log("pgrade", pgrade);
+      // console.log("entry", entry);
 
       if (entry !== undefined) {
         entry.peergrade = pgrade * 10/ entry.max;
