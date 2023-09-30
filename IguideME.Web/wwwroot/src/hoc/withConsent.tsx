@@ -22,7 +22,7 @@ export const withConsent = <P extends object>(Component: React.ComponentType<P>)
     componentDidMount(): void {
       ConsentController.fetchConsent().then(result => {
         ConsentController.isAccepted().then(accepted => {
-          console.log(result)
+          // console.log(result)
           this.setState({
             accepted,
             consentLoaded: true,

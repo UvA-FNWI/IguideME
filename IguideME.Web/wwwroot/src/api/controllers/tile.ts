@@ -70,7 +70,7 @@ export default class TileController extends Controller {
 
       let mappedHistoricGrades: Map<string,HistoricTileGrades>;
       mappedHistoricGrades = new Map(Object.entries(response.data));
-      console.log(mappedHistoricGrades);
+      // console.log(mappedHistoricGrades);
 
       if(mappedHistoricGrades != null)
       {
@@ -89,7 +89,7 @@ export default class TileController extends Controller {
         });
       }
 
-      console.log(returnValue);
+      // console.log(returnValue);
 
       return returnValue!;
     });

@@ -201,6 +201,7 @@ class StudentDashboard extends Component<Props, IState> {
                          historicGrades={historicGrades.get((displayTile as any).tile.id)!}
       />
     }
+    console.log("discussions", discussions);
 
     return (
       <div id={"studentDashboard"}>
