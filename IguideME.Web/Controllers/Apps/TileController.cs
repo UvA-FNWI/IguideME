@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+
 using IguideME.Web.Models;
 using IguideME.Web.Models.App;
 using IguideME.Web.Models.Impl;
 using IguideME.Web.Services;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -185,8 +188,10 @@ namespace IguideME.Web.Controllers
 
             if (success)
             {
-                foreach (GoalRequirement req in goal.Requirements){
-                    switch (req.State) {
+                foreach (GoalRequirement req in goal.Requirements)
+                {
+                    switch (req.State)
+                    {
                         case EditState.New:
                             DatabaseManager.Instance.CreateGoalRequirement(
                                 req.GoalID,
@@ -334,25 +339,25 @@ namespace IguideME.Web.Controllers
                 Tile tile = DatabaseManager.Instance.GetTile(GetCourseID(), id);
 
                 if (obj.GroupID != null)
-                    tile.GroupID = (int) obj.GroupID;
+                    tile.GroupID = (int)obj.GroupID;
 
                 if (obj.Title != null)
                     tile.Title = obj.Title;
 
                 if (obj.Notifications != null)
-                    tile.Notifications = (bool) obj.Notifications;
+                    tile.Notifications = (bool)obj.Notifications;
 
                 if (obj.Visible != null)
-                    tile.Visible = (bool) obj.Visible;
+                    tile.Visible = (bool)obj.Visible;
 
                 if (obj.Position != null)
-                    tile.Position = (int) obj.Position;
+                    tile.Position = (int)obj.Position;
 
                 if (obj.GraphView != null)
-                    tile.GraphView = (bool) obj.GraphView;
+                    tile.GraphView = (bool)obj.GraphView;
 
                 if (obj.Wildcard != null)
-                    tile.Wildcard = (bool) obj.Wildcard;
+                    tile.Wildcard = (bool)obj.Wildcard;
 
                 DatabaseManager.Instance.UpdateTile(GetCourseID(), tile);
 
@@ -442,15 +447,20 @@ namespace IguideME.Web.Controllers
 
             bool success = int.TryParse(tileID, out int id);
 
-            if (!success) {
+            if (!success)
+            {
                 return BadRequest();
             }
 
             User user = DatabaseManager.Instance.GetUser(course_id, userID);
 
+            _logger.LogInformation("Getting discussions for user {u} with {i}", user.UserID, userID);
+
             List<AppDiscussion> discussions = DatabaseManager.Instance.GetDiscussionsForTile(course_id, id);
 
-            foreach (AppDiscussion discussion in new List<AppDiscussion>(discussions)) {
+            foreach (AppDiscussion discussion in new List<AppDiscussion>(discussions))
+            {
+                _logger.LogInformation("found discussion for tile with title {t}", discussion.Title);
                 discussions.AddRange(DatabaseManager.Instance.GetDiscussionEntries(course_id,
                     discussion.DiscussionID, user_id: user.UserID.ToString()));
                 discussions.AddRange(DatabaseManager.Instance.GetDiscussionReplies(course_id,
@@ -499,7 +509,8 @@ namespace IguideME.Web.Controllers
                         if (submission == null)
                         {
                             success = false;
-                        } else
+                        }
+                        else
                         {
                             switch (req.Expression)
                             {
@@ -577,18 +588,20 @@ namespace IguideME.Web.Controllers
 
             int id_column = data["id_column"].ToObject<int>();
             int grade_column = data["grade_column"].ToObject<int>();
-            JArray table = (JArray) data["data"];
+            JArray table = (JArray)data["data"];
 
             string[] names = table[0].ToObject<string[]>();
 
             IEnumerable<int> range = Enumerable.Range(0, names.Length).Where(i => i != id_column && i != grade_column);
-            foreach (JArray row in table.Cast<JArray>().Skip(1)) {
+            foreach (JArray row in table.Cast<JArray>().Skip(1))
+            {
 
                 string[] values = row.ToObject<string[]>();
 
                 _ = float.TryParse(values[grade_column], out float grade);
 
-                if (DatabaseManager.Instance.GetConsent(courseID,values[id_column]) != 1) {
+                if (DatabaseManager.Instance.GetConsent(courseID, values[id_column]) != 1)
+                {
                     continue;
                 }
 
@@ -600,7 +613,8 @@ namespace IguideME.Web.Controllers
                     DateTime.Now.ToShortDateString()
                 );
 
-                foreach (int i in range) {
+                foreach (int i in range)
+                {
                     DatabaseManager.Instance.CreateSubmissionMeta(
                         submissionID,
                         names[i],

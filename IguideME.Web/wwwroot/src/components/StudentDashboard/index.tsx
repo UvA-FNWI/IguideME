@@ -147,7 +147,7 @@ class StudentDashboard extends Component<Props, IState> {
 
     let goalGrade = await AppController.getGoalGrade(student.userID);
     let historicGrades = await TileController.getHistory(student.userID);
-    console.log(historicGrades)
+    // console.log(historicGrades)
 
     this.setState({
       discussions,
