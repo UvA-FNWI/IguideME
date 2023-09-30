@@ -2381,6 +2381,7 @@ namespace IguideME.Web.Services
                         r.GetValue(2).ToString(),
                         r.GetValue(3).ToString()
                     );
+                    _logger.LogInformation("Found entry {e}", r.GetInt32(0));
                     entries.Add(row);
                 }
             }

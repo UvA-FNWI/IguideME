@@ -47,14 +47,6 @@ public static class DatabaseQueries
                 "
             },
             {
-                "007_clean_settings",
-                @"
-                DELETE FROM user_settings WHERE user_id IS NULL OR trim(user_id) = '';
-                DELETE FROM user_settings WHERE user_name IS NULL OR trim(user_id) = '';
-                ;
-                "
-            },
-            {
                 "007_clean_submissions_and_tracker",
                 @"
                 DELETE FROM tile_entry_submission WHERE user_id IS NULL OR trim(user_id) = '';
@@ -77,6 +69,14 @@ public static class DatabaseQueries
                 @"
                 DROP TABLE canvas_discussion_entry;
                 DROP TABLE canvas_discussion_reply
+                ;
+                "
+            },
+            {
+                "0011_clean_settings",
+                @"
+                DELETE FROM user_settings WHERE user_id IS NULL OR trim(user_id) = '';
+                DELETE FROM user_settings WHERE user_name IS NULL OR trim(user_id) = '';
                 ;
                 "
             },

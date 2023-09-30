@@ -31,7 +31,9 @@ export default class TileController extends Controller {
 
     return this.client.get(
       `tiles/${tileId}/discussions/${userID}`
-    ).then(response => response.data).catch(_ => []);
+    ).then(response => {
+      console.log("discs resp data", response.data);
+      return response.data}).catch(_ => []);
   }
 
   static getUserGoals(tileId: number, userID: string): Promise<LearningOutcome[]> {
