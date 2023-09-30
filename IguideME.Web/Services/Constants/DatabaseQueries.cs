@@ -73,9 +73,10 @@ public static class DatabaseQueries
                 "
             },
             {
-                "009_clean_discussions",
+                "0010_clean_discussions",
                 @"
-                DROP TABLE canvas_discussion
+                DROP TABLE canvas_discussion_entry;
+                DROP TABLE canvas_discussion_reply
                 ;
                 "
             },

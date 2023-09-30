@@ -123,7 +123,7 @@ namespace IguideME.Web.Services.Workers
                     _logger.LogInformation("User {id} has no grade for tile {tile}", student.UserID, modelParameter.ParameterID);
                 }
 
-                _logger.LogInformation("grade += {partialGrade} * {Weight}", partialGrade, modelParameter.Weight);
+                // _logger.LogInformation("grade += {partialGrade} * {Weight}", partialGrade, modelParameter.Weight);
 
                 wGrade += partialGrade * modelParameter.Weight;
             }
