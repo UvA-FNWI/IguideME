@@ -519,6 +519,7 @@ namespace IguideME.Web.Services
 
         public void UpdateDiscussion(Discussion discussion, int tileID, string hash)
         {
+            _logger.LogInformation("updating discussion");
             NonQuery(
                 DatabaseQueries.UPDATE_CANVAS_DISCUSSION,
                 new SQLiteParameter("id", discussion.ID),

@@ -9,63 +9,66 @@ using Canvas = UvA.DataNose.Connectors.Canvas;
 namespace IguideME.Web.Services.Workers
 {
 	/// <summary>
-    /// Class <a>DiscussionWorker</a> models a worker that handles registering discussions during a sync.
-    /// </summary>
+	/// Class <a>DiscussionWorker</a> models a worker that handles registering discussions during a sync.
+	/// </summary>
 	public class DiscussionWorker
 	{
-        readonly private ILogger<SyncManager> _logger;
+		readonly private ILogger<SyncManager> _logger;
 		readonly private CanvasHandler _canvasHandler;
 		readonly private int _courseID;
 		readonly private string _hashCode;
 
 		/// <summary>
-        /// This constructor initializes the new DiscussionWorker to
-        /// (<paramref name="courseID"/>, <paramref name="hashCode"/>, <paramref name="canvasHandler"/>, <paramref name="logger"/>).
-        /// </summary>
-        /// <param name="courseID">the id of the course.</param>
-        /// <param name="hashCode">the hash code associated to the current sync.</param>
-        /// <param name="canvasHandler">a reference to the class managing the connection with canvas.</param>
-        /// <param name="logger">a reference to the logger used for the sync.</param>
+		/// This constructor initializes the new DiscussionWorker to
+		/// (<paramref name="courseID"/>, <paramref name="hashCode"/>, <paramref name="canvasHandler"/>, <paramref name="logger"/>).
+		/// </summary>
+		/// <param name="courseID">the id of the course.</param>
+		/// <param name="hashCode">the hash code associated to the current sync.</param>
+		/// <param name="canvasHandler">a reference to the class managing the connection with canvas.</param>
+		/// <param name="logger">a reference to the logger used for the sync.</param>
 		public DiscussionWorker(int courseID, string hashCode, CanvasHandler canvasHandler, ILogger<SyncManager> logger)
 		{
-            _logger = logger;
+			_logger = logger;
 			this._courseID = courseID;
 			this._hashCode = hashCode;
 			this._canvasHandler = canvasHandler;
 		}
 
 		/// <summary>
-        /// Register the discussions in the database as discussions aren't necessarily linked to tiles.
-        /// There are three types of discussiosn:
-        /// <list type="bullet">
+		/// Register the discussions in the database as discussions aren't necessarily linked to tiles.
+		/// There are three types of discussiosn:
+		/// <list type="bullet">
 		///     <item>
 		///     	Topics: the main discussion on canvas.
 		///     </item>
-        ///     <item>
+		///     <item>
 		/// 		Entries: replies to a topic.
 		/// 	</item>
-        /// 	<item>
+		/// 	<item>
 		/// 		Replies: replies to entries or replies.
 		/// 	</item>
 		/// </list>
-        /// </summary>
-        /// <param name="discussions">the discussions to register.</param>
-        /// <param name="students">the students in the course, needed to convert user id's.</param>
-		private void RegisterDiscusions(List<Canvas.Discussion> discussions, List<User> students) {
+		/// </summary>
+		/// <param name="discussions">the discussions to register.</param>
+		/// <param name="students">the students in the course, needed to convert user id's.</param>
+		private void RegisterDiscusions(List<Canvas.Discussion> discussions, List<User> students)
+		{
 
 			foreach (Canvas.Discussion discussion in discussions)
-            {
+			{
 				DatabaseManager.Instance.RegisterDiscussion(discussion, this._hashCode);
 
 				// Register the entries corresponding to the topic as well.
-				foreach (Canvas.DiscussionEntry entry in discussion.Entries) {
-                    int entry_id = DatabaseManager.Instance.RegisterDiscussionEntry(
+				foreach (Canvas.DiscussionEntry entry in discussion.Entries)
+				{
+					int entry_id = DatabaseManager.Instance.RegisterDiscussionEntry(
 						entry,
 						students?.Find(s => s.StudentNumber == entry.UserID)?.UserID);
 
 					// Register the replies corresponding to the entry as well.
-					foreach (Canvas.DiscussionReply reply in entry.Replies) {
-                        DatabaseManager.Instance.RegisterDiscussionReply(
+					foreach (Canvas.DiscussionReply reply in entry.Replies)
+					{
+						DatabaseManager.Instance.RegisterDiscussionReply(
 							reply,
 							entry_id,
 							students?.Find(s => s.StudentNumber == reply.UserID)?.UserID);
@@ -75,18 +78,20 @@ namespace IguideME.Web.Services.Workers
 		}
 
 		/// <summary>
-        /// Link discussions to wild card tiles which are tiles that link to all the discussions instead
-        /// of specifying specific discussions.
-        /// </summary>
-        /// <param name="discussions">a list of all the discussions.</param>
-        /// <param name="students">a list of all the students.</param>
-        /// <param name="tile">the tile that's a wild card.</param>
-		private void HandleWildcardTile(List<Canvas.Discussion> discussions, List<User> students, Tile tile) {
+		/// Link discussions to wild card tiles which are tiles that link to all the discussions instead
+		/// of specifying specific discussions.
+		/// </summary>
+		/// <param name="discussions">a list of all the discussions.</param>
+		/// <param name="students">a list of all the students.</param>
+		/// <param name="tile">the tile that's a wild card.</param>
+		private void HandleWildcardTile(List<Canvas.Discussion> discussions, List<User> students, Tile tile)
+		{
 			_logger.LogInformation("wildcard");
 
 			// Filter out the discussions from students who did not give consent. TODO: is this how we want to handle this?
 			IEnumerable<Canvas.Discussion> postedDiscussions = discussions
-				.Where(d => {
+				.Where(d =>
+				{
 					User student = students.Find(s => s.Name == d.UserName);
 					return student != null && DatabaseManager.Instance.GetConsent(this._courseID, student.UserID) == 1;
 				});
@@ -99,17 +104,23 @@ namespace IguideME.Web.Services.Workers
 		}
 
 		/// <summary>
-        /// Link discussions that are assigned to a tile to that tile.
-        /// </summary>
-        /// <param name="discussions">a list of all the discussions.</param>
-        /// <param name="tile">the tile the discussions should link to.</param>
-		private void HandleTile(List<Canvas.Discussion> discussions, Tile tile) {
-
+		/// Link discussions that are assigned to a tile to that tile.
+		/// </summary>
+		/// <param name="discussions">a list of all the discussions.</param>
+		/// <param name="tile">the tile the discussions should link to.</param>
+		private void HandleTile(List<Canvas.Discussion> discussions, Tile tile)
+		{
+			_logger.LogInformation("Logging discussions {d}", discussions);
 			tile.GetEntries();
 
-			foreach (Canvas.Discussion discussion in discussions) {
-				foreach (TileEntry entry in tile.Entries) {
-					if (discussion.Title.Equals(entry.Title, StringComparison.OrdinalIgnoreCase)) {
+			foreach (Canvas.Discussion discussion in discussions)
+			{
+				_logger.LogInformation("Linking discussion {disc} to tile {tile}", discussion.Title, tile.ID);
+				foreach (TileEntry entry in tile.Entries)
+				{
+					_logger.LogInformation("entry title {t}", entry.Title);
+					if (discussion.Title.Equals(entry.Title, StringComparison.OrdinalIgnoreCase))
+					{
 						DatabaseManager.Instance.UpdateDiscussion(discussion, tile.ID, this._hashCode);
 					}
 				}
@@ -117,32 +128,33 @@ namespace IguideME.Web.Services.Workers
 		}
 
 		/// <summary>
-        /// Link the discussions to the tiles they are assigned to by the instructor(s).
-        /// </summary>
-        /// <param name="discussions">a list of all the discussions.</param>
-        /// <param name="students">a list of all the students.</param>
-		private void LinkToTiles(List<Canvas.Discussion> discussions, List<User> students) {
+		/// Link the discussions to the tiles they are assigned to by the instructor(s).
+		/// </summary>
+		/// <param name="discussions">a list of all the discussions.</param>
+		/// <param name="students">a list of all the students.</param>
+		private void LinkToTiles(List<Canvas.Discussion> discussions, List<User> students)
+		{
 
 			// Get all the discussion tiles.
 			IEnumerable<Tile> tiles = DatabaseManager.Instance.GetTiles(this._courseID)
 				.Where(tile => tile.TileType == "DISCUSSIONS");
 
-            foreach (Tile tile in tiles)
+			foreach (Tile tile in tiles)
 			{
 				if (tile.Wildcard)
 				{
-                    this.HandleWildcardTile(discussions, students, tile);
-                }
+					this.HandleWildcardTile(discussions, students, tile);
+				}
 				else
 				{
-                    this.HandleTile(discussions, tile);
-                }
+					this.HandleTile(discussions, tile);
+				}
 			}
 		}
 
 		/// <summary>
-        /// Starts the disussion worker.
-        /// </summary>
+		/// Starts the disussion worker.
+		/// </summary>
 		public void Start()
 		{
 
@@ -151,9 +163,9 @@ namespace IguideME.Web.Services.Workers
 			List<User> students = DatabaseManager.Instance.GetUsers(this._courseID, "student", this._hashCode);
 			List<Canvas.Discussion> discussions = this._canvasHandler.GetDiscussions(this._courseID);
 
-            this.RegisterDiscusions(discussions, students);
+			this.RegisterDiscusions(discussions, students);
 
-            this.LinkToTiles(discussions, students);
-        }
+			this.LinkToTiles(discussions, students);
+		}
 	}
 }
