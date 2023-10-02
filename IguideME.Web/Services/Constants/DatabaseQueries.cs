@@ -689,7 +689,7 @@ public static class DatabaseQueries
             @message
         )
         ON CONFLICT ( `course_id`, `posted_by`, `discussion_id`, `posted_at` )
-        DO UPDATE SET `message` = '@message'
+        DO UPDATE SET `message` = @message
         ;";
 
     public const string REGISTER_CANVAS_DISCUSSION_REPLY =
