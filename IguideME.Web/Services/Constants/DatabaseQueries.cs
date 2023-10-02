@@ -1689,10 +1689,10 @@ public static class DatabaseQueries
         WHERE           `discussion_id`=@id
         AND             `course_id`=@courseID
         AND             `title`=@title
-        AND             `posted_by`=@userName
         AND             `posted_at`=@postedAt
         AND             `message`=@message
         AND             `sync_hash`=@hash;";
+    // AND             `posted_by`=@userName
 
     public const string RECYCLE_EXTERNAL_DATA =
         @"UPDATE        `tile_entry_submission`

@@ -519,31 +519,31 @@ namespace IguideME.Web.Services
 
         public void UpdateDiscussion(Discussion discussion, int tileID, string hash)
         {
-            _logger.LogInformation(@"
-updating discussion:
-    id: {id}
-    courseID: {cid}
-    tileID: {tid}
-    title: {title}
-    username: {uname}
-    postedAt: {pat}
-    hash: {hash}
-    message: {message}
-",
-discussion.ID,
-discussion.CourseID,
-tileID,
-discussion.Title,
-discussion.UserName,
-discussion.PostedAt,
-hash,
-discussion.Message);
+            //             _logger.LogInformation(@"
+            // updating discussion:
+            //     id: {id}
+            //     courseID: {cid}
+            //     tileID: {tid}
+            //     title: {title}
+            //     username: {uname}
+            //     postedAt: {pat}
+            //     hash: {hash}
+            //     message: {message}
+            // ",
+            // discussion.ID,
+            // discussion.CourseID,
+            // tileID,
+            // discussion.Title,
+            // discussion.UserName,
+            // discussion.PostedAt,
+            // hash,
+            // discussion.Message);
             NonQuery(
                 DatabaseQueries.UPDATE_CANVAS_DISCUSSION,
                 new SQLiteParameter("id", discussion.ID),
                 new SQLiteParameter("courseID", discussion.CourseID),
                 new SQLiteParameter("title", discussion.Title),
-                new SQLiteParameter("userName", discussion.UserName),
+                // new SQLiteParameter("userName", discussion.UserName),
                 new SQLiteParameter("postedAt", discussion.PostedAt),
                 new SQLiteParameter("message", discussion.Message),
                 new SQLiteParameter("tileID", tileID),
