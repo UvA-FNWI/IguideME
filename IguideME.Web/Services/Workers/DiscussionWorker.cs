@@ -110,15 +110,12 @@ namespace IguideME.Web.Services.Workers
 		/// <param name="tile">the tile the discussions should link to.</param>
 		private void HandleTile(List<Canvas.Discussion> discussions, Tile tile)
 		{
-			_logger.LogInformation("Logging discussions {d}", discussions);
 			tile.GetEntries();
 
 			foreach (Canvas.Discussion discussion in discussions)
 			{
-				_logger.LogInformation("Linking discussion {disc} to tile {tile}", discussion.Title, tile.ID);
 				foreach (TileEntry entry in tile.Entries)
 				{
-					_logger.LogInformation("entry title {t}", entry.Title);
 					if (discussion.Title.Equals(entry.Title, StringComparison.OrdinalIgnoreCase))
 					{
 						DatabaseManager.Instance.UpdateDiscussion(discussion, tile.ID, this._hashCode);
