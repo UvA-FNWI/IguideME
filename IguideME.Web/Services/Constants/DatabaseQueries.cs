@@ -1103,7 +1103,7 @@ public static class DatabaseQueries
     //     WHERE       subtable.sync = 1
     //     ORDER BY    subtable.`name` ASC;";
 
-    public const string QUERY_USERS_WITH_ROLE_FOR_COURSE =
+    public const string QUERY_USERS_WITH_ROLE_FOR_COURSE = // no consent (but bellow it has consent)
         @"SELECT    `users`.`user_id`,
                     `users`.`student_number`,
                     `users`.`name`,
@@ -1139,14 +1139,14 @@ public static class DatabaseQueries
             ORDER BY    `users`.`name` ASC
             ";
 
-    public const string QUERY_USER_ID =
+    public const string QUERY_USER_ID = // no consent
         @"SELECT    `users`.`user_id`
         FROM        `users`
         WHERE       `users`.`student_number`=@studentNumber
         ORDER BY    `users`.`name` ASC
         LIMIT       1;";
 
-    public const string QUERY_STUDENT_ID =
+    public const string QUERY_STUDENT_ID = // no consent
         @"SELECT    `users`.`user_id`
         FROM        `users`
         INNER JOIN  `student_settings`
@@ -1171,7 +1171,7 @@ public static class DatabaseQueries
     //     ORDER BY    `student_settings`.`sync_id`
     //     LIMIT       1";
 
-    public const string QUERY_USER_FOR_COURSE =
+    public const string QUERY_USER_FOR_COURSE = // no consent
         @"SELECT    `users`.`user_id`,
                     `users`.`student_number`,
                     `users`.`name`,
@@ -1225,13 +1225,6 @@ public static class DatabaseQueries
                     max(`student_settings`.`sync_id`) 
         WHERE       `course_id`=@courseID
         AND         `user_id`=@userID
-        ;";
-    public const string QUERY_GOAL_GRADES =
-        @"SELECT    `goal_grade`,
-                    `user_id`,
-                    max(`student_settings`.`sync_id`) 
-        FROM        `student_settings`
-        WHERE       `course_id`=@courseID
         ;";
 
     public const string QUERY_LAST_STUDENT_SETTINGS =
@@ -1361,7 +1354,7 @@ public static class DatabaseQueries
     //     ;";
 
 
-public const string QUERY_DISCUSSION_COUNTER_FOR_USER =
+public const string QUERY_DISCUSSION_COUNTER_FOR_USER = // no consent
         @"SELECT        `tile_entries`.`tile_id`,
                         SUM(`counter`)
         FROM(
