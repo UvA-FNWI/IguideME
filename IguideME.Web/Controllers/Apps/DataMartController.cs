@@ -148,7 +148,7 @@ namespace IguideME.Web.Controllers
             return this.IsAdministrator()
                 ? Json(1)
                 : Json(
-                _databaseManager.GetConsent(
+                _databaseManager.GetUserConsent(
                     GetCourseID(), GetUserID(), GetHashCode()));
         }
 
@@ -165,7 +165,7 @@ namespace IguideME.Web.Controllers
         //         GetUserID(),
         //         (int)JObject.Parse(body)["granted"]
         //     );
-        //     _databaseManager.SetConsent(consent, this.GetHashCode());
+        //     _databaseManager.SetUserConsent(consent, this.GetHashCode());
         //     return Json(consent.Granted);
         // }
 

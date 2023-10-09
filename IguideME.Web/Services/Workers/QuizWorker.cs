@@ -57,7 +57,7 @@ namespace IguideME.Web.Services.Workers
 			IEnumerable<QuizSubmission> submissions = quiz.Submissions
                 .Where(submission =>
 					submission.Score != null &&
-					_databaseManager.GetConsent(this._courseID,
+					_databaseManager.GetUserConsent(this._courseID,
 						_databaseManager.GetStudentID(this._courseID, submission.UserID), _syncID)
 				);
 

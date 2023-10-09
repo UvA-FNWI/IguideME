@@ -51,8 +51,7 @@ namespace IguideME.Web.Controllers
             /**
              * Returns information of the logged in user.
              */
-            Models.Impl.User user = _databaseManager.GetUser(this.GetUserID());
-            user.CourseID = GetCourseID();
+            Models.Impl.User user = _databaseManager.GetUser(GetCourseID(), this.GetUserID());
             return Json(
                 user
             );
@@ -149,7 +148,7 @@ namespace IguideME.Web.Controllers
              * consent policy for their course.
              */
             _databaseManager.UpdateInformedConsent(
-                GetCourseID(), obj.Text);
+                GetCourseID(), obj.Text, this.GetHashCode());
 
             // return newly fetched consent object
             return Json(

@@ -169,9 +169,13 @@ public static class DatabaseQueries
      *
      *  - goal_grade: target grade of the user for the course. Also used to
                       create the peer groups.
-     *      -   -1: Grade not set yet / No consent given.
-     *      -   0-10
+     *      -   0: Grade not set yet
+     *      -   1-10
      *
+     *  - consent: 
+     *      -1: unspecified
+     *       0: denied
+     *      +1: granted
      *  - notifications: whether the user wants to receive performance updates.
      *
      *
@@ -185,7 +189,8 @@ public static class DatabaseQueries
             `user_id`           STRING,
             `course_id`         INTEGER,
             `predicted_grade`   INTEGER DEFAULT 0,
-            `goal_grade`        INTEGER DEFAULT -1,
+            `goal_grade`        INTEGER DEFAULT 0,
+            `consent`           INTEGER DEFAULT -1,
             `notifications`     BOOLEAN DEFAULT true,
             `sync_id`           INTEGER,
             PRIMARY KEY (`user_id`,`course_id`,`sync_id`),
@@ -596,8 +601,8 @@ public static class DatabaseQueries
                             `user_id`,
                             `sync_id`   )
             VALUES(
-                @CourseID,
-                @UserID,
+                @courseID,
+                @userID,
                 @syncID
             )
         ;";
@@ -608,13 +613,15 @@ public static class DatabaseQueries
                             `user_id`,
                             `predicted_grade`,
                             `goal_grade`,
-                            `notifications`
+                            `consent,`
+                            `notifications`,
                             `sync_id`   )
             VALUES(
                 @CourseID,
                 @UserID,
                 @PredictedGrade,
                 @GoalGrade,
+                @Consent,
                 @Notifications,
                 @syncID
             )
@@ -1067,18 +1074,34 @@ public static class DatabaseQueries
         LIMIT       -1
         OFFSET      @offset;";
 
-    public const string QUERY_USERS_FOR_COURSE =
-        @"SELECT    `users`.`user_id`,
-                    `users`.`student_number`,
-                    `users`.`name`,
-                    `users`.`sortable_name`,
-                    `users`.`role`
-        FROM        `users`
-        INNER JOIN  `student_settings`
-            USING   (`user_id`)
-        WHERE       `student_settings`.`course_id`={0}
-        AND         `student_settings`.`sync_id`='{1}'
-        ORDER BY    `users`.`name` ASC;";
+
+    // This is a different way to have the following query. Needs more investigatin as to what is better.
+    // public const string QUERY_USERS_WITH_ROLE_FOR_COURSE =
+    //     @"SELECT    subtable.`user_id`,
+    //                 subtable.`student_number`,
+    //                 subtable.`name`,
+    //                 subtable.`sortable_name`,
+    //                 subtable.`role`,
+    //                 subtable.`goal_grade`
+    //         FROM (
+    //             SELECT  `users`.`user_id`,
+    //                     `users`.`student_number`,
+    //                     `users`.`name`,
+    //                     `users`.`sortable_name`,
+    //                     `users`.`role`,
+    //                     `student_settings`.`goal_grade`,
+    //                     ROW_NUMBER()
+    //                         OVER    (PARTITION BY `student_settings`.`user_id`
+    //                                 ORDER BY `student_settings`.`sync_id` DESC) 
+    //                         As sync
+    //             FROM        `users`
+    //                 LEFT JOIN   `student_settings`
+    //                     USING   (`user_id`)
+    //             WHERE       `student_settings`.`course_id`= @courseID
+    //             AND         `users`.`role`=@role
+    //         ) subtable
+    //     WHERE       subtable.sync = 1
+    //     ORDER BY    subtable.`name` ASC;";
 
     public const string QUERY_USERS_WITH_ROLE_FOR_COURSE =
         @"SELECT    `users`.`user_id`,
@@ -1086,30 +1109,35 @@ public static class DatabaseQueries
                     `users`.`name`,
                     `users`.`sortable_name`,
                     `users`.`role`,
-                    `student_settings`.`goal_grade`
-        FROM        `users`
-        LEFT JOIN   `student_settings`
-            USING   (`user_id`)
-        WHERE       `student_settings`.`course_id`=@courseID
-        AND         `users`.`role`=@role
-        AND         `student_settings`.`sync_id`=@syncID
-        ORDER BY    `users`.`name` ASC;";
+                    `student_settings`.`goal_grade`,
+                    max(`student_settings`.`sync_id`) 
+            FROM    `users`
+                LEFT JOIN   `student_settings`
+                    USING   (`user_id`)
+            WHERE       `student_settings`.`course_id`= @courseID
+            AND         `users`.`role`= @role
+            GROUP BY    `users`.`user_id`
+            ORDER BY    `users`.`name` ASC
+            ;";
 
+        
     public const string QUERY_CONSENTED_USERS_WITH_ROLE_FOR_COURSE =
         @"SELECT    `users`.`user_id`,
                     `users`.`student_number`,
                     `users`.`name`,
                     `users`.`sortable_name`,
                     `users`.`role`,
-                    `student_settings`.`goal_grade`
-        FROM        `users`
-        LEFT JOIN   `student_settings`
-            USING   (`user_id`)
-        WHERE       `student_settings`.`course_id`=@courseID
-        AND         `users`.`role`=@role
-        AND         `student_settings`.`goal_grade` > 0
-        AND         `student_settings`.`sync_id`=@syncID
-        ORDER BY    `users`.`name` ASC;";
+                    `student_settings`.`goal_grade`,
+                    max(`student_settings`.`sync_id`) 
+            FROM    `users`
+                LEFT JOIN   `student_settings`
+                    USING   (`user_id`)
+            WHERE       `student_settings`.`course_id`= @courseID
+            AND         `users`.`role`= @role
+            AND         `student_settings`.`consent` = 1
+            GROUP BY    `users`.`user_id`
+            ORDER BY    `users`.`name` ASC
+            ";
 
     public const string QUERY_USER_ID =
         @"SELECT    `users`.`user_id`
@@ -1128,17 +1156,20 @@ public static class DatabaseQueries
         ORDER BY    `users`.`name` ASC
         LIMIT       1;";
 
-    public const string QUERY_USER =
-        @"SELECT    `users`.`user_id`,
-                    `users`.`student_number`,
-                    `users`.`name`,
-                    `users`.`sortable_name`,
-                    `users`.`role`,
-                    `student_settings`.`goal_grade`
-        FROM        `users`
-        LEFT JOIN   `student_settings`
-            USING   (`user_id`)
-        WHERE       `users`.`user_id`=@userID";
+    // public const string QUERY_CONSENTED_USER = //// WITH CONSENT
+    //     @"SELECT    `users`.`user_id`,
+    //                 `users`.`student_number`,
+    //                 `users`.`name`,
+    //                 `users`.`sortable_name`,
+    //                 `users`.`role`,
+    //                 `student_settings`.`goal_grade`
+    //     FROM        `users`
+    //     LEFT JOIN   `student_settings`
+    //         USING   (`user_id`)
+    //     WHERE       `users`.`user_id`=@userID
+    //     AND         `student_settings`.`consent` = 1
+    //     ORDER BY    `student_settings`.`sync_id`
+    //     LIMIT       1";
 
     public const string QUERY_USER_FOR_COURSE =
         @"SELECT    `users`.`user_id`,
@@ -1152,59 +1183,63 @@ public static class DatabaseQueries
             USING   (`user_id`)
         WHERE       `student_settings`.`course_id`=@courseID
         AND         `users`.`user_id`=@userID
-        AND         `student_settings`.`sync_id`=@syncID
-        ORDER BY    `users`.`name` ASC
+        ORDER BY    `student_settings`.`sync_id` DESC
         LIMIT       1;";
 
-    public const string QUERY_USERS_WITH_GOAL_GRADE =
+    public const string QUERY_STUDENTS_WITH_GOAL_GRADE =
         @"SELECT    `users`.`user_id`,
                     `users`.`student_number`,
                     `users`.`name`,
                     `users`.`sortable_name`,
-                    `users`.`role`
-        FROM        `users`
-        INNER JOIN  `student_settings`
-            USING   (`user_id`)
-        WHERE       `student_settings`.`course_id`=@courseID
-        AND         `student_settings`.`sync_ID`=@syncID
-        AND         `student_settings`.`goal_grade`=@goalGrade;";
+                    `users`.`role`,
+                    max(`student_settings`.`sync_id`) 
+            FROM    `users`
+                LEFT JOIN   `student_settings`
+                    USING   (`user_id`)
+            WHERE       `student_settings`.`course_id`= @courseID
+            AND         `student_settings`.`goal_grade`=@goalGrade
+            AND         `student_settings`.`consent`= 1
+            GROUP BY    `users`.`user_id`
+            ORDER BY    `users`.`name` ASC
+            ;";
 
     public const string QUERY_NOTIFICATIONS_ENABLE =
-        @"SELECT    `notifications`
+        @"SELECT    `notifications`,
+                    max(`student_settings`.`sync_id`) 
         FROM        `student_settings`
         WHERE       `course_id`=@courseID
         AND         `user_id`=@userID
-        AND         `sync_ID`=@syncID
         ;";
 
     public const string QUERY_GOAL_GRADE_FOR_USER =
-        @"SELECT    `goal_grade`
+        @"SELECT    `goal_grade`,
+                    max(`student_settings`.`sync_id`) 
         FROM        `student_settings`
         WHERE       `course_id`=@courseID
         AND         `user_id`=@userID
-        AND         `sync_ID`=@syncID
+        ;";
+
+    public const string QUERY_CONSENT_FOR_USER =
+        @"SELECT    `consent`
+        FROM        `student_settings`
+                    max(`student_settings`.`sync_id`) 
+        WHERE       `course_id`=@courseID
+        AND         `user_id`=@userID
         ;";
     public const string QUERY_GOAL_GRADES =
         @"SELECT    `goal_grade`,
-                    `user_id`
+                    `user_id`,
+                    max(`student_settings`.`sync_id`) 
         FROM        `student_settings`
         WHERE       `course_id`=@courseID
-        AND         `sync_ID`=@syncID
         ;";
 
-    // public const string QUERY_LAST_STUDENT_SETTINGS =
-    //     @"SELECT    `predicted_grade`,
-    //                 `goal_grade`,
-    //                 `notifications`,
-    //                 `sync_ID`
-    //     FROM        `student_settings`
-    //     WHERE       `course_id`=@courseID
-    //     AND         `user_id`=@userID
-    //     ORDER BY    `sync_ID` DESC
-    //     LIMIT       1
-    //     ;";
     public const string QUERY_LAST_STUDENT_SETTINGS =
-        @"SELECT    `sync_ID`
+        @"SELECT    `predicted_grade`,
+                    `goal_grade`,
+                    `consent`,
+                    `notifications`,
+                    `sync_ID`
         FROM        `student_settings`
         WHERE       `course_id`=@courseID
         AND         `user_id`=@userID
