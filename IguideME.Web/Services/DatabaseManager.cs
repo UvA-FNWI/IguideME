@@ -179,7 +179,6 @@ namespace IguideME.Web.Services
 
                 DatabaseQueries.CREATE_TABLE_GRADE_PREDICTION_MODEL,
                 DatabaseQueries.CREATE_TABLE_GRADE_PREDICTION_MODEL_PARAMETER,
-                DatabaseQueries.CREATE_TABLE_PREDICTED_GRADE,
 
                 DatabaseQueries.CREATE_TABLE_PEER_GROUPS,
                 DatabaseQueries.CREATE_TABLE_NOTIFICATIONS,
@@ -581,28 +580,46 @@ namespace IguideME.Web.Services
         }
 
 
-        public string GetStudentID(int courseID, int studentNumber) {
-            long syncID = this.GetCurrentSyncID(courseID);
+        public string GetConsentedStudentID(int courseID, int studentNumber) {
 
-            if (syncID == 0) return null;
-
-            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_STUDENT_ID,
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_CONSENTED_USER_ID_FROM_STUDENT_NUMBER,
                     new SQLiteParameter("courseID", courseID),
                     new SQLiteParameter("studentNumber", studentNumber)
                 )) {
                 if (r.Read())
-                {
                     return r.GetValue(0).ToString();
+            }
+            return null;
+        }
+
+        public User GetCurrentUser(int courseID, string userID)
+        {
+            User user = null;
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_USER_DATA_FOR_COURSE,
+                    new SQLiteParameter("courseID", courseID),
+                    new SQLiteParameter("userID", userID)
+                )) {
+                if (r.Read())
+                {
+                    user = new User(
+                        r.GetValue(0).ToString(),
+                        courseID,
+                        r.GetInt32(1),
+                        r.GetValue(2).ToString(),
+                        r.GetValue(3).ToString(),
+                        r.GetInt32(4),
+                        r.GetValue(5) != null ? r.GetInt32(5) : 1
+                    );
                 }
             }
 
-            return null;
+            return user;
         }
 
         public User GetUser(int courseID, string userID)
         {
             User user = null;
-            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_USER_FOR_COURSE,
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_CONSENTED_USER_DATA_FOR_COURSE,
                     new SQLiteParameter("courseID", courseID),
                     new SQLiteParameter("userID", userID)
                 )) {
@@ -753,14 +770,29 @@ namespace IguideME.Web.Services
         public void CreatePredictedGrade(
             int courseID,
             string userID,
-            double grade)
+            double grade,
+            long syncID = 0)
         {
-            try {
-                NonQuery(DatabaseQueries.REGISTER_PREDICTED_GRADE,
+            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
+
+            try{
+            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_LAST_STUDENT_SETTINGS,
                     new SQLiteParameter("courseID", courseID),
-                    new SQLiteParameter("userID", userID),
-                    new SQLiteParameter("grade", grade)
-                );
+                    new SQLiteParameter("userID", userID)
+                )) {
+                while (r.Read())
+                {
+                    NonQuery(DatabaseQueries.REGISTER_STUDENT_SETTINGS,
+                        new SQLiteParameter("courseID", courseID),
+                        new SQLiteParameter("userID", userID),
+                        new SQLiteParameter("PredictedGrade", grade),
+                        new SQLiteParameter("GoalGrade", r.GetInt32(1)),
+                        new SQLiteParameter("Consent", r.GetInt32(2)),
+                        new SQLiteParameter("Notifications", r.GetBoolean(3)),
+                        new SQLiteParameter("syncID", activeSync)
+                    );
+                }
+            }
             } catch (Exception e) {
                 _logger.LogError("Error storing predicted grade: {message}\n{trace}", e.Message, e.StackTrace);
             }
@@ -1385,9 +1417,9 @@ namespace IguideME.Web.Services
                 while (r.Read())
                 {
                     PredictedGrade prediction = new(
-                        r.GetValue(0).ToString(),
-                        r.GetValue(1).ToString(),
-                        r.GetFloat(2)
+                        userID,
+                        r.GetFloat(1),
+                        r.GetFloat(0)
                     );
                     predictions.Add(prediction);
                 }
@@ -2437,14 +2469,14 @@ namespace IguideME.Web.Services
             }
         }
 
-        public bool GetUserConsent(int courseID, string userID, long syncID)
+        public bool GetUserConsent(int courseID, string userID)
         {
-            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_GOAL_GRADE_FOR_USER,
+            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_CONSENT_FOR_USER,
                     new SQLiteParameter("courseID", courseID),
                     new SQLiteParameter("userID", userID)
                 )){
                 if (r.Read())
-                    return Convert.ToInt32(r["goal_grade"]) == 1;
+                    return r.GetInt32(0) == 1;
             }
             return false;
         }

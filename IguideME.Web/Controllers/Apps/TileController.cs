@@ -429,7 +429,7 @@ namespace IguideME.Web.Controllers
             // Only instructors may view submissions of other students
             if ((this.GetUserID() != userID &&
                 !this.IsAdministrator()) ||
-                !_databaseManager.GetUserConsent(course_id, userID,GetHashCode()))
+                !_databaseManager.GetUserConsent(course_id, userID))
                 return Unauthorized();
 
             bool success = int.TryParse(tileID, out int id);

@@ -51,7 +51,7 @@ namespace IguideME.Web.Controllers
             /**
              * Returns information of the logged in user.
              */
-            Models.Impl.User user = _databaseManager.GetUser(GetCourseID(), this.GetUserID());
+            Models.Impl.User user = _databaseManager.GetCurrentUser(GetCourseID(), this.GetUserID());
             return Json(
                 user
             );

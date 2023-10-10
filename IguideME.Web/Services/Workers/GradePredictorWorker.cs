@@ -87,7 +87,8 @@ namespace IguideME.Web.Services.Workers
 
             _databaseManager.CreatePredictedGrade(this._courseID,
                                                           student.UserID,
-                                                          wGrade);
+                                                          wGrade,
+                                                          _syncID);
         }
     }
 }

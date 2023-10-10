@@ -91,7 +91,7 @@ namespace IguideME.Web.Services.Workers
 			IEnumerable<Canvas.Discussion> postedDiscussions = discussions
 				.Where(d => {
 					User student = students.Find(s => s.Name == d.UserName);
-					return student != null && _databaseManager.GetUserConsent(this._courseID, student.UserID, GetHashCode());
+					return student != null && _databaseManager.GetUserConsent(this._courseID, student.UserID);
 				});
 
 			foreach (Canvas.Discussion discussion in postedDiscussions)

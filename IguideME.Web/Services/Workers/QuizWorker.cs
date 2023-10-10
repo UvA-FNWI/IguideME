@@ -57,14 +57,13 @@ namespace IguideME.Web.Services.Workers
 			IEnumerable<QuizSubmission> submissions = quiz.Submissions
                 .Where(submission =>
 					submission.Score != null &&
-					_databaseManager.GetUserConsent(this._courseID,
-						_databaseManager.GetStudentID(this._courseID, submission.UserID), _syncID)
+					_databaseManager.GetConsentedStudentID(this._courseID, submission.UserID) != null
 				);
 
 			foreach (QuizSubmission sub in quiz.Submissions) {
 				_databaseManager.CreateUserSubmission(
 					quiz.ID ?? -1, // TODO: handle properly when null
-					_databaseManager.GetStudentID(this._courseID, sub.UserID),
+					_databaseManager.GetConsentedStudentID(this._courseID, sub.UserID),
 					sub.Score ?? 0,
 					((DateTimeOffset)sub.FinishedDate.Value).ToUnixTimeMilliseconds()
 				);

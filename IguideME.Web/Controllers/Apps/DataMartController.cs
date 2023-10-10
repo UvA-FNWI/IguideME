@@ -149,7 +149,7 @@ namespace IguideME.Web.Controllers
                 ? Json(1)
                 : Json(
                 _databaseManager.GetUserConsent(
-                    GetCourseID(), GetUserID(), GetHashCode()));
+                    GetCourseID(), GetUserID()));
         }
 
         // [Authorize]

@@ -252,7 +252,7 @@ public static class DatabaseQueries
 
     // /------------------------ Grade Prediction ------------------------/
 
-    public const string CREATE_TABLE_GRADE_PREDICTION_MODEL = // NOT DONE
+    public const string CREATE_TABLE_GRADE_PREDICTION_MODEL = // NOT TOUCHED
         @"CREATE TABLE IF NOT EXISTS `grade_prediction_model` (
             `id`                  INTEGER PRIMARY KEY AUTOINCREMENT,
             `course_id`           INTEGER,
@@ -260,17 +260,17 @@ public static class DatabaseQueries
             `enabled`             BOOLEAN
         );";
 
-    public const string CREATE_TABLE_PREDICTED_GRADE = // NOT DONE
-        @"CREATE TABLE IF NOT EXISTS `predicted_grade` (
-            `id`                  INTEGER PRIMARY KEY AUTOINCREMENT,
-            `course_id`           INTEGER,
-            `user_id`             STRING,
-            `grade`               FLOAT,
-            `date`                TEXT,
-            UNIQUE(course_id, user_id, date)
-        );";
+    // public const string CREATE_TABLE_PREDICTED_GRADE = // NOT NEEDED ANYMORE
+    //     @"CREATE TABLE IF NOT EXISTS `predicted_grade` (
+    //         `id`                  INTEGER PRIMARY KEY AUTOINCREMENT,
+    //         `course_id`           INTEGER,
+    //         `user_id`             STRING,
+    //         `grade`               FLOAT,
+    //         `date`                TEXT,
+    //         UNIQUE(course_id, user_id, date)
+    //     );";
 
-    public const string CREATE_TABLE_GRADE_PREDICTION_MODEL_PARAMETER = // NOT DONE
+    public const string CREATE_TABLE_GRADE_PREDICTION_MODEL_PARAMETER = // NOT TOUCHED
         @"CREATE TABLE IF NOT EXISTS `grade_prediction_model_parameter` (
             `id`                  INTEGER PRIMARY KEY AUTOINCREMENT,
             `model_id`            INTEGER,
@@ -352,18 +352,18 @@ public static class DatabaseQueries
         @"INSERT INTO   `course_settings` (`course_id`, `name`)
         VALUES (@courseID, @courseName);";
 
-    public const string REGISTER_PREDICTED_GRADE =  // NOT DONE , need to integrate this in student_settings
-        @"INSERT INTO   `predicted_grade` ( `course_id`,
-                                            `user_id`,
-                                            `grade`,
-                                            `date` )
-          VALUES        (
-            @courseID,
-            @userID,
-            @grade,
-            CURRENT_DATE
-          )
-          ON CONFLICT (`course_id`, `user_id`, `date`) DO UPDATE SET `grade`=`excluded`.`grade`;";
+    // public const string REGISTER_PREDICTED_GRADE =  // DONE , integrated into student_settings
+    //     @"INSERT INTO   `predicted_grade` ( `course_id`,
+    //                                         `user_id`,
+    //                                         `grade`,
+    //                                         `date` )
+    //       VALUES        (
+    //         @courseID,
+    //         @userID,
+    //         @grade,
+    //         CURRENT_DATE
+    //       )
+    //       ON CONFLICT (`course_id`, `user_id`, `date`) DO UPDATE SET `grade`=`excluded`.`grade`;";
 
     public const string REGISTER_USER_PEER = // DO WE KEEP THE USER_IDS?????
     @"INSERT INTO   `peer_groups` ( `goal_grade`,
@@ -529,24 +529,6 @@ public static class DatabaseQueries
             @message
         );";
 
-    // public const string REGISTER_discussion_replies =
-    //     @"INSERT INTO   `discussion_replies`
-    //                     (   `course_id`,
-    //                         `discussion_id`,
-    //                         `posted_by`,
-    //                         `posted_at`,
-    //                         `message`)
-    //     VALUES(
-    //         @courseID,
-    //         @topicID,
-    //         @postedBy,
-    //         @postedAt,
-    //         @message
-    //     )
-    //     ON CONFLICT ( `course_id`, `posted_by`, `discussion_id`, `posted_at` )
-    //     DO UPDATE SET `message` = '{4}'
-    //     ;";
-
     public const string REGISTER_DISCUSSION_REPLY =
         @"INSERT OR REPLACE
             INTO   `discussion_replies`
@@ -673,13 +655,14 @@ public static class DatabaseQueries
         @"SELECT `course_id` FROM `course_settings`;";
 
     public const string QUERY_PREDICTED_GRADES_FOR_USER =
-        @"SELECT    `user_id`,
-                    `date`,
-                    `grade`
-        FROM        `predicted_grade`
+        @"SELECT    `predicted_grade`,
+                    `sync_id`
+        FROM        `student_settings`
         WHERE       `course_id`=@courseID
         AND         `user_id`=@userID
-        ORDER BY    `date` DESC;";
+        ORDER BY    `sync_id` DESC
+        LIMIT       1
+        ;";
 
     public const string QUERY_GROUP_PEERS = //// DO WE KEEP THIS ?????
         @"SELECT        `user_ids`
@@ -763,7 +746,6 @@ public static class DatabaseQueries
         AND         `column_id`=@columnID
         ORDER BY    `order` ASC;";
 
-    /////// WHY DUPLICATE?????
     public const string QUERY_LAYOUT_COLUMNS =
         @"SELECT    `column_id`,
                     `size`,
@@ -784,13 +766,6 @@ public static class DatabaseQueries
         WHERE       `course_id`=@courseID
         LIMIT       1;";
 
-    // public const string QUERY_PERSONALIZED_PEERS_FOR_COURSE =
-    //     @"SELECT    `personalized_peers`
-    //     FROM        `course_settings`
-    //     WHERE       `course_id`=@courseID
-    //     LIMIT       1;
-    //     ";
-
     public const string QUERY_NOTIFICATION_DATES_FOR_COURSE =
     @"SELECT    `notification_dates`
     FROM        `course_settings`
@@ -807,7 +782,6 @@ public static class DatabaseQueries
         WHERE       `course_id`=@courseID
         AND         `group_id`=@groupID;";
 
-    //// AGAIN, WHY TWO OF THEM?????
     public const string QUERY_TILE_GROUPS =
         @"SELECT    `group_id`,
                     `title`,
@@ -1075,7 +1049,9 @@ public static class DatabaseQueries
         OFFSET      @offset;";
 
 
-    // This is a different way to have the following query. Needs more investigatin as to what is better.
+    // This is a different way to have the following query. 
+    // Needs more investigatin as to what is better.
+    // 
     // public const string QUERY_USERS_WITH_ROLE_FOR_COURSE =
     //     @"SELECT    subtable.`user_id`,
     //                 subtable.`student_number`,
@@ -1103,7 +1079,7 @@ public static class DatabaseQueries
     //     WHERE       subtable.sync = 1
     //     ORDER BY    subtable.`name` ASC;";
 
-    public const string QUERY_USERS_WITH_ROLE_FOR_COURSE = // no consent (but bellow it has consent)
+    public const string QUERY_USERS_WITH_ROLE_FOR_COURSE = // no consent
         @"SELECT    `users`.`user_id`,
                     `users`.`student_number`,
                     `users`.`name`,
@@ -1121,7 +1097,7 @@ public static class DatabaseQueries
             ;";
 
         
-    public const string QUERY_CONSENTED_USERS_WITH_ROLE_FOR_COURSE =
+    public const string QUERY_CONSENTED_USERS_WITH_ROLE_FOR_COURSE = /// ^^^ WITH CONSENT ^^^
         @"SELECT    `users`.`user_id`,
                     `users`.`student_number`,
                     `users`.`name`,
@@ -1139,39 +1115,26 @@ public static class DatabaseQueries
             ORDER BY    `users`.`name` ASC
             ";
 
-    public const string QUERY_USER_ID = // no consent
+    public const string QUERY_USER_ID =
         @"SELECT    `users`.`user_id`
         FROM        `users`
         WHERE       `users`.`student_number`=@studentNumber
         ORDER BY    `users`.`name` ASC
         LIMIT       1;";
 
-    public const string QUERY_STUDENT_ID = // no consent
+    public const string QUERY_CONSENTED_USER_ID_FROM_STUDENT_NUMBER =
         @"SELECT    `users`.`user_id`
         FROM        `users`
         INNER JOIN  `student_settings`
             USING   (`user_id`)
         WHERE       `student_settings`.`course_id`=@courseID
         AND         `users`.`student_number`=@studentNumber
+        AND         `student_settings`.`consent`= 1
         ORDER BY    `users`.`name` ASC
         LIMIT       1;";
 
-    // public const string QUERY_CONSENTED_USER = //// WITH CONSENT
-    //     @"SELECT    `users`.`user_id`,
-    //                 `users`.`student_number`,
-    //                 `users`.`name`,
-    //                 `users`.`sortable_name`,
-    //                 `users`.`role`,
-    //                 `student_settings`.`goal_grade`
-    //     FROM        `users`
-    //     LEFT JOIN   `student_settings`
-    //         USING   (`user_id`)
-    //     WHERE       `users`.`user_id`=@userID
-    //     AND         `student_settings`.`consent` = 1
-    //     ORDER BY    `student_settings`.`sync_id`
-    //     LIMIT       1";
 
-    public const string QUERY_USER_FOR_COURSE = // no consent
+    public const string QUERY_USER_DATA_FOR_COURSE = // no consent
         @"SELECT    `users`.`user_id`,
                     `users`.`student_number`,
                     `users`.`name`,
@@ -1185,6 +1148,22 @@ public static class DatabaseQueries
         AND         `users`.`user_id`=@userID
         ORDER BY    `student_settings`.`sync_id` DESC
         LIMIT       1;";
+
+    public const string QUERY_CONSENTED_USER_DATA_FOR_COURSE = //// ^^^ WITH CONSENT ^^^
+        @"SELECT    `users`.`user_id`,
+                    `users`.`student_number`,
+                    `users`.`name`,
+                    `users`.`sortable_name`,
+                    `users`.`role`,
+                    `student_settings`.`goal_grade`
+        FROM        `users`
+        LEFT JOIN   `student_settings`
+            USING   (`user_id`)
+        WHERE       `student_settings`.`course_id`=@courseID
+        AND         `users`.`user_id`=@userID
+        AND         `student_settings`.`consent` = 1
+        ORDER BY    `student_settings`.`sync_id` DESC
+        LIMIT       1";
 
     public const string QUERY_STUDENTS_WITH_GOAL_GRADE =
         @"SELECT    `users`.`user_id`,
@@ -1209,6 +1188,7 @@ public static class DatabaseQueries
         FROM        `student_settings`
         WHERE       `course_id`=@courseID
         AND         `user_id`=@userID
+        AND         `consent` = 1
         ;";
 
     public const string QUERY_GOAL_GRADE_FOR_USER =
@@ -1217,6 +1197,7 @@ public static class DatabaseQueries
         FROM        `student_settings`
         WHERE       `course_id`=@courseID
         AND         `user_id`=@userID
+        AND         `consent` = 1
         ;";
 
     public const string QUERY_CONSENT_FOR_USER =
@@ -1225,6 +1206,7 @@ public static class DatabaseQueries
                     max(`student_settings`.`sync_id`) 
         WHERE       `course_id`=@courseID
         AND         `user_id`=@userID
+        AND         `consent` = 1
         ;";
 
     public const string QUERY_LAST_STUDENT_SETTINGS =
@@ -1469,8 +1451,6 @@ public const string QUERY_DISCUSSION_COUNTER_FOR_USER = // no consent
         FROM        `submissions`
         WHERE       `entry_id`=@entryID
         ;";
-        // AND         `sync_hash`=@hash
-
     public const string QUERY_EXTERNALDATA =
         @"SELECT    `user_id`,
                     `title`,
