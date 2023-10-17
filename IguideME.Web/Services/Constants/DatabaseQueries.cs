@@ -10,14 +10,14 @@ public static class DatabaseQueries
         new()
         {
             // {
-                // "000_rename_all_old_tables",
-                // @"
-                // ALTER TABLE `foo` RENAME TO `bar`;
-                // ;"
+            // "000_rename_all_old_tables",
+            // @"
+            // ALTER TABLE `foo` RENAME TO `bar`;
+            // ;"
             // }
         };
 
-// //================================ Tables ================================//
+    // //================================ Tables ================================//
 
     // /------------------------ Course Settings -------------------------/
 
@@ -172,7 +172,7 @@ public static class DatabaseQueries
      *      -   0: Grade not set yet
      *      -   1-10
      *
-     *  - consent: 
+     *  - consent:
      *      -1: unspecified
      *       0: denied
      *      +1: granted
@@ -346,7 +346,7 @@ public static class DatabaseQueries
         );";
 
 
-// //=========================== Register Values ============================//
+    // //=========================== Register Values ============================//
 
     public const string REGISTER_COURSE =
         @"INSERT INTO   `course_settings` (`course_id`, `name`)
@@ -421,8 +421,8 @@ public static class DatabaseQueries
             @order
         );";
 
-        public const string REGISTER_TILE_GROUP =
-        @"INSERT INTO       `tile_groups`
+    public const string REGISTER_TILE_GROUP =
+    @"INSERT INTO       `tile_groups`
                             (
                                 `title`,
                                 `order`,
@@ -644,7 +644,7 @@ public static class DatabaseQueries
           );";
 
 
-// //============================= Query Values =============================//
+    // //============================= Query Values =============================//
 
     public const string QUERY_DOES_COURSE_EXIST =
         @"SELECT 1
@@ -951,7 +951,7 @@ public static class DatabaseQueries
         WHERE       `tile_entries`.`tile_id`=@tileID
         ;";
 
-// NOT USED ANYWHERE. DO WE WANT IT?????
+    // NOT USED ANYWHERE. DO WE WANT IT?????
     // public const string QUERY_TILE_DISCUSSIONS_FOR_USER =
     //     @"SELECT    `id`,
     //                 `discussion_id`,
@@ -1049,9 +1049,9 @@ public static class DatabaseQueries
         OFFSET      @offset;";
 
 
-    // This is a different way to have the following query. 
+    // This is a different way to have the following query.
     // Needs more investigatin as to what is better.
-    // 
+    //
     // public const string QUERY_USERS_WITH_ROLE_FOR_COURSE =
     //     @"SELECT    subtable.`user_id`,
     //                 subtable.`student_number`,
@@ -1068,7 +1068,7 @@ public static class DatabaseQueries
     //                     `student_settings`.`goal_grade`,
     //                     ROW_NUMBER()
     //                         OVER    (PARTITION BY `student_settings`.`user_id`
-    //                                 ORDER BY `student_settings`.`sync_id` DESC) 
+    //                                 ORDER BY `student_settings`.`sync_id` DESC)
     //                         As sync
     //             FROM        `users`
     //                 LEFT JOIN   `student_settings`
@@ -1086,7 +1086,7 @@ public static class DatabaseQueries
                     `users`.`sortable_name`,
                     `users`.`role`,
                     `student_settings`.`goal_grade`,
-                    max(`student_settings`.`sync_id`) 
+                    max(`student_settings`.`sync_id`)
             FROM    `users`
                 LEFT JOIN   `student_settings`
                     USING   (`user_id`)
@@ -1096,20 +1096,20 @@ public static class DatabaseQueries
             ORDER BY    `users`.`name` ASC
             ;";
 
-        
-    public const string QUERY_CONSENTED_USERS_WITH_ROLE_FOR_COURSE = /// ^^^ WITH CONSENT ^^^
+
+    public const string QUERY_CONSENTED_STUDENTS_FOR_COURSE = /// ^^^ WITH CONSENT ^^^
         @"SELECT    `users`.`user_id`,
                     `users`.`student_number`,
                     `users`.`name`,
                     `users`.`sortable_name`,
                     `users`.`role`,
                     `student_settings`.`goal_grade`,
-                    max(`student_settings`.`sync_id`) 
+                    max(`student_settings`.`sync_id`)
             FROM    `users`
                 LEFT JOIN   `student_settings`
                     USING   (`user_id`)
             WHERE       `student_settings`.`course_id`= @courseID
-            AND         `users`.`role`= @role
+            AND         `users`.`role`= 0
             AND         `student_settings`.`consent` = 1
             GROUP BY    `users`.`user_id`
             ORDER BY    `users`.`name` ASC
@@ -1165,7 +1165,7 @@ public static class DatabaseQueries
                     `users`.`name`,
                     `users`.`sortable_name`,
                     `users`.`role`,
-                    max(`student_settings`.`sync_id`) 
+                    max(`student_settings`.`sync_id`)
             FROM    `users`
                 LEFT JOIN   `student_settings`
                     USING   (`user_id`)
@@ -1178,7 +1178,7 @@ public static class DatabaseQueries
 
     public const string QUERY_NOTIFICATIONS_ENABLE =
         @"SELECT    `notifications`,
-                    max(`student_settings`.`sync_id`) 
+                    max(`student_settings`.`sync_id`)
         FROM        `student_settings`
         WHERE       `course_id`=@courseID
         AND         `user_id`=@userID
@@ -1187,7 +1187,7 @@ public static class DatabaseQueries
 
     public const string QUERY_GOAL_GRADE_FOR_USER =
         @"SELECT    `goal_grade`,
-                    max(`student_settings`.`sync_id`) 
+                    max(`student_settings`.`sync_id`)
         FROM        `student_settings`
         WHERE       `course_id`=@courseID
         AND         `user_id`=@userID
@@ -1197,7 +1197,7 @@ public static class DatabaseQueries
     public const string QUERY_CONSENT_FOR_USER =
         @"SELECT    `consent`
         FROM        `student_settings`
-                    max(`student_settings`.`sync_id`) 
+                    max(`student_settings`.`sync_id`)
         WHERE       `course_id`=@courseID
         AND         `user_id`=@userID
         AND         `consent` = 1
@@ -1330,8 +1330,8 @@ public static class DatabaseQueries
     //     ;";
 
 
-public const string QUERY_DISCUSSION_COUNTER_FOR_USER = // no consent
-        @"SELECT        `tile_entries`.`tile_id`,
+    public const string QUERY_DISCUSSION_COUNTER_FOR_USER = // no consent
+            @"SELECT        `tile_entries`.`tile_id`,
                         SUM(`counter`)
         FROM(
                 SELECT      `discussions`.`discussion_id`
@@ -1461,7 +1461,7 @@ public const string QUERY_DISCUSSION_COUNTER_FOR_USER = // no consent
           WHERE     `migration_id`=@id;";
 
 
-// //============================ Update Values =============================//
+    // //============================ Update Values =============================//
 
 
     public const string UPDATE_LAYOUT_COLUMN =
@@ -1532,7 +1532,7 @@ public const string QUERY_DISCUSSION_COUNTER_FOR_USER = // no consent
         SET         `end_timestamp`=@currentTimestamp
         WHERE       `sync_id`=@startTimestamp;";
 
-// I think we should just update it in the tile entry table, right?????
+    // I think we should just update it in the tile entry table, right?????
     // public const string UPDATE_discussions =
     //     @"UPDATE        `discussions`
     //     SET             `tile_id`=@tileID
@@ -1544,7 +1544,7 @@ public const string QUERY_DISCUSSION_COUNTER_FOR_USER = // no consent
     //     AND             `message`=@message
     //     AND             `sync_hash`=@hash;";
 
-///// EXTERNAL DATA EXISTS NO MORE, WHAT DO WE DO HERE?????
+    ///// EXTERNAL DATA EXISTS NO MORE, WHAT DO WE DO HERE?????
     public const string RECYCLE_EXTERNAL_DATA =
         @"UPDATE        `submissions`
           SET           `sync_hash`=@hash
@@ -1560,7 +1560,7 @@ public const string QUERY_DISCUSSION_COUNTER_FOR_USER = // no consent
           );";
 
 
-// //============================ Delete Values =============================//
+    // //============================ Delete Values =============================//
 
     public const string DELETE_ALL_LAYOUT_COLUMNS =
         @"DELETE FROM   `layout_columns`
@@ -1604,7 +1604,7 @@ public const string QUERY_DISCUSSION_COUNTER_FOR_USER = // no consent
             @action
           );";
 
-// TODO: check if change here was ok
+    // TODO: check if change here was ok
     public const string DELETE_OLD_SYNCS_FOR_COURSE = //half done
         @"DELETE
         FROM        `peer_groups`
@@ -1621,7 +1621,7 @@ public const string QUERY_DISCUSSION_COUNTER_FOR_USER = // no consent
         AND         `sync_id`=@syncID;
         ";
 
-// //============================ Accept List Queries =============================//
+    // //============================ Accept List Queries =============================//
 
     // public const string REGISTER_ACCEPTED_STUDENT =
     //     @"INSERT INTO       `accept_list`

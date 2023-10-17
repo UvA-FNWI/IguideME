@@ -34,7 +34,8 @@ namespace IguideME.Web.Services
         /// <summary>
         /// Creates or renews a connection with canvas. We always initialize and keep one because we communicate with canvas outside of syncs as well.
         /// </summary>
-        public void CreateConnection() {
+        public void CreateConnection()
+        {
             this.Connector = new CanvasApiConnector(this.BaseUrl, this.AccessToken);
         }
 
@@ -46,7 +47,8 @@ namespace IguideME.Web.Services
         /// <param name="body">The message to be send.</param>
         public void SendMessage(string userID, string subject, string body)
         {
-            try {
+            try
+            {
                 Conversation conv = new(this.Connector)
                 {
                     Subject = subject,
@@ -57,10 +59,11 @@ namespace IguideME.Web.Services
 
                 conv.Save();
             }
-            catch (System.Net.WebException e) {
+            catch (System.Net.WebException e)
+            {
                 _logger.LogError("Error sending message: {error}", e);
-                _logger.LogError("Status description: {status}", ((System.Net.HttpWebResponse) e.Response).StatusDescription);
-                _logger.LogError("Response: {response}", new System.IO.StreamReader(((System.Net.HttpWebResponse) e.Response).GetResponseStream()).ReadToEnd());
+                _logger.LogError("Status description: {status}", ((System.Net.HttpWebResponse)e.Response).StatusDescription);
+                _logger.LogError("Response: {response}", new System.IO.StreamReader(((System.Net.HttpWebResponse)e.Response).GetResponseStream()).ReadToEnd());
             }
         }
 
@@ -83,12 +86,13 @@ namespace IguideME.Web.Services
         /// <param name="courseID">The course the student is a part of.</param>
         /// <param name="sisID">The sisID of the user.</param>
         /// <returns>The loginID of the user.</returns>
-        public string TranslateSISToLoginID(int courseID, string sisID) {
+        public string TranslateSISToLoginID(int courseID, string sisID)
+        {
             List<Enrollment> users = Connector.FindCourseById(courseID).Enrollments;
             return users.First(x => x.User.SISUserID == sisID).User.LoginID;
         }
 
-// TODO: change many of these arrays to Enumerables.
+        // TODO: change many of these arrays to Enumerables.
 
         /// <summary>
         /// Get all the users with the student role for a course.
@@ -130,6 +134,19 @@ namespace IguideME.Web.Services
                 .Assignments
                 .Where(assignment => assignment != null)
                 .OrderBy(a => a.Position);
+        }
+
+        /// <summary>
+        /// Gets all the submissions for a lis of (consented) students for a course from canvas.
+        /// </summary>
+        /// <param name="courseID">The id of the course the assignments are from.</param>
+        /// <param name="userIDs">The list of student ids that have given consent that the submissions are from.</param>
+        /// <returns>An iterable with submissions for the course.</returns>
+        public IEnumerable<SubmissionGroup> GetSubmissions(int courseID, string[] userIDs)
+        {
+            return Connector
+                .FindCourseById(courseID)
+                .GetSubmissions(userIDs, false);
         }
 
         /// <summary>

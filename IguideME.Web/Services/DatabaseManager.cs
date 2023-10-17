@@ -21,7 +21,8 @@ namespace IguideME.Web.Services
         private readonly string _connection_string;
         private readonly ILogger _logger;
 
-        private DatabaseManager(bool isDev = false) {
+        private DatabaseManager(bool isDev = false)
+        {
             DatabaseManager.s_instance = this;
             _connection_string = isDev ? "Data Source=db.sqlite;Version=3;New=False;Compress=True;"
                                       : "Data Source=/data/IguideME.db;Version=3;New=False;Compress=True;";
@@ -32,7 +33,7 @@ namespace IguideME.Web.Services
             _logger = factory.CreateLogger("DatabaseManager");
         }
 
-        public static DatabaseManager GetInstance (bool isDev = false)
+        public static DatabaseManager GetInstance(bool isDev = false)
         {
 
             s_instance ??= new DatabaseManager(isDev);
@@ -45,18 +46,22 @@ namespace IguideME.Web.Services
         private void NonQuery(string query, params SQLiteParameter[] parameters)
         {
             SQLiteConnection connection = GetConnection();
-            try {
+            try
+            {
                 connection.Open();
-                using(SQLiteCommand command = connection.CreateCommand())
+                using (SQLiteCommand command = connection.CreateCommand())
                 {
                     command.CommandText = query;
-                    foreach (SQLiteParameter param in parameters) {
+                    foreach (SQLiteParameter param in parameters)
+                    {
                         command.Parameters.Add(param);
                     }
                     command.ExecuteNonQuery();
                 }
                 connection.Close();
-            } catch {
+            }
+            catch
+            {
                 // Close connection before rethrowing
                 connection.Close();
                 throw;
@@ -67,24 +72,28 @@ namespace IguideME.Web.Services
         {
             int id = 0;
             SQLiteConnection connection = GetConnection();
-            try {
+            try
+            {
                 connection.Open();
-                using(SQLiteCommand command = connection.CreateCommand())
+                using (SQLiteCommand command = connection.CreateCommand())
                 {
                     command.CommandText = query;
-                    foreach (SQLiteParameter param in parameters) {
+                    foreach (SQLiteParameter param in parameters)
+                    {
                         command.Parameters.Add(param);
                     }
                     command.ExecuteNonQuery();
                 }
 
-                using(SQLiteCommand command = connection.CreateCommand())
+                using (SQLiteCommand command = connection.CreateCommand())
                 {
                     command.CommandText = "SELECT last_insert_rowid()";
                     id = int.Parse(command.ExecuteScalar().ToString());
                 }
                 connection.Close();
-            } catch {
+            }
+            catch
+            {
                 // Close connection before rethrowing
                 connection.Close();
                 throw;
@@ -96,17 +105,21 @@ namespace IguideME.Web.Services
         private SQLiteDataReader Query(string query, params SQLiteParameter[] parameters)
         {
             SQLiteConnection connection = GetConnection();
-            try {
+            try
+            {
                 connection.Open();
-                using(SQLiteCommand command = connection.CreateCommand())
+                using (SQLiteCommand command = connection.CreateCommand())
                 {
                     command.CommandText = query;
-                    foreach (SQLiteParameter param in parameters) {
+                    foreach (SQLiteParameter param in parameters)
+                    {
                         command.Parameters.Add(param);
                     }
                     return command.ExecuteReader(CommandBehavior.CloseConnection);
                 }
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 // Close connection before rethrowing
                 _logger.LogError("Exception encountered while creating query: {message}\n {trace}", e.Message, e.StackTrace);
                 connection.Close();
@@ -114,20 +127,25 @@ namespace IguideME.Web.Services
             }
         }
 
-        private void PrintQueryError(string title, int rows, SQLiteDataReader r, Exception e) {
+        private void PrintQueryError(string title, int rows, SQLiteDataReader r, Exception e)
+        {
             string error = $"{title}\nRequested:\nColumn | Data Type | Value | Type\n";
 
-            try {
+            try
+            {
                 for (int i = 0; i <= rows; i++)
                     error += $"{r.GetName(i)} {r.GetDataTypeName(i)} {r.GetValue(i)} {r.GetValue(i).GetType()}\n";
 
                 _logger.LogError("Error reading from the query: {error} \n\n {message} \n {trace}", error, e.Message, e.StackTrace);
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 _logger.LogError("Error in printquerryerror: {message} {trace}\n\nOriginal error:\n{original} {originaltrace}", ex.Message, ex.StackTrace, e.Message, e.StackTrace);
             }
         }
 
-        public void LogTable(string name) {
+        public void LogTable(string name)
+        {
             _logger.LogInformation("Logging table {name}", name);
 
             string table = "";
@@ -138,8 +156,10 @@ namespace IguideME.Web.Services
                     table += r.GetName(i) + "\t";
                 }
                 table += "\n\n";
-                while (r.Read()) {
-                    for (int i = 0; i < r.FieldCount; i++) {
+                while (r.Read())
+                {
+                    for (int i = 0; i < r.FieldCount; i++)
+                    {
                         table += r.GetValue(i).ToString() + "\t";
                     }
                     table += "\n";
@@ -237,30 +257,38 @@ namespace IguideME.Web.Services
             using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_LATEST_SYNCS_FOR_COURSE,
                                               new SQLiteParameter("courseID", courseID),
                                               new SQLiteParameter("limit", number_of_syncs)))
-                while (r.Read()) {
+                while (r.Read())
+                {
                     syncIDs.Add(long.Parse(r.GetValue(0).ToString()));
                 }
 
             return syncIDs;
         }
 
-        public void CleanupSync(int courseID) {
+        public void CleanupSync(int courseID)
+        {
             RemoveSyncsWithNoEndTimestamp(courseID);
 
             List<long> syncIDs = new();
 
             using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_OLD_HASHES_FOR_COURSE,
                                               new SQLiteParameter("courseID", courseID),
-                                              new  SQLiteParameter("offset", 15))) {
-                while (r.Read()) {
-                    try {
+                                              new SQLiteParameter("offset", 15)))
+            {
+                while (r.Read())
+                {
+                    try
+                    {
                         syncIDs.Add(long.Parse(r.GetValue(0).ToString()));
-                    } catch (Exception e) {
+                    }
+                    catch (Exception e)
+                    {
                         _logger.LogError("Unable to get old sync: {sync}\nError: {message}\n{trace}", r.GetValue(0), e.Message, e.StackTrace);
                     }
                 }
             }
-            foreach (long syncID in syncIDs) {
+            foreach (long syncID in syncIDs)
+            {
                 NonQuery(DatabaseQueries.DELETE_OLD_SYNCS_FOR_COURSE, new SQLiteParameter("courseID", courseID), new SQLiteParameter("syncID", syncID));
             }
         }
@@ -284,13 +312,18 @@ namespace IguideME.Web.Services
         public List<int> GetCourseIds()
         {
             List<int> course_ids = new();
-            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_COURSE_IDS)) {
-                try {
-                    while (r.Read()) {
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_COURSE_IDS))
+            {
+                try
+                {
+                    while (r.Read())
+                    {
                         course_ids.Add(r.GetInt32(0));
                     }
 
-                } catch (Exception e) {
+                }
+                catch (Exception e)
+                {
                     PrintQueryError("GetCourseIds", 0, r, e);
                 }
             }
@@ -298,14 +331,18 @@ namespace IguideME.Web.Services
         }
 
 
-        public void RemoveSyncsWithNoEndTimestamp(int courseID) {
+        public void RemoveSyncsWithNoEndTimestamp(int courseID)
+        {
             _logger.LogInformation("Starting cleanup of sync hystory ");
-            try {
+            try
+            {
                 NonQuery(
                     DatabaseQueries.DELETE_INCOMPLETE_SYNCS,
                     new SQLiteParameter("courseID", courseID)
                 );
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 _logger.LogError("Error removing syncs: {message}\n{trace}", e.Message, e.StackTrace);
             }
         }
@@ -330,7 +367,7 @@ namespace IguideME.Web.Services
         public void CompleteSync(long syncID)
         {
 
-        long currentTimestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            long currentTimestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
             NonQuery(
                 DatabaseQueries.COMPLETE_NEW_SYNC,
@@ -346,17 +383,22 @@ namespace IguideME.Web.Services
              */
             List<DataSynchronization> hashes = new();
 
-            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_SYNC_HASHES_FOR_COURSE, new SQLiteParameter("courseID", courseID))) {
-                while (r.Read()) {
-                    try {
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_SYNC_HASHES_FOR_COURSE, new SQLiteParameter("courseID", courseID)))
+            {
+                while (r.Read())
+                {
+                    try
+                    {
                         string status;
                         long? endTime = null;
 
-                        if (r.GetValue(2).GetType() != typeof(DBNull)) {
+                        if (r.GetValue(2).GetType() != typeof(DBNull))
+                        {
                             endTime = long.Parse(r.GetValue(2).ToString()); //.ToLocalTime()
                             status = "COMPLETE";
                         }
-                        else {
+                        else
+                        {
                             status = "INCOMPLETE";
                         }
 
@@ -367,7 +409,9 @@ namespace IguideME.Web.Services
                             status
                             )
                         );
-                    } catch (Exception e) {
+                    }
+                    catch (Exception e)
+                    {
                         PrintQueryError("GetsyncIDes", 5, r, e);
                     }
                 }
@@ -379,7 +423,8 @@ namespace IguideME.Web.Services
         public int GetMinimumPeerGroupSize(int courseID)
         {
 
-            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_PEER_GROUP_FOR_COURSE, new SQLiteParameter("courseID", courseID))) {
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_PEER_GROUP_FOR_COURSE, new SQLiteParameter("courseID", courseID)))
+            {
                 if (r.Read())
                     return r.GetInt32(0);
             }
@@ -447,11 +492,12 @@ namespace IguideME.Web.Services
                 new SQLiteParameter("authorName", discussion.UserName),
                 new SQLiteParameter("date", discussion.PostedAt),
                 new SQLiteParameter("message", discussion.Message)
-                // new SQLiteParameter("message", discussion.Message.Replace("'", "''")), // TODO: remove if didn't break
+            // new SQLiteParameter("message", discussion.Message.Replace("'", "''")), // TODO: remove if didn't break
             );
         }
 
-        public void UpdateDiscussion(Discussion discussion, int tileID, long syncID) {
+        public void UpdateDiscussion(Discussion discussion, int tileID, long syncID)
+        {
             // I think that this is only to tie the discussion to the tile.
             // If that's so, then this is the wrong query, we just have to create a tile entry with this discussion id
             NonQuery(
@@ -473,16 +519,17 @@ namespace IguideME.Web.Services
                     DatabaseQueries.REGISTER_DISCUSSION_REPLY,
                     new SQLiteParameter("entryID", entry.TopicID),
                     new SQLiteParameter("userID", userID),
-    				new SQLiteParameter("date", entry.CreatedAt),
+                    new SQLiteParameter("date", entry.CreatedAt),
                     new SQLiteParameter("message", entry.Message)
-                    // new SQLiteParameter("message", entry.Message.Replace("'", "''")),
+            // new SQLiteParameter("message", entry.Message.Replace("'", "''")),
 
             );
         }
 
         public void RegisterDiscussionReply(DiscussionReply reply, int discussionID, string userID)
         {
-            if (discussionID == -1) {
+            if (discussionID == -1)
+            {
                 return;
             }
 
@@ -509,9 +556,10 @@ namespace IguideME.Web.Services
 
             using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_USERS_WITH_ROLE_FOR_COURSE,
                     new SQLiteParameter("courseID", courseID),
-                    new SQLiteParameter("role", (int) role),
+                    new SQLiteParameter("role", (int)role),
                     new SQLiteParameter("syncID", activeSync)
-                )) {
+                ))
+            {
                 // collect all users
                 while (r.Read())
                 {
@@ -544,11 +592,11 @@ namespace IguideME.Web.Services
 
             List<User> users = new();
 
-            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_CONSENTED_USERS_WITH_ROLE_FOR_COURSE,
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_CONSENTED_STUDENTS_FOR_COURSE,
                     new SQLiteParameter("courseID", courseID),
-                    new SQLiteParameter("role", (int) role),
                     new SQLiteParameter("syncID", activeSync)
-                )) {
+                ))
+            {
                 while (r.Read())
                 {
                     User user = new(
@@ -567,10 +615,12 @@ namespace IguideME.Web.Services
             return users;
         }
 
-        public string GetUserID(int studentNumber) {
+        public string GetUserID(int studentNumber)
+        {
             using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_USER_ID,
                     new SQLiteParameter("studentNumber", studentNumber)
-                )) {
+                ))
+            {
                 if (r.Read())
                 {
                     return r.GetValue(0).ToString();
@@ -580,12 +630,14 @@ namespace IguideME.Web.Services
         }
 
 
-        public string GetConsentedStudentID(int courseID, int studentNumber) {
+        public string GetConsentedStudentID(int courseID, int studentNumber)
+        {
 
             using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_CONSENTED_USER_ID_FROM_STUDENT_NUMBER,
                     new SQLiteParameter("courseID", courseID),
                     new SQLiteParameter("studentNumber", studentNumber)
-                )) {
+                ))
+            {
                 if (r.Read())
                     return r.GetValue(0).ToString();
             }
@@ -598,7 +650,8 @@ namespace IguideME.Web.Services
             using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_USER_DATA_FOR_COURSE,
                     new SQLiteParameter("courseID", courseID),
                     new SQLiteParameter("userID", userID)
-                )) {
+                ))
+            {
                 if (r.Read())
                 {
                     user = new User(
@@ -612,16 +665,18 @@ namespace IguideME.Web.Services
                 }
             }
 
-            if (user.Role == UserRoles.student) {
+            if (user.Role == UserRoles.student)
+            {
                 using (SQLiteDataReader r2 = Query(DatabaseQueries.QUERY_GOAL_GRADE_FOR_USER,
                     new SQLiteParameter("courseID", courseID),
                     new SQLiteParameter("userID", userID)
-                )) {
-                if (r2.Read())
+                ))
                 {
-                    user.GoalGrade = r2.GetInt32(0);
+                    if (r2.Read())
+                    {
+                        user.GoalGrade = r2.GetInt32(0);
+                    }
                 }
-            }
             }
 
             return user;
@@ -633,7 +688,8 @@ namespace IguideME.Web.Services
             using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_CONSENTED_USER_DATA_FOR_COURSE,
                     new SQLiteParameter("courseID", courseID),
                     new SQLiteParameter("userID", userID)
-                )) {
+                ))
+            {
                 if (r.Read())
                 {
                     user = new User(
@@ -661,10 +717,11 @@ namespace IguideME.Web.Services
 
             List<User> users = new();
 
-            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_STUDENTS_WITH_GOAL_GRADE,
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_STUDENTS_WITH_GOAL_GRADE,
                     new SQLiteParameter("courseID", courseID),
                     new SQLiteParameter("goalGrade", goalGrade)
-                )) {
+                ))
+            {
                 // collect all users
                 while (r.Read())
                 {
@@ -709,19 +766,23 @@ namespace IguideME.Web.Services
             List<GradePredictionModel> models = new();
             GradePredictionModel model;
 
-            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_GRADE_PREDICTION_MODELS_FOR_COURSE,
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_GRADE_PREDICTION_MODELS_FOR_COURSE,
                     new SQLiteParameter("courseID", courseID)
-                )) {
+                ))
+            {
                 while (r.Read())
                 {
-                    try {
+                    try
+                    {
                         model = new GradePredictionModel(r.GetInt32(0),
                                                     courseID,
                                                     r.GetBoolean(2),
                                                     r.GetFloat(1));
                         // model.getParameters();
                         models.Add(model);
-                    } catch (Exception e) {
+                    }
+                    catch (Exception e)
+                    {
                         PrintQueryError("GetGrade{redictionModels", 2, r, e);
                     }
                 }
@@ -737,10 +798,12 @@ namespace IguideME.Web.Services
 
             GradePredictionModel model = null;
 
-            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_GRADE_PREDICTION_MODEL_FOR_COURSE,
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_GRADE_PREDICTION_MODEL_FOR_COURSE,
                 new SQLiteParameter("courseID", courseID)
-                )) {
-                if (r.Read()) {
+                ))
+            {
+                if (r.Read())
+                {
                     model = new GradePredictionModel(
                             r.GetInt32(0),
                             courseID,
@@ -760,9 +823,10 @@ namespace IguideME.Web.Services
 
             List<GradePredictionModelParameter> parameters = new();
 
-            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_GRADE_PREDICTION_MODEL_PARAMETERS_FOR_MODEL,
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_GRADE_PREDICTION_MODEL_PARAMETERS_FOR_MODEL,
                 new SQLiteParameter("modelID", modelID)
-            )) {
+            ))
+            {
                 while (r.Read())
                 {
                     GradePredictionModelParameter parameter = new(
@@ -786,25 +850,29 @@ namespace IguideME.Web.Services
         {
             long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
 
-            try{
-            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_LAST_STUDENT_SETTINGS,
-                    new SQLiteParameter("courseID", courseID),
-                    new SQLiteParameter("userID", userID)
-                )) {
-                while (r.Read())
-                {
-                    NonQuery(DatabaseQueries.REGISTER_STUDENT_SETTINGS,
+            try
+            {
+                using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_LAST_STUDENT_SETTINGS,
                         new SQLiteParameter("courseID", courseID),
-                        new SQLiteParameter("userID", userID),
-                        new SQLiteParameter("PredictedGrade", grade),
-                        new SQLiteParameter("GoalGrade", r.GetInt32(1)),
-                        new SQLiteParameter("Consent", r.GetInt32(2)),
-                        new SQLiteParameter("Notifications", r.GetBoolean(3)),
-                        new SQLiteParameter("syncID", activeSync)
-                    );
+                        new SQLiteParameter("userID", userID)
+                    ))
+                {
+                    while (r.Read())
+                    {
+                        NonQuery(DatabaseQueries.REGISTER_STUDENT_SETTINGS,
+                            new SQLiteParameter("courseID", courseID),
+                            new SQLiteParameter("userID", userID),
+                            new SQLiteParameter("PredictedGrade", grade),
+                            new SQLiteParameter("GoalGrade", r.GetInt32(1)),
+                            new SQLiteParameter("Consent", r.GetInt32(2)),
+                            new SQLiteParameter("Notifications", r.GetBoolean(3)),
+                            new SQLiteParameter("syncID", activeSync)
+                        );
+                    }
                 }
             }
-            } catch (Exception e) {
+            catch (Exception e)
+            {
                 _logger.LogError("Error storing predicted grade: {message}\n{trace}", e.Message, e.StackTrace);
             }
         }
@@ -814,13 +882,14 @@ namespace IguideME.Web.Services
             long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
             long old_sync = 0;
 
-            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_LAST_STUDENT_SETTINGS,
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_LAST_STUDENT_SETTINGS,
                     new SQLiteParameter("courseID", courseID),
                     new SQLiteParameter("userID", userID)
-                )) {
-                    if (r.Read())
-                        old_sync = long.Parse(r.GetValue(4).ToString());
-                }
+                ))
+            {
+                if (r.Read())
+                    old_sync = long.Parse(r.GetValue(4).ToString());
+            }
 
             _logger.LogInformation("old {old}", old_sync);
             if (old_sync != 0)
@@ -839,15 +908,18 @@ namespace IguideME.Web.Services
         public bool GetTileNotificationState(int tileID)
         {
             bool result = false;
-            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_TILE_NOTIFICATIONS_STATE,
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_TILE_NOTIFICATIONS_STATE,
                     new SQLiteParameter("tileID", tileID)
-                )) {
+                ))
+            {
                 if (r.Read())
                 {
-                    try{
+                    try
+                    {
                         result = r.GetBoolean(0);
                     }
-                    catch (Exception e) {
+                    catch (Exception e)
+                    {
                         PrintQueryError("GetUserGoalGrade", 0, r, e);
                     }
                 }
@@ -858,10 +930,11 @@ namespace IguideME.Web.Services
         public void UpdateNotificationEnable(int courseID, string userID, bool enable, long syncID)
         {
             long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
-            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_LAST_STUDENT_SETTINGS,
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_LAST_STUDENT_SETTINGS,
                     new SQLiteParameter("courseID", courseID),
                     new SQLiteParameter("userID", userID)
-                )) {
+                ))
+            {
                 while (r.Read())
                 {
                     NonQuery(DatabaseQueries.REGISTER_STUDENT_SETTINGS,
@@ -881,16 +954,19 @@ namespace IguideME.Web.Services
         {
 
             bool result = true;
-            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_NOTIFICATIONS_ENABLE,
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_NOTIFICATIONS_ENABLE,
                     new SQLiteParameter("courseID", courseID),
                     new SQLiteParameter("userID", userID)
-                )) {
+                ))
+            {
                 if (r.Read())
                 {
-                    try{
+                    try
+                    {
                         result = r.GetBoolean(0);
                     }
-                    catch (Exception e) {
+                    catch (Exception e)
+                    {
                         PrintQueryError("GetUserGoalGrade", 0, r, e);
                     }
                 }
@@ -901,10 +977,11 @@ namespace IguideME.Web.Services
         public void UpdateUserGoalGrade(int courseID, string userID, int grade, long syncID)
         {
             long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
-            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_LAST_STUDENT_SETTINGS,
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_LAST_STUDENT_SETTINGS,
                     new SQLiteParameter("courseID", courseID),
                     new SQLiteParameter("userID", userID)
-                )) {
+                ))
+            {
                 while (r.Read())
                 {
                     NonQuery(DatabaseQueries.REGISTER_STUDENT_SETTINGS,
@@ -923,16 +1000,19 @@ namespace IguideME.Web.Services
         public int GetUserGoalGrade(int courseID, string userID, long syncID)
         {
             int result = -1;
-            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_GOAL_GRADE_FOR_USER,
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_GOAL_GRADE_FOR_USER,
                     new SQLiteParameter("courseID", courseID),
                     new SQLiteParameter("userID", userID)
-                )) {
+                ))
+            {
                 if (r.Read())
                 {
-                    try{
+                    try
+                    {
                         result = Convert.ToInt32(r.GetValue(0).ToString());
                     }
-                    catch (Exception e) {
+                    catch (Exception e)
+                    {
                         PrintQueryError("GetUserGoalGrade", 0, r, e);
                     }
                 }
@@ -973,7 +1053,7 @@ namespace IguideME.Web.Services
             float maxGrade,
             long syncID)
         {
-            string combinedIDs = string.Join( ",", userIDs);
+            string combinedIDs = string.Join(",", userIDs);
             NonQuery(DatabaseQueries.REGISTER_USER_PEER,
                 new SQLiteParameter("goalGrade", goalGrade),
                 new SQLiteParameter("combinedIDs", combinedIDs),
@@ -996,11 +1076,12 @@ namespace IguideME.Web.Services
 
             List<String> peers = new();
 
-            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_GROUP_PEERS,
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_GROUP_PEERS,
                     new SQLiteParameter("courseID", courseID),
                     new SQLiteParameter("goalGrade", goalGrade),
                     new SQLiteParameter("syncID", activeSync)
-                )) {
+                ))
+            {
                 while (r.Read())
                 {
                     peers.Add(r.GetValue(0).ToString());
@@ -1041,9 +1122,10 @@ namespace IguideME.Web.Services
         {
             List<AssignmentSubmission> submissions = new();
 
-            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_SUBMISSIONS_FOR_ENTRY,
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_SUBMISSIONS_FOR_ENTRY,
                     new SQLiteParameter("entryID", entryID)
-                )) {
+                ))
+            {
                 while (r.Read())
                 {
                     AssignmentSubmission submission = new(
@@ -1057,7 +1139,8 @@ namespace IguideME.Web.Services
                 }
             }
 
-            foreach (AssignmentSubmission sub in submissions) {
+            foreach (AssignmentSubmission sub in submissions)
+            {
                 sub.Meta = GetEntryMeta(sub.ID);
             }
 
@@ -1073,13 +1156,15 @@ namespace IguideME.Web.Services
 
             List<AssignmentSubmission> submissions = new();
 
-            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_COURSE_SUBMISSIONS,
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_COURSE_SUBMISSIONS,
                     new SQLiteParameter("courseID", courseID),
                     new SQLiteParameter("syncID", activeSync)
-                )) {
+                ))
+            {
                 while (r.Read())
                 {
-                    try {
+                    try
+                    {
                         AssignmentSubmission submission = new(
                             r.GetInt32(0),
                             r.GetInt32(1),
@@ -1089,13 +1174,15 @@ namespace IguideME.Web.Services
                         );
                         submissions.Add(submission);
                     }
-                    catch (Exception e) {
+                    catch (Exception e)
+                    {
                         PrintQueryError("GetCourseSubmissions", 4, r, e);
                     }
                 }
             }
 
-            foreach (AssignmentSubmission sub in submissions) {
+            foreach (AssignmentSubmission sub in submissions)
+            {
                 sub.Meta = GetEntryMeta(sub.ID);
             }
 
@@ -1112,10 +1199,11 @@ namespace IguideME.Web.Services
 
             List<AssignmentSubmission> submissions = new();
 
-            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_COURSE_SUBMISSIONS_FOR_STUDENT,
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_COURSE_SUBMISSIONS_FOR_STUDENT,
                     new SQLiteParameter("courseID", courseID),
                     new SQLiteParameter("userID", userID)
-                )) {
+                ))
+            {
                 while (r.Read())
                 {
                     AssignmentSubmission submission = new(
@@ -1129,7 +1217,8 @@ namespace IguideME.Web.Services
                 }
             }
 
-            foreach (AssignmentSubmission sub in submissions) {
+            foreach (AssignmentSubmission sub in submissions)
+            {
                 sub.Meta = GetEntryMeta(sub.ID);
             }
 
@@ -1144,10 +1233,11 @@ namespace IguideME.Web.Services
         {
             List<AssignmentSubmission> submissions = new();
 
-            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_USER_SUBMISSIONS_FOR_ENTRY_FOR_USER,
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_USER_SUBMISSIONS_FOR_ENTRY_FOR_USER,
                     new SQLiteParameter("entryID", entryID),
                     new SQLiteParameter("userID", userID)
-                )) {
+                ))
+            {
                 while (r.Read())
                 {
                     AssignmentSubmission submission = new(
@@ -1161,22 +1251,25 @@ namespace IguideME.Web.Services
                 }
             }
 
-            foreach (AssignmentSubmission sub in submissions) {
+            foreach (AssignmentSubmission sub in submissions)
+            {
                 sub.Meta = GetEntryMeta(sub.ID);
             }
 
             return submissions;
         }
 
-        public List<AssignmentSubmission> GetTileSubmissions( int courseID, int tileID, long syncID = 0) {
+        public List<AssignmentSubmission> GetTileSubmissions(int courseID, int tileID, long syncID = 0)
+        {
             long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
             if (activeSync == 0) return new List<AssignmentSubmission>() { };
 
             List<AssignmentSubmission> submissions = new();
 
-            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_ALL_USER_SUBMISSIONS_FOR_TILE,
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_ALL_USER_SUBMISSIONS_FOR_TILE,
                     new SQLiteParameter("tileID", tileID)
-                )) {
+                ))
+            {
                 while (r.Read())
                 {
                     AssignmentSubmission submission = new(
@@ -1190,7 +1283,8 @@ namespace IguideME.Web.Services
                 }
             }
 
-            foreach (AssignmentSubmission sub in submissions) {
+            foreach (AssignmentSubmission sub in submissions)
+            {
                 sub.Meta = GetEntryMeta(sub.ID);
             }
 
@@ -1209,10 +1303,11 @@ namespace IguideME.Web.Services
 
             List<AssignmentSubmission> submissions = new();
 
-            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_SUBMISSIONS_FOR_TILE_FOR_USER,
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_SUBMISSIONS_FOR_TILE_FOR_USER,
                     new SQLiteParameter("tileID", tileID),
                     new SQLiteParameter("userID", userID)
-                )) {
+                ))
+            {
                 while (r.Read())
                 {
                     AssignmentSubmission submission = new(
@@ -1226,7 +1321,8 @@ namespace IguideME.Web.Services
                 }
             }
 
-            foreach (AssignmentSubmission sub in submissions) {
+            foreach (AssignmentSubmission sub in submissions)
+            {
                 sub.Meta = GetEntryMeta(sub.ID);
             }
 
@@ -1237,9 +1333,10 @@ namespace IguideME.Web.Services
         {
             PeerGroup group = null;
 
-            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_PEER_GROUP_FOR_COURSE,
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_PEER_GROUP_FOR_COURSE,
                     new SQLiteParameter("courseID", courseID)
-                )) {
+                ))
+            {
                 if (r.Read())
                 {
                     group = new PeerGroup(
@@ -1256,9 +1353,10 @@ namespace IguideME.Web.Services
         {
             PublicInformedConsent consent = null;
 
-            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_CONSENT_FOR_COURSE,
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_CONSENT_FOR_COURSE,
                     new SQLiteParameter("courseID", courseID)
-                )) {
+                ))
+            {
                 if (r.Read())
                 {
                     consent = new PublicInformedConsent(
@@ -1285,16 +1383,20 @@ namespace IguideME.Web.Services
 
             // First we find all their ids and save them in a list
             List<int> consentedStudentIds = new List<int>();
-            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_CONSENTED_USERS_WITH_ROLE_FOR_COURSE,
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_CONSENTED_STUDENTS_FOR_COURSE,
                     new SQLiteParameter("courseID", courseID),
-                    new SQLiteParameter("role", UserRoles.student),
                     new SQLiteParameter("syncID", syncID)
-                )) {
-                while (r.Read()) {
-                    try {
+                ))
+            {
+                while (r.Read())
+                {
+                    try
+                    {
                         // add the id of every consented student to the list
                         consentedStudentIds.Add(r.GetInt32(0));
-                    } catch (Exception e) {
+                    }
+                    catch (Exception e)
+                    {
                         PrintQueryError("UpdateInformedConsent", 0, r, e);
                     }
                 }
@@ -1329,18 +1431,21 @@ namespace IguideME.Web.Services
             );
         }
 
-    public Dictionary<int,List<float>> GetUserGrades(
-            int courseID,
-            string userID)
+        public Dictionary<int, List<float>> GetUserGrades(
+                int courseID,
+                string userID)
         {
-            Dictionary<int,List<float>> grades = new();
+            Dictionary<int, List<float>> grades = new();
 
-            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_COURSE_SUBMISSIONS_FOR_STUDENT,
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_COURSE_SUBMISSIONS_FOR_STUDENT,
                     new SQLiteParameter("courseID", courseID),
                     new SQLiteParameter("userID", userID)
-                )) {
-                while (r.Read()) {
-                    try {
+                ))
+            {
+                while (r.Read())
+                {
+                    try
+                    {
                         // We save all the retrieved grades in a dictionary with
                         // the assignment.id as key and a list of grades as value
                         if (!grades.TryGetValue(r.GetInt32(1), out List<float> value))
@@ -1348,18 +1453,23 @@ namespace IguideME.Web.Services
                             grades[r.GetInt32(1)] = new List<float>();
                         }
                         grades[r.GetInt32(1)].Add(r.GetFloat(3));
-                    } catch (Exception e) {
+                    }
+                    catch (Exception e)
+                    {
                         PrintQueryError("GetUserGrades", 3, r, e);
                     }
                 }
             }
-            
-            using(SQLiteDataReader r2 = Query(DatabaseQueries.QUERY_DISCUSSION_COUNTER_FOR_USER,
+
+            using (SQLiteDataReader r2 = Query(DatabaseQueries.QUERY_DISCUSSION_COUNTER_FOR_USER,
                     new SQLiteParameter("courseID", courseID),
                     new SQLiteParameter("userID", userID)
-                )) {
-                while (r2.Read()) {
-                    try {
+                ))
+            {
+                while (r2.Read())
+                {
+                    try
+                    {
                         // We save the sum of discussion entries and replies in a dictionary with
                         // the root discussion_id as key and the total of their entries/replies as value
                         if (!r2.IsDBNull(0))
@@ -1368,7 +1478,9 @@ namespace IguideME.Web.Services
                             grades[discID] = new List<float> { r2.GetInt32(1) };
                         }
 
-                    } catch (Exception e) {
+                    }
+                    catch (Exception e)
+                    {
                         PrintQueryError("GetUserGrades", 3, r2, e);
                     }
                 }
@@ -1392,15 +1504,18 @@ namespace IguideME.Web.Services
             List<PeerComparisonData> submissions = new();
 
             // First we need to find the user's goal grade to find their peer-group
-            int goalGrade = GetUserGoalGrade(courseID,loginID,syncID);
+            int goalGrade = GetUserGoalGrade(courseID, loginID, syncID);
 
-            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_PEER_GROUP_RESULTS,
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_PEER_GROUP_RESULTS,
                     new SQLiteParameter("courseID", courseID),
                     new SQLiteParameter("goalGrade", goalGrade),
                     new SQLiteParameter("syncID", activeSync)
-                )) {
-                while (r.Read()) {
-                    try {
+                ))
+            {
+                while (r.Read())
+                {
+                    try
+                    {
                         PeerComparisonData submission = new(
                             r.GetInt32(0),
                             r.GetFloat(1),
@@ -1409,7 +1524,9 @@ namespace IguideME.Web.Services
                         );
                         submissions.Add(submission);
 
-                    } catch (Exception e) {
+                    }
+                    catch (Exception e)
+                    {
                         PrintQueryError("GetUserPeerComparison2", 3, r, e);
                     }
                 }
@@ -1421,10 +1538,11 @@ namespace IguideME.Web.Services
         {
             List<PredictedGrade> predictions = new();
 
-            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_PREDICTED_GRADES_FOR_USER,
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_PREDICTED_GRADES_FOR_USER,
                     new SQLiteParameter("courseID", courseID),
                     new SQLiteParameter("userID", userID)
-                )) {
+                ))
+            {
                 while (r.Read())
                 {
                     PredictedGrade prediction = new(
@@ -1446,11 +1564,13 @@ namespace IguideME.Web.Services
 
             List<PeerComparisonData> submissions = new();
 
-            using(SQLiteDataReader r1 = Query(DatabaseQueries.QUERY_USER_RESULTS,
+            using (SQLiteDataReader r1 = Query(DatabaseQueries.QUERY_USER_RESULTS,
                     new SQLiteParameter("courseID", courseID),
                     new SQLiteParameter("userID", userID)
-                )) {
-                while (r1.Read()) {
+                ))
+            {
+                while (r1.Read())
+                {
                     PeerComparisonData submission = new(
                         r1.GetInt32(0),
                         r1.GetFloat(1),
@@ -1473,10 +1593,11 @@ namespace IguideME.Web.Services
 
             List<AssignmentSubmission> submissions = new();
 
-            using(SQLiteDataReader r1 = Query(DatabaseQueries.QUERY_COURSE_SUBMISSIONS_FOR_STUDENT,
+            using (SQLiteDataReader r1 = Query(DatabaseQueries.QUERY_COURSE_SUBMISSIONS_FOR_STUDENT,
                     new SQLiteParameter("userID", userID),
                     new SQLiteParameter("courseID", courseID)
-                )) {
+                ))
+            {
                 while (r1.Read())
                 {
                     AssignmentSubmission submission = new(
@@ -1490,7 +1611,8 @@ namespace IguideME.Web.Services
                 }
             }
 
-            foreach (AssignmentSubmission sub in submissions) {
+            foreach (AssignmentSubmission sub in submissions)
+            {
                 sub.Meta = GetEntryMeta(sub.ID);
             }
 
@@ -1499,7 +1621,7 @@ namespace IguideME.Web.Services
 
 
 
-        public Dictionary <int,List<List<object>>> GetHistoricComparison(
+        public Dictionary<int, List<List<object>>> GetHistoricComparison(
             int courseID,
             string userID,
             long syncID = 0)
@@ -1509,11 +1631,12 @@ namespace IguideME.Web.Services
 
             Dictionary<int, List<List<object>>> comparisson_history = new();
 
-            using(SQLiteDataReader r1 = Query(DatabaseQueries.QUERY_GRADE_COMPARISSON_HISTORY,
+            using (SQLiteDataReader r1 = Query(DatabaseQueries.QUERY_GRADE_COMPARISSON_HISTORY,
                     new SQLiteParameter("courseID", courseID),
-                    new SQLiteParameter("grade", GetUserGoalGrade(courseID,userID, syncID)),
+                    new SQLiteParameter("grade", GetUserGoalGrade(courseID, userID, syncID)),
                     new SQLiteParameter("userID", userID)
-                )) {
+                ))
+            {
                 try
                 {
                     // Initialize last elements
@@ -1533,14 +1656,16 @@ namespace IguideME.Web.Services
 
                         DateTime labelDate = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
                         labelDate = labelDate.AddMilliseconds(long.Parse(r1.GetValue(5).ToString()));
-                        string label = String.Format("{0:dd/MM/yyyy}",labelDate); //sync_hash
+                        string label = String.Format("{0:dd/MM/yyyy}", labelDate); //sync_hash
 
                         // If this entry is different than the last, we add it
                         if (last_user_avg != user_avg || last_peer_avg != peer_avg
-                            || last_peer_max != peer_max || last_peer_min != peer_min) {
+                            || last_peer_max != peer_max || last_peer_min != peer_min)
+                        {
 
                             // If we have gone in a new tile, we create new pair
-                            if (!comparisson_history.ContainsKey(tile_id)) {
+                            if (!comparisson_history.ContainsKey(tile_id))
+                            {
                                 // Use tile id as key and create new list to add the values
                                 comparisson_history[tile_id] = new List<List<object>>
                                 {
@@ -1551,7 +1676,8 @@ namespace IguideME.Web.Services
                                     new List<object> { peer_min }
                                 };
                             }
-                            else {
+                            else
+                            {
                                 comparisson_history[tile_id][0].Add(label);
                                 comparisson_history[tile_id][1].Add(user_avg);
                                 comparisson_history[tile_id][2].Add(peer_avg);
@@ -1567,7 +1693,8 @@ namespace IguideME.Web.Services
                         }
                     }
                 }
-                catch (Exception e) {
+                catch (Exception e)
+                {
                     PrintQueryError("GetHistoricComparison", 3, r1, e);
                 }
             }
@@ -1578,18 +1705,22 @@ namespace IguideME.Web.Services
         {
             List<LearningGoal> goals = new();
 
-            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_LEARNING_GOALS,
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_LEARNING_GOALS,
                     new SQLiteParameter("courseID", courseID)
-                )) {
+                ))
+            {
                 while (r.Read())
                 {
-                    try {
+                    try
+                    {
                         goals.Add(new LearningGoal(
                             r.GetInt32(0),
                             r.GetInt32(1),
                             r.GetValue(2).ToString()
                         ));
-                    } catch (Exception e) {
+                    }
+                    catch (Exception e)
+                    {
                         PrintQueryError("GetGoals", 2, r, e);
                     }
                 }
@@ -1601,13 +1732,18 @@ namespace IguideME.Web.Services
         public List<LearningGoal> GetGoals(int courseID, int tileID)
         {
             List<LearningGoal> goals = new();
-            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_TILE_LEARNING_GOALS,
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_TILE_LEARNING_GOALS,
                     new SQLiteParameter("tileID", tileID)
-                )){
-                while (r.Read()){
-                    try {
+                ))
+            {
+                while (r.Read())
+                {
+                    try
+                    {
                         goals.Add(new LearningGoal(r.GetInt32(0), tileID, r.GetValue(1).ToString()));
-                    } catch (Exception e) {
+                    }
+                    catch (Exception e)
+                    {
                         PrintQueryError("GetGoals", 1, r, e);
                     }
                 }
@@ -1618,13 +1754,18 @@ namespace IguideME.Web.Services
         public LearningGoal GetGoal(int courseID, int id)
         {
             LearningGoal goal = null;
-            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_LEARNING_GOAL,
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_LEARNING_GOAL,
                     new SQLiteParameter("goalID", id)
-                )){
-                if (r.Read()){
-                    try {
+                ))
+            {
+                if (r.Read())
+                {
+                    try
+                    {
                         goal = new LearningGoal(id, r.GetInt32(0), r.GetValue(1).ToString());
-                    } catch (Exception e) {
+                    }
+                    catch (Exception e)
+                    {
                         PrintQueryError("GetGoals", 1, r, e);
                     }
                 }
@@ -1658,7 +1799,8 @@ namespace IguideME.Web.Services
             return GetGoal(courseID, goal.ID);
         }
 
-        public void DeleteGoal(int courseID, LearningGoal goal) {
+        public void DeleteGoal(int courseID, LearningGoal goal)
+        {
 
             goal.Requirements = GetGoalRequirements(goal.ID);
 
@@ -1682,7 +1824,8 @@ namespace IguideME.Web.Services
         public void DeleteGoals(int courseID, int tileID)
         {
             List<LearningGoal> goals = GetGoals(courseID, tileID);
-            foreach (LearningGoal goal in goals) {
+            foreach (LearningGoal goal in goals)
+            {
                 DeleteGoal(courseID, goal);
             }
         }
@@ -1727,9 +1870,10 @@ namespace IguideME.Web.Services
         {
             List<GoalRequirement> requirements = new();
 
-            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_GOAL_REQUIREMENTS,
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_GOAL_REQUIREMENTS,
                     new SQLiteParameter("goalID", goalID)
-                )) {
+                ))
+            {
                 while (r.Read())
                 {
                     requirements.Add(new GoalRequirement(
@@ -1775,17 +1919,21 @@ namespace IguideME.Web.Services
 
             List<Notification> notifications = new();
 
-            using (SQLiteDataReader r = Query(query)) {
+            using (SQLiteDataReader r = Query(query))
+            {
                 while (r.Read())
                 {
-                    try {
+                    try
+                    {
                         notifications.Add(new Notification(
                             r.GetValue(0).ToString(),
                             r.GetInt32(1),
                             r.GetInt32(2),
                             r.GetBoolean(3)
                         ));
-                    } catch (Exception e) {
+                    }
+                    catch (Exception e)
+                    {
                         PrintQueryError("GetAllNotifications", 3, r, e);
                     }
                 }
@@ -1807,7 +1955,8 @@ namespace IguideME.Web.Services
                     new SQLiteParameter("courseID", courseID),
                     new SQLiteParameter("userID", userID),
                     new SQLiteParameter("syncID", activeSync)
-                )) {
+                ))
+            {
                 while (r.Read())
                 {
                     notifications.Add(new Notification(
@@ -1835,7 +1984,8 @@ namespace IguideME.Web.Services
                     new SQLiteParameter("courseID", courseID),
                     new SQLiteParameter("userID", userID),
                     new SQLiteParameter("syncID", activeSync)
-                )){
+                ))
+            {
                 while (r.Read())
                 {
                     notifications.Add(new Notification(
@@ -1865,19 +2015,23 @@ namespace IguideME.Web.Services
         {
             List<TileEntry> entries = new();
 
-            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_ALL_TILE_ENTRIES,
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_ALL_TILE_ENTRIES,
                     new SQLiteParameter("courseID", courseID)
-                )) {
+                ))
+            {
                 while (r.Read())
                 {
-                    try {
+                    try
+                    {
                         entries.Add(new TileEntry(
                         0,
                         r.GetInt32(0),
                         r.GetInt32(1),
                         "This is another title"
                     ));
-                    } catch (Exception e) {
+                    }
+                    catch (Exception e)
+                    {
                         PrintQueryError("GetEntries", 3, r, e);
                     }
                 }
@@ -1901,9 +2055,9 @@ namespace IguideME.Web.Services
             );
         }
 
-/////////////////////////////////////////////////////////////////////////////////
-//////////////////////////         ACCEPT LIST         //////////////////////////
-/////////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////
+        //////////////////////////         ACCEPT LIST         //////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////
 
 
         // public void RegisterAcceptedStudent(
@@ -1953,17 +2107,18 @@ namespace IguideME.Web.Services
         //     return keys;
         // }
 
-/////////////////////////////////////////////////////////////////////////////////
-//////////////////////////         END OF LIST         //////////////////////////
-/////////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////
+        //////////////////////////         END OF LIST         //////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////
 
         public List<string> GetEntryMetaKeys(int submissionID)
         {
             List<string> keys = new();
 
-            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_TILE_ENTRY_META_KEYS,
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_TILE_ENTRY_META_KEYS,
                     new SQLiteParameter("submissionID", submissionID)
-                )) {
+                ))
+            {
                 while (r.Read())
                 {
                     keys.Add(r.GetValue(0).ToString());
@@ -1976,14 +2131,18 @@ namespace IguideME.Web.Services
         {
             Dictionary<string, string> meta = new();
 
-            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_TILE_ENTRY_SUBMISSION_META,
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_TILE_ENTRY_SUBMISSION_META,
                     new SQLiteParameter("submissionID", submissionID)
-                )) {
+                ))
+            {
                 while (r.Read())
                 {
-                    try {
+                    try
+                    {
                         meta.Add(r.GetValue(0).ToString(), r.GetValue(1).ToString());
-                    } catch (Exception e) {
+                    }
+                    catch (Exception e)
+                    {
                         PrintQueryError("GetSubmissionMeta", 1, r, e);
                     }
                 }
@@ -2009,30 +2168,34 @@ namespace IguideME.Web.Services
         {
             List<Tile> tiles = new();
 
-            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_TILES,
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_TILES,
                     new SQLiteParameter("courseID", courseID)
-                )) {
+                ))
+            {
                 while (r.Read())
                 {
-                    try {
+                    try
+                    {
                         Tile row = new(
                             r.GetInt32(0),
                             r.GetInt32(1),
                             r.GetValue(2).ToString(),
                             r.GetInt32(3),
-                            (Tile.Tile_type) r.GetInt32(4),
+                            (Tile.Tile_type)r.GetInt32(4),
                             r.GetBoolean(5),
                             r.GetBoolean(6)
                         );
                         tiles.Add(row);
                     }
-                    catch (Exception e) {
+                    catch (Exception e)
+                    {
                         PrintQueryError("GetTiles", 9, r, e);
                     }
                 }
             }
 
-            foreach (Tile t in tiles) {
+            foreach (Tile t in tiles)
+            {
                 if (autoLoadEntries)
                     t.Entries = GetTileEntries(t.ID);
             }
@@ -2052,7 +2215,7 @@ namespace IguideME.Web.Services
                 // new SQLiteParameter("columnID", cols[0].ID),
                 new SQLiteParameter("title", title),
                 new SQLiteParameter("order", position),
-                new SQLiteParameter("courseID", courseID )
+                new SQLiteParameter("courseID", courseID)
 
             );
         }
@@ -2086,7 +2249,8 @@ namespace IguideME.Web.Services
             using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_TILE_GROUP,
                     new SQLiteParameter("courseID", courseID),
                     new SQLiteParameter("groupID", groupID)
-                )) {
+                ))
+            {
                 if (r.Read())
                     return new LayoutTileGroup(
                         r.GetInt32(0),
@@ -2104,12 +2268,14 @@ namespace IguideME.Web.Services
 
             List<LayoutTileGroup> tileGroups = new();
 
-            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_TILE_GROUPS,
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_TILE_GROUPS,
                     new SQLiteParameter("courseID", courseID)
-                )) {
+                ))
+            {
                 while (r.Read())
                 {
-                    try {
+                    try
+                    {
                         LayoutTileGroup row = new(
                         r.GetInt32(0),
                         courseID,
@@ -2117,8 +2283,10 @@ namespace IguideME.Web.Services
                         r.GetInt32(2),
                         r.GetInt32(3)
                     );
-                    tileGroups.Add(row);
-                    } catch (Exception e) {
+                        tileGroups.Add(row);
+                    }
+                    catch (Exception e)
+                    {
                         PrintQueryError("GetLayoutTileGroups", 3, r, e);
                     }
                 }
@@ -2132,12 +2300,14 @@ namespace IguideME.Web.Services
 
             List<AppAssignment> assignments = new();
 
-            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_COURSE_ASSIGNMENTS,
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_COURSE_ASSIGNMENTS,
                     new SQLiteParameter("courseID", courseID)
-                )) {
+                ))
+            {
                 while (r.Read())
                 {
-                    try {
+                    try
+                    {
                         AppAssignment row = new(
                             r.GetInt32(0),
                             r.GetInt32(1),
@@ -2149,7 +2319,8 @@ namespace IguideME.Web.Services
                             r.GetInt32(7)
                         );
                         assignments.Add(row);
-                    } catch (Exception e)
+                    }
+                    catch (Exception e)
                     {
                         PrintQueryError("GetAssignments", 9, r, e);
                     }
@@ -2163,9 +2334,10 @@ namespace IguideME.Web.Services
         {
             List<AppDiscussion> discussions = new();
 
-            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_COURSE_DISCUSSIONS,
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_COURSE_DISCUSSIONS,
                     new SQLiteParameter("courseID", courseID)
-                )) {
+                ))
+            {
                 while (r.Read())
                 {
                     AppDiscussion row = new(
@@ -2191,9 +2363,10 @@ namespace IguideME.Web.Services
 
             List<AppDiscussion> discussions = new();
 
-            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_TILE_DISCUSSIONS,
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_TILE_DISCUSSIONS,
                     new SQLiteParameter("tileID", tileID)
-                )) {
+                ))
+            {
                 while (r.Read())
                 {
                     AppDiscussion row = new(
@@ -2213,13 +2386,16 @@ namespace IguideME.Web.Services
             return discussions;
         }
 
-        public List<AppDiscussion> GetDiscussionEntries(int discussionID) {
+        public List<AppDiscussion> GetDiscussionEntries(int discussionID)
+        {
 
             List<AppDiscussion> entries = new();
-            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_DISCUSSION_ENTRIES,
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_DISCUSSION_ENTRIES,
                     new SQLiteParameter("discussionID", discussionID)
-                )) {
-                while (r.Read()) {
+                ))
+            {
+                while (r.Read())
+                {
                     AppDiscussion row = new(
                         Discussion_type.entry,
                         r.GetInt32(0),
@@ -2236,14 +2412,17 @@ namespace IguideME.Web.Services
             return entries;
         }
 
-        public List<AppDiscussion> GetDiscussionEntries(int discussion_id, string user_id) {
+        public List<AppDiscussion> GetDiscussionEntries(int discussion_id, string user_id)
+        {
 
             List<AppDiscussion> entries = new();
-            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_DISCUSSION_ENTRIES_FOR_USER,
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_DISCUSSION_ENTRIES_FOR_USER,
                     new SQLiteParameter("discussionID", discussion_id),
                     new SQLiteParameter("userID", user_id)
-                )) {
-                while (r.Read()) {
+                ))
+            {
+                while (r.Read())
+                {
                     AppDiscussion row = new(
                         Discussion_type.entry,
                         r.GetInt32(0),
@@ -2261,13 +2440,16 @@ namespace IguideME.Web.Services
         }
 
 
-        public List<AppDiscussion> GetDiscussionReplies(int discussion_id) {
+        public List<AppDiscussion> GetDiscussionReplies(int discussion_id)
+        {
 
             List<AppDiscussion> entries = new();
-            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_DISCUSSION_REPLIES,
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_DISCUSSION_REPLIES,
                     new SQLiteParameter("discussionID", discussion_id)
-                )) {
-                while (r.Read()) {
+                ))
+            {
+                while (r.Read())
+                {
                     AppDiscussion row = new(
                         Discussion_type.reply,
                         r.GetInt32(0),
@@ -2284,13 +2466,16 @@ namespace IguideME.Web.Services
             return entries;
         }
 
-        public List<AppDiscussion> GetDiscussionReplies(int discussion_id, string user_id) {
+        public List<AppDiscussion> GetDiscussionReplies(int discussion_id, string user_id)
+        {
             List<AppDiscussion> entries = new();
-            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_DISCUSSION_REPLIES_FOR_USER,
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_DISCUSSION_REPLIES_FOR_USER,
                     new SQLiteParameter("discussionID", discussion_id),
                     new SQLiteParameter("userID", user_id)
-                )) {
-                while (r.Read()) {
+                ))
+            {
+                while (r.Read())
+                {
                     AppDiscussion row = new(
                         Discussion_type.reply,
                         r.GetInt32(0),
@@ -2314,16 +2499,21 @@ namespace IguideME.Web.Services
 
             using (SQLiteDataReader r2 = Query(DatabaseQueries.QUERY_LAYOUT_COLUMNS,
                 new SQLiteParameter("courseID", courseID)
-                )) {
-                while (r2.Read()) {
-                    try {
+                ))
+            {
+                while (r2.Read())
+                {
+                    try
+                    {
                         layoutList.Add(new LayoutColumn(
                             r2.GetInt32(0),
                             r2.GetInt32(1),
                             r2.GetInt32(2),
                             new List<int>()
                         ));
-                    } catch (Exception e) {
+                    }
+                    catch (Exception e)
+                    {
                         PrintQueryError("GetLayoutColumn", 2, r2, e);
                     }
                 }
@@ -2332,11 +2522,16 @@ namespace IguideME.Web.Services
             foreach (LayoutColumn lcolumn in layoutList)
                 using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_ALL_TILE_GROUPS_IN_LAYOUT_COLUMN,
                     new SQLiteParameter("columnID", lcolumn.ID)
-                    )) {
-                    while (r.Read()) {
-                        try {
+                    ))
+                {
+                    while (r.Read())
+                    {
+                        try
+                        {
                             lcolumn.TileGroups.Add(r.GetInt32(0));
-                        } catch (Exception e) {
+                        }
+                        catch (Exception e)
+                        {
                             PrintQueryError("GetLayoutColumn", 2, r, e);
                         }
 
@@ -2349,7 +2544,8 @@ namespace IguideME.Web.Services
 
         public void DeleteAllLayoutColumns(
             int courseID
-        ) {
+        )
+        {
             NonQuery(DatabaseQueries.RELEASE_ALL_COURSE_TILE_GROUPS_FROM_COLUMNS,
                 new SQLiteParameter("courseID", courseID)
             );
@@ -2380,17 +2576,18 @@ namespace IguideME.Web.Services
 
         public Tile GetTile(int courseID, int tileID)
         {
-            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_TILE,
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_TILE,
                     new SQLiteParameter("courseID", courseID),
                     new SQLiteParameter("tileID", tileID)
-                )) {
+                ))
+            {
                 if (r.Read())
                     return new Tile(
                         r.GetInt32(0),
                         r.GetInt32(1),
                         r.GetValue(2).ToString(),
                         r.GetInt32(3),
-                        (Tile.Tile_type) r.GetInt32(4),
+                        (Tile.Tile_type)r.GetInt32(4),
                         r.GetBoolean(5),
                         r.GetBoolean(6)
                     );
@@ -2424,9 +2621,10 @@ namespace IguideME.Web.Services
 
             List<TileEntry> entries = new();
 
-            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_ENTRIES_FOR_TILE,
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_ENTRIES_FOR_TILE,
                     new SQLiteParameter("tileID", tileID)
-                )) {
+                ))
+            {
                 while (r.Read())
                 {
                     entries.Add(new TileEntry(
@@ -2451,21 +2649,21 @@ namespace IguideME.Web.Services
 
         public void SetUserConsent(ConsentData data, long syncID)
         {
-            switch (data.Granted) 
+            switch (data.Granted)
             {
                 case 0: //denied
-                    //TODO: delete everything???
+                        //TODO: delete everything???
 
 
 
-                break;
+                    break;
 
 
                 case -1: //unspecified
                 case 1: // or granted
-                    using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_LAST_STUDENT_SETTINGS,
+                    using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_LAST_STUDENT_SETTINGS,
                         new SQLiteParameter("courseID", data.CourseID),
-                        new SQLiteParameter("userID", data.UserID))) 
+                        new SQLiteParameter("userID", data.UserID)))
                         while (r.Read())
                             NonQuery(DatabaseQueries.REGISTER_STUDENT_SETTINGS,
                                 new SQLiteParameter("courseID", data.CourseID),
@@ -2476,16 +2674,17 @@ namespace IguideME.Web.Services
                                 new SQLiteParameter("Notifications", r.GetBoolean(3)),
                                 new SQLiteParameter("syncID", syncID)
                             );
-                break;
+                    break;
             }
         }
 
         public bool GetUserConsent(int courseID, string userID)
         {
-            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_CONSENT_FOR_USER,
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_CONSENT_FOR_USER,
                     new SQLiteParameter("courseID", courseID),
                     new SQLiteParameter("userID", userID)
-                )){
+                ))
+            {
                 if (r.Read())
                     return r.GetInt32(0) == 1;
             }
@@ -2559,11 +2758,12 @@ namespace IguideME.Web.Services
             //         );
             List<ExternalData> submissions = new();
 
-            using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_EXTERNALDATA,
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_EXTERNALDATA,
                     new SQLiteParameter("courseID", courseID),
                     new SQLiteParameter("tileID", tileID == -1 ? '*' : tileID),
                     new SQLiteParameter("userID", userID == null ? '*' : userID)
-                )) {
+                ))
+            {
                 while (r.Read())
                 {
                     ExternalData submission = new(courseID, r.GetValue(0).ToString(), tileID, r.GetValue(1).ToString(), r.GetValue(2).ToString());
@@ -2577,7 +2777,8 @@ namespace IguideME.Web.Services
         public void TrackUserAction(
             string userID,
             string action
-        ) {
+        )
+        {
             NonQuery(DatabaseQueries.INSERT_USER_ACTION,
                 new SQLiteParameter("userID", userID),
                 new SQLiteParameter("action", action)

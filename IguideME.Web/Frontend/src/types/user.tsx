@@ -11,5 +11,5 @@ export interface User {
 	sortable_name: string;
 	role: UserRoles;
 	consent: boolean | null;
-	goal_grade: number;
+	goal_grade: number | null;
 }

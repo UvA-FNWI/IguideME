@@ -3,15 +3,19 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+
 using IguideME.Web.Models;
 using IguideME.Web.Models.App;
 using IguideME.Web.Models.Service;
 using IguideME.Web.Services;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+
 using Newtonsoft.Json.Linq;
+
 using UserRoles = IguideME.Web.Models.Impl.UserRoles;
 
 
@@ -142,7 +146,7 @@ namespace IguideME.Web.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [Route("/datamart/consent")]
-// DBrefTODO: This was a ConsentData item, now it is just a bool wit the result
+        // DBrefTODO: This was a ConsentData item, now it is just a bool wit the result
         public JsonResult GetConsent()
         {
             return this.IsAdministrator()
@@ -187,7 +191,7 @@ namespace IguideME.Web.Controllers
         public ActionResult GetStudents()
         {
             return Json(
-                _databaseManager.GetUsers(this.GetCourseID(), UserRoles.student)
+                _databaseManager.GetUsersWithGrantedConsent(this.GetCourseID(), UserRoles.student)
                 .ToArray());
         }
 
@@ -196,7 +200,7 @@ namespace IguideME.Web.Controllers
         // [Route("/Consents")]
         // [ProducesResponseType(StatusCodes.Status200OK)]
         // [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-// DBrefTODO: This is useless now, we have the GetGoalGrades() that substitutes this
+        // DBrefTODO: This is useless now, we have the GetGoalGrades() that substitutes this
         // public ActionResult GetConsents()
         // {
         //     return Json(
@@ -306,7 +310,8 @@ namespace IguideME.Web.Controllers
 
             List<AppDiscussion> discussions = _databaseManager.GetDiscussions(course_id);
 
-            foreach (AppDiscussion discussion in new List<AppDiscussion>(discussions)) {
+            foreach (AppDiscussion discussion in new List<AppDiscussion>(discussions))
+            {
                 discussions.AddRange(_databaseManager.GetDiscussionEntries(
                     discussion.ID));
                 discussions.AddRange(_databaseManager.GetDiscussionReplies(
