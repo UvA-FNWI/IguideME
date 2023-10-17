@@ -33,7 +33,25 @@ namespace IguideME.Web.Models.Impl
         public UserRoles Role { get; set; }
 
         [JsonProperty("goal_grade")]
-        public int GoalGrade { get; set; }
+        public int? GoalGrade { get; set; }
+
+        public User(
+            // int id,
+            string userID,
+            int courseID,
+            int studentnumber,
+            string name,
+            string sortableName,
+            int role)
+        {
+            // this.ID = id;
+            this.CourseID = courseID;
+            this.StudentNumber = studentnumber;
+            this.UserID = userID;
+            this.Name = name;
+            this.SortableName = sortableName;
+            this.Role = (UserRoles) role;
+        }
 
         public User(
             // int id,

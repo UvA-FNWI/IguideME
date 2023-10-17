@@ -607,10 +607,21 @@ namespace IguideME.Web.Services
                         r.GetInt32(1),
                         r.GetValue(2).ToString(),
                         r.GetValue(3).ToString(),
-                        r.GetInt32(4),
-                        r.GetValue(5) != null ? r.GetInt32(5) : 1
+                        r.GetInt32(4)
                     );
                 }
+            }
+
+            if (user.Role == UserRoles.student) {
+                using (SQLiteDataReader r2 = Query(DatabaseQueries.QUERY_GOAL_GRADE_FOR_USER,
+                    new SQLiteParameter("courseID", courseID),
+                    new SQLiteParameter("userID", userID)
+                )) {
+                if (r2.Read())
+                {
+                    user.GoalGrade = r2.GetInt32(0);
+                }
+            }
             }
 
             return user;

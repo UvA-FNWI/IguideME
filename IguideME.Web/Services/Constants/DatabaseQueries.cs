@@ -1139,15 +1139,9 @@ public static class DatabaseQueries
                     `users`.`student_number`,
                     `users`.`name`,
                     `users`.`sortable_name`,
-                    `users`.`role`,
-                    `student_settings`.`goal_grade`
+                    `users`.`role`
         FROM        `users`
-        LEFT JOIN   `student_settings`
-            USING   (`user_id`)
-        WHERE       `student_settings`.`course_id`=@courseID
-        AND         `users`.`user_id`=@userID
-        ORDER BY    `student_settings`.`sync_id` DESC
-        LIMIT       1;";
+        WHERE       `users`.`user_id`= @userID;";
 
     public const string QUERY_CONSENTED_USER_DATA_FOR_COURSE = //// ^^^ WITH CONSENT ^^^
         @"SELECT    `users`.`user_id`,
