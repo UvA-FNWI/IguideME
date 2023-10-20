@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+
 using IguideME.Web.Models;
 using IguideME.Web.Models.App;
 using IguideME.Web.Models.Impl;
+
 using Microsoft.Extensions.Logging;
 
 namespace IguideME.Web.Services.Workers
@@ -20,7 +22,7 @@ namespace IguideME.Web.Services.Workers
     /// Class <a>PeerGroupWorker</a> models a worker that handles the creation of peer groups and their stats.
     /// </summary>
     ///
-    public class PeerGroupWorker
+    public class PeerGroupWorker : IWorker
     {
         readonly private ILogger<SyncManager> _logger;
         private readonly DatabaseManager _databaseManager;
@@ -63,14 +65,15 @@ namespace IguideME.Web.Services.Workers
         /// Creates an array of lists of users, where the array is indexed by the goal grade of the users.
         /// </summary>
         /// <returns>A list of users per goal grade.</returns>
-        List<string>[] GetUsersSortedByGoalGrade() {
+        List<string>[] GetUsersSortedByGoalGrade()
+        {
             List<string>[] usersWithSameGoalGrade = new List<string>[11];
 
             for (int goalGradeClass = 1; goalGradeClass <= 10; goalGradeClass++)
             {
                 usersWithSameGoalGrade[goalGradeClass] = new List<string>();
                 //TODO: get only those with consent!!!
-                List<User> sameGraders = _databaseManager.GetUsersWithGoalGrade(this._courseID,goalGradeClass, this._syncID);
+                List<User> sameGraders = _databaseManager.GetUsersWithGoalGrade(this._courseID, goalGradeClass, this._syncID);
                 sameGraders.ForEach(x => usersWithSameGoalGrade[goalGradeClass].Add(x.UserID));
             }
 
@@ -84,7 +87,8 @@ namespace IguideME.Web.Services.Workers
         /// <param name="goalGrade">The goal grade to create a peer group for.</param>
         /// <param name="minPeerGroupSize">The minimum group size a peer group needs to have.</param>
         /// <returns></returns>
-        static List<string> CreatePeerGroup(List<string>[] sortedUsers, int goalGrade, int minPeerGroupSize) {
+        static List<string> CreatePeerGroup(List<string>[] sortedUsers, int goalGrade, int minPeerGroupSize)
+        {
             List<string> peerGroup = new(sortedUsers[goalGrade]);
 
             // Look for peers until minimum size is reached or untill the offset exceeds the range of valid grades.
@@ -115,14 +119,15 @@ namespace IguideME.Web.Services.Workers
         /// </summary>
         /// <param name="peerGroup"></param>
         /// <returns>A dictionary with the assignmentID/discussionID as key and the collecton of all students' grades as a list.</returns>
-        Dictionary<int,List<float>> CalculateGrades(List<string> peerGroup){
-            Dictionary<int,List<float>> grades = new();
+        Dictionary<int, List<float>> CalculateGrades(List<string> peerGroup)
+        {
+            Dictionary<int, List<float>> grades = new();
 
             // We run the following process for each individual peer in the group
-            foreach(string peerID in peerGroup)
+            foreach (string peerID in peerGroup)
             {
                 // We query all the grades of each peer
-                Dictionary<int,List<float>> temp = _databaseManager.GetUserGrades(this._courseID, peerID);
+                Dictionary<int, List<float>> temp = _databaseManager.GetUserGrades(this._courseID, peerID);
 
                 temp.ToList().ForEach(x =>
                 {
@@ -182,9 +187,10 @@ namespace IguideME.Web.Services.Workers
         }
 
 
-        void CreateNotifications(List<string> users, Dictionary<int, List<float>> grades) {
+        void CreateNotifications(List<string> users, Dictionary<int, List<float>> grades)
+        {
 
-            foreach(string user in users)
+            foreach (string user in users)
             {
                 foreach (KeyValuePair<int, List<float>> entry in grades)
                 {
@@ -214,10 +220,10 @@ namespace IguideME.Web.Services.Workers
                         float lastAverage = -1;
                         float peerAverage = -1;
                         // Store the three important Averages in variables
-                        if (currentSubmissionGrades.Count != 0) 
+                        if (currentSubmissionGrades.Count != 0)
                             currentAverage = currentSubmissionGrades.Average();
                         if (lastSubmissionGrades.Count != 0)
-                            lastAverage =lastSubmissionGrades.Average();
+                            lastAverage = lastSubmissionGrades.Average();
                         if (entry.Value != null)
                             peerAverage = entry.Value.Average();
 
@@ -230,7 +236,7 @@ namespace IguideME.Web.Services.Workers
                                     this._courseID,
                                     user,
                                     entry.Key,
-                                    (int) Notification_Types.outperforming,
+                                    (int)Notification_Types.outperforming,
                                     this._syncID
                                 );
                             }
@@ -245,7 +251,7 @@ namespace IguideME.Web.Services.Workers
                                     this._courseID,
                                     user,
                                     entry.Key,
-                                    (int) Notification_Types.closing_gap,
+                                    (int)Notification_Types.closing_gap,
                                     this._syncID
                                 );
                             }
@@ -256,7 +262,7 @@ namespace IguideME.Web.Services.Workers
                                     this._courseID,
                                     user,
                                     entry.Key,
-                                    (int) Notification_Types.falling_behind,
+                                    (int)Notification_Types.falling_behind,
                                     this._syncID
                                 );
                             }
@@ -267,7 +273,7 @@ namespace IguideME.Web.Services.Workers
                                     this._courseID,
                                     user,
                                     entry.Key,
-                                    (int) Notification_Types.more_effort,
+                                    (int)Notification_Types.more_effort,
                                     this._syncID
                                 );
                             }

@@ -11,7 +11,7 @@ export enum SyncStateNames {
 	'QUIZZES' = 'tasks.quizzes',
 	'DISCUSSIONS' = 'tasks.discussions',
 	'ASSIGNMENTS' = 'tasks.assignments',
-	'SUBMISSIONS' = 'tasks.submissions',
+	// 'SUBMISSIONS' = 'tasks.submissions',
 	'GRADE_PREDICTOR' = 'tasks.grade-predictor',
 	'PEER_GROUPS' = 'tasks.peer-groups',
 	'NOTIFICATIONS' = 'tasks.notifications',
@@ -47,10 +47,10 @@ export const SyncStates = new Map<string, State>([
 		SyncStateNames.ASSIGNMENTS,
 		{ title: 'Assignments', busy_text: 'Acquiring available assignments...', finished_text: 'Assignments acquired.' },
 	],
-	[
-		SyncStateNames.SUBMISSIONS,
-		{ title: 'Submissions', busy_text: 'Retrieving students submissions...', finished_text: 'Submissions retrieved.' },
-	],
+	// [
+	// 	SyncStateNames.SUBMISSIONS,
+	// 	{ title: 'Submissions', busy_text: 'Retrieving students submissions...', finished_text: 'Submissions retrieved.' },
+	// ],
 	[
 		SyncStateNames.GRADE_PREDICTOR,
 		{ title: 'Grade Prediction', busy_text: 'Predicting potential grades...', finished_text: 'Grades predicted.' },

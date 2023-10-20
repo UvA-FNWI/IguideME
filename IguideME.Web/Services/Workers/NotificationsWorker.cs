@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 using IguideME.Web.Models;
 using IguideME.Web.Models.App;
@@ -12,7 +11,7 @@ namespace IguideME.Web.Services.Workers
     /// <summary>
     /// Class <a>NotificationsWorker</a> models a worker that handles the sending of performance notifications.
     /// </summary>
-    public class NotificationsWorker
+    public class NotificationsWorker : IWorker
     {
         readonly private ILogger<SyncManager> _logger;
         readonly private CanvasHandler _canvasHandler;
@@ -68,16 +67,16 @@ namespace IguideME.Web.Services.Workers
                 Tile tile = _databaseManager.GetTile(this._courseID, notification.TileID);
                 switch (notification.Status)
                 {
-                    case (int) Notification_Types.outperforming:
+                    case (int)Notification_Types.outperforming:
                         outperforming += $"    - {tile.Title}\n";
                         break;
-                    case (int) Notification_Types.closing_gap:
+                    case (int)Notification_Types.closing_gap:
                         closing += $"    - {tile.Title}\n";
                         break;
-                    case (int) Notification_Types.falling_behind:
+                    case (int)Notification_Types.falling_behind:
                         falling += $"    - {tile.Title}\n";
                         break;
-                    case (int) Notification_Types.more_effort:
+                    case (int)Notification_Types.more_effort:
                         moreEffort += $"    - {tile.Title}\n";
                         break;
                 }
@@ -94,7 +93,8 @@ namespace IguideME.Web.Services.Workers
             if (!string.IsNullOrEmpty(moreEffort))
                 body += "You have to put more effort in:\n" + moreEffort + "\n";
 
-            if (!string.IsNullOrEmpty(body)) {
+            if (!string.IsNullOrEmpty(body))
+            {
                 body = "You are using IguideME, please find your personal feedback below. Visit IguideME in your course for more detailed information.\n\n" + body;
                 _logger.LogInformation("Sending notification to {ID}: {Body}", student.UserID, body);
                 _canvasHandler.SendMessage(student.UserID,
@@ -116,16 +116,18 @@ namespace IguideME.Web.Services.Workers
         {
             _logger.LogInformation("Starting notifications sync...");
 
-            if (!_send_notifications) {
+            if (!_send_notifications)
+            {
                 _logger.LogInformation("Not sending notifications this sync");
                 return;
             }
 
-            List<User> students = _databaseManager.GetUsers(this._courseID, (int) UserRoles.student, this._syncID);
+            List<User> students = _databaseManager.GetUsers(this._courseID, (int)UserRoles.student, this._syncID);
 
             foreach (User student in students)
             {
-                if (!_databaseManager.GetNotificationEnable(this._courseID, student.UserID, this._syncID)) {
+                if (!_databaseManager.GetNotificationEnable(this._courseID, student.UserID, this._syncID))
+                {
                     _logger.LogInformation("Not sending to {ID}, they have notifications disabled", student.UserID);
                 }
                 this.SendNotificationsToStudent(student);

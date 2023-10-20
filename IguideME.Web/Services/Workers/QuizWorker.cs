@@ -13,54 +13,55 @@ using UvA.DataNose.Connectors.Canvas;
 namespace IguideME.Web.Services.Workers
 {
 	/// <summary>
-    /// Class <a>QuizWorker</a> models a worker that handles registering quizzes during a sync.
-    /// </summary>
-    public class QuizWorker
-    {
-        readonly private ILogger<SyncManager> _logger;
+	/// Class <a>QuizWorker</a> models a worker that handles registering quizzes during a sync.
+	/// </summary>
+	public class QuizWorker : IWorker
+	{
+		readonly private ILogger<SyncManager> _logger;
 		readonly private CanvasHandler _canvasHandler;
-        private readonly DatabaseManager _databaseManager;
+		private readonly DatabaseManager _databaseManager;
 
 		readonly private int _courseID;
 		readonly private long _syncID;
 
 		/// <summary>
-        /// This constructor initializes the new Quizworker to
-        /// (<paramref name="courseID"/>, <paramref name="syncID"/>, <paramref name="canvasHandler"/>, <paramref name="logger"/>).
-        /// </summary>
-        /// <param name="courseID">the id of the course.</param>
-        /// <param name="syncID">the hash code associated to the current sync.</param>
-        /// <param name="canvasHandler">a reference to the class managing the connection with canvas.</param>
-        /// <param name="logger">a reference to the logger used for the sync.</param>
-        public QuizWorker(
+		/// This constructor initializes the new Quizworker to
+		/// (<paramref name="courseID"/>, <paramref name="syncID"/>, <paramref name="canvasHandler"/>, <paramref name="logger"/>).
+		/// </summary>
+		/// <param name="courseID">the id of the course.</param>
+		/// <param name="syncID">the hash code associated to the current sync.</param>
+		/// <param name="canvasHandler">a reference to the class managing the connection with canvas.</param>
+		/// <param name="logger">a reference to the logger used for the sync.</param>
+		public QuizWorker(
 			int courseID,
 			long syncID,
 			CanvasHandler canvasHandler,
 			DatabaseManager databaseManager,
-            ILogger<SyncManager> logger)
+			ILogger<SyncManager> logger)
 
-        {
+		{
 			_logger = logger;
 			_courseID = courseID;
 			_syncID = syncID;
 			_canvasHandler = canvasHandler;
 			_databaseManager = databaseManager;
-        }
+		}
 
 		/// <summary>
-        /// Register submissions associated to a quiz in the database.
-        /// </summary>
-        /// <param name="quiz">the quiz the submissions are associated to.</param>
-        /// <param name="entry">the tile entry the submissions are associated to.</param>
-        public void RegisterSubmissions(Quiz quiz, TileEntry entry)
-        {
+		/// Register submissions associated to a quiz in the database.
+		/// </summary>
+		/// <param name="quiz">the quiz the submissions are associated to.</param>
+		/// <param name="entry">the tile entry the submissions are associated to.</param>
+		public void RegisterSubmissions(Quiz quiz, TileEntry entry)
+		{
 			IEnumerable<QuizSubmission> submissions = quiz.Submissions
-                .Where(submission =>
+				.Where(submission =>
 					submission.Score != null &&
 					_databaseManager.GetConsentedStudentID(this._courseID, submission.UserID) != null
 				);
 
-			foreach (QuizSubmission sub in quiz.Submissions) {
+			foreach (QuizSubmission sub in quiz.Submissions)
+			{
 				_databaseManager.CreateUserSubmission(
 					quiz.ID ?? -1, // TODO: handle properly when null
 					_databaseManager.GetConsentedStudentID(this._courseID, sub.UserID),
@@ -68,13 +69,13 @@ namespace IguideME.Web.Services.Workers
 					((DateTimeOffset)sub.FinishedDate.Value).ToUnixTimeMilliseconds()
 				);
 			}
-        }
+		}
 
-        /// <summary>
-        /// Starts the quiz worker.
-        /// </summary>
-        public void Start()
-        {
+		/// <summary>
+		/// Starts the quiz worker.
+		/// </summary>
+		public void Start()
+		{
 			_logger.LogInformation("Starting quiz registry...");
 
 			// Get the quizzes from canvas.
@@ -86,25 +87,25 @@ namespace IguideME.Web.Services.Workers
 			{
 				// Graded quizzes (assignment quizzes) are treated as assignments by canvas and will be handled in the assignment worker.
 				if (quiz.Type == QuizType.Assignment)
-                    continue;
+					continue;
 
-                _logger.LogInformation("Processing quiz: {Name}", quiz.Name);
+				_logger.LogInformation("Processing quiz: {Name}", quiz.Name);
 				_databaseManager.RegisterAssignment(
 					quiz.ID,
 					quiz.CourseID,
 					quiz.Name,
 					quiz.IsPublished,
 					false,
-					quiz.DueDate.HasValue ?(int) ((DateTimeOffset)quiz.DueDate.Value).ToUnixTimeSeconds() : 0,
+					quiz.DueDate.HasValue ? (int)((DateTimeOffset)quiz.DueDate.Value).ToUnixTimeSeconds() : 0,
 					quiz.PointsPossible ?? 0,
-					(int) GradingType.Points
+					(int)GradingType.Points
 				);
 
 				// Don't register submissions that aren't assigned to tiles (as entries).
-                TileEntry entry = entries.Find(e => e.ContentID == quiz.ID);
-                if (entry == null) continue;
+				TileEntry entry = entries.Find(e => e.ContentID == quiz.ID);
+				if (entry == null) continue;
 
-                this.RegisterSubmissions(quiz, entry);
+				this.RegisterSubmissions(quiz, entry);
 			}
 		}
 	}

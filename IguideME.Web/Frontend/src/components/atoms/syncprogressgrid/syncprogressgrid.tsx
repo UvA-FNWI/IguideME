@@ -3,7 +3,7 @@ import { type FC, type ReactElement } from 'react';
 import { useQuery } from 'react-query';
 import './style.scss';
 import { Col, Row } from 'antd';
-import { type JobModel, JobStatus, SyncStateNames, SyncStates } from '@/types/synchronization';
+import { JobStatus, SyncStateNames, SyncStates } from '@/types/synchronization';
 import StatusCard from '@/components/particles/status-card/status-card';
 
 const SyncProgressGrid: FC = (): ReactElement => {
@@ -11,11 +11,15 @@ const SyncProgressGrid: FC = (): ReactElement => {
 	const statuses = new Map<string, JobStatus>();
 
 	if (data !== undefined) {
-		Object.values(data).forEach((x: JobModel) => {
-			statuses.set(x.task, x.status);
-		});
+		const response = Object.values(data);
+		if (response.length > 0) {
+			const tmp = response[response.length - 1].task.split(',');
+			tmp.forEach((pair: string) => {
+				const [task, status] = pair.split(':');
+				statuses.set(task, status as JobStatus);
+			});
+		}
 	}
-
 	return (
 		<div className="SyncProgressGrid">
 			<Row gutter={[10, 10]}>
@@ -24,8 +28,11 @@ const SyncProgressGrid: FC = (): ReactElement => {
 					if (stateType === undefined) {
 						return '';
 					}
+					console.log('statuses', statuses);
 
 					const status = statuses.get(name);
+					console.log('stauts', status);
+					console.log('name', name);
 					const description = status === JobStatus.Processing ? stateType.busy_text : stateType.finished_text;
 
 					return (

@@ -16,7 +16,7 @@ namespace IguideME.Web.Services.Workers
     /// <summary>
     /// Class <a>AssignemntWorker</a> models a worker that handles registering assignments during a sync..
     /// </summary>
-    public class AssignmentWorker
+    public class AssignmentWorker : IWorker
     {
         readonly private ILogger<SyncManager> _logger;
         readonly private CanvasHandler _canvasHandler;
