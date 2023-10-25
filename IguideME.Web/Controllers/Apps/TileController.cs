@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+
 using IguideME.Web.Models;
 using IguideME.Web.Models.App;
 using IguideME.Web.Models.Impl;
 using IguideME.Web.Services;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -55,7 +58,7 @@ namespace IguideME.Web.Controllers
                 tile.GroupID,
                 tile.Title,
                 tilesInGroup + 1,
-                (int) tile.Type,
+                (int)tile.Type,
                 tile.Visible,
                 tile.Notifications
             );
@@ -125,7 +128,7 @@ namespace IguideME.Web.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [Route("/tiles/goals")]
+        [Route("/learning-goals")]
         public ActionResult GetGoals()
         {
             List<LearningGoal> goals = _databaseManager.GetGoals(GetCourseID());
@@ -163,7 +166,7 @@ namespace IguideME.Web.Controllers
                 _databaseManager.CreateGoalRequirement(
                     stored_goal.ID,
                     requirement.AssignmentID,
-                    (int) requirement.Expression,
+                    (int)requirement.Expression,
                     requirement.Value);
             }
 
@@ -184,13 +187,15 @@ namespace IguideME.Web.Controllers
 
             if (success)
             {
-                foreach (GoalRequirement req in goal.Requirements){
-                    switch (req.State) {
+                foreach (GoalRequirement req in goal.Requirements)
+                {
+                    switch (req.State)
+                    {
                         case EditState.New:
                             _databaseManager.CreateGoalRequirement(
                                 req.GoalID,
                                 req.AssignmentID,
-                                (int) req.Expression,
+                                (int)req.Expression,
                                 req.Value
                             );
                             break;
@@ -332,19 +337,19 @@ namespace IguideME.Web.Controllers
                 Tile tile = _databaseManager.GetTile(GetCourseID(), id);
 
                 if (obj.GroupID != null)
-                    tile.GroupID = (int) obj.GroupID;
+                    tile.GroupID = (int)obj.GroupID;
 
                 if (obj.Title != null)
                     tile.Title = obj.Title;
 
                 if (obj.Notifications != null)
-                    tile.Notifications = (bool) obj.Notifications;
+                    tile.Notifications = (bool)obj.Notifications;
 
                 if (obj.Visible != null)
-                    tile.Visible = (bool) obj.Visible;
+                    tile.Visible = (bool)obj.Visible;
 
                 if (obj.Order != null)
-                    tile.Order = (int) obj.Order;
+                    tile.Order = (int)obj.Order;
 
                 _databaseManager.UpdateTile(tile);
 
@@ -434,7 +439,8 @@ namespace IguideME.Web.Controllers
 
             bool success = int.TryParse(tileID, out int id);
 
-            if (!success) {
+            if (!success)
+            {
                 return BadRequest();
             }
 
@@ -442,7 +448,8 @@ namespace IguideME.Web.Controllers
 
             List<AppDiscussion> discussions = _databaseManager.GetDiscussionsForTile(id);
 
-            foreach (AppDiscussion discussion in new List<AppDiscussion>(discussions)) {
+            foreach (AppDiscussion discussion in new List<AppDiscussion>(discussions))
+            {
                 discussions.AddRange(_databaseManager.GetDiscussionEntries(
                     discussion.ID, user_id: user.UserID.ToString()));
                 discussions.AddRange(_databaseManager.GetDiscussionReplies(
@@ -491,15 +498,16 @@ namespace IguideME.Web.Controllers
                         if (submission == null)
                         {
                             success = false;
-                        } else
+                        }
+                        else
                         {
                             switch (req.Expression)
                             {
-                                case GoalRequirement.LogicalExpressions.Less_than:
+                                case GoalRequirement.LogicalExpressions.Less:
                                     if (submission.Grade >= req.Value)
                                         success = false;
                                     break;
-                                case GoalRequirement.LogicalExpressions.Less_equal:
+                                case GoalRequirement.LogicalExpressions.LessEqual:
                                     if (submission.Grade > req.Value)
                                         success = false;
                                     break;
@@ -507,11 +515,11 @@ namespace IguideME.Web.Controllers
                                     if (submission.Grade != req.Value)
                                         success = false;
                                     break;
-                                case GoalRequirement.LogicalExpressions.Greater_equal:
+                                case GoalRequirement.LogicalExpressions.GreaterEqual:
                                     if (submission.Grade < req.Value)
                                         success = false;
                                     break;
-                                case GoalRequirement.LogicalExpressions.Greater_than:
+                                case GoalRequirement.LogicalExpressions.Greater:
                                     if (submission.Grade <= req.Value)
                                         success = false;
                                     break;
@@ -586,12 +594,13 @@ namespace IguideME.Web.Controllers
 
             int id_column = data["id_column"].ToObject<int>();
             int grade_column = data["grade_column"].ToObject<int>();
-            JArray table = (JArray) data["data"];
+            JArray table = (JArray)data["data"];
 
             string[] names = table[0].ToObject<string[]>();
 
             IEnumerable<int> range = Enumerable.Range(0, names.Length).Where(i => i != id_column && i != grade_column);
-            foreach (JArray row in table.Cast<JArray>().Skip(1)) {
+            foreach (JArray row in table.Cast<JArray>().Skip(1))
+            {
 
                 string[] values = row.ToObject<string[]>();
 
@@ -604,7 +613,8 @@ namespace IguideME.Web.Controllers
                     DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
                 );
 
-                foreach (int i in range) {
+                foreach (int i in range)
+                {
                     _databaseManager.CreateSubmissionMeta(
                         submissionID,
                         names[i],

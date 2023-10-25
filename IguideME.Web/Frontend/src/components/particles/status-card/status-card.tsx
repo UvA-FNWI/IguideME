@@ -19,7 +19,6 @@ const statusColors = new Map<string, LiteralUnion<'red' | 'orange' | 'yellow' | 
 ]);
 
 const StatusCard: FC<Props> = ({ title, description, status }): ReactElement => {
-	console.log('status', status);
 	return (
 		<div className="card">
 			<Row justify="space-between">

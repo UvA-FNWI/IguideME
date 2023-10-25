@@ -2341,7 +2341,7 @@ namespace IguideME.Web.Services
                 while (r.Read())
                 {
                     AppDiscussion row = new(
-                        Discussion_type.topic,
+                        Discussion_type.Topic,
                         r.GetInt32(0),
                         r.GetInt32(1),
                         r.GetInt32(2),
@@ -2370,7 +2370,7 @@ namespace IguideME.Web.Services
                 while (r.Read())
                 {
                     AppDiscussion row = new(
-                        Discussion_type.topic,
+                        Discussion_type.Topic,
                         r.GetInt32(0),
                         tileID,
                         r.GetInt32(1),
@@ -2397,7 +2397,7 @@ namespace IguideME.Web.Services
                 while (r.Read())
                 {
                     AppDiscussion row = new(
-                        Discussion_type.entry,
+                        Discussion_type.Entry,
                         r.GetInt32(0),
                         discussionID,
                         r.GetInt32(5),
@@ -2424,7 +2424,7 @@ namespace IguideME.Web.Services
                 while (r.Read())
                 {
                     AppDiscussion row = new(
-                        Discussion_type.entry,
+                        Discussion_type.Entry,
                         r.GetInt32(0),
                         discussion_id,
                         r.GetInt32(5),
@@ -2451,7 +2451,7 @@ namespace IguideME.Web.Services
                 while (r.Read())
                 {
                     AppDiscussion row = new(
-                        Discussion_type.reply,
+                        Discussion_type.Reply,
                         r.GetInt32(0),
                         discussion_id,
                         r.GetInt32(5),
@@ -2477,7 +2477,7 @@ namespace IguideME.Web.Services
                 while (r.Read())
                 {
                     AppDiscussion row = new(
-                        Discussion_type.reply,
+                        Discussion_type.Reply,
                         r.GetInt32(0),
                         discussion_id,
                         r.GetInt32(5),

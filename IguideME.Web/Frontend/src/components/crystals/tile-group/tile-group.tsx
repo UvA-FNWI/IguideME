@@ -1,5 +1,5 @@
 import { useState, type FC, type ReactElement, useMemo } from 'react';
-import { TileType, type TileGroup } from '@/types/tile';
+import { TileType, type TileGroup, GradingType } from '@/types/tile';
 
 import './style.scss';
 import { Button, Col, Divider, Input, Row } from 'antd';
@@ -21,6 +21,8 @@ const TileGroupView: FC<Props> = ({ group }): ReactElement => {
 
 	const tiles = data?.filter((tile) => tile.group_id === group.id);
 
+	const queryClient = useQueryClient();
+
 	const { mutate: addTile } = useMutation({
 		mutationFn: postTile,
 		onSuccess: async () => {
@@ -28,7 +30,6 @@ const TileGroupView: FC<Props> = ({ group }): ReactElement => {
 		},
 	});
 
-	const queryClient = useQueryClient();
 	const { mutate: patchGroup } = useMutation({
 		mutationFn: patchTileGroup,
 		onSuccess: async () => {
@@ -126,10 +127,13 @@ const TileGroupView: FC<Props> = ({ group }): ReactElement => {
 								id: -1,
 								group_id: group.id,
 								title: 'Tile',
+								weight: 0,
 								position: tiles === undefined ? 1 : tiles.length + 1,
 								type: TileType.assignments,
 								visible: false,
 								notifications: false,
+								gradingType: GradingType.Points,
+								entries: [],
 							});
 						}}
 						block

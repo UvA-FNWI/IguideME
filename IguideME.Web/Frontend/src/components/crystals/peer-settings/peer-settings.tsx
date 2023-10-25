@@ -5,12 +5,17 @@ import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
 
 import { getPeerSettings, postPeerSettings } from '@/api/course_settings';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
+import Loading from '@/components/particles/loading';
 
 const PeerSettings: FC = (): ReactElement => {
 	const { data } = useQuery('peer-settings', getPeerSettings);
 
 	if (data === undefined) {
-		return <>Loading...</>;
+		return (
+			<div style={{ minHeight: 80 }}>
+				<Loading />
+			</div>
+		);
 	}
 
 	return (

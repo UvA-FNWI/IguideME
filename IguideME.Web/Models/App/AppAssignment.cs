@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+
 using UvA.DataNose.Connectors.Canvas;
 
 namespace IguideME.Web.Models.App
@@ -32,7 +33,7 @@ namespace IguideME.Web.Models.App
         // [JsonProperty("position")]
         // public int Position { get; set; }
 
-        [JsonProperty("submission_type")]
+        [JsonProperty("grading_type")]
         public GradingType GradingType { get; set; }
 
         public AppAssignment(
@@ -56,7 +57,7 @@ namespace IguideME.Web.Models.App
             this.DueDate = dueDate;
             this.MaxGrade = maxGrade;
             // this.Position = position;
-            this.GradingType = (GradingType) gradingType;
+            this.GradingType = (GradingType)gradingType;
         }
 
     }

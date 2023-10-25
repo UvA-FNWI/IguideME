@@ -32,6 +32,16 @@ export const postTile: (tile: Tile) => Promise<void> = async (tile: Tile) => {
 	await apiClient.post(`tiles`, tile);
 };
 
+interface quickTilePatch {
+	id: number;
+	notifications?: boolean;
+	visible?: boolean;
+}
+
+export const qPatchTile: (patch: quickTilePatch) => Promise<void> = async (patch: quickTilePatch) => {
+	await apiClient.patch(`tiles/${patch.id}`, patch);
+};
+
 export const deleteTile: (id: number) => Promise<void> = async (id: number) => {
 	await apiClient.delete(`tiles/${id}`);
 };

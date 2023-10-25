@@ -89,7 +89,7 @@ const SyncClock: FC = (): ReactElement => {
 						onClick={() => {
 							void Swal.fire({
 								title: 'Do you really want to abort the synchronization?',
-								text: `It will be unsuccessful!`,
+								text: `This will undo the updates from the current sync!`,
 								icon: 'warning',
 								focusCancel: true,
 								showCancelButton: true,
@@ -97,7 +97,7 @@ const SyncClock: FC = (): ReactElement => {
 								cancelButtonText: 'Cancel',
 								customClass: {},
 							}).then((result) => {
-								if (result.value !== null) {
+								if (result.isConfirmed) {
 									stopSync();
 									void Swal.fire(
 										'Synchronization aborted!',

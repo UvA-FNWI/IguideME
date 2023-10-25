@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+
 using IguideME.Web.Services;
+
 using Newtonsoft.Json;
 
 
@@ -33,14 +35,15 @@ namespace IguideME.Web.Models.App
     public class GoalRequirement
     {
 
-        public enum LogicalExpressions {
-        Less_than,
-        Less_equal,
-        Equal,
-        Greater_equal,
-        Greater_than,
-        Different_than
-    }
+        public enum LogicalExpressions
+        {
+            Less,
+            LessEqual,
+            Equal,
+            GreaterEqual,
+            Greater,
+            NotEqual
+        }
 
         [JsonProperty("id")]
         public int ID { get; set; }
@@ -79,7 +82,7 @@ namespace IguideME.Web.Models.App
             this.GoalID = goalID;
             this.AssignmentID = assignmentID;
             this.Value = value;
-            this.Expression = (LogicalExpressions) expression;
+            this.Expression = (LogicalExpressions)expression;
         }
 
         public GoalRequirement(

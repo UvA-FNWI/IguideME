@@ -293,7 +293,7 @@ namespace IguideME.Web.Controllers
 
         [Authorize(Policy = "IsInstructor")]
         [HttpGet]
-        [Route("/datamart/canvas/assignments")]
+        [Route("/assignments")]
         public ActionResult GetCanvasAssignments()
         {
             return Json(

@@ -21,6 +21,7 @@ import TileView from '@/components/crystals/tile-view/tile-view';
 import TileGroupView from '@/components/crystals/tile-group/tile-group';
 import { getTileGroups, patchTileGroup, postTileGroup } from '@/api/tiles';
 import { DrawerContext } from './contexts';
+import Swal from 'sweetalert2';
 
 const TileGroupBoard: FC = (): ReactElement => {
 	const { data: tilegroups, isFetching } = useQuery('tile-groups', getTileGroups);
@@ -60,8 +61,6 @@ const TileGroupBoard: FC = (): ReactElement => {
 		return <Loading />;
 	}
 
-	console.log('groups', tilegroups);
-
 	return (
 		<DrawerContext.Provider value={{ editTile, setEditTile }}>
 			<div className="tileGroupBoard">
@@ -70,7 +69,19 @@ const TileGroupBoard: FC = (): ReactElement => {
 					placement="right"
 					closable
 					onClose={() => {
-						setEditTile(null);
+						void Swal.fire({
+							title: 'Warning: any unsaved changes will be deleted!',
+							icon: 'warning',
+							focusCancel: true,
+							showCancelButton: true,
+							confirmButtonText: 'Close',
+							cancelButtonText: 'Cancel',
+							customClass: {},
+						}).then((result) => {
+							if (result.isConfirmed) {
+								setEditTile(null);
+							}
+						});
 					}}
 					open={editTile !== null}
 					rootStyle={{ position: 'absolute' }}

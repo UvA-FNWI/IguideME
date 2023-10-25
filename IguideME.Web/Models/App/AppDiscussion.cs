@@ -8,9 +8,9 @@ namespace IguideME.Web.Models.App
 {
     public enum Discussion_type
     {
-        topic,
-        entry,
-        reply
+        Topic,
+        Entry,
+        Reply
     }
     public class AppDiscussion
     {

@@ -28,11 +28,7 @@ const SyncProgressGrid: FC = (): ReactElement => {
 					if (stateType === undefined) {
 						return '';
 					}
-					console.log('statuses', statuses);
-
 					const status = statuses.get(name);
-					console.log('stauts', status);
-					console.log('name', name);
 					const description = status === JobStatus.Processing ? stateType.busy_text : stateType.finished_text;
 
 					return (

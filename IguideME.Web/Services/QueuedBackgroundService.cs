@@ -33,11 +33,11 @@ namespace IguideME.Web.Services
             public JobParametersModel JobParameters { get; set; }
         }
 
-		private readonly ICanvasSyncService _workService;
+        private readonly ICanvasSyncService _workService;
 
-		private readonly ILogger<QueuedBackgroundService> _logger;
+        private readonly ILogger<QueuedBackgroundService> _logger;
 
-		private readonly IComputationJobStatusService _jobStatusService;
+        private readonly IComputationJobStatusService _jobStatusService;
 
         /// <summary>
         /// The queue of jobs waiting to be processed.
@@ -57,14 +57,14 @@ namespace IguideME.Web.Services
         /// <param name="jobStatusService">The service used to manage the status of computation jobs.</param>
         /// <param name="logger">The logger used to log events for this service.</param>
 		public QueuedBackgroundService(
-			ICanvasSyncService workService,
-			IComputationJobStatusService jobStatusService,
-			ILogger<QueuedBackgroundService> logger)
-		{
-			_workService = workService;
-			_jobStatusService = jobStatusService;
-			_logger = logger;
-		}
+            ICanvasSyncService workService,
+            IComputationJobStatusService jobStatusService,
+            ILogger<QueuedBackgroundService> logger)
+        {
+            _workService = workService;
+            _jobStatusService = jobStatusService;
+            _logger = logger;
+        }
 
         /// <inheritdoc />
         public async Task<JobCreatedModel> PostWorkItemAsync(JobParametersModel jobParameters)
@@ -107,34 +107,34 @@ namespace IguideME.Web.Services
                             jobQueueItem.JobId, jobQueueItem.JobParameters,
                             stoppingToken).ConfigureAwait(false);
 
-						// store the result of the work and set the status to "finished"
-						await _jobStatusService.StoreJobResultAsync(
-							jobQueueItem.JobId, result, JobStatus.Success).ConfigureAwait(false);
-					}
-				}
-				catch (TaskCanceledException ex)
-				{
-					_logger.LogError("Task canceled: {exception}", ex.StackTrace );
-					break;
-				}
-				catch (Exception ex)
-				{
-					try
-					{
+                        // store the result of the work and set the status to "finished"
+                        await _jobStatusService.StoreJobResultAsync(
+                            jobQueueItem.JobId, result, JobStatus.Success).ConfigureAwait(false);
+                    }
+                }
+                catch (TaskCanceledException ex)
+                {
+                    _logger.LogError("Task canceled: {exception}", ex.StackTrace);
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    try
+                    {
                         _logger.LogError("Error caught, setting the job as errored: {message}, {trace}", ex.Message, ex.StackTrace);
-						// something went wrong. Put the job in to an errored state and continue on
-						// application will use latest successful state
-						await _jobStatusService.StoreJobResultAsync(jobQueueItem.JobId, new JobResultModel
-						{
-							Exception = new JobExceptionModel(ex)
-						}, JobStatus.Errored).ConfigureAwait(false);
-					}
-					catch (Exception e)
-					{
-						_logger.LogError("Something went wrong while moving job to errored state: {error}", e.StackTrace);
-					}
-				}
-			}
-		}
-	}
+                        // something went wrong. Put the job in to an errored state and continue on
+                        // application will use latest successful state
+                        await _jobStatusService.StoreJobResultAsync(jobQueueItem.JobId, new JobResultModel
+                        {
+                            Exception = new JobExceptionModel(ex)
+                        }, JobStatus.Errored).ConfigureAwait(false);
+                    }
+                    catch (Exception e)
+                    {
+                        _logger.LogError("Something went wrong while moving job to errored state: {error}", e.StackTrace);
+                    }
+                }
+            }
+        }
+    }
 }

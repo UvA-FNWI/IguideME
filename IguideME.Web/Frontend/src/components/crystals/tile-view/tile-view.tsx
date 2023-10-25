@@ -10,13 +10,14 @@ import {
 	FormOutlined,
 	StopTwoTone,
 } from '@ant-design/icons';
-import { deleteTile } from '@/api/tiles';
+import { deleteTile, qPatchTile } from '@/api/tiles';
 import { useMutation, useQueryClient } from 'react-query';
 import { CSS } from '@dnd-kit/utilities';
 
 import './style.scss';
 import { useSortable } from '@dnd-kit/sortable';
 import { DrawerContext } from '../tile-group-board/contexts';
+import Swal from 'sweetalert2';
 
 const GREEN = 'rgb(55, 212, 63)';
 const RED = 'red';
@@ -29,6 +30,13 @@ const TileView: FC<Props> = ({ tile }): ReactElement => {
 	const queryClient = useQueryClient();
 	const { mutate: removeTile } = useMutation({
 		mutationFn: deleteTile,
+		onSuccess: async () => {
+			await queryClient.invalidateQueries('tiles');
+		},
+	});
+
+	const { mutate: qUpdateTile } = useMutation({
+		mutationFn: qPatchTile,
 		onSuccess: async () => {
 			await queryClient.invalidateQueries('tiles');
 		},
@@ -50,7 +58,11 @@ const TileView: FC<Props> = ({ tile }): ReactElement => {
 	};
 
 	const toggleVisible = (): void => {
-		console.log('test');
+		qUpdateTile({ id: tile.id, visible: !tile.visible });
+	};
+
+	const toggleNotifications = (): void => {
+		qUpdateTile({ id: tile.id, notifications: !tile.notifications });
 	};
 
 	if (isDragging) {
@@ -73,9 +85,21 @@ const TileView: FC<Props> = ({ tile }): ReactElement => {
 					<Space align="center">
 						<Tooltip title={<>This tile is {!tile.visible && <b>not </b>}visible on canvas</>}>
 							{tile.visible ? (
-								<CheckCircleTwoTone twoToneColor={GREEN} style={{ fontSize: '9pt' }} onClick={toggleVisible} />
+								<CheckCircleTwoTone
+									twoToneColor={GREEN}
+									style={{ fontSize: '9pt' }}
+									onClick={(event) => {
+										clickThrough(event, toggleVisible);
+									}}
+								/>
 							) : (
-								<StopTwoTone twoToneColor={RED} style={{ fontSize: '9pt' }} onClick={toggleVisible} />
+								<StopTwoTone
+									twoToneColor={RED}
+									style={{ fontSize: '9pt' }}
+									onClick={(event) => {
+										clickThrough(event, toggleVisible);
+									}}
+								/>
 							)}
 						</Tooltip>
 						<h3 style={{ margin: 0, paddingTop: 2 }}>{tile.title}</h3>
@@ -85,7 +109,20 @@ const TileView: FC<Props> = ({ tile }): ReactElement => {
 					<DeleteFilled
 						onClick={(event) => {
 							event.stopPropagation();
-							removeTile(tile.id);
+							void Swal.fire({
+								title: 'Warning: This will permanently delete the tile!',
+								icon: 'warning',
+								focusCancel: true,
+								showCancelButton: true,
+								confirmButtonText: 'Delete',
+								cancelButtonText: 'Cancel',
+								customClass: {},
+							}).then((result) => {
+								if (result.isConfirmed) {
+									setEditTile(null);
+									removeTile(tile.id);
+								}
+							});
 						}}
 						style={{ paddingRight: 5 }}
 					/>
@@ -115,13 +152,22 @@ const TileView: FC<Props> = ({ tile }): ReactElement => {
 							</>
 						}
 					>
-						{/* TODO: toggle */}
-						<BellTwoTone twoToneColor={tile.notifications ? GREEN : RED} onClick={toggleVisible} />
+						<BellTwoTone
+							twoToneColor={tile.notifications ? GREEN : RED}
+							onClick={(event) => {
+								clickThrough(event, toggleNotifications);
+							}}
+						/>
 					</Tooltip>
 				</Col>
 			</Row>
 		</div>
 	);
+
+	function clickThrough(event: React.MouseEvent<HTMLSpanElement, MouseEvent>, func: () => void): void {
+		event.stopPropagation();
+		func();
+	}
 };
 
 const TileTypeView: FC<{ tileType: TileType }> = ({ tileType }): ReactElement => {

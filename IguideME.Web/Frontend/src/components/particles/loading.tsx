@@ -1,7 +1,7 @@
 import { Spin } from 'antd';
 import { type FC, type ReactElement } from 'react';
 
-const LoadingCentered: FC = (): ReactElement => {
+const Loading: FC = (): ReactElement => {
 	return (
 		// <div style={{ display: 'flex', justifyContent: 'center' }}>
 		<div>
@@ -12,4 +12,4 @@ const LoadingCentered: FC = (): ReactElement => {
 	);
 };
 
-export default LoadingCentered;
+export default Loading;

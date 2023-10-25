@@ -154,16 +154,14 @@ namespace IguideME.Web.Services
             this.workerStatus.statuses[this.workerStatus.counter] = "Processing";
             UpdateStatus(jobId);
 
-            try
-            {
-                worker.Start();
-            }
-            catch (Exception ex)
+            try { worker.Start(); }
+            catch (Exception)
             {
                 this.workerStatus.statuses[this.workerStatus.counter] = "Errored";
                 UpdateStatus(jobId);
-                throw ex;
+                throw;
             }
+
             this.workerStatus.statuses[this.workerStatus.counter] = "Success";
             UpdateStatus(jobId);
             this.workerStatus.counter++;
