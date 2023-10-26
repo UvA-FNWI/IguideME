@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using IguideME.Web.Models.App;
 using IguideME.Web.Services;
 using Newtonsoft.Json;
+using UvA.DataNose.Connectors.Canvas;
 
 namespace IguideME.Web.Models
 {
@@ -42,13 +44,22 @@ namespace IguideME.Web.Models
         [JsonProperty(PropertyName = "notifications")]
         public bool Notifications { get; set; }
 
+        // [JsonProperty(PropertyName = "content")]
+        // public List<Object> Content { get; set; }
+
+        // [JsonProperty(PropertyName = "discussions")]
+        // public List<AppDiscussion> Discussions { get; set; }
+
+        // [JsonProperty(PropertyName = "learningGoals")]
+        // public List<LearningGoal> LearningGoals { get; set; }
+
         // [JsonProperty(PropertyName = "graph_view")]
         // public bool GraphView { get; set; }
 
         // [JsonProperty(PropertyName = "wildcard")]
         // public bool Wildcard { get; set; }
 
-        [JsonIgnore]
+        [JsonProperty(PropertyName = "entries")]
         public List<TileEntry> Entries { get; set; }
 
         public Tile(
@@ -69,10 +80,10 @@ namespace IguideME.Web.Models
             this.Notifications = notifications;
         }
 
-        public List<TileEntry> GetEntries()
-        {
-            return this.Entries;
-        }
+        // public List<TileEntry> GetEntries()
+        // {
+        //     return this.Entries;
+        // }
     }
 
     public class TileEntry
