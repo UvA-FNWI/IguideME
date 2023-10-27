@@ -2,7 +2,7 @@ import { Form, InputNumber, Row, Select } from 'antd';
 import { type FC, type ReactElement } from 'react';
 import { useQuery } from 'react-query';
 
-import { getAssignments } from '@/api/assignments';
+import { getAssignments } from '@/api/entries';
 
 const { Item } = Form;
 
@@ -18,7 +18,7 @@ const EditTileAssignments: FC = (): ReactElement => {
 			</Row>
 			<Row>
 				<Item name="entries" label="Assignments">
-					<Select mode="multiple" options={} />
+					<Select mode="multiple" />
 				</Item>
 			</Row>
 		</>

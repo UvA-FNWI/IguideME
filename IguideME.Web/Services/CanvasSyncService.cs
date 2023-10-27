@@ -94,7 +94,7 @@ namespace IguideME.Web.Services
                     string[] splittedDates = datepair.Split("-");
                     if (isBetweenDates(DateTime.Parse(string.Format("{0:yyyy/MM/dd}", DateTime.Now)), DateTime.Parse(splittedDates[0]), DateTime.Parse(splittedDates[1])))
                     {
-                        notifications_bool = work.Notifications_bool; // What is this bool??
+                        notifications_bool = work.Notifications_bool;
                         break;
                     }
                 }
@@ -136,11 +136,6 @@ namespace IguideME.Web.Services
             _logger.LogInformation("Finishing sync");
             this.workerStatus.statuses[this.workerStatus.counter] = "Success";
             UpdateStatus(jobId);
-
-            // TODO: COMMENTED OUT CODE THAT SHOULD GO BACK IN ---------------------
-            // _logger.LogInformation("Starting recycleexternaldata");
-            // _databaseManager.RecycleExternalData(courseID, timestamp);
-            //----------------------------------------------------------------------
 
             long duration = sw.ElapsedMilliseconds;
             Console.WriteLine("Took: " + duration.ToString() + "ms");

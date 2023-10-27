@@ -45,7 +45,6 @@ namespace IguideME.Web.Controllers
         [Route("/tiles")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        // DBrefTODO: The tile type should be according to the enum
         public JsonResult PostTile([FromBody] Tile tile)
         {
             // Creates a new tile with information posted in the request's body
