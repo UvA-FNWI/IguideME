@@ -11,6 +11,7 @@ using DiscussionEntry = UvA.DataNose.Connectors.Canvas.DiscussionEntry;
 using DiscussionReply = UvA.DataNose.Connectors.Canvas.DiscussionReply;
 using System.Linq;
 using StackExchange.Redis;
+using static IguideME.Web.Models.Tile;
 
 namespace IguideME.Web.Services
 {
@@ -2202,6 +2203,36 @@ namespace IguideME.Web.Services
 
             return tiles;
         }
+
+        // public Tile FillTileContent(Tile tile)
+        // {
+        //     switch(tile.Type)
+        //     {
+        //         case Tile_type.assignments:
+        //             using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_COURSE_ASSIGNMENTS,
+        //                 new SQLiteParameter("tileID", courseID)))
+        //             {
+        //                 while (r.Read())
+        //                 {
+        //                     try
+        //                     {
+                                
+        //                     }
+        //                     catch (Exception e)
+        //                     {
+        //                         PrintQueryError("FillTileContent", 9, r, e);
+        //                     }
+        //                 }
+        //             }
+        //         break;
+        //         case Tile_type.discussions:
+        //         break;
+        //         case Tile_type.learning_outcomes:
+        //         break;
+        //     }
+            
+        //     return tile;
+        // }
 
         public void CreateLayoutTileGroup(
             int courseID,

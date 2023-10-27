@@ -5,6 +5,7 @@ using IguideME.Web.Models.Impl;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Canvas = UvA.DataNose.Connectors.Canvas;
+using Microsoft.IdentityModel.Tokens;
 
 namespace IguideME.Web.Services.Workers
 {
@@ -114,7 +115,7 @@ namespace IguideME.Web.Services.Workers
 		private void HandleTile(List<Canvas.Discussion> discussions, Tile tile)
 		{
 
-			if (tile.GetEntries() == null)
+			if (tile.Entries.IsNullOrEmpty())
 				tile.Entries = _databaseManager.GetTileEntries(tile.ID);
 
 			foreach (Canvas.Discussion discussion in discussions)
