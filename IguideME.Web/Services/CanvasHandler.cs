@@ -34,7 +34,8 @@ namespace IguideME.Web.Services
         /// <summary>
         /// Creates or renews a connection with canvas. We always initialize and keep one because we communicate with canvas outside of syncs as well.
         /// </summary>
-        public void CreateConnection() {
+        public void CreateConnection()
+        {
             this.Connector = new CanvasApiConnector(this.BaseUrl, this.AccessToken);
         }
 
@@ -46,7 +47,8 @@ namespace IguideME.Web.Services
         /// <param name="body">The message to be send.</param>
         public void SendMessage(string userID, string subject, string body)
         {
-            try {
+            try
+            {
                 Conversation conv = new(this.Connector)
                 {
                     Subject = subject,
@@ -57,10 +59,11 @@ namespace IguideME.Web.Services
 
                 conv.Save();
             }
-            catch (System.Net.WebException e) {
+            catch (System.Net.WebException e)
+            {
                 _logger.LogError("Error sending message: {error}", e);
-                _logger.LogError("Status description: {status}", ((System.Net.HttpWebResponse) e.Response).StatusDescription);
-                _logger.LogError("Response: {response}", new System.IO.StreamReader(((System.Net.HttpWebResponse) e.Response).GetResponseStream()).ReadToEnd());
+                _logger.LogError("Status description: {status}", ((System.Net.HttpWebResponse)e.Response).StatusDescription);
+                _logger.LogError("Response: {response}", new System.IO.StreamReader(((System.Net.HttpWebResponse)e.Response).GetResponseStream()).ReadToEnd());
             }
         }
 
@@ -72,6 +75,7 @@ namespace IguideME.Web.Services
         /// <returns>The requested user if found.</returns>
         public User GetUser(int courseID, string userID)
         {
+            _logger.LogInformation("Getting user {u} from canvas", userID);
             // _logger.LogInformation("Trying to get user\ncourseID: {courseID}, userID: {userID}", courseID, userID);
             List<Enrollment> users = Connector.FindCourseById(courseID).Enrollments;
             return users.First(x => x.UserID == userID).User;
@@ -83,12 +87,13 @@ namespace IguideME.Web.Services
         /// <param name="courseID">The course the student is a part of.</param>
         /// <param name="sisID">The sisID of the user.</param>
         /// <returns>The loginID of the user.</returns>
-        public string TranslateSISToLoginID(int courseID, string sisID) {
+        public string TranslateSISToLoginID(int courseID, string sisID)
+        {
             List<Enrollment> users = Connector.FindCourseById(courseID).Enrollments;
             return users.First(x => x.User.SISUserID == sisID).User.LoginID;
         }
 
-// TODO: change many of these arrays to Enumerables.
+        // TODO: change many of these arrays to Enumerables.
 
         /// <summary>
         /// Get all the users with the student role for a course.
