@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
+using System;
+
 using System.Security.Claims;
 
 namespace IguideME.Web.Controllers
@@ -45,7 +47,7 @@ namespace IguideME.Web.Controllers
             }
 
             _logger.LogInformation("Unable to parse userid claim");
-            throw;
+            throw new Exception();
         }
 
         protected string GetUserName()
