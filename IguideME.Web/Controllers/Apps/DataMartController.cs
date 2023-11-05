@@ -338,6 +338,19 @@ namespace IguideME.Web.Controllers
             );
         }
 
+        [Authorize(Policy = "IsInstructor")]
+        [HttpGet]
+        [Route("/topics")]
+        public ActionResult GetCanvasTopics()
+        {
+            int course_id = this.GetCourseID();
+
+            List<AppDiscussion> discussions = _databaseManager.GetDiscussions(course_id);
+            return Json(
+                discussions
+            );
+        }
+
         // -------------------- User notifications --------------------
         [Authorize(Policy = "IsInstructor")]
         [HttpGet]

@@ -1,4 +1,4 @@
-import { Col, Divider, Form, type FormInstance, InputNumber, Row, Slider, Transfer } from 'antd';
+import { Col, Divider, InputNumber, Row, Slider, Transfer } from 'antd';
 import { type FC, type ReactElement, useState } from 'react';
 import { useQuery } from 'react-query';
 import { DeleteFilled } from '@ant-design/icons';
@@ -8,16 +8,16 @@ import { CSS } from '@dnd-kit/utilities';
 import { getTileGroups } from '@/api/tiles';
 
 import './style.scss';
+import { type LayoutColumn } from '@/types/tile';
 
 const MIN_WIDTH = 1;
 const MAX_WIDTH = 100;
 const formatter = (value: number | undefined): string => (value !== undefined ? `${value}%` : '');
 
 interface Props {
-	name: number;
-	restField?: { fieldKey?: number | undefined };
-	remove?: (index: number | number[]) => void;
-	form: FormInstance;
+	column: LayoutColumn;
+	remove?: (index: number) => void;
+	parentOnChange?: (column: LayoutColumn) => void;
 }
 
 interface RecordType {
@@ -25,10 +25,24 @@ interface RecordType {
 	title: string;
 }
 
-const ConfigLayoutColumn: FC<Props> = ({ name, restField, form, remove }): ReactElement => {
+const ConfigLayoutColumn: FC<Props> = ({ column, remove, parentOnChange }): ReactElement => {
+	const [width, setWidth] = useState<number>(column.width);
+	const [targetGroups, setGroups] = useState<string[]>(column.groups);
+	const [selectedGroups, setSelectedGroups] = useState<string[]>([]);
+	const { data } = useQuery('tile-groups', getTileGroups);
+	const groups: RecordType[] | undefined = data?.map((x) => {
+		return { key: x.id, title: x.title };
+	});
+
+	const onChange = (): void => {
+		column.width = width;
+		column.groups = targetGroups;
+		parentOnChange?.(column);
+	};
+
 	const { setNodeRef, attributes, listeners, transform, transition, isDragging } = useSortable({
-		id: form.getFieldValue(['columns', name]).id,
-		data: { name, restField },
+		id: column !== undefined ? column.id : 0,
+		data: { column },
 	});
 
 	const style = {
@@ -36,10 +50,18 @@ const ConfigLayoutColumn: FC<Props> = ({ name, restField, form, remove }): React
 		transform: CSS.Transform.toString(transform),
 	};
 
+	const onGroupSelectChange = (source: string[], target: string[]): void => {
+		setSelectedGroups([...source, ...target]);
+	};
+
+	const onGroupChange = (targetKeys: string[]): void => {
+		setGroups(targetKeys);
+		onChange();
+	};
+
 	if (isDragging) {
 		return <div ref={setNodeRef} style={style} className="LayoutColumn"></div>;
 	}
-	console.log('test', name);
 
 	return (
 		<div className="LayoutColumn" ref={setNodeRef} style={style}>
@@ -48,7 +70,7 @@ const ConfigLayoutColumn: FC<Props> = ({ name, restField, form, remove }): React
 					<h3>Column</h3>
 				</Col>
 				<Col>
-					<DeleteFilled onClick={() => remove?.(name)} />
+					<DeleteFilled onClick={() => remove?.(column.id)} />
 				</Col>
 			</Row>
 
@@ -59,14 +81,28 @@ const ConfigLayoutColumn: FC<Props> = ({ name, restField, form, remove }): React
 					<span>Width:</span>
 				</Col>
 				<Col span={14}>
-					<Form.Item {...restField} name={[name, 'width']} initialValue={50}>
-						<Slider min={MIN_WIDTH} max={MAX_WIDTH} tooltip={{ formatter }} />
-					</Form.Item>
+					<Slider
+						min={MIN_WIDTH}
+						max={MAX_WIDTH}
+						value={width}
+						onChange={(value) => {
+							setWidth(value);
+							onChange();
+						}}
+						tooltip={{ formatter }}
+					/>
 				</Col>
 				<Col span={7}>
-					<Form.Item {...restField} name={[name, 'width']}>
-						<InputNumber min={MIN_WIDTH} max={MAX_WIDTH} formatter={formatter} />
-					</Form.Item>
+					<InputNumber
+						min={MIN_WIDTH}
+						max={MAX_WIDTH}
+						value={width}
+						onChange={(value) => {
+							setWidth(value ?? MIN_WIDTH);
+							onChange();
+						}}
+						formatter={formatter}
+					/>
 				</Col>
 			</Row>
 
@@ -74,45 +110,18 @@ const ConfigLayoutColumn: FC<Props> = ({ name, restField, form, remove }): React
 			<div style={{ marginBottom: '10px' }}>Tile Groups:</div>
 
 			<Row justify="center">
-				<Form.Item {...restField} name={[name, 'groups']} trigger="onChange" initialValue={[]}>
-					<TransferWrapper />
-				</Form.Item>
+				<Transfer
+					dataSource={groups}
+					targetKeys={targetGroups.map((id) => id)}
+					selectedKeys={selectedGroups}
+					onChange={onGroupChange}
+					onSelectChange={onGroupSelectChange}
+					render={(item) => item.title}
+					oneWay
+					showSearch
+				/>
 			</Row>
 		</div>
-	);
-};
-
-interface TransferProps {
-	value?: string[];
-	onChange?: (value: string[]) => void;
-}
-
-const TransferWrapper: FC<TransferProps> = ({ value = [], onChange }): ReactElement => {
-	const [selectedGroups, setSelectedGroups] = useState<string[]>([]);
-	const { data } = useQuery('tile-groups', getTileGroups);
-	const groups: RecordType[] | undefined = data?.map((x) => {
-		return { key: '' + x.id, title: x.title };
-	});
-
-	const onGroupChange = (nTargetKeys: string[]): void => {
-		onChange?.(nTargetKeys);
-	};
-
-	const onGroupSelectChange = (source: string[], target: string[]): void => {
-		setSelectedGroups([...source, ...target]);
-	};
-
-	return (
-		<Transfer
-			dataSource={groups}
-			targetKeys={value}
-			selectedKeys={selectedGroups}
-			onChange={onGroupChange}
-			onSelectChange={onGroupSelectChange}
-			render={(item) => item.title}
-			oneWay
-			showSearch
-		/>
 	);
 };
 
