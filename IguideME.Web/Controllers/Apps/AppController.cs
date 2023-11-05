@@ -4,6 +4,7 @@ using System.IO;
 using IguideME.Web.Models.App;
 using IguideME.Web.Models.Impl;
 using IguideME.Web.Services;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -33,12 +34,6 @@ namespace IguideME.Web.Controllers
         }
 
         // [Authorize(Policy = "IsInstructor")]
-        [Route("/app/setup")]
-        [HttpPost]
-        public void SetupCourse() {
-            if (!_databaseManager.IsCourseRegistered(GetCourseID()))
-                _databaseManager.RegisterCourse(GetCourseID(), GetCourseTitle());
-        }
 
         [Authorize]
         [Route("/app/self")]
@@ -74,7 +69,7 @@ namespace IguideME.Web.Controllers
                     this.GetHashCode()));
         }
 
-// What is the difference between these two ?????
+        // What is the difference between these two ?????
         [Authorize]
         [HttpGet]
         [Route("/app/notification")]
@@ -101,7 +96,7 @@ namespace IguideME.Web.Controllers
             _databaseManager.UpdateNotificationEnable(
                     this.GetCourseID(),
                     this.GetUserID(),
-                    (bool) JObject.Parse(body)["enable"],
+                    (bool)JObject.Parse(body)["enable"],
                     this.GetHashCode()
                     );
 
@@ -206,7 +201,7 @@ namespace IguideME.Web.Controllers
             if (this.IsAdministrator()) return Json("");
 
             var body = new StreamReader(Request.Body).ReadToEnd();
-            string action = (string) JObject.Parse(body)["action"];
+            string action = (string)JObject.Parse(body)["action"];
 
             _databaseManager.TrackUserAction(
                     this.GetUserID(),
@@ -228,7 +223,7 @@ namespace IguideME.Web.Controllers
             int courseID = this.GetCourseID();
 
             var body = new StreamReader(Request.Body).ReadToEnd();
-            string dates = (string) JObject.Parse(body)["dates"];
+            string dates = (string)JObject.Parse(body)["dates"];
 
             _databaseManager.UpdateNotificationDates(
                 courseID,

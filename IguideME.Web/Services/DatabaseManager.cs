@@ -666,7 +666,12 @@ namespace IguideME.Web.Services
                 }
             }
 
-            if (user.Role == UserRoles.student)
+            if (user is null)
+            {
+                _logger.LogInformation("User {u} not found for course {c}", userID, courseID);
+            }
+
+            if (user?.Role == UserRoles.student)
             {
                 using (SQLiteDataReader r2 = Query(DatabaseQueries.QUERY_GOAL_GRADE_FOR_USER,
                     new SQLiteParameter("courseID", courseID),
@@ -2216,7 +2221,7 @@ namespace IguideME.Web.Services
         //                 {
         //                     try
         //                     {
-                                
+
         //                     }
         //                     catch (Exception e)
         //                     {
@@ -2230,7 +2235,7 @@ namespace IguideME.Web.Services
         //         case Tile_type.learning_outcomes:
         //         break;
         //     }
-            
+
         //     return tile;
         // }
 

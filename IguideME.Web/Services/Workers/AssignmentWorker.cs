@@ -80,46 +80,51 @@ namespace IguideME.Web.Services.Workers
         /// <param name="entry">the tile entry the submissions are associated to.</param>
         private void RegisterSubmissions(IEnumerable<SubmissionGroup> submissionGroups, Dictionary<int, GradingType> gradingTypes)
         {
+            GradingType type;
             foreach (SubmissionGroup group in submissionGroups)
             {
 
                 foreach (Submission submission in group.Submissions)
                 {
-                    double grade;
-
-                    switch (gradingTypes[submission.AssignmentID])
+                    if (gradingTypes.TryGetValue(submission.AssignmentID, out type))
                     {
-                        case GradingType.Points:
-                            // grade = (double.Parse(submission.Grade) - 1)/0.09; // should switch to this
-                            grade = double.Parse(submission.Grade);
-                            break;
-                        case GradingType.Percentage:
-                            grade = double.Parse(submission.Grade);
-                            break;
-                        case GradingType.GPA:
-                        case GradingType.Letters:
-                            grade = LetterToGrade(submission.Grade);
-                            break;
-                        case GradingType.PassFail:
-                            _logger.LogInformation("passfail text: {Grade}", submission.Grade);
-                            grade = submission.Grade == "PASS" ? 100 : 0;
-                            break;
-                        case GradingType.NotGraded:
-                            grade = -1;
-                            break;
-                        default:
-                            grade = -1;
-                            _logger.LogError("Grade format {Type} is not supported, grade = {Grade}", gradingTypes[submission.AssignmentID], submission.Grade);
-                            break;
-                    }
-                    _logger.LogInformation("loginid {ID}", submission.User.LoginID);
 
-                    _databaseManager.CreateUserSubmission(
-                            submission.AssignmentID,
-                            submission.User.LoginID,
-                            grade,
-                            ((DateTimeOffset)submission.SubmittedAt.Value).ToUnixTimeMilliseconds()
-                            );
+                        double grade;
+
+                        switch (gradingTypes[submission.AssignmentID])
+                        {
+                            case GradingType.Points:
+                                // grade = (double.Parse(submission.Grade) - 1)/0.09; // should switch to this
+                                grade = double.Parse(submission.Grade);
+                                break;
+                            case GradingType.Percentage:
+                                grade = double.Parse(submission.Grade);
+                                break;
+                            case GradingType.GPA:
+                            case GradingType.Letters:
+                                grade = LetterToGrade(submission.Grade);
+                                break;
+                            case GradingType.PassFail:
+                                _logger.LogInformation("passfail text: {Grade}", submission.Grade);
+                                grade = submission.Grade == "PASS" ? 100 : 0;
+                                break;
+                            case GradingType.NotGraded:
+                                grade = -1;
+                                break;
+                            default:
+                                grade = -1;
+                                _logger.LogError("Grade format {Type} is not supported, grade = {Grade}", gradingTypes[submission.AssignmentID], submission.Grade);
+                                break;
+                        }
+                        _logger.LogInformation("loginid {ID}", submission.User.LoginID);
+
+                        _databaseManager.CreateUserSubmission(
+                                submission.AssignmentID,
+                                submission.User.LoginID,
+                                grade,
+                                ((DateTimeOffset)submission.SubmittedAt.Value).ToUnixTimeMilliseconds()
+                                );
+                    }
                 }
             }
         }

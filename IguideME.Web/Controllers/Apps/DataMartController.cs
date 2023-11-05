@@ -60,6 +60,22 @@ namespace IguideME.Web.Controllers
         //     _databaseManager.LogTable(JObject.Parse(body)["name"].ToString());
         // }
 
+        [Route("/app/setup")]
+        [HttpPost]
+        public async void SetupCourse()
+        {
+            if (!_databaseManager.IsCourseRegistered(GetCourseID()))
+            {
+                _databaseManager.RegisterCourse(GetCourseID(), GetCourseTitle());
+                JobParametersModel obj = new()
+                {
+                    CourseID = GetCourseID(),
+                    Notifications_bool = false
+                };
+                await _queuedBackgroundService.PostWorkItemAsync(obj).ConfigureAwait(false);
+            }
+        }
+
         [Authorize(Policy = "IsInstructor")]
         [HttpPost, Route("/datamart/start-sync")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
