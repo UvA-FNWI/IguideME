@@ -870,7 +870,7 @@ namespace IguideME.Web.Services
                             new SQLiteParameter("userID", userID),
                             new SQLiteParameter("PredictedGrade", grade),
                             new SQLiteParameter("GoalGrade", r.GetInt32(1)),
-                            new SQLiteParameter("Consent", r.GetInt32(2)),
+                            new SQLiteParameter("Consent", r.GetBoolean(2)),
                             new SQLiteParameter("Notifications", r.GetBoolean(3)),
                             new SQLiteParameter("syncID", activeSync)
                         );
@@ -948,7 +948,7 @@ namespace IguideME.Web.Services
                         new SQLiteParameter("userID", userID),
                         new SQLiteParameter("PredictedGrade", long.Parse(r.GetValue(0).ToString())),
                         new SQLiteParameter("GoalGrade", r.GetInt32(1)),
-                        new SQLiteParameter("Consent", r.GetInt32(2)),
+                        new SQLiteParameter("Consent", r.GetBoolean(2)),
                         new SQLiteParameter("Notifications", enable),
                         new SQLiteParameter("syncID", activeSync)
                     );
@@ -995,7 +995,7 @@ namespace IguideME.Web.Services
                         new SQLiteParameter("userID", userID),
                         new SQLiteParameter("PredictedGrade", long.Parse(r.GetValue(0).ToString())),
                         new SQLiteParameter("GoalGrade", grade),
-                        new SQLiteParameter("Consent", r.GetInt32(2)),
+                        new SQLiteParameter("Consent", r.GetBoolean(2)),
                         new SQLiteParameter("Notifications", r.GetBoolean(3)),
                         new SQLiteParameter("syncID", activeSync)
                     );
@@ -2033,7 +2033,8 @@ namespace IguideME.Web.Services
                         0,
                         r.GetInt32(0),
                         r.GetInt32(1),
-                        "This is another title"
+                        "This is another title",
+                        r.GetFloat(2)
                     ));
                     }
                     catch (Exception e)
@@ -2050,7 +2051,8 @@ namespace IguideME.Web.Services
         {
             NonQuery(DatabaseQueries.REGISTER_TILE_ENTRY,
                 new SQLiteParameter("tileID", entry.TileID),
-                new SQLiteParameter("content_id", entry.ContentID)
+                new SQLiteParameter("content_id", entry.ContentID),
+                new SQLiteParameter("weight", entry.Weight)
             );
         }
 
@@ -2165,6 +2167,7 @@ namespace IguideME.Web.Services
                 new SQLiteParameter("title", tile.Title),
                 new SQLiteParameter("order", tile.Order),
                 new SQLiteParameter("type", tile.Type),
+                new SQLiteParameter("weight", tile.Weight),
                 new SQLiteParameter("visible", tile.Visible),
                 new SQLiteParameter("notifications", tile.Notifications)
             );
@@ -2188,8 +2191,9 @@ namespace IguideME.Web.Services
                             r.GetValue(2).ToString(),
                             r.GetInt32(3),
                             (Tile.Tile_type)r.GetInt32(4),
-                            r.GetBoolean(5),
-                            r.GetBoolean(6)
+                            r.GetFloat(5),
+                            r.GetBoolean(6),
+                            r.GetBoolean(7)
                         );
                         tiles.Add(row);
                     }
@@ -2624,8 +2628,9 @@ namespace IguideME.Web.Services
                         r.GetValue(2).ToString(),
                         r.GetInt32(3),
                         (Tile.Tile_type)r.GetInt32(4),
-                        r.GetBoolean(5),
-                        r.GetBoolean(6)
+                        r.GetFloat(5),
+                        r.GetBoolean(6),
+                        r.GetBoolean(7)
                     );
             }
 
@@ -2638,6 +2643,7 @@ namespace IguideME.Web.Services
             string title,
             int order,
             int type,
+            float weight,
             bool visible,
             bool notifications)
         {
@@ -2646,6 +2652,7 @@ namespace IguideME.Web.Services
                 new SQLiteParameter("title", title),
                 new SQLiteParameter("order", order),
                 new SQLiteParameter("type", type),
+                new SQLiteParameter("weight", weight),
                 new SQLiteParameter("visible", visible),
                 new SQLiteParameter("notifications", notifications)
             );
@@ -2667,7 +2674,8 @@ namespace IguideME.Web.Services
                         0,
                         r.GetInt32(0),
                         r.GetInt32(1),
-                        r.GetValue(2).ToString()
+                        r.GetValue(2).ToString(),
+                        r.GetFloat(3)
                     ));
                 }
             }
@@ -2706,7 +2714,7 @@ namespace IguideME.Web.Services
                                 new SQLiteParameter("userID", data.UserID),
                                 new SQLiteParameter("PredictedGrade", long.Parse(r.GetValue(0).ToString())),
                                 new SQLiteParameter("GoalGrade", r.GetInt32(1)),
-                                new SQLiteParameter("Consent", data.Granted),
+                                new SQLiteParameter("Consent", data.Granted), ///TODOOOOOOOOO: make boolean
                                 new SQLiteParameter("Notifications", r.GetBoolean(3)),
                                 new SQLiteParameter("syncID", syncID)
                             );

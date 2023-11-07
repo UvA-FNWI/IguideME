@@ -98,6 +98,7 @@ public static class DatabaseQueries
             `title`           STRING,
             `order`           INTEGER,
             `type`            INTEGER,
+            `weight`          REAL default 0.0,
             `visible`         BOOLEAN DEFAULT false,
             `notifications`   BOOLEAN DEFAULT false,
             FOREIGN KEY(`group_id`) REFERENCES `tile_groups`(`group_id`)
@@ -115,6 +116,7 @@ public static class DatabaseQueries
         @"CREATE TABLE IF NOT EXISTS `tile_entries` (
             `tile_id`         INTEGER,
             `content_id`      INTEGER,
+            `weight`          REAL DEFAULT 0.0,
             PRIMARY KEY (`tile_id`,`content_id`),
             FOREIGN KEY(`tile_id`) REFERENCES `tiles`(`tile_id`)
         );";
@@ -190,7 +192,7 @@ public static class DatabaseQueries
             `course_id`         INTEGER,
             `predicted_grade`   INTEGER DEFAULT 0,
             `goal_grade`        INTEGER DEFAULT 0,
-            `consent`           INTEGER DEFAULT -1,
+            `consent`           BOOLEAN DEFAULT false,
             `notifications`     BOOLEAN DEFAULT true,
             `sync_id`           INTEGER,
             PRIMARY KEY (`user_id`,`course_id`,`sync_id`),
@@ -439,6 +441,7 @@ public static class DatabaseQueries
                        `title`,
                        `order`,
                        `type`,
+                       `weight`,
                        `visible`,
                        `notifications`
                     )
@@ -447,6 +450,7 @@ public static class DatabaseQueries
             @title,
             @order,
             @type,
+            @weight,
             @visible,
             @notifications
         );";
@@ -479,10 +483,12 @@ public static class DatabaseQueries
     public const string REGISTER_TILE_ENTRY =
         @"INSERT INTO       `tile_entries`
                             (   `tile_id`,
-                                `content_id`)
+                                `content_id`,
+                                `weight`)
         VALUES(
             @tileID,
-            @contentID
+            @contentID,
+            @weight
         );";
 
     public const string REGISTER_NEW_SYNC =
@@ -796,6 +802,7 @@ public static class DatabaseQueries
                     `tiles`.`title`,
                     `tiles`.`order`,
                     `tiles`.`type`,
+                    `tiles`.`weight`,
                     `tiles`.`visible`,
                     `tiles`.`notifications`
         FROM        `tiles`
@@ -811,6 +818,7 @@ public static class DatabaseQueries
                     `tiles`.`title`,
                     `tiles`.`order`,
                     `tiles`.`type`,
+                    `tiles`.`weight`,
                     `tiles`.`visible`,
                     `tiles`.`notifications`
         FROM        `tiles`
@@ -867,7 +875,8 @@ public static class DatabaseQueries
                 WHEN    0   THEN `assignments`.`title`
                 WHEN    1   THEN `discussions`.`title`
                 WHEN    2   THEN `learning_goals`.`title`
-            END title
+            END title,
+            `tile_entries`.`weight`
         FROM        `tile_entries`
         INNER JOIN  `tiles`
             USING   (`tile_id`)
@@ -889,7 +898,8 @@ public static class DatabaseQueries
 
     public const string QUERY_ALL_TILE_ENTRIES =
         @"SELECT    `tile_entries`.`tile_id`,
-                    `tile_entries`.`content_id`
+                    `tile_entries`.`content_id`,
+                    `tile_entries`.`weight`
         FROM        `tile_entries`
         INNER JOIN  `tiles`
             USING   (`tile_id`)
@@ -1110,7 +1120,7 @@ public static class DatabaseQueries
                     USING   (`user_id`)
             WHERE       `student_settings`.`course_id`= @courseID
             AND         `users`.`role`= 0
-            AND         `student_settings`.`consent` = 1
+            AND         `student_settings`.`consent` = true
             GROUP BY    `users`.`user_id`
             ORDER BY    `users`.`name` ASC
             ";
@@ -1129,7 +1139,7 @@ public static class DatabaseQueries
             USING   (`user_id`)
         WHERE       `student_settings`.`course_id`=@courseID
         AND         `users`.`student_number`=@studentNumber
-        AND         `student_settings`.`consent`= 1
+        AND         `student_settings`.`consent`= true
         ORDER BY    `users`.`name` ASC
         LIMIT       1;";
 
@@ -1155,7 +1165,7 @@ public static class DatabaseQueries
             USING   (`user_id`)
         WHERE       `student_settings`.`course_id`=@courseID
         AND         `users`.`user_id`=@userID
-        AND         `student_settings`.`consent` = 1
+        AND         `student_settings`.`consent` = true
         ORDER BY    `student_settings`.`sync_id` DESC
         LIMIT       1";
 
@@ -1171,7 +1181,7 @@ public static class DatabaseQueries
                     USING   (`user_id`)
             WHERE       `student_settings`.`course_id`= @courseID
             AND         `student_settings`.`goal_grade`=@goalGrade
-            AND         `student_settings`.`consent`= 1
+            AND         `student_settings`.`consent`= true
             GROUP BY    `users`.`user_id`
             ORDER BY    `users`.`name` ASC
             ;";
@@ -1182,7 +1192,7 @@ public static class DatabaseQueries
         FROM        `student_settings`
         WHERE       `course_id`=@courseID
         AND         `user_id`=@userID
-        AND         `consent` = 1
+        AND         `consent` = true
         ;";
 
     public const string QUERY_GOAL_GRADE_FOR_USER =
@@ -1191,7 +1201,7 @@ public static class DatabaseQueries
         FROM        `student_settings`
         WHERE       `course_id`=@courseID
         AND         `user_id`=@userID
-        AND         `consent` = 1
+        AND         `consent` = true
         ;";
 
     public const string QUERY_CONSENT_FOR_USER =
@@ -1200,7 +1210,7 @@ public static class DatabaseQueries
                     max(`student_settings`.`sync_id`)
         WHERE       `course_id`=@courseID
         AND         `user_id`=@userID
-        AND         `consent` = 1
+        AND         `consent` = true
         ;";
 
     public const string QUERY_LAST_STUDENT_SETTINGS =
@@ -1523,6 +1533,7 @@ public static class DatabaseQueries
                     `title`=@title,
                     `order`=@order,
                     `type`=@type,
+                    `weight`=@weight,
                     `visible`=@visible,
                     `notifications`=@notifications
         WHERE       `tiles`.`tile_id`=@tileID;";
@@ -1543,22 +1554,6 @@ public static class DatabaseQueries
     //     AND             `posted_at`=@postedAt
     //     AND             `message`=@message
     //     AND             `sync_hash`=@hash;";
-
-    ///// EXTERNAL DATA EXISTS NO MORE, WHAT DO WE DO HERE?????
-    public const string RECYCLE_EXTERNAL_DATA =
-        @"UPDATE        `submissions`
-          SET           `sync_hash`=@hash
-          WHERE         `entry_id` IN (
-            SELECT      `tile_entries`.`entry_id`
-            FROM        `tiles`
-            INNER JOIN  `tile_entries`
-                USING   (`tile_id`)
-            INNER JOIN  `tile_groups`
-                USING   (`group_id`)
-            WHERE       `tile_groups`.`course_id`=@courseID
-            AND     `tiles`.`type`='EXTERNAL_DATA'
-          );";
-
 
     // //============================ Delete Values =============================//
 

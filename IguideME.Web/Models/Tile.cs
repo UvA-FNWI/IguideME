@@ -38,26 +38,14 @@ namespace IguideME.Web.Models
         [JsonProperty(PropertyName = "type")]
         public Tile_type Type { get; set; }
 
+        [JsonProperty(PropertyName = "weight")]
+        public float Weight { get; set; }
+
         [JsonProperty(PropertyName = "visible")]
         public bool Visible { get; set; }
 
         [JsonProperty(PropertyName = "notifications")]
         public bool Notifications { get; set; }
-
-        // [JsonProperty(PropertyName = "content")]
-        // public List<Object> Content { get; set; }
-
-        // [JsonProperty(PropertyName = "discussions")]
-        // public List<AppDiscussion> Discussions { get; set; }
-
-        // [JsonProperty(PropertyName = "learningGoals")]
-        // public List<LearningGoal> LearningGoals { get; set; }
-
-        // [JsonProperty(PropertyName = "graph_view")]
-        // public bool GraphView { get; set; }
-
-        // [JsonProperty(PropertyName = "wildcard")]
-        // public bool Wildcard { get; set; }
 
         [JsonProperty(PropertyName = "entries")]
         public List<TileEntry> Entries { get; set; }
@@ -68,6 +56,7 @@ namespace IguideME.Web.Models
             string title,
             int order,
             Tile_type type,
+            float weight,
             bool visible,
             bool notifications)
         {
@@ -76,21 +65,14 @@ namespace IguideME.Web.Models
             this.Title = title;
             this.Order = order;
             this.Type = type;
+            this.Weight = weight;
             this.Visible = visible;
             this.Notifications = notifications;
         }
-
-        // public List<TileEntry> GetEntries()
-        // {
-        //     return this.Entries;
-        // }
     }
 
     public class TileEntry
     {
-        // [JsonProperty(PropertyName = "id")]
-        // public int ID { get; set; }
-
         [JsonProperty(PropertyName = "state")]
         public EditState State { get; set; }
 
@@ -103,18 +85,21 @@ namespace IguideME.Web.Models
         [JsonProperty(PropertyName = "content_id")]
         public int ContentID { get; set; }
 
+        [JsonProperty(PropertyName = "weight")]
+        public float Weight { get; set; }
+
         public TileEntry(
-            // int id,
             EditState state,
             int tileID,
             int ContentID,
-            string title)
+            string title,
+            float weight)
         {
-            // this.ID = id;
             this.State = state;
             this.TileID = tileID;
             this.ContentID = ContentID;
             this.Title = title;
+            this.Weight = weight;
         }
     }
 }
