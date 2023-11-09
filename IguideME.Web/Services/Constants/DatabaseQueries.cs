@@ -295,9 +295,10 @@ public static class DatabaseQueries
 
     public const string CREATE_TABLE_ASSIGNMENTS =
         @"CREATE TABLE IF NOT EXISTS `assignments` (
-            `assignment_id`   INTEGER PRIMARY KEY,
+            `assignment_id`   INTEGER PRIMARY KEY AUTOINCREMENT,
             `course_id`       INTEGER,
             `title`           STRING,
+            `external_id`     STRING DEFAULT null,
             `published`       BOOLEAN DEFAULT true,
             `muted`           BOOLEAN DEFAULT false,
             `due_date`        INTEGER DEAFULT NULL,
@@ -498,7 +499,7 @@ public static class DatabaseQueries
     public const string REGISTER_ASSIGNMENT =
         @"INSERT OR REPLACE
             INTO   `assignments`
-                        (   `assignment_id`,
+                        (   `external_id`,
                             `course_id`,
                             `title`,
                             `published`,
@@ -919,6 +920,13 @@ public static class DatabaseQueries
                     `submissions_meta`.`value`
         FROM        `submissions_meta`
         WHERE       ``submission_id`=@submissionID
+        ;";
+
+    public const string QUERY_ASSIGNMENT_ID_FROM_EXTERNAL =
+        @"SELECT    `assignment_id`
+        FROM        `assignments`
+        WHERE       `course_id`= @courseID
+        AND         `external_id`= @externalID
         ;";
 
     public const string QUERY_COURSE_ASSIGNMENTS =

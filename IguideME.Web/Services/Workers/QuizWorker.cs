@@ -62,6 +62,9 @@ namespace IguideME.Web.Services.Workers
 
 			foreach (QuizSubmission sub in quiz.Submissions)
 			{
+				 // WE NEED TO CHANGE THE SUBMISSION IDs FROM EXTERNAL QUIZ ID TO INTERNAL ASSIGNMENT ID
+				sub.QuizID = _databaseManager.GetInternalAssignmentID(_courseID,sub.QuizID);
+
 				_databaseManager.CreateUserSubmission(
 					quiz.ID ?? -1, // TODO: handle properly when null
 					_databaseManager.GetConsentedStudentID(this._courseID, sub.UserID),

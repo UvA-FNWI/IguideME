@@ -1096,6 +1096,16 @@ namespace IguideME.Web.Services
             return peers;
         }
 
+        public int GetInternalAssignmentID(
+            int externalID,
+            int courseID)
+        {
+            return IDNonQuery(DatabaseQueries.REGISTER_USER_SUBMISSION,
+                    new SQLiteParameter("externalID", externalID),
+                    new SQLiteParameter("courseID", courseID)
+                );
+        }
+        
         public int CreateUserSubmission(
             int assignmentID,
             string userID,

@@ -86,6 +86,9 @@ namespace IguideME.Web.Services.Workers
 
                 foreach (Submission submission in group.Submissions)
                 {
+                    // WE NEED TO CHANGE THE SUBMISSION IDs FROM EXTERNAL ASSIGNMENT ID TO INTERNAL ASSIGNMENT ID
+                    submission.AssignmentID = _databaseManager.GetInternalAssignmentID(_courseID,submission.AssignmentID);
+
                     if (gradingTypes.TryGetValue(submission.AssignmentID, out type))
                     {
 
