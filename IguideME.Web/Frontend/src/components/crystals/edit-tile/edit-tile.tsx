@@ -7,6 +7,7 @@ import { DrawerContext } from '../tile-group-board/contexts';
 import Swal from 'sweetalert2';
 import { BellTwoTone, CheckCircleTwoTone, StopTwoTone } from '@ant-design/icons';
 import EditTileAssignments from '@/components/atoms/edit-tile-assignments/edit-tile-assignments';
+import EditTileDiscussions from '@/components/atoms/edit-tile-discussions/edit-tile-discussions';
 import { useForm, useWatch } from 'antd/es/form/Form';
 
 interface Props {
@@ -36,8 +37,6 @@ const EditTile: FC<Props> = ({ tile }): ReactElement => {
 			await queryClient.invalidateQueries('tiles');
 		},
 	});
-
-	// console.log('tile', tile);
 
 	return (
 		<Form<Tile>
@@ -137,7 +136,7 @@ const EditTile: FC<Props> = ({ tile }): ReactElement => {
 			case TileType.assignments:
 				return <EditTileAssignments></EditTileAssignments>;
 			case TileType.discussions:
-				return <></>;
+				return <EditTileDiscussions></EditTileDiscussions>;
 			case TileType.learning_outcomes:
 				return <></>;
 		}
