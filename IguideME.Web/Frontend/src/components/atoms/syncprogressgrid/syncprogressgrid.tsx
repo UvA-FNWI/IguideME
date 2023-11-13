@@ -20,6 +20,7 @@ const SyncProgressGrid: FC = (): ReactElement => {
 			});
 		}
 	}
+
 	return (
 		<div className="SyncProgressGrid">
 			<Row gutter={[10, 10]}>

@@ -1,13 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+
 using IguideME.Web.Models.App;
 using IguideME.Web.Services;
+
 using Newtonsoft.Json;
+
 using UvA.DataNose.Connectors.Canvas;
 
 namespace IguideME.Web.Models
 {
-    public enum EditState {
+    public enum EditState
+    {
         Unchanged,
         New,
         Updated,
@@ -73,6 +77,7 @@ namespace IguideME.Web.Models
 
     public class TileEntry
     {
+        // TODO: remove I think
         [JsonProperty(PropertyName = "state")]
         public EditState State { get; set; }
 

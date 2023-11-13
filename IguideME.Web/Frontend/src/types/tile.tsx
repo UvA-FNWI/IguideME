@@ -6,14 +6,14 @@ export interface LayoutColumn {
 }
 
 export interface TileGroup {
-	id: string;
+	id: number;
 	title: string;
 	position: number;
 }
 
 export interface Tile {
 	id: number;
-	group_id: string;
+	group_id: number;
 	title: string;
 	position: number;
 	type: TileType;
@@ -21,7 +21,7 @@ export interface Tile {
 	visible: boolean;
 	notifications: boolean;
 	gradingType: GradingType;
-	entries: TileEntries;
+	entries: TileEntry[];
 }
 
 export enum TileType {
@@ -30,7 +30,12 @@ export enum TileType {
 	learning_outcomes,
 }
 
-export type TileEntries = Assignment[] | Discussion[] | LearningGoal[];
+export interface TileEntry {
+	tile_id: number;
+	title: string;
+	weight: number;
+	content_id: number;
+}
 
 export interface Assignment {
 	id: number;
@@ -62,13 +67,29 @@ export interface LearningGoal {
 }
 
 export enum GradingType {
-	PassFail,
-	Percentage,
-	Letters,
-	GPA,
-	Points,
-	NotGraded,
+	PassFail = 'pass_fail',
+	Percentage = 'percent',
+	Letters = 'letter_grade',
+	GPA = 'gpa_scale',
+	Points = 'points',
+	NotGraded = 'not_graded',
 }
+
+export const printGradingType = (type: GradingType): string => {
+	switch (type) {
+		case GradingType.PassFail:
+			return 'Pass/Fail';
+		case GradingType.Percentage:
+			return 'Percentage %';
+		case GradingType.Letters:
+		case GradingType.GPA:
+			return 'Letters/GPA';
+		case GradingType.Points:
+			return 'Points';
+		case GradingType.NotGraded:
+			return 'Not Graded';
+	}
+};
 
 export enum DiscussionType {
 	Topic,

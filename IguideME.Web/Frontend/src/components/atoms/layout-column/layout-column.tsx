@@ -35,14 +35,12 @@ const ConfigLayoutColumn: FC<Props> = ({ column, remove, parentOnChange }): Reac
 	});
 
 	const onChange = (): void => {
-		column.width = width;
-		column.groups = targetGroups;
+		console.log('column', column.width);
 		parentOnChange?.(column);
 	};
 
 	const { setNodeRef, attributes, listeners, transform, transition, isDragging } = useSortable({
 		id: column !== undefined ? column.id : 0,
-		data: { column },
 	});
 
 	const style = {
@@ -56,6 +54,7 @@ const ConfigLayoutColumn: FC<Props> = ({ column, remove, parentOnChange }): Reac
 
 	const onGroupChange = (targetKeys: string[]): void => {
 		setGroups(targetKeys);
+		column.groups = targetKeys;
 		onChange();
 	};
 
@@ -87,6 +86,7 @@ const ConfigLayoutColumn: FC<Props> = ({ column, remove, parentOnChange }): Reac
 						value={width}
 						onChange={(value) => {
 							setWidth(value);
+							column.width = value;
 							onChange();
 						}}
 						tooltip={{ formatter }}
@@ -99,6 +99,7 @@ const ConfigLayoutColumn: FC<Props> = ({ column, remove, parentOnChange }): Reac
 						value={width}
 						onChange={(value) => {
 							setWidth(value ?? MIN_WIDTH);
+							column.width = value ?? MIN_WIDTH;
 							onChange();
 						}}
 						formatter={formatter}

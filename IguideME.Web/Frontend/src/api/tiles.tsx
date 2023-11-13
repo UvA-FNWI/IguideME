@@ -17,7 +17,7 @@ export const postTileGroup: (group: TileGroup) => Promise<void> = async (group: 
 	await apiClient.post(`tiles/group`, group);
 };
 
-export const deleteTileGroup: (id: string) => Promise<void> = async (id: string) => {
+export const deleteTileGroup: (id: number) => Promise<void> = async (id: number) => {
 	await apiClient.delete(`tiles/groups/${id}`);
 };
 

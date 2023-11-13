@@ -64,7 +64,7 @@ const AdminPanel: FC = (): ReactElement => {
 				},
 			}}
 		>
-			<Layout>
+			<Layout style={{ minHeight: '90vh' }}>
 				<Sider
 					breakpoint="lg"
 					trigger={null}

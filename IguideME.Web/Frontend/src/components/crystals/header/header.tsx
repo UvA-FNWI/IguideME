@@ -118,7 +118,6 @@ const Header: FC = (): ReactElement => {
 					<div style={{ minWidth: '100px' }}>
 						{isAdmin && (
 							<Button
-								ghost
 								className="adminButton"
 								type="link"
 								onClick={() => {

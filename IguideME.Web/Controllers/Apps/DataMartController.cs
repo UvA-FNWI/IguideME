@@ -313,7 +313,7 @@ namespace IguideME.Web.Controllers
         public ActionResult GetCanvasAssignments()
         {
             return Json(
-                _databaseManager.GetAssignments(GetCourseID())
+                _databaseManager.GetAssignmentsMap(GetCourseID())
             );
         }
 

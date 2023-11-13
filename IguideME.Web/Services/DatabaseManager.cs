@@ -1105,7 +1105,7 @@ namespace IguideME.Web.Services
                     new SQLiteParameter("courseID", courseID)
                 );
         }
-        
+
         public int CreateUserSubmission(
             int assignmentID,
             string userID,
@@ -2345,10 +2345,10 @@ namespace IguideME.Web.Services
             return tileGroups;
         }
 
-        public List<AppAssignment> GetAssignments(int courseID)
+        public Dictionary<int, AppAssignment> GetAssignmentsMap(int courseID)
         {
 
-            List<AppAssignment> assignments = new();
+            Dictionary<int, AppAssignment> assignments = new();
 
             using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_COURSE_ASSIGNMENTS,
                     new SQLiteParameter("courseID", courseID)
@@ -2368,7 +2368,7 @@ namespace IguideME.Web.Services
                             r.GetFloat(6),
                             r.GetInt32(7)
                         );
-                        assignments.Add(row);
+                        assignments.Add(r.GetInt32(0), row);
                     }
                     catch (Exception e)
                     {

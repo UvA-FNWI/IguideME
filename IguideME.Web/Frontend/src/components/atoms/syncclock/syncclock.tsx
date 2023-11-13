@@ -8,7 +8,7 @@ import './style.scss';
 import { pollSync, startNewSync, stopCurrentSync } from '@/api/syncing';
 import { syncContext } from '@/components/crystals/syncmanager/types';
 import { getRelativeTimeTimer } from '@/helpers/time';
-import { SyncStateNames } from '@/types/synchronization';
+import { JobStatus } from '@/types/synchronization';
 
 const SyncClock: FC = (): ReactElement => {
 	const { startTime, setStartTime } = useContext(syncContext);
@@ -26,7 +26,7 @@ const SyncClock: FC = (): ReactElement => {
 
 	useEffect(() => {
 		if (data !== undefined) {
-			const done = !data.some((job) => job.task !== SyncStateNames.DONE);
+			const done = !data.some((job) => job.status !== JobStatus.Success);
 			if (done) {
 				setStartTime(null);
 				// This marks everything for a refetch from the backend.

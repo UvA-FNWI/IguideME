@@ -1,6 +1,6 @@
 import { deleteTile, postTile } from '@/api/tiles';
 import { TileType, type Tile } from '@/types/tile';
-import { Button, Col, Form, Input, Row, Select } from 'antd';
+import { Button, Col, Form, Input, Row, Select, Space } from 'antd';
 import { useContext, type FC, type ReactElement, useState } from 'react';
 import { useMutation, useQueryClient } from 'react-query';
 import { DrawerContext } from '../tile-group-board/contexts';
@@ -37,6 +37,8 @@ const EditTile: FC<Props> = ({ tile }): ReactElement => {
 		},
 	});
 
+	// console.log('tile', tile);
+
 	return (
 		<Form<Tile>
 			form={form}
@@ -45,35 +47,42 @@ const EditTile: FC<Props> = ({ tile }): ReactElement => {
 			onFinish={(data: Tile) => {
 				console.log('data', data);
 				setEditTile(null);
+				saveTile(data);
 			}}
 			requiredMark={false}
 		>
 			<Item name="id" hidden></Item>
 			<Item name="group_id" hidden></Item>
 			<Item name="position" hidden></Item>
-			<Row align="middle" justify="space-between">
-				<Col>
-					<Item name="title" label="Title" rules={[{ required: true, message: 'Please insert a title for the tile' }]}>
-						<Input style={{ width: '194px' }} />
+			<Row align="middle" style={{ height: '3em' }}>
+				<Col span={4}>
+					<div style={{ height: '100%' }}>Title:</div>
+				</Col>
+				<Col span={8}>
+					<Item name="title" rules={[{ required: true, message: 'Please insert a title for the tile' }]} noStyle>
+						<Input style={{ width: '100%' }} />
 					</Item>
 				</Col>
-				<Col>
-					<Item name="notifications">
-						<Notification />
-					</Item>
-				</Col>
-				<Col>
-					<Item name="visible">
-						<Visible />
-					</Item>
+				<Col span={4} offset={8}>
+					<Space>
+						<Item name="notifications" noStyle>
+							<Notification />
+						</Item>
+						<Item name="visible" noStyle>
+							<Visible />
+						</Item>
+					</Space>
 				</Col>
 			</Row>
 
-			<Row>
-				<Col>
-					<Item name="type" label="Type">
+			<Row align="middle" style={{ height: '3em' }}>
+				<Col span={4}>
+					<div style={{ height: '100%' }}>Type:</div>
+				</Col>
+				<Col span={8}>
+					<Item name="type" noStyle>
 						<Select
-							style={{ width: '190px' }}
+							style={{ width: '100%' }}
 							options={[
 								{ value: TileType.assignments, label: 'Assignments' },
 								{ value: TileType.discussions, label: 'Discussions' },

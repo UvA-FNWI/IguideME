@@ -89,6 +89,7 @@ const LayoutConfiguratorInner: FC<Props> = ({ data }): ReactElement => {
 								column={column}
 								remove={removeColumn}
 								parentOnChange={(column) => {
+									console.log('hey', column.width);
 									columns[columns.findIndex((col) => col.id === column.id)] = column;
 									setColumns(columns);
 								}}
@@ -125,7 +126,7 @@ const LayoutConfiguratorInner: FC<Props> = ({ data }): ReactElement => {
 
 	function onDragStart(event: DragStartEvent): void {
 		if (event.active.data.current !== undefined) {
-			setActive(event.active.data.current.column);
+			setActive(columns.find((col) => col.id === event.active.id) ?? null);
 		}
 	}
 
