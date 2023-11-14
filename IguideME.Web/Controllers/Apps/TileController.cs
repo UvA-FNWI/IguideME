@@ -76,7 +76,7 @@ namespace IguideME.Web.Controllers
         {
             // return all tiles registered to the course
             return Json(
-                _databaseManager.GetTiles(GetCourseID()));
+                _databaseManager.GetTiles(GetCourseID(), true));
         }
 
         [Authorize]

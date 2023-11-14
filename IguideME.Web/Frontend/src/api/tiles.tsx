@@ -17,7 +17,7 @@ export const postTileGroup: (group: TileGroup) => Promise<void> = async (group: 
 	await apiClient.post(`tiles/group`, group);
 };
 
-export const deleteTileGroup: (id: string) => Promise<void> = async (id: string) => {
+export const deleteTileGroup: (id: number) => Promise<void> = async (id: number) => {
 	await apiClient.delete(`tiles/groups/${id}`);
 };
 
@@ -30,6 +30,10 @@ export const getTiles: () => Promise<Tile[]> = async () =>
 
 export const postTile: (tile: Tile) => Promise<void> = async (tile: Tile) => {
 	await apiClient.post(`tiles`, tile);
+};
+
+export const patchTile: (tile: Tile) => Promise<void> = async (tile: Tile) => {
+	await apiClient.patch(`tiles`, tile);
 };
 
 interface quickTilePatch {

@@ -1,12 +1,13 @@
-import { deleteTile, postTile } from '@/api/tiles';
+import { deleteTile, patchTile } from '@/api/tiles';
 import { TileType, type Tile } from '@/types/tile';
-import { Button, Col, Form, Input, Row, Select } from 'antd';
+import { Button, Col, Form, Input, Row, Select, Space } from 'antd';
 import { useContext, type FC, type ReactElement, useState } from 'react';
 import { useMutation, useQueryClient } from 'react-query';
 import { DrawerContext } from '../tile-group-board/contexts';
 import Swal from 'sweetalert2';
 import { BellTwoTone, CheckCircleTwoTone, StopTwoTone } from '@ant-design/icons';
 import EditTileAssignments from '@/components/atoms/edit-tile-assignments/edit-tile-assignments';
+import EditTileDiscussions from '@/components/atoms/edit-tile-discussions/edit-tile-discussions';
 import { useForm, useWatch } from 'antd/es/form/Form';
 
 interface Props {
@@ -24,7 +25,7 @@ const EditTile: FC<Props> = ({ tile }): ReactElement => {
 	const { setEditTile } = useContext(DrawerContext);
 
 	const { mutate: saveTile } = useMutation({
-		mutationFn: postTile,
+		mutationFn: patchTile,
 		onSuccess: async () => {
 			await queryClient.invalidateQueries('tiles');
 		},
@@ -45,35 +46,42 @@ const EditTile: FC<Props> = ({ tile }): ReactElement => {
 			onFinish={(data: Tile) => {
 				console.log('data', data);
 				setEditTile(null);
+				saveTile(data);
 			}}
 			requiredMark={false}
 		>
 			<Item name="id" hidden></Item>
 			<Item name="group_id" hidden></Item>
 			<Item name="position" hidden></Item>
-			<Row align="middle" justify="space-between">
-				<Col>
-					<Item name="title" label="Title" rules={[{ required: true, message: 'Please insert a title for the tile' }]}>
-						<Input style={{ width: '194px' }} />
+			<Row align="middle" style={{ height: '3em' }}>
+				<Col span={4}>
+					<div style={{ height: '100%' }}>Title:</div>
+				</Col>
+				<Col span={8}>
+					<Item name="title" rules={[{ required: true, message: 'Please insert a title for the tile' }]} noStyle>
+						<Input style={{ width: '100%' }} />
 					</Item>
 				</Col>
-				<Col>
-					<Item name="notifications">
-						<Notification />
-					</Item>
-				</Col>
-				<Col>
-					<Item name="visible">
-						<Visible />
-					</Item>
+				<Col span={4} offset={8}>
+					<Space>
+						<Item name="notifications" noStyle>
+							<Notification />
+						</Item>
+						<Item name="visible" noStyle>
+							<Visible />
+						</Item>
+					</Space>
 				</Col>
 			</Row>
 
-			<Row>
-				<Col>
-					<Item name="type" label="Type">
+			<Row align="middle" style={{ height: '3em' }}>
+				<Col span={4}>
+					<div style={{ height: '100%' }}>Type:</div>
+				</Col>
+				<Col span={8}>
+					<Item name="type" noStyle>
 						<Select
-							style={{ width: '190px' }}
+							style={{ width: '100%' }}
 							options={[
 								{ value: TileType.assignments, label: 'Assignments' },
 								{ value: TileType.discussions, label: 'Discussions' },
@@ -128,7 +136,7 @@ const EditTile: FC<Props> = ({ tile }): ReactElement => {
 			case TileType.assignments:
 				return <EditTileAssignments></EditTileAssignments>;
 			case TileType.discussions:
-				return <></>;
+				return <EditTileDiscussions></EditTileDiscussions>;
 			case TileType.learning_outcomes:
 				return <></>;
 		}

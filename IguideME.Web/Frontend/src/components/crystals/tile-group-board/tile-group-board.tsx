@@ -68,6 +68,7 @@ const TileGroupBoard: FC = (): ReactElement => {
 					title={'Editing: ' + editTile?.title}
 					placement="right"
 					closable
+					width="45vw"
 					onClose={() => {
 						void Swal.fire({
 							title: 'Warning: any unsaved changes will be deleted!',

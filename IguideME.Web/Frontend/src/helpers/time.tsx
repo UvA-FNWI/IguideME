@@ -29,7 +29,7 @@ export const getRelativeTimeTimer = (start: number, end: number): string => {
 	const seconds = (end - start) / 1000;
 	const hours = ~~(seconds / (60 * 60));
 	const minutes = ~~((seconds % (60 * 60)) / 60);
-	return `${padZeros(hours)}:${padZeros(minutes)}:${padZeros(~~seconds)}`;
+	return `${padZeros(hours)}:${padZeros(minutes)}:${padZeros(~~(seconds % 60))}`;
 };
 
 const padZeros = (number: number): string => {

@@ -944,15 +944,11 @@ public static class DatabaseQueries
 
     public const string QUERY_COURSE_DISCUSSIONS =
         @"SELECT    `discussions`.`discussion_id`,
-                    `tile_entries`.`tile_id`,
-                    `discussions`.`course_id`,
                     `discussions`.`title`,
                     `discussions`.`author`,
                     `discussions`.`date`,
                     `discussions`.`message`
         FROM        `discussions`
-        INNER JOIN  `tile_entries`
-            ON      `tile_entries`.`content_id` == `discussions`.`discussion_id`
         WHERE       `discussions`.`course_id`=@courseID
         ;";
 

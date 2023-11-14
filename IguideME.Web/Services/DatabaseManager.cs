@@ -491,9 +491,8 @@ namespace IguideME.Web.Services
                 new SQLiteParameter("courseID", discussion.CourseID),
                 new SQLiteParameter("title", discussion.Title),
                 new SQLiteParameter("authorName", discussion.UserName),
-                new SQLiteParameter("date", discussion.PostedAt),
+                new SQLiteParameter("date", discussion.PostedAt.HasValue ? (int)((DateTimeOffset)discussion.PostedAt.Value).ToUnixTimeSeconds() : 0),
                 new SQLiteParameter("message", discussion.Message)
-            // new SQLiteParameter("message", discussion.Message.Replace("'", "''")), // TODO: remove if didn't break
             );
         }
 
@@ -2345,10 +2344,10 @@ namespace IguideME.Web.Services
             return tileGroups;
         }
 
-        public List<AppAssignment> GetAssignments(int courseID)
+        public Dictionary<int, AppAssignment> GetAssignmentsMap(int courseID)
         {
 
-            List<AppAssignment> assignments = new();
+            Dictionary<int, AppAssignment> assignments = new();
 
             using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_COURSE_ASSIGNMENTS,
                     new SQLiteParameter("courseID", courseID)
@@ -2368,7 +2367,7 @@ namespace IguideME.Web.Services
                             r.GetFloat(6),
                             r.GetInt32(7)
                         );
-                        assignments.Add(row);
+                        assignments.Add(r.GetInt32(0), row);
                     }
                     catch (Exception e)
                     {
@@ -2384,6 +2383,7 @@ namespace IguideME.Web.Services
         {
             List<AppDiscussion> discussions = new();
 
+
             using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_COURSE_DISCUSSIONS,
                     new SQLiteParameter("courseID", courseID)
                 ))
@@ -2393,12 +2393,12 @@ namespace IguideME.Web.Services
                     AppDiscussion row = new(
                         Discussion_type.Topic,
                         r.GetInt32(0),
-                        r.GetInt32(1),
-                        r.GetInt32(2),
-                        r.GetValue(3).ToString(),
-                        r.GetValue(4).ToString(),
-                        r.GetInt32(5),
-                        r.GetValue(6).ToString()
+                        -1,
+                        courseID,
+                        r.GetValue(1).ToString(),
+                        r.GetValue(2).ToString(),
+                        r.GetInt32(3),
+                        r.GetValue(4).ToString()
                     );
                     discussions.Add(row);
                 }
