@@ -1056,6 +1056,7 @@ namespace IguideME.Web.Services
             float avgGrade,
             float minGrade,
             float maxGrade,
+            int entityType,
             long syncID)
         {
             string combinedIDs = string.Join(",", userIDs);
@@ -1066,6 +1067,7 @@ namespace IguideME.Web.Services
                 new SQLiteParameter("avgGrade", avgGrade),
                 new SQLiteParameter("minGrade", minGrade),
                 new SQLiteParameter("maxGrade", maxGrade),
+                new SQLiteParameter("entityType", entityType),
                 new SQLiteParameter("syncID", syncID)
             );
         }
@@ -1446,7 +1448,7 @@ namespace IguideME.Web.Services
             );
         }
 
-        public Dictionary<int, float> GetUserGrades(
+        public Dictionary<int, float> GetUserAssignmentGrades(
                 int courseID,
                 string userID)
         {
@@ -1471,43 +1473,51 @@ namespace IguideME.Web.Services
                     }
                     catch (Exception e)
                     {
-                        PrintQueryError("GetUserGrades", 3, r, e);
+                        PrintQueryError("GetUserAssignmentGrades", 3, r, e);
                     }
                 }
             }
+            return grades;
+        }
 
-            using (SQLiteDataReader r2 = Query(DatabaseQueries.QUERY_DISCUSSION_COUNTER_FOR_USER,
+        public Dictionary<int, float> GetUserDiscussionCounters(
+                int courseID,
+                string userID)
+        {
+            Dictionary<int, float> discussionCounters = new();
+
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_DISCUSSION_COUNTER_FOR_USER,
                     new SQLiteParameter("courseID", courseID),
                     new SQLiteParameter("userID", userID)
                 ))
             {
-                while (r2.Read())
+                while (r.Read())
                 {
                     try
                     {
                         // We save the sum of discussion entries and replies in a dictionary with
                         // the root discussion_id as key and the total of their entries/replies as value
-                        if (!r2.IsDBNull(0))
+                        if (!r.IsDBNull(0))
                         {
-                            int discID = r2.GetInt32(0);
-                            grades[discID] = (float) r2.GetInt32(1);
+                            int discID = r.GetInt32(0);
+                            discussionCounters[discID] = r.GetInt32(1);
                         }
 
                     }
                     catch (Exception e)
                     {
-                        PrintQueryError("GetUserGrades", 3, r2, e);
+                        PrintQueryError("GetUserDiscussionCounters", 3, r, e);
                     }
                 }
             }
-
-            return grades;
+            return discussionCounters;
         }
 
 
         public PeerComparisonData[] GetUserPeerComparison(
             int courseID,
             string loginID,
+            int entityType,
             long syncID = 0)
         {
             long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
@@ -1524,6 +1534,7 @@ namespace IguideME.Web.Services
             using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_PEER_GROUP_RESULTS,
                     new SQLiteParameter("courseID", courseID),
                     new SQLiteParameter("goalGrade", goalGrade),
+                    new SQLiteParameter("entityType", entityType),
                     new SQLiteParameter("syncID", activeSync)
                 ))
             {

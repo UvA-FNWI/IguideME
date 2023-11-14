@@ -6,8 +6,8 @@ namespace IguideME.Web.Models
 {
     public class PeerComparisonData
     {
-        [JsonProperty("tileID")]
-        public int TileID { get; set; }
+        [JsonProperty("entityID")]
+        public int EntityID { get; set; }
 
         [JsonProperty("min")]
         public Nullable<double> Minimum { get; set; }
@@ -19,12 +19,12 @@ namespace IguideME.Web.Models
         public double Average { get; set; }
 
         public PeerComparisonData(
-            int tileID,
+            int entityID,
             float avg,
             Nullable<float> min,
             Nullable<float> max)
         {
-            this.TileID = tileID;
+            this.EntityID = entityID;
             this.Average = avg;
             this.Minimum = min;
             this.Maximum = max;

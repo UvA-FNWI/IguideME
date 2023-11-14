@@ -679,12 +679,13 @@ namespace IguideME.Web.Controllers
 
         }
 
+        //TODO: Change the route in the frontend
         [Authorize]
         [HttpGet]
-        [Route("/peer-comparison/{userID}")]
+        [Route("/peer-comparison/tiles/{userID}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public ActionResult GetPeerComparison(string userID)
+        public ActionResult GetPeerComparisonForTiles(string userID)
         {
             // Only instructors may view peer comparisons of other students
             if (this.GetUserID() != userID && !this.IsAdministrator())
@@ -697,7 +698,35 @@ namespace IguideME.Web.Controllers
                 ? BadRequest()
                 : Json(
                 _databaseManager.GetUserPeerComparison(
-                GetCourseID(), user.UserID, GetHashCode()));
+                GetCourseID(), 
+                user.UserID, 
+                (int) Services.Workers.Comparison_Entity_Types.tile , 
+                GetHashCode()));
+        }
+
+        //TODO: Create the route in the frontend
+        [Authorize]
+        [HttpGet]
+        [Route("/peer-comparison/assignments/{userID}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public ActionResult GetPeerComparisonForAssignments(string userID)
+        {
+            // Only instructors may view peer comparisons of other students
+            if (this.GetUserID() != userID && !this.IsAdministrator())
+                return Unauthorized();
+
+            User user = _databaseManager.GetUser(
+                this.GetCourseID(), userID);
+
+            return user == null
+                ? BadRequest()
+                : Json(
+                _databaseManager.GetUserPeerComparison(
+                GetCourseID(), 
+                user.UserID, 
+                (int) Services.Workers.Comparison_Entity_Types.assignment , 
+                GetHashCode()));
         }
 
         [Authorize]

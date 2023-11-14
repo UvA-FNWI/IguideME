@@ -210,6 +210,11 @@ public static class DatabaseQueries
      * grade belong to as well as the grade statistics of that group.
      *
      * user_ids should go away, right?????
+     * `entity_type` is an enum and it is the type of comparison and it might be:
+     *      - Tile
+     *      - Assignment
+     *      - Discussion (not implemented yet)
+     *      - Learning Goal (not implemented yet)
      */
     public const string CREATE_TABLE_PEER_GROUPS =
     @"CREATE TABLE IF NOT EXISTS `peer_groups` (
@@ -219,6 +224,7 @@ public static class DatabaseQueries
         `avg_grade`         INTEGER,
         `min_grade`         INTEGER,
         `max_grade`         INTEGER,
+        `entity_type`       INTEGER,
         `sync_id`           INTEGER,
         PRIMARY KEY (`tile_id`,`goal_grade`,`sync_id`),
         FOREIGN KEY(`tile_id`) REFERENCES `tiles`(`tile_id`),
@@ -375,6 +381,7 @@ public static class DatabaseQueries
                                     `avg_grade`,
                                     `min_grade`,
                                     `max_grade`,
+                                    `entity_type`,
                                     `sync_id`)
         VALUES        (
             @goalGrade,
@@ -383,6 +390,7 @@ public static class DatabaseQueries
             @avgGrade,
             @minGrade,
             @maxGrade,
+            @entityType
             @syncID
         );";
 
@@ -1397,9 +1405,10 @@ public static class DatabaseQueries
                     `min_grade`,
                     `max_grade`
         FROM        `peer_groups`
-        WHERE       `course_id`=@courseID
-        AND         `goal_grade`=@goalGrade
-        AND         `sync_id`=@syncID;";
+        WHERE       `course_id`= @courseID
+        AND         `goal_grade`= @goalGrade
+        AND         `entity_type`= @entityType
+        AND         `sync_id`= @syncID;";
 
 
     public const string QUERY_GRADE_COMPARISSON_HISTORY = // half done ?????
@@ -1418,6 +1427,7 @@ public static class DatabaseQueries
             ON      `tile_entries`.`content_id` == `submissions`.`assignment_id`
         WHERE       `peer_groups`.`course_id`=@courseID
         AND         `peer_groups`.`goal_grade`=@grade
+        AND         `peer_groups`.`entity_type`= @entityType
         AND         `submissions`.`user_id` = @userID
         GROUP BY    `peer_groups`.`tile_id`, `peer_groups`.`sync_id`
         ORDER BY    `peer_groups`.`tile_id`;";
