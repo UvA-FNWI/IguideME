@@ -1,4 +1,4 @@
-import { deleteTile, postTile } from '@/api/tiles';
+import { deleteTile, patchTile } from '@/api/tiles';
 import { TileType, type Tile } from '@/types/tile';
 import { Button, Col, Form, Input, Row, Select, Space } from 'antd';
 import { useContext, type FC, type ReactElement, useState } from 'react';
@@ -25,7 +25,7 @@ const EditTile: FC<Props> = ({ tile }): ReactElement => {
 	const { setEditTile } = useContext(DrawerContext);
 
 	const { mutate: saveTile } = useMutation({
-		mutationFn: postTile,
+		mutationFn: patchTile,
 		onSuccess: async () => {
 			await queryClient.invalidateQueries('tiles');
 		},
