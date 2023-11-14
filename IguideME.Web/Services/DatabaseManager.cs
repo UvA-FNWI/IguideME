@@ -1105,7 +1105,7 @@ namespace IguideME.Web.Services
                     new SQLiteParameter("courseID", courseID)
                 );
         }
-        
+
         public int CreateUserSubmission(
             int assignmentID,
             string userID,
@@ -1447,11 +1447,11 @@ namespace IguideME.Web.Services
             );
         }
 
-        public Dictionary<int, List<float>> GetUserGrades(
+        public Dictionary<int, float> GetUserGrades(
                 int courseID,
                 string userID)
         {
-            Dictionary<int, List<float>> grades = new();
+            Dictionary<int, float> grades = new();
 
             using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_COURSE_SUBMISSIONS_FOR_STUDENT,
                     new SQLiteParameter("courseID", courseID),
@@ -1464,11 +1464,11 @@ namespace IguideME.Web.Services
                     {
                         // We save all the retrieved grades in a dictionary with
                         // the assignment.id as key and a list of grades as value
-                        if (!grades.TryGetValue(r.GetInt32(1), out List<float> value))
+                        if (!grades.TryGetValue(r.GetInt32(1), out float value))
                         {
-                            grades[r.GetInt32(1)] = new List<float>();
+                            grades[r.GetInt32(1)] = 0f;
                         }
-                        grades[r.GetInt32(1)].Add(r.GetFloat(3));
+                        grades[r.GetInt32(1)] = r.GetFloat(3);
                     }
                     catch (Exception e)
                     {
@@ -1491,7 +1491,7 @@ namespace IguideME.Web.Services
                         if (!r2.IsDBNull(0))
                         {
                             int discID = r2.GetInt32(0);
-                            grades[discID] = new List<float> { r2.GetInt32(1) };
+                            grades[discID] = (float) r2.GetInt32(1);
                         }
 
                     }

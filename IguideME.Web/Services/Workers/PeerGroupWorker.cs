@@ -114,29 +114,49 @@ namespace IguideME.Web.Services.Workers
             return peerGroup;
         }
 
+        // /// <summary>
+        // /// Calculate the minimum, average, and maximum for a peergroup for each entry (= assigment / discussion).
+        // /// </summary>
+        // /// <param name="peerGroup"></param>
+        // /// <returns>A dictionary with the assignmentID/discussionID as key and the collecton of all students' grades as a list.</returns>
+        // Dictionary<int, List<float>> CalculateGrades(List<string> peerGroup)
+        // {
+        //     Dictionary<int, List<float>> grades = new();
+
+        //     // We run the following process for each individual peer in the group
+        //     foreach (string peerID in peerGroup)
+        //     {
+        //         // We query all the grades of each peer
+        //         Dictionary<int, List<float>> temp = _databaseManager.GetUserGrades(this._courseID, peerID);
+
+        //         temp.ToList().ForEach(x =>
+        //         {
+        //             // And we merge the temporary dictionary with the grades dictionary
+        //             if (!grades.TryGetValue(x.Key, out List<float> value))
+        //                 grades[x.Key] = new List<float>(x.Value);
+        //             else
+        //                 x.Value.ForEach(y => grades[x.Key].Add(y));
+        //         });
+        //     }
+
+        //     return grades;
+        // }
+
         /// <summary>
         /// Calculate the minimum, average, and maximum for a peergroup for each entry (= assigment / discussion).
         /// </summary>
         /// <param name="peerGroup"></param>
         /// <returns>A dictionary with the assignmentID/discussionID as key and the collecton of all students' grades as a list.</returns>
-        Dictionary<int, List<float>> CalculateGrades(List<string> peerGroup)
+        Dictionary<string, Dictionary<int,float>> CalculateGrades(List<string> peerGroup)
         {
-            Dictionary<int, List<float>> grades = new();
+            Dictionary<string, Dictionary<int,float>> grades = new();
 
             // We run the following process for each individual peer in the group
             foreach (string peerID in peerGroup)
             {
                 // We query all the grades of each peer
-                Dictionary<int, List<float>> temp = _databaseManager.GetUserGrades(this._courseID, peerID);
-
-                temp.ToList().ForEach(x =>
-                {
-                    // And we merge the temporary dictionary with the grades dictionary
-                    if (!grades.TryGetValue(x.Key, out List<float> value))
-                        grades[x.Key] = new List<float>(x.Value);
-                    else
-                        x.Value.ForEach(y => grades[x.Key].Add(y));
-                });
+                Dictionary<int, float> temp = _databaseManager.GetUserGrades(this._courseID, peerID);
+                grades[peerID] = temp;
             }
 
             return grades;
@@ -159,27 +179,42 @@ namespace IguideME.Web.Services.Workers
                 // We initiallize the peer group by filling it with the users of the same goal grade
                 List<string> peerGroup = CreatePeerGroup(sortedUsers, goalGradeClass, minPeerGroupSize);
 
-                // Since we have the loginIds of all members in the peer-group,
-                // we will calculate their minimum, maximum and average grade.
+                // Since we have the userIDs of all members in the peer-group,
+                // we will find their grade in each assignment.
+                Dictionary<string, Dictionary<int,float>> grades = CalculateGrades(peerGroup);
 
-                Dictionary<int, List<float>> grades = CalculateGrades(peerGroup);
+                //Afterwards we get all Tiles of the course and with its corresponding entries
+                List<Tile> tiles = _databaseManager.GetTiles(_courseID);
+                foreach(Tile tile in tiles) {
 
-                // Finally, we go through all dictionary (= all assignments/discussions)
-                // and we store the id, min, max and average of each list in the database.
-                // also, we save the user_ids of the peers in said group
-                foreach (KeyValuePair<int, List<float>> entry in grades)
-                {
-                    if ((entry.Value != null) && entry.Value.Any())
+                    // Retrieve the assignment/discussion IDs tied to the tile
+                    List<int> tileAssignmentIDs = new List<int>();
+                    foreach(TileEntry tileEntry in tile.Entries)
+                        tileAssignmentIDs.Add(tileEntry.ContentID);
+
+                    // Finally, we go through all dictionary (= all assignments/discussions) per user
+                    // and we store the average of each user in a list.
+                    List<float> averages = new List<float>();
+                    foreach (KeyValuePair<string, Dictionary<int,float>> entry in grades)
                     {
-                        _databaseManager.CreateUserPeer(
+                        float user_avg = 0f;
+                        if ((entry.Value != null) && entry.Value.Any())
+                            foreach(int assigmentId in tileAssignmentIDs)
+                                user_avg += entry.Value[assigmentId];
+                        averages.Add(user_avg / tileAssignmentIDs.Count);
+                    }
+
+                    // Afterwards, we save the min, max and avg in the DB table.
+                    // also, we save the user_ids of the peers in said group
+                    _databaseManager.CreateUserPeer(
                         goalGradeClass,
                         peerGroup,
-                        entry.Key,
-                        entry.Value.Average(),
-                        entry.Value.Min(),
-                        entry.Value.Max(),
-                        this._syncID);
-                    }
+                        tile.ID,
+                        averages.Average(),
+                        averages.Min(),
+                        averages.Max(),
+                        _syncID
+                    );
                 }
 
                 CreateNotifications(sortedUsers[goalGradeClass], grades);
