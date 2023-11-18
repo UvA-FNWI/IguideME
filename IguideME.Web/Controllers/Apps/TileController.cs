@@ -57,8 +57,9 @@ namespace IguideME.Web.Controllers
                 tile.GroupID,
                 tile.Title,
                 tilesInGroup + 1,
-                (int)tile.Type,
+                (int) tile.Type,
                 tile.Weight,
+                (int) tile.GradingType,
                 tile.Visible,
                 tile.Notifications
             );

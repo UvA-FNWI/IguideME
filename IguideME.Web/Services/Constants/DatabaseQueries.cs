@@ -99,6 +99,7 @@ public static class DatabaseQueries
             `order`           INTEGER,
             `type`            INTEGER,
             `weight`          REAL default 0.0,
+            `grading_type`    INTEGER,
             `visible`         BOOLEAN DEFAULT false,
             `notifications`   BOOLEAN DEFAULT false,
             FOREIGN KEY(`group_id`) REFERENCES `tile_groups`(`group_id`)
@@ -451,6 +452,7 @@ public static class DatabaseQueries
                        `order`,
                        `type`,
                        `weight`,
+                       `grading_type`,
                        `visible`,
                        `notifications`
                     )
@@ -460,6 +462,7 @@ public static class DatabaseQueries
             @order,
             @type,
             @weight,
+            @gradingType,
             @visible,
             @notifications
         );";
@@ -812,6 +815,7 @@ public static class DatabaseQueries
                     `tiles`.`order`,
                     `tiles`.`type`,
                     `tiles`.`weight`,
+                    `tiles`.`grading_type`
                     `tiles`.`visible`,
                     `tiles`.`notifications`
         FROM        `tiles`
@@ -828,6 +832,7 @@ public static class DatabaseQueries
                     `tiles`.`order`,
                     `tiles`.`type`,
                     `tiles`.`weight`,
+                    `tiles`.`grading_type`,
                     `tiles`.`visible`,
                     `tiles`.`notifications`
         FROM        `tiles`
@@ -1548,6 +1553,7 @@ public static class DatabaseQueries
                     `order`=@order,
                     `type`=@type,
                     `weight`=@weight,
+                    `grading_type`=@gradingType,
                     `visible`=@visible,
                     `notifications`=@notifications
         WHERE       `tiles`.`tile_id`=@tileID;";

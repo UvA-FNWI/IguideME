@@ -45,6 +45,9 @@ namespace IguideME.Web.Models
         [JsonProperty(PropertyName = "weight")]
         public float Weight { get; set; }
 
+        [JsonProperty(PropertyName = "grading_type")]
+        public GradingType GradingType { get; set; }
+
         [JsonProperty(PropertyName = "visible")]
         public bool Visible { get; set; }
 
@@ -61,6 +64,7 @@ namespace IguideME.Web.Models
             int order,
             Tile_type type,
             float weight,
+            GradingType gradingType,
             bool visible,
             bool notifications)
         {
@@ -70,6 +74,7 @@ namespace IguideME.Web.Models
             this.Order = order;
             this.Type = type;
             this.Weight = weight;
+            this.GradingType = gradingType;
             this.Visible = visible;
             this.Notifications = notifications;
         }
