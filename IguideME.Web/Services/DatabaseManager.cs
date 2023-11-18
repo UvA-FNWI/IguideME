@@ -1101,7 +1101,7 @@ namespace IguideME.Web.Services
             int externalID,
             int courseID)
         {
-            return IDNonQuery(DatabaseQueries.REGISTER_USER_SUBMISSION,
+            return IDNonQuery(DatabaseQueries.QUERY_ASSIGNMENT_ID_FROM_EXTERNAL,
                     new SQLiteParameter("externalID", externalID),
                     new SQLiteParameter("courseID", courseID)
                 );
@@ -2186,8 +2186,9 @@ namespace IguideME.Web.Services
                 new SQLiteParameter("groupID", tile.GroupID),
                 new SQLiteParameter("title", tile.Title),
                 new SQLiteParameter("order", tile.Order),
-                new SQLiteParameter("type", tile.Type),
+                new SQLiteParameter("type", (int) tile.Type),
                 new SQLiteParameter("weight", tile.Weight),
+                new SQLiteParameter("gradingType", (int) tile.GradingType),
                 new SQLiteParameter("visible", tile.Visible),
                 new SQLiteParameter("notifications", tile.Notifications)
             );
@@ -2212,8 +2213,9 @@ namespace IguideME.Web.Services
                             r.GetInt32(3),
                             (Tile.Tile_type)r.GetInt32(4),
                             r.GetFloat(5),
-                            r.GetBoolean(6),
-                            r.GetBoolean(7)
+                            (UvA.DataNose.Connectors.Canvas.GradingType)r.GetInt32(6),
+                            r.GetBoolean(7),
+                            r.GetBoolean(8)
                         );
                         tiles.Add(row);
                     }
@@ -2662,8 +2664,9 @@ namespace IguideME.Web.Services
                         r.GetInt32(3),
                         (Tile.Tile_type)r.GetInt32(4),
                         r.GetFloat(5),
-                        r.GetBoolean(6),
-                        r.GetBoolean(7)
+                        (UvA.DataNose.Connectors.Canvas.GradingType)r.GetInt32(6),
+                        r.GetBoolean(7),
+                        r.GetBoolean(8)
                     );
             }
 
@@ -2677,6 +2680,7 @@ namespace IguideME.Web.Services
             int order,
             int type,
             float weight,
+            int gradingType,
             bool visible,
             bool notifications)
         {
@@ -2686,6 +2690,7 @@ namespace IguideME.Web.Services
                 new SQLiteParameter("order", order),
                 new SQLiteParameter("type", type),
                 new SQLiteParameter("weight", weight),
+                new SQLiteParameter("gradingType", gradingType),
                 new SQLiteParameter("visible", visible),
                 new SQLiteParameter("notifications", notifications)
             );
