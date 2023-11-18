@@ -1101,7 +1101,7 @@ namespace IguideME.Web.Services
             int externalID,
             int courseID)
         {
-            return IDNonQuery(DatabaseQueries.REGISTER_USER_SUBMISSION,
+            return IDNonQuery(DatabaseQueries.QUERY_ASSIGNMENT_ID_FROM_EXTERNAL,
                     new SQLiteParameter("externalID", externalID),
                     new SQLiteParameter("courseID", courseID)
                 );
