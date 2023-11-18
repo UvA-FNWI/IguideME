@@ -698,9 +698,9 @@ namespace IguideME.Web.Controllers
                 ? BadRequest()
                 : Json(
                 _databaseManager.GetUserPeerComparison(
-                GetCourseID(), 
-                user.UserID, 
-                (int) Services.Workers.Comparison_Entity_Types.tile , 
+                GetCourseID(),
+                user.UserID,
+                (int)Services.Workers.Comparison_Entity_Types.tile,
                 GetHashCode()));
         }
 
@@ -723,9 +723,9 @@ namespace IguideME.Web.Controllers
                 ? BadRequest()
                 : Json(
                 _databaseManager.GetUserPeerComparison(
-                GetCourseID(), 
-                user.UserID, 
-                (int) Services.Workers.Comparison_Entity_Types.assignment , 
+                GetCourseID(),
+                user.UserID,
+                (int)Services.Workers.Comparison_Entity_Types.assignment,
                 GetHashCode()));
         }
 
@@ -786,8 +786,6 @@ namespace IguideME.Web.Controllers
             return Ok();
         }
 
-
-
         [Authorize(Policy = "IsInstructor")]
         [HttpPatch]
         [Route("/tiles/groups/{groupID}")]
@@ -796,6 +794,8 @@ namespace IguideME.Web.Controllers
         public ActionResult UpdateTileGroup(string groupID, [FromBody] LayoutTileGroup tileGroup)
         {
             bool success = int.TryParse(groupID, out int id);
+
+            _logger.LogInformation("position {p}", tileGroup.Position);
 
             return success
                 ? Json(
@@ -806,6 +806,16 @@ namespace IguideME.Web.Controllers
                         tileGroup.Title,
                         tileGroup.Position))
                 : BadRequest();
+        }
+
+        [Authorize(Policy = "IsInstructor")]
+        [HttpPatch]
+        [Route("/tiles/groups/order")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public void UpdateTileGroupOrder([FromBody] int[] ids)
+        {
+            _databaseManager.UpdateTileGroupOrder(ids);
         }
     }
 }

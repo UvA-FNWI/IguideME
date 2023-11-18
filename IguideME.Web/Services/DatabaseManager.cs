@@ -2297,6 +2297,18 @@ namespace IguideME.Web.Services
             return GetLayoutTileGroup(courseID, tileGroupID);
         }
 
+        public void UpdateTileGroupOrder(
+            int[] tileGroupIDs)
+        {
+            for (int i = 0; i < tileGroupIDs.Length; i++)
+            {
+                NonQuery(DatabaseQueries.UPDATE_TILE_GROUP_ORDER,
+                    new SQLiteParameter("groupID", tileGroupIDs[i]),
+                    new SQLiteParameter("order", i)
+                );
+            }
+        }
+
         public void DeleteLayoutTileGroup(int groupID)
         {
             NonQuery(DatabaseQueries.DELETE_TILE_GROUP,

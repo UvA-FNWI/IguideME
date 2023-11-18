@@ -8,6 +8,7 @@ import Swal from 'sweetalert2';
 import { BellTwoTone, CheckCircleTwoTone, StopTwoTone } from '@ant-design/icons';
 import EditTileAssignments from '@/components/atoms/edit-tile-assignments/edit-tile-assignments';
 import EditTileDiscussions from '@/components/atoms/edit-tile-discussions/edit-tile-discussions';
+import EditTileGoals from '@/components/atoms/edit-tile-goals/edit-tile-goals';
 import { useForm, useWatch } from 'antd/es/form/Form';
 
 interface Props {
@@ -138,7 +139,7 @@ const EditTile: FC<Props> = ({ tile }): ReactElement => {
 			case TileType.discussions:
 				return <EditTileDiscussions></EditTileDiscussions>;
 			case TileType.learning_outcomes:
-				return <></>;
+				return <EditTileGoals></EditTileGoals>;
 		}
 	}
 };

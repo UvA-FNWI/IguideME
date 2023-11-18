@@ -45,7 +45,8 @@ const TileGroupView: FC<Props> = ({ group }): ReactElement => {
 	});
 
 	const { setNodeRef, attributes, listeners, transform, transition, isDragging } = useSortable({
-		id: group.position,
+		// Add 1 to the id's because dnd doesn't like 0 as an id.
+		id: group.id + 1,
 		data: {
 			type: 'Group',
 			group,
@@ -126,13 +127,13 @@ const TileGroupView: FC<Props> = ({ group }): ReactElement => {
 							addTile({
 								id: -1,
 								group_id: group.id,
-								title: 'Tile',
+								title: 'Title',
 								weight: 0,
 								position: tiles === undefined ? 1 : tiles.length + 1,
 								type: TileType.assignments,
 								visible: false,
 								notifications: false,
-								gradingType: GradingType.Points,
+								gradingType: GradingType.Percentage,
 								entries: [],
 							});
 						}}

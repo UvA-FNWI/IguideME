@@ -11,7 +11,7 @@ import {
 	useSensor,
 	PointerSensor,
 } from '@dnd-kit/core';
-import { SortableContext } from '@dnd-kit/sortable';
+import { SortableContext, arrayMove } from '@dnd-kit/sortable';
 import { createPortal } from 'react-dom';
 
 import Loading from '@/components/particles/loading';
@@ -19,15 +19,17 @@ import { type Tile, type TileGroup } from '@/types/tile';
 import EditTile from '@/components/crystals/edit-tile/edit-tile';
 import TileView from '@/components/crystals/tile-view/tile-view';
 import TileGroupView from '@/components/crystals/tile-group/tile-group';
-import { getTileGroups, patchTileGroup, postTileGroup } from '@/api/tiles';
+import { getTileGroups, patchTileGroupOrder, postTileGroup } from '@/api/tiles';
 import { DrawerContext } from './contexts';
 import Swal from 'sweetalert2';
 
 const TileGroupBoard: FC = (): ReactElement => {
-	const { data: tilegroups, isFetching } = useQuery('tile-groups', getTileGroups);
+	const { data, isFetching } = useQuery('tile-groups', getTileGroups);
 	const [activeGroup, setActiveGroup] = useState<TileGroup | null>(null);
 	const [activeTile, setActiveTile] = useState<Tile | null>(null);
 	const [editTile, setEditTile] = useState<Tile | null>(null);
+
+	const tilegroups = data?.sort((a, b) => a.position - b.position);
 
 	const queryClient = useQueryClient();
 	const { mutate: postGroup } = useMutation({
@@ -37,15 +39,16 @@ const TileGroupBoard: FC = (): ReactElement => {
 		},
 	});
 
-	const { mutate: patchGroup } = useMutation({
-		mutationFn: patchTileGroup,
+	const { mutate: updateTileGroupOrder } = useMutation({
+		mutationFn: patchTileGroupOrder,
 		onSuccess: async () => {
 			await queryClient.invalidateQueries('tile-groups');
 		},
 	});
 
+	// Add 1 to the id's because dnd doesn't like 0 as an id.
 	const groupIds = useMemo(
-		() => (tilegroups === undefined ? [] : tilegroups.map((group) => group.position)),
+		() => (tilegroups === undefined ? [] : tilegroups.map((group) => group.id + 1)),
 		[tilegroups],
 	);
 
@@ -125,6 +128,7 @@ const TileGroupBoard: FC = (): ReactElement => {
 	);
 
 	function onDragStart(event: DragStartEvent): void {
+		console.log('test', event.active.id);
 		if (event.active.data.current?.type === 'Group') {
 			setActiveGroup(event.active.data.current.group);
 		}
@@ -139,18 +143,22 @@ const TileGroupBoard: FC = (): ReactElement => {
 		const { active, over } = event;
 		if (over === null) return;
 
-		const activeGroupId = active.id;
-		const overGroupId = over.id;
-		if (activeGroupId === overGroupId) return;
+		if (tilegroups === undefined) return;
 
-		if (active.data.current === undefined) return;
-		if (over.data.current === undefined) return;
+		const activeID = active.id;
+		const overID = over.id;
+		if (activeID === overID) return;
 
-		const activegroup = active.data.current.group;
-		const overgroup = over.data.current.group;
+		// if (active.data.current === undefined) return;
+		// if (over.data.current === undefined) return;
 
-		patchGroup({ id: activegroup.id, position: +overGroupId, title: activegroup.title });
-		patchGroup({ id: overgroup.id, position: +activeGroupId, title: overgroup.title });
+		// const activegroup = active.data.current.group;
+		// const overgroup = over.data.current.group;
+
+		const ids = tilegroups.map((group) => group.id);
+		const activeIndex = ids.findIndex((id) => id === +activeID - 1);
+		const overIndex = ids.findIndex((id) => id === +overID - 1);
+		updateTileGroupOrder(arrayMove(ids, activeIndex, overIndex));
 	}
 };
 

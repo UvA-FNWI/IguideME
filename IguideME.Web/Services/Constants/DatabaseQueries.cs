@@ -1526,6 +1526,12 @@ public static class DatabaseQueries
                     `order`=@order
         WHERE       `group_id`=@groupID;";
 
+    public const string UPDATE_TILE_GROUP_ORDER =
+        @"UPDATE    `tile_groups`
+        SET         `order`=@order
+        WHERE       `group_id`=@groupID
+        ";
+
     public const string UPDATE_LEARNING_GOAL =
         @"UPDATE    `learning_goals`
         SET         `title`=@title

@@ -11,16 +11,13 @@ const { Item } = Form;
 const EditTileDiscussions: FC = (): ReactElement => {
 	const { data: topics } = useQuery('topics', getTopics);
 
-	console.log('topics', topics);
 	return (
-		<div>
-			<Row style={{ marginTop: '1em' }}>
-				<p>Discussions:</p>
-				<Item name="entries" style={{ width: '100%' }}>
-					{topics === undefined ? <Loading /> : <SelectTopics topics={topics} />}
-				</Item>
-			</Row>
-		</div>
+		<Row style={{ marginTop: '1em' }}>
+			<p>Discussions:</p>
+			<Item name="entries" style={{ width: '100%' }}>
+				{topics === undefined ? <Loading /> : <SelectTopics topics={topics} />}
+			</Item>
+		</Row>
 	);
 };
 

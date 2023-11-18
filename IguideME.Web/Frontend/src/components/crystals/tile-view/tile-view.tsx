@@ -1,4 +1,4 @@
-import { TileType, type Tile } from '@/types/tile';
+import { TileType, type Tile, printGradingType } from '@/types/tile';
 import { useContext, type FC, type ReactElement } from 'react';
 import { Col, Row, Space, Tooltip } from 'antd';
 import {
@@ -102,7 +102,22 @@ const TileView: FC<Props> = ({ tile }): ReactElement => {
 								/>
 							)}
 						</Tooltip>
-						<h3 style={{ margin: 0, paddingTop: 2 }}>{tile.title}</h3>
+						<Tooltip
+							title={
+								<>
+									Notifications are toggled <b>{tile.notifications ? 'on' : 'off'}</b>
+								</>
+							}
+						>
+							<BellTwoTone
+								twoToneColor={tile.notifications ? GREEN : RED}
+								onClick={(event) => {
+									clickThrough(event, toggleNotifications);
+								}}
+								style={{ fontSize: '9pt' }}
+							/>
+						</Tooltip>
+						<h3 style={{ margin: '0 0 0 10px', paddingTop: 2 }}>{tile.title}</h3>
 					</Space>
 				</Col>
 				<Col>
@@ -135,31 +150,19 @@ const TileView: FC<Props> = ({ tile }): ReactElement => {
 			</Row>
 			<Row align="middle" justify="space-between" style={{ paddingTop: 30 }}>
 				<Col style={{ textAlign: 'center', height: 30 }}>
-					{tile.type === TileType.assignments ? (
+					{tile.type === TileType.assignments && (
 						<>
 							<h4>Grading:</h4>
-							<p>0-10</p>
+							<p>{printGradingType(tile.gradingType)}</p>
 						</>
-					) : (
-						''
 					)}
 				</Col>
-				<Col style={{ paddingRight: 5 }}>
-					<Tooltip
-						title={
-							<>
-								Notifications are toggled <b>{tile.notifications ? 'on' : 'off'}</b>
-							</>
-						}
-					>
-						<BellTwoTone
-							twoToneColor={tile.notifications ? GREEN : RED}
-							onClick={(event) => {
-								clickThrough(event, toggleNotifications);
-							}}
-						/>
-					</Tooltip>
-				</Col>
+				{tile.weight > 0 && (
+					<Col style={{ textAlign: 'center', height: 30 }}>
+						<h4>Weight:</h4>
+						<p>{tile.weight}</p>
+					</Col>
+				)}
 			</Row>
 		</div>
 	);

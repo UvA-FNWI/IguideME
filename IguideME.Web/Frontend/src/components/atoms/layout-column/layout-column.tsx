@@ -21,7 +21,7 @@ interface Props {
 }
 
 interface RecordType {
-	key: string;
+	key: number;
 	title: string;
 }
 
@@ -79,7 +79,7 @@ const ConfigLayoutColumn: FC<Props> = ({ column, remove, parentOnChange }): Reac
 				<Col span={3}>
 					<span>Width:</span>
 				</Col>
-				<Col span={14}>
+				<Col span={15}>
 					<Slider
 						min={MIN_WIDTH}
 						max={MAX_WIDTH}
@@ -92,7 +92,7 @@ const ConfigLayoutColumn: FC<Props> = ({ column, remove, parentOnChange }): Reac
 						tooltip={{ formatter }}
 					/>
 				</Col>
-				<Col span={7}>
+				<Col span={4}>
 					<InputNumber
 						min={MIN_WIDTH}
 						max={MAX_WIDTH}
@@ -103,6 +103,7 @@ const ConfigLayoutColumn: FC<Props> = ({ column, remove, parentOnChange }): Reac
 							onChange();
 						}}
 						formatter={formatter}
+						style={{ width: '90%' }}
 					/>
 				</Col>
 			</Row>
@@ -112,7 +113,7 @@ const ConfigLayoutColumn: FC<Props> = ({ column, remove, parentOnChange }): Reac
 
 			<Row justify="center">
 				<Transfer
-					dataSource={groups}
+					dataSource={groups?.map((value) => ({ ...value, key: value.key.toString() }))}
 					targetKeys={targetGroups.map((id) => id)}
 					selectedKeys={selectedGroups}
 					onChange={onGroupChange}
