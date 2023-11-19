@@ -45,7 +45,7 @@ namespace IguideME.Web.Models
         [JsonProperty(PropertyName = "weight")]
         public float Weight { get; set; }
 
-        [JsonProperty(PropertyName = "grading_type")]
+        [JsonProperty(PropertyName = "gradingType")]
         public GradingType GradingType { get; set; }
 
         [JsonProperty(PropertyName = "visible")]

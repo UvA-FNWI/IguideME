@@ -2186,12 +2186,25 @@ namespace IguideME.Web.Services
                 new SQLiteParameter("groupID", tile.GroupID),
                 new SQLiteParameter("title", tile.Title),
                 new SQLiteParameter("order", tile.Order),
-                new SQLiteParameter("type", (int) tile.Type),
+                new SQLiteParameter("type", (int)tile.Type),
                 new SQLiteParameter("weight", tile.Weight),
-                new SQLiteParameter("gradingType", (int) tile.GradingType),
+                new SQLiteParameter("gradingType", (int)tile.GradingType),
                 new SQLiteParameter("visible", tile.Visible),
                 new SQLiteParameter("notifications", tile.Notifications)
             );
+        }
+
+        public void UpdateTileOrder(
+            int[] tileIDs)
+        {
+
+            for (int i = 0; i < tileIDs.Length; i++)
+            {
+                NonQuery(DatabaseQueries.UPDATE_TILE_ORDER,
+                    new SQLiteParameter("tileID", tileIDs[i]),
+                    new SQLiteParameter("order", i)
+                );
+            }
         }
 
         public List<Tile> GetTiles(int courseID, bool autoLoadEntries = false)
@@ -2673,7 +2686,7 @@ namespace IguideME.Web.Services
             return null;
         }
 
-        public Tile CreateTile(
+        public void CreateTile(
             int courseID,
             int groupID,
             string title,
@@ -2694,7 +2707,6 @@ namespace IguideME.Web.Services
                 new SQLiteParameter("visible", visible),
                 new SQLiteParameter("notifications", notifications)
             );
-            return GetTile(courseID, id);
         }
 
         public List<TileEntry> GetTileEntries(int tileID)

@@ -806,7 +806,8 @@ public static class DatabaseQueries
                     `column_id`,
                     `order`
         FROM        `tile_groups`
-        WHERE       `course_id`=@courseID;";
+        WHERE       `course_id`=@courseID
+        ORDER BY    `order` ASC;";
 
     public const string QUERY_TILE =
         @"SELECT    `tiles`.`tile_id`,
@@ -815,7 +816,7 @@ public static class DatabaseQueries
                     `tiles`.`order`,
                     `tiles`.`type`,
                     `tiles`.`weight`,
-                    `tiles`.`grading_type`
+                    `tiles`.`grading_type`,
                     `tiles`.`visible`,
                     `tiles`.`notifications`
         FROM        `tiles`
@@ -1563,6 +1564,12 @@ public static class DatabaseQueries
                     `visible`=@visible,
                     `notifications`=@notifications
         WHERE       `tiles`.`tile_id`=@tileID;";
+
+    public const string UPDATE_TILE_ORDER =
+        @"UPDATE    `tiles`
+        SET         `order`=@order
+        WHERE       `tile_id`=@tileID
+        ";
 
     public const string COMPLETE_NEW_SYNC =
         @"UPDATE    `sync_history`

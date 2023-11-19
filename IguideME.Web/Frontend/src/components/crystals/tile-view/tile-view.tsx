@@ -24,9 +24,10 @@ const RED = 'red';
 
 interface Props {
 	tile: Tile;
+	move?: boolean;
 }
 
-const TileView: FC<Props> = ({ tile }): ReactElement => {
+const TileView: FC<Props> = ({ tile, move }): ReactElement => {
 	const queryClient = useQueryClient();
 	const { mutate: removeTile } = useMutation({
 		mutationFn: deleteTile,
@@ -45,7 +46,7 @@ const TileView: FC<Props> = ({ tile }): ReactElement => {
 	const { setEditTile } = useContext(DrawerContext);
 
 	const { setNodeRef, attributes, listeners, transform, transition, isDragging } = useSortable({
-		id: `${tile.group_id}:${tile.position}`,
+		id: `t${tile.id + 1}`,
 		data: {
 			type: 'Tile',
 			tile,
@@ -66,7 +67,17 @@ const TileView: FC<Props> = ({ tile }): ReactElement => {
 	};
 
 	if (isDragging) {
-		return <div className="tile" ref={setNodeRef} style={style}></div>;
+		return <div className="tile" ref={setNodeRef} style={style} />;
+	}
+
+	if (move === true) {
+		return (
+			<div className="tile" ref={setNodeRef} style={style}>
+				<div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+					<p>Move here</p>
+				</div>
+			</div>
+		);
 	}
 
 	return (

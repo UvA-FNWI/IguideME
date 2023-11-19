@@ -80,7 +80,7 @@ export const printGradingType = (type: GradingType): string => {
 		case GradingType.PassFail:
 			return 'Pass/Fail';
 		case GradingType.Percentage:
-			return 'Percentage %';
+			return 'Percentage';
 		case GradingType.Letters:
 		case GradingType.GPA:
 			return 'Letters/GPA';

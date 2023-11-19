@@ -17,7 +17,7 @@ interface Props {
 const TileGroupView: FC<Props> = ({ group }): ReactElement => {
 	const [editing, setEditing] = useState<boolean>(false);
 	const [title, setTitle] = useState<string>(group.title);
-	const { data } = useQuery('tiles', getTiles);
+	const { data, isFetching } = useQuery('tiles', getTiles);
 
 	const tiles = data?.filter((tile) => tile.group_id === group.id);
 
@@ -59,13 +59,19 @@ const TileGroupView: FC<Props> = ({ group }): ReactElement => {
 		transform: CSS.Transform.toString(transform),
 	};
 
-	const tileIds = useMemo(
-		() => (tiles === undefined ? [] : tiles.map((tile) => `${tile.group_id}:${tile.position}`)),
-		[tiles],
-	);
+	// Add 1 to the id's because dnd doesn't like 0 as an id.
+	const tileIds = useMemo(() => (tiles === undefined ? [] : tiles.map((tile) => `t${tile.id + 1}`)), [tiles]);
 
 	if (isDragging) {
 		return <div className="tileGroup" ref={setNodeRef} style={style}></div>;
+	}
+
+	if (tiles === undefined || isFetching) {
+		return (
+			<Row>
+				<Loading />
+			</Row>
+		);
 	}
 
 	return (

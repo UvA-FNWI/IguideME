@@ -40,6 +40,10 @@ export const patchTile: (tile: Tile) => Promise<void> = async (tile: Tile) => {
 	await apiClient.patch(`tiles`, tile);
 };
 
+export const patchTileOrder: (ids: number[]) => Promise<void> = async (ids: number[]) => {
+	await apiClient.patch(`tiles/order`, ids);
+};
+
 interface quickTilePatch {
 	id: number;
 	notifications?: boolean;

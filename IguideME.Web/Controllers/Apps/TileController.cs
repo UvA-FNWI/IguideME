@@ -45,27 +45,24 @@ namespace IguideME.Web.Controllers
         [Route("/tiles")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public JsonResult PostTile([FromBody] Tile tile)
+        public void PostTile([FromBody] Tile tile)
         {
             // Creates a new tile with information posted in the request's body
             int tilesInGroup = _databaseManager.GetTiles(GetCourseID())
                 .Where(t => t.GroupID == tile.GroupID)
                 .Count();
 
-            Tile newTile = _databaseManager.CreateTile(
+            _databaseManager.CreateTile(
                 GetCourseID(),
                 tile.GroupID,
                 tile.Title,
                 tilesInGroup + 1,
-                (int) tile.Type,
+                (int)tile.Type,
                 tile.Weight,
-                (int) tile.GradingType,
+                (int)tile.GradingType,
                 tile.Visible,
                 tile.Notifications
             );
-
-            // return newly created tile
-            return Json(newTile);
         }
 
         [Authorize]
@@ -817,6 +814,16 @@ namespace IguideME.Web.Controllers
         public void UpdateTileGroupOrder([FromBody] int[] ids)
         {
             _databaseManager.UpdateTileGroupOrder(ids);
+        }
+
+        [Authorize(Policy = "IsInstructor")]
+        [HttpPatch]
+        [Route("/tiles/order")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public void UpdateTileOrder([FromBody] int[] ids)
+        {
+            _databaseManager.UpdateTileOrder(ids);
         }
     }
 }

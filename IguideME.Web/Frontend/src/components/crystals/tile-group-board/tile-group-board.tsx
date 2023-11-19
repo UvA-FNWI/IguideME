@@ -10,6 +10,7 @@ import {
 	useSensors,
 	useSensor,
 	PointerSensor,
+	type DragOverEvent,
 } from '@dnd-kit/core';
 import { SortableContext, arrayMove } from '@dnd-kit/sortable';
 import { createPortal } from 'react-dom';
@@ -19,17 +20,17 @@ import { type Tile, type TileGroup } from '@/types/tile';
 import EditTile from '@/components/crystals/edit-tile/edit-tile';
 import TileView from '@/components/crystals/tile-view/tile-view';
 import TileGroupView from '@/components/crystals/tile-group/tile-group';
-import { getTileGroups, patchTileGroupOrder, postTileGroup } from '@/api/tiles';
+import { getTileGroups, getTiles, patchTile, patchTileGroupOrder, patchTileOrder, postTileGroup } from '@/api/tiles';
 import { DrawerContext } from './contexts';
 import Swal from 'sweetalert2';
 
 const TileGroupBoard: FC = (): ReactElement => {
-	const { data, isFetching } = useQuery('tile-groups', getTileGroups);
+	const { data: tilegroups, isFetching } = useQuery('tile-groups', getTileGroups);
+	const { data: tiles } = useQuery('tiles', getTiles);
 	const [activeGroup, setActiveGroup] = useState<TileGroup | null>(null);
 	const [activeTile, setActiveTile] = useState<Tile | null>(null);
 	const [editTile, setEditTile] = useState<Tile | null>(null);
-
-	const tilegroups = data?.sort((a, b) => a.position - b.position);
+	const [move, setMove] = useState<boolean>(false);
 
 	const queryClient = useQueryClient();
 	const { mutate: postGroup } = useMutation({
@@ -43,6 +44,20 @@ const TileGroupBoard: FC = (): ReactElement => {
 		mutationFn: patchTileGroupOrder,
 		onSuccess: async () => {
 			await queryClient.invalidateQueries('tile-groups');
+		},
+	});
+
+	const { mutate: updateTileOrder } = useMutation({
+		mutationFn: patchTileOrder,
+		onSuccess: async () => {
+			await queryClient.invalidateQueries('tiles');
+		},
+	});
+
+	const { mutate: updateTile } = useMutation({
+		mutationFn: patchTile,
+		onSuccess: async () => {
+			await queryClient.invalidateQueries('tiles');
 		},
 	});
 
@@ -95,7 +110,7 @@ const TileGroupBoard: FC = (): ReactElement => {
 				>
 					{editTile === null ? '' : <EditTile tile={editTile} />}
 				</Drawer>
-				<DndContext onDragStart={onDragStart} onDragEnd={onDragEnd} sensors={sensors}>
+				<DndContext onDragStart={onDragStart} onDragEnd={onDragEnd} onDragOver={onDragOver} sensors={sensors}>
 					<div>
 						<SortableContext items={groupIds}>
 							{tilegroups.map((group, index) => (
@@ -118,7 +133,7 @@ const TileGroupBoard: FC = (): ReactElement => {
 					{createPortal(
 						<DragOverlay>
 							{activeGroup !== null && <TileGroupView group={activeGroup} />}
-							{activeTile !== null && <TileView tile={activeTile} />}
+							{activeTile !== null && <TileView tile={activeTile} move={move} />}
 						</DragOverlay>,
 						document.body,
 					)}
@@ -128,37 +143,97 @@ const TileGroupBoard: FC = (): ReactElement => {
 	);
 
 	function onDragStart(event: DragStartEvent): void {
-		console.log('test', event.active.id);
-		if (event.active.data.current?.type === 'Group') {
-			setActiveGroup(event.active.data.current.group);
-		}
-		if (event.active.data.current?.type === 'Tile') {
-			setActiveTile(event.active.data.current.tile);
+		switch (event.active.data.current?.type) {
+			case 'Group':
+				setActiveGroup(event.active.data.current.group);
+				return;
+			case 'Tile':
+				setActiveTile(event.active.data.current.tile);
 		}
 	}
 
-	function onDragEnd(event: DragEndEvent): void {
-		setActiveGroup(null);
-		setActiveTile(null);
+	function onDragOver(event: DragOverEvent): void {
+		setMove(false);
+
 		const { active, over } = event;
 		if (over === null) return;
-
-		if (tilegroups === undefined) return;
 
 		const activeID = active.id;
 		const overID = over.id;
 		if (activeID === overID) return;
 
-		// if (active.data.current === undefined) return;
-		// if (over.data.current === undefined) return;
+		const activeData = active.data.current;
+		const overData = over.data.current;
 
-		// const activegroup = active.data.current.group;
-		// const overgroup = over.data.current.group;
+		if (activeData === undefined) return;
+		if (overData === undefined) return;
+		if (activeData.type === 'Group') return;
 
-		const ids = tilegroups.map((group) => group.id);
-		const activeIndex = ids.findIndex((id) => id === +activeID - 1);
-		const overIndex = ids.findIndex((id) => id === +overID - 1);
-		updateTileGroupOrder(arrayMove(ids, activeIndex, overIndex));
+		if (activeData.type === 'Tile') {
+			if (overData.type === 'Group' && activeData.tile.group_id === +overID - 1) return;
+			if (overData.type === 'Tile' && activeData.tile.group_id === overData.tile.group_id) return;
+			setMove(true);
+		}
+	}
+
+	function onDragEnd(event: DragEndEvent): void {
+		// TODO: refactor to separate smaller functions and comment.
+		setActiveGroup(null);
+		setActiveTile(null);
+		setMove(false);
+		const { active, over } = event;
+		if (over === null) return;
+
+		const activeID = active.id;
+		const overID = over.id;
+		if (activeID === overID) return;
+
+		const activeData = active.data.current;
+		const overData = over.data.current;
+
+		if (activeData === undefined) return;
+		if (overData === undefined) return;
+
+		// Handle dropping of tile groups and save new order.
+		if (activeData.type === 'Group' && tilegroups !== undefined) {
+			const ids = tilegroups.map((group) => group.id);
+			const activeIndex = ids.findIndex((id) => id === +activeID - 1);
+			const overIndex = ids.findIndex((id) => id === +overID - 1);
+			updateTileGroupOrder(arrayMove(ids, activeIndex, overIndex));
+		}
+
+		// Handle dropping of tiles.
+		if (activeData.type === 'Tile' && tiles !== undefined) {
+			// When dropping a tile into a new group we move the tile to the end of that group.
+			if (overData.type === 'Group' && activeData.tile.group_id !== +overID - 1) {
+				const gtiles = tiles.filter((tile) => tile.group_id === +overID - 1);
+				// Set the position of the tile to the last of the new group
+				updateTile({
+					...activeData.tile,
+					group_id: over.id,
+					position: (gtiles.length > 0 ? gtiles[gtiles.length - 1].position : 0) + 1,
+				});
+			}
+			// If we're on top of another tile we check if the tile is in the same group.
+			if (overData.type === 'Tile') {
+				// Sort if in same group
+				if (activeData.tile.group_id === overData.tile.group_id) {
+					const ids = tiles.flatMap((tile) => (tile.group_id === overData.tile.group_id ? [tile.id] : []));
+					const activeIndex = ids.findIndex((id) => id === +(activeID as string).substring(1) - 1);
+					const overIndex = ids.findIndex((id) => id === +(overID as string).substring(1) - 1);
+					updateTileOrder(arrayMove(ids, activeIndex, overIndex));
+					// Move the tile otherwise.
+				} else {
+					const gtiles = tiles.filter((tile) => tile.group_id === overData.tile.group_id);
+					// Set the position of the tile to the last of the new group
+					updateTile({
+						...activeData.tile,
+						group_id: over.id,
+						position: (gtiles.length > 0 ? gtiles[gtiles.length - 1].position : 0) + 1,
+					});
+				}
+			}
+		}
 	}
 };
 
