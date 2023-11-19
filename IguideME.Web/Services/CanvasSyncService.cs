@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
-using System.Diagnostics.Metrics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -70,7 +69,6 @@ namespace IguideME.Web.Services
         {
             JobResultModel result = new();
             int courseID = work.CourseID;
-            bool notifications_bool = false;
 
             this.workerStatus = new()
             {
@@ -79,28 +77,6 @@ namespace IguideME.Web.Services
             };
             this.workerStatus.statuses = this.workerStatus.tasks.Select((_) => "Pending").ToArray();
             UpdateStatus(jobId);
-
-            static bool isBetweenDates(DateTime input, DateTime startDate, DateTime endDate)
-            {
-                return input >= startDate && input <= endDate;
-            }
-
-            List<string> notificationDates = _databaseManager.GetNotificationDates(courseID);
-            if (notificationDates[0].Contains("-"))
-            {
-                // We are looking in a range of dates
-                foreach (string datepair in notificationDates)
-                {
-                    string[] splittedDates = datepair.Split("-");
-                    if (isBetweenDates(DateTime.Parse(string.Format("{0:yyyy/MM/dd}", DateTime.Now)), DateTime.Parse(splittedDates[0]), DateTime.Parse(splittedDates[1])))
-                    {
-                        notifications_bool = work.Notifications_bool;
-                        break;
-                    }
-                }
-            }
-            else
-                notifications_bool = work.Notifications_bool && notificationDates.Contains(string.Format("{0:yyyy/MM/dd}", DateTime.Now));
 
             _logger.LogInformation("{Time}: Starting sync for course {CourseID}", DateTime.Now, courseID);
 
@@ -131,7 +107,7 @@ namespace IguideME.Web.Services
             RunWorker(jobId, new AssignmentWorker(courseID, timestamp, _canvasHandler, _databaseManager, _logger));
             RunWorker(jobId, new GradePredictorWorker(courseID, timestamp, _databaseManager, _logger));
             RunWorker(jobId, new PeerGroupWorker(courseID, timestamp, _databaseManager, _logger));
-            RunWorker(jobId, new NotificationsWorker(courseID, timestamp, _canvasHandler, _databaseManager, notifications_bool, _logger));
+            RunWorker(jobId, new NotificationsWorker(courseID, timestamp, _canvasHandler, _databaseManager, work.SendNotifications, _logger));
 
             _logger.LogInformation("Finishing sync");
             this.workerStatus.statuses[this.workerStatus.counter] = "Success";

@@ -70,7 +70,7 @@ namespace IguideME.Web.Controllers
                 JobParametersModel obj = new()
                 {
                     CourseID = GetCourseID(),
-                    Notifications_bool = false
+                    SendNotifications = false
                 };
                 await _queuedBackgroundService.PostWorkItemAsync(obj).ConfigureAwait(false);
             }
@@ -83,7 +83,7 @@ namespace IguideME.Web.Controllers
         public async Task<IActionResult> BeginComputation([FromBody] JobParametersModel obj)
         {
             obj.CourseID = this.GetCourseID();
-            obj.Notifications_bool = false;
+            obj.SendNotifications = false;
             return Accepted(
                 await _queuedBackgroundService.PostWorkItemAsync(obj).ConfigureAwait(false)
             );

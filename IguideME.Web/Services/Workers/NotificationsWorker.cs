@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 using IguideME.Web.Models;
 using IguideME.Web.Models.App;
@@ -15,12 +16,12 @@ namespace IguideME.Web.Services.Workers
     {
         readonly private ILogger<SyncManager> _logger;
         readonly private CanvasHandler _canvasHandler;
-        private readonly DatabaseManager _databaseManager;
+        readonly private DatabaseManager _databaseManager;
+
+        readonly private bool _sendNotifications;
 
         readonly private int _courseID;
         readonly private long _syncID;
-
-        readonly private bool _send_notifications;
 
         /// <summary>
         /// This constructor initializes the new NotificationsWorker to
@@ -36,7 +37,7 @@ namespace IguideME.Web.Services.Workers
             long syncID,
             CanvasHandler canvasHandler,
             DatabaseManager databaseManager,
-            bool send_notifications,
+            bool sendNotifications,
             ILogger<SyncManager> logger)
         {
             _logger = logger;
@@ -44,7 +45,7 @@ namespace IguideME.Web.Services.Workers
             this._syncID = syncID;
             this._canvasHandler = canvasHandler;
             this._databaseManager = databaseManager;
-            this._send_notifications = send_notifications;
+            this._sendNotifications = sendNotifications;
         }
 
         /// <summary>
@@ -109,6 +110,29 @@ namespace IguideME.Web.Services.Workers
 
         }
 
+        private bool checkSend()
+        {
+            List<string> notificationDates = _databaseManager.GetNotificationDates(_courseID);
+            if (notificationDates[0].Contains("-"))
+            {
+                // We are looking in a range of dates
+                foreach (string datepair in notificationDates)
+                {
+                    string[] splittedDates = datepair.Split("-");
+                    // DateTime today = DateTime.Parse(string.Format("{0:yyyy/MM/dd}", DateTime.Now));
+
+                    if (DateTime.Now >= DateTime.Parse(splittedDates[0]) && DateTime.Now <= DateTime.Parse(splittedDates[1]))
+                    {
+                        return _sendNotifications;
+                    }
+                }
+            }
+            else
+                return _sendNotifications && notificationDates.Contains(string.Format("{0:yyyy/MM/dd}", DateTime.Now));
+
+            return false;
+        }
+
         /// <summary>
         /// Starts the notifications worker.
         /// </summary>
@@ -116,7 +140,7 @@ namespace IguideME.Web.Services.Workers
         {
             _logger.LogInformation("Starting notifications sync...");
 
-            if (!_send_notifications)
+            if (!checkSend())
             {
                 _logger.LogInformation("Not sending notifications this sync");
                 return;

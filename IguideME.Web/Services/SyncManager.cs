@@ -61,11 +61,12 @@ namespace IguideME.Web.Services
 
                 List<int> course_ids = _databaseManager.GetCourseIds();
 
-                foreach (int id in course_ids) {
+                foreach (int id in course_ids)
+                {
                     JobParametersModel parameters = new()
                     {
-                            CourseID = id,
-                            Notifications_bool = true
+                        CourseID = id,
+                        SendNotifications = true
                     };
                     await this._queuedBackgroundService.PostWorkItemAsync(parameters).ConfigureAwait(false);
                     _logger.LogInformation("Execute");
