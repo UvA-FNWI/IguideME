@@ -87,7 +87,7 @@ namespace IguideME.Web.Services.Workers
                 foreach (Submission submission in group.Submissions)
                 {
                     // WE NEED TO CHANGE THE SUBMISSION IDs FROM EXTERNAL ASSIGNMENT ID TO INTERNAL ASSIGNMENT ID
-                    submission.AssignmentID = _databaseManager.GetInternalAssignmentID(_courseID,submission.AssignmentID);
+                    submission.AssignmentID = _databaseManager.GetInternalAssignmentID(_courseID, submission.AssignmentID);
 
                     if (gradingTypes.TryGetValue(submission.AssignmentID, out type))
                     {
@@ -116,10 +116,9 @@ namespace IguideME.Web.Services.Workers
                                 break;
                             default:
                                 grade = -1;
-                                _logger.LogError("Grade format {Type} is not supported, grade = {Grade}", gradingTypes[submission.AssignmentID], submission.Grade);
+                                _logger.LogWarning("Grade format {Type} is not supported, grade = {Grade}, treating as not graded...", gradingTypes[submission.AssignmentID], submission.Grade);
                                 break;
                         }
-                        _logger.LogInformation("loginid {ID}", submission.User.LoginID);
 
                         _databaseManager.CreateUserSubmission(
                                 submission.AssignmentID,

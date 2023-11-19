@@ -43,7 +43,7 @@ namespace IguideME.Web.Services.Workers
             _logger.LogInformation("Making grade predictions");
             if (this._model == null)
             {
-                _logger.LogInformation("No suitible grade prediction model found for courseID {ID}", this._courseID);
+                _logger.LogWarning("No suitible grade prediction model found for courseID {ID}", this._courseID);
                 return;
             }
 

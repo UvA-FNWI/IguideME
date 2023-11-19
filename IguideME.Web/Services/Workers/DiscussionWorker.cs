@@ -90,7 +90,7 @@ namespace IguideME.Web.Services.Workers
 		/// <param name="tile">the tile that's a wild card.</param>
 		private void HandleWildcardTile(List<Canvas.Discussion> discussions, List<User> students, Tile tile)
 		{
-			_logger.LogInformation("wildcard");
+			_logger.LogDebug("wildcard");
 
 			// Filter out the discussions from students who did not give consent. TODO: is this how we want to handle this?
 			IEnumerable<Canvas.Discussion> postedDiscussions = discussions

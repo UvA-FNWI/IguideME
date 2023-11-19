@@ -101,14 +101,8 @@ namespace IguideME.Web.Services
         /// <returns>A list of students for the course.</returns>
         public User[] GetStudents(int courseID)
         {
-            _logger.LogInformation("Finding course by id, id = {ID}", courseID);
-
             Course course = Connector.FindCourseById(courseID);
-            _logger.LogInformation("Course = {course}", course);
-
             User[] students = course.GetUsersByType(EnrollmentType.Student).ToArray();
-            _logger.LogInformation("Getting users {students}", students);
-
             return students;
         }
 

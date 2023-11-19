@@ -122,7 +122,7 @@ namespace IguideME.Web.Services
             catch (Exception e)
             {
                 // Close connection before rethrowing
-                _logger.LogError("Exception encountered while creating query: {message}\n {trace}", e.Message, e.StackTrace);
+                _logger.LogError("Exception encountered while creating query: {message}", e.Message);
                 connection.Close();
                 throw;
             }
@@ -147,7 +147,7 @@ namespace IguideME.Web.Services
 
         public void LogTable(string name)
         {
-            _logger.LogInformation("Logging table {name}", name);
+            _logger.LogDebug("Logging table {name}", name);
 
             string table = "";
             using (SQLiteDataReader r = Query("select * from @name", new SQLiteParameter("name", name)))
@@ -167,7 +167,7 @@ namespace IguideME.Web.Services
                 }
             }
 
-            _logger.LogInformation("contents:\n {table}", table);
+            _logger.LogDebug("contents:\n {table}", table);
 
         }
 
@@ -220,8 +220,6 @@ namespace IguideME.Web.Services
                 using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_MIGRATIONS, new SQLiteParameter("id", migration_id)))
                     if (r.HasRows)
                         continue;
-
-                // _logger.LogInformation("Migration {id} not yet applied, proceeding to apply...", migration_id);
 
                 Console.WriteLine($"Migration {migration_id} not yet applied, proceeding to apply...");
 
@@ -547,11 +545,9 @@ namespace IguideME.Web.Services
             long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
             if (activeSync == 0)
             {
-                _logger.LogInformation("Hash is null, returning empty user list.");
+                _logger.LogWarning("Hash is null, returning empty user list.");
                 return new List<User>() { };
             }
-            _logger.LogInformation("current sync: {s]}", activeSync);
-
             List<User> users = new();
 
             using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_USERS_WITH_ROLE_FOR_COURSE,
@@ -563,7 +559,6 @@ namespace IguideME.Web.Services
                 // collect all users
                 while (r.Read())
                 {
-                    _logger.LogInformation("tests {i}", r.GetValue(0));
                     User user = new(
                         r.GetValue(0).ToString(),
                         courseID,
@@ -586,7 +581,7 @@ namespace IguideME.Web.Services
             long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
             if (activeSync == 0)
             {
-                _logger.LogInformation("Hash is null, returning empty user list.");
+                _logger.LogWarning("Hash is null, returning empty user list.");
                 return new List<User>() { };
             }
 
@@ -667,7 +662,7 @@ namespace IguideME.Web.Services
 
             if (user is null)
             {
-                _logger.LogInformation("User {u} not found for course {c}", userID, courseID);
+                _logger.LogWarning("User {u} not found for course {c}", userID, courseID);
             }
 
             if (user?.Role == UserRoles.student)
@@ -896,7 +891,6 @@ namespace IguideME.Web.Services
                     old_sync = long.Parse(r.GetValue(4).ToString());
             }
 
-            _logger.LogInformation("old {old}", old_sync);
             if (old_sync != 0)
                 NonQuery(DatabaseQueries.QUERY_UPDATE_STUDENT_SETTINGS,
                     new SQLiteParameter("courseID", courseID),

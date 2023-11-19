@@ -70,16 +70,15 @@ namespace IguideME.Web.Services
             JobResultModel result = new();
             int courseID = work.CourseID;
 
-            this.workerStatus = new()
+            workerStatus = new()
             {
                 counter = 0,
                 tasks = new string[] { "boot-up", "students", "quizzes", "discussions", "assignments", "grade-predictor", "peer-groups", "notifications", "done" }
             };
-            this.workerStatus.statuses = this.workerStatus.tasks.Select((_) => "Pending").ToArray();
+            workerStatus.statuses = workerStatus.tasks.Select((_) => "Pending").ToArray();
             UpdateStatus(jobId);
 
             _logger.LogInformation("{Time}: Starting sync for course {CourseID}", DateTime.Now, courseID);
-
             long timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
             // Renew the connection with canvas.
@@ -91,14 +90,13 @@ namespace IguideME.Web.Services
             // Register the new sync in the database.
             _databaseManager.RegisterSync(courseID, timestamp);
             _logger.LogInformation("Sync hash: {Hash}", timestamp);
-            _logger.LogInformation("Course: {Course}", work.CourseID);
 
             // Time how long the sync takes.
             Stopwatch sw = new();
             sw.Start();
 
-            this.workerStatus.statuses[0] = "Success";
-            this.workerStatus.counter++;
+            workerStatus.statuses[0] = "Success";
+            workerStatus.counter++;
             UpdateStatus(jobId);
 
             RunWorker(jobId, new UserWorker(courseID, timestamp, _canvasHandler, _databaseManager, _logger));
@@ -110,7 +108,7 @@ namespace IguideME.Web.Services
             RunWorker(jobId, new NotificationsWorker(courseID, timestamp, _canvasHandler, _databaseManager, work.SendNotifications, _logger));
 
             _logger.LogInformation("Finishing sync");
-            this.workerStatus.statuses[this.workerStatus.counter] = "Success";
+            workerStatus.statuses[workerStatus.counter] = "Success";
             UpdateStatus(jobId);
 
             long duration = sw.ElapsedMilliseconds;
@@ -122,25 +120,26 @@ namespace IguideME.Web.Services
 
         private void RunWorker(string jobId, IWorker worker)
         {
-            this.workerStatus.statuses[this.workerStatus.counter] = "Processing";
+            workerStatus.statuses[workerStatus.counter] = "Processing";
             UpdateStatus(jobId);
 
             try { worker.Start(); }
             catch (Exception)
             {
-                this.workerStatus.statuses[this.workerStatus.counter] = "Errored";
+                _logger.LogError("Error encountered by {task} worker", workerStatus.tasks[workerStatus.counter]);
+                workerStatus.statuses[workerStatus.counter] = "Errored";
                 UpdateStatus(jobId);
                 throw;
             }
 
-            this.workerStatus.statuses[this.workerStatus.counter] = "Success";
+            workerStatus.statuses[workerStatus.counter] = "Success";
             UpdateStatus(jobId);
-            this.workerStatus.counter++;
+            workerStatus.counter++;
         }
 
         private async void UpdateStatus(string jobId)
         {
-            IEnumerable<string> status = this.workerStatus.tasks.Zip(this.workerStatus.statuses, (task, status) => "tasks." + task + ":" + status);
+            IEnumerable<string> status = workerStatus.tasks.Zip(workerStatus.statuses, (task, status) => "tasks." + task + ":" + status);
             await _computationJobStatus.UpdateJobProgressInformationAsync(
                 jobId, string.Join(",", status), 0
             ).ConfigureAwait(false);
