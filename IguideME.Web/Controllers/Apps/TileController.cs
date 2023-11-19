@@ -222,7 +222,6 @@ namespace IguideME.Web.Controllers
         public ActionResult DeleteTileGoal(string goalID)
         {
             bool success = int.TryParse(goalID, out int id);
-            _logger.LogInformation("deleting goal");
 
             if (success)
             {
@@ -792,8 +791,6 @@ namespace IguideME.Web.Controllers
         public ActionResult UpdateTileGroup(string groupID, [FromBody] LayoutTileGroup tileGroup)
         {
             bool success = int.TryParse(groupID, out int id);
-
-            _logger.LogInformation("position {p}", tileGroup.Position);
 
             return success
                 ? Json(

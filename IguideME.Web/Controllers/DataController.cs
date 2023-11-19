@@ -1,8 +1,11 @@
 ﻿using IguideME.Web.Services;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+
 using System.Security.Claims;
+
 using UserRoles = IguideME.Web.Models.Impl.UserRoles;
 
 
@@ -47,7 +50,6 @@ namespace IguideME.Web.Controllers
 
         protected string GetCourseTitle()
         {
-            _logger.LogInformation("testestests");
             return (User.Identity as ClaimsIdentity).FindFirst("courseName").Value;
         }
     }
