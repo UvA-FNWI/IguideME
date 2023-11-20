@@ -11,6 +11,7 @@ import {
 	useSensor,
 	PointerSensor,
 	type DragOverEvent,
+	type UniqueIdentifier,
 } from '@dnd-kit/core';
 import { SortableContext, arrayMove } from '@dnd-kit/sortable';
 import { createPortal } from 'react-dom';
@@ -177,7 +178,6 @@ const TileGroupBoard: FC = (): ReactElement => {
 	}
 
 	function onDragEnd(event: DragEndEvent): void {
-		// TODO: refactor to separate smaller functions and comment.
 		setActiveGroup(null);
 		setActiveTile(null);
 		setMove(false);
@@ -195,45 +195,59 @@ const TileGroupBoard: FC = (): ReactElement => {
 		if (overData === undefined) return;
 
 		// Handle dropping of tile groups and save new order.
-		if (activeData.type === 'Group' && tilegroups !== undefined) {
-			const ids = tilegroups.map((group) => group.id);
-			const activeIndex = ids.findIndex((id) => id === +activeID - 1);
-			const overIndex = ids.findIndex((id) => id === +overID - 1);
-			updateTileGroupOrder(arrayMove(ids, activeIndex, overIndex));
+		switch (activeData.type) {
+			case 'Group':
+				dropGroup(+activeID - 1, +overID - 1);
+				return;
+			case 'Tile':
+				dropTile(activeID, overID, activeData, overData);
+				return;
+			default:
+				console.log('Unknown active object type encountered during drop', activeData.type);
 		}
+	}
 
-		// Handle dropping of tiles.
-		if (activeData.type === 'Tile' && tiles !== undefined) {
-			// When dropping a tile into a new group we move the tile to the end of that group.
-			if (overData.type === 'Group' && activeData.tile.group_id !== +overID - 1) {
-				const gtiles = tiles.filter((tile) => tile.group_id === +overID - 1);
-				// Set the position of the tile to the last of the new group
-				updateTile({
-					...activeData.tile,
-					group_id: over.id,
-					position: (gtiles.length > 0 ? gtiles[gtiles.length - 1].position : 0) + 1,
-				});
-			}
-			// If we're on top of another tile we check if the tile is in the same group.
-			if (overData.type === 'Tile') {
-				// Sort if in same group
-				if (activeData.tile.group_id === overData.tile.group_id) {
-					const ids = tiles.flatMap((tile) => (tile.group_id === overData.tile.group_id ? [tile.id] : []));
-					const activeIndex = ids.findIndex((id) => id === +(activeID as string).substring(1) - 1);
-					const overIndex = ids.findIndex((id) => id === +(overID as string).substring(1) - 1);
-					updateTileOrder(arrayMove(ids, activeIndex, overIndex));
-					// Move the tile otherwise.
-				} else {
-					const gtiles = tiles.filter((tile) => tile.group_id === overData.tile.group_id);
-					// Set the position of the tile to the last of the new group
-					updateTile({
-						...activeData.tile,
-						group_id: over.id,
-						position: (gtiles.length > 0 ? gtiles[gtiles.length - 1].position : 0) + 1,
-					});
-				}
-			}
+	function dropGroup(activeID: number, overID: number): void {
+		if (tilegroups === undefined) return;
+
+		const ids = tilegroups.map((group) => group.id);
+		const activeIndex = ids.findIndex((id) => id === activeID);
+		const overIndex = ids.findIndex((id) => id === overID);
+		updateTileGroupOrder(arrayMove(ids, activeIndex, overIndex));
+	}
+
+	function dropTile(activeID: UniqueIdentifier, overID: UniqueIdentifier, activeData: any, overData: any): void {
+		if (tiles === undefined) return;
+
+		switch (overData.type) {
+			case 'Group':
+				activeData.tile.group_id !== +overID - 1 && moveTileToGroup(activeData.tile, +overID - 1);
+				return;
+			case 'Tile':
+				activeData.tile.group_id === overData.tile.group_id
+					? swapTiles(+(activeID as string).substring(1) - 1, +(overID as string).substring(1) - 1, overData)
+					: moveTileToGroup(activeData.tile, overData.tile.group_id);
+				return;
+			default:
+				console.log('Unknown over object type encountered during drop', activeData.type);
 		}
+	}
+
+	function swapTiles(activeID: number, overID: number, overData: any): void {
+		const ids = tiles!.flatMap((tile) => (tile.group_id === overData.tile.group_id ? [tile.id] : []));
+		const activeIndex = ids.findIndex((id) => id === activeID);
+		const overIndex = ids.findIndex((id) => id === overID);
+		updateTileOrder(arrayMove(ids, activeIndex, overIndex));
+	}
+
+	function moveTileToGroup(tile: Tile, gid: number): void {
+		const gtiles = tiles!.filter((tile) => tile.group_id === gid);
+		// Set the position of the tile to the last of the new group
+		updateTile({
+			...tile,
+			group_id: gid,
+			position: (gtiles.length > 0 ? gtiles[gtiles.length - 1].position : 0) + 1,
+		});
 	}
 };
 
