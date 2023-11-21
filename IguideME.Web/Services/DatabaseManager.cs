@@ -1898,7 +1898,6 @@ namespace IguideME.Web.Services
                 {
                     requirements.Add(new GoalRequirement(
                         r.GetInt32(0),
-                        0,
                         r.GetInt32(1),
                         r.GetInt32(2),
                         r.GetInt32(3),
@@ -2044,7 +2043,6 @@ namespace IguideME.Web.Services
                     try
                     {
                         entries.Add(new TileEntry(
-                        0,
                         r.GetInt32(0),
                         r.GetInt32(1),
                         "This is another title",
@@ -2067,6 +2065,25 @@ namespace IguideME.Web.Services
                 new SQLiteParameter("tileID", entry.TileID),
                 new SQLiteParameter("content_id", entry.ContentID),
                 new SQLiteParameter("weight", entry.Weight)
+            );
+        }
+
+
+        public void CreateTileEntries(int tileID, List<TileEntry> entries)
+        {
+            foreach (TileEntry entry in entries)
+                NonQuery(DatabaseQueries.REGISTER_TILE_ENTRY,
+                    new SQLiteParameter("tileID", tileID),
+                    new SQLiteParameter("contentID", entry.ContentID),
+                    new SQLiteParameter("weight", entry.Weight)
+                );
+        }
+
+        public void DeleteAllTileEntries(int tileID)
+        {
+
+            NonQuery(DatabaseQueries.DELETE_ALL_TILE_ENTRIES_OF_TILE,
+                new SQLiteParameter("tileID", tileID)
             );
         }
 
@@ -2715,7 +2732,6 @@ namespace IguideME.Web.Services
                 while (r.Read())
                 {
                     entries.Add(new TileEntry(
-                        0,
                         r.GetInt32(0),
                         r.GetInt32(1),
                         r.GetValue(2).ToString(),

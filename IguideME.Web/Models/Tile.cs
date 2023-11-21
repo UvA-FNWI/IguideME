@@ -10,13 +10,6 @@ using UvA.DataNose.Connectors.Canvas;
 
 namespace IguideME.Web.Models
 {
-    public enum EditState
-    {
-        Unchanged,
-        New,
-        Updated,
-        Removed
-    }
     public class Tile
     {
 
@@ -82,10 +75,6 @@ namespace IguideME.Web.Models
 
     public class TileEntry
     {
-        // TODO: remove I think
-        [JsonProperty(PropertyName = "state")]
-        public EditState State { get; set; }
-
         [JsonProperty(PropertyName = "tile_id")]
         public int TileID { get; set; }
 
@@ -99,13 +88,11 @@ namespace IguideME.Web.Models
         public float Weight { get; set; }
 
         public TileEntry(
-            EditState state,
             int tileID,
             int ContentID,
             string title,
             float weight)
         {
-            this.State = state;
             this.TileID = tileID;
             this.ContentID = ContentID;
             this.Title = title;

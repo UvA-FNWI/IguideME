@@ -132,6 +132,7 @@ const EditTile: FC<Props> = ({ tile }): ReactElement => {
 	);
 
 	function renderTypeSettings(): ReactElement {
+		// TODO: delete entries when changing types.
 		const type = useWatch('type', form);
 		switch (type) {
 			case TileType.assignments:

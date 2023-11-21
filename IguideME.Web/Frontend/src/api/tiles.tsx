@@ -2,9 +2,7 @@ import apiClient from './axios';
 import { type Tile, type LayoutColumn, type TileGroup } from '@/types/tile';
 
 export const getLayoutColumns: () => Promise<LayoutColumn[]> = async () =>
-	await apiClient
-		.get(`layout/columns`)
-		.then((response) => response.data.sort((A: LayoutColumn, B: LayoutColumn) => A.position - B.position));
+	await apiClient.get(`layout/columns`).then((response) => response.data);
 
 export const postLayoutColumns: (layouts: LayoutColumn[]) => Promise<void> = async (layouts: LayoutColumn[]) => {
 	await apiClient.post(`layout/columns`, layouts);
@@ -14,7 +12,7 @@ export const getTileGroups: () => Promise<TileGroup[]> = async () =>
 	await apiClient.get(`tiles/groups`).then((response) => response.data);
 
 export const postTileGroup: (group: TileGroup) => Promise<void> = async (group: TileGroup) => {
-	await apiClient.post(`tiles/group`, group);
+	await apiClient.post(`tiles/groups/${group.id}`, group);
 };
 
 export const deleteTileGroup: (id: number) => Promise<void> = async (id: number) => {
@@ -33,11 +31,15 @@ export const getTiles: () => Promise<Tile[]> = async () =>
 	await apiClient.get(`tiles`).then((response) => response.data);
 
 export const postTile: (tile: Tile) => Promise<void> = async (tile: Tile) => {
-	await apiClient.post(`tiles`, tile);
+	await apiClient.post(`tiles${tile.id}`, tile);
 };
 
 export const patchTile: (tile: Tile) => Promise<void> = async (tile: Tile) => {
-	await apiClient.patch(`tiles`, tile);
+	await apiClient.patch(`tiles/${tile.id}`, tile);
+};
+
+export const deleteTile: (id: number) => Promise<void> = async (id: number) => {
+	await apiClient.delete(`tiles/${id}`);
 };
 
 export const patchTileOrder: (ids: number[]) => Promise<void> = async (ids: number[]) => {
@@ -52,8 +54,4 @@ interface quickTilePatch {
 
 export const qPatchTile: (patch: quickTilePatch) => Promise<void> = async (patch: quickTilePatch) => {
 	await apiClient.patch(`tiles/${patch.id}`, patch);
-};
-
-export const deleteTile: (id: number) => Promise<void> = async (id: number) => {
-	await apiClient.delete(`tiles/${id}`);
 };

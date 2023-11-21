@@ -1618,6 +1618,10 @@ public static class DatabaseQueries
          @"DELETE FROM       `tile_entries`
           WHERE              ROWID=@entryID;";
 
+    public const string DELETE_ALL_TILE_ENTRIES_OF_TILE =
+         @"DELETE FROM       `tile_entries`
+          WHERE              `tile_id`=@tileID;";
+
     public const string DELETE_INCOMPLETE_SYNCS =
         @"DELETE
           FROM          `sync_history`

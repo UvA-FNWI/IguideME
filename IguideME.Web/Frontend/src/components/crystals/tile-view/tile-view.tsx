@@ -160,7 +160,7 @@ const TileView: FC<Props> = ({ tile, move }): ReactElement => {
 				</Col>
 			</Row>
 			<Row align="middle" justify="space-between" style={{ paddingTop: 30 }}>
-				<Col style={{ textAlign: 'center', height: 30 }}>
+				<Col style={{ height: 30 }}>
 					{tile.type === TileType.assignments && (
 						<>
 							<h4>Grading:</h4>

@@ -48,9 +48,6 @@ namespace IguideME.Web.Models.App
         [JsonProperty("id")]
         public int ID { get; set; }
 
-        [JsonProperty("state")]
-        public EditState State { get; set; }
-
         [JsonProperty("goal_id")]
         public int GoalID { get; set; }
 
@@ -71,14 +68,12 @@ namespace IguideME.Web.Models.App
 
         public GoalRequirement(
             int id,
-            EditState state,
             int goalID,
             int assignmentID,
             int expression,
             float value)
         {
             this.ID = id;
-            this.State = state;
             this.GoalID = goalID;
             this.AssignmentID = assignmentID;
             this.Value = value;
@@ -87,14 +82,12 @@ namespace IguideME.Web.Models.App
 
         public GoalRequirement(
             int id,
-            EditState state,
             int goalID,
             int assignmentID,
             LogicalExpressions expression,
             float value)
         {
             this.ID = id;
-            this.State = state;
             this.GoalID = goalID;
             this.AssignmentID = assignmentID;
             this.Value = value;

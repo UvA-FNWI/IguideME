@@ -60,6 +60,7 @@ namespace IguideME.Web.Controllers
         //     _databaseManager.LogTable(JObject.Parse(body)["name"].ToString());
         // }
 
+        // TODO: move to different controller (+ change route)
         [Route("/app/setup")]
         [HttpPost]
         public async void SetupCourse()
@@ -142,35 +143,35 @@ namespace IguideME.Web.Controllers
         // }
 
         // TODO: move to different controller + url
-        [Authorize]
-        [HttpGet, Route("/datamart/predictions/{userID}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public ActionResult GetUserPredictions(string userID)
-        {
-            return !this.IsAdministrator() && "self" != userID && userID != GetUserID()
-                ? Unauthorized()
-                : Json(
-                _databaseManager
-                    .GetPredictedGrades(
-                        GetCourseID(),
-                        userID == "self" ? GetUserID() : userID));
-        }
+        // [Authorize]
+        // [HttpGet, Route("/datamart/predictions/{userID}")]
+        // [ProducesResponseType(StatusCodes.Status200OK)]
+        // [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        // public ActionResult GetUserPredictions(string userID)
+        // {
+        //     return !this.IsAdministrator() && "self" != userID && userID != GetUserID()
+        //         ? Unauthorized()
+        //         : Json(
+        //         _databaseManager
+        //             .GetPredictedGrades(
+        //                 GetCourseID(),
+        //                 userID == "self" ? GetUserID() : userID));
+        // }
 
-        [Authorize]
-        [HttpGet]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [Route("/datamart/consent")]
-        // DBrefTODO: This was a ConsentData item, now it is just a bool wit the result
-        public JsonResult GetConsent()
-        {
-            return this.IsAdministrator()
-                ? Json(1)
-                : Json(
-                _databaseManager.GetUserConsent(
-                    GetCourseID(), GetUserID()));
-        }
+        // [Authorize]
+        // [HttpGet]
+        // [ProducesResponseType(StatusCodes.Status200OK)]
+        // [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        // [Route("/datamart/consent")]
+        // // DBrefTODO: This was a ConsentData item, now it is just a bool wit the result
+        // public JsonResult GetConsent()
+        // {
+        //     return this.IsAdministrator()
+        //         ? Json(1)
+        //         : Json(
+        //         _databaseManager.GetUserConsent(
+        //             GetCourseID(), GetUserID()));
+        // }
 
         // [Authorize]
         // [HttpPost]
@@ -189,6 +190,7 @@ namespace IguideME.Web.Controllers
         //     return Json(consent.Granted);
         // }
 
+        // TODO: move to different controller.
         [Authorize]
         [HttpGet]
         [Route("/Is-admin")]
@@ -199,6 +201,7 @@ namespace IguideME.Web.Controllers
             return IsAdministrator();
         }
 
+        // TODO: move to different controller.
         [Authorize(Policy = "IsInstructor")]
         [HttpGet]
         [Route("/Students")]
@@ -224,89 +227,90 @@ namespace IguideME.Web.Controllers
         //         .ToArray());
         // }
 
-        [Authorize(Policy = "IsInstructor")]
-        [HttpGet]
-        [Route("/submissions")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public ActionResult GetSubmissions()
-        {
-            return Json(
-                _databaseManager.GetCourseSubmissions(GetCourseID()));
-        }
+        // [Authorize(Policy = "IsInstructor")]
+        // [HttpGet]
+        // [Route("/submissions")]
+        // [ProducesResponseType(StatusCodes.Status200OK)]
+        // [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        // public ActionResult GetSubmissions()
+        // {
+        //     return Json(
+        //         _databaseManager.GetCourseSubmissions(GetCourseID()));
+        // }
 
-        [Authorize(Policy = "IsInstructor")]
-        [HttpGet]
-        [Route("/goal-grades")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        // DBrefTODO: We used to return GoalGrade type, now it's User type entity
-        public ActionResult GetGoalGrades()
-        {
-            // returns all users along with their goal grades
-            return Json(
-                _databaseManager.GetUsers(
-                    this.GetCourseID(),
-                    UserRoles.student));
-        }
+        // [Authorize(Policy = "IsInstructor")]
+        // [HttpGet]
+        // [Route("/goal-grades")]
+        // [ProducesResponseType(StatusCodes.Status200OK)]
+        // [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        // // DBrefTODO: We used to return GoalGrade type, now it's User type entity
+        // public ActionResult GetGoalGrades()
+        // {
+        //     // returns all users along with their goal grades
+        //     return Json(
+        //         _databaseManager.GetUsers(
+        //             this.GetCourseID(),
+        //             UserRoles.student));
+        // }
 
-        [Authorize]
-        [HttpGet]
-        [Route("/goal-grade/{userID}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public ActionResult GetGoalGrade(string userID)
-        {
-            if (this.GetUserID() != userID &&
-                !this.IsAdministrator())
-                return Unauthorized();
+        // [Authorize]
+        // [HttpGet]
+        // [Route("/goal-grade/{userID}")]
+        // [ProducesResponseType(StatusCodes.Status200OK)]
+        // [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        // public ActionResult GetGoalGrade(string userID)
+        // {
+        //     if (this.GetUserID() != userID &&
+        //         !this.IsAdministrator())
+        //         return Unauthorized();
 
-            // returns the goal grade for the logged in user
-            return Json(
-                _databaseManager.GetUserGoalGrade(
-                    this.GetCourseID(),
-                    userID,
-                    this.GetHashCode()));
-        }
+        //     // returns the goal grade for the logged in user
+        //     return Json(
+        //         _databaseManager.GetUserGoalGrade(
+        //             this.GetCourseID(),
+        //             userID,
+        //             this.GetHashCode()));
+        // }
 
-        [Authorize]
-        [HttpGet]
-        [Route("/goal-grade")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public ActionResult GetGoalGrade()
-        {
-            // returns the goal grade for the logged in user
-            return Json(
-                _databaseManager.GetUserGoalGrade(
-                    this.GetCourseID(),
-                    this.GetUserID(),
-                    this.GetHashCode()));
-        }
+        // [Authorize]
+        // [HttpGet]
+        // [Route("/goal-grade")]
+        // [ProducesResponseType(StatusCodes.Status200OK)]
+        // [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        // public ActionResult GetGoalGrade()
+        // {
+        //     // returns the goal grade for the logged in user
+        //     return Json(
+        //         _databaseManager.GetUserGoalGrade(
+        //             this.GetCourseID(),
+        //             this.GetUserID(),
+        //             this.GetHashCode()));
+        // }
 
-        [Authorize]
-        [HttpPost]
-        [Route("/goal-grade")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public ActionResult UpdateGoalGrade()
-        {
-            var body = new StreamReader(Request.Body).ReadToEnd();
-            _databaseManager.UpdateUserGoalGrade(
-                    this.GetCourseID(),
-                    this.GetUserID(),
-                    (int)JObject.Parse(body)["goal_grade"],
-                    this.GetHashCode());
+        // [Authorize]
+        // [HttpPost]
+        // [Route("/goal-grade")]
+        // [ProducesResponseType(StatusCodes.Status200OK)]
+        // [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        // public ActionResult UpdateGoalGrade()
+        // {
+        //     var body = new StreamReader(Request.Body).ReadToEnd();
+        //     _databaseManager.UpdateUserGoalGrade(
+        //             this.GetCourseID(),
+        //             this.GetUserID(),
+        //             (int)JObject.Parse(body)["goal_grade"],
+        //             this.GetHashCode());
 
-            return Json(
-                _databaseManager.GetUserGoalGrade(
-                    this.GetCourseID(),
-                    this.GetUserID(),
-                    this.GetHashCode()));
-        }
+        //     return Json(
+        //         _databaseManager.GetUserGoalGrade(
+        //             this.GetCourseID(),
+        //             this.GetUserID(),
+        //             this.GetHashCode()));
+        // }
 
         // -------------------- Canvas registry --------------------
 
+        // TODO: move to different controller.
         [Authorize(Policy = "IsInstructor")]
         [HttpGet]
         [Route("/assignments")]
@@ -317,62 +321,60 @@ namespace IguideME.Web.Controllers
             );
         }
 
-        [Authorize(Policy = "IsInstructor")]
-        [HttpGet]
-        [Route("/datamart/canvas/discussions")]
-        public ActionResult GetCanvasDiscussions()
-        {
-            int course_id = this.GetCourseID();
+        // TODO: move to different controller.
+        // [Authorize(Policy = "IsInstructor")]
+        // [HttpGet]
+        // [Route("/datamart/discussions")]
+        // public ActionResult GetDiscussions()
+        // {
+        //     int course_id = this.GetCourseID();
 
-            List<AppDiscussion> discussions = _databaseManager.GetDiscussions(course_id);
+        //     List<AppDiscussion> discussions = _databaseManager.GetDiscussions(course_id);
 
-            foreach (AppDiscussion discussion in new List<AppDiscussion>(discussions))
-            {
-                discussions.AddRange(_databaseManager.GetDiscussionEntries(
-                    discussion.ID));
-                discussions.AddRange(_databaseManager.GetDiscussionReplies(
-                    discussion.ID));
-            }
-            return Json(
-                discussions
-            );
-        }
+        //     foreach (AppDiscussion discussion in new List<AppDiscussion>(discussions))
+        //     {
+        //         discussions.AddRange(_databaseManager.GetDiscussionEntries(
+        //             discussion.ID));
+        //         discussions.AddRange(_databaseManager.GetDiscussionReplies(
+        //             discussion.ID));
+        //     }
+        //     return Json(
+        //         discussions
+        //     );
+        // }
 
+        // TODO: move to different controller.
         [Authorize(Policy = "IsInstructor")]
         [HttpGet]
         [Route("/topics")]
         public ActionResult GetCanvasTopics()
         {
-            int course_id = this.GetCourseID();
-
-            List<AppDiscussion> discussions = _databaseManager.GetDiscussions(course_id);
-            return Json(
-                discussions
-            );
+            return Json(_databaseManager.GetDiscussions(this.GetCourseID()));
         }
 
         // -------------------- User notifications --------------------
-        [Authorize(Policy = "IsInstructor")]
-        [HttpGet]
-        [Route("/datamart/notifications")]
-        public ActionResult GetCourseNotifications()
-        {
-            return Json(_databaseManager.GetAllNotifications(GetCourseID()));
-        }
+        // [Authorize(Policy = "IsInstructor")]
+        // [HttpGet]
+        // [Route("/datamart/notifications")]
+        // public ActionResult GetCourseNotifications()
+        // {
+        //     return Json(_databaseManager.GetAllNotifications(GetCourseID()));
+        // }
 
-        [Authorize]
-        [HttpGet]
-        [Route("/datamart/notifications/{userID}")]
-        public ActionResult GetNotifications(string userID)
-        {
-            return !this.IsAdministrator() && userID != GetUserID()
-                ? Unauthorized()
-                : Json(
-                _databaseManager.GetPendingNotifications(
-                    GetCourseID(), userID, GetHashCode())
-            );
-        }
+        // [Authorize]
+        // [HttpGet]
+        // [Route("/datamart/notifications/{userID}")]
+        // public ActionResult GetNotifications(string userID)
+        // {
+        //     return !this.IsAdministrator() && userID != GetUserID()
+        //         ? Unauthorized()
+        //         : Json(
+        //         _databaseManager.GetPendingNotifications(
+        //             GetCourseID(), userID, GetHashCode())
+        //     );
+        // }
 
+        ///////////////////////////////////////////////////////////////////////////////////////////////
         // -------------------- Accept List --------------------
 
         // [Authorize(Policy = "IsInstructor")]

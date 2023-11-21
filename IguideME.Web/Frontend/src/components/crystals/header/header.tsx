@@ -90,6 +90,7 @@ const Header: FC = (): ReactElement => {
 	const [currentUser, setCurrentUser] = useState<User | undefined>(self);
 	const [inHome, setInHome] = useState<boolean>(true);
 
+	// TODO: change to request from is-admin route.
 	const isAdmin: boolean = self?.role === UserRoles.instructor;
 
 	const goHome = (): void => {
