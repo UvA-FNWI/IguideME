@@ -90,7 +90,7 @@ namespace IguideME.Web.Services.Workers
                 {
                     case GradingType.Points:
                         // grade = (double.Parse(submission.Grade) - 1)/0.09; // should switch to this
-                        grade = double.Parse(submission.Grade);
+                        grade = (double)(double.Parse(submission.Grade) * 100 / assignment.PointsPossible);
                         break;
                     case GradingType.Percentage:
                         string clean = submission.Grade.Replace(System.Globalization.CultureInfo.CurrentCulture.NumberFormat.PercentSymbol, "");

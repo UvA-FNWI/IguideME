@@ -17,7 +17,7 @@ export default class GradeStatistic extends Component<
   setup = () => {
     const { grade } = this.props;
 
-    this.setState({ loading: false, passed: parseFloat(grade) >= 5.5 });
+    this.setState({ loading: false, passed: parseFloat(grade) >= 55 });
   }
 
   render(): React.ReactNode {
