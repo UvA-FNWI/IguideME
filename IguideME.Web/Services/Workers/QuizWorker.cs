@@ -59,6 +59,7 @@ namespace IguideME.Web.Services.Workers
 
 			foreach (QuizSubmission sub in quiz.Submissions)
 			{
+				_logger.LogWarning("Score: {score}, possible: {possible}", sub.Score, quiz.PointsPossible);
 				DatabaseManager.Instance.CreateUserSubmission(
 					this._courseID,
 					entry.ID,
