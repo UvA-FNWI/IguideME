@@ -170,8 +170,8 @@ namespace IguideME.Web.Services.Workers
                 // Since we have the userIDs of all members in the peer-group,
                 // we will find their grade in each assignment and make a list out of it
                 // since we do not care about the ID of any specific student beyond this point
-                List<Dictionary<int,float>> userGrades = new();
-                List<Dictionary<int,float>> userDiscussions = new();
+                List<Dictionary<int, float>> userGrades = new();
+                List<Dictionary<int, float>> userDiscussions = new();
                 // We run the following process for each individual peer in the group
                 foreach (string peerID in peerGroup)
                 {
@@ -179,46 +179,49 @@ namespace IguideME.Web.Services.Workers
                     userGrades.Add(_databaseManager.GetUserAssignmentGrades(this._courseID, peerID));
 
                     //and all Discussion counters
-                    userDiscussions.Add(_databaseManager.GetUserDiscussionCounters(this._courseID, peerID));   
+                    userDiscussions.Add(_databaseManager.GetUserDiscussionCounters(this._courseID, peerID));
                 }
-                   
+
                 //Afterwards we get all Tiles of the course and with its corresponding entries
                 List<Tile> tiles = _databaseManager.GetTiles(_courseID);
-                foreach(Tile tile in tiles) {
+                foreach (Tile tile in tiles)
+                {
 
                     // Retrieve the assignment IDs tied to the tile
-                        List<int> tileContentIDs = new List<int>();
-                        foreach(TileEntry tileEntry in tile.Entries)
-                            tileContentIDs.Add(tileEntry.ContentID);
+                    List<int> tileContentIDs = new List<int>();
 
-                        // Finally, we go through the list of all users and 
-                        // from each dictionary (= all assignment submissions of the user) 
-                        // we keep the ones belonging to the tile.
-                        // So, we calculate and store the average of each user in a list.
-                        List<float> averages = new List<float>();
+                    foreach (TileEntry tileEntry in tile.Entries)
+                        tileContentIDs.Add(tileEntry.ContentID);
 
-                    if (tile.Type == Tile.Tile_type.assignments) {                        
-                        foreach (Dictionary<int,float> gradelist in userGrades)
+                    // Finally, we go through the list of all users and 
+                    // from each dictionary (= all assignment submissions of the user) 
+                    // we keep the ones belonging to the tile.
+                    // So, we calculate and store the average of each user in a list.
+                    List<float> averages = new List<float>();
+
+                    if (tile.Type == Tile.Tile_type.assignments)
+                    {
+                        foreach (Dictionary<int, float> gradelist in userGrades)
                         {
                             float user_avg = 0f;
                             if ((gradelist != null) && gradelist.Any())
-                                foreach(int assigmentId in tileContentIDs)
+                                foreach (int assigmentId in tileContentIDs)
                                     // We multiply by the weight of the assignment
-                                    user_avg += gradelist[assigmentId] * tile.Entries[assigmentId].Weight / 100 ;
+                                    user_avg += gradelist[assigmentId] * tile.Entries[assigmentId].Weight / 100;
                             averages.Add(user_avg / tileContentIDs.Count);
-                        }          
+                        }
                     }
                     else if (tile.Type == Tile.Tile_type.discussions)
                     {
-                        foreach (Dictionary<int,float> discussionCounter in userDiscussions)
+                        foreach (Dictionary<int, float> discussionCounter in userDiscussions)
                         {
                             float user_avg = 0f;
                             if ((discussionCounter != null) && discussionCounter.Any())
-                                foreach(int discussionId in tileContentIDs)
+                                foreach (int discussionId in tileContentIDs)
                                     // We multiply by the weight of the assignment
                                     user_avg += discussionCounter[discussionId];
                             averages.Add(user_avg / tileContentIDs.Count);
-                        }  
+                        }
                     }
                     else // if (tile.Type == Tile.Tile_type.learning_outcomes)
                     {
@@ -226,17 +229,17 @@ namespace IguideME.Web.Services.Workers
                     }
 
                     // Afterwards, we save the min, max and avg in the DB table.
-                        // also, we save the user_ids of the peers in said group
-                        _databaseManager.CreateUserPeer(
-                            goalGradeClass,
-                            peerGroup,
-                            tile.ID,
-                            averages.Average(),
-                            averages.Min(),
-                            averages.Max(),
-                            (int) Comparison_Entity_Types.tile,
-                            _syncID
-                        );
+                    // also, we save the user_ids of the peers in said group
+                    _databaseManager.CreateUserPeer(
+                        goalGradeClass,
+                        peerGroup,
+                        tile.ID,
+                        averages.Count > 0 ? averages.Average() : 0,
+                        averages.Count > 0 ? averages.Min() : 0,
+                        averages.Count > 0 ? averages.Max() : 0,
+                        (int)Comparison_Entity_Types.tile,
+                        _syncID
+                    );
 
 
                 }
@@ -251,8 +254,10 @@ namespace IguideME.Web.Services.Workers
                 // and the value is a list of all grades received
                 Dictionary<int, List<float>> assignmentGrades = new Dictionary<int, List<float>>();
                 // We create it from the old dictionary
-                foreach (Dictionary<int,float> gradelist in userGrades){
-                    foreach (KeyValuePair<int, float> entry in gradelist){
+                foreach (Dictionary<int, float> gradelist in userGrades)
+                {
+                    foreach (KeyValuePair<int, float> entry in gradelist)
+                    {
 
                         // If the assignment is not already in our dictionary, 
                         // we have to create an empty list in that key
@@ -265,7 +270,7 @@ namespace IguideME.Web.Services.Workers
                 }
 
                 // After we created the new dictionary, we can store the results in the DB
-                foreach (KeyValuePair<int,List<float>> entry in assignmentGrades)
+                foreach (KeyValuePair<int, List<float>> entry in assignmentGrades)
                     _databaseManager.CreateUserPeer(
                         goalGradeClass,
                         peerGroup,
@@ -273,7 +278,7 @@ namespace IguideME.Web.Services.Workers
                         entry.Value.Average(),
                         entry.Value.Min(),
                         entry.Value.Max(),
-                        (int) Comparison_Entity_Types.assignment,
+                        (int)Comparison_Entity_Types.assignment,
                         _syncID
                     );
 

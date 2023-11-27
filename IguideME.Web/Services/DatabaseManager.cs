@@ -10,8 +10,6 @@ using Discussion = UvA.DataNose.Connectors.Canvas.Discussion;
 using DiscussionEntry = UvA.DataNose.Connectors.Canvas.DiscussionEntry;
 using DiscussionReply = UvA.DataNose.Connectors.Canvas.DiscussionReply;
 using System.Linq;
-using StackExchange.Redis;
-using static IguideME.Web.Models.Tile;
 
 namespace IguideME.Web.Services
 {

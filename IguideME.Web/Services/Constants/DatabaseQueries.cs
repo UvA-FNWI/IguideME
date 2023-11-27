@@ -391,7 +391,7 @@ public static class DatabaseQueries
             @avgGrade,
             @minGrade,
             @maxGrade,
-            @entityType
+            @entityType,
             @syncID
         );";
 
