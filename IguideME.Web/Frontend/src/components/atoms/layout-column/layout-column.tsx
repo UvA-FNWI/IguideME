@@ -27,7 +27,7 @@ interface RecordType {
 
 const ConfigLayoutColumn: FC<Props> = ({ column, remove, parentOnChange }): ReactElement => {
 	const [width, setWidth] = useState<number>(column.width);
-	const [targetGroups, setGroups] = useState<string[]>(column.groups);
+	const [targetGroups, setGroups] = useState<string[]>(column.groups.map(String));
 	const [selectedGroups, setSelectedGroups] = useState<string[]>([]);
 	const { data } = useQuery('tile-groups', getTileGroups);
 	const groups: RecordType[] | undefined = data?.map((x) => {
@@ -35,7 +35,6 @@ const ConfigLayoutColumn: FC<Props> = ({ column, remove, parentOnChange }): Reac
 	});
 
 	const onChange = (): void => {
-		console.log('column', column.width);
 		parentOnChange?.(column);
 	};
 
@@ -57,11 +56,11 @@ const ConfigLayoutColumn: FC<Props> = ({ column, remove, parentOnChange }): Reac
 		column.groups = targetKeys;
 		onChange();
 	};
+	console.log('target', targetGroups)
 
 	if (isDragging) {
 		return <div ref={setNodeRef} style={style} className="LayoutColumn"></div>;
 	}
-
 	return (
 		<div className="LayoutColumn" ref={setNodeRef} style={style}>
 			<Row justify={'space-between'} {...attributes} {...listeners} style={{ cursor: 'grab' }}>
@@ -114,7 +113,7 @@ const ConfigLayoutColumn: FC<Props> = ({ column, remove, parentOnChange }): Reac
 			<Row justify="center">
 				<Transfer
 					dataSource={groups?.map((value) => ({ ...value, key: value.key.toString() }))}
-					targetKeys={targetGroups.map((id) => id)}
+					targetKeys={targetGroups}
 					selectedKeys={selectedGroups}
 					onChange={onGroupChange}
 					onSelectChange={onGroupSelectChange}

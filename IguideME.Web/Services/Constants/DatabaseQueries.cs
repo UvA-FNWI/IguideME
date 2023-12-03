@@ -67,7 +67,7 @@ public static class DatabaseQueries
      * The `tile_groups` table stores all tile groups. A tile group is
      * a collection of tiles.
      */
-    public const string CREATE_TABLE_LAYOUT_TILE_GROUPS =
+    public const string CREATE_TABLE_TILE_GROUPS =
         @"CREATE TABLE IF NOT EXISTS `tile_groups` (
             `group_id`        INTEGER PRIMARY KEY AUTOINCREMENT,
             `title`           STRING,
@@ -840,6 +840,23 @@ public static class DatabaseQueries
         INNER JOIN  `tile_groups`
             USING   (`group_id`)
         WHERE       `tile_groups`.`course_id`=@courseID
+        ORDER BY    `tiles`.`order` ASC;";
+
+    public const string QUERY_TILES_FOR_GROUP =
+        @"SELECT    `tiles`.`tile_id`,
+                    `tiles`.`group_id`,
+                    `tiles`.`title`,
+                    `tiles`.`order`,
+                    `tiles`.`type`,
+                    `tiles`.`weight`,
+                    `tiles`.`grading_type`,
+                    `tiles`.`visible`,
+                    `tiles`.`notifications`
+        FROM        `tiles`
+        INNER JOIN  `tile_groups`
+            USING   (`group_id`)
+        WHERE       `tile_groups`.`course_id`=@courseID
+        AND         `tile_groups`.`group_id`=@groupID
         ORDER BY    `tiles`.`order` ASC;";
 
     public const string QUERY_TILE_NOTIFICATIONS_STATE =

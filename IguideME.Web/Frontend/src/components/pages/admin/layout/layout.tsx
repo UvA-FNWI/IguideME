@@ -5,7 +5,7 @@ import LayoutConfigurator from '@/components/crystals/layout-configurator/layout
 // import LayoutVisualizer from '@/components/crystals/layout-visualizer/layout-visualizer';
 // import { Divider } from 'antd';
 
-const Layout: FC = (): ReactElement => {
+const EditLayout: FC = (): ReactElement => {
 	return (
 		<div>
 			<AdminTitle title="Layout" description="Configure the layout of the student dashboard." />
@@ -17,4 +17,4 @@ const Layout: FC = (): ReactElement => {
 	);
 };
 
-export default Layout;
+export default EditLayout;
