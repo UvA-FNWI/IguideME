@@ -1,12 +1,12 @@
 import React, { Component } from "react";
-import {Statistic} from "antd";
+import { Statistic } from "antd";
 import { WarningOutlined, LikeOutlined } from "@ant-design/icons";
 import "./style.scss";
 
 export default class GradeStatistic extends Component<
   { grade: string },
   { loading: boolean, passed: boolean }
-  > {
+> {
 
   state = { loading: true, passed: false }
 
@@ -27,12 +27,13 @@ export default class GradeStatistic extends Component<
     return (
       <div className={"gradeStatistic"}>
         <Statistic title={"Grade"}
-                   value={grade}
-                   loading={loading}
-                   prefix={passed ?
-                     <LikeOutlined className={"pass"} /> :
-                     <WarningOutlined  className={"fail"} />
-                   }
+          value={grade}
+          loading={loading}
+          prefix={passed ?
+            <LikeOutlined className={"pass"} /> :
+            <WarningOutlined className={"fail"} />
+          }
+          suffix={'%'}
         />
       </div>
     );

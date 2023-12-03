@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import "./style.scss";
-import {PeerGrades} from "../../../types";
+import { PeerGrades } from "../../../types";
 
-export default class PeerComparison extends Component<{peerGrades: PeerGrades | undefined}> {
+export default class PeerComparison extends Component<{ peerGrades: PeerGrades | undefined }> {
   render(): React.ReactNode {
     const { peerGrades } = this.props;
 
@@ -14,24 +14,24 @@ export default class PeerComparison extends Component<{peerGrades: PeerGrades | 
       <div className={"peerComparison"}>
         <span className={"title"}>Peer Comparison</span>
 
-        { peerGrades ?
+        {peerGrades ?
           <div className={"distribution"}>
             <div className={"min"}>
               <small>min.</small>
               <br />
-              { round(peerGrades.min) }
+              {round(peerGrades.min)}%
             </div>
 
             <div className={"avg"}>
               <small>avg.</small>
               <br />
-              { round(peerGrades.avg) }
+              {round(peerGrades.avg)}%
             </div>
 
             <div className={"max"}>
               <small>max.</small>
               <br />
-              { round(peerGrades.max) }
+              {round(peerGrades.max)}%
             </div>
           </div> :
           <p>Not available</p>

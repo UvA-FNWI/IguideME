@@ -1,9 +1,9 @@
 import React, { Component } from "react";
 import { Progress, Space } from "antd";
 import PeerComparison from "./PeerComparison";
-import {IProps, IState} from "./types";
-import {getAverageGrade} from "../../../../utils/grades";
-import {getProgression} from "./helpers";
+import { IProps, IState } from "./types";
+import { getAverageGrade } from "../../../../utils/grades";
+import { getProgression } from "./helpers";
 import GradeStatistic from "../../../../containers/GradeStatistic";
 import "./style.scss";
 import { discussionType } from "../../../../models/canvas/Discussion";
@@ -19,7 +19,7 @@ export default class Tile extends Component<IProps, IState> {
     if (tile.type === "DISCUSSIONS") {
       let disc_grade = 0;
       discussions.forEach(discussion => {
-        if (discussion.type === discussionType.topic ){
+        if (discussion.type === discussionType.topic) {
           if (discussion.posted_by === student.name)
             disc_grade++;
         } else {
@@ -27,18 +27,18 @@ export default class Tile extends Component<IProps, IState> {
         }
       })
       return (
-        <span style={{textAlign: 'center'}}>
-          <strong>{ disc_grade }</strong> discussion{discussions.length !== 1 && "s"}
+        <span style={{ textAlign: 'center' }}>
+          <strong>{disc_grade}</strong> discussion{discussions.length !== 1 && "s"}
         </span>
       );
     }
 
-    switch (tile.content){
+    switch (tile.content) {
       case "LEARNING_OUTCOMES":
         const success = learningOutcomes.filter(lo => lo.success).length;
         return (
-          <span style={{textAlign: 'center'}}>
-            <strong>{ success }<small>/{ learningOutcomes.length }</small></strong> completed
+          <span style={{ textAlign: 'center' }}>
+            <strong>{success}<small>/{learningOutcomes.length}</small></strong> completed
           </span>
         );
       case "PREDICTION":
@@ -46,14 +46,14 @@ export default class Tile extends Component<IProps, IState> {
       case "BINARY":
         return (
           <>
-            { !!avg && <Progress percent={getProgression(tile, tileEntries, submissions)} /> }
+            {!!avg && <Progress percent={getProgression(tile, tileEntries, submissions)} />}
             <GradeStatistic grade={avg !== null ? (avg * 10).toFixed(2) : "-"} />
           </>
         );
       case "ENTRIES":
         return (
           <>
-            { !!avg && <Progress percent={getProgression(tile, tileEntries, submissions)} /> }
+            {!!avg && <Progress percent={getProgression(tile, tileEntries, submissions)} steps={tileEntries.length} />}
             <GradeStatistic grade={avg !== null ? avg!.toFixed(2) : "-"} />
           </>
         );
@@ -66,15 +66,15 @@ export default class Tile extends Component<IProps, IState> {
     const { tile, peerGrades, userGrades } = this.props;
     return (
       <div className={"tile"}
-           onClick={() => {
-             window.dispatchEvent(new CustomEvent("selectTile", { detail: { tile, userGrades } }))
-           }}
+        onClick={() => {
+          window.dispatchEvent(new CustomEvent("selectTile", { detail: { tile, userGrades } }))
+        }}
       >
         <div className={"wrapper"}>
           <div className={"content"}>
-            <h2>{ tile.title }</h2>
+            <h2>{tile.title}</h2>
             <Space direction={"vertical"} style={{ width: '100%' }}>
-              { this.getHeader() }
+              {this.getHeader()}
             </Space>
           </div>
 
