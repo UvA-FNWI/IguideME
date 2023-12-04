@@ -9,12 +9,12 @@ import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { deleteTileGroup, getTiles, patchTileGroup, postTile } from '@/api/tiles';
 import { DeleteFilled, PlusOutlined } from '@ant-design/icons';
 import Loading from '@/components/particles/loading';
-import TileView from '@/components/crystals/tile-view/tile-view';
+import AdminTileView from '@/components/crystals/admin-tile-view/admin-tile-view';
 
 interface Props {
 	group: TileGroup;
 }
-const TileGroupView: FC<Props> = ({ group }): ReactElement => {
+const AdminTileGroupView: FC<Props> = ({ group }): ReactElement => {
 	const [editing, setEditing] = useState<boolean>(false);
 	const [title, setTitle] = useState<string>(group.title);
 	const { data, isFetching } = useQuery('tiles', getTiles);
@@ -121,7 +121,7 @@ const TileGroupView: FC<Props> = ({ group }): ReactElement => {
 					) : (
 						tiles.map((tile, index) => (
 							<Col key={index}>
-								<TileView tile={tile} />
+								<AdminTileView tile={tile} />
 							</Col>
 						))
 					)}
@@ -155,4 +155,4 @@ const TileGroupView: FC<Props> = ({ group }): ReactElement => {
 	);
 };
 
-export default TileGroupView;
+export default AdminTileGroupView;

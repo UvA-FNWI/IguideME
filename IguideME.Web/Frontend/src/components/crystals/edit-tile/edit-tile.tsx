@@ -45,7 +45,6 @@ const EditTile: FC<Props> = ({ tile }): ReactElement => {
 			name="edit_tile_form"
 			initialValues={tile}
 			onFinish={(data: Tile) => {
-				console.log('data', data);
 				setEditTile(null);
 				saveTile(data);
 			}}

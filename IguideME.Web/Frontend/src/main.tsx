@@ -7,7 +7,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import ErrorPage from '@/components/pages/error';
 import Home from '@/components/pages/home/home.tsx';
 import Tiles from '@/components/pages/admin/tiles/tiles.tsx';
-import Layout from '@/components/pages/admin/layout/layout.tsx';
+import EditLayout from '@/components/pages/admin/layout/layout.tsx';
 import Settings from '@/components/pages/admin/settings/settings.tsx';
 import Dashboard from '@/components/pages/admin/dashboard/dashboard.tsx';
 import Analytics from '@/components/pages/admin/analytics/analytics.tsx';
@@ -54,7 +54,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 						<Route path="admin" element={<AdminPanel />}>
 							<Route path="" element={<Dashboard />} />
 							<Route path="tiles" element={<Tiles />} />
-							<Route path="layout" element={<Layout />} />
+							<Route path="layout" element={<EditLayout />} />
 							<Route path="student-overview" element={<StudentOverview />} />
 							<Route path="grade-predictor" element={<GradePredictor />} />
 							<Route path="grade-analyzer" element={<GradeAnalyzer />} />

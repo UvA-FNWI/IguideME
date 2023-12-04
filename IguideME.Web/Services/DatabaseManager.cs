@@ -10,8 +10,6 @@ using Discussion = UvA.DataNose.Connectors.Canvas.Discussion;
 using DiscussionEntry = UvA.DataNose.Connectors.Canvas.DiscussionEntry;
 using DiscussionReply = UvA.DataNose.Connectors.Canvas.DiscussionReply;
 using System.Linq;
-using StackExchange.Redis;
-using static IguideME.Web.Models.Tile;
 
 namespace IguideME.Web.Services
 {
@@ -185,7 +183,7 @@ namespace IguideME.Web.Services
                 DatabaseQueries.CREATE_TABLE_USER_TRACKER,
 
                 DatabaseQueries.CREATE_TABLE_LAYOUT_COLUMNS,
-                DatabaseQueries.CREATE_TABLE_LAYOUT_TILE_GROUPS,
+                DatabaseQueries.CREATE_TABLE_TILE_GROUPS,
                 DatabaseQueries.CREATE_TABLE_TILES,
 
                 DatabaseQueries.CREATE_TABLE_ASSIGNMENTS,
@@ -2309,6 +2307,47 @@ namespace IguideME.Web.Services
             return tiles;
         }
 
+        public List<Tile> GetGroupTiles(int courseID, string groupID, bool autoLoadEntries = false)
+        {
+            List<Tile> tiles = new();
+
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_TILES_FOR_GROUP,
+                    new SQLiteParameter("courseID", courseID),
+                    new SQLiteParameter("groupID", groupID)
+                ))
+            {
+                while (r.Read())
+                {
+                    try
+                    {
+                        Tile row = new(
+                            r.GetInt32(0),
+                            r.GetInt32(1),
+                            r.GetValue(2).ToString(),
+                            r.GetInt32(3),
+                            (Tile.Tile_type)r.GetInt32(4),
+                            r.GetFloat(5),
+                            (UvA.DataNose.Connectors.Canvas.GradingType)r.GetInt32(6),
+                            r.GetBoolean(7),
+                            r.GetBoolean(8)
+                        );
+                        tiles.Add(row);
+                    }
+                    catch (Exception e)
+                    {
+                        PrintQueryError("GetTiles", 9, r, e);
+                    }
+                }
+            }
+
+            foreach (Tile t in tiles)
+            {
+                if (autoLoadEntries)
+                    t.Entries = GetTileEntries(t.ID);
+            }
+
+            return tiles;
+            }
         // public Tile FillTileContent(Tile tile)
         // {
         //     switch(tile.Type)

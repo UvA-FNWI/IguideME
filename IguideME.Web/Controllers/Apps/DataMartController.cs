@@ -204,7 +204,7 @@ namespace IguideME.Web.Controllers
         // TODO: move to different controller.
         [Authorize(Policy = "IsInstructor")]
         [HttpGet]
-        [Route("/Students")]
+        [Route("/students")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public ActionResult GetStudents()

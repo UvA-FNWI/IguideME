@@ -55,7 +55,6 @@ const LayoutConfiguratorInner: FC<Props> = ({ data }): ReactElement => {
 	);
 
 	const save = (): void => {
-		console.log('saving', columns);
 		if (columns !== null) {
 			saveLayout(columns);
 		}
@@ -89,7 +88,6 @@ const LayoutConfiguratorInner: FC<Props> = ({ data }): ReactElement => {
 								column={column}
 								remove={removeColumn}
 								parentOnChange={(column) => {
-									console.log('hey', column.width);
 									columns[columns.findIndex((col) => col.id === column.id)] = column;
 									setColumns(columns);
 								}}
@@ -114,9 +112,7 @@ const LayoutConfiguratorInner: FC<Props> = ({ data }): ReactElement => {
 			{createPortal(
 				<DragOverlay>
 					{active !== null && (
-						<Col>
-							<ConfigLayoutColumn column={active} />
-						</Col>
+						<ConfigLayoutColumn column={active} />
 					)}
 				</DragOverlay>,
 				document.body,

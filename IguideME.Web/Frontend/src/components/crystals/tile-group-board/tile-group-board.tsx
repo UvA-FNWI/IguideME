@@ -19,8 +19,8 @@ import { createPortal } from 'react-dom';
 import Loading from '@/components/particles/loading';
 import { type Tile, type TileGroup } from '@/types/tile';
 import EditTile from '@/components/crystals/edit-tile/edit-tile';
-import TileView from '@/components/crystals/tile-view/tile-view';
-import TileGroupView from '@/components/crystals/tile-group/tile-group';
+import AdminTileView from '@/components/crystals/admin-tile-view/admin-tile-view';
+import AdminTileGroupView from '@/components/crystals/admin-tile-group/admin-tile-group';
 import { getTileGroups, getTiles, patchTile, patchTileGroupOrder, patchTileOrder, postTileGroup } from '@/api/tiles';
 import { DrawerContext } from './contexts';
 import Swal from 'sweetalert2';
@@ -116,7 +116,7 @@ const TileGroupBoard: FC = (): ReactElement => {
 						<SortableContext items={groupIds}>
 							{tilegroups.map((group, index) => (
 								<div key={index}>
-									<TileGroupView group={group} />
+									<AdminTileGroupView group={group} />
 								</div>
 							))}
 						</SortableContext>
@@ -133,8 +133,8 @@ const TileGroupBoard: FC = (): ReactElement => {
 					</div>
 					{createPortal(
 						<DragOverlay>
-							{activeGroup !== null && <TileGroupView group={activeGroup} />}
-							{activeTile !== null && <TileView tile={activeTile} move={move} />}
+							{activeGroup !== null && <AdminTileGroupView group={activeGroup} />}
+							{activeTile !== null && <AdminTileView tile={activeTile} move={move} />}
 						</DragOverlay>,
 						document.body,
 					)}

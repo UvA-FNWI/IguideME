@@ -86,6 +86,18 @@ namespace IguideME.Web.Controllers
 
         [Authorize]
         [HttpGet]
+        [Route("/tilegroup/{id}/tiles")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public ActionResult GetGroupTiles(string id)
+        {
+            // return all tiles registered to the course
+            return Json(
+                _databaseManager.GetGroupTiles(GetCourseID(), id, true));
+        }
+
+        [Authorize]
+        [HttpGet]
         [Route("/tiles/groups")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]

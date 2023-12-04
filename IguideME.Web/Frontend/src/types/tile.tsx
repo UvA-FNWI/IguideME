@@ -2,7 +2,7 @@ export interface LayoutColumn {
 	id: number;
 	width: number;
 	position: number;
-	groups: string[];
+	groups: number[];
 }
 
 export interface TileGroup {

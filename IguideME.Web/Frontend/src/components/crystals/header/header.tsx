@@ -77,7 +77,7 @@ const Header: FC = (): ReactElement => {
 	// Get the current user from the backend and updates the route if the user is a student.
 	const { data: self } = useQuery('self', getSelf, {
 		onSuccess: (data) => {
-			if (data == null) {
+			if (data === null) {
 				// navigate(errorpage) TODO:
 				return;
 			}

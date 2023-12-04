@@ -27,11 +27,14 @@ export const patchTileGroupOrder: (ids: number[]) => Promise<void> = async (ids:
 	await apiClient.patch(`tiles/groups/order`, ids);
 };
 
+export const getGroupTiles: (id: number) => Promise<Tile[]> = async (id: number) =>
+	await apiClient.get(`tilegroup/${id}/tiles`).then((response) => response.data);
+
 export const getTiles: () => Promise<Tile[]> = async () =>
 	await apiClient.get(`tiles`).then((response) => response.data);
 
 export const postTile: (tile: Tile) => Promise<void> = async (tile: Tile) => {
-	await apiClient.post(`tiles${tile.id}`, tile);
+	await apiClient.post(`tiles/${tile.id}`, tile);
 };
 
 export const patchTile: (tile: Tile) => Promise<void> = async (tile: Tile) => {

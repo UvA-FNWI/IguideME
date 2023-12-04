@@ -50,6 +50,20 @@ namespace IguideME.Web.Controllers
             );
         }
 
+        [Authorize(Policy = "IsInstructor")]
+        [Route("/student/{id}")]
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public ActionResult GetStudent(string id)
+        {
+            /**
+             * Returns information of the user with the given id.
+             */
+            return Json(
+                _databaseManager.GetUser(GetCourseID(), id)
+            );
+        }
         // [Authorize(Policy = "IsInstructor")]
         // [HttpGet]
         // [Route("/app/notification/{userID}")]
