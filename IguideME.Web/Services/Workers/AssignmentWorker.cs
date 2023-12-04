@@ -138,9 +138,11 @@ namespace IguideME.Web.Services.Workers
         {
             _logger.LogInformation("Starting assignment registry...");
 
+            // Get the assignments from canvas.
             IEnumerable<Assignment> assignments = this._canvasHandler.GetAssignments(this._courseID);
-            List<TileEntry> entries = _databaseManager.GetEntries(this._courseID);
+            List<TileEntry> entries = _databaseManager.GetAllTileEntries(this._courseID);
 
+            // Get the consented users and only ask for their submissions
             List<Models.Impl.User> users = _databaseManager.GetUsersWithGrantedConsent(this._courseID);
             IEnumerable<SubmissionGroup> submissions = this._canvasHandler.GetSubmissions(this._courseID, users.Select(user => user.UserID).ToArray());
 

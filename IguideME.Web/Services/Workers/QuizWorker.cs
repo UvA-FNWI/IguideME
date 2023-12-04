@@ -83,7 +83,11 @@ namespace IguideME.Web.Services.Workers
 
 			// Get the quizzes from canvas.
 			List<Quiz> quizzes = this._canvasHandler.GetQuizzes(_courseID);
-			List<TileEntry> entries = _databaseManager.GetEntries(this._courseID);
+			List<TileEntry> entries = _databaseManager.GetAllTileEntries(this._courseID);
+
+			// Get the consented users and only ask for their submissions
+			List<Models.Impl.User> users = _databaseManager.GetUsersWithGrantedConsent(this._courseID);
+            // IEnumerable<SubmissionGroup> submissions = this._canvasHandler.GetQuizzes(this._courseID, users.Select(user => user.UserID).ToArray());
 
 			// Register the quizzes in the database.
 			foreach (Quiz quiz in quizzes)

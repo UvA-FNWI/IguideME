@@ -863,9 +863,10 @@ namespace IguideME.Web.Services
                             new SQLiteParameter("courseID", courseID),
                             new SQLiteParameter("userID", userID),
                             new SQLiteParameter("PredictedGrade", grade),
-                            new SQLiteParameter("GoalGrade", r.GetInt32(1)),
-                            new SQLiteParameter("Consent", r.GetBoolean(2)),
-                            new SQLiteParameter("Notifications", r.GetBoolean(3)),
+                            new SQLiteParameter("GeneralAverage", r.GetFloat(1)),
+                            new SQLiteParameter("GoalGrade", r.GetInt32(2)),
+                            new SQLiteParameter("Consent", r.GetBoolean(3)),
+                            new SQLiteParameter("Notifications", r.GetBoolean(4)),
                             new SQLiteParameter("syncID", activeSync)
                         );
                     }
@@ -888,7 +889,7 @@ namespace IguideME.Web.Services
                 ))
             {
                 if (r.Read())
-                    old_sync = long.Parse(r.GetValue(4).ToString());
+                    old_sync = long.Parse(r.GetValue(5).ToString());
             }
 
             if (old_sync != 0)
@@ -940,8 +941,9 @@ namespace IguideME.Web.Services
                         new SQLiteParameter("courseID", courseID),
                         new SQLiteParameter("userID", userID),
                         new SQLiteParameter("PredictedGrade", long.Parse(r.GetValue(0).ToString())),
-                        new SQLiteParameter("GoalGrade", r.GetInt32(1)),
-                        new SQLiteParameter("Consent", r.GetBoolean(2)),
+                        new SQLiteParameter("GeneralAverage", r.GetFloat(1)),
+                        new SQLiteParameter("GoalGrade", r.GetInt32(2)),
+                        new SQLiteParameter("Consent", r.GetBoolean(3)),
                         new SQLiteParameter("Notifications", enable),
                         new SQLiteParameter("syncID", activeSync)
                     );
@@ -973,6 +975,53 @@ namespace IguideME.Web.Services
             }
         }
 
+        public void UpdateUserTotalAverage(int courseID, string userID, float average, long syncID)
+        {
+            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_LAST_STUDENT_SETTINGS,
+                    new SQLiteParameter("courseID", courseID),
+                    new SQLiteParameter("userID", userID)
+                ))
+            {
+                while (r.Read())
+                {
+                    NonQuery(DatabaseQueries.REGISTER_STUDENT_SETTINGS,
+                        new SQLiteParameter("courseID", courseID),
+                        new SQLiteParameter("userID", userID),
+                        new SQLiteParameter("PredictedGrade", long.Parse(r.GetValue(0).ToString())),
+                        new SQLiteParameter("GeneralAverage", average),
+                        new SQLiteParameter("GoalGrade", r.GetInt32(2)),
+                        new SQLiteParameter("Consent", r.GetBoolean(3)),
+                        new SQLiteParameter("Notifications", r.GetBoolean(4)),
+                        new SQLiteParameter("syncID", activeSync)
+                    );
+                }
+            }
+        }
+
+        public float GetUserTotalAverage(int courseID, string userID)
+        {
+            float result = -1;
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_TOTAL_AVERAGE_FOR_USER,
+                    new SQLiteParameter("courseID", courseID),
+                    new SQLiteParameter("userID", userID)
+                ))
+            {
+                if (r.Read())
+                {
+                    try
+                    {
+                        result = r.GetFloat(0);
+                    }
+                    catch (Exception e)
+                    {
+                        PrintQueryError("GetUserTotalAverage", 0, r, e);
+                    }
+                }
+                return result;
+            }
+        }
+
         public void UpdateUserGoalGrade(int courseID, string userID, int grade, long syncID)
         {
             long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
@@ -987,9 +1036,10 @@ namespace IguideME.Web.Services
                         new SQLiteParameter("courseID", courseID),
                         new SQLiteParameter("userID", userID),
                         new SQLiteParameter("PredictedGrade", long.Parse(r.GetValue(0).ToString())),
+                        new SQLiteParameter("GeneralAverage", r.GetFloat(1)),
                         new SQLiteParameter("GoalGrade", grade),
-                        new SQLiteParameter("Consent", r.GetBoolean(2)),
-                        new SQLiteParameter("Notifications", r.GetBoolean(3)),
+                        new SQLiteParameter("Consent", r.GetBoolean(3)),
+                        new SQLiteParameter("Notifications", r.GetBoolean(4)),
                         new SQLiteParameter("syncID", activeSync)
                     );
                 }
@@ -2030,7 +2080,7 @@ namespace IguideME.Web.Services
             );
         }
 
-        public List<TileEntry> GetEntries(int courseID)
+        public List<TileEntry> GetAllTileEntries(int courseID)
         {
             List<TileEntry> entries = new();
 
@@ -2751,36 +2801,37 @@ namespace IguideME.Web.Services
             );
         }
 
-        public void SetUserConsent(ConsentData data, long syncID)
-        {
-            switch (data.Granted)
-            {
-                case 0: //denied
-                        //TODO: delete everything???
+        // public void SetUserConsent(Boolean consent, long syncID)
+        // {
+        //     switch (data.Granted)
+        //     {
+        //         case 0: //denied
+        //                 //TODO: delete everything???
 
 
 
-                    break;
+        //             break;
 
 
-                case -1: //unspecified
-                case 1: // or granted
-                    using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_LAST_STUDENT_SETTINGS,
-                        new SQLiteParameter("courseID", data.CourseID),
-                        new SQLiteParameter("userID", data.UserID)))
-                        while (r.Read())
-                            NonQuery(DatabaseQueries.REGISTER_STUDENT_SETTINGS,
-                                new SQLiteParameter("courseID", data.CourseID),
-                                new SQLiteParameter("userID", data.UserID),
-                                new SQLiteParameter("PredictedGrade", long.Parse(r.GetValue(0).ToString())),
-                                new SQLiteParameter("GoalGrade", r.GetInt32(1)),
-                                new SQLiteParameter("Consent", data.Granted), ///TODOOOOOOOOO: make boolean
-                                new SQLiteParameter("Notifications", r.GetBoolean(3)),
-                                new SQLiteParameter("syncID", syncID)
-                            );
-                    break;
-            }
-        }
+        //         case -1: //unspecified
+        //         case 1: // or granted
+        //             using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_LAST_STUDENT_SETTINGS,
+        //                 new SQLiteParameter("courseID", data.CourseID),
+        //                 new SQLiteParameter("userID", data.UserID)))
+        //                 while (r.Read())
+        //                     NonQuery(DatabaseQueries.REGISTER_STUDENT_SETTINGS,
+        //                         new SQLiteParameter("courseID", data.CourseID),
+        //                         new SQLiteParameter("userID", data.UserID),
+        //                         new SQLiteParameter("PredictedGrade", long.Parse(r.GetValue(0).ToString())),
+        //                         new SQLiteParameter("GeneralAverage", r.GetFloat(1)),
+        //                         new SQLiteParameter("GoalGrade", r.GetInt32(2)),
+        //                         new SQLiteParameter("Consent", data.Granted),
+        //                         new SQLiteParameter("Notifications", r.GetBoolean(4)),
+        //                         new SQLiteParameter("syncID", syncID)
+        //                     );
+        //             break;
+        //     }
+        // }
 
         public bool GetUserConsent(int courseID, string userID)
         {
