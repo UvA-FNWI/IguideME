@@ -46,14 +46,14 @@ export default class Tile extends Component<IProps, IState> {
       case "BINARY":
         return (
           <>
-            {!!avg && <Progress percent={getProgression(tile, tileEntries, submissions)} />}
+            {!!avg && <Progress percent={getProgression(tile, tileEntries, submissions)} steps={tileEntries.length} style={{ width: '100%' }} />}
             <GradeStatistic grade={avg !== null ? (avg * 10).toFixed(2) : "-"} />
           </>
         );
       case "ENTRIES":
         return (
           <>
-            {!!avg && <Progress percent={getProgression(tile, tileEntries, submissions)} steps={tileEntries.length} />}
+            {!!avg && <Progress percent={getProgression(tile, tileEntries, submissions)} steps={tileEntries.length} style={{ width: '100%' }} />}
             <GradeStatistic grade={avg !== null ? avg!.toFixed(2) : "-"} />
           </>
         );
