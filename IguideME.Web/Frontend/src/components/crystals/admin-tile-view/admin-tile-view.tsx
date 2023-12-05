@@ -4,13 +4,13 @@ import { Col, Row, Space, Tooltip } from 'antd';
 import {
 	BellTwoTone,
 	CarryOutOutlined,
-	CheckCircleTwoTone,
 	CommentOutlined,
 	DeleteFilled,
+	EyeInvisibleTwoTone,
+	EyeTwoTone,
 	FormOutlined,
-	StopTwoTone,
 } from '@ant-design/icons';
-import { deleteTile, qPatchTile } from '@/api/tiles';
+import { deleteTile, patchTile } from '@/api/tiles';
 import { useMutation, useQueryClient } from 'react-query';
 import { CSS } from '@dnd-kit/utilities';
 
@@ -20,7 +20,9 @@ import { DrawerContext } from '../tile-group-board/contexts';
 import Swal from 'sweetalert2';
 
 const GREEN = 'rgb(55, 212, 63)';
-const RED = 'red';
+const GREEN_BG = 'rgba(55, 212, 63, 0.1)';
+const RED = 'rgb(252, 69, 3)';
+const RED_BG = 'rgba(252, 69, 3, 0.1)';
 
 interface Props {
 	tile: Tile;
@@ -36,8 +38,8 @@ const AdminTileView: FC<Props> = ({ tile, move }): ReactElement => {
 		},
 	});
 
-	const { mutate: qUpdateTile } = useMutation({
-		mutationFn: qPatchTile,
+	const { mutate: updateTile } = useMutation({
+		mutationFn: patchTile,
 		onSuccess: async () => {
 			await queryClient.invalidateQueries('tiles');
 		},
@@ -56,14 +58,15 @@ const AdminTileView: FC<Props> = ({ tile, move }): ReactElement => {
 	const style = {
 		transition,
 		transform: CSS.Transform.toString(transform),
+		background: tile.visible ? GREEN_BG : RED_BG
 	};
 
 	const toggleVisible = (): void => {
-		qUpdateTile({ id: tile.id, visible: !tile.visible });
+		updateTile({ ...tile, visible: !tile.visible });
 	};
 
 	const toggleNotifications = (): void => {
-		qUpdateTile({ id: tile.id, notifications: !tile.notifications });
+		updateTile({ ...tile, notifications: !tile.notifications });
 	};
 
 	if (isDragging) {
@@ -94,19 +97,19 @@ const AdminTileView: FC<Props> = ({ tile, move }): ReactElement => {
 			<Row align="middle" justify={'space-between'} gutter={[10, 10]} style={{ marginBottom: '25px' }}>
 				<Col>
 					<Space align="center">
-						<Tooltip title={<>This tile is {!tile.visible && <b>not </b>}visible on canvas</>}>
+						<Tooltip title={<>This tile is {!tile.visible && <b>not </b>}visible for students</>}>
 							{tile.visible ? (
-								<CheckCircleTwoTone
+								<EyeTwoTone
 									twoToneColor={GREEN}
-									style={{ fontSize: '9pt' }}
+									style={{ fontSize: '10pt' }}
 									onClick={(event) => {
 										clickThrough(event, toggleVisible);
 									}}
 								/>
 							) : (
-								<StopTwoTone
+								<EyeInvisibleTwoTone
 									twoToneColor={RED}
-									style={{ fontSize: '9pt' }}
+									style={{ fontSize: '10pt' }}
 									onClick={(event) => {
 										clickThrough(event, toggleVisible);
 									}}
@@ -125,7 +128,7 @@ const AdminTileView: FC<Props> = ({ tile, move }): ReactElement => {
 								onClick={(event) => {
 									clickThrough(event, toggleNotifications);
 								}}
-								style={{ fontSize: '9pt' }}
+								style={{ fontSize: '10pt' }}
 							/>
 						</Tooltip>
 						<h3 style={{ margin: '0 0 0 10px', paddingTop: 2 }}>{tile.title}</h3>

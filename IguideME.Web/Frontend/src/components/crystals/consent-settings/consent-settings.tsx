@@ -1,5 +1,4 @@
 import { type FC, type ReactElement } from 'react';
-import TextEditor from '@/components/atoms/text-editor/text-editor';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { getConsentSettings, postConsentSettings } from '@/api/course_settings';
 import { Button, Form } from 'antd';
@@ -31,7 +30,7 @@ const ConsentSettingsForm: FC<Props> = ({ name, text }): ReactElement => {
 		<div>
 			<Form name="consent_settings_form" initialValues={{ name, text }} onFinish={saveConsent}>
 				<Form.Item name="text" valuePropName="text" noStyle>
-					<TextEditor />
+					TODO
 				</Form.Item>
 				<Form.Item>
 					<Button htmlType="submit">Save</Button>

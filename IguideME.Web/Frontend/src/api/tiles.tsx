@@ -49,12 +49,3 @@ export const patchTileOrder: (ids: number[]) => Promise<void> = async (ids: numb
 	await apiClient.patch(`tiles/order`, ids);
 };
 
-interface quickTilePatch {
-	id: number;
-	notifications?: boolean;
-	visible?: boolean;
-}
-
-export const qPatchTile: (patch: quickTilePatch) => Promise<void> = async (patch: quickTilePatch) => {
-	await apiClient.patch(`tiles/${patch.id}`, patch);
-};
