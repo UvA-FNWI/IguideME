@@ -131,7 +131,7 @@ namespace IguideME.Web.Services
         }
 
         /// <summary>
-        /// Gets all the submissions for a lis of (consented) students for a course from canvas.
+        /// Gets all the submissions for a list of (consented) students for a course from canvas.
         /// </summary>
         /// <param name="courseID">The id of the course the assignments are from.</param>
         /// <param name="userIDs">The list of student ids that have given consent that the submissions are from.</param>
@@ -149,6 +149,19 @@ namespace IguideME.Web.Services
         /// <param name="courseID">The id of the course the quizzes are from.</param>
         /// <returns>A list of quizzes.</returns>
         public List<Quiz> GetQuizzes(int courseID)
+        {
+            return Connector
+                .FindCourseById(courseID)
+                .Quizzes;
+        }
+
+        /// <summary>
+        /// Gets all the quizzes for a list of (consented) students for a course from canvas.
+        /// </summary>
+        /// <param name="courseID">The id of the course the quizzes are from.</param>
+        /// <param name="userIDs">The list of student ids that have given consent that the submissions are from.</param>
+        /// <returns>A list of quizzes.</returns>
+        public List<Quiz> GetQuizzes(int courseID, string[] userIDs)
         {
             return Connector
                 .FindCourseById(courseID)

@@ -73,14 +73,14 @@ namespace IguideME.Web.Services.Workers
         /// Creates an array of lists of users, where the array is indexed by the goal grade of the users.
         /// </summary>
         /// <returns>A list of users per goal grade.</returns>
-        List<string>[] GetUsersSortedByGoalGrade()
+        List<string>[] GetUsersGroupedByGoalGrade()
         {
             List<string>[] usersWithSameGoalGrade = new List<string>[11];
 
             for (int goalGradeClass = 1; goalGradeClass <= 10; goalGradeClass++)
             {
                 usersWithSameGoalGrade[goalGradeClass] = new List<string>();
-                //TODO: get only those with consent!!!
+                
                 List<User> sameGraders = _databaseManager.GetUsersWithGoalGrade(this._courseID, goalGradeClass, this._syncID);
                 sameGraders.ForEach(x => usersWithSameGoalGrade[goalGradeClass].Add(x.UserID));
             }
@@ -91,13 +91,13 @@ namespace IguideME.Web.Services.Workers
         /// <summary>
         /// Create the peer groups for a given goal grade.
         /// </summary>
-        /// <param name="sortedUsers">An array of lists of users indexed by their goal grades.</param>
+        /// <param name="groupedUsers">An array of lists of users indexed by their goal grades.</param>
         /// <param name="goalGrade">The goal grade to create a peer group for.</param>
         /// <param name="minPeerGroupSize">The minimum group size a peer group needs to have.</param>
         /// <returns></returns>
-        static List<string> CreatePeerGroup(List<string>[] sortedUsers, int goalGrade, int minPeerGroupSize)
+        static List<string> CreatePeerGroup(List<string>[] groupedUsers, int goalGrade, int minPeerGroupSize)
         {
-            List<string> peerGroup = new(sortedUsers[goalGrade]);
+            List<string> peerGroup = new(groupedUsers[goalGrade]);
 
             // Look for peers until minimum size is reached or untill the offset exceeds the range of valid grades.
             for (int offset = 1; peerGroup.Count < minPeerGroupSize && offset < 10; offset++)
@@ -106,7 +106,7 @@ namespace IguideME.Web.Services.Workers
                 if (goalGrade + offset <= 10)
                 {
                     // Fill with found peers
-                    peerGroup.AddRange(sortedUsers[goalGrade + offset]);
+                    peerGroup.AddRange(groupedUsers[goalGrade + offset]);
                 }
 
                 // Check if no more peers are required
@@ -116,7 +116,7 @@ namespace IguideME.Web.Services.Workers
                 if (goalGrade - offset >= 1)
                 {
                     // Fill with found peers
-                    peerGroup.AddRange(sortedUsers[goalGrade - offset]);
+                    peerGroup.AddRange(groupedUsers[goalGrade - offset]);
                 }
             }
             return peerGroup;
@@ -156,7 +156,10 @@ namespace IguideME.Web.Services.Workers
         void CreatePeerGroupsForCourse()
         {
             // We find all students of the course and classify them according to their goal grade
-            List<string>[] sortedUsers = this.GetUsersSortedByGoalGrade();
+            List<string>[] groupedUsers = this.GetUsersGroupedByGoalGrade();
+
+            // // Then we create a dictionary with them and their list of Tile averages
+            // Dictionary<string,List<float>> user_totals = new Dictionary<string, List<float>>();
 
             int minPeerGroupSize = _databaseManager.GetMinimumPeerGroupSize(this._courseID);
 
@@ -165,7 +168,7 @@ namespace IguideME.Web.Services.Workers
             {
 
                 // We initiallize the peer group by filling it with the users of the same goal grade
-                List<string> peerGroup = CreatePeerGroup(sortedUsers, goalGradeClass, minPeerGroupSize);
+                List<string> peerGroup = CreatePeerGroup(groupedUsers, goalGradeClass, minPeerGroupSize);
 
                 // Since we have the userIDs of all members in the peer-group,
                 // we will find their grade in each assignment and make a list out of it
@@ -180,6 +183,9 @@ namespace IguideME.Web.Services.Workers
 
                     //and all Discussion counters
                     userDiscussions.Add(_databaseManager.GetUserDiscussionCounters(this._courseID, peerID));
+
+                    // // and initialize their avg list
+                    // user_totals[peerID] = new List<float>();
                 }
 
                 //Afterwards we get all Tiles of the course and with its corresponding entries
@@ -207,9 +213,12 @@ namespace IguideME.Web.Services.Workers
                             if ((gradelist != null) && gradelist.Any())
                                 foreach (int assigmentId in tileContentIDs)
                                     // We multiply by the weight of the assignment
-                                    user_avg += gradelist[assigmentId] * tile.Entries[assigmentId].Weight / 100;
-                            averages.Add(user_avg / tileContentIDs.Count);
-                        }
+                                    user_avg += gradelist[assigmentId] * tile.Entries[assigmentId].Weight / 100 ;
+                            if (tileContentIDs.Count != 0) {
+                                averages.Add(user_avg / tileContentIDs.Count);
+                                // user_totals[peerID].Add(user_avg / tileContentIDs.Count); 
+                            }
+                        }          
                     }
                     else if (tile.Type == Tile.Tile_type.discussions)
                     {
@@ -284,7 +293,7 @@ namespace IguideME.Web.Services.Workers
 
 
                 // Finally, we can create the notifications in the DB for that peer group
-                CreateNotifications(sortedUsers[goalGradeClass], assignmentGrades);
+                CreateNotifications(groupedUsers[goalGradeClass], assignmentGrades);
             }
         }
 

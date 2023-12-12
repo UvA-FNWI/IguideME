@@ -66,7 +66,7 @@ namespace IguideME.Web.Services.Workers
                                                                                       student.UserID,
                                                                                       this._syncID);
 
-            List<TileEntry> tileEntries = _databaseManager.GetEntries(this._courseID);
+            List<TileEntry> tileEntries = _databaseManager.GetAllTileEntries(this._courseID);
 
             double wGrade = 0.0;
 

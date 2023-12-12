@@ -192,6 +192,7 @@ public static class DatabaseQueries
             `user_id`           STRING,
             `course_id`         INTEGER,
             `predicted_grade`   INTEGER DEFAULT 0,
+            `total_average`   REAL DEFAULT 0,
             `goal_grade`        INTEGER DEFAULT 0,
             `consent`           BOOLEAN DEFAULT false,
             `notifications`     BOOLEAN DEFAULT true,
@@ -612,6 +613,7 @@ public static class DatabaseQueries
                         (   `course_id`,
                             `user_id`,
                             `predicted_grade`,
+                            `total_average`,
                             `goal_grade`,
                             `consent,`
                             `notifications`,
@@ -620,6 +622,7 @@ public static class DatabaseQueries
                 @CourseID,
                 @UserID,
                 @PredictedGrade,
+                @TotalAverage,
                 @GoalGrade,
                 @Consent,
                 @Notifications,
@@ -674,6 +677,16 @@ public static class DatabaseQueries
 
     public const string QUERY_PREDICTED_GRADES_FOR_USER =
         @"SELECT    `predicted_grade`,
+                    `sync_id`
+        FROM        `student_settings`
+        WHERE       `course_id`=@courseID
+        AND         `user_id`=@userID
+        ORDER BY    `sync_id` DESC
+        LIMIT       1
+        ;";
+
+    public const string QUERY_TOTAL_AVERAGE_FOR_USER =
+        @"SELECT    `total_average`,
                     `sync_id`
         FROM        `student_settings`
         WHERE       `course_id`=@courseID
@@ -1125,7 +1138,7 @@ public static class DatabaseQueries
     //     WHERE       subtable.sync = 1
     //     ORDER BY    subtable.`name` ASC;";
 
-    public const string QUERY_USERS_WITH_ROLE_FOR_COURSE = // no consent
+    public const string QUERY_USERS_WITH_ROLE_FOR_COURSE = // no consent //NoTotalAverage
         @"SELECT    `users`.`user_id`,
                     `users`.`student_number`,
                     `users`.`name`,
@@ -1143,7 +1156,7 @@ public static class DatabaseQueries
             ;";
 
 
-    public const string QUERY_CONSENTED_STUDENTS_FOR_COURSE = /// ^^^ WITH CONSENT ^^^
+    public const string QUERY_CONSENTED_STUDENTS_FOR_COURSE = /// ^^^ WITH CONSENT ^^^ //NoTotalAverage
         @"SELECT    `users`.`user_id`,
                     `users`.`student_number`,
                     `users`.`name`,
@@ -1189,7 +1202,7 @@ public static class DatabaseQueries
         FROM        `users`
         WHERE       `users`.`user_id`= @userID;";
 
-    public const string QUERY_CONSENTED_USER_DATA_FOR_COURSE = //// ^^^ WITH CONSENT ^^^
+    public const string QUERY_CONSENTED_USER_DATA_FOR_COURSE = //// ^^^ WITH CONSENT ^^^ //NoTotalAverage
         @"SELECT    `users`.`user_id`,
                     `users`.`student_number`,
                     `users`.`name`,
@@ -1205,7 +1218,7 @@ public static class DatabaseQueries
         ORDER BY    `student_settings`.`sync_id` DESC
         LIMIT       1";
 
-    public const string QUERY_STUDENTS_WITH_GOAL_GRADE =
+    public const string QUERY_STUDENTS_WITH_GOAL_GRADE = //NoTotalAverage
         @"SELECT    `users`.`user_id`,
                     `users`.`student_number`,
                     `users`.`name`,
@@ -1251,6 +1264,7 @@ public static class DatabaseQueries
 
     public const string QUERY_LAST_STUDENT_SETTINGS =
         @"SELECT    `predicted_grade`,
+                    `total_average`,
                     `goal_grade`,
                     `consent`,
                     `notifications`,
