@@ -16,7 +16,7 @@ interface Props {
 }
 
 const GREEN = 'rgb(55, 212, 63)';
-const RED = 'red';
+const RED = 'rgb(252, 69, 3)';
 
 const { Item } = Form;
 

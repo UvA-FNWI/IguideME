@@ -184,6 +184,7 @@ ClientBin/
 orleans.codegen.cs
 
 **/*node_modules
+**/node_modules
 **/*local_node_modules
 
 # RIA/Silverlight projects

@@ -1,35 +1,45 @@
-import { useContext, type FC, type ReactElement } from 'react';
-import './style.scss'
-import { Row, Col } from 'antd';
-import { tileViewContext } from '@/components/pages/student-dashboard/context';
+import { useContext, type FC, type ReactElement } from "react";
+import { tileViewContext } from "@/components/pages/student-dashboard/context";
+import { Tile } from "@/types/tile";
+
+import "./style.scss";
+
 interface Props {
-  tile: Tile
+  tile: Tile;
 }
 const ViewTile: FC<Props> = ({ tile }): ReactElement => {
-  const viewType = useContext(tileViewContext)
-  return <div className='tileView'>
-    <div style={{ margin: 12, }}>
-      <h3 style={{ fontSize: 16, fontWeight: 1400, fontFamily: '"Antic Slab", serif' }}>
-        {tile.title}
-      </h3>
+  const viewType = useContext(tileViewContext);
+  return (
+    <div className="tileView">
+      <div style={{ margin: 12 }}>
+        <h3
+          style={{
+            fontSize: 16,
+            fontWeight: 1400,
+            fontFamily: '"Antic Slab", serif',
+          }}
+        >
+          {tile.title}
+        </h3>
+      </div>
+      {renderViewType()}
     </div>
-    {renderViewType()}
-  </div >
+  );
   function renderViewType() {
     switch (viewType) {
-      case 'graph':
-        return <GraphTile tile={tile} />
-      case 'grid':
-        return <GridTile tile={tile} />
+      case "graph":
+        return <GraphTile tile={tile} />;
+      case "grid":
+        return <GridTile tile={tile} />;
     }
   }
-}
+};
 
 const GraphTile: FC<Props> = ({ tile }): ReactElement => {
-  return <>graph</>
-}
+  return <>{tile.entries.map((e) => e.title)}</>;
+};
 
 const GridTile: FC<Props> = ({ tile }): ReactElement => {
-  return <>grid</>
-}
+  return <>grid</>;
+};
 export default ViewTile;

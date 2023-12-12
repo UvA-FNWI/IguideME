@@ -857,6 +857,7 @@ public static class DatabaseQueries
             USING   (`group_id`)
         WHERE       `tile_groups`.`course_id`=@courseID
         AND         `tile_groups`.`group_id`=@groupID
+        AND         `tiles`.`visible` = 1
         ORDER BY    `tiles`.`order` ASC;";
 
     public const string QUERY_TILE_NOTIFICATIONS_STATE =

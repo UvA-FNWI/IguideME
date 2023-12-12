@@ -53,10 +53,9 @@ const ConfigLayoutColumn: FC<Props> = ({ column, remove, parentOnChange }): Reac
 
 	const onGroupChange = (targetKeys: string[]): void => {
 		setGroups(targetKeys);
-		column.groups = targetKeys;
+		column.groups = targetKeys.map(key => +key);
 		onChange();
 	};
-	console.log('target', targetGroups)
 
 	if (isDragging) {
 		return <div ref={setNodeRef} style={style} className="LayoutColumn"></div>;
