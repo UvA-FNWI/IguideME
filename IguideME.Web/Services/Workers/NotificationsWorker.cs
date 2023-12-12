@@ -113,6 +113,9 @@ namespace IguideME.Web.Services.Workers
         private bool checkSend()
         {
             List<string> notificationDates = _databaseManager.GetNotificationDates(_courseID);
+            if (notificationDates.Count == 0) {
+                return false;
+            }
             if (notificationDates[0].Contains("-"))
             {
                 // We are looking in a range of dates

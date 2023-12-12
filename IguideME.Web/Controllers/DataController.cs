@@ -28,7 +28,7 @@ namespace IguideME.Web.Controllers
 
         protected string GetUserID()
         {
-            return (User.Identity as ClaimsIdentity).FindFirst("loginid").Value;
+            return (User.Identity as ClaimsIdentity).FindFirst("userid").Value;
         }
 
         protected string GetUserName()

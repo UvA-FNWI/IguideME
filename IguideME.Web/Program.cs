@@ -135,15 +135,27 @@ DatabaseManager db = DatabaseManager.GetInstance(app.Environment.IsDevelopment()
 
 
 string GetUserID(string userid, string course) {
+    if (String.IsNullOrEmpty(userid)) {
+        throw new Exception("No userid in claims.");
+    }
     int courseid = int.Parse(course);
     if (int.TryParse(userid, out int id)) {
-        string user = db.GetUserID(id);
-        if (user != null) {
-            return user;
+        string userID = db.GetUserID(id);
+        if (userID != null) {
+            return userID;
         }
     }
     // Try's to find the user in canvas.
-    return app.Services.GetService<CanvasHandler>().GetUser(courseid, userid).LoginID;
+
+    UvA.DataNose.Connectors.Canvas.User user = app.Services.GetService<CanvasHandler>().GetUser(courseid, userid);
+
+    if (!String.IsNullOrEmpty(user.SISUserID)) {
+        return user.SISUserID;
+    }
+    if (!String.IsNullOrEmpty(user.LoginID)) {
+        return user.LoginID;
+    }
+    return userid;
 }
 
 app.UseLti(new LtiOptions
@@ -163,8 +175,7 @@ app.UseLti(new LtiOptions
             ["courseName"] = p.Context.Title,
             ["user_name"] = p.Name,
             ["courseid"] = courseid,
-            ["userid"] = userid, //TODO: rename to studentnumber
-            ["loginid"] = GetUserID(userid, courseid), //TODO: rename to userid
+            ["userid"] = GetUserID(userid, courseid),
             [ClaimTypes.Role] = p.Roles.Any(e => e.Contains("http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor"))
         ? UserRoles.instructor.ToString() : UserRoles.student.ToString(),
             [ClaimTypes.Email] = p.Email,
