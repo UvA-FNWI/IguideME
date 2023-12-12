@@ -222,7 +222,7 @@ public static class DatabaseQueries
     @"CREATE TABLE IF NOT EXISTS `peer_groups` (
         `tile_id`           INTEGER,
         `goal_grade`        INTEGER,
-        `user_ids`          STRING
+        `user_ids`          STRING,
         `avg_grade`         INTEGER,
         `min_grade`         INTEGER,
         `max_grade`         INTEGER,
