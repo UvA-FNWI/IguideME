@@ -82,7 +82,7 @@ namespace IguideME.Web.Services.Workers
 			_logger.LogInformation("Starting quiz registry...");
 
 			// Get the quizzes from canvas.
-			List<Quiz> quizzes = this._canvasHandler.GetQuizzes(_courseID);
+			IEnumerable<Quiz> quizzes = this._canvasHandler.GetQuizzes(_courseID);
 			List<TileEntry> entries = _databaseManager.GetAllTileEntries(this._courseID);
 
 			// Get the consented users and only ask for their submissions

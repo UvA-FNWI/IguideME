@@ -28,13 +28,13 @@ namespace IguideME.Web.Services
             _logger = logger;
             this.AccessToken = config["Canvas:AccessToken"];
             this.BaseUrl = config["Canvas:Url"];
-            this.CreateConnection();
+            this.SyncInit();
         }
 
         /// <summary>
         /// Creates or renews a connection with canvas. We always initialize and keep one because we communicate with canvas outside of syncs as well.
         /// </summary>
-        public void CreateConnection()
+        public void SyncInit()
         {
             this.Connector = new CanvasApiConnector(this.BaseUrl, this.AccessToken);
         }
@@ -67,12 +67,8 @@ namespace IguideME.Web.Services
             }
         }
 
-        /// <summary>
-        /// Get a user for a course.
-        /// </summary>
-        /// <param name="courseID">The course to get the user from.</param>
-        /// <param name="userID">The id of the user.</param>
-        /// <returns>The requested user if found.</returns>
+        // TODO: change all the functions to output our own objects, so not canvasUser but ourUSer etc.
+        /// <inheritdoc />
         public User GetUser(int courseID, string userID)
         {
             _logger.LogInformation("Trying to get user\ncourseID: {courseID}, userID: {userID}", courseID, userID);
@@ -94,11 +90,7 @@ namespace IguideME.Web.Services
 
         // TODO: change many of these arrays to Enumerables.
 
-        /// <summary>
-        /// Get all the users with the student role for a course.
-        /// </summary>
-        /// <param name="courseID">The id of the course.</param>
-        /// <returns>A list of students for the course.</returns>
+        /// <inheritdoc />
         public User[] GetStudents(int courseID)
         {
             Course course = Connector.FindCourseById(courseID);
@@ -106,21 +98,13 @@ namespace IguideME.Web.Services
             return students;
         }
 
-        /// <summary>
-        /// Get all the users with the admin role for a course.
-        /// </summary>
-        /// <param name="courseID">The id of the course.</param>
-        /// <returns>A list of administrators for the course.</returns>
+        /// <inheritdoc />
         public User[] GetAdministrators(int courseID)
         {
             return Connector.FindCourseById(courseID).GetUsersByType(EnrollmentType.Teacher).ToArray();
         }
 
-        /// <summary>
-        /// Gets all the non null assignemnts for a course from canvas.
-        /// </summary>
-        /// <param name="courseID">The id of the course the assignments are from.</param>
-        /// <returns>An iterable with assignments for the course.</returns>
+        /// <inheritdoc />
         public IEnumerable<Assignment> GetAssignments(int courseID)
         {
             return Connector
@@ -130,12 +114,7 @@ namespace IguideME.Web.Services
                 .OrderBy(a => a.Position);
         }
 
-        /// <summary>
-        /// Gets all the submissions for a list of (consented) students for a course from canvas.
-        /// </summary>
-        /// <param name="courseID">The id of the course the assignments are from.</param>
-        /// <param name="userIDs">The list of student ids that have given consent that the submissions are from.</param>
-        /// <returns>An iterable with submissions for the course.</returns>
+        /// <inheritdoc />
         public IEnumerable<SubmissionGroup> GetSubmissions(int courseID, string[] userIDs)
         {
             return Connector
@@ -143,37 +122,16 @@ namespace IguideME.Web.Services
                 .GetSubmissions(userIDs, false);
         }
 
-        /// <summary>
-        /// Gets all the quizzes for a course.
-        /// </summary>
-        /// <param name="courseID">The id of the course the quizzes are from.</param>
-        /// <returns>A list of quizzes.</returns>
-        public List<Quiz> GetQuizzes(int courseID)
+        /// <inheritdoc />
+        public IEnumerable<Quiz> GetQuizzes(int courseID)
         {
             return Connector
                 .FindCourseById(courseID)
                 .Quizzes;
         }
 
-        /// <summary>
-        /// Gets all the quizzes for a list of (consented) students for a course from canvas.
-        /// </summary>
-        /// <param name="courseID">The id of the course the quizzes are from.</param>
-        /// <param name="userIDs">The list of student ids that have given consent that the submissions are from.</param>
-        /// <returns>A list of quizzes.</returns>
-        public List<Quiz> GetQuizzes(int courseID, string[] userIDs)
-        {
-            return Connector
-                .FindCourseById(courseID)
-                .Quizzes;
-        }
-
-        /// <summary>
-        /// Gets all the Discussions for a course.
-        /// </summary>
-        /// <param name="courseID">The id of the course the quizzes are from.</param>
-        /// <returns>A list of discussions.</returns>
-        public List<Discussion> GetDiscussions(int courseID)
+        /// <inheritdoc />
+        public IEnumerable<Discussion> GetDiscussions(int courseID)
         {
             return Connector
                 .FindCourseById(courseID)

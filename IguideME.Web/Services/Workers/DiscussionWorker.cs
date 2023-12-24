@@ -55,7 +55,7 @@ namespace IguideME.Web.Services.Workers
 		/// </summary>
 		/// <param name="discussions">the discussions to register.</param>
 		/// <param name="students">the students in the course, needed to convert user id's.</param>
-		private void RegisterDiscusions(List<Canvas.Discussion> discussions, List<User> students)
+		private void RegisterDiscusions(IEnumerable<Canvas.Discussion> discussions, List<User> students)
 		{
 
 			foreach (Canvas.Discussion discussion in discussions)
@@ -88,7 +88,7 @@ namespace IguideME.Web.Services.Workers
 		/// <param name="discussions">a list of all the discussions.</param>
 		/// <param name="students">a list of all the students.</param>
 		/// <param name="tile">the tile that's a wild card.</param>
-		private void HandleWildcardTile(List<Canvas.Discussion> discussions, List<User> students, Tile tile)
+		private void HandleWildcardTile(IEnumerable<Canvas.Discussion> discussions, List<User> students, Tile tile)
 		{
 			_logger.LogDebug("wildcard");
 
@@ -112,7 +112,7 @@ namespace IguideME.Web.Services.Workers
 		/// </summary>
 		/// <param name="discussions">a list of all the discussions.</param>
 		/// <param name="tile">the tile the discussions should link to.</param>
-		private void HandleTile(List<Canvas.Discussion> discussions, Tile tile)
+		private void HandleTile(IEnumerable<Canvas.Discussion> discussions, Tile tile)
 		{
 
 			if (tile.Entries.IsNullOrEmpty())
@@ -135,7 +135,7 @@ namespace IguideME.Web.Services.Workers
 		/// </summary>
 		/// <param name="discussions">a list of all the discussions.</param>
 		/// <param name="students">a list of all the students.</param>
-		private void LinkToTiles(List<Canvas.Discussion> discussions, List<User> students)
+		private void LinkToTiles(IEnumerable<Canvas.Discussion> discussions, List<User> students)
 		{
 
 			// Get all the discussion tiles.
@@ -164,7 +164,7 @@ namespace IguideME.Web.Services.Workers
 			_logger.LogInformation("Starting discussion registry...");
 
 			List<User> students = _databaseManager.GetUsers(this._courseID, (int)UserRoles.student, this._syncID);
-			List<Canvas.Discussion> discussions = this._canvasHandler.GetDiscussions(this._courseID);
+			IEnumerable<Canvas.Discussion> discussions = this._canvasHandler.GetDiscussions(this._courseID);
 
 			this.RegisterDiscusions(discussions, students);
 

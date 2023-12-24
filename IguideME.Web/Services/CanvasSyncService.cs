@@ -82,7 +82,7 @@ namespace IguideME.Web.Services
             long timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
             // Renew the connection with canvas.
-            _canvasHandler.CreateConnection();
+            _canvasHandler.SyncInit();
 
             // Don't keep ancient syncs in the database.
             _databaseManager.CleanupSync(courseID);
