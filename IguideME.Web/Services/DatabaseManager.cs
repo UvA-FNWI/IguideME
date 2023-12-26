@@ -1136,17 +1136,13 @@ namespace IguideME.Web.Services
                 );
         }
 
-        public int CreateUserSubmission(
-            int assignmentID,
-            string userID,
-            double grade,
-            long date)
+        public int CreateUserSubmission(AssignmentSubmission submission)
         {
             return IDNonQuery(DatabaseQueries.REGISTER_USER_SUBMISSION,
-                    new SQLiteParameter("assignmentID", assignmentID),
-                    new SQLiteParameter("userID", userID),
-                    new SQLiteParameter("grade", grade),
-                    new SQLiteParameter("date", date)
+                    new SQLiteParameter("assignmentID", submission.AssignmentID),
+                    new SQLiteParameter("userID", submission.UserID),
+                    new SQLiteParameter("grade", submission.Grade),
+                    new SQLiteParameter("date", submission.Date)
                 );
         }
 

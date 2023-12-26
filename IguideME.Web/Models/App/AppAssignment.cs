@@ -9,9 +9,6 @@ namespace IguideME.Web.Models.App
         [JsonProperty("id")]
         public int ID { get; set; }
 
-        // [JsonProperty("assignment_id")]
-        // public string AssignmentID { get; set; }
-
         [JsonProperty("course_id")]
         public int CourseID { get; set; }
 
@@ -30,33 +27,26 @@ namespace IguideME.Web.Models.App
         [JsonProperty("max_grade")]
         public double MaxGrade { get; set; }
 
-        // [JsonProperty("position")]
-        // public int Position { get; set; }
-
         [JsonProperty("grading_type")]
         public GradingType GradingType { get; set; }
 
         public AppAssignment(
             int id,
-            // string assignmentID,
             int courseID,
             string title,
             bool published,
             bool muted,
             int dueDate,
             double maxGrade,
-            // int position,
             int gradingType)
         {
             this.ID = id;
-            // this.AssignmentID = assignmentID;
             this.CourseID = courseID;
             this.Title = title;
             this.Published = published;
             this.Muted = muted;
             this.DueDate = dueDate;
             this.MaxGrade = maxGrade;
-            // this.Position = position;
             this.GradingType = (GradingType)gradingType;
         }
 

@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 
 using IguideME.Web.Models;
-
+using IguideME.Web.Models.App;
 using Microsoft.Extensions.Logging;
-
-using Newtonsoft.Json;
-
-using UvA.DataNose.Connectors.Canvas;
 
 namespace IguideME.Web.Services.Workers
 {
@@ -52,25 +46,13 @@ namespace IguideME.Web.Services.Workers
 		/// </summary>
 		/// <param name="quiz">the quiz the submissions are associated to.</param>
 		/// <param name="entry">the tile entry the submissions are associated to.</param>
-		public void RegisterSubmissions(Quiz quiz, TileEntry entry)
+		public void RegisterSubmissions(IEnumerable<AssignmentSubmission> submissions, TileEntry entry)
 		{
-			IEnumerable<QuizSubmission> submissions = quiz.Submissions
-				.Where(submission =>
-					submission.Score != null &&
-					_databaseManager.GetConsentedStudentID(this._courseID, submission.UserID) != null
-				);
-
-			foreach (QuizSubmission sub in quiz.Submissions)
+			foreach (AssignmentSubmission sub in submissions)
 			{
 				// TODO: WE NEED TO CHANGE THE SUBMISSION IDs FROM EXTERNAL QUIZ ID TO INTERNAL ASSIGNMENT ID
-				sub.QuizID = _databaseManager.GetInternalAssignmentID(_courseID, sub.QuizID);
-
-				_databaseManager.CreateUserSubmission(
-					quiz.ID ?? -1, // TODO: handle properly when null
-					_databaseManager.GetConsentedStudentID(this._courseID, sub.UserID),
-					sub.Score ?? 0,
-					((DateTimeOffset)sub.FinishedDate.Value).ToUnixTimeMilliseconds()
-				);
+				sub.AssignmentID = _databaseManager.GetInternalAssignmentID(_courseID, sub.AssignmentID);
+				_databaseManager.CreateUserSubmission(sub);
 			}
 		}
 
@@ -82,7 +64,7 @@ namespace IguideME.Web.Services.Workers
 			_logger.LogInformation("Starting quiz registry...");
 
 			// Get the quizzes from canvas.
-			IEnumerable<Quiz> quizzes = this._canvasHandler.GetQuizzes(_courseID);
+			IEnumerable<(AppAssignment, IEnumerable<AssignmentSubmission>)> quizzes = this._canvasHandler.GetQuizzes(_courseID);
 			List<TileEntry> entries = _databaseManager.GetAllTileEntries(this._courseID);
 
 			// Get the consented users and only ask for their submissions
@@ -90,29 +72,17 @@ namespace IguideME.Web.Services.Workers
             // IEnumerable<SubmissionGroup> submissions = this._canvasHandler.GetQuizzes(this._courseID, users.Select(user => user.UserID).ToArray());
 
 			// Register the quizzes in the database.
-			foreach (Quiz quiz in quizzes)
+			foreach ((AppAssignment quiz, IEnumerable<AssignmentSubmission> submissions) in quizzes)
 			{
-				// Graded quizzes (assignment quizzes) are treated as assignments by canvas and will be handled in the assignment worker.
-				if (quiz.Type == QuizType.Assignment)
-					continue;
 
-				_logger.LogInformation("Processing quiz: {Name}", quiz.Name);
-				_databaseManager.RegisterAssignment(
-					quiz.ID,
-					quiz.CourseID,
-					quiz.Name,
-					quiz.IsPublished,
-					false,
-					quiz.DueDate.HasValue ? (int)((DateTimeOffset)quiz.DueDate.Value).ToUnixTimeSeconds() : 0,
-					quiz.PointsPossible ?? 0,
-					(int)GradingType.Points
-				);
+				_logger.LogInformation("Processing quiz: {Name}", quiz.Title);
+				_databaseManager.RegisterAssignment(quiz);
 
 				// Don't register submissions that aren't assigned to tiles (as entries).
 				TileEntry entry = entries.Find(e => e.ContentID == quiz.ID);
 				if (entry == null) continue;
 
-				this.RegisterSubmissions(quiz, entry);
+				this.RegisterSubmissions(submissions, entry);
 			}
 		}
 	}

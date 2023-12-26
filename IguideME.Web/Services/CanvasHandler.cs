@@ -73,7 +73,6 @@ namespace IguideME.Web.Services
             }
         }
 
-        // TODO: change all the functions to output our own objects, so not canvasUser but ourUSer etc.
         /// <inheritdoc />
         public string[] GetUserIDs(int courseID, string userID)
         {
@@ -82,20 +81,6 @@ namespace IguideME.Web.Services
             CanvasUser user = users.First(x => x.UserID == userID).User;
             return new string[]{user.LoginID, user.SISUserID, user.ID.ToString()};
         }
-
-        /// <summary>
-        /// Translate the sisID to the loginID. We use the latter throughout IguideME.
-        /// </summary>
-        /// <param name="courseID">The course the student is a part of.</param>
-        /// <param name="sisID">The sisID of the user.</param>
-        /// <returns>The loginID of the user.</returns>
-        public string TranslateSISToLoginID(int courseID, string sisID)
-        {
-            List<Enrollment> users = Connector.FindCourseById(courseID).Enrollments;
-            return users.First(x => x.User.SISUserID == sisID).User.LoginID;
-        }
-
-        // TODO: change many of these arrays to Enumerables.
 
         /// <inheritdoc />
         public IEnumerable<User> GetStudents(int courseID)
@@ -134,19 +119,46 @@ namespace IguideME.Web.Services
         }
 
         /// <inheritdoc />
-        public IEnumerable<SubmissionGroup> GetSubmissions(int courseID, string[] userIDs)
+        public IEnumerable<AssignmentSubmission> GetSubmissions(int courseID, string[] userIDs)
         {
             return Connector
                 .FindCourseById(courseID)
-                .GetSubmissions(userIDs, false);
+                .GetSubmissions(userIDs, false)
+                .SelectMany(group => group.Submissions)
+                .Select(sub => new AssignmentSubmission(
+                    -1,
+                    sub.AssignmentID,
+                    sub.User.SISUserID,
+                    null,
+                    sub.Grade,
+                    ((DateTimeOffset)sub.SubmittedAt.Value).ToUnixTimeMilliseconds()
+                ));
         }
 
         /// <inheritdoc />
-        public IEnumerable<Quiz> GetQuizzes(int courseID)
+        public IEnumerable<(AppAssignment, IEnumerable<AssignmentSubmission>)> GetQuizzes(int courseID)
         {
+			// Graded quizzes (assignment quizzes) are also treated as assignments by canvas and will be handled accordingly.
             return Connector
                 .FindCourseById(courseID)
-                .Quizzes;
+                .Quizzes
+                .Where(quiz => quiz.Type != QuizType.Assignment)
+                .Select(quiz => (
+                    new AppAssignment(
+                        quiz.ID ?? -1,
+                        courseID,
+                        quiz.Name,
+                        quiz.IsPublished,
+                        false,
+                        quiz.DueDate.HasValue ? (int)((DateTimeOffset)quiz.DueDate.Value).ToUnixTimeSeconds() : 0,
+                        quiz.PointsPossible ?? 0,
+                        (int)GradingType.Points
+                    ),
+                    quiz.Submissions
+                        .Where(sub => sub.Score != null)
+                        .Select(sub => new AssignmentSubmission(-1, quiz.ID ?? -1, sub.UserID.ToString(), sub.Score ?? 1, ((DateTimeOffset)sub.FinishedDate.Value).ToUnixTimeMilliseconds() ))
+                )
+            );
         }
 
         /// <inheritdoc />

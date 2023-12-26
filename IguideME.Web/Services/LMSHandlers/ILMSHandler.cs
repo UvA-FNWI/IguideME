@@ -46,7 +46,7 @@ namespace IguideME.Web.Services.LMSHandlers
         /// </summary>
         /// <param name="courseID">The id of the course the quizzes are from.</param>
         /// <returns>A list of quizzes.</returns>
-		IEnumerable<AppAssignment> GetQuizzes(int courseID);
+		IEnumerable<(AppAssignment, IEnumerable<AssignmentSubmission>)> GetQuizzes(int courseID);
 
         /// <summary>
         /// Gets all the submissions for a list of (consented) students for a course from the LMS.

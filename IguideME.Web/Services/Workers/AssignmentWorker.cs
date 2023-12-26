@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-
-using GraphQL;
-
 using IguideME.Web.Models;
 using IguideME.Web.Models.App;
 using Microsoft.Extensions.Logging;
@@ -78,55 +74,44 @@ namespace IguideME.Web.Services.Workers
         /// </summary>
         /// <param name="assignment">the assignment the submissions are associated to.</param>
         /// <param name="entry">the tile entry the submissions are associated to.</param>
-        private void RegisterSubmissions(IEnumerable<SubmissionGroup> submissionGroups, Dictionary<int, GradingType> gradingTypes)
+        private void RegisterSubmissions(IEnumerable<AssignmentSubmission> submissions, Dictionary<int, GradingType> gradingTypes)
         {
             GradingType type;
-            foreach (SubmissionGroup group in submissionGroups)
+            foreach (AssignmentSubmission submission in submissions)
             {
+                // WE NEED TO CHANGE THE SUBMISSION IDs FROM EXTERNAL ASSIGNMENT ID TO INTERNAL ASSIGNMENT ID
+                submission.AssignmentID = _databaseManager.GetInternalAssignmentID(_courseID, submission.AssignmentID);
 
-                foreach (Submission submission in group.Submissions)
+                if (gradingTypes.TryGetValue(submission.AssignmentID, out type))
                 {
-                    // WE NEED TO CHANGE THE SUBMISSION IDs FROM EXTERNAL ASSIGNMENT ID TO INTERNAL ASSIGNMENT ID
-                    submission.AssignmentID = _databaseManager.GetInternalAssignmentID(_courseID, submission.AssignmentID);
 
-                    if (gradingTypes.TryGetValue(submission.AssignmentID, out type))
+                    switch (gradingTypes[submission.AssignmentID])
                     {
-
-                        double grade;
-
-                        switch (gradingTypes[submission.AssignmentID])
-                        {
-                            case GradingType.Points:
-                                // grade = (double.Parse(submission.Grade) - 1)/0.09; // should switch to this
-                                grade = double.Parse(submission.Grade);
-                                break;
-                            case GradingType.Percentage:
-                                grade = double.Parse(submission.Grade);
-                                break;
-                            case GradingType.GPA:
-                            case GradingType.Letters:
-                                grade = LetterToGrade(submission.Grade);
-                                break;
-                            case GradingType.PassFail:
-                                _logger.LogInformation("passfail text: {Grade}", submission.Grade);
-                                grade = submission.Grade == "PASS" ? 100 : 0;
-                                break;
-                            case GradingType.NotGraded:
-                                grade = -1;
-                                break;
-                            default:
-                                grade = -1;
-                                _logger.LogWarning("Grade format {Type} is not supported, grade = {Grade}, treating as not graded...", gradingTypes[submission.AssignmentID], submission.Grade);
-                                break;
-                        }
-
-                        _databaseManager.CreateUserSubmission(
-                                submission.AssignmentID,
-                                submission.User.LoginID,
-                                grade,
-                                ((DateTimeOffset)submission.SubmittedAt.Value).ToUnixTimeMilliseconds()
-                                );
+                        case GradingType.Points:
+                            // submissions.Grade = (double.Parse(submission.RawGrade) - 1)/0.09; // should switch to this
+                            submission.Grade = double.Parse(submission.RawGrade);
+                            break;
+                        case GradingType.Percentage:
+                            submission.Grade = double.Parse(submission.RawGrade);
+                            break;
+                        case GradingType.GPA:
+                        case GradingType.Letters:
+                            submission.Grade = LetterToGrade(submission.RawGrade);
+                            break;
+                        case GradingType.PassFail:
+                            _logger.LogInformation("passfail text: {Grade}", submission.RawGrade);
+                            submission.Grade = submission.RawGrade == "PASS" ? 100 : 0;
+                            break;
+                        case GradingType.NotGraded:
+                            submission.Grade = -1;
+                            break;
+                        default:
+                            submission.Grade = -1;
+                            _logger.LogWarning("Grade format {Type} is not supported, submissions.Grade = {Grade}, treating as not graded...", gradingTypes[submission.AssignmentID], submission.RawGrade);
+                            break;
                     }
+
+                    _databaseManager.CreateUserSubmission(submission);
                 }
             }
         }
@@ -144,7 +129,7 @@ namespace IguideME.Web.Services.Workers
 
             // Get the consented users and only ask for their submissions
             List<Models.Impl.User> users = _databaseManager.GetUsersWithGrantedConsent(this._courseID);
-            IEnumerable<SubmissionGroup> submissions = this._canvasHandler.GetSubmissions(this._courseID, users.Select(user => user.UserID).ToArray());
+            IEnumerable<AssignmentSubmission> submissions = this._canvasHandler.GetSubmissions(this._courseID, users.Select(user => user.UserID).ToArray());
 
             Dictionary<int, GradingType> gradingTypes = new();
 
