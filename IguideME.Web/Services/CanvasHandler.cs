@@ -1,16 +1,22 @@
 ﻿using Microsoft.Extensions.Configuration;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UvA.DataNose.Connectors.Canvas;
 using Microsoft.Extensions.Logging;
+using IguideME.Web.Services.LMSHandlers;
+using IguideME.Web.Models.App;
+using IguideME.Web.Models.Impl;
+
+using User = IguideME.Web.Models.Impl.User;
+using CanvasUser = UvA.DataNose.Connectors.Canvas.User;
+using System;
 
 namespace IguideME.Web.Services
 {
     /// <summary>
     /// Class <a>CanvasHandler</a> models a singelton service that handles the communication with Canvas LMS..
     /// </summary>
-    public class CanvasHandler
+    public class CanvasHandler : ILMSHandler 
     {
         private readonly ILogger<SyncManager> _logger;
         public CanvasApiConnector Connector;
@@ -69,11 +75,12 @@ namespace IguideME.Web.Services
 
         // TODO: change all the functions to output our own objects, so not canvasUser but ourUSer etc.
         /// <inheritdoc />
-        public User GetUser(int courseID, string userID)
+        public string[] GetUserIDs(int courseID, string userID)
         {
             _logger.LogInformation("Trying to get user\ncourseID: {courseID}, userID: {userID}", courseID, userID);
             List<Enrollment> users = Connector.FindCourseById(courseID).Enrollments;
-            return users.First(x => x.UserID == userID).User;
+            CanvasUser user = users.First(x => x.UserID == userID).User;
+            return new string[]{user.LoginID, user.SISUserID, user.ID.ToString()};
         }
 
         /// <summary>
@@ -91,27 +98,39 @@ namespace IguideME.Web.Services
         // TODO: change many of these arrays to Enumerables.
 
         /// <inheritdoc />
-        public User[] GetStudents(int courseID)
+        public IEnumerable<User> GetStudents(int courseID)
         {
             Course course = Connector.FindCourseById(courseID);
-            User[] students = course.GetUsersByType(EnrollmentType.Student).ToArray();
-            return students;
+            IEnumerable<CanvasUser> students = course.GetUsersByType(EnrollmentType.Student).ToArray();
+            
+            return students.Select(student => new User(student.SISUserID, courseID, student.ID.Value, student.Name, student.SortableName, (int) UserRoles.student));
         }
 
         /// <inheritdoc />
-        public User[] GetAdministrators(int courseID)
+        public IEnumerable<User> GetAdministrators(int courseID)
         {
-            return Connector.FindCourseById(courseID).GetUsersByType(EnrollmentType.Teacher).ToArray();
+            IEnumerable<CanvasUser> admins = Connector.FindCourseById(courseID).GetUsersByType(EnrollmentType.Teacher).ToArray();
+            return admins.Select(admin => new User(admin.SISUserID, courseID, admin.ID.Value, admin.Name, admin.SortableName, (int) UserRoles.instructor));
         }
 
         /// <inheritdoc />
-        public IEnumerable<Assignment> GetAssignments(int courseID)
+        public IEnumerable<AppAssignment> GetAssignments(int courseID)
         {
             return Connector
                 .FindCourseById(courseID)
                 .Assignments
                 .Where(assignment => assignment != null)
-                .OrderBy(a => a.Position);
+                .OrderBy(a => a.Position)
+
+                .Select(ass => new AppAssignment(
+                ass.ID.Value,
+                courseID,
+                ass.Name,
+                ass.IsPublished,
+                ass.IsMuted,
+                ass.DueDate.HasValue ? (int)((DateTimeOffset) ass.DueDate.Value).ToUnixTimeSeconds() : 0,
+                ass.PointsPossible ??= 0,
+                (int) ass.GradingType));
         }
 
         /// <inheritdoc />

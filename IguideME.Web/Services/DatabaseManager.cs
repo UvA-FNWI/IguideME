@@ -440,42 +440,29 @@ namespace IguideME.Web.Services
             return dates;
         }
 
-        public void RegisterUser(
-            int? studentnumber,
-            string userID,
-            string name,
-            string sortableName,
-            int role)
+        public void RegisterUser(User user)
         {
             NonQuery(DatabaseQueries.REGISTER_USER_FOR_COURSE,
-                    new SQLiteParameter("studentnumber", studentnumber),
-                    new SQLiteParameter("userID", userID),
-                    new SQLiteParameter("name", name),
-                    new SQLiteParameter("sortableName", sortableName),
-                    new SQLiteParameter("role", role)
+                    new SQLiteParameter("studentnumber", user.StudentNumber),
+                    new SQLiteParameter("userID", user.UserID),
+                    new SQLiteParameter("name", user.Name),
+                    new SQLiteParameter("sortableName", user.SortableName),
+                    new SQLiteParameter("role", user.Role)
                     );
         }
 
-        public void RegisterAssignment(
-            int? assignmentID,
-            int courseID,
-            string title,
-            bool published,
-            bool muted,
-            int dueDate,
-            double? maxGrade,
-            int gradingType)
+        public void RegisterAssignment(AppAssignment assignment)
         {
             NonQuery(
                 DatabaseQueries.REGISTER_ASSIGNMENT,
-                new SQLiteParameter("assignmentID", assignmentID.ToString()),
-                new SQLiteParameter("courseID", courseID),
-                new SQLiteParameter("title", title),
-                new SQLiteParameter("published", published),
-                new SQLiteParameter("muted", muted),
-                new SQLiteParameter("dueDate", dueDate),
-                new SQLiteParameter("maxGrade", maxGrade),
-                new SQLiteParameter("gradingType", gradingType)
+                new SQLiteParameter("assignmentID", assignment.ID),
+                new SQLiteParameter("courseID", assignment.CourseID),
+                new SQLiteParameter("title", assignment.Title),
+                new SQLiteParameter("published", assignment.Published),
+                new SQLiteParameter("muted", assignment.Muted),
+                new SQLiteParameter("dueDate", assignment.DueDate),
+                new SQLiteParameter("maxGrade", assignment.MaxGrade),
+                new SQLiteParameter("gradingType", assignment.GradingType)
             );
         }
 

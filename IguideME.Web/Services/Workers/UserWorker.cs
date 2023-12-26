@@ -1,8 +1,7 @@
 ﻿using System;
-
+using System.Collections.Generic;
+using IguideME.Web.Models.Impl;
 using Microsoft.Extensions.Logging;
-
-using UvA.DataNose.Connectors.Canvas;
 
 using UserRoles = IguideME.Web.Models.Impl.UserRoles;
 
@@ -45,7 +44,7 @@ namespace IguideME.Web.Services.Workers
         /// Registers the given students and initializes their settings in the database.
         /// </summary>
         /// <param name="students">list of students to be registered.</param>
-        private void InitializeStudents(User[] students)
+        private void InitializeStudents(IEnumerable<User> students)
         {
 
             foreach (User student in students)
@@ -53,15 +52,9 @@ namespace IguideME.Web.Services.Workers
                 // _logger.LogInformation("Processing student {ID}...", student.ID);
                 try
                 {
-                    _databaseManager.RegisterUser(
-                        student.ID,
-                        student.LoginID,
-                        student.Name,
-                        student.SortableName,
-                        (int)UserRoles.student
-                    );
+                    _databaseManager.RegisterUser(student);
 
-                    _databaseManager.InitializeUserSettings(_courseID, student.LoginID, this._syncID);
+                    _databaseManager.InitializeUserSettings(_courseID, student.UserID, this._syncID);
 
                 }
                 catch (Exception e)
@@ -75,19 +68,13 @@ namespace IguideME.Web.Services.Workers
         /// Registers the given students in the database.
         /// </summary>
         /// <param name="instructors">list of instructors to be registered.</param>
-        private void RegisterInstructors(User[] instructors)
+        private void RegisterInstructors(IEnumerable<User> instructors)
         {
-            foreach (var instructor in instructors)
+            foreach (User instructor in instructors)
             {
-                _logger.LogInformation("Processing instructor {ID} ...", instructor.ID);
+                _logger.LogInformation("Processing instructor {ID} ...", instructor.UserID);
 
-                _databaseManager.RegisterUser(
-                    instructor.ID,
-                    instructor.LoginID,
-                    instructor.Name,
-                    instructor.SortableName,
-                    (int)UserRoles.instructor
-                );
+                _databaseManager.RegisterUser(instructor);
             }
         }
 
@@ -98,15 +85,15 @@ namespace IguideME.Web.Services.Workers
         {
             _logger.LogInformation("Starting user registry...");
 
-            User[] students = this._canvasHandler.GetStudents(this._courseID);
+            IEnumerable<User> students = this._canvasHandler.GetStudents(this._courseID);
 
-            _logger.LogInformation("Starting student registry, about to process {StudentCount} students...", students.Length);
+            _logger.LogInformation("Starting student registry, about to process students...");
 
             this.InitializeStudents(students);
 
             var instructors = this._canvasHandler.GetAdministrators(_courseID);
 
-            _logger.LogInformation("Starting instructor registry, about to process {InstructorCount} instructurs...", instructors.Length);
+            _logger.LogInformation("Starting instructor registry, about to process instructurs...");
 
             this.RegisterInstructors(instructors);
         }

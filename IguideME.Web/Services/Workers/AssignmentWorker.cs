@@ -5,7 +5,7 @@ using System.Linq;
 using GraphQL;
 
 using IguideME.Web.Models;
-
+using IguideME.Web.Models.App;
 using Microsoft.Extensions.Logging;
 
 using UvA.DataNose.Connectors.Canvas;
@@ -139,7 +139,7 @@ namespace IguideME.Web.Services.Workers
             _logger.LogInformation("Starting assignment registry...");
 
             // Get the assignments from canvas.
-            IEnumerable<Assignment> assignments = this._canvasHandler.GetAssignments(this._courseID);
+            IEnumerable<AppAssignment> assignments = this._canvasHandler.GetAssignments(this._courseID);
             List<TileEntry> entries = _databaseManager.GetAllTileEntries(this._courseID);
 
             // Get the consented users and only ask for their submissions
@@ -148,26 +148,17 @@ namespace IguideME.Web.Services.Workers
 
             Dictionary<int, GradingType> gradingTypes = new();
 
-            foreach (Assignment assignment in assignments)
+            foreach (AppAssignment assignment in assignments)
             {
-                _logger.LogInformation("Processing assignment: {Name}", assignment.Name);
+                _logger.LogInformation("Processing assignment: {Name}", assignment.Title);
 
-                _databaseManager.RegisterAssignment(
-                    assignment.ID,
-                    assignment.CourseID,
-                    assignment.Name ??= "?",
-                    assignment.IsPublished,
-                    assignment.IsMuted,
-                    assignment.DueDate.HasValue ? (int)((DateTimeOffset)assignment.DueDate.Value).ToUnixTimeSeconds() : 0,
-                    assignment.PointsPossible ??= 0,
-                    (int)assignment.GradingType
-                );
+                _databaseManager.RegisterAssignment(assignment);
 
                 // Don't register submissions that aren't assigned to tiles (as entries).
                 TileEntry entry = entries.Find(e => e.ContentID == assignment.ID);
-                if (entry == null || assignment.ID == null) continue;
+                if (entry == null) continue;
 
-                gradingTypes.Add(assignment.ID.Value, assignment.GradingType);
+                gradingTypes.Add(assignment.ID, assignment.GradingType);
 
             }
 

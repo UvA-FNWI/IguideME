@@ -147,14 +147,14 @@ string GetUserID(string userid, string course) {
     }
     // Try's to find the user in canvas.
 
-    UvA.DataNose.Connectors.Canvas.User user = app.Services.GetService<CanvasHandler>().GetUser(courseid, userid);
+    string[] ids = app.Services.GetService<CanvasHandler>().GetUserIDs(courseid, userid);
 
-    if (!String.IsNullOrEmpty(user.SISUserID)) {
-        return user.SISUserID;
+    foreach (string lmsid in ids) {
+        if (!String.IsNullOrEmpty(lmsid)) {
+            return lmsid;
+        }
     }
-    if (!String.IsNullOrEmpty(user.LoginID)) {
-        return user.LoginID;
-    }
+
     return userid;
 }
 

@@ -18,7 +18,7 @@ namespace IguideME.Web.Services.LMSHandlers
         /// <param name="courseID">The course to get the user from.</param>
         /// <param name="userID">The id of the user.</param>
         /// <returns>The requested user if found.</returns>
-		User GetUser(int courseID, string userID);
+		string[] GetUserIDs(int courseID, string userID);
 
         /// <summary>
         /// Get all the users with the student role for a course.

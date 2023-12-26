@@ -28,7 +28,7 @@ namespace IguideME.Web.Models.App
         public int DueDate { get; set; }
 
         [JsonProperty("max_grade")]
-        public float MaxGrade { get; set; }
+        public double MaxGrade { get; set; }
 
         // [JsonProperty("position")]
         // public int Position { get; set; }
@@ -44,7 +44,7 @@ namespace IguideME.Web.Models.App
             bool published,
             bool muted,
             int dueDate,
-            float maxGrade,
+            double maxGrade,
             // int position,
             int gradingType)
         {
