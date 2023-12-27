@@ -5,13 +5,14 @@ using Microsoft.Extensions.Logging;
 using System.Threading;
 using System.Threading.Tasks;
 using IguideME.Web.Models.Service;
+using IguideME.Web.Services.LMSHandlers;
 
 namespace IguideME.Web.Services
 {
     public class SyncManager : IHostedService, IDisposable
     {
         private int _executionCount = 0;
-        private readonly CanvasHandler _canvasHandler;
+        private readonly ILMSHandler _canvasHandler;
         private readonly DatabaseManager _databaseManager;
 
         private readonly ILogger<SyncManager> _logger;
@@ -24,7 +25,7 @@ namespace IguideME.Web.Services
             IComputationJobStatusService computationJobStatus,
             IQueuedBackgroundService queuedBackgroundService,
             DatabaseManager databaseManager,
-            CanvasHandler canvasHandler)
+            ILMSHandler canvasHandler)
         {
             _logger = logger;
             _canvasHandler = canvasHandler;

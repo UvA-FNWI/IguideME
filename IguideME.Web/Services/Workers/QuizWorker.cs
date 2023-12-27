@@ -2,6 +2,7 @@
 
 using IguideME.Web.Models;
 using IguideME.Web.Models.App;
+using IguideME.Web.Services.LMSHandlers;
 using Microsoft.Extensions.Logging;
 
 namespace IguideME.Web.Services.Workers
@@ -12,7 +13,7 @@ namespace IguideME.Web.Services.Workers
 	public class QuizWorker : IWorker
 	{
 		readonly private ILogger<SyncManager> _logger;
-		readonly private CanvasHandler _canvasHandler;
+		readonly private ILMSHandler _canvasHandler;
 		private readonly DatabaseManager _databaseManager;
 
 		readonly private int _courseID;
@@ -29,7 +30,7 @@ namespace IguideME.Web.Services.Workers
 		public QuizWorker(
 			int courseID,
 			long syncID,
-			CanvasHandler canvasHandler,
+			ILMSHandler canvasHandler,
 			DatabaseManager databaseManager,
 			ILogger<SyncManager> logger)
 

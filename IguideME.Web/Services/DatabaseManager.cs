@@ -466,20 +466,20 @@ namespace IguideME.Web.Services
             );
         }
 
-        public void RegisterDiscussion(Discussion discussion, long syncID)
+        public void RegisterDiscussion(AppDiscussion discussion, long syncID)
         {
             NonQuery(
                 DatabaseQueries.REGISTER_DISCUSSION,
                 new SQLiteParameter("discussionID", discussion.ID),
                 new SQLiteParameter("courseID", discussion.CourseID),
                 new SQLiteParameter("title", discussion.Title),
-                new SQLiteParameter("authorName", discussion.UserName),
-                new SQLiteParameter("date", discussion.PostedAt.HasValue ? (int)((DateTimeOffset)discussion.PostedAt.Value).ToUnixTimeSeconds() : 0),
+                new SQLiteParameter("authorName", discussion.Author),
+                new SQLiteParameter("date", discussion.Date),
                 new SQLiteParameter("message", discussion.Message)
             );
         }
 
-        public void UpdateDiscussion(Discussion discussion, int tileID, long syncID)
+        public void UpdateDiscussion(AppDiscussion discussion, int tileID, long syncID)
         {
             // I think that this is only to tie the discussion to the tile.
             // If that's so, then this is the wrong query, we just have to create a tile entry with this discussion id
@@ -488,8 +488,8 @@ namespace IguideME.Web.Services
                 new SQLiteParameter("discussionID", discussion.ID),
                 new SQLiteParameter("courseID", discussion.CourseID),
                 new SQLiteParameter("title", discussion.Title),
-                new SQLiteParameter("authorName", discussion.UserName),
-                new SQLiteParameter("date", discussion.PostedAt),
+                new SQLiteParameter("authorName", discussion.Author),
+                new SQLiteParameter("date", discussion.Date),
                 new SQLiteParameter("message", discussion.Message)
                 // new SQLiteParameter("message", discussion.Message.Replace("'", "''")),
                 // new SQLiteParameter("tileID", tileID)
@@ -509,18 +509,13 @@ namespace IguideME.Web.Services
             );
         }
 
-        public void RegisterDiscussionReply(DiscussionReply reply, int discussionID, string userID)
+        public void RegisterDiscussionReply(AppDiscussion reply)
         {
-            if (discussionID == -1)
-            {
-                return;
-            }
-
             NonQuery(
                 DatabaseQueries.REGISTER_DISCUSSION_REPLY,
-                new SQLiteParameter("entryID", discussionID),
-                new SQLiteParameter("userID", userID),
-                new SQLiteParameter("date", reply.CreatedAt),
+                new SQLiteParameter("entryID", reply.ParentID),
+                new SQLiteParameter("userID", reply.Author),
+                new SQLiteParameter("date", reply.Date),
                 new SQLiteParameter("message", reply.Message)
             );
         }

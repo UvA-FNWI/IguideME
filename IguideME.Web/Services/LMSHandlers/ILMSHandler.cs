@@ -13,6 +13,14 @@ namespace IguideME.Web.Services.LMSHandlers
 		void SyncInit();
 
         /// <summary>
+        /// Sends a message to a user.
+        /// </summary>
+        /// <param name="userID">The id of the user to send the message to.</param>
+        /// <param name="subject">The subject of the conversation.</param>
+        /// <param name="body">The message to be send.</param>
+        public void SendMessage(string userID, string subject, string body);
+
+        /// <summary>
         /// Get a user for a course.
         /// </summary>
         /// <param name="courseID">The course to get the user from.</param>
@@ -61,6 +69,6 @@ namespace IguideME.Web.Services.LMSHandlers
         /// </summary>
         /// <param name="courseID">The id of the course the quizzes are from.</param>
         /// <returns>A list of discussions.</returns>
-		IEnumerable<AppDiscussion> AppDiscussions(int courseID);
+		IEnumerable<AppDiscussion> GetDiscussions(int courseID);
 	}
 }

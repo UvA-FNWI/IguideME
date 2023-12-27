@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using IguideME.Web.Models.Impl;
+using IguideME.Web.Services.LMSHandlers;
 using Microsoft.Extensions.Logging;
-
-using UserRoles = IguideME.Web.Models.Impl.UserRoles;
 
 namespace IguideME.Web.Services.Workers
 {
@@ -13,7 +12,7 @@ namespace IguideME.Web.Services.Workers
     public class UserWorker : IWorker
     {
         readonly private ILogger<SyncManager> _logger;
-        readonly private CanvasHandler _canvasHandler;
+        readonly private ILMSHandler _canvasHandler;
         readonly private DatabaseManager _databaseManager;
         readonly private int _courseID;
         readonly private long _syncID;
@@ -29,7 +28,7 @@ namespace IguideME.Web.Services.Workers
         public UserWorker(
             int courseID,
             long syncID,
-            CanvasHandler canvasHandler,
+            ILMSHandler canvasHandler,
             DatabaseManager databaseManager,
             ILogger<SyncManager> logger)
         {

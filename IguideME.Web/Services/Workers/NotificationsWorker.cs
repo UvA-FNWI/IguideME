@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using IguideME.Web.Models;
 using IguideME.Web.Models.App;
 using IguideME.Web.Models.Impl;
-
+using IguideME.Web.Services.LMSHandlers;
 using Microsoft.Extensions.Logging;
 
 namespace IguideME.Web.Services.Workers
@@ -15,7 +15,7 @@ namespace IguideME.Web.Services.Workers
     public class NotificationsWorker : IWorker
     {
         readonly private ILogger<SyncManager> _logger;
-        readonly private CanvasHandler _canvasHandler;
+        readonly private ILMSHandler _canvasHandler;
         readonly private DatabaseManager _databaseManager;
 
         readonly private bool _sendNotifications;
@@ -35,7 +35,7 @@ namespace IguideME.Web.Services.Workers
         public NotificationsWorker(
             int courseID,
             long syncID,
-            CanvasHandler canvasHandler,
+            ILMSHandler canvasHandler,
             DatabaseManager databaseManager,
             bool sendNotifications,
             ILogger<SyncManager> logger)

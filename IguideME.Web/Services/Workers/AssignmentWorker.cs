@@ -2,6 +2,7 @@
 using System.Linq;
 using IguideME.Web.Models;
 using IguideME.Web.Models.App;
+using IguideME.Web.Services.LMSHandlers;
 using Microsoft.Extensions.Logging;
 
 using UvA.DataNose.Connectors.Canvas;
@@ -15,7 +16,7 @@ namespace IguideME.Web.Services.Workers
     public class AssignmentWorker : IWorker
     {
         readonly private ILogger<SyncManager> _logger;
-        readonly private CanvasHandler _canvasHandler;
+        readonly private ILMSHandler _canvasHandler;
         private readonly DatabaseManager _databaseManager;
 
         readonly private int _courseID;
@@ -32,7 +33,7 @@ namespace IguideME.Web.Services.Workers
         public AssignmentWorker(
             int courseID,
             long syncID,
-            CanvasHandler canvasHandler,
+            ILMSHandler canvasHandler,
             DatabaseManager databaseManager,
             ILogger<SyncManager> logger)
         {

@@ -37,6 +37,7 @@ namespace IguideME.Web.Services
             this.SyncInit();
         }
 
+        /// <inheritdoc />
         /// <summary>
         /// Creates or renews a connection with canvas. We always initialize and keep one because we communicate with canvas outside of syncs as well.
         /// </summary>
@@ -45,12 +46,7 @@ namespace IguideME.Web.Services
             this.Connector = new CanvasApiConnector(this.BaseUrl, this.AccessToken);
         }
 
-        /// <summary>
-        /// Sends a message to a user.
-        /// </summary>
-        /// <param name="userID">The id of the user to send the message to.</param>
-        /// <param name="subject">The subject of the conversation.</param>
-        /// <param name="body">The message to be send.</param>
+        /// <inheritdoc />
         public void SendMessage(string userID, string subject, string body)
         {
             try
@@ -150,7 +146,7 @@ namespace IguideME.Web.Services
                         quiz.Name,
                         quiz.IsPublished,
                         false,
-                        quiz.DueDate.HasValue ? (int)((DateTimeOffset)quiz.DueDate.Value).ToUnixTimeSeconds() : 0,
+                        quiz.DueDate.HasValue ? (int)((DateTimeOffset)quiz.DueDate.Value).ToUnixTimeSeconds() : 0, // TODO: should this be seconds or milliseconds?
                         quiz.PointsPossible ?? 0,
                         (int)GradingType.Points
                     ),
@@ -162,11 +158,44 @@ namespace IguideME.Web.Services
         }
 
         /// <inheritdoc />
-        public IEnumerable<Discussion> GetDiscussions(int courseID)
+        public IEnumerable<AppDiscussion> GetDiscussions(int courseID)
         {
             return Connector
                 .FindCourseById(courseID)
-                .Discussions;
+                .Discussions.SelectMany(topic => 
+                    topic.Entries.SelectMany(entry => 
+                        entry.Replies.Select(reply => new AppDiscussion(
+                            Discussion_type.Reply,
+                            reply.ID ?? -1,
+                            entry.ID ?? -1,
+                            courseID,
+                            topic.Title,
+                            reply.UserID.ToString(),
+                            ((DateTimeOffset) reply.CreatedAt.Value).ToUnixTimeMilliseconds(),
+                            reply.Message
+                        ))
+                        .Append(new AppDiscussion(
+                            Discussion_type.Entry,
+                            entry.ID ?? -1,
+                            topic.ID ?? -1,
+                            courseID,
+                            topic.Title,
+                            entry.UserID.ToString(),
+                            ((DateTimeOffset) entry.CreatedAt).ToUnixTimeMilliseconds(),
+                            entry.Message
+                        ))
+                    )
+                    .Append(new AppDiscussion(
+                        Discussion_type.Topic,
+                        topic.ID ?? -1,
+                        -1,
+                        courseID,
+                        topic.Title,
+                        topic.UserName,
+                        ((DateTimeOffset) topic.PostedAt).ToUnixTimeMilliseconds(),
+                        topic.Message
+                    ))
+                );
         }
     }
 }

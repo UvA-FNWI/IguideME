@@ -318,18 +318,18 @@ namespace IguideME.Web.Services.Workers
 
 
                         // Create one list with all the submission grades and one more without the most recent submission
-                        List<float> currentSubmissionGrades = new();
-                        List<float> lastSubmissionGrades = new();
+                        List<double> currentSubmissionGrades = new();
+                        List<double> lastSubmissionGrades = new();
                         foreach (AssignmentSubmission submission in userTileSubmissions)
                         {
-                            currentSubmissionGrades.Add(submission.Grade);
+                            currentSubmissionGrades.Add(submission.Grade.Value);
                             if (submission.ID != lastSubmissionID)
-                                lastSubmissionGrades.Add(submission.Grade);
+                                lastSubmissionGrades.Add(submission.Grade.Value);
                         }
 
-                        float currentAverage = -1;
-                        float lastAverage = -1;
-                        float peerAverage = -1;
+                        double currentAverage = -1;
+                        double lastAverage = -1;
+                        double peerAverage = -1;
                         // Store the three important Averages in variables
                         if (currentSubmissionGrades.Count != 0)
                             currentAverage = currentSubmissionGrades.Average();

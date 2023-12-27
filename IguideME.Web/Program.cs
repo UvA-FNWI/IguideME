@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 using UserRoles = IguideME.Web.Models.Impl.UserRoles;
+using IguideME.Web.Services.LMSHandlers;
 
 
 // //======================== Builder configuration =========================//
@@ -109,7 +110,7 @@ builder.Services.Configure<KestrelServerOptions>(options => options.AllowSynchro
 builder.Services.Configure<IISServerOptions>(options => options.AllowSynchronousIO = true);
 
 builder.Services.AddControllersWithViews();
-builder.Services.AddSingleton<CanvasHandler>();
+builder.Services.AddSingleton<ILMSHandler, CanvasHandler>();
 builder.Services.AddSingleton<DatabaseManager>(_ => DatabaseManager.GetInstance());
 
 builder.Services.AddHttpClient();

@@ -36,7 +36,7 @@ namespace IguideME.Web.Models.App
         public string Author { get; set; }
 
         [JsonProperty("date")]
-        public int Date { get; set; }
+        public long Date { get; set; }
 
         [JsonProperty("message")]
         public string Message { get; set; }
@@ -49,7 +49,7 @@ namespace IguideME.Web.Models.App
             int courseID,
             string title,
             string author,
-            int date,
+            long date,
             string message)
         {
             this.ID = id;

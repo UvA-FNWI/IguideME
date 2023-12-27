@@ -18,7 +18,7 @@ namespace IguideME.Web.Models.App
         [JsonProperty(PropertyName = "grade")]
         public double? Grade { get; set; }
 
-        public string? RawGrade { get; set; }
+        public string RawGrade { get; set; }
 
         [JsonProperty(PropertyName = "date")]
         public long Date { get; set; }
@@ -31,7 +31,7 @@ namespace IguideME.Web.Models.App
             int assignmentID,
             string userID,
             double? grade,
-            string? rawGrade,
+            string rawGrade,
             long date)
         {
             ID = id;

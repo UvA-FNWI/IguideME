@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using IguideME.Web.Models.Service;
+using IguideME.Web.Services.LMSHandlers;
 using IguideME.Web.Services.Workers;
 
 using Microsoft.Extensions.Logging;
@@ -34,7 +35,7 @@ namespace IguideME.Web.Services
     {
         private readonly ILogger<SyncManager> _logger;
         private readonly IComputationJobStatusService _computationJobStatus;
-        private readonly CanvasHandler _canvasHandler;
+        private readonly ILMSHandler _canvasHandler;
         private readonly DatabaseManager _databaseManager;
         private WorkerStatus workerStatus;
 
@@ -47,7 +48,7 @@ namespace IguideME.Web.Services
         /// <param name="logger"></param>
         public CanvasSyncService(
             IComputationJobStatusService computationJobStatus,
-            CanvasHandler canvasHandler,
+            ILMSHandler canvasHandler,
             DatabaseManager databaseManager,
             ILogger<SyncManager> logger)
         {
