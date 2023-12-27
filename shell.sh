@@ -17,6 +17,7 @@ alias iguideme-add-package='yarn --cwd $PROJECT_ROOT/IguideME.Web/Frontend add'
 # alias frontend-prod='yarn --cwd $PROJECT_ROOT/IguideME.Web/Frontend build'
 alias backend-dev='dotnet watch --project $PROJECT_ROOT/IguideME.Web/ --no-hot-reload';
 alias enter-db='litecli $PROJECT_ROOT/IguideME.Web/db.sqlite';
+alias bright-db='litecli $PROJECT_ROOT/IguideME.Web/brightspace.db';
 alias logs='kubectl logs $KUBECTL_PROJ_ID -n iguideme';
 alias refresh-logs='KUBECTL_PROJ_ID=$(kubectl get pods -n iguideme | grep Running | awk '\''{print $1}'\'')'
 alias h='display_help';
@@ -35,6 +36,7 @@ display_help () {
   echo "  ---administrative---------------------------------------------";
   echo "  kill-process              kill a process by name";
   echo "  enter-db                  enter the database";
+  echo "  bright-db                  enter the brightspace database";
   echo "  logs                      view production logs";
   echo "  refresh-logs              refresh pod name for logs";
   echo "                                          ";
