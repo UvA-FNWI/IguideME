@@ -8,32 +8,37 @@ using IguideME.Web.Models.Impl;
 using Microsoft.Extensions.Logging;
 using IguideME.Web.Services.LMSHandlers;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.Configuration;
 
 namespace IguideME.Web.Services
 {
 
     public sealed class BrightspaceManager :  ILMSHandler
     {
-        private static BrightspaceManager s_instance;
+        // private static BrightspaceManager s_instance;
         private readonly string _connection_string;
         private readonly ILogger _logger;
 
-        private BrightspaceManager(bool isDev = false)
+        private BrightspaceManager(IConfiguration config, ILogger<SyncManager> logger)
         {
-            s_instance = this;
-            _connection_string = isDev ? "Data Source=brightspace.db;Version=3;New=False;Compress=True;"
-                                      : "Data Source=/data/IguideME.db;Version=3;New=False;Compress=True;";
-
-            ILoggerFactory factory = LoggerFactory.Create(builder => builder.AddConsole());
-            _logger = factory.CreateLogger("BrightspaceManager");
+            // s_instance = this;
+            // _connection_string = isDev ? "Data Source=brightspace.db;Version=3;New=False;Compress=True;"
+            //                           : "Data Source=/data/IguideME.db;Version=3;New=False;Compress=True;";
+            _connection_string = config["Brightspace:Connection"];
+            _logger = logger;
         }
 
-        public static BrightspaceManager GetInstance(bool isDev = false)
+        // public static BrightspaceManager GetInstance(bool isDev = false)
+        // {
+
+        //     s_instance ??= new BrightspaceManager(isDev);
+
+        //     return s_instance;
+        // }
+
+        void ILMSHandler.SyncInit()
         {
-
-            s_instance ??= new BrightspaceManager(isDev);
-
-            return s_instance;
+            _logger.LogInformation("Initializing handler for Brightspace.");
         }
 
         private SQLiteConnection GetConnection() => new(_connection_string);
@@ -139,34 +144,9 @@ namespace IguideME.Web.Services
             }
         }
 
-        public void LogTable(string name)
-        {
-            _logger.LogDebug("Logging table {name}", name);
-
-            string table = "";
-            using (SQLiteDataReader r = Query("select * from @name", new SQLiteParameter("name", name)))
-            {
-                for (int i = 0; i < r.FieldCount; i++)
-                {
-                    table += r.GetName(i) + "\t";
-                }
-                table += "\n\n";
-                while (r.Read())
-                {
-                    for (int i = 0; i < r.FieldCount; i++)
-                    {
-                        table += r.GetValue(i).ToString() + "\t";
-                    }
-                    table += "\n";
-                }
-            }
-
-            _logger.LogDebug("contents:\n {table}", table);
-
-        }
-
         // -------------------------- QUERIES ------------------------------------ //
 
+        // TODO: when we start doing multiple courses we need to put this in the lms interface.
         public List<Course> GetAllCourses()
         {
             List<Course> courses = new List<Course>();
@@ -235,22 +215,20 @@ namespace IguideME.Web.Services
 
  ///////////////////////////////////////////////////////////////////////////////////////////////////
         
-        void ILMSHandler.SyncInit()
-        {
-            throw new NotImplementedException();
-        }
-
+        /// <inheritdoc />
         void ILMSHandler.SendMessage(string userID, string subject, string body)
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc />
         string[] ILMSHandler.GetUserIDs(int courseID, string userID)
         {
             _logger.LogInformation("Trying to get user\ncourseID: {courseID}, userID: {userID}", courseID, userID);
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc />
         IEnumerable<User> ILMSHandler.GetStudents(int courseID)
         {
             _logger.LogInformation("Trying to get all students for \ncourseID: {courseID}", courseID);
@@ -282,6 +260,7 @@ namespace IguideME.Web.Services
             }
         }
 
+        /// <inheritdoc />
         IEnumerable<User> ILMSHandler.GetAdministrators(int courseID)
         {
             _logger.LogInformation("Trying to get all teachers for \ncourseID: {courseID}", courseID);
@@ -312,6 +291,7 @@ namespace IguideME.Web.Services
             }
         }
 
+        /// <inheritdoc />
         IEnumerable<AppAssignment> ILMSHandler.GetAssignments(int courseID)
         {
             _logger.LogInformation("Trying to get all assignments for \ncourseID: {courseID}", courseID);
@@ -327,7 +307,7 @@ namespace IguideME.Web.Services
                         WHERE   `grade_object_type_id` = 1
                         OR      `grade_object_type_id` = 2
                         OR      `grade_object_type_id` = 4"
-                    ))
+                    ))// TODO: is the ,students a typo?
             {
                 while (r.Read()){
                     assignments.Add( new AppAssignment(
@@ -346,6 +326,7 @@ namespace IguideME.Web.Services
             }
         }
 
+        /// <inheritdoc />
         IEnumerable<AssignmentSubmission> ILMSHandler.GetSubmissions(int courseID, string[] userIDs)
         {
             List<AssignmentSubmission> submissions = new List<AssignmentSubmission>();
@@ -387,11 +368,14 @@ namespace IguideME.Web.Services
             }
         }
 
+        /// <inheritdoc />
         IEnumerable<(AppAssignment, IEnumerable<AssignmentSubmission>)> ILMSHandler.GetQuizzes(int courseID)
         {
+            // Return an empty collection as brightspace doesn't separate quizzes and assignments.
             return new List<(AppAssignment, IEnumerable<AssignmentSubmission>)>();
         }
 
+        /// <inheritdoc />
         IEnumerable<AppDiscussion> ILMSHandler.GetDiscussions(int courseID)
         {
             return new List<AppDiscussion>();

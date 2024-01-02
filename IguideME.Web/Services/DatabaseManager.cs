@@ -6,9 +6,7 @@ using IguideME.Web.Models;
 using IguideME.Web.Models.App;
 using IguideME.Web.Models.Impl;
 using Microsoft.Extensions.Logging;
-using Discussion = UvA.DataNose.Connectors.Canvas.Discussion;
 using DiscussionEntry = UvA.DataNose.Connectors.Canvas.DiscussionEntry;
-using DiscussionReply = UvA.DataNose.Connectors.Canvas.DiscussionReply;
 using System.Linq;
 
 namespace IguideME.Web.Services
