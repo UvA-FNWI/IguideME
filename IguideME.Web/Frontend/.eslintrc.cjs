@@ -26,7 +26,7 @@ module.exports = {
     ecmaVersion: "latest",
     sourceType: "module",
     // project: true,
-    tsconfigRootDir: path.join(__dirname, "src"),
+    tsconfigRootDir: __dirname,
   },
   plugins: ["react", "react-refresh", "@typescript-eslint", "prettier"],
   rules: {

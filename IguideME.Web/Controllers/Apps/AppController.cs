@@ -118,28 +118,28 @@ namespace IguideME.Web.Controllers
         //             this.GetHashCode()));
         // }
 
-        // [Authorize]
-        // [Route("/app/course")]
-        // [HttpGet]
-        // [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        // [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        // [ProducesResponseType(StatusCodes.Status200OK)]
-        // public ActionResult GetConsent()
-        // {
-        //     /**
-        //      * Provide wether the informed consent is mandatory and the informed
-        //      * consent text (may be null). Caution: if informed consent is
-        //      * mandatory and no informed consent text is provided student's
-        //      * won't be able to accept or decline the terms, and thus nobody
-        //      * is able to use the application.
-        //      */
+        [Authorize]
+        [Route("/app/course")]
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public ActionResult GetConsent()
+        {
+            /**
+             * Provide wether the informed consent is mandatory and the informed
+             * consent text (may be null). Caution: if informed consent is
+             * mandatory and no informed consent text is provided student's
+             * won't be able to accept or decline the terms, and thus nobody
+             * is able to use the application.
+             */
 
-        //     PublicInformedConsent consent = _databaseManager
-        //         .GetPublicInformedConsent(GetCourseID());
+            PublicInformedConsent consent = _databaseManager
+                .GetPublicInformedConsent(GetCourseID());
 
-        //     // Check if consent exists
-        //     return consent == null ? BadRequest() : Json(consent);
-        // }
+            // Check if consent exists
+            return consent == null ? BadRequest() : Json(consent);
+        }
 
         // [Authorize(Policy = "IsInstructor")]
         // [Route("/app/consent")]
@@ -162,21 +162,21 @@ namespace IguideME.Web.Controllers
         //         .GetPublicInformedConsent(GetCourseID()));
         // }
 
-        // [Authorize(Policy = "IsInstructor")]
-        // [Route("/app/peer-groups")]
-        // [HttpGet]
-        // [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        // [ProducesResponseType(StatusCodes.Status404NotFound)]
-        // [ProducesResponseType(StatusCodes.Status200OK)]
-        // public ActionResult GetCoursePeerGroups()
-        // {
-        //     // TODO: change this url and the function names, they aren't very intuitive.
-        //     PeerGroup peerGroup = _databaseManager
-        //         .GetPeerGroup(GetCourseID());
+        [Authorize(Policy = "IsInstructor")]
+        [Route("/app/peer-groups")]
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public ActionResult GetCoursePeerGroups()
+        {
+            // TODO: change this url and the function names, they aren't very intuitive.
+            PeerGroup peerGroup = _databaseManager
+                .GetPeerGroup(GetCourseID());
 
-        //     // Check if consent exists
-        //     return peerGroup != null ? Json(peerGroup) : NotFound();
-        // }
+            // Check if consent exists
+            return peerGroup != null ? Json(peerGroup) : NotFound();
+        }
 
         // [Authorize(Policy = "IsInstructor")]
         // [Route("/app/peer-groups")]

@@ -1759,8 +1759,7 @@ namespace IguideME.Web.Services
                     {
                         goals.Add(new LearningGoal(
                             r.GetInt32(0),
-                            r.GetInt32(1),
-                            r.GetValue(2).ToString()
+                            r.GetValue(1).ToString()
                         ));
                     }
                     catch (Exception e)
@@ -1784,7 +1783,7 @@ namespace IguideME.Web.Services
                 {
                     try
                     {
-                        goals.Add(new LearningGoal(r.GetInt32(0), tileID, r.GetValue(1).ToString()));
+                        goals.Add(new LearningGoal(r.GetInt32(0), r.GetValue(1).ToString()));
                     }
                     catch (Exception e)
                     {
@@ -1806,7 +1805,7 @@ namespace IguideME.Web.Services
                 {
                     try
                     {
-                        goal = new LearningGoal(id, r.GetInt32(0), r.GetValue(1).ToString());
+                        goal = new LearningGoal(id, r.GetValue(1).ToString());
                     }
                     catch (Exception e)
                     {
@@ -1817,16 +1816,11 @@ namespace IguideME.Web.Services
             return goal;
         }
 
-        public LearningGoal CreateGoal(int courseID, int tileID, string title)
+        public void CreateGoal(int courseID, LearningGoal goal)
         {
-            return new LearningGoal(
-                IDNonQuery(DatabaseQueries.REGISTER_LEARNING_GOAL,
-                    new SQLiteParameter("courseID", courseID),
-                    new SQLiteParameter("tileID", tileID),
-                    new SQLiteParameter("title", title)
-                ),
-                tileID,
-                title
+            NonQuery(DatabaseQueries.REGISTER_LEARNING_GOAL,
+                new SQLiteParameter("courseID", courseID),
+                new SQLiteParameter("title", goal.Title)
             );
 
         }
@@ -1836,7 +1830,7 @@ namespace IguideME.Web.Services
             NonQuery(DatabaseQueries.UPDATE_LEARNING_GOAL,
                     new SQLiteParameter("courseID", courseID),
                     new SQLiteParameter("goalID", goal.ID),
-                    new SQLiteParameter("tileID", goal.TileID),
+                    // new SQLiteParameter("tileID", goal.TileID),
                     new SQLiteParameter("title", goal.Title)
                 );
 

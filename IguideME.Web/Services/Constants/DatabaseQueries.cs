@@ -147,6 +147,7 @@ public static class DatabaseQueries
 
     public const string CREATE_TABLE_LEARNING_GOALS =
         @"CREATE TABLE IF NOT EXISTS `learning_goals` (
+            `course_id`           INTEGER,
             `goal_id`             INTEGER PRIMARY KEY AUTOINCREMENT,
             `title`               STRING
         );";
@@ -472,11 +473,9 @@ public static class DatabaseQueries
     public const string REGISTER_LEARNING_GOAL =
         @"INSERT INTO       `learning_goals`
                             (   `course_id`,
-                                `tile_id`,
                                 `title`  )
         VALUES(
             @courseID,
-            @tileID,
             @title
         );";
 
@@ -882,13 +881,7 @@ public static class DatabaseQueries
         @"SELECT    `learning_goals`.`goal_id`,
                     `learning_goals`.`title`
         FROM        `learning_goals`
-        INNER JOIN  `tile_entries`
-            ON      `tile_entries`.`content_id` == `learning_goals`.`goal_id`
-        INNER JOIN  `tiles`
-            USING   (`tile_id`)
-        INNER JOIN  `tile_groups`
-            USING   (`group_id`)
-        WHERE       `tile_groups`.`course_id`=@courseID
+        WHERE       `learning_goals`.`course_id`=@courseID
         ;";
 
     public const string QUERY_TILE_LEARNING_GOALS =

@@ -12,8 +12,8 @@ namespace IguideME.Web.Models.App
         [JsonProperty("id")]
         public int ID { get; set; }
 
-        [JsonProperty("tile_id")]
-        public int TileID { get; set; }
+        // [JsonProperty("tile_id")]
+        // public int TileID { get; set; }
 
         [JsonProperty("title")]
         public string Title { get; set; }
@@ -23,11 +23,11 @@ namespace IguideME.Web.Models.App
 
         public LearningGoal(
             int id,
-            int tileID,
+            // int tileID,
             string title)
         {
             this.ID = id;
-            this.TileID = tileID;
+            // this.TileID = tileID;
             this.Title = title;
         }
     }

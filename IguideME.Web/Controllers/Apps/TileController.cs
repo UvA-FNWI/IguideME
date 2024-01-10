@@ -23,17 +23,14 @@ namespace IguideME.Web.Controllers
     public class TileController : DataController
     {
         private readonly ILogger<DataController> _logger;
-        private readonly CanvasHandler _canvasHandler;
         private readonly DatabaseManager _databaseManager;
 
         public TileController(
             ILogger<DataController> logger,
-            CanvasHandler canvasHandler,
             DatabaseManager databaseManager) : base(
                 logger)
         {
             _logger = logger;
-            _canvasHandler = canvasHandler;
             _databaseManager = databaseManager;
         }
 
@@ -155,6 +152,22 @@ namespace IguideME.Web.Controllers
             return Json(_databaseManager.GetGoals(GetCourseID()));
         }
 
+        [Authorize(Policy = "IsInstructor")]
+        [HttpPost]
+        [Route("/learning-goals/{ID}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public ActionResult PostGoal(string ID, [FromBody] LearningGoal obj)
+        {
+            bool success = int.TryParse(ID, out int id);
+            if (success)
+            {
+                _databaseManager.CreateGoal(GetCourseID(), obj);
+                return Ok();
+            }
+            return BadRequest();
+        }
         // [Authorize]
         // [HttpGet]
         // [ProducesResponseType(StatusCodes.Status200OK)]

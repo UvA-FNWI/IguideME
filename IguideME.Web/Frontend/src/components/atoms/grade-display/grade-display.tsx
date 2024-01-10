@@ -94,6 +94,12 @@ const GraphGrades: FC<Props> = ({ goal, avg, pred }): ReactElement => {
               strokeWidth: 2,
               strokeDasharray: 4,
             },
+            textStyle: {
+              fontSize: "8pt",
+            },
+            legend: "Goal",
+            legendOrientation: "horizontal",
+            legendPosition: "center",
           },
         ]}
         label={""}
