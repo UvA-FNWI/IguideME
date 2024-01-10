@@ -11,7 +11,7 @@ const { Item } = Form;
 
 const EditTileAssignments: FC = (): ReactElement => {
 	const { data: assignments } = useQuery('assignments', getAssignments);
-	console.log('ass', assignments)
+	console.log('ass', assignments);
 	return (
 		<>
 			<Row align="middle" style={{ height: '3em' }}>
@@ -21,10 +21,12 @@ const EditTileAssignments: FC = (): ReactElement => {
 				<Col span={8}>
 					<Item name="gradingType" noStyle>
 						<Select
-							options={Object.entries(GradingType).map((key, _) => ({
-								value: key[1],
-								label: printGradingType(key[1]),
-							}))}
+							options={Object.entries(GradingType)
+								.filter((key, _) => isNaN(Number(key[0])))
+								.map((_, val) => ({
+									value: val,
+									label: printGradingType(val),
+								}))}
 							style={{ width: '100%' }}
 						/>
 					</Item>
