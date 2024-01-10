@@ -26,7 +26,8 @@ using IguideME.Web.Services.LMSHandlers;
 
 // Create a new WebApplicationBuilder for setting up the application.
 WebApplicationBuilder builder = WebApplication.CreateBuilder(
-    new WebApplicationOptions{
+    new WebApplicationOptions
+    {
         Args = args, // command-line arguments passed to the app
         WebRootPath = "wwwroot/dist" // specifies the path to the web root directory
     }
@@ -35,6 +36,13 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(
 //    /------------------------ Read appsettings.json -------------------------/
 
 // "UnsecureApplicationSettings:UseRedisCache" - indicates whether to use Redis cache or not.
+Backends lms;
+if (!Backends.TryParse(builder.Configuration.GetSection("LMS:Backend").Value, out lms))
+{
+    // Console.WriteLine();
+    throw new Exception("Incorrect settings for LMS:Backend");
+}
+
 bool useRedisCache = bool.Parse(builder.Configuration.GetSection(
     "UnsecureApplicationSettings:UseRedisCache").Value);
 
@@ -110,7 +118,16 @@ builder.Services.Configure<KestrelServerOptions>(options => options.AllowSynchro
 builder.Services.Configure<IISServerOptions>(options => options.AllowSynchronousIO = true);
 
 builder.Services.AddControllersWithViews();
-builder.Services.AddSingleton<ILMSHandler, CanvasHandler>();
+
+switch (lms)
+{
+    case Backends.Brightspace:
+        builder.Services.AddSingleton<ILMSHandler, BrightspaceHandler>();
+        break;
+    case Backends.Canvas:
+        builder.Services.AddSingleton<ILMSHandler, CanvasHandler>();
+        break;
+}
 builder.Services.AddSingleton<DatabaseManager>(_ => DatabaseManager.GetInstance());
 
 builder.Services.AddHttpClient();
@@ -135,24 +152,30 @@ app.UseForwardedHeaders();
 DatabaseManager db = DatabaseManager.GetInstance(app.Environment.IsDevelopment());
 
 
-string GetUserID(string userid, string course) {
-    if (String.IsNullOrEmpty(userid)) {
+string GetUserID(string userid, string course)
+{
+    if (String.IsNullOrEmpty(userid))
+    {
         throw new Exception("No userid in claims.");
     }
     int courseid = int.Parse(course);
-    if (int.TryParse(userid, out int id)) {
+    if (int.TryParse(userid, out int id))
+    {
         string userID = db.GetUserID(id);
-        if (userID != null) {
+        if (userID != null)
+        {
             return userID;
         }
     }
     // Try's to find the user in canvas.
 
-    string[] ids = app.Services.GetService<CanvasHandler>().GetUserIDs(courseid, userid);
+    string[] ids = app.Services.GetService<ILMSHandler>().GetUserIDs(courseid, userid);
 
-    foreach (string lmsid in ids) {
-        if (!String.IsNullOrEmpty(lmsid)) {
-            return lmsid;
+    foreach (string lms_id in ids)
+    {
+        if (!String.IsNullOrEmpty(lms_id))
+        {
+            return lms_id;
         }
     }
 

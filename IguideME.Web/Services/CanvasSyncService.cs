@@ -35,26 +35,26 @@ namespace IguideME.Web.Services
     {
         private readonly ILogger<SyncManager> _logger;
         private readonly IComputationJobStatusService _computationJobStatus;
-        private readonly ILMSHandler _canvasHandler;
+        private readonly ILMSHandler _lmsHandler;
         private readonly DatabaseManager _databaseManager;
         private WorkerStatus workerStatus;
 
         /// <summary>
         /// This constructor initializes the new CanvasSyncService to
-        /// (<paramref name="computationJobStatus"/>, <paramref name="canvasHandler"/>, <paramref name="logger"/>).
+        /// (<paramref name="computationJobStatus"/>, <paramref name="lmsHandler"/>, <paramref name="logger"/>).
         /// </summary>
         /// <param name="computationJobStatus"></param>
-        /// <param name="canvasHandler"></param>
+        /// <param name="lmsHandler"></param>
         /// <param name="logger"></param>
         public CanvasSyncService(
             IComputationJobStatusService computationJobStatus,
-            ILMSHandler canvasHandler,
+            ILMSHandler lmsHandler,
             DatabaseManager databaseManager,
             ILogger<SyncManager> logger)
         {
             _logger = logger;
             _computationJobStatus = computationJobStatus;
-            _canvasHandler = canvasHandler;
+            _lmsHandler = lmsHandler;
             _databaseManager = databaseManager;
         }
 
@@ -83,7 +83,7 @@ namespace IguideME.Web.Services
             long timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
             // Renew the connection with canvas.
-            _canvasHandler.SyncInit();
+            _lmsHandler.SyncInit();
 
             // Don't keep ancient syncs in the database.
             _databaseManager.CleanupSync(courseID);
@@ -100,13 +100,13 @@ namespace IguideME.Web.Services
             workerStatus.counter++;
             UpdateStatus(jobId);
 
-            RunWorker(jobId, new UserWorker(courseID, timestamp, _canvasHandler, _databaseManager, _logger));
-            RunWorker(jobId, new QuizWorker(courseID, timestamp, _canvasHandler, _databaseManager, _logger));
-            RunWorker(jobId, new DiscussionWorker(courseID, timestamp, _canvasHandler, _databaseManager, _logger));
-            RunWorker(jobId, new AssignmentWorker(courseID, timestamp, _canvasHandler, _databaseManager, _logger));
+            RunWorker(jobId, new UserWorker(courseID, timestamp, _lmsHandler, _databaseManager, _logger));
+            RunWorker(jobId, new QuizWorker(courseID, timestamp, _lmsHandler, _databaseManager, _logger));
+            RunWorker(jobId, new DiscussionWorker(courseID, timestamp, _lmsHandler, _databaseManager, _logger));
+            RunWorker(jobId, new AssignmentWorker(courseID, timestamp, _lmsHandler, _databaseManager, _logger));
             RunWorker(jobId, new GradePredictorWorker(courseID, timestamp, _databaseManager, _logger));
             RunWorker(jobId, new PeerGroupWorker(courseID, timestamp, _databaseManager, _logger));
-            RunWorker(jobId, new NotificationsWorker(courseID, timestamp, _canvasHandler, _databaseManager, work.SendNotifications, _logger));
+            RunWorker(jobId, new NotificationsWorker(courseID, timestamp, _lmsHandler, _databaseManager, work.SendNotifications, _logger));
 
             _logger.LogInformation("Finishing sync");
             workerStatus.statuses[workerStatus.counter] = "Success";

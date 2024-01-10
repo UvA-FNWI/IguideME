@@ -1,9 +1,16 @@
 ﻿using Newtonsoft.Json;
 
-using UvA.DataNose.Connectors.Canvas;
-
 namespace IguideME.Web.Models.App
 {
+
+    public enum AppGradingType
+    {
+        PassFail,
+        Percentage,
+        Letters,
+        Points,
+        NotGraded
+    }
     public class AppAssignment
     {
         [JsonProperty("id")]
@@ -28,7 +35,7 @@ namespace IguideME.Web.Models.App
         public double MaxGrade { get; set; }
 
         [JsonProperty("grading_type")]
-        public GradingType GradingType { get; set; }
+        public AppGradingType GradingType { get; set; }
 
         public AppAssignment(
             int id,
@@ -38,7 +45,7 @@ namespace IguideME.Web.Models.App
             bool muted,
             int dueDate,
             double maxGrade,
-            int gradingType)
+            AppGradingType gradingType)
         {
             this.ID = id;
             this.CourseID = courseID;
@@ -47,7 +54,7 @@ namespace IguideME.Web.Models.App
             this.Muted = muted;
             this.DueDate = dueDate;
             this.MaxGrade = maxGrade;
-            this.GradingType = (GradingType)gradingType;
+            this.GradingType = gradingType;
         }
 
     }

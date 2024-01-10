@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+
 using IguideME.Web.Models;
 using IguideME.Web.Models.App;
 using IguideME.Web.Services.LMSHandlers;
+
 using Microsoft.Extensions.Logging;
 
 using UvA.DataNose.Connectors.Canvas;
@@ -75,9 +77,9 @@ namespace IguideME.Web.Services.Workers
         /// </summary>
         /// <param name="assignment">the assignment the submissions are associated to.</param>
         /// <param name="entry">the tile entry the submissions are associated to.</param>
-        private void RegisterSubmissions(IEnumerable<AssignmentSubmission> submissions, Dictionary<int, GradingType> gradingTypes)
+        private void RegisterSubmissions(IEnumerable<AssignmentSubmission> submissions, Dictionary<int, AppGradingType> gradingTypes)
         {
-            GradingType type;
+            AppGradingType type;
             foreach (AssignmentSubmission submission in submissions)
             {
                 // WE NEED TO CHANGE THE SUBMISSION IDs FROM EXTERNAL ASSIGNMENT ID TO INTERNAL ASSIGNMENT ID
@@ -88,22 +90,21 @@ namespace IguideME.Web.Services.Workers
 
                     switch (gradingTypes[submission.AssignmentID])
                     {
-                        case GradingType.Points:
+                        case AppGradingType.Points:
                             // submissions.Grade = (double.Parse(submission.RawGrade) - 1)/0.09; // should switch to this
                             submission.Grade = double.Parse(submission.RawGrade);
                             break;
-                        case GradingType.Percentage:
+                        case AppGradingType.Percentage:
                             submission.Grade = double.Parse(submission.RawGrade);
                             break;
-                        case GradingType.GPA:
-                        case GradingType.Letters:
+                        case AppGradingType.Letters:
                             submission.Grade = LetterToGrade(submission.RawGrade);
                             break;
-                        case GradingType.PassFail:
+                        case AppGradingType.PassFail:
                             _logger.LogInformation("passfail text: {Grade}", submission.RawGrade);
                             submission.Grade = submission.RawGrade == "PASS" ? 100 : 0;
                             break;
-                        case GradingType.NotGraded:
+                        case AppGradingType.NotGraded:
                             submission.Grade = -1;
                             break;
                         default:
@@ -132,7 +133,7 @@ namespace IguideME.Web.Services.Workers
             List<Models.Impl.User> users = _databaseManager.GetUsersWithGrantedConsent(this._courseID);
             IEnumerable<AssignmentSubmission> submissions = this._canvasHandler.GetSubmissions(this._courseID, users.Select(user => user.UserID).ToArray());
 
-            Dictionary<int, GradingType> gradingTypes = new();
+            Dictionary<int, AppGradingType> gradingTypes = new();
 
             foreach (AppAssignment assignment in assignments)
             {

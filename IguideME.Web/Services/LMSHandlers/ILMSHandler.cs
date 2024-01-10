@@ -1,11 +1,20 @@
 
 using System.Collections.Generic;
+
 using IguideME.Web.Models.App;
 using IguideME.Web.Models.Impl;
 
 namespace IguideME.Web.Services.LMSHandlers
 {
-	public interface ILMSHandler {
+
+    public enum Backends
+    {
+        Canvas,
+        Brightspace
+    }
+
+    public interface ILMSHandler
+    {
 
         /// <summary>
         /// Takes care of any setup required before the sync e.g. refreshing connections.
@@ -70,5 +79,5 @@ namespace IguideME.Web.Services.LMSHandlers
         /// <param name="courseID">The id of the course the quizzes are from.</param>
         /// <returns>A list of discussions.</returns>
 		IEnumerable<AppDiscussion> GetDiscussions(int courseID);
-	}
+    }
 }

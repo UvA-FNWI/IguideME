@@ -6,8 +6,6 @@ using IguideME.Web.Services;
 
 using Newtonsoft.Json;
 
-using UvA.DataNose.Connectors.Canvas;
-
 namespace IguideME.Web.Models
 {
     public class Tile
@@ -39,7 +37,7 @@ namespace IguideME.Web.Models
         public float Weight { get; set; }
 
         [JsonProperty(PropertyName = "gradingType")]
-        public GradingType GradingType { get; set; }
+        public AppGradingType GradingType { get; set; }
 
         [JsonProperty(PropertyName = "visible")]
         public bool Visible { get; set; }
@@ -57,7 +55,7 @@ namespace IguideME.Web.Models
             int order,
             Tile_type type,
             float weight,
-            GradingType gradingType,
+            AppGradingType gradingType,
             bool visible,
             bool notifications)
         {

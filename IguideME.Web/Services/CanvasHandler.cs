@@ -16,7 +16,7 @@ namespace IguideME.Web.Services
     /// <summary>
     /// Class <a>CanvasHandler</a> models a singelton service that handles the communication with Canvas LMS..
     /// </summary>
-    public class CanvasHandler : ILMSHandler 
+    public class CanvasHandler : ILMSHandler
     {
         private readonly ILogger<SyncManager> _logger;
         public CanvasApiConnector Connector;
@@ -32,8 +32,8 @@ namespace IguideME.Web.Services
         public CanvasHandler(IConfiguration config, ILogger<SyncManager> logger)
         {
             _logger = logger;
-            this.AccessToken = config["Canvas:AccessToken"];
-            this.BaseUrl = config["Canvas:Url"];
+            this.AccessToken = config["LMS:Canvas:AccessToken"];
+            this.BaseUrl = config["LMS:Canvas:Url"];
             this.SyncInit();
         }
 
@@ -75,7 +75,7 @@ namespace IguideME.Web.Services
             _logger.LogInformation("Trying to get user\ncourseID: {courseID}, userID: {userID}", courseID, userID);
             List<Enrollment> users = Connector.FindCourseById(courseID).Enrollments;
             CanvasUser user = users.First(x => x.UserID == userID).User;
-            return new string[]{user.LoginID, user.SISUserID, user.ID.ToString()};
+            return new string[] { user.LoginID, user.SISUserID, user.ID.ToString() };
         }
 
         /// <inheritdoc />
@@ -83,15 +83,15 @@ namespace IguideME.Web.Services
         {
             Course course = Connector.FindCourseById(courseID);
             IEnumerable<CanvasUser> students = course.GetUsersByType(EnrollmentType.Student).ToArray();
-            
-            return students.Select(student => new User(student.SISUserID, courseID, student.ID.Value, student.Name, student.SortableName, (int) UserRoles.student));
+
+            return students.Select(student => new User(student.SISUserID, courseID, student.ID.Value, student.Name, student.SortableName, (int)UserRoles.student));
         }
 
         /// <inheritdoc />
         public IEnumerable<User> GetAdministrators(int courseID)
         {
             IEnumerable<CanvasUser> admins = Connector.FindCourseById(courseID).GetUsersByType(EnrollmentType.Teacher).ToArray();
-            return admins.Select(admin => new User(admin.SISUserID, courseID, admin.ID.Value, admin.Name, admin.SortableName, (int) UserRoles.instructor));
+            return admins.Select(admin => new User(admin.SISUserID, courseID, admin.ID.Value, admin.Name, admin.SortableName, (int)UserRoles.instructor));
         }
 
         /// <inheritdoc />
@@ -109,9 +109,30 @@ namespace IguideME.Web.Services
                 ass.Name,
                 ass.IsPublished,
                 ass.IsMuted,
-                ass.DueDate.HasValue ? (int)((DateTimeOffset) ass.DueDate.Value).ToUnixTimeSeconds() : 0,
+                ass.DueDate.HasValue ? (int)((DateTimeOffset)ass.DueDate.Value).ToUnixTimeSeconds() : 0,
                 ass.PointsPossible ??= 0,
-                (int) ass.GradingType));
+                mapGradingType(ass.GradingType)));
+        }
+
+        private AppGradingType mapGradingType(GradingType type)
+        {
+            switch (type)
+            {
+                case GradingType.Points:
+                    return AppGradingType.Points;
+                case GradingType.Percentage:
+                    return AppGradingType.Percentage;
+                case GradingType.Letters:
+                case GradingType.GPA:
+                    return AppGradingType.Letters;
+                case GradingType.PassFail:
+                    return AppGradingType.PassFail;
+                case GradingType.NotGraded:
+                    return AppGradingType.NotGraded;
+                default:
+                    _logger.LogWarning("Grade format {Type} is not supported, treating as not graded...", type);
+                    return AppGradingType.NotGraded;
+            }
         }
 
         /// <inheritdoc />
@@ -134,7 +155,7 @@ namespace IguideME.Web.Services
         /// <inheritdoc />
         public IEnumerable<(AppAssignment, IEnumerable<AssignmentSubmission>)> GetQuizzes(int courseID)
         {
-			// Graded quizzes (assignment quizzes) are also treated as assignments by canvas and will be handled accordingly.
+            // Graded quizzes (assignment quizzes) are also treated as assignments by canvas and will be handled accordingly.
             return Connector
                 .FindCourseById(courseID)
                 .Quizzes
@@ -148,11 +169,11 @@ namespace IguideME.Web.Services
                         false,
                         quiz.DueDate.HasValue ? (int)((DateTimeOffset)quiz.DueDate.Value).ToUnixTimeSeconds() : 0, // TODO: should this be seconds or milliseconds?
                         quiz.PointsPossible ?? 0,
-                        (int)GradingType.Points
+                        AppGradingType.Points
                     ),
                     quiz.Submissions
                         .Where(sub => sub.Score != null)
-                        .Select(sub => new AssignmentSubmission(-1, quiz.ID ?? -1, sub.UserID.ToString(), sub.Score ?? 1, ((DateTimeOffset)sub.FinishedDate.Value).ToUnixTimeMilliseconds() ))
+                        .Select(sub => new AssignmentSubmission(-1, quiz.ID ?? -1, sub.UserID.ToString(), sub.Score ?? 1, ((DateTimeOffset)sub.FinishedDate.Value).ToUnixTimeMilliseconds()))
                 )
             );
         }
@@ -162,8 +183,8 @@ namespace IguideME.Web.Services
         {
             return Connector
                 .FindCourseById(courseID)
-                .Discussions.SelectMany(topic => 
-                    topic.Entries.SelectMany(entry => 
+                .Discussions.SelectMany(topic =>
+                    topic.Entries.SelectMany(entry =>
                         entry.Replies.Select(reply => new AppDiscussion(
                             Discussion_type.Reply,
                             reply.ID ?? -1,
@@ -171,7 +192,7 @@ namespace IguideME.Web.Services
                             courseID,
                             topic.Title,
                             reply.UserID.ToString(),
-                            ((DateTimeOffset) reply.CreatedAt.Value).ToUnixTimeMilliseconds(),
+                            ((DateTimeOffset)reply.CreatedAt.Value).ToUnixTimeMilliseconds(),
                             reply.Message
                         ))
                         .Append(new AppDiscussion(
@@ -181,7 +202,7 @@ namespace IguideME.Web.Services
                             courseID,
                             topic.Title,
                             entry.UserID.ToString(),
-                            ((DateTimeOffset) entry.CreatedAt).ToUnixTimeMilliseconds(),
+                            ((DateTimeOffset)entry.CreatedAt).ToUnixTimeMilliseconds(),
                             entry.Message
                         ))
                     )
@@ -192,7 +213,7 @@ namespace IguideME.Web.Services
                         courseID,
                         topic.Title,
                         topic.UserName,
-                        ((DateTimeOffset) topic.PostedAt).ToUnixTimeMilliseconds(),
+                        ((DateTimeOffset)topic.PostedAt).ToUnixTimeMilliseconds(),
                         topic.Message
                     ))
                 );

@@ -2255,7 +2255,7 @@ namespace IguideME.Web.Services
                             r.GetInt32(3),
                             (Tile.Tile_type)r.GetInt32(4),
                             r.GetFloat(5),
-                            (UvA.DataNose.Connectors.Canvas.GradingType)r.GetInt32(6),
+                            (AppGradingType)r.GetInt32(6),
                             r.GetBoolean(7),
                             r.GetBoolean(8)
                         );
@@ -2297,7 +2297,7 @@ namespace IguideME.Web.Services
                             r.GetInt32(3),
                             (Tile.Tile_type)r.GetInt32(4),
                             r.GetFloat(5),
-                            (UvA.DataNose.Connectors.Canvas.GradingType)r.GetInt32(6),
+                            (AppGradingType)r.GetInt32(6),
                             r.GetBoolean(7),
                             r.GetBoolean(8)
                         );
@@ -2317,7 +2317,7 @@ namespace IguideME.Web.Services
             }
 
             return tiles;
-            }
+        }
         // public Tile FillTileContent(Tile tile)
         // {
         //     switch(tile.Type)
@@ -2473,7 +2473,7 @@ namespace IguideME.Web.Services
                             r.GetBoolean(4),
                             r.GetInt32(5),
                             r.GetFloat(6),
-                            r.GetInt32(7)
+                            (AppGradingType)r.GetInt32(7)
                         );
                         assignments.Add(r.GetInt32(0), row);
                     }
@@ -2747,7 +2747,7 @@ namespace IguideME.Web.Services
                         r.GetInt32(3),
                         (Tile.Tile_type)r.GetInt32(4),
                         r.GetFloat(5),
-                        (UvA.DataNose.Connectors.Canvas.GradingType)r.GetInt32(6),
+                        (AppGradingType)r.GetInt32(6),
                         r.GetBoolean(7),
                         r.GetBoolean(8)
                     );

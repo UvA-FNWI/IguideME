@@ -13,19 +13,20 @@ using Microsoft.Extensions.Configuration;
 namespace IguideME.Web.Services
 {
 
-    public sealed class BrightspaceManager :  ILMSHandler
+    public sealed class BrightspaceHandler : ILMSHandler
     {
         // private static BrightspaceManager s_instance;
         private readonly string _connection_string;
         private readonly ILogger _logger;
 
-        private BrightspaceManager(IConfiguration config, ILogger<SyncManager> logger)
+        public BrightspaceHandler(IConfiguration config, ILogger<SyncManager> logger)
         {
             // s_instance = this;
             // _connection_string = isDev ? "Data Source=brightspace.db;Version=3;New=False;Compress=True;"
             //                           : "Data Source=/data/IguideME.db;Version=3;New=False;Compress=True;";
-            _connection_string = config["Brightspace:Connection"];
+            _connection_string = config["LMS:Brightspace:Connection"];
             _logger = logger;
+            this.SyncInit();
         }
 
         // public static BrightspaceManager GetInstance(bool isDev = false)
@@ -36,7 +37,7 @@ namespace IguideME.Web.Services
         //     return s_instance;
         // }
 
-        void ILMSHandler.SyncInit()
+        public void SyncInit()
         {
             _logger.LogInformation("Initializing handler for Brightspace.");
         }
@@ -66,40 +67,6 @@ namespace IguideME.Web.Services
                 connection.Close();
                 throw;
             }
-        }
-
-        private int IDNonQuery(string query, params SQLiteParameter[] parameters)
-        {
-            int id = 0;
-            SQLiteConnection connection = GetConnection();
-            try
-            {
-                connection.Open();
-                using (SQLiteCommand command = connection.CreateCommand())
-                {
-                    command.CommandText = query;
-                    foreach (SQLiteParameter param in parameters)
-                    {
-                        command.Parameters.Add(param);
-                    }
-                    command.ExecuteNonQuery();
-                }
-
-                using (SQLiteCommand command = connection.CreateCommand())
-                {
-                    command.CommandText = "SELECT last_insert_rowid()";
-                    id = int.Parse(command.ExecuteScalar().ToString());
-                }
-                connection.Close();
-            }
-            catch
-            {
-                // Close connection before rethrowing
-                connection.Close();
-                throw;
-            }
-
-            return id;
         }
 
         private SQLiteDataReader Query(string query, params SQLiteParameter[] parameters)
@@ -150,21 +117,21 @@ namespace IguideME.Web.Services
         public List<Course> GetAllCourses()
         {
             List<Course> courses = new List<Course>();
-            using (SQLiteDataReader r = 
+            using (SQLiteDataReader r =
                 Query(@"SELECT  `org_unit_id`,
                                 `name`,
                                 `start_date`,
-                                `end_date` 
+                                `end_date`
                         FROM    `organizational_units`
                         WHERE   `type`='Course Offering'"
                 ))
             {
                 while (r.Read())
-                    courses.Add( new Course(
+                    courses.Add(new Course(
                         r.GetInt32(0),
                         r.GetValue(1).ToString()
-                        // r.GetValue(2).ToString(), //start and end dates need to be converted from text to float timestamps
-                        // r.GetValue(3).ToString()
+                    // r.GetValue(2).ToString(), //start and end dates need to be converted from text to float timestamps
+                    // r.GetValue(3).ToString()
                     ));
             }
             return null;
@@ -178,7 +145,7 @@ namespace IguideME.Web.Services
             {
                 while (r.Read())
                     usernames.Add(r.GetValue(0).ToString());
-                
+
                 return usernames;
             }
         }
@@ -190,7 +157,7 @@ namespace IguideME.Web.Services
         /// <returns> A User object with their data </returns>
         public User GetSingleUserData(string username)
         {
-            using (SQLiteDataReader r = 
+            using (SQLiteDataReader r =
                 Query(@"SELECT  `username`,
                                 `user_id`,
                                 `first_name`,
@@ -199,138 +166,158 @@ namespace IguideME.Web.Services
                         FROM    `users`
                         WHERE   `username` = '" + username + "'"
                     ))
-            {   
+            {
                 if (r.Read())
-                    return new User (
+                    return new User(
                         r.GetValue(0).ToString(),
                         -1, // we receive the user's data to store in our DB, which are not course specific
                         r.GetInt32(1),
                         r.GetValue(2).ToString() + " " + r.GetValue(3).ToString() + " " + r.GetValue(4).ToString(),
                         r.GetValue(2).ToString() + ", " + r.GetValue(4).ToString(),
-                        (int) UserRoles.student
+                        (int)UserRoles.student
                     );
             }
             return null;
         }
 
- ///////////////////////////////////////////////////////////////////////////////////////////////////
-        
-        /// <inheritdoc />
-        void ILMSHandler.SendMessage(string userID, string subject, string body)
+        private AppGradingType mapGradingType(int type_id)
+        {
+            switch (type_id)
+            {
+                case 1:
+                case 5:
+                case 7:
+                case 8:
+                    return AppGradingType.Points;
+                case 2:
+                    return AppGradingType.PassFail;
+                case 4:
+                    return AppGradingType.Letters;
+                default:
+                    _logger.LogWarning("Grade format {Type} is not supported, treating as not graded...", type_id);
+                    return AppGradingType.NotGraded;
+            }
+        }
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public void SendMessage(string userID, string subject, string body)
         {
             throw new NotImplementedException();
         }
 
         /// <inheritdoc />
-        string[] ILMSHandler.GetUserIDs(int courseID, string userID)
+        public string[] GetUserIDs(int courseID, string userID)
         {
             _logger.LogInformation("Trying to get user\ncourseID: {courseID}, userID: {userID}", courseID, userID);
             throw new NotImplementedException();
         }
 
         /// <inheritdoc />
-        IEnumerable<User> ILMSHandler.GetStudents(int courseID)
+        public IEnumerable<User> GetStudents(int courseID)
         {
             _logger.LogInformation("Trying to get all students for \ncourseID: {courseID}", courseID);
             // TODO: Add WHERE course=courseID
             List<User> students = new List<User>();
-            using (SQLiteDataReader r = 
+            using (SQLiteDataReader r =
                 Query(@"SELECT  `username`,
                                 `user_id`,
                                 `first_name`,
                                 `middle_name`,
                                 `last_name`
                         FROM    `users`
-                        WHERE   `role_id` = 110
-                        OR      `role_id` = 130
-                        OR      `role_id` = 134"
+                        WHERE   `org_role_id` = 110
+                        OR      `org_role_id` = 130
+                        OR      `org_role_id` = 134"
                     ))
             {
                 while (r.Read())
-                    students.Add(new User (
+                    students.Add(new User(
                         r.GetValue(0).ToString(),
                         courseID,
                         r.GetInt32(1),
                         r.GetValue(2).ToString() + " " + r.GetValue(3).ToString() + " " + r.GetValue(4).ToString(),
                         r.GetValue(4).ToString() + ", " + r.GetValue(2).ToString() + " " + r.GetValue(3).ToString(),
-                        (int) UserRoles.student
+                        (int)UserRoles.student
                     ));
-                
+
                 return students;
             }
         }
 
         /// <inheritdoc />
-        IEnumerable<User> ILMSHandler.GetAdministrators(int courseID)
+        public IEnumerable<User> GetAdministrators(int courseID)
         {
             _logger.LogInformation("Trying to get all teachers for \ncourseID: {courseID}", courseID);
             // TODO: Add WHERE course=courseID
             List<User> teachers = new List<User>();
-            using (SQLiteDataReader r = 
+            using (SQLiteDataReader r =
                 Query(@"SELECT  `username`,
                                 `user_id`,
                                 `first_name`,
                                 `middle_name`,
                                 `last_name`
                         FROM    `users`
-                        WHERE   `role_id` = 109
-                        OR      `role_id` = 117"
+                        WHERE   `org_role_id` = 109
+                        OR      `org_role_id` = 117"
                     ))
             {
                 while (r.Read())
-                    teachers.Add(new User (
+                    teachers.Add(new User(
                         r.GetValue(0).ToString(),
                         courseID,
                         r.GetInt32(1),
                         r.GetValue(2).ToString() + " " + r.GetValue(3).ToString() + " " + r.GetValue(4).ToString(),
                         r.GetValue(4).ToString() + ", " + r.GetValue(2).ToString() + " " + r.GetValue(3).ToString(),
-                        (int) UserRoles.instructor
+                        (int)UserRoles.instructor
                     ));
-                
+
                 return teachers;
             }
         }
 
         /// <inheritdoc />
-        IEnumerable<AppAssignment> ILMSHandler.GetAssignments(int courseID)
+        public IEnumerable<AppAssignment> GetAssignments(int courseID)
         {
             _logger.LogInformation("Trying to get all assignments for \ncourseID: {courseID}", courseID);
             List<AppAssignment> assignments = new List<AppAssignment>();
-            using (SQLiteDataReader r = 
+            using (SQLiteDataReader r =
                 Query(@"SELECT  `grade_object_id`,
                                 `org_unit_id`,
                                 `name`,
                                 `end_date`,
-                                `max_points`,students
-                                `type_name`, `grade_object_type_id`
+                                `max_points`,
+                                `type_name`,
+                                `grade_object_type_id`
                         FROM    `grade_objects`
                         WHERE   `grade_object_type_id` = 1
                         OR      `grade_object_type_id` = 2
                         OR      `grade_object_type_id` = 4"
-                    ))// TODO: is the ,students a typo?
+                    ))
             {
-                while (r.Read()){
-                    assignments.Add( new AppAssignment(
+                while (r.Read())
+                {
+                    assignments.Add(new AppAssignment(
                         r.GetInt32(0),
                         r.GetInt32(1),
                         r.GetValue(2).ToString(),
                         true, //bool published,
-                        true, //bool muted,
+                        false, //bool muted,
                         0, //int dueDate, -> r.getValue(3) it is text & needs to be float/int for timestamp
                         r.GetDouble(4),
-                        r.GetInt32(6) // TODO SOS: THIS NEEDS TO BE MAPPED TO ENUM
+                        mapGradingType(r.GetInt32(6)) // This is mapped to our local enum
                     ));
                 }
-                
+
                 return assignments;
             }
         }
 
         /// <inheritdoc />
-        IEnumerable<AssignmentSubmission> ILMSHandler.GetSubmissions(int courseID, string[] userIDs)
+        public IEnumerable<AssignmentSubmission> GetSubmissions(int courseID, string[] userIDs)
         {
             List<AssignmentSubmission> submissions = new List<AssignmentSubmission>();
-            using (SQLiteDataReader r = 
+            using (SQLiteDataReader r =
                 Query(@"SELECT  `grade_object_id`,
                                 `user_id`,
                                 `points_numerator`,
@@ -339,11 +326,12 @@ namespace IguideME.Web.Services
                                 `grade_released_date`
                         FROM    `grade_results`
                         WHERE   `org_unit_id` = " + courseID + @"
-                        AND     `user_id` 
-                            IN  (" + string.Join(",", userIDs) + ")"                        
+                        AND     `user_id`
+                            IN  (" + string.Join(",", userIDs) + ")"
                     ))
             {
-                while (r.Read()){
+                while (r.Read())
+                {
                     string rawGrade = r.GetValue(4).ToString();
                     if (rawGrade.IsNullOrEmpty())
                         submissions.Add(new AssignmentSubmission(
@@ -351,7 +339,7 @@ namespace IguideME.Web.Services
                             r.GetInt32(0),
                             r.GetValue(1).ToString(),
                             r.GetInt32(2) / r.GetInt32(3),
-                            ((DateTime) r.GetValue(5)).ToFileTimeUtc()
+                            ((DateTime)r.GetValue(5)).ToFileTimeUtc()
                         ));
                     else
                         submissions.Add(new AssignmentSubmission(
@@ -360,23 +348,23 @@ namespace IguideME.Web.Services
                             r.GetValue(1).ToString(),
                             r.GetInt32(2) / r.GetInt32(3),
                             rawGrade,
-                            ((DateTime) r.GetValue(5)).ToFileTimeUtc()
+                            ((DateTime)r.GetValue(5)).ToFileTimeUtc()
                         ));
                 }
-                
+
                 return submissions;
             }
         }
 
         /// <inheritdoc />
-        IEnumerable<(AppAssignment, IEnumerable<AssignmentSubmission>)> ILMSHandler.GetQuizzes(int courseID)
+        public IEnumerable<(AppAssignment, IEnumerable<AssignmentSubmission>)> GetQuizzes(int courseID)
         {
             // Return an empty collection as brightspace doesn't separate quizzes and assignments.
             return new List<(AppAssignment, IEnumerable<AssignmentSubmission>)>();
         }
 
         /// <inheritdoc />
-        IEnumerable<AppDiscussion> ILMSHandler.GetDiscussions(int courseID)
+        public IEnumerable<AppDiscussion> GetDiscussions(int courseID)
         {
             return new List<AppDiscussion>();
         }
