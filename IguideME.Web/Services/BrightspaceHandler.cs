@@ -180,6 +180,7 @@ namespace IguideME.Web.Services
             return null;
         }
 
+        // This function is used to map the Grading type values provided by Brightspace to our local enum
         private AppGradingType mapGradingType(int type_id)
         {
             switch (type_id)
@@ -210,25 +211,52 @@ namespace IguideME.Web.Services
         public string[] GetUserIDs(int courseID, string userID)
         {
             _logger.LogInformation("Trying to get user\ncourseID: {courseID}, userID: {userID}", courseID, userID);
-            throw new NotImplementedException();
+            string[] userIDs = new string[3];
+            using (SQLiteDataReader r =
+                Query(@"SELECT  `username`,
+                                `user_id`,
+                                `org_defined_id`
+                        FROM    `users`
+                        WHERE   `user_id` = '" + userID + "'"                        
+                    ))
+            {
+                if (r.Read()) 
+                {
+                    try 
+                    {
+                        userIDs[0] = r.GetValue(0).ToString();
+                        userIDs[1] = r.GetValue(1).ToString();
+                        userIDs[2] = r.GetValue(2).ToString();
+                    } 
+                    catch (Exception e)
+                    {
+                        PrintQueryError("BrigtspaceHandler.GetUserIDs", 0, r, e);
+                    }
+                    
+                }
+                return userIDs;
+            }
         }
 
         /// <inheritdoc />
         public IEnumerable<User> GetStudents(int courseID)
         {
             _logger.LogInformation("Trying to get all students for \ncourseID: {courseID}", courseID);
-            // TODO: Add WHERE course=courseID
             List<User> students = new List<User>();
             using (SQLiteDataReader r =
-                Query(@"SELECT  `username`,
-                                `user_id`,
-                                `first_name`,
-                                `middle_name`,
-                                `last_name`
-                        FROM    `users`
-                        WHERE   `org_role_id` = 110
-                        OR      `org_role_id` = 130
-                        OR      `org_role_id` = 134"
+                Query(@"SELECT      `users`.`username`,
+                                    `users`.`user_id`,
+                                    `users`.`first_name`,
+                                    `users`.`middle_name`,
+                                    `users`.`last_name`
+                        FROM        `users`
+                        INNER JOIN  `user_enrollments`
+                            ON      `users`.`user_id` = `user_enrollments`.`user_id`
+                        WHERE       `user_enrollments`.`org_unit_id` = @courseID
+                        AND        (`user_enrollments`.`role_id` = 110
+                        OR          `user_enrollments`.`role_id` = 130
+                        OR          `user_enrollments`.`role_id` = 134)",
+                        new SQLiteParameter("courseID", courseID)
                     ))
             {
                 while (r.Read())
@@ -249,17 +277,20 @@ namespace IguideME.Web.Services
         public IEnumerable<User> GetAdministrators(int courseID)
         {
             _logger.LogInformation("Trying to get all teachers for \ncourseID: {courseID}", courseID);
-            // TODO: Add WHERE course=courseID
             List<User> teachers = new List<User>();
             using (SQLiteDataReader r =
-                Query(@"SELECT  `username`,
-                                `user_id`,
-                                `first_name`,
-                                `middle_name`,
-                                `last_name`
-                        FROM    `users`
-                        WHERE   `org_role_id` = 109
-                        OR      `org_role_id` = 117"
+                Query(@"SELECT      `users`.`username`,
+                                    `users`.`user_id`,
+                                    `users`.`first_name`,
+                                    `users`.`middle_name`,
+                                    `users`.`last_name`
+                        FROM        `users`
+                        INNER JOIN  `user_enrollments`
+                            ON      `users`.`user_id` = `user_enrollments`.`user_id`
+                        WHERE       `user_enrollments`.`org_unit_id` = @courseID
+                        AND        (`user_enrollments`.`role_id` = 109
+                        OR          `user_enrollments`.`role_id` = 117)",
+                        new SQLiteParameter("courseID", courseID)
                     ))
             {
                 while (r.Read())

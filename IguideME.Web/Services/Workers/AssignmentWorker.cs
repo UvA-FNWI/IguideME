@@ -6,7 +6,7 @@ using IguideME.Web.Models.App;
 using IguideME.Web.Services.LMSHandlers;
 
 using Microsoft.Extensions.Logging;
-
+using Microsoft.IdentityModel.Tokens;
 using UvA.DataNose.Connectors.Canvas;
 
 namespace IguideME.Web.Services.Workers
@@ -18,7 +18,7 @@ namespace IguideME.Web.Services.Workers
     public class AssignmentWorker : IWorker
     {
         readonly private ILogger<SyncManager> _logger;
-        readonly private ILMSHandler _canvasHandler;
+        readonly private ILMSHandler _ILMSHandler;
         private readonly DatabaseManager _databaseManager;
 
         readonly private int _courseID;
@@ -26,23 +26,23 @@ namespace IguideME.Web.Services.Workers
 
         /// <summary>
         /// This constructor initializes the new AssignmentWorker to:
-        /// (<paramref name="courseID"/>, <paramref name="syncID"/>, <paramref name="canvasHandler"/>, <paramref name="logger"/>).
+        /// (<paramref name="courseID"/>, <paramref name="syncID"/>, <paramref name="ILMSHandler"/>, <paramref name="logger"/>).
         /// </summary>
         /// <param name="courseID">the id of the course.</param>
         /// <param name="syncID">the hash code associated to the current sync.</param>
-        /// <param name="canvasHandler">a reference to the class managing the connection with canvas.</param>
+        /// <param name="ILMSHandler">a reference to the class managing the connection with canvas.</param>
         /// <param name="logger">a reference to the logger used for the sync.</param>
         public AssignmentWorker(
             int courseID,
             long syncID,
-            ILMSHandler canvasHandler,
+            ILMSHandler ILMSHandler,
             DatabaseManager databaseManager,
             ILogger<SyncManager> logger)
         {
             _logger = logger;
             _courseID = courseID;
             _syncID = syncID;
-            _canvasHandler = canvasHandler;
+            _ILMSHandler = ILMSHandler;
             _databaseManager = databaseManager;
         }
 
@@ -125,13 +125,15 @@ namespace IguideME.Web.Services.Workers
         {
             _logger.LogInformation("Starting assignment registry...");
 
-            // Get the assignments from canvas.
-            IEnumerable<AppAssignment> assignments = this._canvasHandler.GetAssignments(this._courseID);
+            // Get the assignments from the ILMS.
+            IEnumerable<AppAssignment> assignments = this._ILMSHandler.GetAssignments(this._courseID);
             List<TileEntry> entries = _databaseManager.GetAllTileEntries(this._courseID);
 
             // Get the consented users and only ask for their submissions
             List<Models.Impl.User> users = _databaseManager.GetUsersWithGrantedConsent(this._courseID);
-            IEnumerable<AssignmentSubmission> submissions = this._canvasHandler.GetSubmissions(this._courseID, users.Select(user => user.UserID).ToArray());
+            if (users.Count == 0) //if no users have given consent yet, no point to continue
+                return;
+            IEnumerable<AssignmentSubmission> submissions = this._ILMSHandler.GetSubmissions(this._courseID, users.Select(user => user.UserID).ToArray());
 
             Dictionary<int, AppGradingType> gradingTypes = new();
 
