@@ -471,7 +471,8 @@ public static class DatabaseQueries
 
 
     public const string REGISTER_LEARNING_GOAL =
-        @"INSERT INTO       `learning_goals`
+        @"INSERT OR REPLACE 
+            INTO            `learning_goals`
                             (   `course_id`,
                                 `title`  )
         VALUES(
@@ -893,10 +894,9 @@ public static class DatabaseQueries
         WHERE       `tile_entries`.`tile_id`=@tileID;";
 
     public const string QUERY_LEARNING_GOAL =
-        @"SELECT    `tile_id`,
-                    `title`
+        @"SELECT    `title`
         FROM        `learning_goals`
-        AND         `goal_id`=@goalID;";
+        WHERE       `goal_id`=@goalID;";
 
     public const string QUERY_GOAL_REQUIREMENTS =
         @"SELECT    `requirement_id`,
@@ -1567,14 +1567,13 @@ public static class DatabaseQueries
         @"UPDATE    `learning_goals`
         SET         `title`=@title
         WHERE       `goal_id`=@goalID
-        AND         `tile_id`=@tileID
         AND         `course_id`=@courseID;";
 
     public const string UPDATE_LEARNING_GOAL_REQUIREMENT =
         @"UPDATE    `goal_requirements`
         SET         `assignment_id`=@assignmentID,
                     `expression`=@expression,
-                    `value`=@value,
+                    `value`=@value
         WHERE       `requirement_id`=@requirementID
         ;";
 

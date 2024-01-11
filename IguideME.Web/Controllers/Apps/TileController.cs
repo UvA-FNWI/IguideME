@@ -149,7 +149,7 @@ namespace IguideME.Web.Controllers
         [Route("/learning-goals")]
         public ActionResult GetGoals()
         {
-            return Json(_databaseManager.GetGoals(GetCourseID()));
+            return Json(_databaseManager.GetGoals(GetCourseID(), true));
         }
 
         [Authorize(Policy = "IsInstructor")]
@@ -168,6 +168,96 @@ namespace IguideME.Web.Controllers
             }
             return BadRequest();
         }
+
+        [Authorize(Policy = "IsInstructor")]
+        [HttpPatch]
+        [Route("/learning-goals/{ID}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public ActionResult PatchGoal(string ID, [FromBody] LearningGoal obj)
+        {
+            bool success = int.TryParse(ID, out int id);
+            if (success)
+            {
+                _databaseManager.UpdateGoal(GetCourseID(), obj);
+                return Ok();
+            }
+            return BadRequest();
+        }
+
+        [Authorize(Policy = "IsInstructor")]
+        [HttpDelete]
+        [Route("/learning-goals/{ID}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public ActionResult DeleteGoal(string ID)
+        {
+            bool success = int.TryParse(ID, out int id);
+
+            if (success)
+            {
+                _databaseManager.DeleteGoal(GetCourseID(), id);
+                return Ok();
+            }
+
+            return BadRequest();
+        }
+
+        [Authorize(Policy = "IsInstructor")]
+        [HttpPost]
+        [Route("/learning-goals/requirements/{ID}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public ActionResult PostGoalRequirement(string ID, [FromBody] GoalRequirement obj)
+        {
+            bool success = int.TryParse(ID, out int id);
+            if (success)
+            {
+                _databaseManager.CreateGoalRequirement(obj);
+                return Ok();
+            }
+            return BadRequest();
+        }
+
+        [Authorize(Policy = "IsInstructor")]
+        [HttpPatch]
+        [Route("/learning-goals/requirements/{ID}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public ActionResult PatchGoalRequirement(string ID, [FromBody] GoalRequirement obj)
+        {
+            bool success = int.TryParse(ID, out int id);
+            if (success)
+            {
+                _databaseManager.UpdateGoalRequirement(obj);
+                return Ok();
+            }
+            return BadRequest();
+        }
+
+        [Authorize(Policy = "IsInstructor")]
+        [HttpDelete]
+        [Route("/learning-goals/requirements/{ID}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public ActionResult DeleteRequirement(string ID)
+        {
+            bool success = int.TryParse(ID, out int id);
+
+            if (success)
+            {
+                _databaseManager.DeleteGoalRequirement(id);
+                return Ok();
+            }
+
+            return BadRequest();
+        }
+
         // [Authorize]
         // [HttpGet]
         // [ProducesResponseType(StatusCodes.Status200OK)]
@@ -348,6 +438,8 @@ namespace IguideME.Web.Controllers
 
             return BadRequest();
         }
+
+        
 
         // [Authorize]
         // [HttpGet]

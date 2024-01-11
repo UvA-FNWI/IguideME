@@ -2,6 +2,7 @@ import {
   type Discussion,
   type Assignment,
   type LearningGoal,
+  GoalRequirement,
 } from "@/types/tile";
 import apiClient from "./axios";
 
@@ -27,4 +28,38 @@ export const postLearningGoal: (goal: LearningGoal) => Promise<void> = async (
   goal: LearningGoal,
 ) => {
   await apiClient.post(`learning-goals/${goal.id}`, goal);
+};
+
+export const patchLearningGoal: (goal: LearningGoal) => Promise<void> = async (
+  goal: LearningGoal,
+) => {
+  await apiClient.patch(`learning-goals/${goal.id}`, goal);
+};
+
+export const deleteGoal: (id: number) => Promise<void> = async (id: number) => {
+  await apiClient.delete(`learning-goals/${id}`);
+};
+
+export const postGoalRequirement: (
+  requirement: GoalRequirement,
+) => Promise<void> = async (requirement: GoalRequirement) => {
+  await apiClient.post(
+    `learning-goals/requirements/${requirement.id}`,
+    requirement,
+  );
+};
+
+export const patchGoalRequirement: (
+  requirement: GoalRequirement,
+) => Promise<void> = async (requirement: GoalRequirement) => {
+  await apiClient.patch(
+    `learning-goals/requirements/${requirement.id}`,
+    requirement,
+  );
+};
+
+export const deleteRequirement: (id: number) => Promise<void> = async (
+  id: number,
+) => {
+  await apiClient.delete(`learning-goals/requirements/${id}`);
 };

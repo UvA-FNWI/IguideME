@@ -68,7 +68,7 @@ namespace IguideME.Web.Models
             this.GradingType = gradingType;
             this.Visible = visible;
             this.Notifications = notifications;
-            this.Entries = new List<TileEntry>();
+            this.Entries = new();
         }
     }
 

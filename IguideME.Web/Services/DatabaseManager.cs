@@ -1745,7 +1745,7 @@ namespace IguideME.Web.Services
             return comparisson_history;
         }
 
-        public List<LearningGoal> GetGoals(int courseID)
+        public List<LearningGoal> GetGoals(int courseID, bool autoLoadRequirements = false)
         {
             List<LearningGoal> goals = new();
 
@@ -1769,6 +1769,11 @@ namespace IguideME.Web.Services
                 }
             }
 
+            foreach (LearningGoal g in goals)
+            {
+                if (autoLoadRequirements)
+                    g.Requirements = GetGoalRequirements(g.ID);
+            }
             return goals;
         }
 
@@ -1805,11 +1810,11 @@ namespace IguideME.Web.Services
                 {
                     try
                     {
-                        goal = new LearningGoal(id, r.GetValue(1).ToString());
+                        goal = new LearningGoal(id, r.GetValue(0).ToString());
                     }
                     catch (Exception e)
                     {
-                        PrintQueryError("GetGoals", 1, r, e);
+                        PrintQueryError("GetGoals", 0, r, e);
                     }
                 }
             }
@@ -1825,16 +1830,13 @@ namespace IguideME.Web.Services
 
         }
 
-        public LearningGoal UpdateGoal(int courseID, LearningGoal goal)
+        public void UpdateGoal(int courseID, LearningGoal goal)
         {
             NonQuery(DatabaseQueries.UPDATE_LEARNING_GOAL,
-                    new SQLiteParameter("courseID", courseID),
                     new SQLiteParameter("goalID", goal.ID),
-                    // new SQLiteParameter("tileID", goal.TileID),
+                    new SQLiteParameter("courseID", courseID),
                     new SQLiteParameter("title", goal.Title)
                 );
-
-            return GetGoal(courseID, goal.ID);
         }
 
         public void DeleteGoal(int courseID, LearningGoal goal)
@@ -1868,17 +1870,13 @@ namespace IguideME.Web.Services
             }
         }
 
-        public void CreateGoalRequirement(
-            int goalID,
-            int assignmentID,
-            int expresson,
-            float value)
+        public void CreateGoalRequirement(GoalRequirement requirement)
         {
             NonQuery(DatabaseQueries.REGISTER_GOAL_REQUIREMENT,
-                new SQLiteParameter("goalID", goalID),
-                new SQLiteParameter("assignmentID", assignmentID),
-                new SQLiteParameter("expresson", expresson),
-                new SQLiteParameter("value", value)
+                new SQLiteParameter("goalID", requirement.GoalID),
+                new SQLiteParameter("assignmentID", requirement.AssignmentID),
+                new SQLiteParameter("expresson", requirement.Expression),
+                new SQLiteParameter("value", requirement.Value)
             );
         }
 

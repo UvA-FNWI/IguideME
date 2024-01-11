@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
 
-using IguideME.Web.Services;
-
 using Newtonsoft.Json;
 
 
@@ -29,30 +27,28 @@ namespace IguideME.Web.Models.App
             this.ID = id;
             // this.TileID = tileID;
             this.Title = title;
+            this.Requirements = new();
         }
+    }
+
+    public enum LogicalExpressions
+    {
+        Less,
+        LessEqual,
+        Equal,
+        GreaterEqual,
+        Greater,
+        NotEqual
     }
 
     public class GoalRequirement
     {
-
-        public enum LogicalExpressions
-        {
-            Less,
-            LessEqual,
-            Equal,
-            GreaterEqual,
-            Greater,
-            NotEqual
-        }
 
         [JsonProperty("id")]
         public int ID { get; set; }
 
         [JsonProperty("goal_id")]
         public int GoalID { get; set; }
-
-        [JsonProperty("tile_id")]
-        public int TileID { get; set; }
 
         [JsonProperty("assignment_id")]
         public int AssignmentID { get; set; }
@@ -80,18 +76,18 @@ namespace IguideME.Web.Models.App
             this.Expression = (LogicalExpressions)expression;
         }
 
-        public GoalRequirement(
-            int id,
-            int goalID,
-            int assignmentID,
-            LogicalExpressions expression,
-            float value)
-        {
-            this.ID = id;
-            this.GoalID = goalID;
-            this.AssignmentID = assignmentID;
-            this.Value = value;
-            this.Expression = expression;
-        }
+        // public GoalRequirement(
+        //     int id,
+        //     int goalID,
+        //     int assignmentID,
+        //     LogicalExpressions expression,
+        //     float value)
+        // {
+        //     this.ID = id;
+        //     this.GoalID = goalID;
+        //     this.AssignmentID = assignmentID;
+        //     this.Value = value;
+        //     this.Expression = expression;
+        // }
     }
 }
