@@ -217,7 +217,8 @@ namespace IguideME.Web.Services
                                 `user_id`,
                                 `org_defined_id`
                         FROM    `users`
-                        WHERE   `user_id` = '" + userID + "'"                        
+                        WHERE   `user_id` = @userID",
+                    new SQLiteParameter("userID", userID)                    
                     ))
             {
                 if (r.Read()) 
@@ -256,7 +257,7 @@ namespace IguideME.Web.Services
                         AND        (`user_enrollments`.`role_id` = 110
                         OR          `user_enrollments`.`role_id` = 130
                         OR          `user_enrollments`.`role_id` = 134)",
-                        new SQLiteParameter("courseID", courseID)
+                    new SQLiteParameter("courseID", courseID)
                     ))
             {
                 while (r.Read())
@@ -290,7 +291,7 @@ namespace IguideME.Web.Services
                         WHERE       `user_enrollments`.`org_unit_id` = @courseID
                         AND        (`user_enrollments`.`role_id` = 109
                         OR          `user_enrollments`.`role_id` = 117)",
-                        new SQLiteParameter("courseID", courseID)
+                    new SQLiteParameter("courseID", courseID)
                     ))
             {
                 while (r.Read())
@@ -356,9 +357,11 @@ namespace IguideME.Web.Services
                                 `grade_text`,
                                 `grade_released_date`
                         FROM    `grade_results`
-                        WHERE   `org_unit_id` = " + courseID + @"
+                        WHERE   `org_unit_id` = @courseID
                         AND     `user_id`
-                            IN  (" + string.Join(",", userIDs) + ")"
+                            IN  (@allIDs)",
+                    new SQLiteParameter("courseID", courseID),
+                    new SQLiteParameter("allIDs", string.Join(",", userIDs))                    
                     ))
             {
                 while (r.Read())
@@ -397,6 +400,7 @@ namespace IguideME.Web.Services
         /// <inheritdoc />
         public IEnumerable<AppDiscussion> GetDiscussions(int courseID)
         {
+            // Return an empty collection as brightspace doesn't have discussions
             return new List<AppDiscussion>();
         }
     }
