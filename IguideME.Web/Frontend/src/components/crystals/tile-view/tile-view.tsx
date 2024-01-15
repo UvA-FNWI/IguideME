@@ -3,7 +3,7 @@ import { tileViewContext } from "@/components/pages/student-dashboard/context";
 import { type Tile, TileType } from "@/types/tile";
 
 import "./style.scss";
-import { Bullet, BulletConfig } from "@ant-design/charts";
+import { Bullet, BulletConfig, RadialBar } from "@ant-design/charts";
 import { Col, Row } from "antd";
 
 interface Props {
@@ -57,14 +57,12 @@ const GraphGrade: FC<Props> = ({ tile }): ReactElement => {
   const peeravg = Math.random() * 100;
   const peermin = peeravg / 2;
   const peermax = (100 + peeravg) / 2;
-  const goal = 80;
   const max = 100;
 
   const studentdata = [
     {
       title: "You",
       Grade: grade,
-      Goal: goal,
       Max: max,
     },
   ];
@@ -117,12 +115,10 @@ const GraphGrade: FC<Props> = ({ tile }): ReactElement => {
         <Bullet
           data={studentdata}
           rangeField="Max"
-          targetField="Goal"
           measureField="Grade"
           color={{
-            Goal: "black",
             Max: ["#f6f8fa"],
-            Grade: "rgba(90, 50, 255, .9)",
+            Grade: "rgb(90, 50, 255)",
           }}
           {...config}
         />
@@ -133,7 +129,7 @@ const GraphGrade: FC<Props> = ({ tile }): ReactElement => {
           measureField="Grade"
           color={{
             ranges: ["#f6f8fa", "rgba(255, 50, 50, .3)", "#f6f8fb"],
-            Grade: "rgba(255, 50, 50, 1)",
+            Grade: "rgb(255, 50, 50)",
           }}
           {...config}
           mapField={{
@@ -148,7 +144,64 @@ const GraphGrade: FC<Props> = ({ tile }): ReactElement => {
 };
 
 const GraphLearning: FC<Props> = ({ tile }): ReactElement => {
-  return <div>{tile.title}</div>;
+  const grade = Math.random() * 100;
+  const peeravg = Math.random() * 100;
+  const peermin = peeravg / 2;
+  const peermax = (100 + peeravg) / 2;
+  const max = 100;
+
+  const data = [
+    {
+      name: "You",
+      Grade: grade,
+    },
+    {
+      name: "Peer",
+      Grade: peeravg,
+    },
+  ];
+  const config = {
+    data,
+    padding: 0,
+    margin: 0,
+    paddingBottom: 10,
+    xField: "name",
+    yField: "Grade",
+    maxAngle: 360,
+    radius: 1.3,
+    innerRadius: 0.3,
+    scale: {
+      y: {
+        domain: [0, 100],
+      },
+    },
+    style: {
+      fill: (data: any) => {
+        if (data.name === "You") {
+          return "rgb(90, 50, 255 )";
+        }
+        return "rgb(255, 50, 50)";
+      },
+    },
+    axis: {
+      y: { label: false, tick: false, grid: false },
+    },
+    tooltip: {
+      title: "",
+      items: [
+        {
+          name: "Completed",
+          field: "Grade",
+          valueFormatter: (d: number) => d.toFixed(0) + "/" + max,
+        },
+      ],
+    },
+  };
+  return (
+    <div style={{ height: "90%", margin: 0 }}>
+      <RadialBar {...config} />
+    </div>
+  );
 };
 
 export default ViewTile;
