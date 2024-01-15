@@ -4,7 +4,7 @@ import { SmileTwoTone } from "@ant-design/icons";
 import { tileViewContext } from "@/components/pages/student-dashboard/context";
 
 import "./style.scss";
-import { ResponsiveBar } from "@nivo/bar";
+import { Bar, type BarConfig } from "@ant-design/charts";
 
 const GradeDisplay: FC = (): ReactElement => {
   const viewType = useContext(tileViewContext);
@@ -66,74 +66,58 @@ const GridGrades: FC<Props> = ({ goal, avg, pred }): ReactElement => {
 };
 
 const GraphGrades: FC<Props> = ({ goal, avg, pred }): ReactElement => {
+  const max = 100;
+  const data = [
+    {
+      name: "Current grade",
+      grade: avg,
+    },
+    {
+      name: "Predicted grade",
+      grade: pred,
+    },
+  ];
+
+  const config: BarConfig = {
+    data,
+    autoFit: true,
+    padding: 20,
+    colorField: "name",
+    color: ["rgba(90, 50, 255, .9)", "rgba(90, 50, 255, .9)"],
+    xField: "name",
+    yField: "grade",
+    legend: false,
+    sort: {
+      // @ts-expect-error I think that the type bindings are incorrect, as this works but the suggested type doesn't
+      reverse: "true",
+    },
+    scale: {
+      y: { domainMax: max },
+    },
+    axis: {
+      x: { label: true, tick: false },
+      y: { label: false, tick: false },
+    },
+    tooltip: {
+      title: "",
+    },
+    annotations: [
+      {
+        type: "lineY",
+        // @ts-expect-error I think that the type bindings are incorrect, as this works but the suggested type doesn't
+        yField: goal,
+        style: {
+          stroke: "black",
+          strokeOpacity: 1,
+          lineWidth: 1,
+          lineDash: [8, 3],
+        },
+      },
+    ],
+  };
   return (
     <div style={{ height: "50px", width: "100% " }}>
-      <ResponsiveBar
-        data={[
-          {
-            key: "Current",
-            tooltipName: "Current grade",
-            grade: avg,
-            color: "rgba(90, 50, 255, .9)",
-            borderColor: "rgba(50, 10, 215, 1)",
-          },
-          {
-            key: "Predicted",
-            tooltipName: "Predicted grade",
-            grade: pred,
-            color: "rgba(83, 198, 150, .9)",
-            borderColor: "rgba(43, 158, 110, 1)",
-          },
-        ]}
-        markers={[
-          {
-            axis: "x",
-            value: goal,
-            lineStyle: {
-              stroke: "rgba(0, 0, 0, .4)",
-              strokeWidth: 2,
-              strokeDasharray: 4,
-            },
-            textStyle: {
-              fontSize: "8pt",
-            },
-            legend: "Goal",
-            legendOrientation: "horizontal",
-            legendPosition: "center",
-          },
-        ]}
-        label={""}
-        enableGridY={false}
-        indexBy="key"
-        tooltip={(d) => (
-          <div
-            style={{
-              background: "rgba(255,255,255,.95)",
-              padding: 5,
-              border: "1px solid #ebebeb",
-            }}
-          >
-            {d.data.tooltipName}: <b>{d.value}</b>
-          </div>
-        )}
-        keys={["grade"]}
-        axisLeft={{
-          tickSize: 0,
-          tickPadding: 5,
-          tickRotation: 0,
-          truncateTickAt: 0,
-        }}
-        axisBottom={null}
-        minValue={0}
-        margin={{ top: 45, right: 0, bottom: 50, left: 55 }}
-        maxValue={100}
-        padding={0.2}
-        borderWidth={1}
-        borderColor={({ data }) => data.data.borderColor}
-        layout="horizontal"
-        colors={({ data }) => data.color}
-        colorBy="indexValue"
-      />
+      <Bar {...config} marginTop={20} marginBottom={30} />
     </div>
   );
 };

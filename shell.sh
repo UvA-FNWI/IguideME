@@ -12,7 +12,7 @@ fi
 #KUBECTL_PROJ_ID=$(kubectl get pods -n iguideme | grep Running | awk '{print $1}')
 
 alias frontend-dev='yarn --cwd $PROJECT_ROOT/IguideME.Web/Frontend dev'
-alias iguideme-packages='yarn --cwd $PROJECT_ROOT/IguideME.Web/Frontend install'
+alias iguideme-packages='yarn --cwd $PROJECT_ROOT/IguideME.Web/Frontend'
 alias iguideme-add-package='yarn --cwd $PROJECT_ROOT/IguideME.Web/Frontend add'
 # alias frontend-prod='yarn --cwd $PROJECT_ROOT/IguideME.Web/Frontend build'
 alias backend-dev='dotnet watch --project $PROJECT_ROOT/IguideME.Web/ --no-hot-reload';
