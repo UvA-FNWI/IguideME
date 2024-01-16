@@ -13,8 +13,6 @@ fi
 
 alias frontend-dev='yarn --cwd $PROJECT_ROOT/IguideME.Web/Frontend dev'
 alias iguideme-packages='yarn --cwd $PROJECT_ROOT/IguideME.Web/Frontend'
-alias iguideme-add-package='yarn --cwd $PROJECT_ROOT/IguideME.Web/Frontend add'
-# alias frontend-prod='yarn --cwd $PROJECT_ROOT/IguideME.Web/Frontend build'
 alias backend-dev='dotnet watch --project $PROJECT_ROOT/IguideME.Web/ --no-hot-reload';
 alias enter-db='litecli $PROJECT_ROOT/IguideME.Web/db.sqlite';
 alias bright-db='litecli $PROJECT_ROOT/IguideME.Web/brightspace.db';
@@ -27,8 +25,7 @@ display_help () {
   echo "                                          ";
   echo "  ---frontend---------------------------------------------------";
   echo "  frontend-dev              build and run the frontend (watcher)";
-  echo "  iguideme-packages         update/install required node modules";
-  echo "  iguideme-add-packages     add new node modules";
+  echo "  iguideme-packages         node package manager in correct directory";
   echo "                                          ";
   echo "  ---backend----------------------------------------------------";
   echo "  backend-dev 	            build and run the backend (watcher)";

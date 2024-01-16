@@ -1,22 +1,25 @@
 import { Space } from "antd";
 import { useContext, type FC, type ReactElement } from "react";
-import { SmileTwoTone } from "@ant-design/icons";
+import { FrownTwoTone, MehTwoTone, SmileTwoTone } from "@ant-design/icons";
 import { tileViewContext } from "@/components/pages/student-dashboard/context";
 
 import "./style.scss";
 import { Bar, type BarConfig } from "@ant-design/charts";
 
+const BLUE = "rgba(90, 50, 255, .9)";
+const GREEN = "rgba(13, 204, 204, 1)";
+
 const GradeDisplay: FC = (): ReactElement => {
   const viewType = useContext(tileViewContext);
-  const goal = 80;
-  const avg = 90;
-  const pred = 70;
+  const goal = 7;
+  const avg = 9;
+  const pred = 7;
 
   switch (viewType) {
     case "grid":
-      return <GridGrades goal={goal} avg={avg} pred={pred} />;
+      return <GridGrades {...{ goal, avg, pred }} />;
     case "graph":
-      return <GraphGrades goal={goal} avg={avg} pred={pred} />;
+      return <GraphGrades {...{ goal, avg, pred }} />;
   }
 };
 
@@ -26,39 +29,36 @@ interface Props {
   pred: number;
 }
 const GridGrades: FC<Props> = ({ goal, avg, pred }): ReactElement => {
+  const happy = <SmileTwoTone size={10} twoToneColor="rgb(0, 185, 120)" />;
+  const meh = <MehTwoTone size={10} twoToneColor="rgb(245, 226, 54)" />;
+  const unhappy = <FrownTwoTone size={10} twoToneColor={"rgb(255, 110, 90)"} />;
   return (
     <Space size="large" style={{ justifyContent: "center", width: "100%" }}>
       <div className="gradeView">
         <p>Goal</p>
         <h2>
-          <SmileTwoTone
-            size={11}
-            style={{ marginRight: 8 }}
-            twoToneColor="#00cc66"
-          />
-          {goal}
+          <Space>
+            {goal >= 7 ? happy : goal >= 5.5 ? meh : unhappy}
+            {goal}
+          </Space>
         </h2>
       </div>
       <div className="gradeView">
         <p>Current</p>
         <h2>
-          <SmileTwoTone
-            size={11}
-            style={{ marginRight: 8 }}
-            twoToneColor="#00cc66"
-          />
-          {avg}
+          <Space>
+            {avg > goal ? happy : avg >= 5.5 ? meh : unhappy}
+            {avg}
+          </Space>
         </h2>
       </div>
       <div className="gradeView">
         <p>Predicted</p>
         <h2>
-          <SmileTwoTone
-            size={11}
-            style={{ marginRight: 8 }}
-            twoToneColor="#00cc66"
-          />
-          {pred}
+          <Space>
+            {pred > goal ? happy : pred >= 5.5 ? meh : unhappy}
+            {pred}
+          </Space>
         </h2>
       </div>
     </Space>
@@ -66,7 +66,7 @@ const GridGrades: FC<Props> = ({ goal, avg, pred }): ReactElement => {
 };
 
 const GraphGrades: FC<Props> = ({ goal, avg, pred }): ReactElement => {
-  const max = 100;
+  const max = 10;
   const data = [
     {
       name: "Current grade",
@@ -83,7 +83,7 @@ const GraphGrades: FC<Props> = ({ goal, avg, pred }): ReactElement => {
     autoFit: true,
     padding: 20,
     colorField: "name",
-    color: ["rgba(90, 50, 255, .9)", "rgba(90, 50, 255, .9)"],
+    color: [BLUE, GREEN],
     xField: "name",
     yField: "grade",
     legend: false,

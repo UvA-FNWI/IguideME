@@ -6,8 +6,6 @@ using IguideME.Web.Models.App;
 using IguideME.Web.Services.LMSHandlers;
 
 using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
-using UvA.DataNose.Connectors.Canvas;
 
 namespace IguideME.Web.Services.Workers
 {
@@ -77,22 +75,24 @@ namespace IguideME.Web.Services.Workers
         /// </summary>
         /// <param name="assignment">the assignment the submissions are associated to.</param>
         /// <param name="entry">the tile entry the submissions are associated to.</param>
-        private void RegisterSubmissions(IEnumerable<AssignmentSubmission> submissions, Dictionary<int, AppGradingType> gradingTypes)
+        private void RegisterSubmissions(IEnumerable<AssignmentSubmission> submissions, Dictionary<int, (double, AppGradingType)> gradingTypes)
         {
+            double max;
             AppGradingType type;
+            (double, AppGradingType) elem;
             foreach (AssignmentSubmission submission in submissions)
             {
                 // WE NEED TO CHANGE THE SUBMISSION IDs FROM EXTERNAL ASSIGNMENT ID TO INTERNAL ASSIGNMENT ID
                 submission.AssignmentID = _databaseManager.GetInternalAssignmentID(_courseID, submission.AssignmentID);
 
-                if (gradingTypes.TryGetValue(submission.AssignmentID, out type))
+                if (gradingTypes.TryGetValue(submission.AssignmentID, out elem))
                 {
 
-                    switch (gradingTypes[submission.AssignmentID])
+                    (max, type) = elem;
+                    switch (type)
                     {
                         case AppGradingType.Points:
-                            // submissions.Grade = (double.Parse(submission.RawGrade) - 1)/0.09; // should switch to this
-                            submission.Grade = double.Parse(submission.RawGrade);
+                            submission.Grade = (double.Parse(submission.RawGrade)) * 100/max;
                             break;
                         case AppGradingType.Percentage:
                             submission.Grade = double.Parse(submission.RawGrade);
@@ -135,7 +135,7 @@ namespace IguideME.Web.Services.Workers
                 return;
             IEnumerable<AssignmentSubmission> submissions = this._ILMSHandler.GetSubmissions(this._courseID, users.Select(user => user.UserID).ToArray());
 
-            Dictionary<int, AppGradingType> gradingTypes = new();
+            Dictionary<int, (double, AppGradingType)> gradingTypes = new();
 
             foreach (AppAssignment assignment in assignments)
             {
@@ -147,7 +147,7 @@ namespace IguideME.Web.Services.Workers
                 TileEntry entry = entries.Find(e => e.ContentID == assignment.ID);
                 if (entry == null) continue;
 
-                gradingTypes.Add(assignment.ID, assignment.GradingType);
+                gradingTypes.Add(assignment.ID, (assignment.MaxGrade, assignment.GradingType));
 
             }
 

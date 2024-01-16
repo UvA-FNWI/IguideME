@@ -2,13 +2,13 @@ import { getSelf, getStudent } from "@/api/users";
 import GradeDisplay from "@/components/atoms/grade-display/grade-display";
 import StudentInfo from "@/components/atoms/student-info/student-info";
 import ViewLayout from "@/components/crystals/layout-view/layout-view";
-import { User, UserRoles } from "@/types/user";
+import { type User, UserRoles } from "@/types/user";
 import { AppstoreOutlined, BarChartOutlined } from "@ant-design/icons";
 import { Col, Radio, Row } from "antd";
 import { useState, type FC, type ReactElement } from "react";
 import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
-import { contextType, tileViewContext } from "./context";
+import { type contextType, tileViewContext } from "./context";
 
 const StudentDashboard: FC = (): ReactElement => {
   const { id } = useParams();
@@ -21,7 +21,10 @@ const StudentDashboard: FC = (): ReactElement => {
 
   if (id === undefined) return <>Something went wrong, could not load user</>;
 
-  const { data: student } = useQuery("student", () => getStudent(id));
+  const { data: student } = useQuery(
+    "student",
+    async () => await getStudent(id),
+  );
 
   if (student !== undefined) {
     return <Dashboard self={student} />;
@@ -49,7 +52,9 @@ const Dashboard: FC<Props> = ({ self }): ReactElement => {
           <Radio.Group
             value={viewType}
             buttonStyle="solid"
-            onChange={(e) => setViewType(e.target.value)}
+            onChange={(e) => {
+              setViewType(e.target.value);
+            }}
           >
             <Radio.Button value="graph">
               <BarChartOutlined /> Graph

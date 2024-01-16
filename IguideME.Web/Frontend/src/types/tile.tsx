@@ -88,6 +88,49 @@ export const printGradingType = (type: GradingType): string => {
   }
 };
 
+export const printGrade = (
+  type: GradingType,
+  grade: number,
+  max: number,
+  ng: boolean = true,
+): string => {
+  switch (type) {
+    case GradingType.PassFail:
+      return grade > 0 ? "Pass" : "Fail";
+    case GradingType.Percentage:
+      return grade.toFixed(1) + "%";
+    case GradingType.Letters:
+      return letterGrade(grade);
+    case GradingType.Points:
+      return ((grade * max) / 100).toFixed(2) + "/" + max;
+    case GradingType.NotGraded:
+      return ng ? "N/A" : grade.toFixed(0);
+  }
+};
+
+const letterGrade = (grade: number): string => {
+  if (grade > 93) return "A";
+  if (grade > 89) return "A-";
+  if (grade > 86) return "B+";
+  if (grade > 83) return "B";
+  if (grade > 79) return "B-";
+  if (grade > 76) return "C+";
+  if (grade > 73) return "C";
+  if (grade > 69) return "C-";
+  if (grade > 66) return "D+";
+  if (grade > 63) return "D";
+  if (grade > 60) return "D-";
+  return "F";
+};
+export interface Grades {
+  grade: number;
+  peerAvg: number;
+  peerMin: number;
+  peerMax: number;
+  max: number;
+  type: GradingType;
+}
+
 export enum DiscussionType {
   Topic,
   Entry,
