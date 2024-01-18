@@ -37,7 +37,7 @@ const GraphGrade: FC<Grades> = ({
   const peerdata = [
     {
       title: "Peers",
-      Grade: peerAvg,
+      "Peer avg": peerAvg,
       ranges: [peerMin, peerMax, max],
     },
   ];
@@ -93,14 +93,14 @@ const GraphGrade: FC<Grades> = ({
       <Col span={12} style={{ height: "100%" }}>
         <Bullet
           data={peerdata}
-          measureField="Grade"
+          measureField="Peer avg"
           color={{
             ranges: ["#f6f8fa", "rgba(255, 50, 50, .3)", "#f6f8fb"],
-            Grade: RED,
+            "Peer avg": RED,
           }}
           {...config}
           mapField={{
-            measures: "Grade",
+            measures: "Peer avg",
             ranges: ["Max", "Peer max", "Peer min"],
             target: "",
           }}

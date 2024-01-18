@@ -224,40 +224,37 @@ namespace IguideME.Web.Controllers
 
 
 
-        // [Authorize(Policy = "IsInstructor")]
-        // [Route("/app/notifications")]
-        // [HttpPost]
-        // [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        // [ProducesResponseType(StatusCodes.Status200OK)]
-        // public ActionResult UpdateNotificationDates()
-        // {
-        //     int courseID = this.GetCourseID();
+        [Authorize(Policy = "IsInstructor")]
+        [Route("/app/notifications")]
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public ActionResult UpdateNotificationDates()
+        {
+            int courseID = this.GetCourseID();
 
-        //     var body = new StreamReader(Request.Body).ReadToEnd();
-        //     string dates = (string)JObject.Parse(body)["dates"];
+            var body = new StreamReader(Request.Body).ReadToEnd();
+            string dates = (string)JObject.Parse(body)["dates"];
 
-        //     _databaseManager.UpdateNotificationDates(
-        //         courseID,
-        //         dates);
+            _databaseManager.UpdateNotificationDates(
+                courseID,
+                dates);
 
-        //     return Json("");
-        //     // return Json(
-        //     //     _databaseManager
-        //     //     .GetNotificationDates(GetCourseID()));
-        // }
+            return Ok();
+        }
 
 
-        // [Authorize(Policy = "IsInstructor")]
-        // [Route("/app/notifications")]
-        // [HttpGet]
-        // [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        // [ProducesResponseType(StatusCodes.Status404NotFound)]
-        // [ProducesResponseType(StatusCodes.Status200OK)]
-        // public ActionResult GetNotificationDates()
-        // {
-        //     List<string> allDates = _databaseManager.GetNotificationDates(GetCourseID());
+        [Authorize(Policy = "IsInstructor")]
+        [Route("/app/notifications")]
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public ActionResult GetNotificationDates()
+        {
+            List<string> allDates = _databaseManager.GetNotificationDates(GetCourseID());
 
-        //     return allDates != null ? Json(allDates) : NotFound();
-        // }
+            return allDates != null ? Json(allDates) : NotFound();
+        }
     }
 }
