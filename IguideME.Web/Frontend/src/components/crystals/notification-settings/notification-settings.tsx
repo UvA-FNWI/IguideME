@@ -22,8 +22,6 @@ const NotificationSettings: FC = (): ReactElement => {
       ? element.split("-").map((v) => new Date(Date.parse(v)))
       : new Date(Date.parse(element)),
   );
-  console.log("test", data);
-  console.log("test1", dates);
   // dates.map((value) => Date.parse(value)),
   return <NotificationSettingsForm dates={dates} isRange={isRange} />;
 };
