@@ -6,9 +6,6 @@ using IguideME.Web.Models;
 using IguideME.Web.Models.App;
 using IguideME.Web.Models.Impl;
 using Microsoft.Extensions.Logging;
-using Discussion = UvA.DataNose.Connectors.Canvas.Discussion;
-using DiscussionEntry = UvA.DataNose.Connectors.Canvas.DiscussionEntry;
-using DiscussionReply = UvA.DataNose.Connectors.Canvas.DiscussionReply;
 using System.Linq;
 
 namespace IguideME.Web.Services
@@ -26,8 +23,8 @@ namespace IguideME.Web.Services
             _connection_string = isDev ? "Data Source=db.sqlite;Version=3;New=False;Compress=True;"
                                       : "Data Source=/data/IguideME.db;Version=3;New=False;Compress=True;";
 
-            DatabaseManager.s_instance.RunMigrations();
             DatabaseManager.s_instance.CreateTables();
+            DatabaseManager.s_instance.RunMigrations();
             ILoggerFactory factory = LoggerFactory.Create(builder => builder.AddConsole());
             _logger = factory.CreateLogger("DatabaseManager");
         }
@@ -474,76 +471,45 @@ namespace IguideME.Web.Services
                     );
         }
 
-        public void RegisterAssignment(
-            int? assignmentID,
-            int courseID,
-            string name,
-            bool published,
-            bool muted,
-            string dueDate,
-            double? pointsPossible,
-            int? position,
-            int gradingType,
-            string submissionType,
-            string syncHash)
+        public void RegisterAssignment(AppAssignment assignment, string syncHash)
         {
             NonQuery(
                 DatabaseQueries.REGISTER_CANVAS_ASSIGNMENT,
-                new SQLiteParameter("assignmentID", assignmentID.ToString()),
-                new SQLiteParameter("courseID", courseID),
-                new SQLiteParameter("name", name),
-                new SQLiteParameter("published", published),
-                new SQLiteParameter("muted", muted),
-                new SQLiteParameter("dueDate", dueDate),
-                new SQLiteParameter("pointsPossible", pointsPossible),
-                new SQLiteParameter("position", position),
-                new SQLiteParameter("gradingType", gradingType),
-                new SQLiteParameter("submissionType", submissionType),
+                new SQLiteParameter("assignmentID", assignment.AssignmentID ),
+                new SQLiteParameter("courseID", assignment.CourseID),
+                new SQLiteParameter("name", assignment.Name),
+                new SQLiteParameter("published", assignment.Published),
+                new SQLiteParameter("muted", assignment.Muted),
+                new SQLiteParameter("dueDate", assignment.DueDate),
+                new SQLiteParameter("pointsPossible", assignment.PointsPossible),
+                new SQLiteParameter("position", assignment.Position),
+                new SQLiteParameter("gradingType", assignment.GradingType),
+                new SQLiteParameter("submissionType", assignment.SubmissionType),
                 new SQLiteParameter("hash", syncHash)
             );
         }
 
-        public void RegisterDiscussion(Discussion discussion, string syncHash)
+        public void RegisterDiscussion(AppDiscussion discussion, string syncHash)
         {
             NonQuery(
                 DatabaseQueries.REGISTER_CANVAS_DISCUSSION,
                 new SQLiteParameter("id", discussion.ID),
                 new SQLiteParameter("courseID", discussion.CourseID),
                 new SQLiteParameter("title", discussion.Title),
-                new SQLiteParameter("userName", discussion.UserName),
+                new SQLiteParameter("userName", discussion.PostedBy),
                 new SQLiteParameter("postedAt", discussion.PostedAt),
                 new SQLiteParameter("message", discussion.Message),
                 new SQLiteParameter("hash", syncHash)
             );
         }
 
-        public void UpdateDiscussion(Discussion discussion, int tileID, string hash)
+        public void UpdateDiscussion(AppDiscussion discussion, int tileID, string hash)
         {
-            //             _logger.LogInformation(@"
-            // updating discussion:
-            //     id: {id}
-            //     courseID: {cid}
-            //     tileID: {tid}
-            //     title: {title}
-            //     username: {uname}
-            //     postedAt: {pat}
-            //     hash: {hash}
-            //     message: {message}
-            // ",
-            // discussion.ID,
-            // discussion.CourseID,
-            // tileID,
-            // discussion.Title,
-            // discussion.UserName,
-            // discussion.PostedAt,
-            // hash,
-            // discussion.Message);
             NonQuery(
                 DatabaseQueries.UPDATE_CANVAS_DISCUSSION,
                 new SQLiteParameter("id", discussion.ID),
                 new SQLiteParameter("courseID", discussion.CourseID),
                 new SQLiteParameter("title", discussion.Title),
-                // new SQLiteParameter("userName", discussion.UserName),
                 new SQLiteParameter("postedAt", discussion.PostedAt),
                 new SQLiteParameter("message", discussion.Message),
                 new SQLiteParameter("tileID", tileID),
@@ -551,30 +517,25 @@ namespace IguideME.Web.Services
             );
         }
 
-        public int RegisterDiscussionEntry(DiscussionEntry entry, string userID)
-        {
-            return IDNonQuery(
-                    DatabaseQueries.REGISTER_CANVAS_DISCUSSION_ENTRY,
-                    new SQLiteParameter("courseID", entry.CourseID),
-                    new SQLiteParameter("topicID", entry.TopicID),
-                    new SQLiteParameter("postedAt", entry.CreatedAt),
-                    new SQLiteParameter("message", entry.Message),
-                    new SQLiteParameter("postedBy", userID)
-            );
-        }
+        // public int RegisterDiscussionEntry(AppDiscussion entry, string userID)
+        // {
+        //     return IDNonQuery(
+        //             DatabaseQueries.REGISTER_CANVAS_DISCUSSION_ENTRY,
+        //             new SQLiteParameter("courseID", entry.CourseID),
+        //             new SQLiteParameter("topicID", entry.TopicID),
+        //             new SQLiteParameter("postedAt", entry.CreatedAt),
+        //             new SQLiteParameter("message", entry.Message),
+        //             new SQLiteParameter("postedBy", userID)
+        //     );
+        // }
 
-        public void RegisterDiscussionReply(DiscussionReply reply, int entry_id, string userID)
+        public void RegisterDiscussionReply(AppDiscussion reply)
         {
-            if (entry_id == -1)
-            {
-                return;
-            }
-
             NonQuery(
                 DatabaseQueries.REGISTER_CANVAS_DISCUSSION_REPLY,
-                new SQLiteParameter("entryID", entry_id),
-                new SQLiteParameter("userID", userID),
-                new SQLiteParameter("postedAt", reply.CreatedAt),
+                new SQLiteParameter("entryID", reply.ParentID),
+                new SQLiteParameter("userID", reply.PostedBy),
+                new SQLiteParameter("postedAt", reply.PostedAt),
                 new SQLiteParameter("message", reply.Message)
             );
         }
@@ -673,6 +634,39 @@ namespace IguideME.Web.Services
             return null;
         }
 
+        public List<User> GetUsersWithGrantedConsent(int courseID, string role = "Student", string hash = null)
+        {
+            string activeHash = hash ?? this.GetCurrentHash(courseID) ;
+            if (activeHash == null)
+            {
+                _logger.LogWarning("Hash is null, returning empty user list.");
+                return new List<User>() { };
+            }
+
+            List<User> users = new();
+
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_CONSENTED_STUDENTS_FOR_COURSE,
+                    new SQLiteParameter("courseID", courseID),
+                    new SQLiteParameter("syncID", activeHash)
+                ))
+            {
+                while (r.Read())
+                {
+                    User user = new(
+                        r.GetInt32(0),
+                        courseID,
+                        r.GetInt32(1),
+                        r.GetValue(2).ToString(),
+                        r.GetValue(3).ToString(),
+                        r.GetValue(4).ToString(),
+                        r.GetValue(5).ToString()
+                    );
+                    users.Add(user);
+                }
+            }
+
+            return users;
+        }
         public User GetUser(int courseID, string userID, string hash = null)
         {
             string activeHash = hash ?? this.GetCurrentHash(courseID);
@@ -1029,22 +1023,17 @@ namespace IguideME.Web.Services
             return peers;
         }
 
-        public int CreateUserSubmission(
-            int courseID,
-            int entryID,
-            string userID,
-            double grade,
-            string submitted,
+        public int CreateUserSubmission(int courseID, AssignmentSubmission submission,
             string hash = null)
         {
             string activeHash = hash ?? this.GetCurrentHash(courseID);
             return activeHash == null
                 ? -1
                 : IDNonQuery(DatabaseQueries.REGISTER_USER_SUBMISSION,
-                    new SQLiteParameter("entryID", entryID),
-                    new SQLiteParameter("userID", userID),
-                    new SQLiteParameter("grade", grade),
-                    new SQLiteParameter("submitted", submitted),
+                    new SQLiteParameter("entryID", submission.EntryID),
+                    new SQLiteParameter("userID", submission.UserID),
+                    new SQLiteParameter("grade", submission.Grade),
+                    new SQLiteParameter("submitted", submission.Submitted),
                     new SQLiteParameter("hash", activeHash)
                 );
         }
@@ -1065,15 +1054,15 @@ namespace IguideME.Web.Services
             );
         }
 
-        public List<TileEntrySubmission> GetTileEntrySubmissions(
+        public List<AssignmentSubmission> GetTileEntrySubmissions(
             int courseID,
             int entryID,
             string hash = null)
         {
             string activeHash = hash ?? this.GetCurrentHash(courseID);
-            if (activeHash == null) return new List<TileEntrySubmission>() { };
+            if (activeHash == null) return new List<AssignmentSubmission>() { };
 
-            List<TileEntrySubmission> submissions = new();
+            List<AssignmentSubmission> submissions = new();
 
             using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_SUBMISSIONS_FOR_ENTRY,
                     new SQLiteParameter("entryID", entryID),
@@ -1082,7 +1071,7 @@ namespace IguideME.Web.Services
             {
                 while (r.Read())
                 {
-                    TileEntrySubmission submission = new(
+                    AssignmentSubmission submission = new(
                         r.GetInt32(0),
                         r.GetInt32(1),
                         r.GetValue(2).ToString(),
@@ -1097,14 +1086,14 @@ namespace IguideME.Web.Services
             return submissions;
         }
 
-        public List<TileEntrySubmission> GetCourseSubmissions(
+        public List<AssignmentSubmission> GetCourseSubmissions(
             int courseID,
             string hash = null)
         {
             string activeHash = hash ?? this.GetCurrentHash(courseID);
-            if (activeHash == null) return new List<TileEntrySubmission>() { };
+            if (activeHash == null) return new List<AssignmentSubmission>() { };
 
-            List<TileEntrySubmission> submissions = new();
+            List<AssignmentSubmission> submissions = new();
 
             using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_COURSE_SUBMISSIONS,
                     new SQLiteParameter("courseID", courseID),
@@ -1115,7 +1104,7 @@ namespace IguideME.Web.Services
                 {
                     try
                     {
-                        TileEntrySubmission submission = new(
+                        AssignmentSubmission submission = new(
                             r.GetInt32(0),
                             r.GetInt32(1),
                             r.GetValue(2).ToString(),
@@ -1136,15 +1125,15 @@ namespace IguideME.Web.Services
             return submissions;
         }
 
-        public List<TileEntrySubmission> GetCourseSubmissionsForStudent(
+        public List<AssignmentSubmission> GetCourseSubmissionsForStudent(
             int courseID,
             string userID,
             string hash = null)
         {
             string activeHash = hash ?? this.GetCurrentHash(courseID);
-            if (activeHash == null) return new List<TileEntrySubmission>() { };
+            if (activeHash == null) return new List<AssignmentSubmission>() { };
 
-            List<TileEntrySubmission> submissions = new();
+            List<AssignmentSubmission> submissions = new();
 
             using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_COURSE_SUBMISSIONS_FOR_STUDENT,
                     new SQLiteParameter("courseID", courseID),
@@ -1154,7 +1143,7 @@ namespace IguideME.Web.Services
             {
                 while (r.Read())
                 {
-                    TileEntrySubmission submission = new(
+                    AssignmentSubmission submission = new(
                         r.GetInt32(0),
                         r.GetInt32(1),
                         r.GetValue(2).ToString(),
@@ -1170,16 +1159,16 @@ namespace IguideME.Web.Services
         }
 
 
-        public List<TileEntrySubmission> GetTileEntrySubmissionsForUser(
+        public List<AssignmentSubmission> GetTileEntrySubmissionsForUser(
             int courseID,
             int entryID,
             string userID,
             string hash = null)
         {
             string activeHash = hash ?? this.GetCurrentHash(courseID);
-            if (activeHash == null) return new List<TileEntrySubmission>() { };
+            if (activeHash == null) return new List<AssignmentSubmission>() { };
 
-            List<TileEntrySubmission> submissions = new();
+            List<AssignmentSubmission> submissions = new();
 
             using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_USER_SUBMISSIONS_FOR_ENTRY_FOR_USER,
                     new SQLiteParameter("entryID", entryID),
@@ -1189,7 +1178,7 @@ namespace IguideME.Web.Services
             {
                 while (r.Read())
                 {
-                    TileEntrySubmission submission = new(
+                    AssignmentSubmission submission = new(
                         r.GetInt32(0),
                         r.GetInt32(1),
                         r.GetValue(2).ToString(),
@@ -1203,12 +1192,12 @@ namespace IguideME.Web.Services
             return submissions;
         }
 
-        public List<TileEntrySubmission> GetTileSubmissions(int courseID, int tileID, string hash = null)
+        public List<AssignmentSubmission> GetTileSubmissions(int courseID, int tileID, string hash = null)
         {
             string activeHash = hash ?? this.GetCurrentHash(courseID);
-            if (activeHash == null) return new List<TileEntrySubmission>() { };
+            if (activeHash == null) return new List<AssignmentSubmission>() { };
 
-            List<TileEntrySubmission> submissions = new();
+            List<AssignmentSubmission> submissions = new();
 
             using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_USER_SUBMISSIONS_FOR_TILE,
                     new SQLiteParameter("tileID", tileID),
@@ -1217,7 +1206,7 @@ namespace IguideME.Web.Services
             {
                 while (r.Read())
                 {
-                    TileEntrySubmission submission = new(
+                    AssignmentSubmission submission = new(
                         r.GetInt32(0),
                         r.GetInt32(1),
                         r.GetValue(2).ToString(),
@@ -1233,16 +1222,16 @@ namespace IguideME.Web.Services
         }
 
 
-        public List<TileEntrySubmission> GetTileSubmissionsForUser(
+        public List<AssignmentSubmission> GetTileSubmissionsForUser(
             int courseID,
             int tileID,
             string userID,
             string hash = null)
         {
             string activeHash = hash ?? this.GetCurrentHash(courseID);
-            if (activeHash == null) return new List<TileEntrySubmission>() { };
+            if (activeHash == null) return new List<AssignmentSubmission>() { };
 
-            List<TileEntrySubmission> submissions = new();
+            List<AssignmentSubmission> submissions = new();
 
             using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_USER_SUBMISSIONS_FOR_TILE_FOR_USER,
                     new SQLiteParameter("tileID", tileID),
@@ -1252,7 +1241,7 @@ namespace IguideME.Web.Services
             {
                 while (r.Read())
                 {
-                    TileEntrySubmission submission = new(
+                    AssignmentSubmission submission = new(
                         r.GetInt32(0),
                         r.GetInt32(1),
                         r.GetValue(2).ToString(),
@@ -1520,15 +1509,15 @@ namespace IguideME.Web.Services
         }
 
 
-        public List<TileEntrySubmission> GetTileSubmissionsForUser(
+        public List<AssignmentSubmission> GetTileSubmissionsForUser(
             int courseID,
             string userID,
             string hash = null)
         {
             string activeHash = hash ?? this.GetCurrentHash(courseID);
-            if (activeHash == null) return new List<TileEntrySubmission>() { };
+            if (activeHash == null) return new List<AssignmentSubmission>() { };
 
-            List<TileEntrySubmission> submissions = new();
+            List<AssignmentSubmission> submissions = new();
 
             using (SQLiteDataReader r1 = Query(DatabaseQueries.QUERY_USER_SUBMISSIONS_FOR_USER,
                     new SQLiteParameter("userID", userID),
@@ -1537,7 +1526,7 @@ namespace IguideME.Web.Services
             {
                 while (r1.Read())
                 {
-                    TileEntrySubmission submission = new(
+                    AssignmentSubmission submission = new(
                         r1.GetInt32(0),
                         r1.GetInt32(1),
                         r1.GetValue(2).ToString(),
@@ -2462,7 +2451,7 @@ namespace IguideME.Web.Services
                         course_id,
                         r.GetValue(5).ToString(),
                         r.GetValue(2).ToString(),
-                        r.GetValue(3).ToString(),
+                        r.GetInt32(3),
                         r.GetValue(4).ToString()
                     );
                     entries.Add(row);

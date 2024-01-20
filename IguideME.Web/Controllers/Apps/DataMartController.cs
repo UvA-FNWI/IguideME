@@ -7,6 +7,7 @@ using IguideME.Web.Models;
 using IguideME.Web.Models.App;
 using IguideME.Web.Models.Service;
 using IguideME.Web.Services;
+using IguideME.Web.Services.LMSHandlers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -21,19 +22,19 @@ namespace IguideME.Web.Controllers
     public class DataMartController : DataController
     {
         private readonly ILogger<DataController> _logger;
-        private readonly CanvasHandler _canvasHandler;
+        private readonly ILMSHandler _lmsHandler;
         private readonly IQueuedBackgroundService _queuedBackgroundService;
         private readonly IComputationJobStatusService _computationJobStatusService;
 
         public DataMartController(
             ILogger<DataController> logger,
-            CanvasHandler canvasHandler,
+            ILMSHandler lmsHandler,
             IQueuedBackgroundService queuedBackgroundService,
             IComputationJobStatusService computationJobStatusService) : base(
-                logger, canvasHandler)
+                logger, lmsHandler)
         {
             this._logger = logger;
-            this._canvasHandler = canvasHandler;
+            this._lmsHandler = lmsHandler;
 
             this._queuedBackgroundService = queuedBackgroundService;
             this._computationJobStatusService = computationJobStatusService;

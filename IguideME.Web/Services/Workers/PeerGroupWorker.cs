@@ -188,11 +188,11 @@ namespace IguideME.Web.Services.Workers
                     // Get only tiles with notifications
                     if (DatabaseManager.Instance.GetTileNotificationState(entry.Key))
                     {
-                        List<TileEntrySubmission> userTileSubmissions = DatabaseManager.Instance.GetTileSubmissionsForUser(entry.Key, user, this._hashCode);
+                        List<AssignmentSubmission> userTileSubmissions = DatabaseManager.Instance.GetTileSubmissionsForUser(entry.Key, user, this._hashCode);
 
                         // Find the submission with the highest ID, as it is the most recent
                         int lastSubmissionID = -1;
-                        foreach (TileEntrySubmission submission in userTileSubmissions)
+                        foreach (AssignmentSubmission submission in userTileSubmissions)
                             if (submission.ID > lastSubmissionID)
                                 lastSubmissionID = submission.ID;
 
@@ -200,7 +200,7 @@ namespace IguideME.Web.Services.Workers
                         // Create one list with all the submission grades and one more without the most recent submission
                         List<float> currentSubmissionGrades = new();
                         List<float> lastSubmissionGrades = new();
-                        foreach (TileEntrySubmission submission in userTileSubmissions)
+                        foreach (AssignmentSubmission submission in userTileSubmissions)
                         {
                             currentSubmissionGrades.Add(float.Parse(submission.Grade));
                             if (submission.ID != lastSubmissionID)

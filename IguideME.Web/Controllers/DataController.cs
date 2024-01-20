@@ -1,5 +1,5 @@
 ﻿using IguideME.Web.Services;
-
+using IguideME.Web.Services.LMSHandlers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -16,15 +16,15 @@ namespace IguideME.Web.Controllers
     public class DataController : Controller
     {
         private readonly ILogger<DataController> _logger;
-        private readonly CanvasHandler _canvasHandler;
+        private readonly ILMSHandler _lmsHandler;
 
         public DataController(
             ILogger<DataController> logger,
-            CanvasHandler canvasHandler
+            ILMSHandler lmsHandler
             )
         {
             this._logger = logger;
-            this._canvasHandler = canvasHandler;
+            this._lmsHandler = lmsHandler;
 
         }
 
@@ -43,7 +43,7 @@ namespace IguideME.Web.Controllers
                 }
                 _logger.LogInformation("Could not find user {user} in database.", id);
                 // Try's to find the user in canvas.
-                return _canvasHandler.GetUser(this.GetCourseID(), (User.Identity as ClaimsIdentity).FindFirst("userid").Value).SISUserID; //TODO: fix
+                return _lmsHandler.GetUser(this.GetCourseID(), (User.Identity as ClaimsIdentity).FindFirst("userid").Value).UserID;
             }
 
             _logger.LogInformation("Unable to parse userid claim");

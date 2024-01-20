@@ -2,13 +2,21 @@
 
 namespace IguideME.Web.Models.App
 {
+    public enum AppGradingType
+    {
+        PassFail,
+        Percentage,
+        Letters,
+        Points,
+        NotGraded
+    }
     public class AppAssignment
     {
         [JsonProperty("id")]
         public int ID { get; set; }
 
         [JsonProperty("assignment_id")]
-        public string AssignmentID { get; set; }
+        public int AssignmentID { get; set; }
 
         [JsonProperty("course_id")]
         public int CourseID { get; set; }
@@ -23,10 +31,10 @@ namespace IguideME.Web.Models.App
         public bool Muted { get; set; }
 
         [JsonProperty("due_date")]
-        public string DueDate { get; set; }
+        public int DueDate { get; set; }
 
         [JsonProperty("points_possible")]
-        public float PointsPossible { get; set; }
+        public double PointsPossible { get; set; }
 
         [JsonProperty("position")]
         public int Position { get; set; }
@@ -34,16 +42,20 @@ namespace IguideME.Web.Models.App
         [JsonProperty("submission_type")]
         public string SubmissionType { get; set; }
 
+        [JsonProperty("grading_type")]
+        public AppGradingType GradingType { get; set; }
+
         public AppAssignment(
             int id,
-            string assignmentID,
+            int assignmentID,
             int courseID,
             string name,
             bool published,
             bool muted,
-            string dueDate,
-            float pointsPossible,
+            int dueDate,
+            double pointsPossible,
             int position,
+            AppGradingType gradingType,
             string submissionType)
         {
             this.ID = id;

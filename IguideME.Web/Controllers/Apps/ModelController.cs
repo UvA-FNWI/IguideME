@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using IguideME.Web.Models.App;
+using IguideME.Web.Services.LMSHandlers;
 
 namespace IguideME.Web.Controllers
 {
@@ -13,15 +14,15 @@ namespace IguideME.Web.Controllers
     public class ModelController : DataController
     {
         private readonly ILogger<DataController> _logger;
-        private readonly CanvasHandler canvasHandler;
+        private readonly ILMSHandler _lmsHandler;
 
         public ModelController(
             ILogger<DataController> logger,
-            CanvasHandler canvasHandler) : base(
-                logger, canvasHandler)
+            ILMSHandler lmsHandler) : base(
+                logger, lmsHandler)
         {
             this._logger = logger;
-            this.canvasHandler = canvasHandler;
+            this._lmsHandler = lmsHandler;
         }
 
         [Authorize(Policy = "IsInstructor")]

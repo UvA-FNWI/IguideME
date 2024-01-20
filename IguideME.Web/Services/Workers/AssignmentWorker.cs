@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-
 using IguideME.Web.Models;
-
+using IguideME.Web.Models.App;
+using IguideME.Web.Services.LMSHandlers;
 using Microsoft.Extensions.Logging;
-
-using UvA.DataNose.Connectors.Canvas;
 
 namespace IguideME.Web.Services.Workers
 {
@@ -17,28 +14,28 @@ namespace IguideME.Web.Services.Workers
     public class AssignmentWorker
     {
         readonly private ILogger<SyncManager> _logger;
-        readonly private CanvasHandler _canvasHandler;
+        readonly private ILMSHandler _lmsHandler;
         readonly private int _courseID;
         readonly private string _hashCode;
 
         /// <summary>
         /// This constructor initializes the new AssignmentWorker to:
-        /// (<paramref name="courseID"/>, <paramref name="hashCode"/>, <paramref name="canvasHandler"/>, <paramref name="logger"/>).
+        /// (<paramref name="courseID"/>, <paramref name="hashCode"/>, <paramref name="lmsHandler"/>, <paramref name="logger"/>).
         /// </summary>
         /// <param name="courseID">the id of the course.</param>
         /// <param name="hashCode">the hash code associated to the current sync.</param>
-        /// <param name="canvasHandler">a reference to the class managing the connection with canvas.</param>
+        /// <param name="lmsHandler">a reference to the class managing the connection with canvas.</param>
         /// <param name="logger">a reference to the logger used for the sync.</param>
         public AssignmentWorker(
             int courseID,
             string hashCode,
-            CanvasHandler canvasHandler,
+            ILMSHandler lmsHandler,
             ILogger<SyncManager> logger)
         {
             _logger = logger;
             this._courseID = courseID;
             this._hashCode = hashCode;
-            this._canvasHandler = canvasHandler;
+            this._lmsHandler = lmsHandler;
         }
 
         /// <summary>
@@ -70,56 +67,50 @@ namespace IguideME.Web.Services.Workers
         /// <summary>
         /// Register submissions associated to an assignment in the database.
         /// </summary>
-        /// <param name="assignment">the assignment the submissions are associated to.</param>
-        /// <param name="entry">the tile entry the submissions are associated to.</param>
-        private void RegisterSubmissions(Assignment assignment, TileEntry entry)
+        /// <param name="submissions">the submissions to be registered.</param>
+        /// <param name="gradingTypes">A map of tile id's to the max grades and grading types.</param>
+        private void RegisterSubmissions(IEnumerable<AssignmentSubmission> submissions, Dictionary<int, (double, AppGradingType)> gradingTypes)
         {
+            double max;
+            AppGradingType type;
+            (double, AppGradingType) elem;
 
-            // Filter out students that did not give consent and that don't have a grade.
-            IEnumerable<Submission> submissions = assignment.Submissions
-                .Where(submission =>
-                    submission.Grade != null &&
-                    DatabaseManager.Instance.GetConsent(this._courseID, submission.User.SISUserID) == 1
-                );
-
-            foreach (Submission submission in submissions)
+            foreach (AssignmentSubmission submission in submissions)
             {
                 double grade;
+                if (gradingTypes.TryGetValue(submission.AssignmentID, out elem))
+                {                
+                    (max, type) = elem;
+                    switch (type)
+                    {
+                        case AppGradingType.Points:
+                            submission.Grade = (double.Parse(submission.rawGrade)) * 100/max;
+                            break;
+                        case AppGradingType.Percentage:
+                            string clean = submission.rawGrade.Replace(System.Globalization.CultureInfo.CurrentCulture.NumberFormat.PercentSymbol, "");
 
-                switch (assignment.GradingType)
-                {
-                    case GradingType.Points:
-                        // grade = (double.Parse(submission.Grade) - 1)/0.09; // should switch to this
-                        grade = (double)(double.Parse(submission.Grade) * 100 / assignment.PointsPossible);
-                        break;
-                    case GradingType.Percentage:
-                        string clean = submission.Grade.Replace(System.Globalization.CultureInfo.CurrentCulture.NumberFormat.PercentSymbol, "");
-
-                        grade = double.Parse(clean);
-                        break;
-                    case GradingType.GPA:
-                    case GradingType.Letters:
-                        grade = LetterToGrade(submission.Grade);
-                        break;
-                    case GradingType.PassFail:
-                        _logger.LogInformation("passfail text: {Grade}", submission.Grade);
-                        grade = submission.Grade == "PASS" ? 100 : 0;
-                        break;
-                    case GradingType.NotGraded:
-                        grade = -1;
-                        break;
-                    default:
-                        grade = -1;
-                        _logger.LogError("Grade format {Type} is not supported, grade = {Grade}", assignment.GradingType, submission.Grade);
-                        break;
+                            grade = double.Parse(clean);
+                            break;
+                        case AppGradingType.Letters:
+                            grade = LetterToGrade(submission.rawGrade);
+                            break;
+                        case AppGradingType.PassFail:
+                            _logger.LogInformation("passfail text: {Grade}", submission.Grade);
+                            grade = submission.rawGrade == "PASS" ? 100 : 0;
+                            break;
+                        case AppGradingType.NotGraded:
+                            grade = -1;
+                            break;
+                        default:
+                            grade = -1;
+                            _logger.LogError("Grade format {Type} is not supported, grade = {Grade}", type, submission.Grade);
+                            break;
+                    }
                 }
-                // _logger.LogInformation("loginid {ID}", submission.User.LoginID);
+
                 DatabaseManager.Instance.CreateUserSubmission(
                         this._courseID,
-                        entry.ID,
-                        submission.User.SISUserID,
-                        grade,
-                        "",//submission.SubmittedAt.Value.ToShortDateString(),
+                        submission,
                         _hashCode);
             }
         }
@@ -131,35 +122,28 @@ namespace IguideME.Web.Services.Workers
         {
             _logger.LogInformation("Starting assignment registry...");
 
-            IEnumerable<Assignment> assignments = this._canvasHandler.GetAssignments(this._courseID);
+            IEnumerable<AppAssignment> assignments = this._lmsHandler.GetAssignments(this._courseID);
             List<TileEntry> entries = DatabaseManager.Instance.GetEntries(this._courseID);
 
-            foreach (Assignment assignment in assignments)
+            List<Models.Impl.User> users = DatabaseManager.Instance.GetUsersWithGrantedConsent(this._courseID);
+            if (users.Count == 0)
+                return;            
+
+            IEnumerable<AssignmentSubmission> submissions = this._lmsHandler.GetSubmissions(this._courseID, users.Select(user => user.UserID).ToArray());
+            Dictionary<int, (double, AppGradingType)> gradingTypes = new();
+            foreach (AppAssignment assignment in assignments)
             {
                 _logger.LogInformation("Processing assignment: {Name}", assignment.Name);
 
-                DatabaseManager.Instance.RegisterAssignment(
-                    assignment.ID,
-                    assignment.CourseID,
-                    assignment.Name ??= "?",
-                    assignment.IsPublished,
-                    assignment.IsMuted,
-                    assignment.DueDate.HasValue ? assignment.DueDate.Value.ToShortDateString() : "",
-                    assignment.PointsPossible ??= 0,
-                    assignment.Position ??= 0,
-              (int)assignment.GradingType,
-                    assignment.SubmissionType,
-                    _hashCode
-                );
+                DatabaseManager.Instance.RegisterAssignment(assignment, _hashCode);
 
                 // Don't register submissions that aren't assigned to tiles (as entries).
                 TileEntry entry = entries.Find(e => e.Title == assignment.Name);
                 if (entry == null) continue;
 
-                this.RegisterSubmissions(assignment, entry);
-
+                gradingTypes.Add(assignment.ID, (assignment.PointsPossible, assignment.GradingType));
             }
-        }
+            this.RegisterSubmissions(submissions, gradingTypes);        }
 
     }
 }

@@ -6,7 +6,7 @@ using IguideME.Web.Models;
 using IguideME.Web.Models.App;
 using IguideME.Web.Models.Impl;
 using IguideME.Web.Services;
-
+using IguideME.Web.Services.LMSHandlers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -23,15 +23,15 @@ namespace IguideME.Web.Controllers
     public class TileController : DataController
     {
         private readonly ILogger<DataController> _logger;
-        private readonly CanvasHandler _canvasHandler;
+        private readonly ILMSHandler _lmsHandler;
 
         public TileController(
             ILogger<DataController> logger,
-            CanvasHandler canvasHandler) : base(
-                logger, canvasHandler)
+            ILMSHandler lmsHandler) : base(
+                logger, lmsHandler)
         {
             this._logger = logger;
-            this._canvasHandler = canvasHandler;
+            this._lmsHandler = lmsHandler;
         }
 
 
@@ -491,7 +491,7 @@ namespace IguideME.Web.Controllers
                     .Where(g => g.TileID == id)
                     .ToList();
 
-                List<TileEntrySubmission> submissions =
+                List<AssignmentSubmission> submissions =
                     DatabaseManager.Instance.GetTileSubmissionsForUser(
                         this.GetCourseID(),
                         userID);
@@ -502,7 +502,7 @@ namespace IguideME.Web.Controllers
                     g.FetchRequirements();
                     foreach (GoalRequirement req in g.Requirements)
                     {
-                        TileEntrySubmission submission = submissions.Find(
+                        AssignmentSubmission submission = submissions.Find(
                             s => s.EntryID == req.EntryID);
 
 
@@ -515,15 +515,15 @@ namespace IguideME.Web.Controllers
                             switch (req.Expression)
                             {
                                 case "lte":
-                                    if (float.Parse(submission.Grade) > req.Value)
+                                    if (submission.Grade > req.Value)
                                         success = false;
                                     break;
                                 case "gte":
-                                    if (float.Parse(submission.Grade) < req.Value)
+                                    if (submission.Grade < req.Value)
                                         success = false;
                                     break;
                                 default:
-                                    if (float.Parse(submission.Grade) != req.Value)
+                                    if (submission.Grade != req.Value)
                                         success = false;
                                     break;
                             }
