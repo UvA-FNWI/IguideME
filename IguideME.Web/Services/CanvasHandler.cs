@@ -167,7 +167,7 @@ namespace IguideME.Web.Services
                         quiz.Name,
                         quiz.IsPublished,
                         false,
-                        quiz.DueDate.HasValue ? ((DateTimeOffset)quiz.DueDate.Value).ToUnixTimeMilliseconds() : 0, // TODO: should this be seconds or milliseconds?
+                        quiz.DueDate.HasValue ? ((DateTimeOffset)quiz.DueDate.Value).ToUnixTimeMilliseconds() : 0,
                         quiz.PointsPossible ?? 0,
                         AppGradingType.Points
                     ),

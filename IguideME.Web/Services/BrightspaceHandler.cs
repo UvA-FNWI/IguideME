@@ -173,7 +173,7 @@ namespace IguideME.Web.Services
                         -1, // we receive the user's data to store in our DB, which are not course specific
                         r.GetInt32(1),
                         r.GetValue(2).ToString() + " " + r.GetValue(3).ToString() + " " + r.GetValue(4).ToString(),
-                        r.GetValue(2).ToString() + ", " + r.GetValue(4).ToString(), // Last name contains "van", "van der" etc.
+                        r.GetValue(4).ToString() + ", " + r.GetValue(2).ToString()  , // Last name contains "van", "van der" etc.
                         (int)UserRoles.student
                     );
             }
@@ -268,7 +268,7 @@ namespace IguideME.Web.Services
                             courseID,
                             r.GetInt32(1),
                             r.GetValue(2).ToString() + " " + r.GetValue(3).ToString() + " " + r.GetValue(4).ToString(),
-                            r.GetValue(4).ToString() + ", " + r.GetValue(2).ToString() + " " + r.GetValue(3).ToString(),
+                            r.GetValue(4).ToString() + ", " + r.GetValue(2).ToString(),
                             (int)UserRoles.student
                         ));
                     } 
@@ -311,7 +311,7 @@ namespace IguideME.Web.Services
                             courseID,
                             r.GetInt32(1),
                             r.GetValue(2).ToString() + " " + r.GetValue(3).ToString() + " " + r.GetValue(4).ToString(),
-                            r.GetValue(4).ToString() + ", " + r.GetValue(2).ToString() + " " + r.GetValue(3).ToString(),
+                            r.GetValue(4).ToString() + ", " + r.GetValue(2).ToString(),
                             (int)UserRoles.instructor
                         ));
                     } 
