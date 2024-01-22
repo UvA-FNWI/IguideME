@@ -31,7 +31,7 @@ namespace IguideME.Web.Models.App
         public bool Muted { get; set; }
 
         [JsonProperty("due_date")]
-        public int DueDate { get; set; }
+        public string DueDate { get; set; }
 
         [JsonProperty("points_possible")]
         public double PointsPossible { get; set; }
@@ -52,7 +52,7 @@ namespace IguideME.Web.Models.App
             string name,
             bool published,
             bool muted,
-            int dueDate,
+            string dueDate,
             double pointsPossible,
             int position,
             AppGradingType gradingType,

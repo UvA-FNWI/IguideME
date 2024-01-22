@@ -1018,6 +1018,7 @@ public static class DatabaseQueries
                     `due_date`,
                     `points_possible`,
                     `position`,
+                    `grading_type`,
                     `submission_type`
         FROM        `canvas_assignment`
         WHERE       `course_id`=@courseID
@@ -1207,16 +1208,16 @@ public static class DatabaseQueries
                     `canvas_users`.`user_id`,
                     `canvas_users`.`name`,
                     `canvas_users`.`sortable_name`,
-                    `canvas_users`.`role`,
+                    `canvas_users`.`role`
             FROM    `canvas_users`
                 LEFT JOIN   `user_settings`
                     USING   (`user_id`)
             WHERE       `user_settings`.`course_id`= @courseID
-            AND         `canvas_users`.`role`= 'Student'
+            AND         `canvas_users`.`role`= 'student'
             AND         `user_settings`.`consent` = 1
             AND         `canvas_users`.`sync_hash`=@hash
-            GROUP BY    `users`.`user_id`
-            ORDER BY    `users`.`name` ASC
+            GROUP BY    `canvas_users`.`user_id`
+            ORDER BY    `canvas_users`.`name` ASC
             ";
 
     public const string QUERY_USER_FOR_COURSE =

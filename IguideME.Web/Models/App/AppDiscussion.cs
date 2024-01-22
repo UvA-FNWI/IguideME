@@ -36,7 +36,7 @@ namespace IguideME.Web.Models.App
         public string PostedBy { get; set; }
 
         [JsonProperty("posted_at")]
-        public long PostedAt { get; set; }
+        public string PostedAt { get; set; }
 
         [JsonProperty("message")]
         public string Message { get; set; }
@@ -49,7 +49,7 @@ namespace IguideME.Web.Models.App
             int courseID,
             string title,
             string postedBy,
-            long postedAt,
+            string postedAt,
             string message)
         {
             this.ID = id;

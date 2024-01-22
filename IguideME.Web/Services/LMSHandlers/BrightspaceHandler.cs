@@ -16,7 +16,7 @@ namespace IguideME.Web.Services
     /// <summary>
     /// Class <a>CanvasHandler</a> models a singelton service that handles the communication with Canvas LMS..
     /// </summary>
-    public class BrightspaceHandler: ILMSHandler
+    public class BrightspaceHandler : ILMSHandler
     {
         private readonly ILogger<SyncManager> _logger;
         public CanvasApiConnector Connector;
@@ -103,7 +103,8 @@ namespace IguideME.Web.Services
             IEnumerable<CanvasUser> students = course.GetUsersByType(EnrollmentType.Student);
             _logger.LogInformation("Getting users {students}", students);
 
-            return students.Select(student => new User(-1, courseID, student.ID.Value, student.LoginID, student.Name, student.SortableName, "Student"));        }
+            return students.Select(student => new User(-1, courseID, student.ID.Value, student.LoginID, student.Name, student.SortableName, "Student"));
+        }
 
         /// <inheritdoc />
         public IEnumerable<User> GetAdministrators(int courseID)
@@ -130,7 +131,7 @@ namespace IguideME.Web.Services
                 ass.Name,
                 ass.IsPublished,
                 ass.IsMuted,
-                ass.DueDate.HasValue ? (int)((DateTimeOffset)ass.DueDate.Value).ToUnixTimeSeconds() : 0,
+                ass.DueDate.HasValue ? ass.DueDate.Value.ToShortDateString() : "",
                 ass.PointsPossible ??= 0,
                 ass.Position ?? 0,
                 mapGradingType(ass.GradingType),
@@ -174,17 +175,34 @@ namespace IguideME.Web.Services
                         quiz.Name,
                         quiz.IsPublished,
                         false,
-                        quiz.DueDate.HasValue ? (int)((DateTimeOffset)quiz.DueDate.Value).ToUnixTimeSeconds() : 0, // TODO: should this be seconds or milliseconds?
+                        quiz.DueDate.HasValue ? quiz.DueDate.Value.ToShortDateString() : "0", // TODO: should this be seconds or milliseconds?
                         quiz.PointsPossible ?? 0,
                         0,
                         AppGradingType.Points,
-    					JsonConvert.SerializeObject(quiz.Type)
+                        JsonConvert.SerializeObject(quiz.Type)
                     ),
                     quiz.Submissions
                         .Where(sub => sub.Score != null)
-                        .Select(sub => new AssignmentSubmission(-1, quiz.ID ?? -1, sub.UserID.ToString(), sub.Score ?? 1, ((DateTimeOffset)sub.FinishedDate.Value).ToUnixTimeMilliseconds()))
+                        .Select(sub => new AssignmentSubmission(-1, -1, quiz.ID ?? -1, sub.UserID.ToString(), sub.Score ?? 1, sub.FinishedDate.Value.ToShortDateString()))
                 )
             );
+        }
+
+        /// <inheritdoc />
+        public IEnumerable<AssignmentSubmission> GetSubmissions(int courseID, string[] userIDs)
+        {
+            return Connector
+                .FindCourseById(courseID)
+                .GetSubmissions(userIDs, false)
+                .SelectMany(group => group.Submissions)
+                .Select(sub => new AssignmentSubmission(
+                    -1,
+                    sub.ID.Value,
+                    sub.AssignmentID,
+                    sub.User.LoginID,
+                    sub.Grade,
+                    sub.SubmittedAt.Value.ToShortDateString()
+                ));
         }
 
         /// <inheritdoc />
@@ -202,7 +220,7 @@ namespace IguideME.Web.Services
                             courseID,
                             topic.Title,
                             reply.UserID.ToString(),
-                            ((DateTimeOffset)reply.CreatedAt.Value).ToUnixTimeMilliseconds(),
+                            reply.CreatedAt.Value.ToShortDateString(),
                             reply.Message
                         ))
                         .Append(new AppDiscussion(
@@ -213,7 +231,7 @@ namespace IguideME.Web.Services
                             courseID,
                             topic.Title,
                             entry.UserID.ToString(),
-                            ((DateTimeOffset)entry.CreatedAt).ToUnixTimeMilliseconds(),
+                            entry.CreatedAt.Value.ToShortDateString(),
                             entry.Message
                         ))
                     )
@@ -225,11 +243,10 @@ namespace IguideME.Web.Services
                         courseID,
                         topic.Title,
                         topic.UserName,
-                        ((DateTimeOffset)topic.PostedAt).ToUnixTimeMilliseconds(),
+                        topic.PostedAt.ToString(),
                         topic.Message
                     ))
-                );    
+                );
         }
     }
 }
-

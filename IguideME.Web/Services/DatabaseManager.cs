@@ -475,7 +475,7 @@ namespace IguideME.Web.Services
         {
             NonQuery(
                 DatabaseQueries.REGISTER_CANVAS_ASSIGNMENT,
-                new SQLiteParameter("assignmentID", assignment.AssignmentID ),
+                new SQLiteParameter("assignmentID", assignment.AssignmentID),
                 new SQLiteParameter("courseID", assignment.CourseID),
                 new SQLiteParameter("name", assignment.Name),
                 new SQLiteParameter("published", assignment.Published),
@@ -636,7 +636,7 @@ namespace IguideME.Web.Services
 
         public List<User> GetUsersWithGrantedConsent(int courseID, string role = "Student", string hash = null)
         {
-            string activeHash = hash ?? this.GetCurrentHash(courseID) ;
+            string activeHash = hash ?? this.GetCurrentHash(courseID);
             if (activeHash == null)
             {
                 _logger.LogWarning("Hash is null, returning empty user list.");
@@ -647,7 +647,7 @@ namespace IguideME.Web.Services
 
             using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_CONSENTED_STUDENTS_FOR_COURSE,
                     new SQLiteParameter("courseID", courseID),
-                    new SQLiteParameter("syncID", activeHash)
+                    new SQLiteParameter("hash", activeHash)
                 ))
             {
                 while (r.Read())
@@ -980,9 +980,9 @@ namespace IguideME.Web.Services
             int goalGrade,
             List<string> userIDs,
             int tileID,
-            float avgGrade,
-            float minGrade,
-            float maxGrade,
+            double avgGrade,
+            double minGrade,
+            double maxGrade,
             string syncHash)
         {
             string combinedIDs = string.Join(",", userIDs);
@@ -1075,7 +1075,7 @@ namespace IguideME.Web.Services
                         r.GetInt32(0),
                         r.GetInt32(1),
                         r.GetValue(2).ToString(),
-                        r.GetValue(3).ToString(),
+                        r.GetDouble(3),
                         r.GetValue(4).ToString(),
                         hash: activeHash
                     );
@@ -1108,7 +1108,7 @@ namespace IguideME.Web.Services
                             r.GetInt32(0),
                             r.GetInt32(1),
                             r.GetValue(2).ToString(),
-                            r.GetValue(3).ToString(),
+                            r.GetDouble(3),
                             r.GetValue(4).ToString(),
                             autoLoadMeta: false,
                             hash: activeHash
@@ -1147,7 +1147,7 @@ namespace IguideME.Web.Services
                         r.GetInt32(0),
                         r.GetInt32(1),
                         r.GetValue(2).ToString(),
-                        r.GetValue(3).ToString(),
+                        r.GetDouble(3),
                         r.GetValue(4).ToString(),
                         hash: activeHash
                     );
@@ -1182,7 +1182,7 @@ namespace IguideME.Web.Services
                         r.GetInt32(0),
                         r.GetInt32(1),
                         r.GetValue(2).ToString(),
-                        r.GetValue(3).ToString(),
+                        r.GetDouble(3),
                         r.GetValue(4).ToString(),
                         hash: activeHash
                     );
@@ -1210,7 +1210,7 @@ namespace IguideME.Web.Services
                         r.GetInt32(0),
                         r.GetInt32(1),
                         r.GetValue(2).ToString(),
-                        r.GetValue(3).ToString(),
+                        r.GetDouble(3),
                         r.GetValue(4).ToString(),
                         hash: activeHash
                     );
@@ -1245,7 +1245,7 @@ namespace IguideME.Web.Services
                         r.GetInt32(0),
                         r.GetInt32(1),
                         r.GetValue(2).ToString(),
-                        r.GetValue(3).ToString(),
+                        r.GetDouble(3),
                         r.GetValue(4).ToString(),
                         hash: activeHash
                     );
@@ -1341,16 +1341,16 @@ namespace IguideME.Web.Services
             );
         }
 
-        public Dictionary<int, List<float>> GetUserGrades(
+        public Dictionary<int, List<double>> GetUserGrades(
                 int courseID,
                 string userID,
                 string hash = null)
         {
             string activeHash = hash ?? this.GetCurrentHash(courseID);
             if (activeHash == null)
-                return new Dictionary<int, List<float>>();
+                return new Dictionary<int, List<double>>();
 
-            Dictionary<int, List<float>> grades = new();
+            Dictionary<int, List<double>> grades = new();
 
             using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_USER_RESULTS2,
                     new SQLiteParameter("courseID", courseID),
@@ -1364,11 +1364,11 @@ namespace IguideME.Web.Services
                     {
                         // We save all the retrieved grades in a dictionary with
                         // the tile.id as key and a list of grades as value
-                        if (!grades.TryGetValue(r.GetInt32(0), out List<float> value))
+                        if (!grades.TryGetValue(r.GetInt32(0), out List<double> value))
                         {
-                            grades[r.GetInt32(0)] = new List<float>();
+                            grades[r.GetInt32(0)] = new List<double>();
                         }
-                        grades[r.GetInt32(0)].Add(r.GetFloat(2));
+                        grades[r.GetInt32(0)].Add(r.GetDouble(2));
                     }
                     catch (Exception e)
                     {
@@ -1392,7 +1392,7 @@ namespace IguideME.Web.Services
                         if (!r2.IsDBNull(0))
                         {
                             int discID = r2.GetInt32(0);
-                            grades[discID] = new List<float> { r2.GetInt32(1) };
+                            grades[discID] = new List<double> { r2.GetInt32(1) };
                         }
 
                     }
@@ -1530,7 +1530,7 @@ namespace IguideME.Web.Services
                         r1.GetInt32(0),
                         r1.GetInt32(1),
                         r1.GetValue(2).ToString(),
-                        r1.GetValue(3).ToString(),
+                        r1.GetDouble(3),
                         r1.GetValue(4).ToString(),
                         hash: activeHash
                     );
@@ -2243,15 +2243,16 @@ namespace IguideME.Web.Services
                     {
                         AppAssignment row = new(
                             r.GetInt32(0),
-                            r.GetValue(1).ToString(),
+                            r.GetInt32(1),
                             r.GetInt32(2),
                             r.GetValue(3).ToString(),
                             r.GetBoolean(4),
                             r.GetBoolean(5),
                             r.GetValue(6).ToString(),
-                            r.GetFloat(7),
+                            r.GetDouble(7),
                             r.GetInt32(8),
-                            r.GetValue(9).ToString()
+                            (AppGradingType)r.GetInt32(9),
+                            r.GetValue(10).ToString()
                         );
                         assignments.Add(row);
                     }
@@ -2451,7 +2452,7 @@ namespace IguideME.Web.Services
                         course_id,
                         r.GetValue(5).ToString(),
                         r.GetValue(2).ToString(),
-                        r.GetInt32(3),
+                        r.GetValue(3).ToString(),
                         r.GetValue(4).ToString()
                     );
                     entries.Add(row);

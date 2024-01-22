@@ -7,6 +7,7 @@ using IguideME.Web.Models.App;
 using IguideME.Web.Models.Impl;
 using IguideME.Web.Services;
 using IguideME.Web.Services.LMSHandlers;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -605,11 +606,7 @@ namespace IguideME.Web.Controllers
                     continue;
                 }
 
-                int submissionID = DatabaseManager.Instance.CreateUserSubmission(
-                    courseID,
-                    entryID,
-                    values[id_column],
-                    grade,
+                int submissionID = DatabaseManager.Instance.CreateUserSubmission(courseID, new AssignmentSubmission(-1, entryID, -1, values[id_column], grade, ""),
                     DateTime.Now.ToShortDateString()
                 );
 

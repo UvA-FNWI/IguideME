@@ -1,8 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
+
 using IguideME.Web.Models;
 using IguideME.Web.Models.App;
 using IguideME.Web.Services.LMSHandlers;
+
 using Microsoft.Extensions.Logging;
 
 namespace IguideME.Web.Services.Workers
@@ -78,13 +81,13 @@ namespace IguideME.Web.Services.Workers
             foreach (AssignmentSubmission submission in submissions)
             {
                 double grade;
-                if (gradingTypes.TryGetValue(submission.AssignmentID, out elem))
-                {                
+                if (gradingTypes.TryGetValue(submission.AssignmentID.Value, out elem))
+                {
                     (max, type) = elem;
                     switch (type)
                     {
                         case AppGradingType.Points:
-                            submission.Grade = (double.Parse(submission.rawGrade)) * 100/max;
+                            submission.Grade = (double.Parse(submission.rawGrade)) * 100 / max;
                             break;
                         case AppGradingType.Percentage:
                             string clean = submission.rawGrade.Replace(System.Globalization.CultureInfo.CurrentCulture.NumberFormat.PercentSymbol, "");
@@ -126,11 +129,13 @@ namespace IguideME.Web.Services.Workers
             List<TileEntry> entries = DatabaseManager.Instance.GetEntries(this._courseID);
 
             List<Models.Impl.User> users = DatabaseManager.Instance.GetUsersWithGrantedConsent(this._courseID);
-            if (users.Count == 0)
-                return;            
+            _logger.LogWarning("test {c}", users.Count());
+            users.ForEach(user => _logger.LogWarning("{c}", user.UserID));
+
 
             IEnumerable<AssignmentSubmission> submissions = this._lmsHandler.GetSubmissions(this._courseID, users.Select(user => user.UserID).ToArray());
             Dictionary<int, (double, AppGradingType)> gradingTypes = new();
+            _logger.LogWarning("test {c}", assignments.Count());
             foreach (AppAssignment assignment in assignments)
             {
                 _logger.LogInformation("Processing assignment: {Name}", assignment.Name);
@@ -141,9 +146,10 @@ namespace IguideME.Web.Services.Workers
                 TileEntry entry = entries.Find(e => e.Title == assignment.Name);
                 if (entry == null) continue;
 
-                gradingTypes.Add(assignment.ID, (assignment.PointsPossible, assignment.GradingType));
+                gradingTypes.Add(assignment.AssignmentID, (assignment.PointsPossible, assignment.GradingType));
             }
-            this.RegisterSubmissions(submissions, gradingTypes);        }
+            this.RegisterSubmissions(submissions, gradingTypes);
+        }
 
     }
 }

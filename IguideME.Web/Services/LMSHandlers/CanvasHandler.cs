@@ -85,7 +85,7 @@ namespace IguideME.Web.Services
             // _logger.LogInformation("Trying to get user\ncourseID: {courseID}, userID: {userID}", courseID, userID);
             List<Enrollment> users = Connector.FindCourseById(courseID).Enrollments;
             CanvasUser user = users.First(x => x.UserID == userID).User;
-            return new User(-1, courseID, user.ID.Value, user.LoginID, user.Name, user.SortableName, "Student");
+            return new User(-1, courseID, user.ID.Value, user.SISUserID, user.Name, user.SortableName, "Student");
         }
 
         /// <summary>
@@ -103,13 +103,14 @@ namespace IguideME.Web.Services
             IEnumerable<CanvasUser> students = course.GetUsersByType(EnrollmentType.Student);
             _logger.LogInformation("Getting users {students}", students);
 
-            return students.Select(student => new User(-1, courseID, student.ID.Value, student.LoginID, student.Name, student.SortableName, "Student"));        }
+            return students.Select(student => new User(-1, courseID, student.ID.Value, student.SISUserID, student.Name, student.SortableName, "Student"));
+        }
 
         /// <inheritdoc />
         public IEnumerable<User> GetAdministrators(int courseID)
         {
             IEnumerable<CanvasUser> admins = Connector.FindCourseById(courseID).GetUsersByType(EnrollmentType.Teacher).ToArray();
-            return admins.Select(admin => new User(-1, courseID, admin.ID.Value, admin.LoginID, admin.Name, admin.SortableName, "Teacher"));
+            return admins.Select(admin => new User(-1, courseID, admin.ID.Value, admin.SISUserID, admin.Name, admin.SortableName, "Teacher"));
         }
         /// <summary>
         /// Gets all the non null assignemnts for a course from canvas.
@@ -130,7 +131,7 @@ namespace IguideME.Web.Services
                 ass.Name,
                 ass.IsPublished,
                 ass.IsMuted,
-                ass.DueDate.HasValue ? (int)((DateTimeOffset)ass.DueDate.Value).ToUnixTimeSeconds() : 0,
+                ass.DueDate.HasValue ? ass.DueDate.Value.ToShortDateString() : "",
                 ass.PointsPossible ??= 0,
                 ass.Position ?? 0,
                 mapGradingType(ass.GradingType),
@@ -174,33 +175,35 @@ namespace IguideME.Web.Services
                         quiz.Name,
                         quiz.IsPublished,
                         false,
-                        quiz.DueDate.HasValue ? (int)((DateTimeOffset)quiz.DueDate.Value).ToUnixTimeSeconds() : 0, // TODO: should this be seconds or milliseconds?
+                        quiz.DueDate.HasValue ? quiz.DueDate.Value.ToShortDateString() : "0", // TODO: should this be seconds or milliseconds?
                         quiz.PointsPossible ?? 0,
                         0,
                         AppGradingType.Points,
-    					JsonConvert.SerializeObject(quiz.Type)
+                        JsonConvert.SerializeObject(quiz.Type)
                     ),
                     quiz.Submissions
                         .Where(sub => sub.Score != null)
-                        .Select(sub => new AssignmentSubmission(-1, -1, quiz.ID ?? -1, sub.UserID.ToString(), sub.Score ?? 1, ((DateTimeOffset)sub.FinishedDate.Value).ToUnixTimeMilliseconds()))
+                        .Select(sub => new AssignmentSubmission(-1, -1, quiz.ID ?? -1, sub.UserID.ToString(), sub.Score ?? 1, sub.FinishedDate.Value.ToShortDateString()))
                 )
             );
         }
 
-         /// <inheritdoc />
+        /// <inheritdoc />
         public IEnumerable<AssignmentSubmission> GetSubmissions(int courseID, string[] userIDs)
         {
-            return Connector
-                .FindCourseById(courseID)
+            if (userIDs.Length == 0) { return Enumerable.Empty<AssignmentSubmission>(); }
+
+
+            return Connector.FindCourseById(courseID)
                 .GetSubmissions(userIDs, false)
                 .SelectMany(group => group.Submissions)
                 .Select(sub => new AssignmentSubmission(
                     -1,
-                    sub.ID.Value,
+                    sub.ID ?? -1,
                     sub.AssignmentID,
-                    sub.User.SISUserID,
+                    sub.User != null ? sub.User.SISUserID : sub.UserID, // FIXME: fsr both the .User and .UserID fields are always null
                     sub.Grade,
-                    ((DateTimeOffset)sub.SubmittedAt.Value).ToUnixTimeMilliseconds()
+                    sub.SubmittedAt.HasValue ? sub.SubmittedAt.Value.ToShortDateString() : ""
                 ));
         }
 
@@ -219,7 +222,7 @@ namespace IguideME.Web.Services
                             courseID,
                             topic.Title,
                             reply.UserID.ToString(),
-                            ((DateTimeOffset)reply.CreatedAt.Value).ToUnixTimeMilliseconds(),
+                            reply.CreatedAt.Value.ToShortDateString(),
                             reply.Message
                         ))
                         .Append(new AppDiscussion(
@@ -230,7 +233,7 @@ namespace IguideME.Web.Services
                             courseID,
                             topic.Title,
                             entry.UserID.ToString(),
-                            ((DateTimeOffset)entry.CreatedAt).ToUnixTimeMilliseconds(),
+                            entry.CreatedAt.Value.ToShortDateString(),
                             entry.Message
                         ))
                     )
@@ -242,10 +245,10 @@ namespace IguideME.Web.Services
                         courseID,
                         topic.Title,
                         topic.UserName,
-                        ((DateTimeOffset)topic.PostedAt).ToUnixTimeMilliseconds(),
+                        topic.PostedAt.ToString(),
                         topic.Message
                     ))
-                );    
+                );
         }
     }
 }

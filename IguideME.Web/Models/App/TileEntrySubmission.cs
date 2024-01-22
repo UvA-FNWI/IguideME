@@ -1,4 +1,5 @@
 ﻿using IguideME.Web.Services;
+
 using Newtonsoft.Json;
 
 namespace IguideME.Web.Models.App
@@ -11,7 +12,7 @@ namespace IguideME.Web.Models.App
         [JsonProperty(PropertyName = "userID")]
         public string UserID { get; set; }
 
-        public int AssignmentID { get; set; }
+        public int? AssignmentID { get; set; }
         public string rawGrade { get; set; }
 
         [JsonProperty(PropertyName = "entry_id")]
@@ -21,7 +22,7 @@ namespace IguideME.Web.Models.App
         public double Grade { get; set; }
 
         [JsonProperty(PropertyName = "submitted")]
-        public long Submitted { get; set; }
+        public string Submitted { get; set; }
 
         [JsonProperty(PropertyName = "meta")]
         public string Meta { get; set; }
@@ -32,7 +33,7 @@ namespace IguideME.Web.Models.App
             int AssignmentID,
             string userID,
             double grade,
-            long submitted,
+            string submitted,
             string meta = null,
             bool autoLoadMeta = true,
             string hash = null)
@@ -51,14 +52,12 @@ namespace IguideME.Web.Models.App
                     DatabaseManager.Instance.GetEntryMeta(this.ID, hash));
             }
         }
-
         public AssignmentSubmission(
             int id,
             int entryID,
-            int AssignmentID,
             string userID,
-            string grade,
-            long submitted,
+            double grade,
+            string submitted,
             string meta = null,
             bool autoLoadMeta = true,
             string hash = null)
@@ -66,7 +65,32 @@ namespace IguideME.Web.Models.App
             this.ID = id;
             this.UserID = userID;
             this.EntryID = entryID;
-            this.rawGrade = grade;
+            this.Grade = grade;
+            this.Submitted = submitted;
+            this.Meta = meta;
+
+            if (autoLoadMeta && meta == null)
+            {
+                this.Meta = JsonConvert.SerializeObject(
+                    DatabaseManager.Instance.GetEntryMeta(this.ID, hash));
+            }
+        }
+
+        public AssignmentSubmission(
+            int id,
+            int entryID,
+            int AssignmentID,
+            string userID,
+            string rawGrade,
+            string submitted,
+            string meta = null,
+            bool autoLoadMeta = true,
+            string hash = null)
+        {
+            this.ID = id;
+            this.UserID = userID;
+            this.EntryID = entryID;
+            this.rawGrade = rawGrade;
             this.Submitted = submitted;
             this.Meta = meta;
             this.AssignmentID = AssignmentID;
