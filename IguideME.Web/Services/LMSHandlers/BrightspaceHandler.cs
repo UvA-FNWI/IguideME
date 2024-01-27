@@ -1,252 +1,392 @@
-using Microsoft.Extensions.Configuration;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using UvA.DataNose.Connectors.Canvas;
+using System.Data.SQLite;
+using System.Data;
+using IguideME.Web.Models;
+using IguideME.Web.Models.App;
+using IguideME.Web.Models.Impl;
 using Microsoft.Extensions.Logging;
 using IguideME.Web.Services.LMSHandlers;
-using IguideME.Web.Models.App;
-using System;
-using Newtonsoft.Json;
-
-using User = IguideME.Web.Models.Impl.User;
-using CanvasUser = UvA.DataNose.Connectors.Canvas.User;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.Configuration;
+using SQLitePCL;
 
 namespace IguideME.Web.Services
 {
-    /// <summary>
-    /// Class <a>CanvasHandler</a> models a singelton service that handles the communication with Canvas LMS..
-    /// </summary>
-    public class BrightspaceHandler : ILMSHandler
-    {
-        private readonly ILogger<SyncManager> _logger;
-        public CanvasApiConnector Connector;
-        public string BaseUrl;
-        public string AccessToken;
 
-        /// <summary>
-        /// This constructor initializes the new CanvasHandler to
-        /// (<paramref name="config"/>, <paramref name="logger"/>).
-        /// </summary>
-        /// <param name="config">The configuration for the instance.</param>
-        /// <param name="logger">A reference to the logger used for this service.</param>
+    public sealed class BrightspaceHandler : ILMSHandler
+    {
+        // private static BrightspaceManager s_instance;
+        private readonly string _connection_string;
+        private readonly ILogger _logger;
+
         public BrightspaceHandler(IConfiguration config, ILogger<SyncManager> logger)
         {
+            // s_instance = this;
+            // _connection_string = isDev ? "Data Source=brightspace.db;Version=3;New=False;Compress=True;"
+            //                           : "Data Source=/data/IguideME.db;Version=3;New=False;Compress=True;";
+            _connection_string = config["LMS:Brightspace:Connection"];
             _logger = logger;
-            this.AccessToken = config["LMS:Canvas:AccessToken"];
-            this.BaseUrl = config["LMS:Canvas:Url"];
             this.SyncInit();
         }
 
-        /// <summary>
-        /// Creates or renews a connection with canvas. We always initialize and keep one because we communicate with canvas outside of syncs as well.
-        /// </summary>
+        // public static BrightspaceManager GetInstance(bool isDev = false)
+        // {
+
+        //     s_instance ??= new BrightspaceManager(isDev);
+
+        //     return s_instance;
+        // }
+
         public void SyncInit()
         {
-            this.Connector = new CanvasApiConnector(this.BaseUrl, this.AccessToken);
+            _logger.LogInformation("Initializing handler for Brightspace.");
         }
 
-        /// <summary>
-        /// Sends a message to a user.
-        /// </summary>
-        /// <param name="userID">The id of the user to send the message to.</param>
-        /// <param name="subject">The subject of the conversation.</param>
-        /// <param name="body">The message to be send.</param>
-        public void SendMessage(string userID, string subject, string body)
+        private SQLiteConnection GetConnection() => new(_connection_string);
+
+        private void NonQuery(string query, params SQLiteParameter[] parameters)
         {
+            SQLiteConnection connection = GetConnection();
             try
             {
-                Conversation conv = new(this.Connector)
+                connection.Open();
+                using (SQLiteCommand command = connection.CreateCommand())
                 {
-                    Subject = subject,
-                    Body = body,
-                    Recipients = new string[1] { userID }
-                };
-                _logger.LogInformation("Created conversation {title} for {recipients}", conv, conv.Recipients[0]);
-
-                conv.Save();
+                    command.CommandText = query;
+                    foreach (SQLiteParameter param in parameters)
+                    {
+                        command.Parameters.Add(param);
+                    }
+                    command.ExecuteNonQuery();
+                }
+                connection.Close();
             }
-            catch (System.Net.WebException e)
+            catch
             {
-                _logger.LogError("Error sending message: {error}", e);
-                _logger.LogError("Status description: {status}", ((System.Net.HttpWebResponse)e.Response).StatusDescription);
-                _logger.LogError("Response: {response}", new System.IO.StreamReader(((System.Net.HttpWebResponse)e.Response).GetResponseStream()).ReadToEnd());
+                // Close connection before rethrowing
+                connection.Close();
+                throw;
             }
         }
 
-        /// <summary>
-        /// Get a user for a course.
-        /// </summary>
-        /// <param name="courseID">The course to get the user from.</param>
-        /// <param name="userID">The id of the user.</param>
-        /// <returns>The requested user if found.</returns>
+        private SQLiteDataReader Query(string query, params SQLiteParameter[] parameters)
+        {
+            SQLiteConnection connection = GetConnection();
+            try
+            {
+                connection.Open();
+                using (SQLiteCommand command = connection.CreateCommand())
+                {
+                    command.CommandText = query;
+                    foreach (SQLiteParameter param in parameters)
+                    {
+                        command.Parameters.Add(param);
+                    }
+                    return command.ExecuteReader(CommandBehavior.CloseConnection);
+                }
+            }
+            catch (Exception e)
+            {
+                // Close connection before rethrowing
+                _logger.LogError("Exception encountered while creating query: {message}", e.Message);
+                connection.Close();
+                throw;
+            }
+        }
+
+        private void PrintQueryError(string title, int rows, SQLiteDataReader r, Exception e)
+        {
+            string error = $"{title}\nRequested:\nColumn | Data Type | Value | Type\n";
+
+            try
+            {
+                for (int i = 0; i <= rows; i++)
+                    error += $"{r.GetName(i)} {r.GetDataTypeName(i)} {r.GetValue(i)} {r.GetValue(i).GetType()}\n";
+
+                _logger.LogError("Error reading from the query: {error} \n\n {message} \n {trace}", error, e.Message, e.StackTrace);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Error in printquerryerror: {message} {trace}\n\nOriginal error:\n{original} {originaltrace}", ex.Message, ex.StackTrace, e.Message, e.StackTrace);
+            }
+        }
+
+        // -------------------------- QUERIES ------------------------------------ //
+ public void SendMessage(string userID, string subject, string body)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc />
         public User GetUser(int courseID, string userID)
         {
-            _logger.LogInformation("Getting user {u} from canvas", userID);
-            // _logger.LogInformation("Trying to get user\ncourseID: {courseID}, userID: {userID}", courseID, userID);
-            List<Enrollment> users = Connector.FindCourseById(courseID).Enrollments;
-            CanvasUser user = users.First(x => x.UserID == userID).User;
-            return new User(-1, courseID, user.ID.Value, user.LoginID, user.Name, user.SortableName, "Student");
+            _logger.LogInformation("Trying to get user\ncourseID: {courseID}, userID: {userID}", courseID, userID);
+            
+            using (SQLiteDataReader r =
+                Query(@"SELECT      `users`.`username`,
+                                    `users`.`user_id`,
+                                    `users`.`first_name`,
+                                    `users`.`middle_name`,
+                                    `users`.`last_name`
+                        FROM        `users`
+                        INNER JOIN  `user_enrollments`
+                            ON      `users`.`user_id` = `user_enrollments`.`user_id`
+                        WHERE       `user_enrollments`.`org_unit_id` = @courseID
+                        AND         `users`.`username`= @userID
+                        AND        (`user_enrollments`.`role_id` = 110
+                        OR          `user_enrollments`.`role_id` = 130
+                        OR          `user_enrollments`.`role_id` = 134)",
+                    new SQLiteParameter("userID", userID),
+                    new SQLiteParameter("courseID", courseID)
+                    ))
+            {
+                if (r.Read()) 
+                {
+                    try 
+                    {
+                        return new User(
+                            -1,
+                            r.GetInt32(1),
+                            courseID,
+                            r.GetValue(0).ToString(),
+                            r.GetValue(2).ToString() + " " + r.GetValue(3).ToString() + " " + r.GetValue(4).ToString(),
+                            r.GetValue(4).ToString() + ", " + r.GetValue(2).ToString(),
+                            "Student"
+                        );
+                    } 
+                    catch (Exception e)
+                    {
+                        PrintQueryError("BrigtspaceHandler.GetUserIDs", 0, r, e);
+                    }
+                    
+                }
+            }
+
+            return null;
         }
 
-        /// <summary>
-        /// Get all the users with the student role for a course.
-        /// </summary>
-        /// <param name="courseID">The id of the course.</param>
-        /// <returns>A list of students for the course.</returns>
+        /// <inheritdoc />
         public IEnumerable<User> GetStudents(int courseID)
         {
-            _logger.LogInformation("Finding course by id, id = {ID}", courseID);
+            _logger.LogInformation("Trying to get all students for \ncourseID: {courseID}", courseID);
+            List<User> students = new List<User>();
+            using (SQLiteDataReader r =
+                Query(@"SELECT      `users`.`username`,
+                                    `users`.`user_id`,
+                                    `users`.`first_name`,
+                                    `users`.`middle_name`,
+                                    `users`.`last_name`
+                        FROM        `users`
+                        INNER JOIN  `user_enrollments`
+                            ON      `users`.`user_id` = `user_enrollments`.`user_id`
+                        WHERE       `user_enrollments`.`org_unit_id` = @courseID
+                        AND        (`user_enrollments`.`role_id` = 110
+                        OR          `user_enrollments`.`role_id` = 130
+                        OR          `user_enrollments`.`role_id` = 134)",
+                    new SQLiteParameter("courseID", courseID)
+                    ))
+            {
+                while (r.Read())
+                    try 
+                    {
+                        students.Add(new User(
+                            -1,
+                            r.GetInt32(1),
+                            courseID,
+                            r.GetValue(0).ToString(),
+                            r.GetValue(2).ToString() + " " + r.GetValue(3).ToString() + " " + r.GetValue(4).ToString(),
+                            r.GetValue(4).ToString() + ", " + r.GetValue(2).ToString(),
+                            "Student"
+                        ));
+                    } 
+                    catch (Exception e)
+                    {
+                        PrintQueryError("BrigtspaceHandler.GetStudents", 0, r, e);
+                    }
+                    
 
-            Course course = Connector.FindCourseById(courseID);
-            _logger.LogInformation("Course = {course}", course);
-
-            IEnumerable<CanvasUser> students = course.GetUsersByType(EnrollmentType.Student);
-            _logger.LogInformation("Getting users {students}", students);
-
-            return students.Select(student => new User(-1, courseID, student.ID.Value, student.LoginID, student.Name, student.SortableName, "Student"));
+                return students;
+            }
         }
 
         /// <inheritdoc />
         public IEnumerable<User> GetAdministrators(int courseID)
         {
-            IEnumerable<CanvasUser> admins = Connector.FindCourseById(courseID).GetUsersByType(EnrollmentType.Teacher).ToArray();
-            return admins.Select(admin => new User(-1, courseID, admin.ID.Value, admin.LoginID, admin.Name, admin.SortableName, "Teacher"));
-        }
-        /// <summary>
-        /// Gets all the non null assignemnts for a course from canvas.
-        /// </summary>
-        /// <param name="courseID">The id of the course the assignments are from.</param>
-        /// <returns>An iterable with assignments for the course.</returns>
-        public IEnumerable<AppAssignment> GetAssignments(int courseID)
-        {
-            return Connector
-                .FindCourseById(courseID)
-                .Assignments
-                .Where(assignment => assignment != null)
-                .OrderBy(a => a.Position)
-                .Select(ass => new AppAssignment(
-                -1,
-                ass.ID.Value,
-                courseID,
-                ass.Name,
-                ass.IsPublished,
-                ass.IsMuted,
-                ass.DueDate.HasValue ? ass.DueDate.Value.ToShortDateString() : "",
-                ass.PointsPossible ??= 0,
-                ass.Position ?? 0,
-                mapGradingType(ass.GradingType),
-                ass.SubmissionType));
+            _logger.LogInformation("Trying to get all teachers for \ncourseID: {courseID}", courseID);
+            List<User> teachers = new List<User>();
+            using (SQLiteDataReader r =
+                Query(@"SELECT      `users`.`username`,
+                                    `users`.`user_id`,
+                                    `users`.`first_name`,
+                                    `users`.`middle_name`,
+                                    `users`.`last_name`
+                        FROM        `users`
+                        INNER JOIN  `user_enrollments`
+                            ON      `users`.`user_id` = `user_enrollments`.`user_id`
+                        WHERE       `user_enrollments`.`org_unit_id` = @courseID
+                        AND        (`user_enrollments`.`role_id` = 109
+                        OR          `user_enrollments`.`role_id` = 117)",
+                    new SQLiteParameter("courseID", courseID)
+                    ))
+            {
+                while (r.Read())
+                {
+                    try 
+                    {
+                        teachers.Add(new User(
+                            -1,
+                            r.GetInt32(1),
+                            courseID,
+                            r.GetValue(0).ToString(),
+                            r.GetValue(2).ToString() + " " + r.GetValue(3).ToString() + " " + r.GetValue(4).ToString(),
+                            r.GetValue(4).ToString() + ", " + r.GetValue(2).ToString(),
+                            "Teacher"
+                        ));
+                    } 
+                    catch (Exception e)
+                    {
+                        PrintQueryError("BrigtspaceHandler.GetAdministrators", 0, r, e);
+                    }
+                }
+                return teachers;
+            }
         }
 
-        private AppGradingType mapGradingType(GradingType type)
+        /// <inheritdoc />
+        public IEnumerable<AppAssignment> GetAssignments(int courseID)
         {
-            switch (type)
+            _logger.LogInformation("Trying to get all assignments for \ncourseID: {courseID}", courseID);
+            List<AppAssignment> assignments = new List<AppAssignment>();
+            using (SQLiteDataReader r =
+                Query(@"SELECT  `grade_object_id`,
+                                `org_unit_id`,
+                                `name`,
+                                `end_date`,
+                                `max_points`,
+                                `type_name`,
+                                `grade_object_type_id`
+                        FROM    `grade_objects`
+                        WHERE   `org_unit_id` = @courseID
+                        AND    (`grade_object_type_id` = 1
+                        OR      `grade_object_type_id` = 2
+                        OR      `grade_object_type_id` = 4)",
+                    new SQLiteParameter("courseID", courseID)
+                    ))
             {
-                case GradingType.Points:
-                    return AppGradingType.Points;
-                case GradingType.Percentage:
-                    return AppGradingType.Percentage;
-                case GradingType.Letters:
-                case GradingType.GPA:
-                    return AppGradingType.Letters;
-                case GradingType.PassFail:
-                    return AppGradingType.PassFail;
-                case GradingType.NotGraded:
-                    return AppGradingType.NotGraded;
-                default:
-                    _logger.LogWarning("Grade format {Type} is not supported, treating as not graded...", type);
-                    return AppGradingType.NotGraded;
+                while (r.Read())
+                {
+                    try 
+                    {
+                        assignments.Add(new AppAssignment(
+                            -1,
+                            r.GetInt32(0),
+                            r.GetInt32(1),
+                            r.GetValue(2).ToString(),
+                            true, //bool published,
+                            false, //bool muted,
+                            r.GetValue(3).ToString(),
+                            r.GetDouble(4),
+                            0, //Position ????????????
+                            mapGradingType(r.GetInt32(6)), // This is mapped to our local enum,
+                            "Submission Type" // ???????????
+                        ));
+                    } 
+                    catch (Exception e)
+                    {
+                        PrintQueryError("BrigtspaceHandler.GetAssignments", 0, r, e);
+                    }
+                }
+
+                return assignments;
+            }
+        }
+
+        /// <inheritdoc />
+        public IEnumerable<AssignmentSubmission> GetSubmissions(int courseID, string[] userIDs)
+        {
+            List<AssignmentSubmission> submissions = new List<AssignmentSubmission>();
+            using (SQLiteDataReader r =
+                Query(@"SELECT  `grade_object_id`,
+                                `user_id`,
+                                `points_numerator`,
+                                `points_denominator`,
+                                `grade_text`,
+                                `grade_released_date`
+                        FROM    `grade_results`
+                        WHERE   `org_unit_id` = @courseID
+                        AND     `user_id`
+                            IN  (@allIDs)",
+                    new SQLiteParameter("courseID", courseID),
+                    new SQLiteParameter("allIDs", string.Join(",", userIDs))                    
+                    ))
+            {
+                while (r.Read())
+                {
+                    try 
+                    {
+                        string rawGrade = r.GetValue(4).ToString();
+                        if (rawGrade.IsNullOrEmpty())
+                            submissions.Add(new AssignmentSubmission(
+                                -1,
+                                -1, ///// ????
+                                r.GetInt32(0),
+                                r.GetValue(1).ToString(),
+                                r.GetInt32(2) / r.GetInt32(3),
+                                r.GetValue(5).ToString()
+                            ));
+                        else
+                            submissions.Add(new AssignmentSubmission( ///???????????
+                                -1, 
+                                -1,
+                                r.GetInt32(0),
+                                r.GetValue(1).ToString(),
+                                rawGrade,
+                                r.GetValue(5).ToString()
+                            ));
+                    } 
+                    catch (Exception e)
+                    {
+                        PrintQueryError("BrigtspaceHandler.GetSubmissions", 0, r, e);
+                    }
+                }
+                return submissions;
             }
         }
 
         /// <inheritdoc />
         public IEnumerable<(AppAssignment, IEnumerable<AssignmentSubmission>)> GetQuizzes(int courseID)
         {
-            // Graded quizzes (assignment quizzes) are also treated as assignments by canvas and will be handled accordingly.
-            return Connector
-                .FindCourseById(courseID)
-                .Quizzes
-                .Where(quiz => quiz.Type != QuizType.Assignment)
-                .Select(quiz => (
-                    new AppAssignment(
-                        -1,
-                        quiz.ID ?? -1,
-                        courseID,
-                        quiz.Name,
-                        quiz.IsPublished,
-                        false,
-                        quiz.DueDate.HasValue ? quiz.DueDate.Value.ToShortDateString() : "0", // TODO: should this be seconds or milliseconds?
-                        quiz.PointsPossible ?? 0,
-                        0,
-                        AppGradingType.Points,
-                        JsonConvert.SerializeObject(quiz.Type)
-                    ),
-                    quiz.Submissions
-                        .Where(sub => sub.Score != null)
-                        .Select(sub => new AssignmentSubmission(-1, -1, quiz.ID ?? -1, sub.UserID.ToString(), sub.Score ?? 1, sub.FinishedDate.Value.ToShortDateString()))
-                )
-            );
-        }
-
-        /// <inheritdoc />
-        public IEnumerable<AssignmentSubmission> GetSubmissions(int courseID, string[] userIDs)
-        {
-            return Connector
-                .FindCourseById(courseID)
-                .GetSubmissions(userIDs, false)
-                .SelectMany(group => group.Submissions)
-                .Select(sub => new AssignmentSubmission(
-                    -1,
-                    sub.ID.Value,
-                    sub.AssignmentID,
-                    sub.User.LoginID,
-                    sub.Grade,
-                    sub.SubmittedAt.Value.ToShortDateString()
-                ));
+            // Return an empty collection as brightspace doesn't separate quizzes and assignments.
+            return new List<(AppAssignment, IEnumerable<AssignmentSubmission>)>();
         }
 
         /// <inheritdoc />
         public IEnumerable<AppDiscussion> GetDiscussions(int courseID)
         {
-            return Connector
-                .FindCourseById(courseID)
-                .Discussions.SelectMany(topic =>
-                    topic.Entries.SelectMany(entry =>
-                        entry.Replies.Select(reply => new AppDiscussion(
-                            -1,
-                            Discussion_type.reply,
-                            reply.ID ?? -1,
-                            entry.ID ?? -1,
-                            courseID,
-                            topic.Title,
-                            reply.UserID.ToString(),
-                            reply.CreatedAt.Value.ToShortDateString(),
-                            reply.Message
-                        ))
-                        .Append(new AppDiscussion(
-                            -1,
-                            Discussion_type.entry,
-                            entry.ID ?? -1,
-                            topic.ID ?? -1,
-                            courseID,
-                            topic.Title,
-                            entry.UserID.ToString(),
-                            entry.CreatedAt.Value.ToShortDateString(),
-                            entry.Message
-                        ))
-                    )
-                    .Append(new AppDiscussion(
-                        -1,
-                        Discussion_type.topic,
-                        topic.ID ?? -1,
-                        -1,
-                        courseID,
-                        topic.Title,
-                        topic.UserName,
-                        topic.PostedAt.ToString(),
-                        topic.Message
-                    ))
-                );
+            // Return an empty collection as brightspace doesn't have discussions
+            return new List<AppDiscussion>();
+        }
+
+
+        /////////////////////// Helper Functions ////////////////////////////////
+        private AppGradingType mapGradingType(int type_id)
+        {
+            switch (type_id)
+            {
+                case 1:
+                case 5:
+                case 7:
+                case 8:
+                    return AppGradingType.Points;
+                case 2:
+                    return AppGradingType.PassFail;
+                case 4:
+                    return AppGradingType.Letters;
+                default:
+                    _logger.LogWarning("Grade format {Type} is not supported, treating as not graded...", type_id);
+                    return AppGradingType.NotGraded;
+            }
         }
     }
 }
