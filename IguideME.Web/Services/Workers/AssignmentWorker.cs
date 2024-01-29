@@ -129,13 +129,10 @@ namespace IguideME.Web.Services.Workers
             List<TileEntry> entries = DatabaseManager.Instance.GetEntries(this._courseID);
 
             List<Models.Impl.User> users = DatabaseManager.Instance.GetUsersWithGrantedConsent(this._courseID);
-            _logger.LogWarning("test {c}", users.Count());
-            users.ForEach(user => _logger.LogWarning("{c}", user.UserID));
-
 
             IEnumerable<AssignmentSubmission> submissions = this._lmsHandler.GetSubmissions(this._courseID, users.Select(user => user.UserID).ToArray());
             Dictionary<int, (double, AppGradingType)> gradingTypes = new();
-            _logger.LogWarning("test {c}", assignments.Count());
+
             foreach (AppAssignment assignment in assignments)
             {
                 _logger.LogInformation("Processing assignment: {Name}", assignment.Name);

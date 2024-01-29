@@ -32,6 +32,8 @@ namespace IguideME.Web.Controllers
 
         protected string GetUserID()
         {
+            // tmp for brightspace until we have an environment
+            return "p371565";
             if (int.TryParse((User.Identity as ClaimsIdentity).FindFirst("userid").Value, out int id))
             {
 
@@ -62,6 +64,9 @@ namespace IguideME.Web.Controllers
 
         protected int GetCourseID()
         {
+
+            // tmp for brightspace until we have an environment
+            return 83337;
             // returns the ID of course in which the IguideME instance is loaded
             return int.Parse((User.Identity as ClaimsIdentity).FindFirst("courseid").Value);
         }

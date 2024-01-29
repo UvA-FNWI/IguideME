@@ -186,8 +186,8 @@ namespace IguideME.Web.Services
                         students.Add(
                             new User(
                                 -1,
-                                r.GetInt32(1),
                                 courseID,
+                                r.GetInt32(1),
                                 r.GetValue(0).ToString(),
                                 r.GetValue(2).ToString()
                                     + " "

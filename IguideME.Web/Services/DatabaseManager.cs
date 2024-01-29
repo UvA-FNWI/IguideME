@@ -615,6 +615,7 @@ namespace IguideME.Web.Services
         {
             string hash = this.GetCurrentHash(courseID);
 
+            _logger.LogWarning("hash {}", hash);
             if (hash == null) return null;
 
             // _logger.LogInformation("getting id for {u} course {c} hash{h}", id, courseID, hash);
