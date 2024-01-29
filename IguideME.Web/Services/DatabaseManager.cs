@@ -540,7 +540,7 @@ namespace IguideME.Web.Services
             );
         }
 
-        public List<User> GetUsers(int courseID, string role = "*", string hash = null)
+        public List<User> GetUsers(int courseID, string role = "%", string hash = null)
         {
             string activeHash = hash ?? this.GetCurrentHash(courseID);
             if (activeHash == null)

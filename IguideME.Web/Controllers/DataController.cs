@@ -32,7 +32,6 @@ namespace IguideME.Web.Controllers
 
         protected string GetUserID()
         {
-
             if (int.TryParse((User.Identity as ClaimsIdentity).FindFirst("userid").Value, out int id))
             {
 
@@ -46,7 +45,7 @@ namespace IguideME.Web.Controllers
                 return _lmsHandler.GetUser(this.GetCourseID(), (User.Identity as ClaimsIdentity).FindFirst("userid").Value).UserID;
             }
 
-            _logger.LogInformation("Unable to parse userid claim");
+            _logger.LogError("Unable to parse userid claim");
             throw new Exception();
         }
 
@@ -69,7 +68,6 @@ namespace IguideME.Web.Controllers
 
         protected string GetCourseTitle()
         {
-            _logger.LogInformation("testestests");
             return (User.Identity as ClaimsIdentity).FindFirst("courseName").Value;
         }
     }

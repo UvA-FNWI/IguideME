@@ -1173,7 +1173,7 @@ public static class DatabaseQueries
                     `role`
         FROM        `canvas_users`
         WHERE       `course_id`=@courseID
-        AND         `role`=@role
+        AND         `role` LIKE @role
         AND         `sync_hash`=@hash
         ORDER BY    `name` ASC;";
 

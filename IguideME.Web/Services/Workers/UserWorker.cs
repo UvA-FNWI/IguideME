@@ -40,26 +40,30 @@ namespace IguideME.Web.Services.Workers
         /// Registers the given students and initializes their settings in the database.
         /// </summary>
         /// <param name="students">list of students to be registered.</param>
-        private void RegisterStudents(IEnumerable<User> students) {
+        private void RegisterStudents(IEnumerable<User> students)
+        {
 
             foreach (User student in students)
             {
                 // _logger.LogInformation("Processing student {ID}...", student.ID);
-                try {
+                try
+                {
                     DatabaseManager.Instance.RegisterUserSettings(new Models.ConsentData(_courseID, student.UserID, student.Name, -1));
 
                     // _logger.LogInformation("registering student with login {l} sis {s} user {u}", student.LoginID, student.SISUserID, student.ID);
 
                     DatabaseManager.Instance.RegisterUser(
                         _courseID,
-                        student.ID,
+                        student.StudentNumber,
                         student.UserID,
                         student.Name,
                         student.SortableName,
                         "student",
                         this._hashCode
                     );
-                } catch (Exception e) {
+                }
+                catch (Exception e)
+                {
                     _logger.LogError("Error registering student: {Error} {StackTrace}", e, e.StackTrace);
                 }
             }
@@ -69,14 +73,15 @@ namespace IguideME.Web.Services.Workers
         /// Registers the given students in the database.
         /// </summary>
         /// <param name="instructors">list of instructors to be registered.</param>
-        private void RegisterInstructors(IEnumerable<User> instructors) {
+        private void RegisterInstructors(IEnumerable<User> instructors)
+        {
             foreach (var instructor in instructors)
             {
                 _logger.LogInformation("Processing instructor {ID} ...", instructor.ID);
 
                 DatabaseManager.Instance.RegisterUser(
                     _courseID,
-                    instructor.ID,
+                    instructor.StudentNumber,
                     instructor.UserID,
                     instructor.Name,
                     instructor.SortableName,
@@ -95,7 +100,7 @@ namespace IguideME.Web.Services.Workers
 
             IEnumerable<User> students = this._lmsHandler.GetStudents(this._courseID);
 
-            _logger.LogInformation("Starting student registry, about to process students..." );
+            _logger.LogInformation("Starting student registry, about to process students...");
 
             this.RegisterStudents(students);
 
