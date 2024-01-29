@@ -68,6 +68,7 @@ namespace IguideME.Web.Models.App
             this.PointsPossible = pointsPossible;
             this.Position = position;
             this.SubmissionType = submissionType;
+            this.GradingType = gradingType;
         }
 
     }
