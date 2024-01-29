@@ -191,8 +191,7 @@ namespace IguideME.Web.Services
                                 r.GetValue(0).ToString(),
                                 r.GetValue(2).ToString()
                                     + " "
-                                    + r.GetValue(3).ToString()
-                                    + " "
+                                    + (r.GetValue(3).ToString().Equals("\\N") ? "" : r.GetValue(3).ToString() + " ") 
                                     + r.GetValue(4).ToString(),
                                 r.GetValue(4).ToString() + ", " + r.GetValue(2).ToString(),
                                 "Student"
@@ -245,8 +244,7 @@ namespace IguideME.Web.Services
                                 r.GetValue(0).ToString(),
                                 r.GetValue(2).ToString()
                                     + " "
-                                    + r.GetValue(3).ToString()
-                                    + " "
+                                    + (r.GetValue(3).ToString().Equals("\\N") ? "" : r.GetValue(3).ToString() + " ") 
                                     + r.GetValue(4).ToString(),
                                 r.GetValue(4).ToString() + ", " + r.GetValue(2).ToString(),
                                 "Teacher"
