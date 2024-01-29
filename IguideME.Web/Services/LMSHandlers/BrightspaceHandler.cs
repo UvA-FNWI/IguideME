@@ -186,8 +186,8 @@ namespace IguideME.Web.Services
                         students.Add(
                             new User(
                                 -1,
-                                r.GetInt32(1),
                                 courseID,
+                                r.GetInt32(1),
                                 r.GetValue(0).ToString(),
                                 r.GetValue(2).ToString()
                                     + " "
@@ -304,7 +304,7 @@ namespace IguideME.Web.Services
                                 r.GetDouble(4),
                                 0, //Position ????????????
                                 mapGradingType(r.GetInt32(6)), // This is mapped to our local enum,
-                                "Submission Type" // ???????????
+                                ""//"Submission Type" ???????????
                             )
                         );
                     }
@@ -358,9 +358,8 @@ namespace IguideME.Web.Services
                         else
                             submissions.Add(
                                 new AssignmentSubmission(
-                                    ///???????????
                                     -1,
-                                    -1,
+                                    -1, ///// ???
                                     r.GetInt32(0),
                                     r.GetValue(1).ToString(),
                                     rawGrade,
