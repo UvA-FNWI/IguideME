@@ -1,25 +1,23 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
-
 using IguideME.Web.Models;
 using IguideME.Web.Models.App;
+using IguideME.Web.Models.Impl;
 using IguideME.Web.Services.LMSHandlers;
-
 using Microsoft.Extensions.Logging;
 
 namespace IguideME.Web.Services.Workers
 {
-
     /// <summary>
     /// Class <a>AssignemntWorker</a> models a worker that handles registering assignments during a sync..
     /// </summary>
     public class AssignmentWorker
     {
-        readonly private ILogger<SyncManager> _logger;
-        readonly private ILMSHandler _lmsHandler;
-        readonly private int _courseID;
-        readonly private string _hashCode;
+        private readonly ILogger<SyncManager> _logger;
+        private readonly ILMSHandler _lmsHandler;
+        private readonly int _courseID;
+        private readonly string _hashCode;
 
         /// <summary>
         /// This constructor initializes the new AssignmentWorker to:
@@ -33,7 +31,8 @@ namespace IguideME.Web.Services.Workers
             int courseID,
             string hashCode,
             ILMSHandler lmsHandler,
-            ILogger<SyncManager> logger)
+            ILogger<SyncManager> logger
+        )
         {
             _logger = logger;
             this._courseID = courseID;
@@ -48,7 +47,6 @@ namespace IguideME.Web.Services.Workers
         /// <returns>The grade as a percentage.</returns>
         static private double LetterToGrade(string grade)
         {
-
             return grade switch
             {
                 "A" => 100,
@@ -72,7 +70,10 @@ namespace IguideME.Web.Services.Workers
         /// </summary>
         /// <param name="submissions">the submissions to be registered.</param>
         /// <param name="gradingTypes">A map of tile id's to the max grades and grading types.</param>
-        private void RegisterSubmissions(IEnumerable<AssignmentSubmission> submissions, Dictionary<int, (double, AppGradingType)> gradingTypes)
+        private void RegisterSubmissions(
+            IEnumerable<AssignmentSubmission> submissions,
+            Dictionary<int, (double, AppGradingType)> gradingTypes
+        )
         {
             double max;
             AppGradingType type;
@@ -90,7 +91,15 @@ namespace IguideME.Web.Services.Workers
                             submission.Grade = (double.Parse(submission.rawGrade)) * 100 / max;
                             break;
                         case AppGradingType.Percentage:
-                            string clean = submission.rawGrade.Replace(System.Globalization.CultureInfo.CurrentCulture.NumberFormat.PercentSymbol, "");
+                            string clean = submission.rawGrade.Replace(
+                                System
+                                    .Globalization
+                                    .CultureInfo
+                                    .CurrentCulture
+                                    .NumberFormat
+                                    .PercentSymbol,
+                                ""
+                            );
 
                             grade = double.Parse(clean);
                             break;
@@ -106,15 +115,20 @@ namespace IguideME.Web.Services.Workers
                             break;
                         default:
                             grade = -1;
-                            _logger.LogError("Grade format {Type} is not supported, grade = {Grade}", type, submission.Grade);
+                            _logger.LogError(
+                                "Grade format {Type} is not supported, grade = {Grade}",
+                                type,
+                                submission.Grade
+                            );
                             break;
                     }
                 }
 
                 DatabaseManager.Instance.CreateUserSubmission(
-                        this._courseID,
-                        submission,
-                        _hashCode);
+                    this._courseID,
+                    submission,
+                    _hashCode
+                );
             }
         }
 
@@ -125,12 +139,17 @@ namespace IguideME.Web.Services.Workers
         {
             _logger.LogInformation("Starting assignment registry...");
 
-            IEnumerable<AppAssignment> assignments = this._lmsHandler.GetAssignments(this._courseID);
+            IEnumerable<AppAssignment> assignments = this._lmsHandler.GetAssignments(
+                this._courseID
+            );
             List<TileEntry> entries = DatabaseManager.Instance.GetEntries(this._courseID);
 
-            List<Models.Impl.User> users = DatabaseManager.Instance.GetUsersWithGrantedConsent(this._courseID);
+            List<User> users = DatabaseManager.Instance.GetUsersWithGrantedConsent(this._courseID);
 
-            IEnumerable<AssignmentSubmission> submissions = this._lmsHandler.GetSubmissions(this._courseID, users.Select(user => user.UserID).ToArray());
+            IEnumerable<AssignmentSubmission> submissions = this._lmsHandler.GetSubmissions(
+                this._courseID,
+                users
+            );
             Dictionary<int, (double, AppGradingType)> gradingTypes = new();
 
             foreach (AppAssignment assignment in assignments)
@@ -141,12 +160,15 @@ namespace IguideME.Web.Services.Workers
 
                 // Don't register submissions that aren't assigned to tiles (as entries).
                 TileEntry entry = entries.Find(e => e.Title == assignment.Name);
-                if (entry == null) continue;
+                if (entry == null)
+                    continue;
 
-                gradingTypes.Add(assignment.AssignmentID, (assignment.PointsPossible, assignment.GradingType));
+                gradingTypes.Add(
+                    assignment.AssignmentID,
+                    (assignment.PointsPossible, assignment.GradingType)
+                );
             }
             this.RegisterSubmissions(submissions, gradingTypes);
         }
-
     }
 }

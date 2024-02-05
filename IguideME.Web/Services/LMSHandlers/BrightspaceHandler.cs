@@ -2,14 +2,13 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SQLite;
-using IguideME.Web.Models;
+using System.Linq;
 using IguideME.Web.Models.App;
 using IguideME.Web.Models.Impl;
 using IguideME.Web.Services.LMSHandlers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
-using SQLitePCL;
 
 namespace IguideME.Web.Services
 {
@@ -131,8 +130,8 @@ namespace IguideME.Web.Services
                     {
                         return new User(
                             -1,
-                            r.GetInt32(1),
                             courseID,
+                            r.GetInt32(1),
                             r.GetValue(0).ToString(),
                             r.GetValue(2).ToString()
                                 + " "
@@ -191,7 +190,11 @@ namespace IguideME.Web.Services
                                 r.GetValue(0).ToString(),
                                 r.GetValue(2).ToString()
                                     + " "
-                                    + (r.GetValue(3).ToString().Equals("\\N") ? "" : r.GetValue(3).ToString() + " ") 
+                                    + (
+                                        r.GetValue(3).ToString().Equals("\\N")
+                                            ? ""
+                                            : r.GetValue(3).ToString() + " "
+                                    )
                                     + r.GetValue(4).ToString(),
                                 r.GetValue(4).ToString() + ", " + r.GetValue(2).ToString(),
                                 "Student"
@@ -244,7 +247,11 @@ namespace IguideME.Web.Services
                                 r.GetValue(0).ToString(),
                                 r.GetValue(2).ToString()
                                     + " "
-                                    + (r.GetValue(3).ToString().Equals("\\N") ? "" : r.GetValue(3).ToString() + " ") 
+                                    + (
+                                        r.GetValue(3).ToString().Equals("\\N")
+                                            ? ""
+                                            : r.GetValue(3).ToString() + " "
+                                    )
                                     + r.GetValue(4).ToString(),
                                 r.GetValue(4).ToString() + ", " + r.GetValue(2).ToString(),
                                 "Teacher"
@@ -302,7 +309,7 @@ namespace IguideME.Web.Services
                                 r.GetDouble(4),
                                 0, //Position ????????????
                                 mapGradingType(r.GetInt32(6)), // This is mapped to our local enum,
-                                ""//"Submission Type" ???????????
+                                "" //"Submission Type" ???????????
                             )
                         );
                     }
@@ -317,12 +324,21 @@ namespace IguideME.Web.Services
         }
 
         /// <inheritdoc />
-        public IEnumerable<AssignmentSubmission> GetSubmissions(int courseID, string[] userIDs)
+        public IEnumerable<AssignmentSubmission> GetSubmissions(
+            int courseID,
+            IEnumerable<User> users
+        )
         {
             List<AssignmentSubmission> submissions = new List<AssignmentSubmission>();
+
+            SQLiteParameter[] parameters = users
+                .Select((user, index) => new SQLiteParameter($"userID{index}", user.StudentNumber))
+                .Concat(new[] { new SQLiteParameter("courseID", courseID) })
+                .ToArray();
+
             using (
                 SQLiteDataReader r = Query(
-                    @"SELECT  `grade_object_id`,
+                    @$"SELECT  `grade_object_id`,
                                 `user_id`,
                                 `points_numerator`,
                                 `points_denominator`,
@@ -331,9 +347,8 @@ namespace IguideME.Web.Services
                         FROM    `grade_results`
                         WHERE   `org_unit_id` = @courseID
                         AND     `user_id`
-                            IN  (@allIDs)",
-                    new SQLiteParameter("courseID", courseID),
-                    new SQLiteParameter("allIDs", string.Join(",", userIDs))
+                            IN  ({string.Join(",", users.Select((_, index) => $"@userID{index}"))})",
+                    parameters
                 )
             )
             {
@@ -342,7 +357,8 @@ namespace IguideME.Web.Services
                     try
                     {
                         string rawGrade = r.GetValue(4).ToString();
-                        if (rawGrade.IsNullOrEmpty())
+                        if (rawGrade.IsNullOrEmpty() || rawGrade == "\\N")
+                        {
                             submissions.Add(
                                 new AssignmentSubmission(
                                     -1,
@@ -353,7 +369,9 @@ namespace IguideME.Web.Services
                                     r.GetValue(5).ToString()
                                 )
                             );
+                        }
                         else
+                        {
                             submissions.Add(
                                 new AssignmentSubmission(
                                     -1,
@@ -364,6 +382,7 @@ namespace IguideME.Web.Services
                                     r.GetValue(5).ToString()
                                 )
                             );
+                        }
                     }
                     catch (Exception e)
                     {

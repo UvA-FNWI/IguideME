@@ -242,8 +242,12 @@ namespace IguideME.Web.Services
         }
 
         /// <inheritdoc />
-        public IEnumerable<AssignmentSubmission> GetSubmissions(int courseID, string[] userIDs)
+        public IEnumerable<AssignmentSubmission> GetSubmissions(
+            int courseID,
+            IEnumerable<User> users
+        )
         {
+            string[] userIDs = users.Select(u => u.UserID).ToArray();
             if (userIDs.Length == 0)
             {
                 return Enumerable.Empty<AssignmentSubmission>();
