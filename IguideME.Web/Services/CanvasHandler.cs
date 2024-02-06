@@ -109,7 +109,7 @@ namespace IguideME.Web.Services
                 ass.Name,
                 ass.IsPublished,
                 ass.IsMuted,
-                ass.DueDate.HasValue ? (int)((DateTimeOffset)ass.DueDate.Value).ToUnixTimeSeconds() : 0,
+                ass.DueDate.HasValue ? ((DateTimeOffset)ass.DueDate.Value).ToUnixTimeMilliseconds() : 0,
                 ass.PointsPossible ??= 0,
                 mapGradingType(ass.GradingType)));
         }
@@ -167,7 +167,7 @@ namespace IguideME.Web.Services
                         quiz.Name,
                         quiz.IsPublished,
                         false,
-                        quiz.DueDate.HasValue ? (int)((DateTimeOffset)quiz.DueDate.Value).ToUnixTimeSeconds() : 0, // TODO: should this be seconds or milliseconds?
+                        quiz.DueDate.HasValue ? ((DateTimeOffset)quiz.DueDate.Value).ToUnixTimeMilliseconds() : 0,
                         quiz.PointsPossible ?? 0,
                         AppGradingType.Points
                     ),

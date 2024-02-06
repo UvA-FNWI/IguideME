@@ -173,7 +173,7 @@ namespace IguideME.Web.Services
                         -1, // we receive the user's data to store in our DB, which are not course specific
                         r.GetInt32(1),
                         r.GetValue(2).ToString() + " " + r.GetValue(3).ToString() + " " + r.GetValue(4).ToString(),
-                        r.GetValue(2).ToString() + ", " + r.GetValue(4).ToString(),
+                        r.GetValue(4).ToString() + ", " + r.GetValue(2).ToString()  , // Last name contains "van", "van der" etc.
                         (int)UserRoles.student
                     );
             }
@@ -217,7 +217,7 @@ namespace IguideME.Web.Services
                                 `user_id`,
                                 `org_defined_id`
                         FROM    `users`
-                        WHERE   `user_id` = @userID",
+                        WHERE   `username` = @userID",
                     new SQLiteParameter("userID", userID)                    
                     ))
             {
@@ -261,14 +261,22 @@ namespace IguideME.Web.Services
                     ))
             {
                 while (r.Read())
-                    students.Add(new User(
-                        r.GetValue(0).ToString(),
-                        courseID,
-                        r.GetInt32(1),
-                        r.GetValue(2).ToString() + " " + r.GetValue(3).ToString() + " " + r.GetValue(4).ToString(),
-                        r.GetValue(4).ToString() + ", " + r.GetValue(2).ToString() + " " + r.GetValue(3).ToString(),
-                        (int)UserRoles.student
-                    ));
+                    try 
+                    {
+                        students.Add(new User(
+                            r.GetValue(0).ToString(),
+                            courseID,
+                            r.GetInt32(1),
+                            r.GetValue(2).ToString() + " " + r.GetValue(3).ToString() + " " + r.GetValue(4).ToString(),
+                            r.GetValue(4).ToString() + ", " + r.GetValue(2).ToString(),
+                            (int)UserRoles.student
+                        ));
+                    } 
+                    catch (Exception e)
+                    {
+                        PrintQueryError("BrigtspaceHandler.GetStudents", 0, r, e);
+                    }
+                    
 
                 return students;
             }
@@ -295,15 +303,23 @@ namespace IguideME.Web.Services
                     ))
             {
                 while (r.Read())
-                    teachers.Add(new User(
-                        r.GetValue(0).ToString(),
-                        courseID,
-                        r.GetInt32(1),
-                        r.GetValue(2).ToString() + " " + r.GetValue(3).ToString() + " " + r.GetValue(4).ToString(),
-                        r.GetValue(4).ToString() + ", " + r.GetValue(2).ToString() + " " + r.GetValue(3).ToString(),
-                        (int)UserRoles.instructor
-                    ));
-
+                {
+                    try 
+                    {
+                        teachers.Add(new User(
+                            r.GetValue(0).ToString(),
+                            courseID,
+                            r.GetInt32(1),
+                            r.GetValue(2).ToString() + " " + r.GetValue(3).ToString() + " " + r.GetValue(4).ToString(),
+                            r.GetValue(4).ToString() + ", " + r.GetValue(2).ToString(),
+                            (int)UserRoles.instructor
+                        ));
+                    } 
+                    catch (Exception e)
+                    {
+                        PrintQueryError("BrigtspaceHandler.GetAdministrators", 0, r, e);
+                    }
+                }
                 return teachers;
             }
         }
@@ -322,23 +338,32 @@ namespace IguideME.Web.Services
                                 `type_name`,
                                 `grade_object_type_id`
                         FROM    `grade_objects`
-                        WHERE   `grade_object_type_id` = 1
+                        WHERE   `org_unit_id` = @courseID
+                        AND    (`grade_object_type_id` = 1
                         OR      `grade_object_type_id` = 2
-                        OR      `grade_object_type_id` = 4"
+                        OR      `grade_object_type_id` = 4)",
+                    new SQLiteParameter("courseID", courseID)
                     ))
             {
                 while (r.Read())
                 {
-                    assignments.Add(new AppAssignment(
-                        r.GetInt32(0),
-                        r.GetInt32(1),
-                        r.GetValue(2).ToString(),
-                        true, //bool published,
-                        false, //bool muted,
-                        0, //int dueDate, -> r.getValue(3) it is text & needs to be float/int for timestamp
-                        r.GetDouble(4),
-                        mapGradingType(r.GetInt32(6)) // This is mapped to our local enum
-                    ));
+                    try 
+                    {
+                        assignments.Add(new AppAssignment(
+                            r.GetInt32(0),
+                            r.GetInt32(1),
+                            r.GetValue(2).ToString(),
+                            true, //bool published,
+                            false, //bool muted,
+                            r.GetValue(3) is not null ? ((DateTimeOffset)r.GetValue(3)).ToUnixTimeMilliseconds() : 0,
+                            r.GetDouble(4),
+                            mapGradingType(r.GetInt32(6)) // This is mapped to our local enum
+                        ));
+                    } 
+                    catch (Exception e)
+                    {
+                        PrintQueryError("BrigtspaceHandler.GetAssignments", 0, r, e);
+                    }
                 }
 
                 return assignments;
@@ -366,26 +391,32 @@ namespace IguideME.Web.Services
             {
                 while (r.Read())
                 {
-                    string rawGrade = r.GetValue(4).ToString();
-                    if (rawGrade.IsNullOrEmpty())
-                        submissions.Add(new AssignmentSubmission(
-                            -1, //-1 cause at this point we haven't stored the data in our DB, so a submission id doesn't exist
-                            r.GetInt32(0),
-                            r.GetValue(1).ToString(),
-                            r.GetInt32(2) / r.GetInt32(3),
-                            ((DateTime)r.GetValue(5)).ToFileTimeUtc()
-                        ));
-                    else
-                        submissions.Add(new AssignmentSubmission(
-                            -1, //-1 cause at this point we haven't stored the data in our DB, so a submission id doesn't exist
-                            r.GetInt32(0),
-                            r.GetValue(1).ToString(),
-                            r.GetInt32(2) / r.GetInt32(3),
-                            rawGrade,
-                            ((DateTime)r.GetValue(5)).ToFileTimeUtc()
-                        ));
+                    try 
+                    {
+                        string rawGrade = r.GetValue(4).ToString();
+                        if (rawGrade.IsNullOrEmpty())
+                            submissions.Add(new AssignmentSubmission(
+                                -1, //-1 cause at this point we haven't stored the data in our DB, so a submission id doesn't exist
+                                r.GetInt32(0),
+                                r.GetValue(1).ToString(),
+                                r.GetInt32(2) / r.GetInt32(3),
+                                ((DateTimeOffset)r.GetValue(5)).ToUnixTimeMilliseconds()
+                            ));
+                        else
+                            submissions.Add(new AssignmentSubmission(
+                                -1, //-1 cause at this point we haven't stored the data in our DB, so a submission id doesn't exist
+                                r.GetInt32(0),
+                                r.GetValue(1).ToString(),
+                                r.GetInt32(2) / r.GetInt32(3),
+                                rawGrade,
+                                ((DateTimeOffset)r.GetValue(5)).ToUnixTimeMilliseconds()
+                            ));
+                    } 
+                    catch (Exception e)
+                    {
+                        PrintQueryError("BrigtspaceHandler.GetSubmissions", 0, r, e);
+                    }
                 }
-
                 return submissions;
             }
         }

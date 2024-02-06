@@ -528,7 +528,10 @@ public static class DatabaseQueries
             @dueDate,
             @maxGrade,
             @gradingType
-        );";
+        )
+        WHERE NOT EXISTS (  SELECT * 
+                            FROM `assignments` 
+                            WHERE `external_id` = @assignmentID);";
 
     public const string REGISTER_DISCUSSION =
         @"INSERT OR REPLACE
