@@ -12,6 +12,7 @@ fi
 #KUBECTL_PROJ_ID=$(kubectl get pods -n iguideme | grep Running | awk '{print $1}')
 
 alias frontend-dev='yarn --cwd $PROJECT_ROOT/IguideME.Web/Frontend dev'
+alias mock-frontend='yarn --cwd $PROJECT_ROOT/IguideME.Web/Frontend mock'
 alias iguideme-packages='yarn --cwd $PROJECT_ROOT/IguideME.Web/Frontend'
 alias backend-dev='dotnet watch --project $PROJECT_ROOT/IguideME.Web/ --no-hot-reload';
 alias enter-db='litecli $PROJECT_ROOT/IguideME.Web/db.sqlite';
@@ -23,21 +24,22 @@ alias h='display_help';
 display_help () {
   echo "You can use the following assist commands:";
   echo "                                          ";
-  echo "  ---frontend---------------------------------------------------";
+  echo "  ---frontend---------------------------------------------------------";
   echo "  frontend-dev              build and run the frontend (watcher)";
+  echo "  mock-frontend             run the frontend with mocking (watcher)";
   echo "  iguideme-packages         node package manager in correct directory";
   echo "                                          ";
-  echo "  ---backend----------------------------------------------------";
+  echo "  ---backend----------------------------------------------------------";
   echo "  backend-dev 	            build and run the backend (watcher)";
   echo "                                          ";
-  echo "  ---administrative---------------------------------------------";
+  echo "  ---administrative---------------------------------------------------";
   echo "  kill-process              kill a process by name";
   echo "  enter-db                  enter the database";
   echo "  bright-db                  enter the brightspace database";
   echo "  logs                      view production logs";
   echo "  refresh-logs              refresh pod name for logs";
   echo "                                          ";
-  echo "  ---misc-------------------------------------------------------";
+  echo "  ---misc-------------------------------------------------------------";
   echo "  h                         display this message again";
   echo "                                          ";
 }

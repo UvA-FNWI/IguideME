@@ -1,23 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
-
-using IguideME.Web.Models;
-using IguideME.Web.Models.App;
 using IguideME.Web.Models.Service;
 using IguideME.Web.Services;
-
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-
-using Newtonsoft.Json.Linq;
-
 using UserRoles = IguideME.Web.Models.Impl.UserRoles;
-
 
 namespace IguideME.Web.Controllers
 {
@@ -36,17 +26,16 @@ namespace IguideME.Web.Controllers
             ILogger<DataController> logger,
             DatabaseManager databaseManager,
             IQueuedBackgroundService queuedBackgroundService,
-            IComputationJobStatusService computationJobStatusService) : base(
-                logger)
+            IComputationJobStatusService computationJobStatusService
+        )
+            : base(logger)
         {
             this._logger = logger;
             this._databaseManager = databaseManager;
 
             this._queuedBackgroundService = queuedBackgroundService;
             this._computationJobStatusService = computationJobStatusService;
-
         }
-
 
         // -------------------- Synchronization managers --------------------
 
@@ -68,11 +57,8 @@ namespace IguideME.Web.Controllers
             if (!_databaseManager.IsCourseRegistered(GetCourseID()))
             {
                 _databaseManager.RegisterCourse(GetCourseID(), GetCourseTitle());
-                JobParametersModel obj = new()
-                {
-                    CourseID = GetCourseID(),
-                    SendNotifications = false
-                };
+                JobParametersModel obj =
+                    new() { CourseID = GetCourseID(), SendNotifications = false };
                 await _queuedBackgroundService.PostWorkItemAsync(obj).ConfigureAwait(false);
             }
         }
@@ -104,7 +90,10 @@ namespace IguideME.Web.Controllers
         [HttpGet, Route("/datamart/status")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IReadOnlyDictionary<string, JobModel>))]
+        [ProducesResponseType(
+            StatusCodes.Status200OK,
+            Type = typeof(IReadOnlyDictionary<string, JobModel>)
+        )]
         public async Task<IActionResult> GetAllJobsAsync()
         {
             return Ok(await _computationJobStatusService.GetAllJobsAsync().ConfigureAwait(false));
@@ -126,8 +115,7 @@ namespace IguideME.Web.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public JsonResult GetSynchronizations()
         {
-            return Json(
-                _databaseManager.GetSyncHashes(this.GetCourseID()));
+            return Json(_databaseManager.GetSyncHashes(this.GetCourseID()));
         }
 
         // -------------------- Synchronization registry --------------------
@@ -210,8 +198,10 @@ namespace IguideME.Web.Controllers
         public ActionResult GetStudents()
         {
             return Json(
-                _databaseManager.GetUsersWithGrantedConsent(this.GetCourseID(), UserRoles.student)
-                .ToArray());
+                _databaseManager
+                    .GetUsersWithGrantedConsent(this.GetCourseID(), UserRoles.student)
+                    .ToArray()
+            );
         }
 
         // [Authorize(Policy = "IsInstructor")]
@@ -316,9 +306,7 @@ namespace IguideME.Web.Controllers
         [Route("/assignments")]
         public ActionResult GetCanvasAssignments()
         {
-            return Json(
-                _databaseManager.GetAssignmentsMap(GetCourseID())
-            );
+            return Json(_databaseManager.GetAssignmentsMap(GetCourseID()));
         }
 
         // TODO: move to different controller.

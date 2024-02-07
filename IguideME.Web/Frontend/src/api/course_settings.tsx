@@ -13,7 +13,7 @@ export const postPeerSettings: (data: {
   min_size: number;
   personalized_peers: boolean;
 }) => {
-  await apiClient.patch(`app/peer-groups`, data);
+  await apiClient.patch("app/peer-groups", data);
 };
 
 // export const getConsentSettings: () => Promise<{
@@ -30,10 +30,10 @@ export const postPeerSettings: (data: {
 // };
 
 export const getNotificationSettings: () => Promise<string[]> = async () =>
-  await apiClient.get(`app/notifications`).then((response) => response.data);
+  await apiClient.get("app/notifications").then((response) => response.data);
 
 export const postNotificationSettings: (
   dates: string,
 ) => Promise<void> = async (dates: string) => {
-  await apiClient.post(`app/notifications`, { dates });
+  await apiClient.post("app/notifications", { dates });
 };

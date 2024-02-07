@@ -28,6 +28,7 @@ import setup from "@/api/setup.tsx";
 import "./base.scss";
 
 import { QueryClient, QueryClientProvider } from "react-query";
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -38,39 +39,66 @@ const queryClient = new QueryClient({
   },
 });
 
-// Sets up the backend (registers the course if the course hasn't been registered yet).
-await setup;
+async function enableMocking(): Promise<ServiceWorkerRegistration | undefined> {
+  if (import.meta.env.MODE !== "mock") {
+    return;
+  }
 
-// Routing for the frontend. This is separate from the routing on the backend.
-// Routes that end with /> are endpoints but routes that have other routes listed before </Route>
-// will have those routes render within an Outlet component.
-ReactDOM.createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<App />} errorElement={<ErrorPage />}>
-            <Route path="" element={<Home />} />
-            <Route path=":id" element={<StudentDashboard />} />
-            <Route path="admin" element={<AdminPanel />}>
-              <Route path="" element={<Dashboard />} />
-              <Route path="tiles" element={<Tiles />} />
-              <Route path="layout" element={<EditLayout />} />
-              <Route path="student-overview" element={<StudentOverview />} />
-              <Route path="grade-predictor" element={<GradePredictor />} />
-              <Route path="grade-analyzer" element={<GradeAnalyzer />} />
-              <Route path="data-wizard" element={<DataWizard />} />
-              <Route path="learning-goals" element={<LearningGoals />} />
-              <Route path="analytics" element={<Analytics />} />
-              <Route
-                path="notification-centre"
-                element={<NotificationCentre />}
-              />
-              <Route path="settings" element={<Settings />} />
-            </Route>
-          </Route>
-        </Routes>
-      </BrowserRouter>
-    </QueryClientProvider>
-  </React.StrictMode>,
-);
+  const { worker } = await import("@/mocks/browser");
+
+  // `worker.start()` returns a Promise that resolves
+  // once the Service Worker is up and ready to intercept requests.
+  return await worker.start();
+}
+
+enableMocking()
+  .then(async () => {
+    // Sets up the backend (registers the course if the course hasn't been registered yet).
+    return await setup();
+  })
+  .then(
+    () => {
+      // Routing for the frontend. This is separate from the routing on the backend.
+      // Routes that end with /> are endpoints but routes that have other routes listed before </Route>
+      // will have those routes render within an Outlet component.
+      ReactDOM.createRoot(document.getElementById("root")!).render(
+        <React.StrictMode>
+          <QueryClientProvider client={queryClient}>
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<App />} errorElement={<ErrorPage />}>
+                  <Route path="" element={<Home />} />
+                  <Route path=":id" element={<StudentDashboard />} />
+                  <Route path="admin" element={<AdminPanel />}>
+                    <Route path="" element={<Dashboard />} />
+                    <Route path="tiles" element={<Tiles />} />
+                    <Route path="layout" element={<EditLayout />} />
+                    <Route
+                      path="student-overview"
+                      element={<StudentOverview />}
+                    />
+                    <Route
+                      path="grade-predictor"
+                      element={<GradePredictor />}
+                    />
+                    <Route path="grade-analyzer" element={<GradeAnalyzer />} />
+                    <Route path="data-wizard" element={<DataWizard />} />
+                    <Route path="learning-goals" element={<LearningGoals />} />
+                    <Route path="analytics" element={<Analytics />} />
+                    <Route
+                      path="notification-centre"
+                      element={<NotificationCentre />}
+                    />
+                    <Route path="settings" element={<Settings />} />
+                  </Route>
+                </Route>
+              </Routes>
+            </BrowserRouter>
+          </QueryClientProvider>
+        </React.StrictMode>,
+      );
+    },
+    () => {
+      console.error("Setup unsuccesful");
+    },
+  );

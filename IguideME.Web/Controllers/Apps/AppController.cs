@@ -1,15 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-
 using IguideME.Web.Models.App;
-using IguideME.Web.Models.Impl;
 using IguideME.Web.Services;
-
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-
 using Newtonsoft.Json.Linq;
 
 namespace IguideME.Web.Controllers
@@ -23,14 +19,11 @@ namespace IguideME.Web.Controllers
 
         private readonly DatabaseManager _databaseManager;
 
-        public AppController(
-            ILogger<DataController> logger,
-            DatabaseManager databaseManager) : base(
-                logger)
+        public AppController(ILogger<DataController> logger, DatabaseManager databaseManager)
+            : base(logger)
         {
             this._logger = logger;
             this._databaseManager = databaseManager;
-
         }
 
         // [Authorize(Policy = "IsInstructor")]
@@ -45,9 +38,7 @@ namespace IguideME.Web.Controllers
             /**
              * Returns information of the logged in user.
              */
-            return Json(
-                _databaseManager.GetCurrentUser(GetCourseID(), this.GetUserID())
-            );
+            return Json(_databaseManager.GetCurrentUser(GetCourseID(), this.GetUserID()));
         }
 
         [Authorize(Policy = "IsInstructor")]
@@ -60,10 +51,9 @@ namespace IguideME.Web.Controllers
             /**
              * Returns information of the user with the given id.
              */
-            return Json(
-                _databaseManager.GetUser(GetCourseID(), id)
-            );
+            return Json(_databaseManager.GetUser(GetCourseID(), id));
         }
+
         // [Authorize(Policy = "IsInstructor")]
         // [HttpGet]
         // [Route("/app/notification/{userID}")]
@@ -134,8 +124,9 @@ namespace IguideME.Web.Controllers
              * is able to use the application.
              */
 
-            PublicInformedConsent consent = _databaseManager
-                .GetPublicInformedConsent(GetCourseID());
+            PublicInformedConsent consent = _databaseManager.GetPublicInformedConsent(
+                GetCourseID()
+            );
 
             // Check if consent exists
             return consent == null ? BadRequest() : Json(consent);
@@ -171,8 +162,7 @@ namespace IguideME.Web.Controllers
         public ActionResult GetCoursePeerGroups()
         {
             // TODO: change this url and the function names, they aren't very intuitive.
-            PeerGroup peerGroup = _databaseManager
-                .GetPeerGroup(GetCourseID());
+            PeerGroup peerGroup = _databaseManager.GetPeerGroup(GetCourseID());
 
             // Check if consent exists
             return peerGroup != null ? Json(peerGroup) : NotFound();
@@ -236,13 +226,10 @@ namespace IguideME.Web.Controllers
             var body = new StreamReader(Request.Body).ReadToEnd();
             string dates = (string)JObject.Parse(body)["dates"];
 
-            _databaseManager.UpdateNotificationDates(
-                courseID,
-                dates);
+            _databaseManager.UpdateNotificationDates(courseID, dates);
 
             return Ok();
         }
-
 
         [Authorize(Policy = "IsInstructor")]
         [Route("/app/notifications")]
