@@ -36,8 +36,8 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
       - name: Build and push Docker image
-        working-directory: ./IguideME.Web
         uses: docker/build-push-action@v5
+        working-directory: "./IguideME.Web"
         with:
           context: .
           push: true
