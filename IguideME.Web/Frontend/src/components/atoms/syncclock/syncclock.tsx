@@ -46,6 +46,7 @@ const SyncClock: FC = (): ReactElement => {
 
   const stopSync = (): void => {
     abortSync();
+    setStartTime(null);
   };
 
   return (

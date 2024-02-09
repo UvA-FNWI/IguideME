@@ -12,7 +12,7 @@ import {
 
 // /-------------------------- Own imports ---------------------------/
 import { type User, UserRoles } from "@/types/user";
-import { getSelf, getUsers } from "@/api/users";
+import { getSelf, getStudents } from "@/api/users";
 
 import "./style.scss";
 
@@ -29,7 +29,7 @@ const selector = (
   setCurrentUser: Dispatch<SetStateAction<User | undefined>>,
   navigate: NavigateFunction,
 ): ReactElement => {
-  const { data } = useQuery("users", getUsers, { enabled: isAdmin });
+  const { data } = useQuery("students", getStudents, { enabled: isAdmin });
   const students = data
     ?.sort((a, b) => a.sortable_name.localeCompare(b.sortable_name))
     .filter((student) => student.userID !== currentUser?.userID);
@@ -64,6 +64,7 @@ const selector = (
         value={currentUser?.name}
         onChange={changeStudent}
         showSearch={true}
+        optionFilterProp="label"
         options={students?.map((student) => ({
           label: student.name,
           value: student.userID,
