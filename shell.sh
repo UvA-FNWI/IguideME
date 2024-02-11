@@ -1,61 +1,64 @@
 #!/usr/bin/env bash
 
 PROJECT_ROOT=$PWD;
+FRONTEND_ROOT="$PROJECT_ROOT/IguideME.Web/Frontend"
 
-if [ ! -d $PWD/IguideME.Web/wwwroot/node_modules ]; then
+if [ ! -d $FRONTEND_ROOT/node_modules ]; then
   echo "Fetching node modules..."
-  cd $PWD/IguideME.Web/wwwroot || exit;
-  yarn;
-  cd $PWD || exit;
+  yarn --cwd $FRONTEND_ROOT;
 fi
 
-#KUBECTL_PROJ_ID=$(kubectl get pods -n iguideme | grep Running | awk '{print $1}')
 
-alias frontend-dev='yarn --cwd $PROJECT_ROOT/IguideME.Web/Frontend dev'
-alias mock-frontend='yarn --cwd $PROJECT_ROOT/IguideME.Web/Frontend mock'
-alias iguideme-packages='yarn --cwd $PROJECT_ROOT/IguideME.Web/Frontend'
+alias frontend-dev='yarn --cwd $FRONTEND_ROOT'
+alias mock-frontend='yarn --cwd $FRONTEND_ROOT'
+alias iguideme-packages='yarn --cwd $FRONTEND_ROOT'
 alias backend-dev='dotnet watch --project $PROJECT_ROOT/IguideME.Web/ --no-hot-reload';
 alias enter-db='litecli $PROJECT_ROOT/IguideME.Web/db.sqlite';
 alias bright-db='litecli $PROJECT_ROOT/IguideME.Web/brightspace.db';
 alias logs='kubectl logs $KUBECTL_PROJ_ID -n iguideme';
 alias refresh-logs='KUBECTL_PROJ_ID=$(kubectl get pods -n iguideme | grep Running | awk '\''{print $1}'\'')'
-alias h='display_help';
+alias h='display_help()';
 
-display_help () {
-  echo "You can use the following assist commands:";
-  echo "                                          ";
-  echo "  ---frontend---------------------------------------------------------";
-  echo "  frontend-dev              build and run the frontend (watcher)";
-  echo "  mock-frontend             run the frontend with mocking (watcher)";
-  echo "  iguideme-packages         node package manager in correct directory";
-  echo "                                          ";
-  echo "  ---backend----------------------------------------------------------";
-  echo "  backend-dev 	            build and run the backend (watcher)";
-  echo "                                          ";
-  echo "  ---administrative---------------------------------------------------";
-  echo "  kill-process              kill a process by name";
-  echo "  enter-db                  enter the database";
-  echo "  bright-db                  enter the brightspace database";
-  echo "  logs                      view production logs";
-  echo "  refresh-logs              refresh pod name for logs";
-  echo "                                          ";
-  echo "  ---misc-------------------------------------------------------------";
-  echo "  h                         display this message again";
-  echo "                                          ";
+display_help() {
+  local c='\e[36m'
+  local m='\e[95m'
+  local e='\e[0m'
+  local HELP=$(cat << END
+You can use the following assist commands:
+
+  ---Frontend------------------------------------------------------------------
+    ${m}frontend-dev              ${c}Build and run the frontend (watcher)${e}
+    ${m}mock-frontend             ${c}Run the frontend with mocking (watcher)${e}
+    ${m}iguideme-packages         ${c}Node package manager in correct directory${e}
+                                          
+  ---Backend-------------------------------------------------------------------
+    ${m}backend-dev               ${c}Build and run the backend (watcher)${e}
+    ${m}enter-db                  ${c}Enter the database${e}
+    ${m}bright-db                 ${c}Enter the brightspace database${e}
+                                          
+  ---Admin---------------------------------------------------------------------
+    ${m}logs                      ${c}View production logs${e}
+    ${m}refresh-logs              ${c}Refresh pod name for logs${e}
+                                          
+  ---Misc----------------------------------------------------------------------
+    ${m}h                         ${c}Display this message again${e}
+                                          
+
+END
+)
+  echo -e "$HELP";
 }
 
-# clear screen
-# printf "\033c"
 
-cat << EOF
+HEADER=$(cat << EOF
 IIIII                 iii      dd        MM    MM EEEEEEE
  III   gggggg uu   uu          dd   eee  MMM  MMM EE
  III  gg   gg uu   uu iii  dddddd ee   e MM MM MM EEEEE
  III  ggggggg uu   uu iii dd   dd eeeee  MM    MM EE
 IIIII      gg  uuuu u iii  dddddd  eeeee MM    MM EEEEEEE
        ggggg
-
-
 EOF
+)
 
+echo -e "\n\e[34m$HEADER\e[0m\n\n";
 display_help;
