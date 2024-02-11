@@ -2,21 +2,18 @@ import {
   type Discussion,
   type Assignment,
   type LearningGoal,
-  GoalRequirement,
+  type GoalRequirement,
 } from "@/types/tile";
 import apiClient from "./axios";
 
 export const getAssignments: () => Promise<
   Map<number, Assignment>
 > = async () =>
-  await apiClient
-    .get(`assignments`)
-    .then(
-      (response) =>
-        new Map<number, Assignment>(
-          Object.entries(response.data).map(([k, v]) => [+k, v as Assignment]),
-        ),
+  await apiClient.get(`assignments`).then((response) => {
+    return new Map<number, Assignment>(
+      Object.entries(response.data).map(([k, v]) => [+k, v as Assignment]),
     );
+  });
 
 export const getTopics: () => Promise<Discussion[]> = async () =>
   await apiClient.get(`topics`).then((response) => response.data);
@@ -36,7 +33,9 @@ export const patchLearningGoal: (goal: LearningGoal) => Promise<void> = async (
   await apiClient.patch(`learning-goals/${goal.id}`, goal);
 };
 
-export const deleteGoal: (id: number) => Promise<void> = async (id: number) => {
+export const deleteLearningGoal: (id: number) => Promise<void> = async (
+  id: number,
+) => {
   await apiClient.delete(`learning-goals/${id}`);
 };
 

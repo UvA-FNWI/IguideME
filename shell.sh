@@ -9,8 +9,8 @@ if [ ! -d $FRONTEND_ROOT/node_modules ]; then
 fi
 
 
-alias frontend-dev='yarn --cwd $FRONTEND_ROOT'
-alias mock-frontend='yarn --cwd $FRONTEND_ROOT'
+alias frontend-dev='yarn --cwd $FRONTEND_ROOT dev'
+alias mock-frontend='yarn --cwd $FRONTEND_ROOT mock'
 alias iguideme-packages='yarn --cwd $FRONTEND_ROOT'
 alias backend-dev='dotnet watch --project $PROJECT_ROOT/IguideME.Web/ --no-hot-reload';
 alias enter-db='litecli $PROJECT_ROOT/IguideME.Web/db.sqlite';
@@ -29,7 +29,7 @@ You can use the following assist commands:
   ---Frontend------------------------------------------------------------------
     ${m}frontend-dev              ${c}Build and run the frontend (watcher)${e}
     ${m}mock-frontend             ${c}Run the frontend with mocking (watcher)${e}
-    ${m}iguideme-packages         ${c}Node package manager in correct directory${e}
+    ${m}iguideme-packages         ${c}Manage Node packages${e}
                                           
   ---Backend-------------------------------------------------------------------
     ${m}backend-dev               ${c}Build and run the backend (watcher)${e}

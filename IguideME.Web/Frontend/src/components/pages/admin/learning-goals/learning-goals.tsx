@@ -1,5 +1,5 @@
 import {
-  deleteGoal,
+  deleteLearningGoal,
   deleteRequirement,
   getAssignments,
   getLearningGoals,
@@ -31,7 +31,6 @@ import { useMutation, useQuery, useQueryClient } from "react-query";
 
 import "./style.scss";
 import Loading from "@/components/particles/loading";
-import { useForm } from "antd/es/form/Form";
 
 const { Item } = Form;
 
@@ -90,7 +89,7 @@ const ViewLearningGoal: FC<GoalProps> = ({ goal }): ReactElement => {
     },
   });
   const { mutate: removeGoal } = useMutation({
-    mutationFn: deleteGoal,
+    mutationFn: deleteLearningGoal,
     onSuccess: async () => {
       await queryClient.invalidateQueries("learning-goals");
     },

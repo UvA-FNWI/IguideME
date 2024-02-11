@@ -6,6 +6,7 @@ import {
   GradingType,
 } from "@/types/tile";
 import { http, HttpResponse } from "msw";
+import { MOCK_ASSIGNMENTS, MOCK_GOALS, MOCK_TOPICS } from "./entries";
 
 export const tileHandlers = [
   http.get("/layout/columns", () => {
@@ -95,7 +96,32 @@ const MOCK_TILES: Tile[] = [
     visible: true,
     notifications: true,
     gradingType: GradingType.Percentage,
-    entries: [],
+    entries: [
+      {
+        tile_id: 1,
+        title: MOCK_ASSIGNMENTS.find((ass) => ass.id === 1)!.title,
+        weight: 1,
+        content_id: 1,
+      },
+      {
+        tile_id: 1,
+        title: MOCK_ASSIGNMENTS.find((ass) => ass.id === 2)!.title,
+        weight: 1,
+        content_id: 2,
+      },
+      {
+        tile_id: 1,
+        title: MOCK_ASSIGNMENTS.find((ass) => ass.id === 3)!.title,
+        weight: 1,
+        content_id: 3,
+      },
+      {
+        tile_id: 1,
+        title: MOCK_ASSIGNMENTS.find((ass) => ass.id === 4)!.title,
+        weight: 1,
+        content_id: 4,
+      },
+    ],
   },
   {
     id: 2,
@@ -107,7 +133,26 @@ const MOCK_TILES: Tile[] = [
     visible: true,
     notifications: true,
     gradingType: GradingType.PassFail,
-    entries: [],
+    entries: [
+      {
+        tile_id: 1,
+        title: MOCK_ASSIGNMENTS.find((ass) => ass.id === 9)!.title,
+        weight: 1,
+        content_id: 9,
+      },
+      {
+        tile_id: 1,
+        title: MOCK_ASSIGNMENTS.find((ass) => ass.id === 10)!.title,
+        weight: 1,
+        content_id: 10,
+      },
+      {
+        tile_id: 1,
+        title: MOCK_ASSIGNMENTS.find((ass) => ass.id === 11)!.title,
+        weight: 1,
+        content_id: 11,
+      },
+    ],
   },
   {
     id: 3,
@@ -131,7 +176,56 @@ const MOCK_TILES: Tile[] = [
     visible: true,
     notifications: true,
     gradingType: GradingType.NotGraded,
-    entries: [],
+    entries: [
+      {
+        tile_id: 1,
+        title: MOCK_ASSIGNMENTS.find((ass) => ass.id === 12)!.title,
+        weight: 1,
+        content_id: 12,
+      },
+      {
+        tile_id: 1,
+        title: MOCK_ASSIGNMENTS.find((ass) => ass.id === 13)!.title,
+        weight: 1,
+        content_id: 13,
+      },
+      {
+        tile_id: 1,
+        title: MOCK_ASSIGNMENTS.find((ass) => ass.id === 14)!.title,
+        weight: 1,
+        content_id: 14,
+      },
+      {
+        tile_id: 1,
+        title: MOCK_ASSIGNMENTS.find((ass) => ass.id === 15)!.title,
+        weight: 1,
+        content_id: 15,
+      },
+      {
+        tile_id: 1,
+        title: MOCK_ASSIGNMENTS.find((ass) => ass.id === 16)!.title,
+        weight: 1,
+        content_id: 16,
+      },
+      {
+        tile_id: 1,
+        title: MOCK_ASSIGNMENTS.find((ass) => ass.id === 17)!.title,
+        weight: 1,
+        content_id: 17,
+      },
+      {
+        tile_id: 1,
+        title: MOCK_ASSIGNMENTS.find((ass) => ass.id === 18)!.title,
+        weight: 1,
+        content_id: 18,
+      },
+      {
+        tile_id: 1,
+        title: MOCK_ASSIGNMENTS.find((ass) => ass.id === 19)!.title,
+        weight: 1,
+        content_id: 19,
+      },
+    ],
   },
   {
     id: 5,
@@ -143,7 +237,32 @@ const MOCK_TILES: Tile[] = [
     visible: true,
     notifications: true,
     gradingType: GradingType.Points,
-    entries: [],
+    entries: [
+      {
+        tile_id: 1,
+        title: MOCK_ASSIGNMENTS.find((top) => top.id === 5)!.title,
+        weight: 1,
+        content_id: 5,
+      },
+      {
+        tile_id: 1,
+        title: MOCK_ASSIGNMENTS.find((top) => top.id === 6)!.title,
+        weight: 1,
+        content_id: 6,
+      },
+      {
+        tile_id: 1,
+        title: MOCK_ASSIGNMENTS.find((top) => top.id === 7)!.title,
+        weight: 1,
+        content_id: 7,
+      },
+      {
+        tile_id: 1,
+        title: MOCK_ASSIGNMENTS.find((top) => top.id === 8)!.title,
+        weight: 1,
+        content_id: 8,
+      },
+    ],
   },
   {
     id: 6,
@@ -165,9 +284,28 @@ const MOCK_TILES: Tile[] = [
     weight: 0,
     type: TileType.discussions,
     visible: true,
-    notifications: true,
+    notifications: false,
     gradingType: GradingType.NotGraded,
-    entries: [],
+    entries: [
+      {
+        tile_id: 7,
+        title: MOCK_TOPICS.find((top) => top.id === 1)!.title,
+        weight: -1,
+        content_id: 1,
+      },
+      {
+        tile_id: 7,
+        title: MOCK_TOPICS.find((top) => top.id === 2)!.title,
+        weight: -1,
+        content_id: 2,
+      },
+      {
+        tile_id: 7,
+        title: MOCK_TOPICS.find((top) => top.id === 3)!.title,
+        weight: -1,
+        content_id: 3,
+      },
+    ],
   },
   {
     id: 9,
@@ -179,6 +317,25 @@ const MOCK_TILES: Tile[] = [
     visible: true,
     notifications: true,
     gradingType: GradingType.NotGraded,
+    entries: [
+      {
+        tile_id: 7,
+        title: MOCK_GOALS.find((goal) => goal.id === 1)!.title,
+        weight: -1,
+        content_id: 1,
+      },
+    ],
+  },
+  {
+    id: 10,
+    group_id: 2,
+    title: "Hidden",
+    position: 2,
+    weight: 0,
+    type: TileType.assignments,
+    visible: false,
+    notifications: true,
+    gradingType: GradingType.Points,
     entries: [],
   },
 ];
