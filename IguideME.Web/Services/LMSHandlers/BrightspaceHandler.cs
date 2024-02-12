@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SQLite;
 using System.Linq;
 using IguideME.Web.Models.App;
 using IguideME.Web.Models.Impl;
@@ -9,6 +8,7 @@ using IguideME.Web.Services.LMSHandlers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using Npgsql;
 
 namespace IguideME.Web.Services
 {
@@ -20,7 +20,13 @@ namespace IguideME.Web.Services
 
         public BrightspaceHandler(IConfiguration config, ILogger<SyncManager> logger)
         {
-            _connection_string = config["LMS:Brightspace:Connection"];
+            _connection_string = "Host = " + config["LMS:Brightspace:Connection:Host"] +
+                                ";Port = " + config["LMS:Brightspace:Connection:Port"] +
+                                ";Database = " + config["LMS:Brightspace:Connection:Database"] +
+                                ";User ID = " + config["LMS:Brightspace:Connection:User ID"] +
+                                ";Password = " + config["LMS:Brightspace:Connection:Password"] +
+                                ";Search Path = " + config["LMS:Brightspace:Connection:Search Path"] +
+                                ";" + config["LMS:Brightspace:Connection:Rest"];
             _logger = logger;
             this.SyncInit();
         }
@@ -30,18 +36,18 @@ namespace IguideME.Web.Services
             _logger.LogInformation("Initializing handler for Brightspace.");
         }
 
-        private SQLiteConnection GetConnection() => new(_connection_string);
+        private NpgsqlConnection GetConnection() => new(_connection_string);
 
-        private SQLiteDataReader Query(string query, params SQLiteParameter[] parameters)
+        private NpgsqlDataReader Query(string query, params NpgsqlParameter[] parameters)
         {
-            SQLiteConnection connection = GetConnection();
+            NpgsqlConnection connection = GetConnection();
             try
             {
                 connection.Open();
-                using (SQLiteCommand command = connection.CreateCommand())
+                using (NpgsqlCommand command = connection.CreateCommand())
                 {
                     command.CommandText = query;
-                    foreach (SQLiteParameter param in parameters)
+                    foreach (NpgsqlParameter param in parameters)
                     {
                         command.Parameters.Add(param);
                     }
@@ -60,7 +66,7 @@ namespace IguideME.Web.Services
             }
         }
 
-        private void PrintQueryError(string title, int rows, SQLiteDataReader r, Exception e)
+        private void PrintQueryError(string title, int rows, NpgsqlDataReader r, Exception e)
         {
             string error = $"{title}\nRequested:\nColumn | Data Type | Value | Type\n";
 
@@ -105,22 +111,22 @@ namespace IguideME.Web.Services
             );
 
             using (
-                SQLiteDataReader r = Query(
-                    @"SELECT      `users`.`username`,
-                                    `users`.`user_id`,
-                                    `users`.`first_name`,
-                                    `users`.`middle_name`,
-                                    `users`.`last_name`
-                        FROM        `users`
-                        INNER JOIN  `user_enrollments`
-                            ON      `users`.`user_id` = `user_enrollments`.`user_id`
-                        WHERE       `user_enrollments`.`org_unit_id` = @courseID
-                        AND         `users`.`username`= @userID
-                        AND        (`user_enrollments`.`role_id` = 110
-                        OR          `user_enrollments`.`role_id` = 130
-                        OR          `user_enrollments`.`role_id` = 134)",
-                    new SQLiteParameter("userID", userID),
-                    new SQLiteParameter("courseID", courseID)
+                NpgsqlDataReader r = Query(
+                    @"SELECT      users.username,
+                                    users.user_id,
+                                    users.first_name,
+                                    users.middle_name,
+                                    users.last_name
+                        FROM        users
+                        INNER JOIN  user_enrollments
+                            ON      users.user_id = user_enrollments.user_id
+                        WHERE       user_enrollments.org_unit_id = @courseID
+                        AND         users.username= @userID
+                        AND        (user_enrollments.role_id = 110
+                        OR          user_enrollments.role_id = 130
+                        OR          user_enrollments.role_id = 134)",
+                    new NpgsqlParameter("userID", userID),
+                    new NpgsqlParameter("courseID", courseID)
                 )
             )
             {
@@ -162,20 +168,20 @@ namespace IguideME.Web.Services
             );
             List<User> students = new List<User>();
             using (
-                SQLiteDataReader r = Query(
-                    @"SELECT      `users`.`username`,
-                                    `users`.`user_id`,
-                                    `users`.`first_name`,
-                                    `users`.`middle_name`,
-                                    `users`.`last_name`
-                        FROM        `users`
-                        INNER JOIN  `user_enrollments`
-                            ON      `users`.`user_id` = `user_enrollments`.`user_id`
-                        WHERE       `user_enrollments`.`org_unit_id` = @courseID
-                        AND        (`user_enrollments`.`role_id` = 110
-                        OR          `user_enrollments`.`role_id` = 130
-                        OR          `user_enrollments`.`role_id` = 134)",
-                    new SQLiteParameter("courseID", courseID)
+                NpgsqlDataReader r = Query(
+                    @"SELECT        users.username,
+                                    users.user_id,
+                                    users.first_name,
+                                    users.middle_name,
+                                    users.last_name
+                        FROM        users
+                        INNER JOIN  user_enrollments
+                            ON      users.user_id = user_enrollments.user_id
+                        WHERE       user_enrollments.org_unit_id = @courseID
+                        AND        (user_enrollments.role_id = 110
+                        OR          user_enrollments.role_id = 130
+                        OR          user_enrollments.role_id = 134)",
+                    new NpgsqlParameter("courseID", courseID)
                 )
             )
             {
@@ -219,19 +225,19 @@ namespace IguideME.Web.Services
             );
             List<User> teachers = new List<User>();
             using (
-                SQLiteDataReader r = Query(
-                    @"SELECT      `users`.`username`,
-                                    `users`.`user_id`,
-                                    `users`.`first_name`,
-                                    `users`.`middle_name`,
-                                    `users`.`last_name`
-                        FROM        `users`
-                        INNER JOIN  `user_enrollments`
-                            ON      `users`.`user_id` = `user_enrollments`.`user_id`
-                        WHERE       `user_enrollments`.`org_unit_id` = @courseID
-                        AND        (`user_enrollments`.`role_id` = 109
-                        OR          `user_enrollments`.`role_id` = 117)",
-                    new SQLiteParameter("courseID", courseID)
+                NpgsqlDataReader r = Query(
+                    @"SELECT      users.username,
+                                    users.user_id,
+                                    users.first_name,
+                                    users.middle_name,
+                                    users.last_name
+                        FROM        users
+                        INNER JOIN  user_enrollments
+                            ON      users.user_id = user_enrollments.user_id
+                        WHERE       user_enrollments.org_unit_id = @courseID
+                        AND        (user_enrollments.role_id = 109
+                        OR          user_enrollments.role_id = 117)",
+                    new NpgsqlParameter("courseID", courseID)
                 )
             )
             {
@@ -276,20 +282,20 @@ namespace IguideME.Web.Services
             );
             List<AppAssignment> assignments = new List<AppAssignment>();
             using (
-                SQLiteDataReader r = Query(
-                    @"SELECT  `grade_object_id`,
-                                `org_unit_id`,
-                                `name`,
-                                `end_date`,
-                                `max_points`,
-                                `type_name`,
-                                `grade_object_type_id`
-                        FROM    `grade_objects`
-                        WHERE   `org_unit_id` = @courseID
-                        AND    (`grade_object_type_id` = 1
-                        OR      `grade_object_type_id` = 2
-                        OR      `grade_object_type_id` = 4)",
-                    new SQLiteParameter("courseID", courseID)
+                NpgsqlDataReader r = Query(
+                    @"SELECT  grade_object_id,
+                                org_unit_id,
+                                name,
+                                end_date,
+                                max_points,
+                                type_name,
+                                grade_object_type_id
+                        FROM    grade_objects
+                        WHERE   org_unit_id = @courseID
+                        AND    (grade_object_type_id = 1
+                        OR      grade_object_type_id = 2
+                        OR      grade_object_type_id = 4)",
+                    new NpgsqlParameter("courseID", courseID)
                 )
             )
             {
@@ -331,23 +337,23 @@ namespace IguideME.Web.Services
         {
             List<AssignmentSubmission> submissions = new List<AssignmentSubmission>();
 
-            SQLiteParameter[] parameters = users
-                .Select((user, index) => new SQLiteParameter($"userID{index}", user.StudentNumber))
-                .Concat(new[] { new SQLiteParameter("courseID", courseID) })
+            NpgsqlParameter[] parameters = users
+                .Select((user, index) => new NpgsqlParameter($"userID{index}", user.StudentNumber))
+                .Concat(new[] { new NpgsqlParameter("courseID", courseID) })
                 .ToArray();
 
             using (
-                SQLiteDataReader r = Query(
-                    @$"SELECT  `grade_object_id`,
-                                `user_id`,
-                                `points_numerator`,
-                                `points_denominator`,
-                                `grade_text`,
-                                `grade_released_date`
-                        FROM    `grade_results`
-                        WHERE   `org_unit_id` = @courseID
-                        AND     `user_id`
-                            IN  ({string.Join(",", users.Select((_, index) => $"@userID{index}"))})",
+                NpgsqlDataReader r = Query(
+                    @$"SELECT  grade_object_id,
+                                user_id,
+                                points_numerator,
+                                points_denominator,
+                                grade_text,
+                                grade_released_date
+                        FROM    grade_results
+                        WHERE   org_unit_id = @courseID",
+                        // AND     user_id
+                        //     IN  ({string.Join(",", users.Select((_, index) => $"@userID{index}"))})",
                     parameters
                 )
             )
