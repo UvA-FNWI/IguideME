@@ -313,9 +313,9 @@ namespace IguideME.Web.Services
                                 false, //bool muted,
                                 r.GetValue(3).ToString(),
                                 r.GetDouble(4),
-                                0, //Position ????????????
+                                0, //Position
                                 mapGradingType(r.GetInt32(6)), // This is mapped to our local enum,
-                                "" //"Submission Type" ???????????
+                                "" //"Submission Type"
                             )
                         );
                     }
@@ -336,6 +336,9 @@ namespace IguideME.Web.Services
         )
         {
             List<AssignmentSubmission> submissions = new List<AssignmentSubmission>();
+            
+            if (users.Count() == 0) // If there is no consented users, no need to search
+                return submissions;
 
             NpgsqlParameter[] parameters = users
                 .Select((user, index) => new NpgsqlParameter($"userID{index}", user.StudentNumber))
@@ -351,9 +354,10 @@ namespace IguideME.Web.Services
                                 grade_text,
                                 grade_released_date
                         FROM    grade_results
-                        WHERE   org_unit_id = @courseID",
-                        // AND     user_id
-                        //     IN  ({string.Join(",", users.Select((_, index) => $"@userID{index}"))})",
+                        WHERE   org_unit_id = @courseID
+                        AND     is_released = TRUE
+                        AND     user_id
+                            IN  ({string.Join(",", users.Select((_, index) => $"@userID{index}"))})",
                     parameters
                 )
             )
@@ -363,7 +367,7 @@ namespace IguideME.Web.Services
                     try
                     {
                         string rawGrade = r.GetValue(4).ToString();
-                        if (rawGrade.IsNullOrEmpty() || rawGrade == "\\N")
+                        if (rawGrade.IsNullOrEmpty())
                         {
                             submissions.Add(
                                 new AssignmentSubmission(
@@ -371,7 +375,7 @@ namespace IguideME.Web.Services
                                     -1, ///// ????
                                     r.GetInt32(0),
                                     r.GetValue(1).ToString(),
-                                    r.GetInt32(2) / r.GetInt32(3),
+                                    (r.IsDBNull(2) || r.IsDBNull(3)) ? "0" : (r.GetDouble(2) / r.GetDouble(3)).ToString(),
                                     r.GetValue(5).ToString()
                                 )
                             );
