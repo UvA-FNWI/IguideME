@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using IguideME.Web.Models.Impl;
+using IguideME.Web.Services.LMSHandlers;
 using Microsoft.Extensions.Logging;
-using UvA.DataNose.Connectors.Canvas;
 
 namespace IguideME.Web.Services.Workers
 {
@@ -10,54 +12,58 @@ namespace IguideME.Web.Services.Workers
     public class UserWorker
     {
         readonly private ILogger<SyncManager> _logger;
-        readonly private CanvasHandler _canvasHandler;
+        readonly private ILMSHandler _lmsHandler;
         readonly private int _courseID;
         readonly private string _hashCode;
 
         /// <summary>
         /// This constructor initializes the new UserWorker to:
-        /// (<paramref name="courseID"/>, <paramref name="hashCode"/>, <paramref name="canvasHandler"/>, <paramref name="logger"/>).
+        /// (<paramref name="courseID"/>, <paramref name="hashCode"/>, <paramref name="lmsHandler"/>, <paramref name="logger"/>).
         /// </summary>
         /// <param name="courseID">the id of the course.</param>
         /// <param name="hashCode">the hash code associated to the current sync.</param>
-        /// <param name="canvasHandler">a reference to the class managing the connection with canvas.</param>
+        /// <param name="lmsHandler">a reference to the class managing the connection with canvas.</param>
         /// <param name="logger">a reference to the logger used for the sync.</param>
         public UserWorker(
             int courseID,
             string hashCode,
-            CanvasHandler canvasHandler,
+            ILMSHandler lmsHandler,
             ILogger<SyncManager> logger)
         {
             _logger = logger;
             this._courseID = courseID;
             this._hashCode = hashCode;
-            this._canvasHandler = canvasHandler;
+            this._lmsHandler = lmsHandler;
         }
 
         /// <summary>
         /// Registers the given students and initializes their settings in the database.
         /// </summary>
         /// <param name="students">list of students to be registered.</param>
-        private void RegisterStudents(User[] students) {
+        private void RegisterStudents(IEnumerable<User> students)
+        {
 
             foreach (User student in students)
             {
                 // _logger.LogInformation("Processing student {ID}...", student.ID);
-                try {
-                    DatabaseManager.Instance.RegisterUserSettings(new Models.ConsentData(_courseID, student.SISUserID, student.Name, -1));
+                try
+                {
+                    DatabaseManager.Instance.RegisterUserSettings(new Models.ConsentData(_courseID, student.UserID, student.Name, -1));
 
                     // _logger.LogInformation("registering student with login {l} sis {s} user {u}", student.LoginID, student.SISUserID, student.ID);
 
                     DatabaseManager.Instance.RegisterUser(
                         _courseID,
-                        student.ID,
-                        student.SISUserID,//TODO: fix
+                        student.StudentNumber,
+                        student.UserID,
                         student.Name,
                         student.SortableName,
                         "student",
                         this._hashCode
                     );
-                } catch (Exception e) {
+                }
+                catch (Exception e)
+                {
                     _logger.LogError("Error registering student: {Error} {StackTrace}", e, e.StackTrace);
                 }
             }
@@ -67,15 +73,16 @@ namespace IguideME.Web.Services.Workers
         /// Registers the given students in the database.
         /// </summary>
         /// <param name="instructors">list of instructors to be registered.</param>
-        private void RegisterInstructors(User[] instructors) {
+        private void RegisterInstructors(IEnumerable<User> instructors)
+        {
             foreach (var instructor in instructors)
             {
                 _logger.LogInformation("Processing instructor {ID} ...", instructor.ID);
 
                 DatabaseManager.Instance.RegisterUser(
                     _courseID,
-                    instructor.ID,
-                    instructor.SISUserID,
+                    instructor.StudentNumber,
+                    instructor.UserID,
                     instructor.Name,
                     instructor.SortableName,
                     "instructor",
@@ -91,15 +98,15 @@ namespace IguideME.Web.Services.Workers
         {
             _logger.LogInformation("Starting user registry...");
 
-            User[] students = this._canvasHandler.GetStudents(this._courseID);
+            IEnumerable<User> students = this._lmsHandler.GetStudents(this._courseID);
 
-            _logger.LogInformation("Starting student registry, about to process {StudentCount} students...", students.Length);
+            _logger.LogInformation("Starting student registry, about to process students...");
 
             this.RegisterStudents(students);
 
-            var instructors = this._canvasHandler.GetAdministrators(_courseID);
+            var instructors = this._lmsHandler.GetAdministrators(_courseID);
 
-            _logger.LogInformation("Starting instructor registry, about to process {InstructorCount} instructurs...", instructors.Length);
+            _logger.LogInformation("Starting instructor registry, about to process instructurs...");
 
             this.RegisterInstructors(instructors);
         }

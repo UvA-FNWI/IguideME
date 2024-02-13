@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+
 using IguideME.Web.Models;
 using IguideME.Web.Models.App;
 using IguideME.Web.Models.Impl;
+
 using Microsoft.Extensions.Logging;
 
 namespace IguideME.Web.Services.Workers
@@ -60,14 +62,15 @@ namespace IguideME.Web.Services.Workers
         /// Creates an array of lists of users, where the array is indexed by the goal grade of the users.
         /// </summary>
         /// <returns>A list of users per goal grade.</returns>
-        List<string>[] GetUsersSortedByGoalGrade() {
+        List<string>[] GetUsersSortedByGoalGrade()
+        {
             List<string>[] usersWithSameGoalGrade = new List<string>[11];
 
             for (int goalGradeClass = 1; goalGradeClass <= 10; goalGradeClass++)
             {
                 usersWithSameGoalGrade[goalGradeClass] = new List<string>();
                 //TODO: get only those with consent!!!
-                List<User> sameGraders = DatabaseManager.Instance.GetUsersWithGoalGrade(this._courseID,goalGradeClass, this._hashCode);
+                List<User> sameGraders = DatabaseManager.Instance.GetUsersWithGoalGrade(this._courseID, goalGradeClass, this._hashCode);
                 sameGraders.ForEach(x => usersWithSameGoalGrade[goalGradeClass].Add(x.UserID));
             }
 
@@ -81,7 +84,8 @@ namespace IguideME.Web.Services.Workers
         /// <param name="goalGrade">The goal grade to create a peer group for.</param>
         /// <param name="minPeerGroupSize">The minimum group size a peer group needs to have.</param>
         /// <returns></returns>
-        static List<string> CreatePeerGroup(List<string>[] sortedUsers, int goalGrade, int minPeerGroupSize) {
+        static List<string> CreatePeerGroup(List<string>[] sortedUsers, int goalGrade, int minPeerGroupSize)
+        {
             List<string> peerGroup = new(sortedUsers[goalGrade]);
 
             // Look for peers until minimum size is reached or untill the offset exceeds the range of valid grades.
@@ -112,20 +116,21 @@ namespace IguideME.Web.Services.Workers
         /// </summary>
         /// <param name="peerGroup"></param>
         /// <returns>A dictionary with the tileID as key and the statistics as a list.</returns>
-        Dictionary<int,List<float>> CalculateGrades(List<string> peerGroup){
-            Dictionary<int,List<float>> grades = new();
+        Dictionary<int, List<double>> CalculateGrades(List<string> peerGroup)
+        {
+            Dictionary<int, List<double>> grades = new();
 
             // We run the following process for each individual peer in the group
-            foreach(string peerID in peerGroup)
+            foreach (string peerID in peerGroup)
             {
                 // We query all the grades of each peer
-                Dictionary<int,List<float>> temp = DatabaseManager.Instance.GetUserGrades(this._courseID, peerID, this._hashCode);
+                Dictionary<int, List<double>> temp = DatabaseManager.Instance.GetUserGrades(this._courseID, peerID, this._hashCode);
 
                 temp.ToList().ForEach(x =>
                 {
                     // And we merge the temporary dictionary with the grades dictionary
-                    if (!grades.TryGetValue(x.Key, out List<float> value))
-                        grades[x.Key] = new List<float>(x.Value);
+                    if (!grades.TryGetValue(x.Key, out List<double> value))
+                        grades[x.Key] = new List<double>(x.Value);
                     else
                         x.Value.ForEach(y => grades[x.Key].Add(y));
                 });
@@ -154,12 +159,12 @@ namespace IguideME.Web.Services.Workers
                 // Since we have the loginIds of all members in the peer-group,
                 // we will calculate their minimum, maximum and average grade.
 
-                Dictionary<int, List<float>> grades = CalculateGrades(peerGroup);
+                Dictionary<int, List<double>> grades = CalculateGrades(peerGroup);
 
                 // Finally, we go through all dictionary (= all tiles)
                 // and we store the title, min, max and average of each list in the database.
                 // also, we save the user_ids of the peers in said group
-                foreach (KeyValuePair<int, List<float>> entry in grades)
+                foreach (KeyValuePair<int, List<double>> entry in grades)
                 {
                     if ((entry.Value != null) && entry.Value.Any())
                     {
@@ -179,42 +184,43 @@ namespace IguideME.Web.Services.Workers
             }
         }
 
-        void CreateNotifications(List<string> users, Dictionary<int, List<float>> grades) {
+        void CreateNotifications(List<string> users, Dictionary<int, List<double>> grades)
+        {
 
-            foreach(string user in users)
+            foreach (string user in users)
             {
-                foreach (KeyValuePair<int, List<float>> entry in grades)
+                foreach (KeyValuePair<int, List<double>> entry in grades)
                 {
                     // Get only tiles with notifications
                     if (DatabaseManager.Instance.GetTileNotificationState(entry.Key))
                     {
-                        List<TileEntrySubmission> userTileSubmissions = DatabaseManager.Instance.GetTileSubmissionsForUser(entry.Key, user, this._hashCode);
+                        List<AssignmentSubmission> userTileSubmissions = DatabaseManager.Instance.GetTileSubmissionsForUser(entry.Key, user, this._hashCode);
 
                         // Find the submission with the highest ID, as it is the most recent
                         int lastSubmissionID = -1;
-                        foreach (TileEntrySubmission submission in userTileSubmissions)
+                        foreach (AssignmentSubmission submission in userTileSubmissions)
                             if (submission.ID > lastSubmissionID)
                                 lastSubmissionID = submission.ID;
 
 
                         // Create one list with all the submission grades and one more without the most recent submission
-                        List<float> currentSubmissionGrades = new();
-                        List<float> lastSubmissionGrades = new();
-                        foreach (TileEntrySubmission submission in userTileSubmissions)
+                        List<double> currentSubmissionGrades = new();
+                        List<double> lastSubmissionGrades = new();
+                        foreach (AssignmentSubmission submission in userTileSubmissions)
                         {
-                            currentSubmissionGrades.Add(float.Parse(submission.Grade));
+                            currentSubmissionGrades.Add(submission.Grade);
                             if (submission.ID != lastSubmissionID)
-                                lastSubmissionGrades.Add(float.Parse(submission.Grade));
+                                lastSubmissionGrades.Add(submission.Grade);
                         }
 
-                        float currentAverage = -1;
-                        float lastAverage = -1;
-                        float peerAverage = -1;
+                        double currentAverage = -1;
+                        double lastAverage = -1;
+                        double peerAverage = -1;
                         // Store the three important Averages in variables
                         if (currentSubmissionGrades.Count != 0)
                             currentAverage = currentSubmissionGrades.Average();
                         if (lastSubmissionGrades.Count != 0)
-                            lastAverage =lastSubmissionGrades.Average();
+                            lastAverage = lastSubmissionGrades.Average();
                         if (entry.Value != null)
                             peerAverage = entry.Value.Average();
 
@@ -227,7 +233,7 @@ namespace IguideME.Web.Services.Workers
                                     this._courseID,
                                     user,
                                     entry.Key,
-                                    (int) Notification_Types.outperforming,
+                                    (int)Notification_Types.outperforming,
                                     this._hashCode
                                 );
                             }
@@ -242,7 +248,7 @@ namespace IguideME.Web.Services.Workers
                                     this._courseID,
                                     user,
                                     entry.Key,
-                                    (int) Notification_Types.closing_gap,
+                                    (int)Notification_Types.closing_gap,
                                     this._hashCode
                                 );
                             }
@@ -253,7 +259,7 @@ namespace IguideME.Web.Services.Workers
                                     this._courseID,
                                     user,
                                     entry.Key,
-                                    (int) Notification_Types.falling_behind,
+                                    (int)Notification_Types.falling_behind,
                                     this._hashCode
                                 );
                             }
@@ -264,7 +270,7 @@ namespace IguideME.Web.Services.Workers
                                     this._courseID,
                                     user,
                                     entry.Key,
-                                    (int) Notification_Types.more_effort,
+                                    (int)Notification_Types.more_effort,
                                     this._hashCode
                                 );
                             }
@@ -273,133 +279,6 @@ namespace IguideME.Web.Services.Workers
                 }
             }
 
-            // for each student, we do the following:
-
-            // foreach (var tile in tilesWithNotifications)
-            // {
-            //     var peerGrade = peerGrades1.FirstOrDefault(
-            //         x => x.TileID == tile.ID);
-            //     var userGrade = userGrades1.FirstOrDefault(
-            //         x => x.TileID == tile.ID);
-            //     if (peerGrade != null && userGrade != null)
-            //     {
-            //         if (userGrade.Average - peerGrade.Average > 0.8)
-            //         {
-            //             DatabaseManager.Instance.RegisterNotification(
-            //                 CourseID,
-            //                 student.LoginID,
-            //                 tile.ID,
-            //                 // TODO: Change to enum
-            //                 "outperforming peers",
-            //                 this.Hash
-            //             );
-            //         }
-            //     }
-
-            //     _logger.LogInformation($"About to process {tile.GetEntries().Count} tile entries...");
-
-            //     List<float> userGradeList = new List<float>();
-            //     List<float> peerGradeList = new List<float>();
-            //     foreach (var entry in tile.GetEntries())
-            //     {
-            //         /**
-            //             * Fetch all grades given to the current user and
-            //             * its peers that belong to the current tile entry.
-            //             */
-
-            //         var userGrades = DatabaseManager.Instance
-            //             .GetTileEntrySubmissionsForUser(
-            //                 this.CourseID,
-            //                 entry.ID,
-            //                 student.LoginID,
-            //                 this.Hash);
-
-            //         var peerGrades =
-            //             DatabaseManager.Instance.GetTileEntrySubmissions(
-            //                     this.CourseID, entry.ID, this.Hash).FindAll(
-            //                     s => peerIDs.Contains(s.UserLoginID));
-
-            //         // Add grades to registry
-            //         userGrades.ForEach(g =>
-            //             userGradeList.Add(float.Parse(g.Grade)));
-            //         peerGrades.ForEach(g =>
-            //             peerGradeList.Add(float.Parse(g.Grade)));
-
-            //     }
-
-            //     // If no grades are available default the average to -1
-            //     float userGradesAverage = userGradeList.Count > 0 ?
-            //         userGradeList.Average() : -1;
-            //     float peerGradesAverage = peerGradeList.Count > 0 ?
-            //         peerGradeList.Average() : -1;
-
-            //     // Validate the presence of grades, otherwise skip tile
-            //     if (userGradesAverage == -1 || peerGradesAverage == -1)
-            //     {
-            //         _logger.LogInformation("Student has invalid grade average, or peer grade average, skipping student.");
-            //         continue;
-            //     }
-
-            //     // Collect the grades excluding the last grade
-            //     var historicUserGrades = userGradeList.Count > 1 ?
-            //         userGradeList
-            //             .GetRange(0, userGradeList.Count - 2) :
-            //         null;
-
-            //     var historicPeerGrades = peerGradeList.Count > 1 ?
-            //         peerGradeList
-            //             .GetRange(0, peerGradeList.Count - 2) :
-            //         null;
-
-            //     // If no historic scenario is possible do not
-            //     // send any notifications
-            //     if (historicUserGrades == null ||
-            //         historicPeerGrades == null)
-            //     {
-            //         _logger.LogInformation("Student has no historic grades, or no historic peer grades, skipping.");
-            //         continue;
-            //     }
-
-            //     // Compute historic average
-            //     float historicUserGradesAverage =
-            //         historicUserGrades.Count > 0 ?
-            //             historicUserGrades.Average() : -1;
-
-            //     float historicPeerGradesAverage =
-            //         historicPeerGrades.Count > 0 ?
-            //             historicPeerGrades.Average() : -1;
-
-            //     // Compute point change
-            //     var historicDiff = historicUserGradesAverage -
-            //         historicPeerGradesAverage;
-            //     var currentDiff = userGradesAverage -
-            //         peerGradesAverage;
-
-            //     // Check if student is closing the gap to its peers
-            //     if ((historicDiff < currentDiff) &&
-            //         (historicDiff < 0) && (currentDiff < 0))
-            //     {
-            //         DatabaseManager.Instance.RegisterNotification(
-            //             CourseID,
-            //             student.LoginID,
-            //             tile.ID,
-            //             "closing the gap",
-            //             this.Hash);
-            //     }
-
-            //     // Check if the gap between the student and peers
-            //     // is growing.
-            //     if ((historicDiff > currentDiff) &&
-            //         (historicDiff < 0) && (currentDiff < 0))
-            //     {
-            //         DatabaseManager.Instance.RegisterNotification(
-            //             CourseID,
-            //             student.LoginID,
-            //             tile.ID,
-            //             "more effort required",
-            //             this.Hash);
-            //     }
-            // }
         }
 
     }

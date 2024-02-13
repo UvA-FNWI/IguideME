@@ -3,6 +3,7 @@ using System.IO;
 
 using IguideME.Web.Models.App;
 using IguideME.Web.Services;
+using IguideME.Web.Services.LMSHandlers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -18,15 +19,15 @@ namespace IguideME.Web.Controllers
     public class AppController : DataController
     {
         private readonly ILogger<DataController> _logger;
-        private readonly CanvasHandler _canvasHandler;
+        private readonly ILMSHandler _lmsHandler;
 
         public AppController(
             ILogger<DataController> logger,
-            CanvasHandler canvasHandler) : base(
-                logger, canvasHandler)
+            ILMSHandler lmsHandler) : base(
+                logger, lmsHandler)
         {
             this._logger = logger;
-            this._canvasHandler = canvasHandler;
+            this._lmsHandler = lmsHandler;
 
         }
 

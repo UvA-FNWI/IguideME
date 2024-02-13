@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using IguideME.Web.Services.LMSHandlers;
 
 
 // //======================== Builder configuration =========================//
@@ -31,6 +32,13 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(
 
 
 //    /------------------------ Read appsettings.json -------------------------/
+
+Backends lms;
+if (!Backends.TryParse(builder.Configuration.GetSection("LMS:Backend").Value, out lms))
+{
+    // Console.WriteLine();
+    throw new Exception("Incorrect settings for LMS:Backend");
+}
 
 // "UnsecureApplicationSettings:UseRedisCache" - indicates whether to use Redis cache or not.
 bool useRedisCache = bool.Parse(builder.Configuration.GetSection(
@@ -105,8 +113,15 @@ builder.Services.Configure<KestrelServerOptions>(options => options.AllowSynchro
 builder.Services.Configure<IISServerOptions>(options => options.AllowSynchronousIO = true);
 
 builder.Services.AddControllersWithViews();
-builder.Services.AddSingleton<CanvasHandler>();
-
+switch (lms)
+{
+    case Backends.Brightspace:
+        builder.Services.AddSingleton<ILMSHandler, BrightspaceHandler>();
+        break;
+    case Backends.Canvas:
+        builder.Services.AddSingleton<ILMSHandler, CanvasHandler>();
+        break;
+}
 builder.Services.AddHttpClient();
 
 builder.Services.AddControllers()

@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using IguideME.Web.Models.Service;
+using IguideME.Web.Services.LMSHandlers;
 using IguideME.Web.Services.Workers;
 using Microsoft.Extensions.Logging;
 
@@ -23,23 +24,23 @@ namespace IguideME.Web.Services
     {
         private readonly ILogger<SyncManager> _logger;
         private readonly IComputationJobStatusService _computationJobStatus;
-        private readonly CanvasHandler _canvasHandler;
+        private readonly ILMSHandler _lmsHandler;
 
         /// <summary>
         /// This constructor initializes the new CanvasSyncService to
-        /// (<paramref name="computationJobStatus"/>, <paramref name="canvasHandler"/>, <paramref name="logger"/>).
+        /// (<paramref name="computationJobStatus"/>, <paramref name="lmsHandler"/>, <paramref name="logger"/>).
         /// </summary>
         /// <param name="computationJobStatus"></param>
-        /// <param name="canvasHandler"></param>
+        /// <param name="lmsHandler"></param>
         /// <param name="logger"></param>
         public CanvasSyncService(
             IComputationJobStatusService computationJobStatus,
-            CanvasHandler canvasHandler,
+            ILMSHandler lmsHandler,
             ILogger<SyncManager> logger)
         {
             _logger = logger;
             _computationJobStatus = computationJobStatus;
-            _canvasHandler = canvasHandler;
+            _lmsHandler = lmsHandler;
         }
 
         /// <summary>
@@ -56,22 +57,26 @@ namespace IguideME.Web.Services
             int courseID = work.CourseID;
             bool notifications_bool = false;
 
-            static bool isBetweenDates (DateTime input, DateTime startDate, DateTime endDate){
+            static bool isBetweenDates(DateTime input, DateTime startDate, DateTime endDate)
+            {
                 return (input >= startDate && input <= endDate);
             }
 
             List<string> notificationDates = DatabaseManager.Instance.GetNotificationDates(courseID);
-            if (notificationDates[0].Contains("-")) {
+            if (notificationDates[0].Contains("-"))
+            {
                 // We are looking in a range of dates
-                foreach(string datepair in notificationDates)
+                foreach (string datepair in notificationDates)
                 {
                     string[] splittedDates = datepair.Split("-");
-                    if (isBetweenDates(DateTime.Parse(String.Format("{0:yyyy/MM/dd}", DateTime.Now)), DateTime.Parse(splittedDates[0]), DateTime.Parse(splittedDates[1]))) {
+                    if (isBetweenDates(DateTime.Parse(String.Format("{0:yyyy/MM/dd}", DateTime.Now)), DateTime.Parse(splittedDates[0]), DateTime.Parse(splittedDates[1])))
+                    {
                         notifications_bool = work.Notifications_bool; // What is this bool??
                         break;
                     }
                 }
-            } else
+            }
+            else
                 notifications_bool = work.Notifications_bool && notificationDates.Contains(String.Format("{0:yyyy/MM/dd}", DateTime.Now));
 
             _logger.LogInformation("{Time}: Starting sync for course {CourseID}", DateTime.Now, courseID);
@@ -79,7 +84,7 @@ namespace IguideME.Web.Services
             string timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
 
             // Renew the connection with canvas.
-            _canvasHandler.CreateConnection();
+            _lmsHandler.SyncInit();
 
             // Don't keep ancient syncs in the database.
             DatabaseManager.Instance.CleanupSync(courseID);
@@ -93,22 +98,22 @@ namespace IguideME.Web.Services
             Stopwatch sw = new();
             sw.Start();
 
-            new UserWorker(courseID, timestamp, _canvasHandler, _logger).Start();
+            new UserWorker(courseID, timestamp, _lmsHandler, _logger).Start();
             await _computationJobStatus.UpdateJobProgressInformationAsync(
                 jobId, $"tasks.students", 0
             ).ConfigureAwait(false);
 
-            new QuizWorker(courseID, timestamp, _canvasHandler, _logger).Start();
+            new QuizWorker(courseID, timestamp, _lmsHandler, _logger).Start();
             await _computationJobStatus.UpdateJobProgressInformationAsync(
                 jobId, $"tasks.quizzes", 0
             ).ConfigureAwait(false);
 
-            new DiscussionWorker(courseID, timestamp, _canvasHandler, _logger).Start();
+            new DiscussionWorker(courseID, timestamp, _lmsHandler, _logger).Start();
             await _computationJobStatus.UpdateJobProgressInformationAsync(
                 jobId, $"tasks.discussions", 0
             ).ConfigureAwait(false);
 
-            new AssignmentWorker(courseID, timestamp, _canvasHandler, _logger).Start();
+            new AssignmentWorker(courseID, timestamp, _lmsHandler, _logger).Start();
             await _computationJobStatus.UpdateJobProgressInformationAsync(
                 jobId, $"tasks.assignments", 0
             ).ConfigureAwait(false);
@@ -126,7 +131,7 @@ namespace IguideME.Web.Services
                 jobId, $"tasks.peer-groups", 0
             ).ConfigureAwait(false);
 
-            new NotificationsWorker(courseID, timestamp, _canvasHandler, notifications_bool, _logger).Start();
+            new NotificationsWorker(courseID, timestamp, _lmsHandler, notifications_bool, _logger).Start();
             await _computationJobStatus.UpdateJobProgressInformationAsync(
                 jobId, $"tasks.notifications", 0
             ).ConfigureAwait(false);

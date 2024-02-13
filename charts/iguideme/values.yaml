@@ -21,4 +21,4 @@ azure:
     - name: iguideme-jwt-key
       key: LTI__SigningKey
     - name: iguideme-canvas-token
-      key: Canvas__AccessToken
+      key: LTI__Canvas__AccessToken

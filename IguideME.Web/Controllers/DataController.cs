@@ -1,12 +1,10 @@
-﻿using IguideME.Web.Services;
-
+﻿using System;
+using System.Security.Claims;
+using IguideME.Web.Services;
+using IguideME.Web.Services.LMSHandlers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-
-using System;
-
-using System.Security.Claims;
 
 namespace IguideME.Web.Controllers
 {
@@ -16,26 +14,27 @@ namespace IguideME.Web.Controllers
     public class DataController : Controller
     {
         private readonly ILogger<DataController> _logger;
-        private readonly CanvasHandler _canvasHandler;
+        private readonly ILMSHandler _lmsHandler;
 
-        public DataController(
-            ILogger<DataController> logger,
-            CanvasHandler canvasHandler
-            )
+        public DataController(ILogger<DataController> logger, ILMSHandler lmsHandler)
         {
             this._logger = logger;
-            this._canvasHandler = canvasHandler;
-
+            this._lmsHandler = lmsHandler;
         }
 
         // -------------------- Helper functions --------------------
 
         protected string GetUserID()
         {
-
-            if (int.TryParse((User.Identity as ClaimsIdentity).FindFirst("userid").Value, out int id))
+            // tmp for brightspace until we have an environment
+            // return "p371565";
+            if (
+                int.TryParse(
+                    (User.Identity as ClaimsIdentity).FindFirst("userid").Value,
+                    out int id
+                )
+            )
             {
-
                 string user = DatabaseManager.Instance.GetUserID(this.GetCourseID(), id);
                 if (user != null)
                 {
@@ -43,10 +42,15 @@ namespace IguideME.Web.Controllers
                 }
                 _logger.LogInformation("Could not find user {user} in database.", id);
                 // Try's to find the user in canvas.
-                return _canvasHandler.GetUser(this.GetCourseID(), (User.Identity as ClaimsIdentity).FindFirst("userid").Value).SISUserID; //TODO: fix
+                return _lmsHandler
+                    .GetUser(
+                        this.GetCourseID(),
+                        (User.Identity as ClaimsIdentity).FindFirst("userid").Value
+                    )
+                    .UserID;
             }
 
-            _logger.LogInformation("Unable to parse userid claim");
+            _logger.LogError("Unable to parse userid claim");
             throw new Exception();
         }
 
@@ -63,13 +67,14 @@ namespace IguideME.Web.Controllers
 
         protected int GetCourseID()
         {
+            // tmp for brightspace until we have an environment
+            // return 83337;
             // returns the ID of course in which the IguideME instance is loaded
             return int.Parse((User.Identity as ClaimsIdentity).FindFirst("courseid").Value);
         }
 
         protected string GetCourseTitle()
         {
-            _logger.LogInformation("testestests");
             return (User.Identity as ClaimsIdentity).FindFirst("courseName").Value;
         }
     }

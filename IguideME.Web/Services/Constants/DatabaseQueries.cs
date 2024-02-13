@@ -9,53 +9,6 @@ public static class DatabaseQueries
     public static readonly Dictionary<string, string> MIGRATIONS =
         new()
         {
-            {
-                "005_drop_empty_ids",
-                @"
-                DELETE FROM canvas_users WHERE user_id IS NULL OR trim(user_id) = '';
-                "
-            },
-            {
-                "005_drop_users",
-                @"
-                DROP TABLE canvas_users;
-                "
-            },
-            {
-                "007_clean_submissions_and_tracker",
-                @"
-                DELETE FROM tile_entry_submission WHERE user_id IS NULL OR trim(user_id) = '';
-                DELETE FROM user_tracker WHERE user_id IS NULL OR trim(user_id) = '';
-                DELETE FROM predicted_grade WHERE user_id IS NULL OR trim(user_id) = '';
-                DELETE FROM notifications WHERE user_id IS NULL OR trim(user_id) = '';
-                ;
-                "
-            },
-            {
-                "008_clean_predictor",
-                @"
-                DELETE FROM predicted_grade WHERE course_id = 39195;
-                DELETE FROM grade_prediction_model WHERE course_id = 39195;
-                ;
-                "
-            },
-            {
-                "0010_clean_discussions",
-                @"
-                DROP TABLE canvas_discussion_entry;
-                DROP TABLE canvas_discussion_reply
-                ;
-                "
-            },
-            {
-                "0011_clean_settings",
-                @"
-                DELETE FROM user_settings WHERE user_id IS NULL OR trim(user_id) = '';
-                DELETE FROM user_settings WHERE user_name IS NULL OR trim(user_id) = '';
-                ;
-                "
-            },
-
         };
 
     // //================================ Tables ================================//
@@ -1065,6 +1018,7 @@ public static class DatabaseQueries
                     `due_date`,
                     `points_possible`,
                     `position`,
+                    `grading_type`,
                     `submission_type`
         FROM        `canvas_assignment`
         WHERE       `course_id`=@courseID
@@ -1219,7 +1173,7 @@ public static class DatabaseQueries
                     `role`
         FROM        `canvas_users`
         WHERE       `course_id`=@courseID
-        AND         `role`=@role
+        AND         `role` LIKE @role
         AND         `sync_hash`=@hash
         ORDER BY    `name` ASC;";
 
@@ -1247,6 +1201,24 @@ public static class DatabaseQueries
         AND         `sync_hash`=@hash
         ORDER BY    `name` ASC
         LIMIT       1;";
+
+    public const string QUERY_CONSENTED_STUDENTS_FOR_COURSE = /// ^^^ WITH CONSENT ^^^ //NoTotalAverage
+        @"SELECT    `canvas_users`.`id`,
+                    `canvas_users`.`studentnumber`,
+                    `canvas_users`.`user_id`,
+                    `canvas_users`.`name`,
+                    `canvas_users`.`sortable_name`,
+                    `canvas_users`.`role`
+            FROM    `canvas_users`
+                LEFT JOIN   `user_settings`
+                    USING   (`user_id`)
+            WHERE       `user_settings`.`course_id`= @courseID
+            AND         `canvas_users`.`role`= 'student'
+            AND         `user_settings`.`consent` = 1
+            AND         `canvas_users`.`sync_hash`=@hash
+            GROUP BY    `canvas_users`.`user_id`
+            ORDER BY    `canvas_users`.`name` ASC
+            ";
 
     public const string QUERY_USER_FOR_COURSE =
         @"SELECT    `id`,
