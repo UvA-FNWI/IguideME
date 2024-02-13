@@ -26,7 +26,7 @@ spec:
           env:
             - name: IGUIDEME_VERSION
               value: "{{ .Chart.AppVersion }}"
-            - name: Canvas__Url
+            - name: LMS__Canvas__Url
               value: "{{ .Values.canvasUrl }}"
             - name: LTI__ClientId
               value: "{{ .Values.clientId }}"
