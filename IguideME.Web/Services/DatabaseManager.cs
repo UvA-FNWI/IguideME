@@ -708,7 +708,6 @@ namespace IguideME.Web.Services
         {
             string hash = this.GetCurrentHash(courseID);
 
-            _logger.LogWarning("hash {}", hash);
             if (hash == null)
                 return null;
 
