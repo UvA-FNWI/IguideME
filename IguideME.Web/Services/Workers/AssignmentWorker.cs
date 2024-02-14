@@ -88,7 +88,14 @@ namespace IguideME.Web.Services.Workers
                     switch (type)
                     {
                         case AppGradingType.Points:
-                            submission.Grade = (double.Parse(submission.rawGrade)) * 100 / max;
+                            if (submission.rawGrade != null)
+                            {
+                                submission.Grade = (double.Parse(submission.rawGrade)) * 100 / max;
+                            }
+                            else
+                            {
+                                submission.Grade = 0;
+                            }
                             break;
                         case AppGradingType.Percentage:
                             string clean = submission.rawGrade.Replace(

@@ -1,0 +1,3 @@
+FROM nginx:1.21.6-alpine
+
+COPY wwwroot/build /usr/share/nginx/html

@@ -1,6 +1,6 @@
 hostname: iguideme.local
 ingressClass: nginx
-image: fnwicr.azurecr.io/iguideme
+image: ghcr.io/uva-fnwi/iguideme
 tag: latest
 
 canvasUrl: canvas.instructure.com
