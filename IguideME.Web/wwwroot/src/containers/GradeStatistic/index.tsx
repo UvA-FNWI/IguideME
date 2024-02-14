@@ -5,10 +5,9 @@ import "./style.scss";
 
 export default class GradeStatistic extends Component<
   { grade: string },
-  { loading: boolean, passed: boolean }
+  { loading: boolean; passed: boolean }
 > {
-
-  state = { loading: true, passed: false }
+  state = { loading: true, passed: false };
 
   componentDidMount(): void {
     this.setup();
@@ -17,8 +16,8 @@ export default class GradeStatistic extends Component<
   setup = () => {
     const { grade } = this.props;
 
-    this.setState({ loading: false, passed: parseFloat(grade) >= 55 });
-  }
+    this.setState({ loading: false, passed: parseFloat(grade) >= 5.5 });
+  };
 
   render(): React.ReactNode {
     const { loading, passed } = this.state;
@@ -26,14 +25,18 @@ export default class GradeStatistic extends Component<
 
     return (
       <div className={"gradeStatistic"}>
-        <Statistic title={"Grade"}
+        <Statistic
+          title={"Grade"}
           value={grade}
           loading={loading}
-          prefix={passed ?
-            <LikeOutlined className={"pass"} /> :
-            <WarningOutlined className={"fail"} />
+          prefix={
+            passed ? (
+              <LikeOutlined className={"pass"} />
+            ) : (
+              <WarningOutlined className={"fail"} />
+            )
           }
-          suffix={'%'}
+          suffix={""}
         />
       </div>
     );
