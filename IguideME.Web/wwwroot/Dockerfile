@@ -4,7 +4,7 @@ RUN mkdir /app
 WORKDIR /app
 
 RUN apt-get update && apt-get install -y curl git
-RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
+RUN curl -fsSL https://deb.nodesource.com/setup_21.x | bash -
 RUN apt-get install -y nodejs
 
 COPY package.json ./
