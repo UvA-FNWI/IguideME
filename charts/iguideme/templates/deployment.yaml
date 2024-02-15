@@ -30,6 +30,16 @@ spec:
               value: "{{ .Values.lmsBackend}}"
             - name: LMS__Canvas__Url
               value: "{{ .Values.canvasUrl }}"
+            - name: LMS__Brightspace__Host
+              value: "{{ .Values.brightspaceHost}}"
+            - name: LMS__Brigtspace__Port
+              value: "{{ .Values.brightspacePort }}"
+            - name: LMS__Brightspace__Database
+              value: "{{ .Values.brightspaceDatabase}}"
+            - name: LMS__Brightspace__SearchPath
+              value: "{{ .Values.brightspaceSearchPath}}"
+            - name: LMS__Canvas__Brightspace__Rest
+              value: "{{ .Values.brightspaceRest}}"
             - name: LTI__ClientId
               value: "{{ .Values.clientId }}"
             - name: LTI__AuthenticateUrl

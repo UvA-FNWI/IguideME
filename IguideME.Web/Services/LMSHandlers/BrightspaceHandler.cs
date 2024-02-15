@@ -20,13 +20,21 @@ namespace IguideME.Web.Services
 
         public BrightspaceHandler(IConfiguration config, ILogger<SyncManager> logger)
         {
-            _connection_string = "Host = " + config["LMS:Brightspace:Connection:Host"] +
-                                ";Port = " + config["LMS:Brightspace:Connection:Port"] +
-                                ";Database = " + config["LMS:Brightspace:Connection:Database"] +
-                                ";User ID = " + config["LMS:Brightspace:Connection:User ID"] +
-                                ";Password = " + config["LMS:Brightspace:Connection:Password"] +
-                                ";Search Path = " + config["LMS:Brightspace:Connection:Search Path"] +
-                                ";" + config["LMS:Brightspace:Connection:Rest"];
+            _connection_string =
+                "Host = "
+                + config["LMS:Brightspace:Connection:Host"]
+                + ";Port = "
+                + config["LMS:Brightspace:Connection:Port"]
+                + ";Database = "
+                + config["LMS:Brightspace:Connection:Database"]
+                + ";User ID = "
+                + config["LMS:Brightspace:Connection:UserID"]
+                + ";Password = "
+                + config["LMS:Brightspace:Connection:Password"]
+                + ";Search Path = "
+                + config["LMS:Brightspace:Connection:SearchPath"]
+                + ";"
+                + config["LMS:Brightspace:Connection:Rest"];
             _logger = logger;
             this.SyncInit();
         }
@@ -336,7 +344,7 @@ namespace IguideME.Web.Services
         )
         {
             List<AssignmentSubmission> submissions = new List<AssignmentSubmission>();
-            
+
             if (users.Count() == 0) // If there is no consented users, no need to search
                 return submissions;
 
@@ -375,7 +383,9 @@ namespace IguideME.Web.Services
                                     -1, ///// ????
                                     r.GetInt32(0),
                                     r.GetValue(1).ToString(),
-                                    (r.IsDBNull(2) || r.IsDBNull(3)) ? "0" : (r.GetDouble(2) / r.GetDouble(3)).ToString(),
+                                    (r.IsDBNull(2) || r.IsDBNull(3))
+                                        ? "0"
+                                        : (r.GetDouble(2) / r.GetDouble(3)).ToString(),
                                     r.GetValue(5).ToString()
                                 )
                             );
