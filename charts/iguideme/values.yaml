@@ -7,6 +7,7 @@ canvasUrl: canvas.instructure.com
 clientId: 104410000000000150
 authenticateUrl: https://uvadlo-dev.instructure.com/api/lti/authorize_redirect
 jwksUrl: https://canvas.instructure.com/api/lti/security/jwks
+lmsBackend: Brightspace
 
 azure:
   keyvaultName: keyvaultName
@@ -21,4 +22,4 @@ azure:
     - name: iguideme-jwt-key
       key: LTI__SigningKey
     - name: iguideme-canvas-token
-      key: LTI__Canvas__AccessToken
+      key: LMS__Canvas__AccessToken
