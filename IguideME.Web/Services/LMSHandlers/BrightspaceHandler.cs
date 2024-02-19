@@ -133,7 +133,7 @@ namespace IguideME.Web.Services
                         AND        (user_enrollments.role_id = 110
                         OR          user_enrollments.role_id = 130
                         OR          user_enrollments.role_id = 134)",
-                    new NpgsqlParameter("userID", userID),
+                    new NpgsqlParameter("userID", int.Parse(userID)),
                     new NpgsqlParameter("courseID", courseID)
                 )
             )
