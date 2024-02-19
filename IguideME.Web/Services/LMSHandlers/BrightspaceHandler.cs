@@ -129,7 +129,7 @@ namespace IguideME.Web.Services
                         INNER JOIN  user_enrollments
                             ON      users.user_id = user_enrollments.user_id
                         WHERE       user_enrollments.org_unit_id = @courseID
-                        AND         users.userid= @userID
+                        AND         users.user_id= @userID
                         AND        (user_enrollments.role_id = 110
                         OR          user_enrollments.role_id = 130
                         OR          user_enrollments.role_id = 134)",
