@@ -38,7 +38,12 @@ namespace IguideME.Web.Controllers
             /**
              * Returns information of the logged in user.
              */
-            return Json(_databaseManager.GetCurrentUser(GetCourseID(), this.GetUserID()));
+            _logger.LogWarning("test1 {}, {}", GetCourseID(), GetUserID());
+            _logger.LogWarning(
+                "test {}",
+                _databaseManager.GetCurrentUser(GetCourseID(), GetUserID())
+            );
+            return Json(_databaseManager.GetCurrentUser(GetCourseID(), GetUserID()));
         }
 
         [Authorize(Policy = "IsInstructor")]
