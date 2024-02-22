@@ -361,8 +361,8 @@ namespace IguideME.Web.Services
                         FROM        grade_results
                         INNER JOIN  users
                             ON      users.user_id = grade_results.user_id
-                        WHERE       org_unit_id = @courseID
-                        AND         user_id
+                        WHERE       grade_results.org_unit_id = @courseID
+                        AND         grade_results.user_id
                             IN      ({string.Join(",", users.Select((_, index) => $"@userID{index}"))})",
                     parameters
                 )
