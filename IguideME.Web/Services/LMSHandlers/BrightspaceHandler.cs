@@ -352,16 +352,18 @@ namespace IguideME.Web.Services
 
             using (
                 NpgsqlDataReader r = Query(
-                    @$"SELECT  grade_object_id,
-                                user_id,
-                                points_numerator,
-                                points_denominator,
-                                grade_text,
-                                grade_released_date
-                        FROM    grade_results
-                        WHERE   org_unit_id = @courseID
-                        AND     user_id
-                            IN  ({string.Join(",", users.Select((_, index) => $"@userID{index}"))})",
+                    @$"SELECT       grade_results.grade_object_id,
+                                    users.username,
+                                    grade_results.points_numerator,
+                                    grade_results.points_denominator,
+                                    grade_results.grade_text,
+                                    grade_results.grade_released_date
+                        FROM        grade_results
+                        INNER JOIN  users
+                            ON      users.user_id = grade_results.user_id
+                        WHERE       org_unit_id = @courseID
+                        AND         user_id
+                            IN      ({string.Join(",", users.Select((_, index) => $"@userID{index}"))})",
                     parameters
                 )
             )
