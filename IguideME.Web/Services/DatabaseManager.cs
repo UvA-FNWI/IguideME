@@ -1294,7 +1294,7 @@ namespace IguideME.Web.Services
             return submissions;
         }
 
-        public List<AssignmentSubmission> GetTileSubmissions(int courseID, int tileID, long syncID = 0)
+    public List<AssignmentSubmission> GetTileSubmissions(int courseID, int tileID, long syncID = 0)
         {
             long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
             if (activeSync == 0) return new List<AssignmentSubmission>() { };
