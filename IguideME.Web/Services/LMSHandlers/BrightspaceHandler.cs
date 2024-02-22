@@ -360,7 +360,6 @@ namespace IguideME.Web.Services
                                 grade_released_date
                         FROM    grade_results
                         WHERE   org_unit_id = @courseID
-                        AND     is_released = TRUE
                         AND     user_id
                             IN  ({string.Join(",", users.Select((_, index) => $"@userID{index}"))})",
                     parameters
