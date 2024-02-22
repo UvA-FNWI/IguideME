@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SQLite;
 using System.Data;
 using IguideME.Web.Models;
 using IguideME.Web.Models.App;
@@ -9,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using IguideME.Web.Services.LMSHandlers;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Configuration;
+using Npgsql;
 
 namespace IguideME.Web.Services
 {
@@ -21,39 +21,42 @@ namespace IguideME.Web.Services
 
         public BrightspaceHandler(IConfiguration config, ILogger<SyncManager> logger)
         {
-            // s_instance = this;
-            // _connection_string = isDev ? "Data Source=brightspace.db;Version=3;New=False;Compress=True;"
-            //                           : "Data Source=/data/IguideME.db;Version=3;New=False;Compress=True;";
-            _connection_string = config["LMS:Brightspace:Connection"];
+            _connection_string =
+                "Host = "
+                + config["LMS:Brightspace:Connection:Host"]
+                + ";Port = "
+                + config["LMS:Brightspace:Connection:Port"]
+                + ";Database = "
+                + config["LMS:Brightspace:Connection:Database"]
+                + ";User ID = "
+                + config["LMS:Brightspace:Connection:UserID"]
+                + ";Password = "
+                + config["LMS:Brightspace:Connection:Password"]
+                + ";Search Path = "
+                + config["LMS:Brightspace:Connection:SearchPath"]
+                + ";"
+                + config["LMS:Brightspace:Connection:Rest"];
             _logger = logger;
             this.SyncInit();
         }
-
-        // public static BrightspaceManager GetInstance(bool isDev = false)
-        // {
-
-        //     s_instance ??= new BrightspaceManager(isDev);
-
-        //     return s_instance;
-        // }
 
         public void SyncInit()
         {
             _logger.LogInformation("Initializing handler for Brightspace.");
         }
 
-        private SQLiteConnection GetConnection() => new(_connection_string);
+        private NpgsqlConnection GetConnection() => new(_connection_string);
 
-        private void NonQuery(string query, params SQLiteParameter[] parameters)
+        private void NonQuery(string query, params NpgsqlParameter[] parameters)
         {
-            SQLiteConnection connection = GetConnection();
+            NpgsqlConnection connection = GetConnection();
             try
             {
                 connection.Open();
-                using (SQLiteCommand command = connection.CreateCommand())
+                using (NpgsqlCommand command = connection.CreateCommand())
                 {
                     command.CommandText = query;
-                    foreach (SQLiteParameter param in parameters)
+                    foreach (NpgsqlParameter param in parameters)
                     {
                         command.Parameters.Add(param);
                     }
@@ -69,16 +72,16 @@ namespace IguideME.Web.Services
             }
         }
 
-        private SQLiteDataReader Query(string query, params SQLiteParameter[] parameters)
+        private NpgsqlDataReader Query(string query, params NpgsqlParameter[] parameters)
         {
-            SQLiteConnection connection = GetConnection();
+            NpgsqlConnection connection = GetConnection();
             try
             {
                 connection.Open();
-                using (SQLiteCommand command = connection.CreateCommand())
+                using (NpgsqlCommand command = connection.CreateCommand())
                 {
                     command.CommandText = query;
-                    foreach (SQLiteParameter param in parameters)
+                    foreach (NpgsqlParameter param in parameters)
                     {
                         command.Parameters.Add(param);
                     }
@@ -94,7 +97,7 @@ namespace IguideME.Web.Services
             }
         }
 
-        private void PrintQueryError(string title, int rows, SQLiteDataReader r, Exception e)
+        private void PrintQueryError(string title, int rows, NpgsqlDataReader r, Exception e)
         {
             string error = $"{title}\nRequested:\nColumn | Data Type | Value | Type\n";
 
@@ -117,7 +120,7 @@ namespace IguideME.Web.Services
         public List<Course> GetAllCourses()
         {
             List<Course> courses = new List<Course>();
-            using (SQLiteDataReader r =
+            using (NpgsqlDataReader r =
                 Query(@"SELECT  `org_unit_id`,
                                 `name`,
                                 `start_date`,
@@ -141,7 +144,7 @@ namespace IguideME.Web.Services
         {
             List<string> usernames = new List<string>();
 
-            using (SQLiteDataReader r = Query("SELECT `username` FROM `users`"))
+            using (NpgsqlDataReader r = Query("SELECT `username` FROM `users`"))
             {
                 while (r.Read())
                     usernames.Add(r.GetValue(0).ToString());
@@ -157,7 +160,7 @@ namespace IguideME.Web.Services
         /// <returns> A User object with their data </returns>
         public User GetSingleUserData(string username)
         {
-            using (SQLiteDataReader r =
+            using (NpgsqlDataReader r =
                 Query(@"SELECT  `username`,
                                 `user_id`,
                                 `first_name`,
@@ -212,13 +215,13 @@ namespace IguideME.Web.Services
         {
             _logger.LogInformation("Trying to get user\ncourseID: {courseID}, userID: {userID}", courseID, userID);
             string[] userIDs = new string[3];
-            using (SQLiteDataReader r =
+            using (NpgsqlDataReader r =
                 Query(@"SELECT  `username`,
                                 `user_id`,
                                 `org_defined_id`
                         FROM    `users`
                         WHERE   `username` = @userID",
-                    new SQLiteParameter("userID", userID)                    
+                    new NpgsqlParameter("userID", userID)                    
                     ))
             {
                 if (r.Read()) 
@@ -244,7 +247,7 @@ namespace IguideME.Web.Services
         {
             _logger.LogInformation("Trying to get all students for \ncourseID: {courseID}", courseID);
             List<User> students = new List<User>();
-            using (SQLiteDataReader r =
+            using (NpgsqlDataReader r =
                 Query(@"SELECT      `users`.`username`,
                                     `users`.`user_id`,
                                     `users`.`first_name`,
@@ -257,7 +260,7 @@ namespace IguideME.Web.Services
                         AND        (`user_enrollments`.`role_id` = 110
                         OR          `user_enrollments`.`role_id` = 130
                         OR          `user_enrollments`.`role_id` = 134)",
-                    new SQLiteParameter("courseID", courseID)
+                    new NpgsqlParameter("courseID", courseID)
                     ))
             {
                 while (r.Read())
@@ -287,7 +290,7 @@ namespace IguideME.Web.Services
         {
             _logger.LogInformation("Trying to get all teachers for \ncourseID: {courseID}", courseID);
             List<User> teachers = new List<User>();
-            using (SQLiteDataReader r =
+            using (NpgsqlDataReader r =
                 Query(@"SELECT      `users`.`username`,
                                     `users`.`user_id`,
                                     `users`.`first_name`,
@@ -299,7 +302,7 @@ namespace IguideME.Web.Services
                         WHERE       `user_enrollments`.`org_unit_id` = @courseID
                         AND        (`user_enrollments`.`role_id` = 109
                         OR          `user_enrollments`.`role_id` = 117)",
-                    new SQLiteParameter("courseID", courseID)
+                    new NpgsqlParameter("courseID", courseID)
                     ))
             {
                 while (r.Read())
@@ -329,7 +332,7 @@ namespace IguideME.Web.Services
         {
             _logger.LogInformation("Trying to get all assignments for \ncourseID: {courseID}", courseID);
             List<AppAssignment> assignments = new List<AppAssignment>();
-            using (SQLiteDataReader r =
+            using (NpgsqlDataReader r =
                 Query(@"SELECT  `grade_object_id`,
                                 `org_unit_id`,
                                 `name`,
@@ -342,7 +345,7 @@ namespace IguideME.Web.Services
                         AND    (`grade_object_type_id` = 1
                         OR      `grade_object_type_id` = 2
                         OR      `grade_object_type_id` = 4)",
-                    new SQLiteParameter("courseID", courseID)
+                    new NpgsqlParameter("courseID", courseID)
                     ))
             {
                 while (r.Read())
@@ -374,7 +377,7 @@ namespace IguideME.Web.Services
         public IEnumerable<AssignmentSubmission> GetSubmissions(int courseID, string[] userIDs)
         {
             List<AssignmentSubmission> submissions = new List<AssignmentSubmission>();
-            using (SQLiteDataReader r =
+            using (NpgsqlDataReader r =
                 Query(@"SELECT  `grade_object_id`,
                                 `user_id`,
                                 `points_numerator`,
@@ -385,8 +388,8 @@ namespace IguideME.Web.Services
                         WHERE   `org_unit_id` = @courseID
                         AND     `user_id`
                             IN  (@allIDs)",
-                    new SQLiteParameter("courseID", courseID),
-                    new SQLiteParameter("allIDs", string.Join(",", userIDs))                    
+                    new NpgsqlParameter("courseID", courseID),
+                    new NpgsqlParameter("allIDs", string.Join(",", userIDs))                    
                     ))
             {
                 while (r.Read())
