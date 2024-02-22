@@ -378,16 +378,18 @@ namespace IguideME.Web.Services
         {
             List<AssignmentSubmission> submissions = new List<AssignmentSubmission>();
             using (NpgsqlDataReader r =
-                Query(@"SELECT  `grade_object_id`,
-                                `user_id`,
-                                `points_numerator`,
-                                `points_denominator`,
-                                `grade_text`,
-                                `grade_released_date`
-                        FROM    `grade_results`
-                        WHERE   `org_unit_id` = @courseID
-                        AND     `user_id`
-                            IN  (@allIDs)",
+                Query(@"SELECT      `grade_results`.`grade_object_id`,
+                                    `users`.`username`,
+                                    `grade_results`.`points_numerator`,
+                                    `grade_results`.`points_denominator`,
+                                    `grade_results`.`grade_text`,
+                                    `grade_results`.`grade_released_date`
+                        FROM        `grade_results`
+                        INNER JOIN  `users`
+                            ON      `users`.`user_id` = `user_enrollments`.`user_id`
+                        WHERE       `org_unit_id` = @courseID
+                        AND         `user_id`
+                            IN      (@allIDs)",
                     new NpgsqlParameter("courseID", courseID),
                     new NpgsqlParameter("allIDs", string.Join(",", userIDs))                    
                     ))
@@ -402,7 +404,9 @@ namespace IguideME.Web.Services
                                 -1, //-1 cause at this point we haven't stored the data in our DB, so a submission id doesn't exist
                                 r.GetInt32(0),
                                 r.GetValue(1).ToString(),
-                                r.GetInt32(2) / r.GetInt32(3),
+                                (r.IsDBNull(2) || r.IsDBNull(3))
+                                    ? 0
+                                    : (r.GetDouble(2) / r.GetDouble(3)),
                                 ((DateTimeOffset)r.GetValue(5)).ToUnixTimeMilliseconds()
                             ));
                         else
@@ -410,7 +414,9 @@ namespace IguideME.Web.Services
                                 -1, //-1 cause at this point we haven't stored the data in our DB, so a submission id doesn't exist
                                 r.GetInt32(0),
                                 r.GetValue(1).ToString(),
-                                r.GetInt32(2) / r.GetInt32(3),
+                                (r.IsDBNull(2) || r.IsDBNull(3))
+                                    ? 0
+                                    : (r.GetDouble(2) / r.GetDouble(3)),
                                 rawGrade,
                                 ((DateTimeOffset)r.GetValue(5)).ToUnixTimeMilliseconds()
                             ));
