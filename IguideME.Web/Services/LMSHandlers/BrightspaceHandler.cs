@@ -387,8 +387,8 @@ namespace IguideME.Web.Services
                         FROM        `grade_results`
                         INNER JOIN  `users`
                             ON      `users`.`user_id` = `user_enrollments`.`user_id`
-                        WHERE       `org_unit_id` = @courseID
-                        AND         `user_id`
+                        WHERE       `grade_results`.`org_unit_id` = @courseID
+                        AND         `grade_results`.`user_id`
                             IN      (@allIDs)",
                     new NpgsqlParameter("courseID", courseID),
                     new NpgsqlParameter("allIDs", string.Join(",", userIDs))                    
