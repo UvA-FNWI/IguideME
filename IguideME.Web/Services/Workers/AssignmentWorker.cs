@@ -5,6 +5,7 @@ using IguideME.Web.Models;
 using IguideME.Web.Models.App;
 using IguideME.Web.Models.Impl;
 using IguideME.Web.Services.LMSHandlers;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using Microsoft.Extensions.Logging;
 
 namespace IguideME.Web.Services.Workers
@@ -75,6 +76,8 @@ namespace IguideME.Web.Services.Workers
             Dictionary<int, (double, AppGradingType)> gradingTypes
         )
         {
+            _logger.LogInformation("Starting submission registry...");
+
             double max;
             AppGradingType type;
             (double, AppGradingType) elem;
@@ -158,6 +161,7 @@ namespace IguideME.Web.Services.Workers
                 users
             );
             Dictionary<int, (double, AppGradingType)> gradingTypes = new();
+            List<AssignmentSubmission> assignmentSubmissionsWithTiles = new ();
 
             foreach (AppAssignment assignment in assignments)
             {
@@ -174,8 +178,18 @@ namespace IguideME.Web.Services.Workers
                     assignment.AssignmentID,
                     (assignment.PointsPossible, assignment.GradingType)
                 );
+
+                // We find all submissions for this assignment, and save them with the corresponding entryID that we found
+                foreach (AssignmentSubmission sub in submissions) {
+                    if(sub.AssignmentID == assignment.AssignmentID){
+                        sub.EntryID = entry.ID;
+                        assignmentSubmissionsWithTiles.Add(sub);
+                    }
+                }
             }
-            this.RegisterSubmissions(submissions, gradingTypes);
+
+            // Finally we register the submissions
+            this.RegisterSubmissions(assignmentSubmissionsWithTiles, gradingTypes);
         }
     }
 }
