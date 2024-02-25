@@ -98,7 +98,7 @@ public static class DatabaseQueries
             `title`           STRING,
             `order`           INTEGER,
             `type`            INTEGER,
-            `weight`          REAL default 0.0,
+            `weight`          FLOAT default 0.0,
             `grading_type`    INTEGER,
             `visible`         BOOLEAN DEFAULT false,
             `notifications`   BOOLEAN DEFAULT false,
@@ -117,7 +117,7 @@ public static class DatabaseQueries
         @"CREATE TABLE IF NOT EXISTS `tile_entries` (
             `tile_id`         INTEGER,
             `content_id`      INTEGER,
-            `weight`          REAL DEFAULT 0.0,
+            `weight`          FLOAT DEFAULT 0.0,
             PRIMARY KEY (`tile_id`,`content_id`),
             FOREIGN KEY(`tile_id`) REFERENCES `tiles`(`tile_id`)
         );";
@@ -128,11 +128,11 @@ public static class DatabaseQueries
             `submission_id`   INTEGER PRIMARY KEY AUTOINCREMENT,
             `assignment_id`   INTEGER,
             `user_id`         STRING,
-            `grade`           INTEGER NULL,
+            `grade`           FLOAT NULL,
             `date`            INTEGER NULL,
             FOREIGN KEY(`assignment_id`) REFERENCES `assignments`(`assignment_id`),
-            FOREIGN KEY(`user_id`) REFERENCES `users`(`user_id`)
-
+            FOREIGN KEY(`user_id`) REFERENCES `users`(`user_id`),
+            UNIQUE (`assignment_id`,`user_id`)
         );";
 
     public const string CREATE_TABLE_SUBMISSIONS_META =
@@ -193,7 +193,7 @@ public static class DatabaseQueries
             `user_id`           STRING,
             `course_id`         INTEGER,
             `predicted_grade`   INTEGER DEFAULT 0,
-            `total_average`   REAL DEFAULT 0,
+            `total_grade`       FLOAT   DEFAULT 0,
             `goal_grade`        INTEGER DEFAULT 0,
             `consent`           BOOLEAN DEFAULT false,
             `notifications`     BOOLEAN DEFAULT true,
@@ -213,27 +213,43 @@ public static class DatabaseQueries
      * grade belong to as well as the grade statistics of that group.
      *
      * user_ids should go away, right?????
-     * `entity_type` is an enum and it is the type of comparison and it might be:
+     * `component_type` is an enum and it is the type of comparison and it might be:
+     *      - Total
      *      - Tile
      *      - Assignment
      *      - Discussion (not implemented yet)
      *      - Learning Goal (not implemented yet)
      */
     public const string CREATE_TABLE_PEER_GROUPS =
-    @"CREATE TABLE IF NOT EXISTS `peer_groups` (
-        `tile_id`           INTEGER,
-        `goal_grade`        INTEGER,
-        `user_ids`          STRING,
-        `avg_grade`         INTEGER,
-        `min_grade`         INTEGER,
-        `max_grade`         INTEGER,
-        `entity_type`       INTEGER,
-        `sync_id`           INTEGER,
-        PRIMARY KEY (`tile_id`,`goal_grade`,`sync_id`),
-        FOREIGN KEY(`tile_id`) REFERENCES `tiles`(`tile_id`),
-        FOREIGN KEY(`sync_id`) REFERENCES `sync_history`(`sync_id`)
+        @"CREATE TABLE IF NOT EXISTS `peer_groups` (
+            `component_id`      INTEGER,
+            `goal_grade`        INTEGER,
+            `user_ids`          STRING,
+            `avg_grade`         INTEGER,
+            `min_grade`         INTEGER,
+            `max_grade`         INTEGER,
+            `component_type`    INTEGER,
+            `sync_id`           INTEGER,
+            PRIMARY KEY (`component_id`,`component_type`,`goal_grade`,`sync_id`),
+            FOREIGN KEY(`sync_id`) REFERENCES `sync_history`(`sync_id`)
+        );";
 
-    );";
+    /**
+     * The tile_grades table stores the tile grade of each student
+     * at any given point in time
+     *
+     */
+    public const string CREATE_TABLE_TILE_GRADES =
+        @"CREATE TABLE IF NOT EXISTS `tile_grades` (
+            `user_id`           STRING,
+            `tile_id`           INTEGER,
+            `grade`             FLOAT,
+            `sync_id`           INTEGER,
+            PRIMARY KEY (`user_id`,`tile_id`,`sync_id`),
+            FOREIGN KEY(`user_id`) REFERENCES `users`(`user_id`),
+            FOREIGN KEY(`tile_id`) REFERENCES `tiles`(`tile_id`),
+            FOREIGN KEY(`sync_id`) REFERENCES `sync_history`(`sync_id`)
+        );";
 
     /**
      * The notifications table stores performance notifications for the
@@ -307,7 +323,7 @@ public static class DatabaseQueries
             `assignment_id`   INTEGER PRIMARY KEY AUTOINCREMENT,
             `course_id`       INTEGER,
             `title`           STRING,
-            `external_id`     STRING DEFAULT null,
+            `external_id`     STRING DEFAULT null UNIQUE,
             `published`       BOOLEAN DEFAULT true,
             `muted`           BOOLEAN DEFAULT false,
             `due_date`        INTEGER DEAFULT NULL,
@@ -377,26 +393,47 @@ public static class DatabaseQueries
     //       )
     //       ON CONFLICT (`course_id`, `user_id`, `date`) DO UPDATE SET `grade`=`excluded`.`grade`;";
 
-    public const string REGISTER_USER_PEER = // DO WE KEEP THE USER_IDS?????
-    @"INSERT INTO   `peer_groups` ( `goal_grade`,
-                                    `user_ids`,
-                                    `tile_id`,
-                                    `avg_grade`,
-                                    `min_grade`,
-                                    `max_grade`,
-                                    `entity_type`,
-                                    `sync_id`)
-        VALUES        (
-            @goalGrade,
-            @combinedIDs,
-            @tileID,
-            @avgGrade,
-            @minGrade,
-            @maxGrade,
-            @entityType,
-            @syncID
-        );";
+    public const string REGISTER_USER_PEER =
+        @"INSERT INTO   `peer_groups` ( `goal_grade`,
+                                        `user_ids`,
+                                        `component_id`,
+                                        `avg_grade`,
+                                        `min_grade`,
+                                        `max_grade`,
+                                        `component_type`,
+                                        `sync_id`)
+            VALUES        (
+                @goalGrade,
+                @combinedIDs,
+                @componentID,
+                @avgGrade,
+                @minGrade,
+                @maxGrade,
+                @componentType,
+                @syncID
+            );";
 
+    public const string REGISTER_TILE_GRADE =
+        @"INSERT INTO   `tile_grades` ( `user_id`,
+                                        `tile_id`,
+                                        `grade`,
+                                        `sync_id`)
+            VALUES        (
+                @userID,
+                @tileID,
+                @grade,
+                @syncID
+            )
+            ON CONFLICT DO NOTHING;";
+
+    public const string QUERY_TILE_GRADE_FOR_USER =
+        @"SELECT    `grade`
+          FROM      `tile_grades`
+          WHERE     `user_id` = @userID
+          AND       `tile_id` = @tileID
+          ORDER BY  `sync_id` 
+            DESC
+          LIMIT 1;";
     public const string REGISTER_USER_NOTIFICATIONS =
         @"INSERT INTO   `notifications` (   `user_id`,
                                             `tile_id`,
@@ -519,8 +556,8 @@ public static class DatabaseQueries
                             `due_date`,
                             `max_grade`,
                             `grading_type`)
-        VALUES(
-            @assignmentID,
+        VALUES (
+            @externalID,
             @courseID,
             @title,
             @published,
@@ -529,9 +566,7 @@ public static class DatabaseQueries
             @maxGrade,
             @gradingType
         )
-        WHERE NOT EXISTS (  SELECT * 
-                            FROM `assignments` 
-                            WHERE `external_id` = @assignmentID);";
+        ON CONFLICT (`external_id`) WHERE NOT NULL DO NOTHING";
 
     public const string REGISTER_DISCUSSION =
         @"INSERT OR REPLACE
@@ -612,20 +647,21 @@ public static class DatabaseQueries
         ;";
 
     public const string REGISTER_STUDENT_SETTINGS =
-        @"  INSERT INTO `student_settings`
+        @"  INSERT OR REPLACE
+                INTO `student_settings`
                         (   `course_id`,
                             `user_id`,
                             `predicted_grade`,
-                            `total_average`,
+                            `total_grade`,
                             `goal_grade`,
-                            `consent,`
+                            `consent`,
                             `notifications`,
                             `sync_id`   )
             VALUES(
                 @CourseID,
                 @UserID,
                 @PredictedGrade,
-                @TotalAverage,
+                @TotalGrade,
                 @GoalGrade,
                 @Consent,
                 @Notifications,
@@ -688,8 +724,8 @@ public static class DatabaseQueries
         LIMIT       1
         ;";
 
-    public const string QUERY_TOTAL_AVERAGE_FOR_USER =
-        @"SELECT    `total_average`,
+    public const string QUERY_TOTAL_GRADE_FOR_USER =
+        @"SELECT    `total_grade`,
                     `sync_id`
         FROM        `student_settings`
         WHERE       `course_id`=@courseID
@@ -974,6 +1010,7 @@ public static class DatabaseQueries
         @"SELECT    `assignment_id`,
                     `course_id`,
                     `title`,
+                    `external_id`,
                     `published`,
                     `muted`,
                     `due_date`,
@@ -1260,7 +1297,7 @@ public static class DatabaseQueries
 
     public const string QUERY_LAST_STUDENT_SETTINGS =
         @"SELECT    `predicted_grade`,
-                    `total_average`,
+                    `total_grade`,
                     `goal_grade`,
                     `consent`,
                     `notifications`,
@@ -1434,19 +1471,19 @@ public static class DatabaseQueries
         ;";
 
     public const string QUERY_PEER_GROUP_RESULTS =
-        @"SELECT    `tile_id`,
+        @"SELECT    `component_id`,
                     `avg_grade`,
                     `min_grade`,
                     `max_grade`
         FROM        `peer_groups`
         WHERE       `course_id`= @courseID
         AND         `goal_grade`= @goalGrade
-        AND         `entity_type`= @entityType
+        AND         `component_type`= @componentType
         AND         `sync_id`= @syncID;";
 
 
     public const string QUERY_GRADE_COMPARISSON_HISTORY = // half done ?????
-        @"SELECT    `peer_groups`.`tile_id`,
+        @"SELECT    `peer_groups`.`component_id`,
                     avg(`submissions`.`grade`),
                     `peer_groups`.`avg_grade`,
                     `peer_groups`.`max_grade`,
@@ -1456,15 +1493,15 @@ public static class DatabaseQueries
         INNER JOIN  `submissions`
             ON      `peer_groups`.`sync_id` == `submissions`.`date`
         INNER JOIN  `tile_entries`
-            USING   (`tile_id`)
+            ON      `tile_entries`.`tile_id` == `peer_groups`.`component_id`
         INNER JOIN  `tile_entries`
             ON      `tile_entries`.`content_id` == `submissions`.`assignment_id`
         WHERE       `peer_groups`.`course_id`=@courseID
         AND         `peer_groups`.`goal_grade`=@grade
-        AND         `peer_groups`.`entity_type`= @entityType
+        AND         `peer_groups`.`componentType`= @componentType
         AND         `submissions`.`user_id` = @userID
-        GROUP BY    `peer_groups`.`tile_id`, `peer_groups`.`sync_id`
-        ORDER BY    `peer_groups`.`tile_id`;";
+        GROUP BY    `peer_groups`.`component_id`, `peer_groups`.`sync_id`
+        ORDER BY    `peer_groups`.`component_id`;";
 
 
     public const string QUERY_USER_RESULTS = // half done , does it work though?????

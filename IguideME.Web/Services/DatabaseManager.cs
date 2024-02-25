@@ -198,6 +198,7 @@ namespace IguideME.Web.Services
                 DatabaseQueries.CREATE_TABLE_GRADE_PREDICTION_MODEL_PARAMETER,
 
                 DatabaseQueries.CREATE_TABLE_PEER_GROUPS,
+                DatabaseQueries.CREATE_TABLE_TILE_GRADES,
                 DatabaseQueries.CREATE_TABLE_NOTIFICATIONS,
 
                 DatabaseQueries.CREATE_TABLE_MIGRATIONS,
@@ -449,11 +450,11 @@ namespace IguideME.Web.Services
                     );
         }
 
-        public void RegisterAssignment(AppAssignment assignment)
+        public int RegisterAssignment(AppAssignment assignment)
         {
-            NonQuery(
+            int assignment_id = IDNonQuery(
                 DatabaseQueries.REGISTER_ASSIGNMENT,
-                new SQLiteParameter("assignmentID", assignment.ID),
+                new SQLiteParameter("externalID", assignment.ExternalID),
                 new SQLiteParameter("courseID", assignment.CourseID),
                 new SQLiteParameter("title", assignment.Title),
                 new SQLiteParameter("published", assignment.Published),
@@ -462,6 +463,11 @@ namespace IguideME.Web.Services
                 new SQLiteParameter("maxGrade", assignment.MaxGrade),
                 new SQLiteParameter("gradingType", assignment.GradingType)
             );
+
+            if (assignment_id == 0)
+                assignment_id = GetInternalAssignmentID((int)assignment.ExternalID, assignment.CourseID);
+
+            return assignment_id;
         }
 
         public void RegisterDiscussion(AppDiscussion discussion, long syncID)
@@ -841,7 +847,7 @@ namespace IguideME.Web.Services
                             new SQLiteParameter("courseID", courseID),
                             new SQLiteParameter("userID", userID),
                             new SQLiteParameter("PredictedGrade", grade),
-                            new SQLiteParameter("GeneralAverage", r.GetFloat(1)),
+                            new SQLiteParameter("GeneralAverage", r.GetDouble(1)),
                             new SQLiteParameter("GoalGrade", r.GetInt32(2)),
                             new SQLiteParameter("Consent", r.GetBoolean(3)),
                             new SQLiteParameter("Notifications", r.GetBoolean(4)),
@@ -919,7 +925,7 @@ namespace IguideME.Web.Services
                         new SQLiteParameter("courseID", courseID),
                         new SQLiteParameter("userID", userID),
                         new SQLiteParameter("PredictedGrade", long.Parse(r.GetValue(0).ToString())),
-                        new SQLiteParameter("GeneralAverage", r.GetFloat(1)),
+                        new SQLiteParameter("GeneralAverage", r.GetDouble(1)),
                         new SQLiteParameter("GoalGrade", r.GetInt32(2)),
                         new SQLiteParameter("Consent", r.GetBoolean(3)),
                         new SQLiteParameter("Notifications", enable),
@@ -953,9 +959,14 @@ namespace IguideME.Web.Services
             }
         }
 
-        public void UpdateUserTotalAverage(int courseID, string userID, float average, long syncID)
+        public void UpdateUserTotalGrade(int courseID, string userID, double grade, long syncID)
         {
             long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
+            long predictedGrade = 0;
+            int goalGrade = 0;
+            bool consent = false;
+            bool notification = false;
+
             using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_LAST_STUDENT_SETTINGS,
                     new SQLiteParameter("courseID", courseID),
                     new SQLiteParameter("userID", userID)
@@ -963,24 +974,29 @@ namespace IguideME.Web.Services
             {
                 while (r.Read())
                 {
-                    NonQuery(DatabaseQueries.REGISTER_STUDENT_SETTINGS,
-                        new SQLiteParameter("courseID", courseID),
-                        new SQLiteParameter("userID", userID),
-                        new SQLiteParameter("PredictedGrade", long.Parse(r.GetValue(0).ToString())),
-                        new SQLiteParameter("GeneralAverage", average),
-                        new SQLiteParameter("GoalGrade", r.GetInt32(2)),
-                        new SQLiteParameter("Consent", r.GetBoolean(3)),
-                        new SQLiteParameter("Notifications", r.GetBoolean(4)),
-                        new SQLiteParameter("syncID", activeSync)
-                    );
+                    predictedGrade = long.Parse(r.GetValue(0).ToString());
+                    goalGrade = r.GetInt32(2);
+                    consent = r.GetBoolean(3);
+                    notification = r.GetBoolean(4);
                 }
             }
+
+            NonQuery(DatabaseQueries.REGISTER_STUDENT_SETTINGS,
+                        new SQLiteParameter("courseID", courseID),
+                        new SQLiteParameter("userID", userID),
+                        new SQLiteParameter("PredictedGrade", predictedGrade),
+                        new SQLiteParameter("TotalGrade", grade),
+                        new SQLiteParameter("GoalGrade", goalGrade),
+                        new SQLiteParameter("Consent", consent),
+                        new SQLiteParameter("Notifications", notification),
+                        new SQLiteParameter("syncID", activeSync)
+                    );
         }
 
-        public float GetUserTotalAverage(int courseID, string userID)
+        public double GetUserTotalGrade(int courseID, string userID)
         {
-            float result = -1;
-            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_TOTAL_AVERAGE_FOR_USER,
+            double result = -1;
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_TOTAL_GRADE_FOR_USER,
                     new SQLiteParameter("courseID", courseID),
                     new SQLiteParameter("userID", userID)
                 ))
@@ -989,11 +1005,11 @@ namespace IguideME.Web.Services
                 {
                     try
                     {
-                        result = r.GetFloat(0);
+                        result = r.GetDouble(0);
                     }
                     catch (Exception e)
                     {
-                        PrintQueryError("GetUserTotalAverage", 0, r, e);
+                        PrintQueryError("GetUserTotalGrade", 0, r, e);
                     }
                 }
                 return result;
@@ -1014,7 +1030,7 @@ namespace IguideME.Web.Services
                         new SQLiteParameter("courseID", courseID),
                         new SQLiteParameter("userID", userID),
                         new SQLiteParameter("PredictedGrade", long.Parse(r.GetValue(0).ToString())),
-                        new SQLiteParameter("GeneralAverage", r.GetFloat(1)),
+                        new SQLiteParameter("GeneralAverage", r.GetDouble(1)),
                         new SQLiteParameter("GoalGrade", grade),
                         new SQLiteParameter("Consent", r.GetBoolean(3)),
                         new SQLiteParameter("Notifications", r.GetBoolean(4)),
@@ -1074,22 +1090,22 @@ namespace IguideME.Web.Services
         public void CreateUserPeer(
             int goalGrade,
             List<string> userIDs,
-            int tileID,
-            float avgGrade,
-            float minGrade,
-            float maxGrade,
-            int entityType,
+            int componentID,
+            double avgGrade,
+            double minGrade,
+            double maxGrade,
+            int componentType,
             long syncID)
         {
             string combinedIDs = string.Join(",", userIDs);
             NonQuery(DatabaseQueries.REGISTER_USER_PEER,
                 new SQLiteParameter("goalGrade", goalGrade),
                 new SQLiteParameter("combinedIDs", combinedIDs),
-                new SQLiteParameter("tileID", tileID),
+                new SQLiteParameter("componentID", componentID),
                 new SQLiteParameter("avgGrade", avgGrade),
                 new SQLiteParameter("minGrade", minGrade),
                 new SQLiteParameter("maxGrade", maxGrade),
-                new SQLiteParameter("entityType", entityType),
+                new SQLiteParameter("componentType", componentType),
                 new SQLiteParameter("syncID", syncID)
             );
         }
@@ -1119,14 +1135,64 @@ namespace IguideME.Web.Services
             return peers;
         }
 
+        public void CreateTileGradeForUser(
+            string userID,
+            int tileID,
+            double grade,
+            long syncID)
+        {
+            NonQuery(DatabaseQueries.REGISTER_TILE_GRADE,
+                new SQLiteParameter("userID", userID),
+                new SQLiteParameter("tileID", tileID),
+                new SQLiteParameter("grade", grade),
+                new SQLiteParameter("syncID", syncID)
+            );
+        }
+
+        public double GetLatestTileGradeForUser(
+            string userID,
+            int tileID)
+        {
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_TILE_GRADE_FOR_USER,
+                    new SQLiteParameter("userID", userID),
+                    new SQLiteParameter("tileID", tileID)
+            ))
+            {
+                if (r.Read())
+                {
+                    try {
+                        return r.GetDouble(0);
+                    }
+                    catch (Exception e)
+                    {
+                        PrintQueryError("GetLatestTileGradeForUser", 4, r, e);
+                    }
+                }
+            }
+            return 0;
+        }
+
         public int GetInternalAssignmentID(
             int externalID,
             int courseID)
         {
-            return IDNonQuery(DatabaseQueries.QUERY_ASSIGNMENT_ID_FROM_EXTERNAL,
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_ASSIGNMENT_ID_FROM_EXTERNAL,
                     new SQLiteParameter("externalID", externalID),
                     new SQLiteParameter("courseID", courseID)
-                );
+                ))
+            {
+                if (r.Read())
+                {
+                    try {
+                        return r.GetInt32(0);
+                    }
+                    catch (Exception e)
+                    {
+                        PrintQueryError("GetInternalAssignmentID", 4, r, e);
+                    }
+                }
+            }
+            return 0;
         }
 
         public int CreateUserSubmission(AssignmentSubmission submission)
@@ -1167,7 +1233,7 @@ namespace IguideME.Web.Services
                         r.GetInt32(0),
                         r.GetInt32(1),
                         r.GetValue(2).ToString(),
-                        r.GetFloat(3),
+                        r.GetDouble(3),
                         r.GetInt64(4)
                     );
                     submissions.Add(submission);
@@ -1279,7 +1345,7 @@ namespace IguideME.Web.Services
                         r.GetInt32(0),
                         r.GetInt32(1),
                         r.GetValue(2).ToString(),
-                        r.GetFloat(3),
+                        r.GetDouble(3),
                         r.GetInt64(4)
                     );
                     submissions.Add(submission);
@@ -1466,11 +1532,11 @@ namespace IguideME.Web.Services
             );
         }
 
-        public Dictionary<int, float> GetUserAssignmentGrades(
+        public Dictionary<int, double> GetUserAssignmentGrades(
                 int courseID,
                 string userID)
         {
-            Dictionary<int, float> grades = new();
+            Dictionary<int, double> grades = new();
 
             using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_COURSE_SUBMISSIONS_FOR_STUDENT,
                     new SQLiteParameter("courseID", courseID),
@@ -1483,11 +1549,7 @@ namespace IguideME.Web.Services
                     {
                         // We save all the retrieved grades in a dictionary with
                         // the assignment.id as key and a list of grades as value
-                        if (!grades.TryGetValue(r.GetInt32(1), out float value))
-                        {
-                            grades[r.GetInt32(1)] = 0f;
-                        }
-                        grades[r.GetInt32(1)] = r.GetFloat(3);
+                        grades.Add(r.GetInt32(1),r.GetDouble(3));
                     }
                     catch (Exception e)
                     {
@@ -1498,11 +1560,11 @@ namespace IguideME.Web.Services
             return grades;
         }
 
-        public Dictionary<int, float> GetUserDiscussionCounters(
+        public Dictionary<int, double> GetUserDiscussionCounters(
                 int courseID,
                 string userID)
         {
-            Dictionary<int, float> discussionCounters = new();
+            Dictionary<int, double> discussionCounters = new();
 
             using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_DISCUSSION_COUNTER_FOR_USER,
                     new SQLiteParameter("courseID", courseID),
@@ -1535,13 +1597,13 @@ namespace IguideME.Web.Services
         public PeerComparisonData[] GetUserPeerComparison(
             int courseID,
             string loginID,
-            int entityType,
+            int componentType,
             long syncID = 0)
         {
             long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
             if (activeSync == 0)
                 return new PeerComparisonData[] {
-                    PeerComparisonData.FromGrades(0, Array.Empty<float>())
+                    PeerComparisonData.FromGrades(0, Array.Empty<double>())
                 };
 
             List<PeerComparisonData> submissions = new();
@@ -1552,7 +1614,7 @@ namespace IguideME.Web.Services
             using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_PEER_GROUP_RESULTS,
                     new SQLiteParameter("courseID", courseID),
                     new SQLiteParameter("goalGrade", goalGrade),
-                    new SQLiteParameter("entityType", entityType),
+                    new SQLiteParameter("componentType", componentType),
                     new SQLiteParameter("syncID", activeSync)
                 ))
             {
@@ -1562,9 +1624,9 @@ namespace IguideME.Web.Services
                     {
                         PeerComparisonData submission = new(
                             r.GetInt32(0),
-                            r.GetFloat(1),
-                            r.GetFloat(2),
-                            r.GetFloat(3)
+                            r.GetDouble(1),
+                            r.GetDouble(2),
+                            r.GetDouble(3)
                         );
                         submissions.Add(submission);
 
@@ -1591,8 +1653,8 @@ namespace IguideME.Web.Services
                 {
                     PredictedGrade prediction = new(
                         userID,
-                        r.GetFloat(1),
-                        r.GetFloat(0)
+                        r.GetInt64(1),
+                        r.GetDouble(0)
                     );
                     predictions.Add(prediction);
                 }
@@ -1617,9 +1679,9 @@ namespace IguideME.Web.Services
                 {
                     PeerComparisonData submission = new(
                         r1.GetInt32(0),
-                        r1.GetFloat(1),
-                        r1.GetFloat(2),
-                        r1.GetFloat(3)
+                        r1.GetDouble(1),
+                        r1.GetDouble(2),
+                        r1.GetDouble(3)
                     );
                     submissions.Add(submission);
                 }
@@ -1684,19 +1746,19 @@ namespace IguideME.Web.Services
                 try
                 {
                     // Initialize last elements
-                    float last_user_avg = -1;  //user
-                    float last_peer_avg = -1;  //avg
-                    float last_peer_max = -1;  //max
-                    float last_peer_min = -1;  //min
+                    double last_user_avg = -1;  //user
+                    double last_peer_avg = -1;  //avg
+                    double last_peer_max = -1;  //max
+                    double last_peer_min = -1;  //min
 
                     while (r1.Read())
                     {
                         // Initialize varaibles with the values to be put inside the lists
                         int tile_id = r1.GetInt32(0);  //tile
-                        float user_avg = r1.GetFloat(1);  //user
-                        float peer_avg = r1.GetFloat(2);  //avg
-                        float peer_max = r1.GetFloat(3);  //max
-                        float peer_min = r1.GetFloat(4);  //min
+                        double user_avg = r1.GetDouble(1);  //user
+                        double peer_avg = r1.GetDouble(2);  //avg
+                        double peer_max = r1.GetDouble(3);  //max
+                        double peer_min = r1.GetDouble(4);  //min
 
                         DateTime labelDate = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
                         labelDate = labelDate.AddMilliseconds(long.Parse(r1.GetValue(5).ToString()));
@@ -1917,7 +1979,7 @@ namespace IguideME.Web.Services
                         r.GetInt32(1),
                         r.GetInt32(2),
                         r.GetInt32(3),
-                        r.GetFloat(4)
+                        r.GetDouble(4)
                     ));
                 }
             }
@@ -2062,7 +2124,7 @@ namespace IguideME.Web.Services
                         r.GetInt32(0),
                         r.GetInt32(1),
                         "This is another title",
-                        r.GetFloat(2)
+                        r.GetDouble(2)
                     ));
                     }
                     catch (Exception e)
@@ -2252,7 +2314,7 @@ namespace IguideME.Web.Services
                             r.GetValue(2).ToString(),
                             r.GetInt32(3),
                             (Tile.Tile_type)r.GetInt32(4),
-                            r.GetFloat(5),
+                            r.GetDouble(5),
                             (AppGradingType)r.GetInt32(6),
                             r.GetBoolean(7),
                             r.GetBoolean(8)
@@ -2294,7 +2356,7 @@ namespace IguideME.Web.Services
                             r.GetValue(2).ToString(),
                             r.GetInt32(3),
                             (Tile.Tile_type)r.GetInt32(4),
-                            r.GetFloat(5),
+                            r.GetDouble(5),
                             (AppGradingType)r.GetInt32(6),
                             r.GetBoolean(7),
                             r.GetBoolean(8)
@@ -2467,11 +2529,12 @@ namespace IguideME.Web.Services
                             r.GetInt32(0),
                             r.GetInt32(1),
                             r.GetValue(2).ToString(),
-                            r.GetBoolean(3),
+                            r.GetInt32(3),
                             r.GetBoolean(4),
-                            r.GetInt32(5),
-                            r.GetFloat(6),
-                            (AppGradingType)r.GetInt32(7)
+                            r.GetBoolean(5),
+                            r.GetInt64(6),
+                            r.GetDouble(7),
+                            (AppGradingType)r.GetInt32(8)
                         );
                         assignments.Add(r.GetInt32(0), row);
                     }
@@ -2744,7 +2807,7 @@ namespace IguideME.Web.Services
                         r.GetValue(2).ToString(),
                         r.GetInt32(3),
                         (Tile.Tile_type)r.GetInt32(4),
-                        r.GetFloat(5),
+                        r.GetDouble(5),
                         (AppGradingType)r.GetInt32(6),
                         r.GetBoolean(7),
                         r.GetBoolean(8)
@@ -2760,7 +2823,7 @@ namespace IguideME.Web.Services
             string title,
             int order,
             int type,
-            float weight,
+            double weight,
             int gradingType,
             bool visible,
             bool notifications)
@@ -2792,7 +2855,7 @@ namespace IguideME.Web.Services
                         r.GetInt32(0),
                         r.GetInt32(1),
                         r.GetValue(2).ToString(),
-                        r.GetFloat(3)
+                        r.GetDouble(3)
                     ));
                 }
             }
@@ -2808,38 +2871,6 @@ namespace IguideME.Web.Services
             );
         }
 
-        // public void SetUserConsent(Boolean consent, long syncID)
-        // {
-        //     switch (data.Granted)
-        //     {
-        //         case 0: //denied
-        //                 //TODO: delete everything???
-
-
-
-        //             break;
-
-
-        //         case -1: //unspecified
-        //         case 1: // or granted
-        //             using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_LAST_STUDENT_SETTINGS,
-        //                 new SQLiteParameter("courseID", data.CourseID),
-        //                 new SQLiteParameter("userID", data.UserID)))
-        //                 while (r.Read())
-        //                     NonQuery(DatabaseQueries.REGISTER_STUDENT_SETTINGS,
-        //                         new SQLiteParameter("courseID", data.CourseID),
-        //                         new SQLiteParameter("userID", data.UserID),
-        //                         new SQLiteParameter("PredictedGrade", long.Parse(r.GetValue(0).ToString())),
-        //                         new SQLiteParameter("GeneralAverage", r.GetFloat(1)),
-        //                         new SQLiteParameter("GoalGrade", r.GetInt32(2)),
-        //                         new SQLiteParameter("Consent", data.Granted),
-        //                         new SQLiteParameter("Notifications", r.GetBoolean(4)),
-        //                         new SQLiteParameter("syncID", syncID)
-        //                     );
-        //             break;
-        //     }
-        // }
-
         public bool GetUserConsent(int courseID, string userID)
         {
             using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_CONSENT_FOR_USER,
@@ -2852,42 +2883,6 @@ namespace IguideME.Web.Services
             }
             return false;
         }
-
-        // public ConsentData[] GetGrantedConsents(int courseID, long syncID)
-        // {
-        //     List<ConsentData> consents = new();
-        //     using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_GRANTED_CONSENTS,
-        //             new SQLiteParameter("courseID", courseID),
-        //             new SQLiteParameter("syncID", syncID)
-        //         )) {
-        //         while (r.Read())
-        //         {
-        //             consents.Add(new ConsentData(courseID, r.GetValue(0).ToString(), 1));
-        //         }
-        //     }
-        //     return consents.ToArray();
-        // }
-
-        // public ConsentData[] GetConsents(int courseID, long syncID)
-        // {
-        //     List<ConsentData> consents = new();
-
-        //     using(SQLiteDataReader r = Query(DatabaseQueries.QUERY_CONSENTS,
-        //             new SQLiteParameter("courseID", courseID),
-        //             new SQLiteParameter("syncID", syncID)
-        //         )) {
-        //         while (r.Read())
-        //         {
-        //             try {
-        //                 consents.Add(new ConsentData(courseID, r.GetValue(0).ToString(), r.GetInt32(1)));
-        //             } catch ( Exception e) {
-        //                 PrintQueryError("GetConsents", 3, r, e);
-        //             }
-        //         }
-        //     }
-
-        //     return consents.ToArray();
-        // }
 
         public void AddExternalData(int courseID, ExternalData[] entries)
         {

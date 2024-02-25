@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using IguideME.Web.Models;
 using IguideME.Web.Models.App;
 using IguideME.Web.Models.Impl;
@@ -121,12 +122,12 @@ namespace IguideME.Web.Services
         {
             List<Course> courses = new List<Course>();
             using (NpgsqlDataReader r =
-                Query(@"SELECT  `org_unit_id`,
-                                `name`,
-                                `start_date`,
-                                `end_date`
-                        FROM    `organizational_units`
-                        WHERE   `type`='Course Offering'"
+                Query(@"SELECT  org_unit_id,
+                                name,
+                                start_date,
+                                end_date
+                        FROM    organizational_units
+                        WHERE   type='Course Offering'"
                 ))
             {
                 while (r.Read())
@@ -144,7 +145,7 @@ namespace IguideME.Web.Services
         {
             List<string> usernames = new List<string>();
 
-            using (NpgsqlDataReader r = Query("SELECT `username` FROM `users`"))
+            using (NpgsqlDataReader r = Query("SELECT username FROM users"))
             {
                 while (r.Read())
                     usernames.Add(r.GetValue(0).ToString());
@@ -161,13 +162,13 @@ namespace IguideME.Web.Services
         public User GetSingleUserData(string username)
         {
             using (NpgsqlDataReader r =
-                Query(@"SELECT  `username`,
-                                `user_id`,
-                                `first_name`,
-                                `middle_name`,
-                                `last_name`
-                        FROM    `users`
-                        WHERE   `username` = '" + username + "'"
+                Query(@"SELECT  username,
+                                user_id,
+                                first_name,
+                                middle_name,
+                                last_name
+                        FROM    users
+                        WHERE   username = '" + username + "'"
                     ))
             {
                 if (r.Read())
@@ -216,11 +217,11 @@ namespace IguideME.Web.Services
             _logger.LogInformation("Trying to get user\ncourseID: {courseID}, userID: {userID}", courseID, userID);
             string[] userIDs = new string[3];
             using (NpgsqlDataReader r =
-                Query(@"SELECT  `username`,
-                                `user_id`,
-                                `org_defined_id`
-                        FROM    `users`
-                        WHERE   `username` = @userID",
+                Query(@"SELECT  username,
+                                user_id,
+                                org_defined_id
+                        FROM    users
+                        WHERE   username = @userID",
                     new NpgsqlParameter("userID", userID)                    
                     ))
             {
@@ -248,18 +249,18 @@ namespace IguideME.Web.Services
             _logger.LogInformation("Trying to get all students for \ncourseID: {courseID}", courseID);
             List<User> students = new List<User>();
             using (NpgsqlDataReader r =
-                Query(@"SELECT      `users`.`username`,
-                                    `users`.`user_id`,
-                                    `users`.`first_name`,
-                                    `users`.`middle_name`,
-                                    `users`.`last_name`
-                        FROM        `users`
-                        INNER JOIN  `user_enrollments`
-                            ON      `users`.`user_id` = `user_enrollments`.`user_id`
-                        WHERE       `user_enrollments`.`org_unit_id` = @courseID
-                        AND        (`user_enrollments`.`role_id` = 110
-                        OR          `user_enrollments`.`role_id` = 130
-                        OR          `user_enrollments`.`role_id` = 134)",
+                Query(@"SELECT      users.username,
+                                    users.user_id,
+                                    users.first_name,
+                                    users.middle_name,
+                                    users.last_name
+                        FROM        users
+                        INNER JOIN  user_enrollments
+                            ON      users.user_id = user_enrollments.user_id
+                        WHERE       user_enrollments.org_unit_id = @courseID
+                        AND        (user_enrollments.role_id = 110
+                        OR          user_enrollments.role_id = 130
+                        OR          user_enrollments.role_id = 134)",
                     new NpgsqlParameter("courseID", courseID)
                     ))
             {
@@ -291,17 +292,17 @@ namespace IguideME.Web.Services
             _logger.LogInformation("Trying to get all teachers for \ncourseID: {courseID}", courseID);
             List<User> teachers = new List<User>();
             using (NpgsqlDataReader r =
-                Query(@"SELECT      `users`.`username`,
-                                    `users`.`user_id`,
-                                    `users`.`first_name`,
-                                    `users`.`middle_name`,
-                                    `users`.`last_name`
-                        FROM        `users`
-                        INNER JOIN  `user_enrollments`
-                            ON      `users`.`user_id` = `user_enrollments`.`user_id`
-                        WHERE       `user_enrollments`.`org_unit_id` = @courseID
-                        AND        (`user_enrollments`.`role_id` = 109
-                        OR          `user_enrollments`.`role_id` = 117)",
+                Query(@"SELECT      users.username,
+                                    users.user_id,
+                                    users.first_name,
+                                    users.middle_name,
+                                    users.last_name
+                        FROM        users
+                        INNER JOIN  user_enrollments
+                            ON      users.user_id = user_enrollments.user_id
+                        WHERE       user_enrollments.org_unit_id = @courseID
+                        AND        (user_enrollments.role_id = 109
+                        OR          user_enrollments.role_id = 117)",
                     new NpgsqlParameter("courseID", courseID)
                     ))
             {
@@ -333,18 +334,18 @@ namespace IguideME.Web.Services
             _logger.LogInformation("Trying to get all assignments for \ncourseID: {courseID}", courseID);
             List<AppAssignment> assignments = new List<AppAssignment>();
             using (NpgsqlDataReader r =
-                Query(@"SELECT  `grade_object_id`,
-                                `org_unit_id`,
-                                `name`,
-                                `end_date`,
-                                `max_points`,
-                                `type_name`,
-                                `grade_object_type_id`
-                        FROM    `grade_objects`
-                        WHERE   `org_unit_id` = @courseID
-                        AND    (`grade_object_type_id` = 1
-                        OR      `grade_object_type_id` = 2
-                        OR      `grade_object_type_id` = 4)",
+                Query(@"SELECT  grade_object_id,
+                                org_unit_id,
+                                name,
+                                end_date,
+                                max_points,
+                                type_name,
+                                grade_object_type_id
+                        FROM    grade_objects
+                        WHERE   org_unit_id = @courseID
+                        AND    (grade_object_type_id = 1
+                        OR      grade_object_type_id = 2
+                        OR      grade_object_type_id = 4)",
                     new NpgsqlParameter("courseID", courseID)
                     ))
             {
@@ -353,12 +354,13 @@ namespace IguideME.Web.Services
                     try 
                     {
                         assignments.Add(new AppAssignment(
-                            r.GetInt32(0),
+                            -1,
                             r.GetInt32(1),
                             r.GetValue(2).ToString(),
+                            r.GetInt32(0),
                             true, //bool published,
                             false, //bool muted,
-                            r.GetValue(3) is not null ? ((DateTimeOffset)r.GetValue(3)).ToUnixTimeMilliseconds() : 0,
+                            r.IsDBNull(3) ? 0 : ((DateTimeOffset)r.GetValue(3)).ToUnixTimeMilliseconds(),
                             r.GetDouble(4),
                             mapGradingType(r.GetInt32(6)) // This is mapped to our local enum
                         ));
@@ -374,24 +376,33 @@ namespace IguideME.Web.Services
         }
 
         /// <inheritdoc />
-        public IEnumerable<AssignmentSubmission> GetSubmissions(int courseID, string[] userIDs)
+        public IEnumerable<AssignmentSubmission> GetSubmissions(int courseID, List<User> users)
         {
+            List<int> userIDs = new();
+            foreach (User user in users)
+                userIDs.Add(user.StudentNumber);
+
+            NpgsqlParameter[] parameters = users
+            .Select((user, index) => new NpgsqlParameter($"userID{index}", user.StudentNumber))
+            .Concat(new[] { new NpgsqlParameter("courseID", courseID) })
+            .ToArray();
+
             List<AssignmentSubmission> submissions = new List<AssignmentSubmission>();
             using (NpgsqlDataReader r =
-                Query(@"SELECT      `grade_results`.`grade_object_id`,
-                                    `users`.`username`,
-                                    `grade_results`.`points_numerator`,
-                                    `grade_results`.`points_denominator`,
-                                    `grade_results`.`grade_text`,
-                                    `grade_results`.`grade_released_date`
-                        FROM        `grade_results`
-                        INNER JOIN  `users`
-                            ON      `users`.`user_id` = `user_enrollments`.`user_id`
-                        WHERE       `grade_results`.`org_unit_id` = @courseID
-                        AND         `grade_results`.`user_id`
-                            IN      (@allIDs)",
-                    new NpgsqlParameter("courseID", courseID),
-                    new NpgsqlParameter("allIDs", string.Join(",", userIDs))                    
+                Query(@$"SELECT      grade_results.grade_object_id,
+                                    users.username,
+                                    grade_results.points_numerator,
+                                    grade_results.points_denominator,
+                                    grade_results.grade_text,
+                                    grade_results.grade_released_date
+                        FROM        grade_results
+                        INNER JOIN  users
+                            ON      users.user_id = grade_results.user_id
+                        WHERE       grade_results.org_unit_id = @courseID
+                        AND         grade_results.user_id
+                            IN      ({string.Join(",", users.Select((_, index) => $"@userID{index}"))})
+                        ",
+                        parameters                
                     ))
             {
                 while (r.Read())
@@ -407,7 +418,9 @@ namespace IguideME.Web.Services
                                 (r.IsDBNull(2) || r.IsDBNull(3))
                                     ? 0
                                     : (r.GetDouble(2) / r.GetDouble(3)),
-                                ((DateTimeOffset)r.GetValue(5)).ToUnixTimeMilliseconds()
+                                r.IsDBNull(5) 
+                                    ? 0
+                                    : ((DateTimeOffset)r.GetValue(5)).ToUnixTimeMilliseconds()
                             ));
                         else
                             submissions.Add(new AssignmentSubmission(
@@ -418,7 +431,9 @@ namespace IguideME.Web.Services
                                     ? 0
                                     : (r.GetDouble(2) / r.GetDouble(3)),
                                 rawGrade,
-                                ((DateTimeOffset)r.GetValue(5)).ToUnixTimeMilliseconds()
+                                r.IsDBNull(5) 
+                                    ? 0
+                                    : ((DateTimeOffset)r.GetValue(5)).ToUnixTimeMilliseconds()
                             ));
                     } 
                     catch (Exception e)

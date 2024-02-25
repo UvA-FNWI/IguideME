@@ -8,15 +8,15 @@ namespace IguideME.Web.Models.App
         public string UserID { get; set; }
 
         [JsonProperty("date")]
-        public float Date { get; set; }
+        public long Date { get; set; }
 
         [JsonProperty("grade")]
-        public float Grade { get; set; }
+        public double Grade { get; set; }
 
         public PredictedGrade(
             string userID,
-            float date,
-            float grade)
+            long date,
+            double grade)
         {
             this.UserID = userID;
             this.Date = date;

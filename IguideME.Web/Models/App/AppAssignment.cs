@@ -22,6 +22,9 @@ namespace IguideME.Web.Models.App
         [JsonProperty("title")]
         public string Title { get; set; }
 
+        [JsonProperty("external_id")]
+        public int? ExternalID { get; set; }
+
         [JsonProperty("published")]
         public bool Published { get; set; }
 
@@ -41,6 +44,7 @@ namespace IguideME.Web.Models.App
             int id,
             int courseID,
             string title,
+            int? externalID,
             bool published,
             bool muted,
             long dueDate,
@@ -50,6 +54,7 @@ namespace IguideME.Web.Models.App
             this.ID = id;
             this.CourseID = courseID;
             this.Title = title;
+            this.ExternalID = externalID;
             this.Published = published;
             this.Muted = muted;
             this.DueDate = dueDate;

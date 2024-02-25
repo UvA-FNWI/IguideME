@@ -71,7 +71,7 @@ namespace IguideME.Web.Services.LMSHandlers
         /// <param name="courseID">The id of the course the assignments are from.</param>
         /// <param name="userIDs">The list of student ids that have given consent that the submissions are from.</param>
         /// <returns>An iterable with submissions for the course.</returns>
-		IEnumerable<AssignmentSubmission> GetSubmissions(int courseID, string[] userIDs);
+		IEnumerable<AssignmentSubmission> GetSubmissions(int courseID, List<User> users);
 
         /// <summary>
         /// Gets all the Discussions for a course.

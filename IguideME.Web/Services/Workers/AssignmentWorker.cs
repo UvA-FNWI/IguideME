@@ -1,11 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-
+using System.Reflection.Metadata;
 using IguideME.Web.Models;
 using IguideME.Web.Models.App;
 using IguideME.Web.Services.LMSHandlers;
 
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 
 namespace IguideME.Web.Services.Workers
 {
@@ -77,28 +79,26 @@ namespace IguideME.Web.Services.Workers
         /// <param name="entry">the tile entry the submissions are associated to.</param>
         private void RegisterSubmissions(IEnumerable<AssignmentSubmission> submissions, Dictionary<int, (double, AppGradingType)> gradingTypes)
         {
+            _logger.LogInformation("Starting submission registry...");
+
             double max;
             AppGradingType type;
             (double, AppGradingType) elem;
             foreach (AssignmentSubmission submission in submissions)
             {
-                // WE NEED TO CHANGE THE SUBMISSION IDs FROM EXTERNAL ASSIGNMENT ID TO INTERNAL ASSIGNMENT ID
-                submission.AssignmentID = _databaseManager.GetInternalAssignmentID(_courseID, submission.AssignmentID);
-
                 if (gradingTypes.TryGetValue(submission.AssignmentID, out elem))
                 {
-
                     (max, type) = elem;
                     switch (type)
                     {
                         case AppGradingType.Points:
-                            submission.Grade = (double.Parse(submission.RawGrade)) * 100/max;
+                            submission.Grade = (submission.RawGrade != null ? double.Parse(submission.RawGrade): submission.Grade) * 100/max;
                             break;
                         case AppGradingType.Percentage:
-                            submission.Grade = double.Parse(submission.RawGrade);
+                            submission.Grade = submission.RawGrade != null ? double.Parse(submission.RawGrade): submission.Grade;
                             break;
                         case AppGradingType.Letters:
-                            submission.Grade = LetterToGrade(submission.RawGrade);
+                            submission.Grade = LetterToGrade(submission.RawGrade??"0");
                             break;
                         case AppGradingType.PassFail:
                             _logger.LogInformation("passfail text: {Grade}", submission.RawGrade);
@@ -133,27 +133,33 @@ namespace IguideME.Web.Services.Workers
             List<Models.Impl.User> users = _databaseManager.GetUsersWithGrantedConsent(this._courseID);
             if (users.Count == 0) //if no users have given consent yet, no point to continue
                 return;
-            IEnumerable<AssignmentSubmission> submissions = this._ILMSHandler.GetSubmissions(this._courseID, users.Select(user => user.UserID).ToArray());
+            IEnumerable<AssignmentSubmission> submissions = this._ILMSHandler.GetSubmissions(this._courseID, users);
 
             Dictionary<int, (double, AppGradingType)> gradingTypes = new();
+            List<AssignmentSubmission> assignmentSubmissionsWithTiles = new ();
 
             foreach (AppAssignment assignment in assignments)
             {
                 _logger.LogInformation("Processing assignment: {Name}", assignment.Title);
-
-                _databaseManager.RegisterAssignment(assignment);
+                assignment.ID = _databaseManager.RegisterAssignment(assignment);
 
                 // Don't register submissions that aren't assigned to tiles (as entries).
                 TileEntry entry = entries.Find(e => e.ContentID == assignment.ID);
                 if (entry == null) continue;
 
-                gradingTypes.Add(assignment.ID, (assignment.MaxGrade, assignment.GradingType));
+                // We register the internal assignmentID in the submission entity
+                foreach (AssignmentSubmission sub in submissions) {
+                    if (sub.AssignmentID == assignment.ExternalID) {
+                        sub.AssignmentID = assignment.ID;
+                        assignmentSubmissionsWithTiles.Add(sub);
+                    }
+                }
 
+                gradingTypes.Add(assignment.ID, (assignment.MaxGrade, assignment.GradingType));
             }
 
-            this.RegisterSubmissions(submissions, gradingTypes);
-
+            if (assignmentSubmissionsWithTiles.Count() > 0 && gradingTypes.Count() > 0)
+                this.RegisterSubmissions(assignmentSubmissionsWithTiles, gradingTypes);
         }
-
     }
 }

@@ -57,7 +57,7 @@ namespace IguideME.Web.Models.App
         // public string MetaKey { get; set; }
 
         [JsonProperty("value")]
-        public float Value { get; set; }
+        public double Value { get; set; }
 
         [JsonProperty("expression")]
         public LogicalExpressions Expression { get; set; }
@@ -67,7 +67,7 @@ namespace IguideME.Web.Models.App
             int goalID,
             int assignmentID,
             int expression,
-            float value)
+            double value)
         {
             this.ID = id;
             this.GoalID = goalID;

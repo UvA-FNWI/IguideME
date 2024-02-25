@@ -104,13 +104,14 @@ namespace IguideME.Web.Services
                 .OrderBy(a => a.Position)
 
                 .Select(ass => new AppAssignment(
-                ass.ID.Value,
-                courseID,
-                ass.Name,
-                ass.IsPublished,
-                ass.IsMuted,
-                ass.DueDate.HasValue ? ((DateTimeOffset)ass.DueDate.Value).ToUnixTimeMilliseconds() : 0,
-                ass.PointsPossible ??= 0,
+                    -1,
+                    courseID,
+                    ass.Name,
+                    ass.ID.Value,
+                    ass.IsPublished,
+                    ass.IsMuted,
+                    ass.DueDate.HasValue ? ((DateTimeOffset)ass.DueDate.Value).ToUnixTimeMilliseconds() : 0,
+                    ass.PointsPossible ??= 0,
                 mapGradingType(ass.GradingType)));
         }
 
@@ -136,11 +137,12 @@ namespace IguideME.Web.Services
         }
 
         /// <inheritdoc />
-        public IEnumerable<AssignmentSubmission> GetSubmissions(int courseID, string[] userIDs)
+        public IEnumerable<AssignmentSubmission> GetSubmissions(int courseID, List<User> users)
         {
+
             return Connector
                 .FindCourseById(courseID)
-                .GetSubmissions(userIDs, false)
+                .GetSubmissions(users.Select(user => user.UserID).ToArray(), false)
                 .SelectMany(group => group.Submissions)
                 .Select(sub => new AssignmentSubmission(
                     -1,
@@ -162,9 +164,10 @@ namespace IguideME.Web.Services
                 .Where(quiz => quiz.Type != QuizType.Assignment)
                 .Select(quiz => (
                     new AppAssignment(
-                        quiz.ID ?? -1,
+                        -1,
                         courseID,
                         quiz.Name,
+                        quiz.ID,
                         quiz.IsPublished,
                         false,
                         quiz.DueDate.HasValue ? ((DateTimeOffset)quiz.DueDate.Value).ToUnixTimeMilliseconds() : 0,

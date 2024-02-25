@@ -20,9 +20,9 @@ namespace IguideME.Web.Models
 
         public PeerComparisonData(
             int entityID,
-            float avg,
-            Nullable<float> min,
-            Nullable<float> max)
+            double avg,
+            Nullable<double> min,
+            Nullable<double> max)
         {
             this.EntityID = entityID;
             this.Average = avg;
@@ -30,16 +30,16 @@ namespace IguideME.Web.Models
             this.Maximum = max;
         }
 
-        public static PeerComparisonData FromGrades(int tileID, float[] grades)
+        public static PeerComparisonData FromGrades(int tileID, double[] grades)
         {
             return grades.Length == 0
                 ? new PeerComparisonData(
                     tileID, 0F, 0F, 0F)
                 : new PeerComparisonData(
                     tileID,
-                    (float)Math.Round(grades.Min(), 1),
-                    (float)Math.Round(grades.Max(), 1),
-                    (float)Math.Round(grades.Average(), 1));
+                    (double)Math.Round(grades.Min(), 1),
+                    (double)Math.Round(grades.Max(), 1),
+                    (double)Math.Round(grades.Average(), 1));
         }
     }
 }
