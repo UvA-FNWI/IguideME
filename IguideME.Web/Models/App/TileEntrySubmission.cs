@@ -1,6 +1,6 @@
-﻿using IguideME.Web.Services;
+﻿using System.Collections.Generic;
+using IguideME.Web.Services;
 using Newtonsoft.Json;
-using System.Collections.Generic;
 
 namespace IguideME.Web.Models.App
 {
@@ -30,14 +30,13 @@ namespace IguideME.Web.Models.App
             int id,
             int assignmentID,
             string userID,
-            double? grade,
             string rawGrade,
-            long date)
+            long date
+        )
         {
             ID = id;
             UserID = userID;
             AssignmentID = assignmentID;
-            Grade = grade;
             RawGrade = rawGrade;
             Date = date;
         }
@@ -46,8 +45,9 @@ namespace IguideME.Web.Models.App
             int id,
             int assignmentID,
             string userID,
-            double? grade,
-            long date)
+            double grade,
+            long date
+        )
         {
             ID = id;
             UserID = userID;

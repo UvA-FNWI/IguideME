@@ -5,24 +5,22 @@ using System.Reflection.Metadata;
 using IguideME.Web.Models;
 using IguideME.Web.Models.App;
 using IguideME.Web.Services.LMSHandlers;
-
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 
 namespace IguideME.Web.Services.Workers
 {
-
     /// <summary>
     /// Class <a>AssignemntWorker</a> models a worker that handles registering assignments during a sync..
     /// </summary>
     public class AssignmentWorker : IWorker
     {
-        readonly private ILogger<SyncManager> _logger;
-        readonly private ILMSHandler _ILMSHandler;
+        private readonly ILogger<SyncManager> _logger;
+        private readonly ILMSHandler _ILMSHandler;
         private readonly DatabaseManager _databaseManager;
 
-        readonly private int _courseID;
-        readonly private long _syncID;
+        private readonly int _courseID;
+        private readonly long _syncID;
 
         /// <summary>
         /// This constructor initializes the new AssignmentWorker to:
@@ -37,7 +35,8 @@ namespace IguideME.Web.Services.Workers
             long syncID,
             ILMSHandler ILMSHandler,
             DatabaseManager databaseManager,
-            ILogger<SyncManager> logger)
+            ILogger<SyncManager> logger
+        )
         {
             _logger = logger;
             _courseID = courseID;
@@ -53,7 +52,6 @@ namespace IguideME.Web.Services.Workers
         /// <returns>The grade as a percentage.</returns>
         static private double LetterToGrade(string grade)
         {
-
             return grade switch
             {
                 "A" => 100,
@@ -77,7 +75,10 @@ namespace IguideME.Web.Services.Workers
         /// </summary>
         /// <param name="assignment">the assignment the submissions are associated to.</param>
         /// <param name="entry">the tile entry the submissions are associated to.</param>
-        private void RegisterSubmissions(IEnumerable<AssignmentSubmission> submissions, Dictionary<int, (double, AppGradingType)> gradingTypes)
+        private void RegisterSubmissions(
+            IEnumerable<AssignmentSubmission> submissions,
+            Dictionary<int, (double, AppGradingType)> gradingTypes
+        )
         {
             _logger.LogInformation("Starting submission registry...");
 
@@ -92,13 +93,23 @@ namespace IguideME.Web.Services.Workers
                     switch (type)
                     {
                         case AppGradingType.Points:
-                            submission.Grade = (submission.RawGrade != null ? double.Parse(submission.RawGrade): submission.Grade) * 100/max;
+                            submission.Grade =
+                                (
+                                    submission.RawGrade != null
+                                        ? double.Parse(submission.RawGrade)
+                                        : submission.Grade
+                                )
+                                * 100
+                                / max;
                             break;
                         case AppGradingType.Percentage:
-                            submission.Grade = submission.RawGrade != null ? double.Parse(submission.RawGrade): submission.Grade;
+                            submission.Grade =
+                                submission.RawGrade != null
+                                    ? double.Parse(submission.RawGrade)
+                                    : submission.Grade;
                             break;
                         case AppGradingType.Letters:
-                            submission.Grade = LetterToGrade(submission.RawGrade??"0");
+                            submission.Grade = LetterToGrade(submission.RawGrade ?? "0");
                             break;
                         case AppGradingType.PassFail:
                             _logger.LogInformation("passfail text: {Grade}", submission.RawGrade);
@@ -109,7 +120,11 @@ namespace IguideME.Web.Services.Workers
                             break;
                         default:
                             submission.Grade = -1;
-                            _logger.LogWarning("Grade format {Type} is not supported, submissions.Grade = {Grade}, treating as not graded...", gradingTypes[submission.AssignmentID], submission.RawGrade);
+                            _logger.LogWarning(
+                                "Grade format {Type} is not supported, submissions.Grade = {Grade}, treating as not graded...",
+                                gradingTypes[submission.AssignmentID],
+                                submission.RawGrade
+                            );
                             break;
                     }
 
@@ -126,17 +141,29 @@ namespace IguideME.Web.Services.Workers
             _logger.LogInformation("Starting assignment registry...");
 
             // Get the assignments from the ILMS.
-            IEnumerable<AppAssignment> assignments = this._ILMSHandler.GetAssignments(this._courseID);
+            IEnumerable<AppAssignment> assignments = this._ILMSHandler.GetAssignments(
+                this._courseID
+            );
             List<TileEntry> entries = _databaseManager.GetAllTileEntries(this._courseID);
 
             // Get the consented users and only ask for their submissions
-            List<Models.Impl.User> users = _databaseManager.GetUsersWithGrantedConsent(this._courseID);
+            List<Models.Impl.User> users = _databaseManager.GetUsersWithGrantedConsent(
+                this._courseID
+            );
             if (users.Count == 0) //if no users have given consent yet, no point to continue
                 return;
-            IEnumerable<AssignmentSubmission> submissions = this._ILMSHandler.GetSubmissions(this._courseID, users);
+            IEnumerable<AssignmentSubmission> submissions = this._ILMSHandler.GetSubmissions(
+                this._courseID,
+                users
+            );
+            Console.WriteLine("test0");
+            _logger.LogWarning("test0 {}", submissions.Any());
+
+            _logger.LogInformation("test1 {}", submissions);
+            _logger.LogInformation("test {}", submissions.Select(sub => sub.UserID));
 
             Dictionary<int, (double, AppGradingType)> gradingTypes = new();
-            List<AssignmentSubmission> assignmentSubmissionsWithTiles = new ();
+            List<AssignmentSubmission> assignmentSubmissionsWithTiles = new();
 
             foreach (AppAssignment assignment in assignments)
             {
@@ -145,11 +172,14 @@ namespace IguideME.Web.Services.Workers
 
                 // Don't register submissions that aren't assigned to tiles (as entries).
                 TileEntry entry = entries.Find(e => e.ContentID == assignment.ID);
-                if (entry == null) continue;
+                if (entry == null)
+                    continue;
 
                 // We register the internal assignmentID in the submission entity
-                foreach (AssignmentSubmission sub in submissions) {
-                    if (sub.AssignmentID == assignment.ExternalID) {
+                foreach (AssignmentSubmission sub in submissions)
+                {
+                    if (sub.AssignmentID == assignment.ExternalID)
+                    {
                         sub.AssignmentID = assignment.ID;
                         assignmentSubmissionsWithTiles.Add(sub);
                     }

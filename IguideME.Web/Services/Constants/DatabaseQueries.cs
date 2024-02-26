@@ -48,7 +48,6 @@ public static class DatabaseQueries
             FOREIGN KEY(`user_id`) REFERENCES `users`(`user_id`)
         );";
 
-
     /**
      * The user interface can be customized by the course's teachers. The "Tile"
      * visualisation places groups of tiles in columns. The columns are stored
@@ -76,7 +75,6 @@ public static class DatabaseQueries
             `course_id`       INTEGER,
             FOREIGN KEY(`course_id`) REFERENCES `course_settings`(`course_id`)
         );";
-
 
     // -------------------- Application configuration --------------------
 
@@ -122,7 +120,6 @@ public static class DatabaseQueries
             FOREIGN KEY(`tile_id`) REFERENCES `tiles`(`tile_id`)
         );";
 
-
     public const string CREATE_TABLE_SUBMISSIONS =
         @"CREATE TABLE IF NOT EXISTS `submissions` (
             `submission_id`   INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -144,7 +141,6 @@ public static class DatabaseQueries
             FOREIGN KEY(`submission_id`) REFERENCES `submissions`(`submission_id`)
         );";
 
-
     public const string CREATE_TABLE_LEARNING_GOALS =
         @"CREATE TABLE IF NOT EXISTS `learning_goals` (
             `course_id`           INTEGER,
@@ -162,7 +158,6 @@ public static class DatabaseQueries
             FOREIGN KEY(`assignment_id`) REFERENCES `assignments`(`assignment_id`),
             FOREIGN KEY(`goal_id`) REFERENCES `learning_goals`(`goal_id`)
         );";
-
 
     // /------------------------- User Settings --------------------------/
 
@@ -203,7 +198,6 @@ public static class DatabaseQueries
             FOREIGN KEY(`course_id`) REFERENCES `course_settings`(`course_id`),
             FOREIGN KEY(`sync_id`) REFERENCES `sync_history`(`sync_id`)
         );";
-
 
     // /--------------------------- User Data ----------------------------/
 
@@ -276,7 +270,6 @@ public static class DatabaseQueries
             FOREIGN KEY(`sync_id`) REFERENCES `sync_history`(`sync_id`)
         );";
 
-
     // /------------------------ Grade Prediction ------------------------/
 
     public const string CREATE_TABLE_GRADE_PREDICTION_MODEL = // NOT TOUCHED
@@ -304,7 +297,6 @@ public static class DatabaseQueries
             `parameter_id`        INTEGER,
             `weight`              FLOAT
         );";
-
 
     // /------------------------- Data registry --------------------------/
 
@@ -364,7 +356,6 @@ public static class DatabaseQueries
             FOREIGN KEY(`course_id`) REFERENCES `course_settings`(`course_id`)
         );";
 
-
     // /--------------------------- Migrations ---------------------------/
 
     public const string CREATE_TABLE_MIGRATIONS =
@@ -372,7 +363,6 @@ public static class DatabaseQueries
             `id`                  INTEGER PRIMARY KEY AUTOINCREMENT,
             `migration_id`        STRING
         );";
-
 
     // //=========================== Register Values ============================//
 
@@ -473,7 +463,7 @@ public static class DatabaseQueries
         );";
 
     public const string REGISTER_TILE_GROUP =
-    @"INSERT INTO       `tile_groups`
+        @"INSERT INTO       `tile_groups`
                             (
                                 `title`,
                                 `order`,
@@ -505,7 +495,6 @@ public static class DatabaseQueries
             @visible,
             @notifications
         );";
-
 
     public const string REGISTER_LEARNING_GOAL =
         @"INSERT OR REPLACE 
@@ -703,7 +692,6 @@ public static class DatabaseQueries
             @id
           );";
 
-
     // //============================= Query Values =============================//
 
     public const string QUERY_DOES_COURSE_EXIST =
@@ -711,8 +699,7 @@ public static class DatabaseQueries
         FROM course_settings
         WHERE course_id = @courseID;";
 
-    public const string QUERY_COURSE_IDS =
-        @"SELECT `course_id` FROM `course_settings`;";
+    public const string QUERY_COURSE_IDS = @"SELECT `course_id` FROM `course_settings`;";
 
     public const string QUERY_PREDICTED_GRADES_FOR_USER =
         @"SELECT    `predicted_grade`,
@@ -797,7 +784,6 @@ public static class DatabaseQueries
         FROM        `grade_prediction_model_parameter`
         WHERE       `grade_prediction_model_parameter`.`model_id`=@modelID;";
 
-
     public const string QUERY_ALL_TILE_GROUPS_IN_LAYOUT_COLUMN =
         @"SELECT    `group_id`
         FROM        `tile_groups`
@@ -805,7 +791,6 @@ public static class DatabaseQueries
         USING       (`column_id`)
         WHERE       `column_id`=@columnID
         ;";
-
 
     public const string QUERY_LAYOUT_COLUMN =
         @"SELECT    `column_id`,
@@ -837,7 +822,7 @@ public static class DatabaseQueries
         LIMIT       1;";
 
     public const string QUERY_NOTIFICATION_DATES_FOR_COURSE =
-    @"SELECT    `notification_dates`
+        @"SELECT    `notification_dates`
     FROM        `course_settings`
     WHERE       `course_id`=@courseID
     LIMIT       1;
@@ -1140,7 +1125,6 @@ public static class DatabaseQueries
         LIMIT       -1
         OFFSET      @offset;";
 
-
     // This is a different way to have the following query.
     // Needs more investigatin as to what is better.
     //
@@ -1176,9 +1160,7 @@ public static class DatabaseQueries
                     `users`.`student_number`,
                     `users`.`name`,
                     `users`.`sortable_name`,
-                    `users`.`role`,
-                    `student_settings`.`goal_grade`,
-                    max(`student_settings`.`sync_id`)
+                    `users`.`role`
             FROM    `users`
                 LEFT JOIN   `student_settings`
                     USING   (`user_id`)
@@ -1188,8 +1170,8 @@ public static class DatabaseQueries
             ORDER BY    `users`.`name` ASC
             ;";
 
-
-    public const string QUERY_CONSENTED_STUDENTS_FOR_COURSE = /// ^^^ WITH CONSENT ^^^ //NoTotalAverage
+    public const string QUERY_CONSENTED_STUDENTS_FOR_COURSE =
+        /// ^^^ WITH CONSENT ^^^ //NoTotalAverage
         @"SELECT    `users`.`user_id`,
                     `users`.`student_number`,
                     `users`.`name`,
@@ -1224,7 +1206,6 @@ public static class DatabaseQueries
         AND         `student_settings`.`consent`= true
         ORDER BY    `users`.`name` ASC
         LIMIT       1;";
-
 
     public const string QUERY_USER_DATA_FOR_COURSE = // no consent
         @"SELECT    `users`.`user_id`,
@@ -1296,9 +1277,10 @@ public static class DatabaseQueries
         ;";
 
     public const string QUERY_LAST_STUDENT_SETTINGS =
-        @"SELECT    `predicted_grade`,
-                    `total_grade`,
+        @"SELECT    
                     `goal_grade`,
+                    `total_grade`,
+                    `predicted_grade`,
                     `consent`,
                     `notifications`,
                     `sync_ID`
@@ -1316,7 +1298,6 @@ public static class DatabaseQueries
         AND         `course_id`= @courseID
         AND         `sync_ID`= @oldSyncID
         ;";
-
 
     public const string QUERY_COURSE_SUBMISSIONS =
         @"SELECT    `submissions`.`submission_id`,
@@ -1377,8 +1358,6 @@ public static class DatabaseQueries
         AND         `submissions`.`user_id`=@userID
         ;";
 
-
-
     // public const string QUERY_USER_DISCUSSION_COUNTER = // TO BE DELETED
     //     @"SELECT        `discussions`.`tile_id`,
     //                     SUM(`counter`)
@@ -1424,7 +1403,7 @@ public static class DatabaseQueries
 
 
     public const string QUERY_DISCUSSION_COUNTER_FOR_USER = // no consent
-            @"SELECT        `tile_entries`.`tile_id`,
+        @"SELECT        `tile_entries`.`tile_id`,
                         SUM(`counter`)
         FROM(
                 SELECT      `discussions`.`discussion_id`
@@ -1481,7 +1460,6 @@ public static class DatabaseQueries
         AND         `component_type`= @componentType
         AND         `sync_id`= @syncID;";
 
-
     public const string QUERY_GRADE_COMPARISSON_HISTORY = // half done ?????
         @"SELECT    `peer_groups`.`component_id`,
                     avg(`submissions`.`grade`),
@@ -1502,7 +1480,6 @@ public static class DatabaseQueries
         AND         `submissions`.`user_id` = @userID
         GROUP BY    `peer_groups`.`component_id`, `peer_groups`.`sync_id`
         ORDER BY    `peer_groups`.`component_id`;";
-
 
     public const string QUERY_USER_RESULTS = // half done , does it work though?????
         @"SELECT   `tiles`.`tile_id`,
@@ -1554,7 +1531,6 @@ public static class DatabaseQueries
         @"SELECT    `migration_id`
           FROM      `migrations`
           WHERE     `migration_id`=@id;";
-
 
     // //============================ Update Values =============================//
 
@@ -1679,11 +1655,11 @@ public static class DatabaseQueries
           WHERE             `requirement_id` = @requirementID;";
 
     public const string DELETE_TILE_ENTRY = ////should this stay like this?????
-         @"DELETE FROM       `tile_entries`
+        @"DELETE FROM       `tile_entries`
           WHERE              ROWID=@entryID;";
 
     public const string DELETE_ALL_TILE_ENTRIES_OF_TILE =
-         @"DELETE FROM       `tile_entries`
+        @"DELETE FROM       `tile_entries`
           WHERE              `tile_id`=@tileID;";
 
     public const string DELETE_INCOMPLETE_SYNCS =
@@ -1692,9 +1668,8 @@ public static class DatabaseQueries
           WHERE         `course_id` = @courseID
           AND           `end_timestamp` IS NULL;";
 
-
     public const string INSERT_USER_ACTION =
-    @"INSERT INTO   `user_tracker` (`user_id`,`action`)
+        @"INSERT INTO   `user_tracker` (`user_id`,`action`)
           VALUES        (
             @userID,
             @action

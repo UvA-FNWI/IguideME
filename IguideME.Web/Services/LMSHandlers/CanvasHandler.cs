@@ -1,15 +1,14 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using UvA.DataNose.Connectors.Canvas;
-using Microsoft.Extensions.Logging;
-using IguideME.Web.Services.LMSHandlers;
 using IguideME.Web.Models.App;
 using IguideME.Web.Models.Impl;
-
-using User = IguideME.Web.Models.Impl.User;
+using IguideME.Web.Services.LMSHandlers;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using UvA.DataNose.Connectors.Canvas;
 using CanvasUser = UvA.DataNose.Connectors.Canvas.User;
-using System;
+using User = IguideME.Web.Models.Impl.User;
 
 namespace IguideME.Web.Services
 {
@@ -51,28 +50,45 @@ namespace IguideME.Web.Services
         {
             try
             {
-                Conversation conv = new(this.Connector)
-                {
-                    Subject = subject,
-                    Body = body,
-                    Recipients = new string[1] { userID }
-                };
-                _logger.LogInformation("Created conversation {title} for {recipients}", conv, conv.Recipients[0]);
+                Conversation conv =
+                    new(this.Connector)
+                    {
+                        Subject = subject,
+                        Body = body,
+                        Recipients = new string[1] { userID }
+                    };
+                _logger.LogInformation(
+                    "Created conversation {title} for {recipients}",
+                    conv,
+                    conv.Recipients[0]
+                );
 
                 conv.Save();
             }
             catch (System.Net.WebException e)
             {
                 _logger.LogError("Error sending message: {error}", e);
-                _logger.LogError("Status description: {status}", ((System.Net.HttpWebResponse)e.Response).StatusDescription);
-                _logger.LogError("Response: {response}", new System.IO.StreamReader(((System.Net.HttpWebResponse)e.Response).GetResponseStream()).ReadToEnd());
+                _logger.LogError(
+                    "Status description: {status}",
+                    ((System.Net.HttpWebResponse)e.Response).StatusDescription
+                );
+                _logger.LogError(
+                    "Response: {response}",
+                    new System.IO.StreamReader(
+                        ((System.Net.HttpWebResponse)e.Response).GetResponseStream()
+                    ).ReadToEnd()
+                );
             }
         }
 
         /// <inheritdoc />
         public string[] GetUserIDs(int courseID, string userID)
         {
-            _logger.LogInformation("Trying to get user\ncourseID: {courseID}, userID: {userID}", courseID, userID);
+            _logger.LogInformation(
+                "Trying to get user\ncourseID: {courseID}, userID: {userID}",
+                courseID,
+                userID
+            );
             List<Enrollment> users = Connector.FindCourseById(courseID).Enrollments;
             CanvasUser user = users.First(x => x.UserID == userID).User;
             return new string[] { user.LoginID, user.SISUserID, user.ID.ToString() };
@@ -82,16 +98,35 @@ namespace IguideME.Web.Services
         public IEnumerable<User> GetStudents(int courseID)
         {
             Course course = Connector.FindCourseById(courseID);
-            IEnumerable<CanvasUser> students = course.GetUsersByType(EnrollmentType.Student).ToArray();
+            IEnumerable<CanvasUser> students = course
+                .GetUsersByType(EnrollmentType.Student)
+                .ToArray();
 
-            return students.Select(student => new User(student.SISUserID, courseID, student.ID.Value, student.Name, student.SortableName, (int)UserRoles.student));
+            return students.Select(student => new User(
+                student.SISUserID,
+                courseID,
+                student.ID.Value,
+                student.Name,
+                student.SortableName,
+                (int)UserRoles.student
+            ));
         }
 
         /// <inheritdoc />
         public IEnumerable<User> GetAdministrators(int courseID)
         {
-            IEnumerable<CanvasUser> admins = Connector.FindCourseById(courseID).GetUsersByType(EnrollmentType.Teacher).ToArray();
-            return admins.Select(admin => new User(admin.SISUserID, courseID, admin.ID.Value, admin.Name, admin.SortableName, (int)UserRoles.instructor));
+            IEnumerable<CanvasUser> admins = Connector
+                .FindCourseById(courseID)
+                .GetUsersByType(EnrollmentType.Teacher)
+                .ToArray();
+            return admins.Select(admin => new User(
+                admin.SISUserID,
+                courseID,
+                admin.ID.Value,
+                admin.Name,
+                admin.SortableName,
+                (int)UserRoles.instructor
+            ));
         }
 
         /// <inheritdoc />
@@ -99,10 +134,8 @@ namespace IguideME.Web.Services
         {
             return Connector
                 .FindCourseById(courseID)
-                .Assignments
-                .Where(assignment => assignment != null)
+                .Assignments.Where(assignment => assignment != null)
                 .OrderBy(a => a.Position)
-
                 .Select(ass => new AppAssignment(
                     -1,
                     courseID,
@@ -110,9 +143,12 @@ namespace IguideME.Web.Services
                     ass.ID.Value,
                     ass.IsPublished,
                     ass.IsMuted,
-                    ass.DueDate.HasValue ? ((DateTimeOffset)ass.DueDate.Value).ToUnixTimeMilliseconds() : 0,
+                    ass.DueDate.HasValue
+                        ? ((DateTimeOffset)ass.DueDate.Value).ToUnixTimeMilliseconds()
+                        : 0,
                     ass.PointsPossible ??= 0,
-                mapGradingType(ass.GradingType)));
+                    mapGradingType(ass.GradingType)
+                ));
         }
 
         private AppGradingType mapGradingType(GradingType type)
@@ -131,7 +167,10 @@ namespace IguideME.Web.Services
                 case GradingType.NotGraded:
                     return AppGradingType.NotGraded;
                 default:
-                    _logger.LogWarning("Grade format {Type} is not supported, treating as not graded...", type);
+                    _logger.LogWarning(
+                        "Grade format {Type} is not supported, treating as not graded...",
+                        type
+                    );
                     return AppGradingType.NotGraded;
             }
         }
@@ -139,46 +178,56 @@ namespace IguideME.Web.Services
         /// <inheritdoc />
         public IEnumerable<AssignmentSubmission> GetSubmissions(int courseID, List<User> users)
         {
-
             return Connector
                 .FindCourseById(courseID)
                 .GetSubmissions(users.Select(user => user.UserID).ToArray(), false)
-                .SelectMany(group => group.Submissions)
-                .Select(sub => new AssignmentSubmission(
-                    -1,
-                    sub.AssignmentID,
-                    sub.User.SISUserID,
-                    null,
-                    sub.Grade,
-                    ((DateTimeOffset)sub.SubmittedAt.Value).ToUnixTimeMilliseconds()
-                ));
+                .SelectMany(group =>
+                    group.Submissions.Select(sub => new AssignmentSubmission(
+                        -1,
+                        sub.AssignmentID,
+                        group.SISUserID,
+                        sub.Grade,
+                        sub.SubmittedAt != null
+                            ? ((DateTimeOffset)sub.SubmittedAt.Value).ToUnixTimeMilliseconds()
+                            : -1
+                    ))
+                );
         }
 
         /// <inheritdoc />
-        public IEnumerable<(AppAssignment, IEnumerable<AssignmentSubmission>)> GetQuizzes(int courseID)
+        public IEnumerable<(AppAssignment, IEnumerable<AssignmentSubmission>)> GetQuizzes(
+            int courseID
+        )
         {
             // Graded quizzes (assignment quizzes) are also treated as assignments by canvas and will be handled accordingly.
             return Connector
                 .FindCourseById(courseID)
-                .Quizzes
-                .Where(quiz => quiz.Type != QuizType.Assignment)
-                .Select(quiz => (
-                    new AppAssignment(
-                        -1,
-                        courseID,
-                        quiz.Name,
-                        quiz.ID,
-                        quiz.IsPublished,
-                        false,
-                        quiz.DueDate.HasValue ? ((DateTimeOffset)quiz.DueDate.Value).ToUnixTimeMilliseconds() : 0,
-                        quiz.PointsPossible ?? 0,
-                        AppGradingType.Points
-                    ),
-                    quiz.Submissions
-                        .Where(sub => sub.Score != null)
-                        .Select(sub => new AssignmentSubmission(-1, quiz.ID ?? -1, sub.UserID.ToString(), sub.Score ?? 1, ((DateTimeOffset)sub.FinishedDate.Value).ToUnixTimeMilliseconds()))
-                )
-            );
+                .Quizzes.Where(quiz => quiz.Type != QuizType.Assignment)
+                .Select(quiz =>
+                    (
+                        new AppAssignment(
+                            -1,
+                            courseID,
+                            quiz.Name,
+                            quiz.ID,
+                            quiz.IsPublished,
+                            false,
+                            quiz.DueDate.HasValue
+                                ? ((DateTimeOffset)quiz.DueDate.Value).ToUnixTimeMilliseconds()
+                                : 0,
+                            quiz.PointsPossible ?? 0,
+                            AppGradingType.Points
+                        ),
+                        quiz.Submissions.Where(sub => sub.Score != null)
+                            .Select(sub => new AssignmentSubmission(
+                                -1,
+                                quiz.ID ?? -1,
+                                sub.UserID.ToString(),
+                                sub.Score ?? 1,
+                                ((DateTimeOffset)sub.FinishedDate.Value).ToUnixTimeMilliseconds()
+                            ))
+                    )
+                );
         }
 
         /// <inheritdoc />
@@ -187,38 +236,46 @@ namespace IguideME.Web.Services
             return Connector
                 .FindCourseById(courseID)
                 .Discussions.SelectMany(topic =>
-                    topic.Entries.SelectMany(entry =>
-                        entry.Replies.Select(reply => new AppDiscussion(
-                            Discussion_type.Reply,
-                            reply.ID ?? -1,
-                            entry.ID ?? -1,
-                            courseID,
-                            topic.Title,
-                            reply.UserID.ToString(),
-                            ((DateTimeOffset)reply.CreatedAt.Value).ToUnixTimeMilliseconds(),
-                            reply.Message
-                        ))
-                        .Append(new AppDiscussion(
-                            Discussion_type.Entry,
-                            entry.ID ?? -1,
-                            topic.ID ?? -1,
-                            courseID,
-                            topic.Title,
-                            entry.UserID.ToString(),
-                            ((DateTimeOffset)entry.CreatedAt).ToUnixTimeMilliseconds(),
-                            entry.Message
-                        ))
-                    )
-                    .Append(new AppDiscussion(
-                        Discussion_type.Topic,
-                        topic.ID ?? -1,
-                        -1,
-                        courseID,
-                        topic.Title,
-                        topic.UserName,
-                        ((DateTimeOffset)topic.PostedAt).ToUnixTimeMilliseconds(),
-                        topic.Message
-                    ))
+                    topic
+                        .Entries.SelectMany(entry =>
+                            entry
+                                .Replies.Select(reply => new AppDiscussion(
+                                    Discussion_type.Reply,
+                                    reply.ID ?? -1,
+                                    entry.ID ?? -1,
+                                    courseID,
+                                    topic.Title,
+                                    reply.UserID.ToString(),
+                                    (
+                                        (DateTimeOffset)reply.CreatedAt.Value
+                                    ).ToUnixTimeMilliseconds(),
+                                    reply.Message
+                                ))
+                                .Append(
+                                    new AppDiscussion(
+                                        Discussion_type.Entry,
+                                        entry.ID ?? -1,
+                                        topic.ID ?? -1,
+                                        courseID,
+                                        topic.Title,
+                                        entry.UserID.ToString(),
+                                        ((DateTimeOffset)entry.CreatedAt).ToUnixTimeMilliseconds(),
+                                        entry.Message
+                                    )
+                                )
+                        )
+                        .Append(
+                            new AppDiscussion(
+                                Discussion_type.Topic,
+                                topic.ID ?? -1,
+                                -1,
+                                courseID,
+                                topic.Title,
+                                topic.UserName,
+                                ((DateTimeOffset)topic.PostedAt).ToUnixTimeMilliseconds(),
+                                topic.Message
+                            )
+                        )
                 );
         }
     }

@@ -24,6 +24,14 @@ export interface Tile {
   entries: TileEntry[];
 }
 
+export interface TileGrades {
+  tileID: number;
+  grade: number;
+  peerMin: number;
+  peerAvg: number;
+  peerMax: number;
+}
+
 export enum TileType {
   assignments,
   discussions,
@@ -152,4 +160,12 @@ export interface GoalRequirement {
   assignment_id: number;
   value: number;
   expression: LogicalExpression;
+}
+
+export interface Submission {
+  id: number;
+  assignmentID: number;
+  userID: string;
+  grade: number;
+  date: number;
 }

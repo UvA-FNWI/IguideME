@@ -117,7 +117,13 @@ const Header: FC = (): ReactElement => {
 
   return (
     <div className="Header">
-      <Row justify={"space-between"} align="middle">
+      <Row
+        justify={"space-between"}
+        align="middle"
+        style={{
+          padding: "0 20px",
+        }}
+      >
         <Col>
           <div className="homebutton">
             <Button type="link" onClick={goHome}>
@@ -144,6 +150,22 @@ const Header: FC = (): ReactElement => {
           </div>
         </Col>
       </Row>
+      {import.meta.env.MODE === "mock" && (
+        <Row>
+          <div
+            style={{
+              width: "100%",
+              padding: 10,
+              backgroundColor: "#ff6e5a",
+              textAlign: "center",
+              fontFamily: "Maitree,serif",
+            }}
+          >
+            Application is running in <strong>demo</strong> mode. Changes will
+            not be saved!
+          </div>
+        </Row>
+      )}{" "}
     </div>
   );
 };

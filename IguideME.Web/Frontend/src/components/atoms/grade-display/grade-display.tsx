@@ -5,30 +5,49 @@ import { tileViewContext } from "@/components/pages/student-dashboard/context";
 
 import "./style.scss";
 import { Bar, type BarConfig } from "@ant-design/charts";
+// import { getStudentSettings } from "@/api/users";
+// import { useQuery } from "react-query";
+import Loading from "@/components/particles/loading";
+import { type User } from "@/types/user";
 
 const BLUE = "rgba(90, 50, 255, .9)";
 const GREEN = "rgba(13, 204, 204, 1)";
 
-const GradeDisplay: FC = (): ReactElement => {
+interface displayProps {
+  self: User;
+}
+
+const GradeDisplay: FC<displayProps> = ({ self }): ReactElement => {
   const viewType = useContext(tileViewContext);
-  const goal = 7;
-  const avg = 9;
-  const pred = 7;
+
+  // const { data: settings } = useQuery(
+  //   "student settings",
+  //   async () => await getStudentSettings(userID),
+  // );
+
+  if (self.settings === undefined) {
+    return <Loading />;
+  }
+
+  const goal = self.settings.goal_grade;
+  const total = self.settings.total_grade;
+  const pred = self.settings.predicted_grade;
 
   switch (viewType) {
     case "grid":
-      return <GridGrades {...{ goal, avg, pred }} />;
+      return <GridGrades goal={goal} total={total} pred={pred} />;
     case "graph":
-      return <GraphGrades {...{ goal, avg, pred }} />;
+      return <GraphGrades goal={goal} total={total} pred={pred} />;
   }
 };
 
 interface Props {
   goal: number;
-  avg: number;
+  total: number;
   pred: number;
 }
-const GridGrades: FC<Props> = ({ goal, avg, pred }): ReactElement => {
+
+const GridGrades: FC<Props> = ({ goal, total, pred }): ReactElement => {
   const happy = <SmileTwoTone size={10} twoToneColor="rgb(0, 185, 120)" />;
   const meh = <MehTwoTone size={10} twoToneColor="rgb(245, 226, 54)" />;
   const unhappy = <FrownTwoTone size={10} twoToneColor={"rgb(255, 110, 90)"} />;
@@ -47,8 +66,8 @@ const GridGrades: FC<Props> = ({ goal, avg, pred }): ReactElement => {
         <p>Current</p>
         <h2>
           <Space>
-            {avg > goal ? happy : avg >= 5.5 ? meh : unhappy}
-            {avg}
+            {total > goal ? happy : total >= 5.5 ? meh : unhappy}
+            {total}
           </Space>
         </h2>
       </div>
@@ -65,7 +84,7 @@ const GridGrades: FC<Props> = ({ goal, avg, pred }): ReactElement => {
   );
 };
 
-const GraphGrades: FC<Props> = ({ goal, avg, pred }): ReactElement => {
+const GraphGrades: FC<Props> = ({ goal, total: avg, pred }): ReactElement => {
   const max = 10;
   const data = [
     {

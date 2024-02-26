@@ -1,5 +1,6 @@
 import { courseSettingsHandlers } from "./course_settings";
 import { entriesHandlers } from "./entries";
+import { gradeHandlers } from "./grades";
 import { setupHandlers } from "./setup";
 import { syncingHandlers } from "./syncing";
 import { tileHandlers } from "./tiles";
@@ -12,4 +13,5 @@ export const handlers = [
   ...courseSettingsHandlers,
   ...tileHandlers,
   ...entriesHandlers,
+  ...gradeHandlers,
 ];

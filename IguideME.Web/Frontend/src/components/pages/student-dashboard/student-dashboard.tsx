@@ -46,7 +46,7 @@ const Dashboard: FC<Props> = ({ self }): ReactElement => {
           <StudentInfo self={self} />
         </Col>
         <Col span={14}>
-          <GradeDisplay />
+          <GradeDisplay self={self} />
         </Col>
         <Col>
           <Radio.Group

@@ -7,6 +7,10 @@ import GridTile from "@/components/crystals/grid-tile/grid-tile.tsx";
 import { TileType, type Tile, GradingType } from "@/types/tile";
 import { Col, Divider, Row } from "antd";
 import PeerComparison from "@/components/particles/peer-comparison/peercomparison";
+import { getTileGrades } from "@/api/tiles";
+import { useQuery } from "react-query";
+import Loading from "@/components/particles/loading";
+import { getSelf } from "@/api/users";
 
 interface Props {
   tile: Tile;
@@ -14,10 +18,17 @@ interface Props {
 
 const ViewTile: FC<Props> = ({ tile }): ReactElement => {
   const viewType = useContext(tileViewContext);
-  const grade = Math.random() * 100;
-  const peerAvg = Math.random() * 100;
-  const peerMin = peerAvg / 2;
-  const peerMax = (100 + peerAvg) / 2;
+  const { data: self } = useQuery("self", getSelf);
+  const { data: grades } = useQuery(
+    "tiles grades" + tile.id,
+    async () =>
+      await getTileGrades(self !== undefined ? self.userID : "-1", tile.id),
+  );
+
+  // const grade = Math.random() * 100;
+  // const peerAvg = Math.random() * 100;
+  // const peerMin = peerAvg / 2;
+  // const peerMax = (100 + peerAvg) / 2;
   const max = 100;
 
   return (
@@ -37,7 +48,12 @@ const ViewTile: FC<Props> = ({ tile }): ReactElement => {
       {renderViewType()}
     </div>
   );
+
   function renderViewType(): ReactElement {
+    if (grades === undefined) {
+      return <Loading />;
+    }
+
     switch (viewType) {
       case "graph":
         return (
@@ -45,10 +61,10 @@ const ViewTile: FC<Props> = ({ tile }): ReactElement => {
             <GraphTile
               type={tile.type}
               grades={{
-                grade,
-                peerAvg,
-                peerMin,
-                peerMax,
+                grade: grades.grade,
+                peerAvg: grades.peerAvg,
+                peerMin: grades.peerMin,
+                peerMax: grades.peerMax,
                 max,
                 type: tile.gradingType,
               }}
@@ -62,10 +78,10 @@ const ViewTile: FC<Props> = ({ tile }): ReactElement => {
               <GridTile
                 type={tile.type}
                 grades={{
-                  grade,
-                  peerAvg,
-                  peerMin,
-                  peerMax,
+                  grade: grades.grade,
+                  peerAvg: grades.peerAvg,
+                  peerMin: grades.peerMin,
+                  peerMax: grades.peerMax,
                   max,
                   type: tile.gradingType,
                 }}
@@ -76,10 +92,10 @@ const ViewTile: FC<Props> = ({ tile }): ReactElement => {
                 <Divider style={{ margin: 0, padding: 0 }} />
                 <PeerComparison
                   {...{
-                    grade,
-                    peerAvg,
-                    peerMin,
-                    peerMax,
+                    grade: grades.grade,
+                    peerAvg: grades.peerAvg,
+                    peerMin: grades.peerMin,
+                    peerMax: grades.peerMax,
                     max,
                     type:
                       tile.type === TileType.assignments
