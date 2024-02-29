@@ -1094,8 +1094,8 @@ namespace IguideME.Web.Services
             {
                 while (r.Read())
                 {
-                    predictedGrade = long.Parse(r.GetValue(0).ToString());
-                    goalGrade = r.GetInt32(2);
+                    predictedGrade = long.Parse(r.GetValue(2).ToString());
+                    goalGrade = r.GetInt32(0);
                     consent = r.GetBoolean(3);
                     notification = r.GetBoolean(4);
                 }

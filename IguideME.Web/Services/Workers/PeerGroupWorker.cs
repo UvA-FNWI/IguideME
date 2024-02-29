@@ -1,15 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-
 using IguideME.Web.Models;
 using IguideME.Web.Models.App;
 using IguideME.Web.Models.Impl;
-
 using Microsoft.Extensions.Logging;
 
 namespace IguideME.Web.Services.Workers
 {
-
     public enum Comparison_Component_Types
     {
         total,
@@ -33,10 +30,10 @@ namespace IguideME.Web.Services.Workers
     ///
     public class PeerGroupWorker : IWorker
     {
-        readonly private ILogger<SyncManager> _logger;
+        private readonly ILogger<SyncManager> _logger;
         private readonly DatabaseManager _databaseManager;
-        readonly private int _courseID;
-        readonly private long _syncID;
+        private readonly int _courseID;
+        private readonly long _syncID;
 
         /// <summary>
         /// This constructor initializes the new PeerGroupWorker to
@@ -49,7 +46,8 @@ namespace IguideME.Web.Services.Workers
             int courseID,
             long syncID,
             DatabaseManager databaseManager,
-            ILogger<SyncManager> logger)
+            ILogger<SyncManager> logger
+        )
         {
             _logger = logger;
             _courseID = courseID;
@@ -81,8 +79,12 @@ namespace IguideME.Web.Services.Workers
             for (int goalGradeClass = 1; goalGradeClass <= 10; goalGradeClass++)
             {
                 usersWithSameGoalGrade[goalGradeClass] = new List<string>();
-                
-                List<User> sameGraders = _databaseManager.GetUsersWithGoalGrade(this._courseID, goalGradeClass, this._syncID);
+
+                List<User> sameGraders = _databaseManager.GetUsersWithGoalGrade(
+                    this._courseID,
+                    goalGradeClass,
+                    this._syncID
+                );
                 sameGraders.ForEach(x => usersWithSameGoalGrade[goalGradeClass].Add(x.UserID));
             }
 
@@ -96,7 +98,11 @@ namespace IguideME.Web.Services.Workers
         /// <param name="goalGrade">The goal grade to create a peer group for.</param>
         /// <param name="minPeerGroupSize">The minimum group size a peer group needs to have.</param>
         /// <returns></returns>
-        static List<string> CreatePeerGroup(List<string>[] groupedUsers, int goalGrade, int minPeerGroupSize)
+        static List<string> CreatePeerGroup(
+            List<string>[] groupedUsers,
+            int goalGrade,
+            int minPeerGroupSize
+        )
         {
             List<string> peerGroup = new(groupedUsers[goalGrade]);
 
@@ -115,7 +121,8 @@ namespace IguideME.Web.Services.Workers
                 }
 
                 // Check if no more peers are required
-                if (peerGroup.Count >= minPeerGroupSize) break;
+                if (peerGroup.Count >= minPeerGroupSize)
+                    break;
 
                 // Check if there are peers with lower grades.
                 if (goalGrade - offset >= 1)
@@ -141,13 +148,20 @@ namespace IguideME.Web.Services.Workers
             // We create the peer groups for each goal grade classification
             for (int goalGradeClass = 1; goalGradeClass <= 10; goalGradeClass++)
             {
-
                 // We initiallize the peer group by filling it with the users of the same goal grade
-                List<string> peerGroup = CreatePeerGroup(groupedUsers, goalGradeClass, minPeerGroupSize);
+                List<string> peerGroup = CreatePeerGroup(
+                    groupedUsers,
+                    goalGradeClass,
+                    minPeerGroupSize
+                );
 
                 // If noone is this peerGroup, we skip the calculations
-                if (peerGroup.Count() == 0) {
-                    this._logger.LogInformation("No students in Peer Group: {goalgrade}. Skipping...", goalGradeClass);
+                if (peerGroup.Count() == 0)
+                {
+                    this._logger.LogInformation(
+                        "No students in Peer Group: {goalgrade}. Skipping...",
+                        goalGradeClass
+                    );
                     continue;
                 }
                 this._logger.LogInformation("Creating Peer Group: {goalgrade}", goalGradeClass);
@@ -156,45 +170,52 @@ namespace IguideME.Web.Services.Workers
                 Dictionary<int, List<double>> peerTileDict = new();
                 List<double> peerTotalAvg = new();
 
-                foreach (string peerID in peerGroup) {
-                    Dictionary<int, double> userAssignmentGrades = _databaseManager.GetUserAssignmentGrades(_courseID, peerID);
+                foreach (string peerID in peerGroup)
+                {
+                    Dictionary<int, double> userAssignmentGrades =
+                        _databaseManager.GetUserAssignmentGrades(_courseID, peerID);
                     double userTotal = 0;
-                    
-                    foreach (Tile tile in tiles) {
+
+                    foreach (Tile tile in tiles)
+                    {
                         double userTileGrade = 0;
 
-
-                        // TODO: change the checks for weight = 0. Maybe we want an ungraded assignment. What happens then?
                         // We get the user's submissions one by one (if they exists in their gradelist)
-                        foreach (TileEntry entry in tile.Entries) {
-                            double singleEntryGrade = userAssignmentGrades.ContainsKey(entry.ContentID) 
-                                                    ? userAssignmentGrades[entry.ContentID]
-                                                    : 0d;
+                        foreach (TileEntry entry in tile.Entries)
+                        {
+                            double singleEntryGrade = userAssignmentGrades.ContainsKey(
+                                entry.ContentID
+                            )
+                                ? userAssignmentGrades[entry.ContentID]
+                                : 0d;
                             // and by summing them (multiplying by weight) we get the total of the user's Tile Grade
-                            userTileGrade += singleEntryGrade * (entry.Weight==0.0f
-                                                                ? (1.0 / (float) tile.Entries.Count)
-                                                                : entry.Weight);
+                            userTileGrade += singleEntryGrade * entry.Weight;
 
                             // Also, we store the grade of each submission to a List of the Assignment Dictionary, accross all users of the same peergroup
                             if (!peerAssignmentDict.ContainsKey(entry.ContentID))
-                                peerAssignmentDict[entry.ContentID] = new ();
+                                peerAssignmentDict[entry.ContentID] = new();
                             peerAssignmentDict[entry.ContentID].Add(singleEntryGrade);
                             // peerAssignmentDict[entry.ContentID] =  peerAssignmentDict[entry.ContentID] < grade ? grade : peerAssignmentDict[entry.ContentID];
-                           
                         }
                         // After we're done with all entries of that tile, we register the Tile Grade for this peer
-                        _databaseManager.CreateTileGradeForUser(peerID, tile.ID, userTileGrade, _syncID);
-                        
+                        _databaseManager.CreateTileGradeForUser(
+                            peerID,
+                            tile.ID,
+                            userTileGrade,
+                            _syncID
+                        );
+
                         // And then we add this to the Tile Dictionary (again accross peers)
                         if (!peerTileDict.ContainsKey(tile.ID))
                             peerTileDict[tile.ID] = new();
                         peerTileDict[tile.ID].Add(userTileGrade);
 
                         // FInaly we add to the user's total grade
-                        userTotal += userTileGrade * (tile.Weight == 0.0f
-                                                     ? (1.0 / tiles.Count)
-                                                     : tile.Weight);
+                        userTotal += userTileGrade * tile.Weight;
                     }
+
+                    // For consistency with the goal and predicted grade display we divide it by 10.
+                    userTotal /= 10;
 
                     // Store the user's Total grade and add this to the list of all grades across the peergroup (peerTotalAvg)
                     _databaseManager.UpdateUserTotalGrade(_courseID, peerID, userTotal, _syncID);
@@ -229,19 +250,19 @@ namespace IguideME.Web.Services.Workers
                 _databaseManager.CreateUserPeer(
                     goalGradeClass,
                     peerGroup,
-                    0, /// 0 means that we don't compare for assignment/tile/etc., but total average
+                    0,
+                    /// 0 means that we don't compare for assignment/tile/etc., but total average
                     peerTotalAvg.Average(),
                     peerTotalAvg.Min(),
                     peerTotalAvg.Max(),
                     (int)Comparison_Component_Types.total,
                     _syncID
                 );
-                
+
                 // Finally, we can create the notifications in the DB for that peer group
                 CreateNotifications(groupedUsers[goalGradeClass], peerAssignmentDict);
             }
         }
-
 
         void CreateNotifications(List<string> users, Dictionary<int, List<double>> grades)
         {
@@ -254,14 +275,18 @@ namespace IguideME.Web.Services.Workers
                     // Get only tiles with notifications
                     if (_databaseManager.GetTileNotificationState(entry.Key))
                     {
-                        List<AssignmentSubmission> userTileSubmissions = _databaseManager.GetTileSubmissionsForUser(entry.Key, user, this._syncID);
+                        List<AssignmentSubmission> userTileSubmissions =
+                            _databaseManager.GetTileSubmissionsForUser(
+                                entry.Key,
+                                user,
+                                this._syncID
+                            );
 
                         // Find the submission with the highest ID, as it is the most recent
                         int lastSubmissionID = -1;
                         foreach (AssignmentSubmission submission in userTileSubmissions)
                             if (submission.ID > lastSubmissionID)
                                 lastSubmissionID = submission.ID;
-
 
                         // Create one list with all the submission grades and one more without the most recent submission
                         List<double> currentSubmissionGrades = new();
@@ -312,7 +337,10 @@ namespace IguideME.Web.Services.Workers
                                     this._syncID
                                 );
                             }
-                            else if ((currentAverage - lastAverage <= 0) && (peerAverage - currentAverage <= 1))
+                            else if (
+                                (currentAverage - lastAverage <= 0)
+                                && (peerAverage - currentAverage <= 1)
+                            )
                             {
                                 // falling behind
                                 _databaseManager.RegisterNotification(
@@ -323,7 +351,10 @@ namespace IguideME.Web.Services.Workers
                                     this._syncID
                                 );
                             }
-                            else if ((currentAverage - lastAverage <= 0) && (peerAverage - currentAverage > 1))
+                            else if (
+                                (currentAverage - lastAverage <= 0)
+                                && (peerAverage - currentAverage > 1)
+                            )
                             {
                                 // put more effort
                                 _databaseManager.RegisterNotification(
@@ -338,8 +369,6 @@ namespace IguideME.Web.Services.Workers
                     }
                 }
             }
-
         }
-
     }
 }
