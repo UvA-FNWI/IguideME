@@ -100,7 +100,10 @@ const GraphGrades: FC<Props> = ({ goal, total: avg, pred }): ReactElement => {
   const config: BarConfig = {
     data,
     autoFit: true,
+    margin: 0,
+    paddingLeft: 0,
     padding: 20,
+    insetLeft: 70,
     colorField: "name",
     color: [BLUE, GREEN],
     xField: "name",
@@ -114,11 +117,17 @@ const GraphGrades: FC<Props> = ({ goal, total: avg, pred }): ReactElement => {
       y: { domainMax: max },
     },
     axis: {
-      x: { label: true, tick: false },
+      // x should have label true, but fsr it wants to overlap with the graph
+      x: {
+        label: true,
+        tick: false,
+        labelFormatter: (label: string) => label.split(" ")[0] + ":",
+      },
       y: { label: false, tick: false },
     },
     tooltip: {
       title: "",
+      items: [{ channel: "y", valueFormatter: ".1f" }],
     },
     annotations: [
       {

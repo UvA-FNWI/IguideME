@@ -22,7 +22,7 @@ const StudentDashboard: FC = (): ReactElement => {
   if (id === undefined) return <>Something went wrong, could not load user</>;
 
   const { data: student } = useQuery(
-    "student",
+    "student" + id,
     async () => await getStudent(id),
   );
 

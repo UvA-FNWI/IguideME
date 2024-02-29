@@ -191,7 +191,11 @@ app.UseLti(
         SigningKey = key,
         ClaimsMapping = p =>
         {
-            string courseid = p.CustomClaims?.GetProperty("courseid").ToString();
+            string courseID = p.CustomClaims?.GetProperty("courseid").ToString();
+            if (courseID.IsNullOrEmpty())
+            {
+                courseID = p.Context.Id;
+            }
             string userid = p.CustomClaims?.GetProperty("userid").ToString();
             return new Dictionary<string, object>
             {
@@ -199,8 +203,8 @@ app.UseLti(
                 ["contextLabel"] = p.Context.Label,
                 ["courseName"] = p.Context.Title,
                 ["user_name"] = p.Name,
-                ["courseid"] = courseid,
-                ["userid"] = GetUserID(userid, courseid),
+                ["courseid"] = courseID,
+                ["userid"] = GetUserID(userid, courseID),
                 [ClaimTypes.Role] = p.Roles.Any(e =>
                     e.Contains("http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor")
                 )

@@ -44,7 +44,13 @@ const EditTileAssignments: FC = (): ReactElement => {
         </Col>
         <Col span={7}>
           <Item name="weight" noStyle>
-            <InputNumber style={{ width: "100%" }} />
+            <InputNumber<number>
+              style={{ width: "100%" }}
+              formatter={(value) => `${(value ?? 0) * 100}%`}
+              parser={(value) =>
+                +parseFloat(value!.replace("%", "")).toFixed(1) / 100
+              }
+            />
           </Item>
         </Col>
       </Row>
@@ -165,6 +171,10 @@ const SelectAssignments: FC<SelectProps> = ({
                   onChange={(val) => {
                     changeWeight(entry, val);
                   }}
+                  formatter={(value) => `${(value ?? 0) * 100}%`}
+                  parser={(value) =>
+                    +parseFloat(value!.replace("%", "")).toFixed(1) / 100
+                  }
                 />
               );
             },
