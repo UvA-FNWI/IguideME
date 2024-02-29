@@ -1,17 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-
 using IguideME.Web.Models;
 using IguideME.Web.Models.App;
 using IguideME.Web.Models.Impl;
 using IguideME.Web.Services;
-
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -25,15 +22,12 @@ namespace IguideME.Web.Controllers
         private readonly ILogger<DataController> _logger;
         private readonly DatabaseManager _databaseManager;
 
-        public TileController(
-            ILogger<DataController> logger,
-            DatabaseManager databaseManager) : base(
-                logger)
+        public TileController(ILogger<DataController> logger, DatabaseManager databaseManager)
+            : base(logger)
         {
             _logger = logger;
             _databaseManager = databaseManager;
         }
-
 
         // -------------------- Tile logic --------------------
 
@@ -49,7 +43,8 @@ namespace IguideME.Web.Controllers
             if (success)
             {
                 // Creates a new tile with information posted in the request's body
-                int tilesInGroup = _databaseManager.GetTiles(GetCourseID())
+                int tilesInGroup = _databaseManager
+                    .GetTiles(GetCourseID())
                     .Where(t => t.GroupID == tile.GroupID)
                     .Count();
 
@@ -77,8 +72,7 @@ namespace IguideME.Web.Controllers
         public ActionResult GetTiles()
         {
             // return all tiles registered to the course
-            return Json(
-                _databaseManager.GetTiles(GetCourseID(), true));
+            return Json(_databaseManager.GetTiles(GetCourseID(), true));
         }
 
         [Authorize]
@@ -89,8 +83,18 @@ namespace IguideME.Web.Controllers
         public ActionResult GetGroupTiles(string id)
         {
             // return all tiles registered to the course
-            return Json(
-                _databaseManager.GetGroupTiles(GetCourseID(), id, true));
+            return Json(_databaseManager.GetGroupTiles(GetCourseID(), id, true));
+        }
+
+        [Authorize]
+        [HttpGet]
+        [Route("tiles/{tileID}/grades/{userID}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public ActionResult GetTileGrades(string tileID, string userID)
+        {
+            // TODO: implement body, see Frontend/src/types/tile.tsx -> tilegrades for the expected format
+            return Json("");
         }
 
         [Authorize]
@@ -101,8 +105,7 @@ namespace IguideME.Web.Controllers
         public ActionResult GetTileGroups()
         {
             // return all tiles registered to the course
-            return Json(
-                    _databaseManager.GetLayoutTileGroups(GetCourseID()));
+            return Json(_databaseManager.GetLayoutTileGroups(GetCourseID()));
         }
 
         [Authorize(Policy = "IsInstructor")]
@@ -438,8 +441,6 @@ namespace IguideME.Web.Controllers
 
             return BadRequest();
         }
-
-        
 
         // [Authorize]
         // [HttpGet]
@@ -816,8 +817,7 @@ namespace IguideME.Web.Controllers
             /**
              * Returns all columns registered to the course.
              */
-            return Json(
-                _databaseManager.GetLayoutColumns(GetCourseID()));
+            return Json(_databaseManager.GetLayoutColumns(GetCourseID()));
         }
 
         [Authorize]
@@ -850,7 +850,9 @@ namespace IguideME.Web.Controllers
                         id,
                         tileGroup.ColumnID,
                         tileGroup.Title,
-                        tileGroup.Position));
+                        tileGroup.Position
+                    )
+                );
 
             return BadRequest();
         }
