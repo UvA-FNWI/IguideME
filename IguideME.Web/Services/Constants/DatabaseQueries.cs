@@ -187,8 +187,8 @@ public static class DatabaseQueries
         @"CREATE TABLE IF NOT EXISTS `student_settings` (
             `user_id`           STRING,
             `course_id`         INTEGER,
-            `predicted_grade`   INTEGER DEFAULT 0,
-            `total_grade`       FLOAT   DEFAULT 0,
+            `predicted_grade`   FLOAT   DEFAULT 0.0,
+            `total_grade`       FLOAT   DEFAULT 0.0,
             `goal_grade`        INTEGER DEFAULT 0,
             `consent`           BOOLEAN DEFAULT false,
             `notifications`     BOOLEAN DEFAULT true,
@@ -219,9 +219,9 @@ public static class DatabaseQueries
             `component_id`      INTEGER,
             `goal_grade`        INTEGER,
             `user_ids`          STRING,
-            `avg_grade`         INTEGER,
-            `min_grade`         INTEGER,
-            `max_grade`         INTEGER,
+            `avg_grade`         FLOAT,
+            `min_grade`         FLOAT,
+            `max_grade`         FLOAT,
             `component_type`    INTEGER,
             `sync_id`           INTEGER,
             PRIMARY KEY (`component_id`,`component_type`,`goal_grade`,`sync_id`),
@@ -656,6 +656,12 @@ public static class DatabaseQueries
                 @Notifications,
                 @syncID
             )
+            ON CONFLICT (`user_id`,`course_id`,`sync_id`)
+            DO UPDATE SET   `predicted_grade` = excluded.`predicted_grade`,
+                            `total_grade` = excluded.`total_grade`,
+                            `goal_grade` = excluded.`goal_grade` ,
+                            `consent`= excluded.`consent` ,
+                            `notifications`= excluded.`notifications`
         ;";
 
     public const string REGISTER_EXTERNALDATA =
@@ -1277,8 +1283,7 @@ public static class DatabaseQueries
         ;";
 
     public const string QUERY_LAST_STUDENT_SETTINGS =
-        @"SELECT    
-                    `goal_grade`,
+        @"SELECT    `goal_grade`,
                     `total_grade`,
                     `predicted_grade`,
                     `consent`,

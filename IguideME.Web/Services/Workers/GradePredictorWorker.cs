@@ -86,10 +86,14 @@ namespace IguideME.Web.Services.Workers
             // } TODO: fix
             //----------------------------------------------------------------------------------------------------------------------
 
-            _databaseManager.CreatePredictedGrade(this._courseID,
-                                                          student.UserID,
-                                                          wGrade,
-                                                          _syncID);
+            _databaseManager.UpdateUserSettings(
+                                        _courseID, 
+                                        student.UserID,
+                                        null, 
+                                        null, 
+                                        wGrade, 
+                                        null, 
+                                        _syncID);
         }
     }
 }

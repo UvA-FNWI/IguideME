@@ -287,7 +287,7 @@ namespace IguideME.Web.Services
             List<User> students = new List<User>();
             using (
                 NpgsqlDataReader r = Query(
-                    @"SELECT      users.username,
+                    @"SELECT        users.username,
                                     users.user_id,
                                     users.first_name,
                                     users.middle_name,
@@ -340,7 +340,7 @@ namespace IguideME.Web.Services
             List<User> teachers = new List<User>();
             using (
                 NpgsqlDataReader r = Query(
-                    @"SELECT      users.username,
+                    @"SELECT        users.username,
                                     users.user_id,
                                     users.first_name,
                                     users.middle_name,
@@ -393,7 +393,7 @@ namespace IguideME.Web.Services
             List<AppAssignment> assignments = new List<AppAssignment>();
             using (
                 NpgsqlDataReader r = Query(
-                    @"SELECT  grade_object_id,
+                    @"SELECT    grade_object_id,
                                 org_unit_id,
                                 name,
                                 end_date,
@@ -454,7 +454,7 @@ namespace IguideME.Web.Services
             List<AssignmentSubmission> submissions = new List<AssignmentSubmission>();
             using (
                 NpgsqlDataReader r = Query(
-                    @$"SELECT      grade_results.grade_object_id,
+                    @$"SELECT       grade_results.grade_object_id,
                                     users.username,
                                     grade_results.points_numerator,
                                     grade_results.points_denominator,

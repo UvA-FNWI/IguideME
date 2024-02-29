@@ -94,11 +94,14 @@ namespace IguideME.Web.Controllers
         // public ActionResult UpdateNotificationEnable()
         // {
         //     var body = new StreamReader(Request.Body).ReadToEnd();
-        //     _databaseManager.UpdateNotificationEnable(
+        //     _databaseManager.UpdateUserSettings(
         //             this.GetCourseID(),
         //             this.GetUserID(),
+        //             null, 
+        //             null, 
+        //             null, 
         //             (bool)JObject.Parse(body)["enable"],
-        //             this.GetHashCode()
+        //             0
         //             );
 
         //     return Json(

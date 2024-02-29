@@ -285,11 +285,15 @@ namespace IguideME.Web.Controllers
         // public ActionResult UpdateGoalGrade()
         // {
         //     var body = new StreamReader(Request.Body).ReadToEnd();
-        //     _databaseManager.UpdateUserGoalGrade(
+        //     _databaseManager.UpdateUserSettings(
         //             this.GetCourseID(),
         //             this.GetUserID(),
         //             (int)JObject.Parse(body)["goal_grade"],
-        //             this.GetHashCode());
+        //             null, 
+        //             null, 
+        //             null, 
+        //             0
+        //         );
 
         //     return Json(
         //         _databaseManager.GetUserGoalGrade(

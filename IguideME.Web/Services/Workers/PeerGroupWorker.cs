@@ -218,7 +218,14 @@ namespace IguideME.Web.Services.Workers
                     userTotal /= 10;
 
                     // Store the user's Total grade and add this to the list of all grades across the peergroup (peerTotalAvg)
-                    _databaseManager.UpdateUserTotalGrade(_courseID, peerID, userTotal, _syncID);
+                    _databaseManager.UpdateUserSettings(
+                                        _courseID, 
+                                        peerID,
+                                        null, 
+                                        userTotal, 
+                                        null, 
+                                        null, 
+                                        _syncID);
                     peerTotalAvg.Add(userTotal);
                 }
 
