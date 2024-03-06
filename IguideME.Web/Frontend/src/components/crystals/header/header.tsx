@@ -1,6 +1,6 @@
 // /------------------------- Module imports -------------------------/
 import { useQuery } from "react-query";
-import { Button, Col, ConfigProvider, Row, Select } from "antd";
+import { Button, Col, ConfigProvider, Row, Select, Space } from "antd";
 import { type NavigateFunction, useNavigate } from "react-router-dom";
 import {
   type Dispatch,
@@ -15,6 +15,7 @@ import { type User, UserRoles } from "@/types/user";
 import { getSelf, getStudents } from "@/api/users";
 
 import "./style.scss";
+import NotificationPanel from "@/components/atoms/notification-panel/notification-panel";
 
 /**
  * Helper function for the student selector component.
@@ -100,7 +101,6 @@ const Header: FC = (): ReactElement => {
   const [currentUser, setCurrentUser] = useState<User | undefined>(self);
   const [inHome, setInHome] = useState<boolean>(true);
 
-  console.log("hello", self);
   // TODO: change to request from is-admin route.
   const isAdmin: boolean = self?.role === UserRoles.instructor;
 
@@ -135,19 +135,24 @@ const Header: FC = (): ReactElement => {
           {selector(isAdmin && inHome, currentUser, setCurrentUser, navigate)}
         </Col>
         <Col>
-          <div style={{ minWidth: "100px" }}>
-            {isAdmin && (
-              <Button
-                className="adminButton"
-                type="link"
-                onClick={() => {
-                  inHome ? toggleAdmin("/admin") : goHome();
-                }}
-              >
-                <h3>{inHome ? "Admin Panel" : "Home"}</h3>
-              </Button>
-            )}
-          </div>
+          <Space>
+            <div style={{ minWidth: "30px" }}>
+              <NotificationPanel user={currentUser} />
+            </div>
+            <div style={{ minWidth: "100px" }}>
+              {isAdmin && (
+                <Button
+                  className="headerButton adminButton"
+                  type="link"
+                  onClick={() => {
+                    inHome ? toggleAdmin("/admin") : goHome();
+                  }}
+                >
+                  <h3>{inHome ? "Admin Panel" : "Home"}</h3>
+                </Button>
+              )}
+            </div>
+          </Space>
         </Col>
       </Row>
       {import.meta.env.MODE === "mock" && (

@@ -54,22 +54,24 @@ namespace IguideME.Web.Controllers
             return Json(_databaseManager.GetUser(GetCourseID(), id));
         }
 
-        // [Authorize(Policy = "IsInstructor")]
-        // [HttpGet]
-        // [Route("/app/notification/{userID}")]
-        // [ProducesResponseType(StatusCodes.Status204NoContent)]
-        // [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        // [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        // [ProducesResponseType(StatusCodes.Status404NotFound)]
-        // public ActionResult GetNotificationEnable(string userID)
-        // {
-
-        //     return Json(
-        //         _databaseManager.GetNotificationEnable(
-        //             this.GetCourseID(),
-        //             userID,
-        //             this.GetHashCode()));
-        // }
+        [HttpGet]
+        [Route("/app/notifications/{userID}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public ActionResult GetNotifications(string userID)
+        {
+            if (userID == GetUserID() || IsAdministrator())
+            {
+                return Json(
+                    _databaseManager.GetAllUserNotifications(GetCourseID(), userID, GetHashCode())
+                );
+            }
+            else
+            {
+                return Unauthorized();
+            }
+        }
 
         // [Authorize]
         // [HttpGet]
@@ -97,9 +99,9 @@ namespace IguideME.Web.Controllers
         //     _databaseManager.UpdateUserSettings(
         //             this.GetCourseID(),
         //             this.GetUserID(),
-        //             null, 
-        //             null, 
-        //             null, 
+        //             null,
+        //             null,
+        //             null,
         //             (bool)JObject.Parse(body)["enable"],
         //             0
         //             );

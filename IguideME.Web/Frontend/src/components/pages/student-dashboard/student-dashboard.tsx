@@ -8,7 +8,7 @@ import { Col, Radio, Row } from "antd";
 import { useState, type FC, type ReactElement } from "react";
 import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
-import { type contextType, tileViewContext } from "./context";
+import { tileViewContext, type viewType } from "./context";
 
 const StudentDashboard: FC = (): ReactElement => {
   const { id } = useParams();
@@ -38,9 +38,14 @@ interface Props {
 }
 
 const Dashboard: FC<Props> = ({ self }): ReactElement => {
-  const [viewType, setViewType] = useState<contextType>("graph");
+  const [viewType, setViewType] = useState<viewType>("graph");
+  const context = {
+    user: self,
+    viewType,
+  };
+
   return (
-    <tileViewContext.Provider value={viewType}>
+    <tileViewContext.Provider value={context}>
       <Row justify="space-between" align="top" style={{ padding: 12 }}>
         <Col>
           <StudentInfo self={self} />
@@ -50,7 +55,7 @@ const Dashboard: FC<Props> = ({ self }): ReactElement => {
         </Col>
         <Col>
           <Radio.Group
-            value={viewType}
+            value={context.viewType}
             buttonStyle="solid"
             onChange={(e) => {
               setViewType(e.target.value);

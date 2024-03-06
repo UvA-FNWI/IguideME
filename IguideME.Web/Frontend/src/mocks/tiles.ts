@@ -32,7 +32,9 @@ export const tileHandlers = [
   }),
   http.get("tilegroup/*/tiles", ({ params }) => {
     return HttpResponse.json<Tile[]>(
-      MOCK_TILES.filter((tile) => tile.group_id.toString() === params[0]),
+      MOCK_TILES.filter(
+        (tile) => tile.visible && tile.group_id.toString() === params[0],
+      ),
     );
   }),
   http.get("/tiles", () => {
@@ -85,13 +87,13 @@ const MOCK_GROUPS: TileGroup[] = [
   },
 ];
 
-const MOCK_TILES: Tile[] = [
+export const MOCK_TILES: Tile[] = [
   {
     id: 1,
     group_id: 1,
     title: "Quizzes",
     position: 1,
-    weight: 1,
+    weight: 0.1,
     type: TileType.assignments,
     visible: true,
     notifications: true,
@@ -100,25 +102,25 @@ const MOCK_TILES: Tile[] = [
       {
         tile_id: 1,
         title: MOCK_ASSIGNMENTS.find((ass) => ass.id === 1)!.title,
-        weight: 1,
+        weight: 0.25,
         content_id: 1,
       },
       {
         tile_id: 1,
         title: MOCK_ASSIGNMENTS.find((ass) => ass.id === 2)!.title,
-        weight: 1,
+        weight: 0.25,
         content_id: 2,
       },
       {
         tile_id: 1,
         title: MOCK_ASSIGNMENTS.find((ass) => ass.id === 3)!.title,
-        weight: 1,
+        weight: 0.25,
         content_id: 3,
       },
       {
         tile_id: 1,
         title: MOCK_ASSIGNMENTS.find((ass) => ass.id === 4)!.title,
-        weight: 1,
+        weight: 0.25,
         content_id: 4,
       },
     ],
@@ -128,7 +130,7 @@ const MOCK_TILES: Tile[] = [
     group_id: 1,
     title: "Perusall",
     position: 2,
-    weight: 0,
+    weight: 0.1,
     type: TileType.assignments,
     visible: true,
     notifications: true,
@@ -137,19 +139,19 @@ const MOCK_TILES: Tile[] = [
       {
         tile_id: 1,
         title: MOCK_ASSIGNMENTS.find((ass) => ass.id === 9)!.title,
-        weight: 1,
+        weight: 0.33,
         content_id: 9,
       },
       {
         tile_id: 1,
         title: MOCK_ASSIGNMENTS.find((ass) => ass.id === 10)!.title,
-        weight: 1,
+        weight: 0.33,
         content_id: 10,
       },
       {
         tile_id: 1,
         title: MOCK_ASSIGNMENTS.find((ass) => ass.id === 11)!.title,
-        weight: 1,
+        weight: 0.33,
         content_id: 11,
       },
     ],
@@ -180,49 +182,49 @@ const MOCK_TILES: Tile[] = [
       {
         tile_id: 1,
         title: MOCK_ASSIGNMENTS.find((ass) => ass.id === 12)!.title,
-        weight: 1,
+        weight: 0.125,
         content_id: 12,
       },
       {
         tile_id: 1,
         title: MOCK_ASSIGNMENTS.find((ass) => ass.id === 13)!.title,
-        weight: 1,
+        weight: 0.125,
         content_id: 13,
       },
       {
         tile_id: 1,
         title: MOCK_ASSIGNMENTS.find((ass) => ass.id === 14)!.title,
-        weight: 1,
+        weight: 0.125,
         content_id: 14,
       },
       {
         tile_id: 1,
         title: MOCK_ASSIGNMENTS.find((ass) => ass.id === 15)!.title,
-        weight: 1,
+        weight: 0.125,
         content_id: 15,
       },
       {
         tile_id: 1,
         title: MOCK_ASSIGNMENTS.find((ass) => ass.id === 16)!.title,
-        weight: 1,
+        weight: 0.125,
         content_id: 16,
       },
       {
         tile_id: 1,
         title: MOCK_ASSIGNMENTS.find((ass) => ass.id === 17)!.title,
-        weight: 1,
+        weight: 0.125,
         content_id: 17,
       },
       {
         tile_id: 1,
         title: MOCK_ASSIGNMENTS.find((ass) => ass.id === 18)!.title,
-        weight: 1,
+        weight: 0.125,
         content_id: 18,
       },
       {
         tile_id: 1,
         title: MOCK_ASSIGNMENTS.find((ass) => ass.id === 19)!.title,
-        weight: 1,
+        weight: 0.125,
         content_id: 19,
       },
     ],
@@ -232,7 +234,7 @@ const MOCK_TILES: Tile[] = [
     group_id: 2,
     title: "Exam Grades",
     position: 1,
-    weight: 9,
+    weight: 0.8,
     type: TileType.assignments,
     visible: true,
     notifications: true,
@@ -241,25 +243,25 @@ const MOCK_TILES: Tile[] = [
       {
         tile_id: 1,
         title: MOCK_ASSIGNMENTS.find((top) => top.id === 5)!.title,
-        weight: 1,
+        weight: 0.25,
         content_id: 5,
       },
       {
         tile_id: 1,
         title: MOCK_ASSIGNMENTS.find((top) => top.id === 6)!.title,
-        weight: 1,
+        weight: 0.25,
         content_id: 6,
       },
       {
         tile_id: 1,
         title: MOCK_ASSIGNMENTS.find((top) => top.id === 7)!.title,
-        weight: 1,
+        weight: 0.25,
         content_id: 7,
       },
       {
         tile_id: 1,
         title: MOCK_ASSIGNMENTS.find((top) => top.id === 8)!.title,
-        weight: 1,
+        weight: 0.25,
         content_id: 8,
       },
     ],
@@ -290,19 +292,19 @@ const MOCK_TILES: Tile[] = [
       {
         tile_id: 7,
         title: MOCK_TOPICS.find((top) => top.id === 1)!.title,
-        weight: -1,
+        weight: 0.333,
         content_id: 1,
       },
       {
         tile_id: 7,
         title: MOCK_TOPICS.find((top) => top.id === 2)!.title,
-        weight: -1,
+        weight: 0.333,
         content_id: 2,
       },
       {
         tile_id: 7,
         title: MOCK_TOPICS.find((top) => top.id === 3)!.title,
-        weight: -1,
+        weight: 0.333,
         content_id: 3,
       },
     ],
@@ -321,7 +323,7 @@ const MOCK_TILES: Tile[] = [
       {
         tile_id: 7,
         title: MOCK_GOALS.find((goal) => goal.id === 1)!.title,
-        weight: -1,
+        weight: 1,
         content_id: 1,
       },
     ],

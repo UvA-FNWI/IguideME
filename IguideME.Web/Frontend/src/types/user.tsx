@@ -17,6 +17,6 @@ export interface UserSettings {
   goal_grade: number;
   predicted_grade: number;
   total_grade: number;
-  consent: number;
-  notifications: number;
+  consent: boolean;
+  notifications: boolean;
 }

@@ -11,7 +11,7 @@ export const courseSettingsHandlers = [
     return new HttpResponse(null, { status: 200 });
   }),
   http.get("/app/notifications", () => {
-    let date = new Date();
+    const date = new Date();
     return HttpResponse.json([
       `${date.getFullYear()}/${date.getMonth()}/${date.getDate() + 1}`,
     ]);

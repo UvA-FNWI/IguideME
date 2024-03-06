@@ -56,17 +56,20 @@
     display: inline-block;
   }
 
-  .adminButton {
+  .headerButton {
     display: flex;
     align-content: center;
     flex-direction: column;
     justify-content: center;
     height: 38px;
-    width: 120px;
-    padding: 6px;
-    border-radius: 5px;
     border: 1px solid white;
     vertical-align: middle;
+  }
+
+  .adminButton {
+    border-radius: 5px;
+    width: 120px;
+    padding: 6px;
   }
 }
 

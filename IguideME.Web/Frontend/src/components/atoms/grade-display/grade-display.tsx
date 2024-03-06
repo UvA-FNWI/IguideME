@@ -18,12 +18,7 @@ interface displayProps {
 }
 
 const GradeDisplay: FC<displayProps> = ({ self }): ReactElement => {
-  const viewType = useContext(tileViewContext);
-
-  // const { data: settings } = useQuery(
-  //   "student settings",
-  //   async () => await getStudentSettings(userID),
-  // );
+  const context = useContext(tileViewContext);
 
   if (self.settings === undefined) {
     return <Loading />;
@@ -33,7 +28,7 @@ const GradeDisplay: FC<displayProps> = ({ self }): ReactElement => {
   const total = self.settings.total_grade;
   const pred = self.settings.predicted_grade;
 
-  switch (viewType) {
+  switch (context.viewType) {
     case "grid":
       return <GridGrades goal={goal} total={total} pred={pred} />;
     case "graph":

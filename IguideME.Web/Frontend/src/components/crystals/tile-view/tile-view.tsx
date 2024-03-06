@@ -10,25 +10,22 @@ import PeerComparison from "@/components/particles/peer-comparison/peercompariso
 import { getTileGrades } from "@/api/tiles";
 import { useQuery } from "react-query";
 import Loading from "@/components/particles/loading";
-import { getSelf } from "@/api/users";
 
 interface Props {
   tile: Tile;
 }
 
 const ViewTile: FC<Props> = ({ tile }): ReactElement => {
-  const viewType = useContext(tileViewContext);
-  const { data: self } = useQuery("self", getSelf);
+  const context = useContext(tileViewContext);
   const { data: grades } = useQuery(
-    "tiles grades" + tile.id,
+    `tiles grades/${context.user.userID}/${tile.id}`,
     async () =>
-      await getTileGrades(self !== undefined ? self.userID : "-1", tile.id),
+      await getTileGrades(
+        context.user !== undefined ? context.user.userID : "-1",
+        tile.id,
+      ),
   );
 
-  // const grade = Math.random() * 100;
-  // const peerAvg = Math.random() * 100;
-  // const peerMin = peerAvg / 2;
-  // const peerMax = (100 + peerAvg) / 2;
   const max = 100;
 
   return (
@@ -54,7 +51,7 @@ const ViewTile: FC<Props> = ({ tile }): ReactElement => {
       return <Loading />;
     }
 
-    switch (viewType) {
+    switch (context.viewType) {
       case "graph":
         return (
           <Row justify={"center"} align={"middle"} style={{ height: "80%" }}>

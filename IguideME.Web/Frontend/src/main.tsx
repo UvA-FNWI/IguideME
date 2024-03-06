@@ -22,7 +22,7 @@ import NotificationCentre from "@/components/pages/admin/notificationcentre/noti
 
 // /----------------------------- Misc. ------------------------------/
 import App from "./App.tsx";
-import setup from "@/api/setup.tsx";
+import setup from "@/api/setup.ts";
 
 // Loads the base style sheet for the app.
 import "./base.scss";
