@@ -60,6 +60,15 @@ export const getTileGrades: (
     .get(`tiles/${tileID}/grades/${userID}`)
     .then((response) => response.data);
 
+export const getAllTileGrades: () => Promise<
+  Array<{
+    id: string;
+    goal: number;
+    tile_grades: TileGrades[];
+  }>
+> = async () =>
+  await apiClient.get(`tiles/grades/`).then((response) => response.data);
+
 export const postTile: (tile: Tile) => Promise<void> = async (tile: Tile) => {
   await apiClient.post(`tiles/${tile.id}`, tile);
 };

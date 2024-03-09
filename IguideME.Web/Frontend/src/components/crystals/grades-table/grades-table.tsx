@@ -6,8 +6,16 @@ import Loading from "@/components/particles/loading";
 import { type User } from "@/types/user";
 import { type ColumnsType } from "antd/lib/table";
 import { CheckCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
+import { getAllTileGrades, getTiles } from "@/api/tiles";
 
 const GradesTable: FC = (): ReactElement => {
+  // In principe zijn deze 2 routes voor nu genoeg denk ik
+  const { data: tiles } = useQuery("tiles", getTiles);
+  const { data: tileGrades } = useQuery("tilegrades", getAllTileGrades);
+  console.log("tiles", tiles);
+  console.log("tile_grades", tileGrades);
+
+  // Deze hieronder laat ik staan zodat de voorbeeld tabel werkt, maar zal uiteindelijk niet nodig zijn vgm
   const { data: students } = useQuery("students", getStudents);
 
   if (students === undefined) {
