@@ -1,6 +1,9 @@
 // /------------------------- Module imports -------------------------/
-import { useQuery } from "react-query";
-import { Button, Col, ConfigProvider, Row, Select, Space } from "antd";
+import NotificationPanel from '@/components/atoms/notification-panel/notification-panel';
+import { Button, Col, ConfigProvider, Row, Select, Space } from 'antd';
+import { getSelf, getStudents } from '@/api/users';
+import { useQuery } from 'react-query';
+import './style.scss';
 import { type NavigateFunction, useNavigate } from "react-router-dom";
 import {
   type Dispatch,
@@ -12,10 +15,7 @@ import {
 
 // /-------------------------- Own imports ---------------------------/
 import { type User, UserRoles } from "@/types/user";
-import { getSelf, getStudents } from "@/api/users";
 
-import "./style.scss";
-import NotificationPanel from "@/components/atoms/notification-panel/notification-panel";
 
 /**
  * Helper function for the student selector component.
@@ -30,7 +30,9 @@ const selector = (
   setCurrentUser: Dispatch<SetStateAction<User | undefined>>,
   navigate: NavigateFunction,
 ): ReactElement => {
+
   const { data } = useQuery("students", getStudents, { enabled: isAdmin });
+
   const students = data
     ?.sort((a, b) => a.sortable_name.localeCompare(b.sortable_name))
     .filter((student) => student.userID !== currentUser?.userID);
