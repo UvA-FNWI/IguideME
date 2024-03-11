@@ -1,21 +1,14 @@
 // /------------------------- Module imports -------------------------/
-import NotificationPanel from '@/components/atoms/notification-panel/notification-panel';
-import { Button, Col, ConfigProvider, Row, Select, Space } from 'antd';
-import { getSelf, getStudents } from '@/api/users';
 import { useQuery } from 'react-query';
-import './style.scss';
-import { type NavigateFunction, useNavigate } from "react-router-dom";
-import {
-  type Dispatch,
-  type FC,
-  type ReactElement,
-  type SetStateAction,
-  useState,
-} from "react";
+import { Button, Col, ConfigProvider, Row, Select, Space } from 'antd';
+import { type NavigateFunction, useNavigate } from 'react-router-dom';
+import { type Dispatch, type FC, type ReactElement, type SetStateAction, useState } from 'react';
 
 // /-------------------------- Own imports ---------------------------/
-import { type User, UserRoles } from "@/types/user";
+import { type User, UserRoles } from '@/types/user';
+import { getSelf, getStudents } from '@/api/users';
 
+import NotificationPanel from '@/components/atoms/notification-panel/notification-panel';
 
 /**
  * Helper function for the student selector component.
@@ -30,16 +23,14 @@ const selector = (
   setCurrentUser: Dispatch<SetStateAction<User | undefined>>,
   navigate: NavigateFunction,
 ): ReactElement => {
-
-  const { data } = useQuery("students", getStudents, { enabled: isAdmin });
-
+  const { data } = useQuery('students', getStudents, { enabled: isAdmin });
   const students = data
     ?.sort((a, b) => a.sortable_name.localeCompare(b.sortable_name))
     .filter((student) => student.userID !== currentUser?.userID);
 
   const changeStudent = (userID: string): void => {
     setCurrentUser(students?.find((student) => student.userID === userID));
-    navigate(userID ?? "/");
+    navigate(userID ?? '/');
   };
 
   // Don't show the selector to students.
@@ -53,17 +44,17 @@ const selector = (
         token: {
           controlOutlineWidth: 0,
           controlHeight: 38,
-          colorText: "white",
-          colorBorder: "white",
-          colorTextSecondary: "white",
-          colorTextQuaternary: "white",
-          colorBgBase: "rgb(90, 50, 255)",
+          colorText: 'white',
+          colorBorder: 'white',
+          colorTextSecondary: 'white',
+          colorTextQuaternary: 'white',
+          colorBgBase: 'rgb(90, 50, 255)',
           motion: false,
         },
       }}
     >
       <Select
-        placeholder={"Choose a student"}
+        placeholder={'Choose a student'}
         value={currentUser?.name}
         onChange={changeStudent}
         showSearch={true}
@@ -73,7 +64,7 @@ const selector = (
           value: student.userID,
         }))}
         allowClear={true}
-        style={{ width: "40vw", maxWidth: "400px" }}
+        className="w-[40vw] max-w-[400px] [&>div]:!bg-indigo-600"
       />
     </ConfigProvider>
   );
@@ -88,14 +79,14 @@ const Header: FC = (): ReactElement => {
   const navigate = useNavigate();
 
   // Get the current user from the backend and updates the route if the user is a student.
-  const { data: self } = useQuery("self", getSelf, {
+  const { data: self } = useQuery('self', getSelf, {
     onSuccess: (data) => {
       if (data === null) {
         // navigate(errorpage) TODO:
         return;
       }
       if (data.role === UserRoles.student) {
-        navigate(data.userID ?? "/");
+        navigate(data.userID ?? '/');
       }
     },
   });
@@ -109,7 +100,7 @@ const Header: FC = (): ReactElement => {
   const goHome = (): void => {
     setCurrentUser(undefined);
     setInHome(true);
-    navigate("/");
+    navigate('/');
   };
 
   const toggleAdmin = (path: string): void => {
@@ -118,62 +109,43 @@ const Header: FC = (): ReactElement => {
   };
 
   return (
-    <div className="Header">
-      <Row
-        justify={"space-between"}
-        align="middle"
-        style={{
-          padding: "0 20px",
-        }}
-      >
+    <header className="bg-indigo-600 table w-full align-middle font-header text-white">
+      <Row align="middle" className="h-header px-4" justify="space-between">
         <Col>
-          <div className="homebutton">
-            <Button type="link" onClick={goHome}>
-              <h1>IguideME</h1>
-            </Button>
-          </div>
+          <Button className="p-0 m-0" onClick={goHome} type="link">
+            <h1 className="text-white align-middle font-semibold inline-block text-2xl">IguideME</h1>
+          </Button>
         </Col>
-        <Col>
-          {selector(isAdmin && inHome, currentUser, setCurrentUser, navigate)}
-        </Col>
+        <Col>{selector(isAdmin && inHome, currentUser, setCurrentUser, navigate)}</Col>
         <Col>
           <Space>
-            <div style={{ minWidth: "30px" }}>
+            <div className="min-w-[30px]">
               <NotificationPanel user={currentUser} />
             </div>
-            <div style={{ minWidth: "100px" }}>
+            <div className="min-w-[100px]">
               {isAdmin && (
                 <Button
-                  className="headerButton adminButton"
+                  className="flex flex-col justify-center items-center h-10 border border-solid border-white align-middle rounded-md w-32 p-2 text-white"
                   type="link"
                   onClick={() => {
-                    inHome ? toggleAdmin("/admin") : goHome();
+                    inHome ? toggleAdmin('/admin') : goHome();
                   }}
                 >
-                  <h3>{inHome ? "Admin Panel" : "Home"}</h3>
+                  <h3>{inHome ? 'Admin Panel' : 'Home'}</h3>
                 </Button>
               )}
             </div>
           </Space>
         </Col>
       </Row>
-      {import.meta.env.MODE === "mock" && (
+      {import.meta.env.MODE === 'mock' && (
         <Row>
-          <div
-            style={{
-              width: "100%",
-              padding: 10,
-              backgroundColor: "#ff6e5a",
-              textAlign: "center",
-              fontFamily: "Maitree,serif",
-            }}
-          >
-            Application is running in <strong>demo</strong> mode. Changes will
-            not be saved!
+          <div className="w-full p-2 bg-orange-500 text-center font-header">
+            Application is running in <strong>demo</strong> mode. Changes will not be saved!
           </div>
         </Row>
-      )}{" "}
-    </div>
+      )}{' '}
+    </header>
   );
 };
 

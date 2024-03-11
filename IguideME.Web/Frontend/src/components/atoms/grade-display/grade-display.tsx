@@ -3,10 +3,7 @@ import { useContext, type FC, type ReactElement } from "react";
 import { FrownTwoTone, MehTwoTone, SmileTwoTone } from "@ant-design/icons";
 import { tileViewContext } from "@/components/pages/student-dashboard/context";
 
-import "./style.scss";
 import { Bar, type BarConfig } from "@ant-design/charts";
-// import { getStudentSettings } from "@/api/users";
-// import { useQuery } from "react-query";
 import Loading from "@/components/particles/loading";
 import { type User } from "@/types/user";
 
@@ -47,28 +44,31 @@ const GridGrades: FC<Props> = ({ goal, total, pred }): ReactElement => {
   const meh = <MehTwoTone size={10} twoToneColor="rgb(245, 226, 54)" />;
   const unhappy = <FrownTwoTone size={10} twoToneColor={"rgb(255, 110, 90)"} />;
   return (
-    <Space size="large" style={{ justifyContent: "center", width: "100%" }}>
-      <div className="gradeView">
-        <p>Goal</p>
-        <h2>
+    <Space
+      className='justify-center w-full'
+      size="large"
+    >
+      <div className="text-center">
+        <p className='m-0'>Goal</p>
+        <h2 className='font-gradeDisplay'>
           <Space>
             {goal >= 7 ? happy : goal >= 5.5 ? meh : unhappy}
             {goal}
           </Space>
         </h2>
       </div>
-      <div className="gradeView">
-        <p>Current</p>
-        <h2>
+      <div className="text-center">
+        <p className='m-0'>Current</p>
+        <h2 className='font-gradeDisplay'>
           <Space>
             {total > goal ? happy : total >= 5.5 ? meh : unhappy}
             {total}
           </Space>
         </h2>
       </div>
-      <div className="gradeView">
-        <p>Predicted</p>
-        <h2>
+      <div className="text-center">
+        <p className='m-0'>Predicted</p>
+        <h2 className='font-gradeDisplay'>
           <Space>
             {pred > goal ? happy : pred >= 5.5 ? meh : unhappy}
             {pred}
@@ -139,7 +139,7 @@ const GraphGrades: FC<Props> = ({ goal, total: avg, pred }): ReactElement => {
     ],
   };
   return (
-    <div style={{ height: "50px", width: "100% " }}>
+    <div className='h-[50px] w-full'>
       <Bar {...config} marginTop={20} marginBottom={30} />
     </div>
   );

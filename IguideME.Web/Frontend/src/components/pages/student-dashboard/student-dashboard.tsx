@@ -1,19 +1,19 @@
-import { getSelf, getStudent } from "@/api/users";
-import GradeDisplay from "@/components/atoms/grade-display/grade-display";
-import StudentInfo from "@/components/atoms/student-info/student-info";
-import ViewLayout from "@/components/crystals/layout-view/layout-view";
-import { type User, UserRoles } from "@/types/user";
-import { AppstoreOutlined, BarChartOutlined } from "@ant-design/icons";
-import { Col, Radio, Row } from "antd";
-import { useState, type FC, type ReactElement } from "react";
-import { useQuery } from "react-query";
-import { useParams } from "react-router-dom";
-import { tileViewContext, type viewType } from "./context";
+import { getSelf, getStudent } from '@/api/users';
+import GradeDisplay from '@/components/atoms/grade-display/grade-display';
+import StudentInfo from '@/components/atoms/student-info/student-info';
+import ViewLayout from '@/components/crystals/layout-view/layout-view';
+import { type User, UserRoles } from '@/types/user';
+import { AppstoreOutlined, BarChartOutlined } from '@ant-design/icons';
+import { Col, Radio, Row } from 'antd';
+import { useState, type FC, type ReactElement } from 'react';
+import { useQuery } from 'react-query';
+import { useParams } from 'react-router-dom';
+import { tileViewContext, type viewType } from './context';
 
 const StudentDashboard: FC = (): ReactElement => {
   const { id } = useParams();
 
-  const { data: self } = useQuery("self", getSelf);
+  const { data: self } = useQuery('self', getSelf);
 
   if (self?.role === UserRoles.student) {
     return <Dashboard self={self} />;
@@ -21,10 +21,7 @@ const StudentDashboard: FC = (): ReactElement => {
 
   if (id === undefined) return <>Something went wrong, could not load user</>;
 
-  const { data: student } = useQuery(
-    "student" + id,
-    async () => await getStudent(id),
-  );
+  const { data: student } = useQuery('student' + id, async () => await getStudent(id));
 
   if (student !== undefined) {
     return <Dashboard self={student} />;
@@ -38,7 +35,7 @@ interface Props {
 }
 
 const Dashboard: FC<Props> = ({ self }): ReactElement => {
-  const [viewType, setViewType] = useState<viewType>("graph");
+  const [viewType, setViewType] = useState<viewType>('graph');
   const context = {
     user: self,
     viewType,
@@ -46,7 +43,7 @@ const Dashboard: FC<Props> = ({ self }): ReactElement => {
 
   return (
     <tileViewContext.Provider value={context}>
-      <Row justify="space-between" align="top" style={{ padding: 12 }}>
+      <Row justify="space-between" align="top" className="p-3">
         <Col>
           <StudentInfo self={self} />
         </Col>

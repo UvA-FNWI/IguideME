@@ -7,7 +7,6 @@ import { CSS } from '@dnd-kit/utilities';
 
 import { getTileGroups } from '@/api/tiles';
 
-import './style.scss';
 import { type LayoutColumn } from '@/types/tile';
 
 const MIN_WIDTH = 1;
@@ -58,11 +57,26 @@ const ConfigLayoutColumn: FC<Props> = ({ column, remove, parentOnChange }): Reac
 	};
 
 	if (isDragging) {
-		return <div ref={setNodeRef} style={style} className="LayoutColumn"></div>;
+		return (
+      <div
+        className="rounded-md w-[425px] h-[360px] p-3 m-2 bg-white shadow-statusCard"
+        ref={setNodeRef}
+        style={style}
+      />
+    );
 	}
 	return (
-		<div className="LayoutColumn" ref={setNodeRef} style={style}>
-			<Row justify={'space-between'} {...attributes} {...listeners} style={{ cursor: 'grab' }}>
+		<div
+      className="rounded-md w-[425px] h-[360px] p-3 m-2 bg-white shadow-statusCard"
+      ref={setNodeRef}
+      style={style}
+    >
+			<Row
+        className='cursor-grab'
+        justify={'space-between'}
+        {...attributes}
+        {...listeners}
+      >
 				<Col>
 					<h3>Column</h3>
 				</Col>
@@ -71,7 +85,7 @@ const ConfigLayoutColumn: FC<Props> = ({ column, remove, parentOnChange }): Reac
 				</Col>
 			</Row>
 
-			<Divider style={{ margin: '10px', marginLeft: 0 }} />
+			<Divider className='my-[10px] mr-[10px]' />
 
 			<Row align="middle" justify="space-between">
 				<Col span={3}>
@@ -101,13 +115,13 @@ const ConfigLayoutColumn: FC<Props> = ({ column, remove, parentOnChange }): Reac
 							onChange();
 						}}
 						formatter={formatter}
-						style={{ width: '90%' }}
+            className='w-[90%]'
 					/>
 				</Col>
 			</Row>
 
-			<Divider style={{ margin: '10px', marginLeft: 0 }} />
-			<div style={{ marginBottom: '10px' }}>Tile Groups:</div>
+			<Divider className='my-[10px] mr-[10px]' />
+			<div className='mb-[10px]'>Tile Groups:</div>
 
 			<Row justify="center">
 				<Transfer

@@ -2,27 +2,40 @@
   "compilerOptions": {
     "target": "ES2020",
     "useDefineForClassFields": true,
-    "lib": ["ES2020", "DOM", "ESNext.Array", "DOM.Iterable"],
+    "lib": [
+      "ES2020",
+      "DOM",
+      "ESNext.Array",
+      "DOM.Iterable"
+    ],
     "module": "ESNext",
     "skipLibCheck": true,
-
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-
     "baseUrl": "./",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": [
+        "./src/*"
+      ]
     }
   },
-  "include": ["./src", "./.eslintrc.cjs"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "include": [
+    "./src",
+    "./.eslintrc.cjs",
+    "./tailwind.config.ts",
+    "./postcss.config.cjs",
+  ],
+  "references": [
+    {
+      "path": "./tsconfig.node.json"
+    }
+  ]
 }

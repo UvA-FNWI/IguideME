@@ -3,12 +3,13 @@ import { type FC, type ReactElement } from 'react';
 
 const Loading: FC = (): ReactElement => {
 	return (
-		// <div style={{ display: 'flex', justifyContent: 'center' }}>
-		<div>
-			<Spin tip="Loading" size="large" style={{ marginLeft: 'auto', marginRight: 'auto', height: 80 }}>
-				<div className="content" />
-			</Spin>
-		</div>
+    <Spin
+      className='mx-auto h-20'
+      size="large"
+      tip="Loading"
+    >
+      <></>
+    </Spin>
 	);
 };
 

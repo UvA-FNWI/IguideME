@@ -18,8 +18,6 @@ import {
 import { ConfigProvider, Layout, Menu, type MenuProps } from "antd";
 import { Link, Outlet } from "react-router-dom";
 
-import "./style.scss";
-
 const { Content, Sider } = Layout;
 
 type MenuItem = Required<MenuProps>["items"][number];
@@ -98,7 +96,7 @@ const AdminPanel: FC = (): ReactElement => {
         },
       }}
     >
-      <Layout style={{ minHeight: "90vh" }}>
+      <Layout className='min-h-[90dvh]'>
         <Sider
           breakpoint="lg"
           trigger={null}
@@ -108,9 +106,9 @@ const AdminPanel: FC = (): ReactElement => {
           onCollapse={(value) => {
             setCollapsed(value);
           }}
-          style={{ background: "white" }}
+          className="bg-white"
         >
-          <div id={"user"}>
+          <div className='flex content-center flex-col justify-center font-maitree p-4 border-b border-solid border-b-gray-200 h-header'>
             {!collapsed ? (
               <>
                 <div>
@@ -129,14 +127,7 @@ const AdminPanel: FC = (): ReactElement => {
           <Menu defaultSelectedKeys={["1"]} mode="inline" items={items} />
         </Sider>
         <Content
-          className="adminContent"
-          // Classname and position: relative here are necessary for the drawer to be positioned correctly in tiles
-          style={{
-            position: "relative",
-            backgroundColor: "#f6f8fa",
-            padding: "20px",
-            fontFamily: "Maitree, serif",
-          }}
+          className='relative bg-slate-50 p-5 font-maitree'
         >
           <Outlet />
         </Content>

@@ -6,15 +6,15 @@ import LayoutConfigurator from '@/components/crystals/layout-configurator/layout
 // import { Divider } from 'antd';
 
 const EditLayout: FC = (): ReactElement => {
-	return (
-		<div>
-			<AdminTitle title="Layout" description="Configure the layout of the student dashboard." />
-			<LayoutConfigurator />
+  return (
+    <div>
+      <AdminTitle title="Layout" description="Configure the layout of the student dashboard." />
+      <LayoutConfigurator />
 
-			{/* <Divider style={{ margin: '10px' }} />
+      {/* <Divider style={{ margin: '10px' }} />
         <LayoutVisualizer /> */}
-		</div>
-	);
+    </div>
+  );
 };
 
 export default EditLayout;

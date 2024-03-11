@@ -1,7 +1,6 @@
 import { pollSync } from '@/api/syncing';
 import { type FC, type ReactElement } from 'react';
 import { useQuery } from 'react-query';
-import './style.scss';
 import { Col, Row } from 'antd';
 import { JobStatus, SyncStateNames, SyncStates } from '@/types/synchronization';
 import StatusCard from '@/components/particles/status-card/status-card';
@@ -22,7 +21,7 @@ const SyncProgressGrid: FC = (): ReactElement => {
 	}
 
 	return (
-		<div className="SyncProgressGrid">
+		<div className="w-full h-full p-[10px] rounded-lg shadow-statusCard">
 			<Row gutter={[10, 10]}>
 				{Object.values(SyncStateNames).map((name: string) => {
 					const stateType = SyncStates.get(name);

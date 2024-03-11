@@ -11,9 +11,9 @@ const { Item } = Form;
 const EditTileGoals: FC = (): ReactElement => {
   const { data: goals } = useQuery("learning-goals", getLearningGoals);
   return (
-    <Row style={{ marginTop: "1em" }}>
+    <Row className='mt-3'>
       <p>Goals:</p>
-      <Item name="entries" style={{ width: "100%" }}>
+      <Item name="entries" className="w-full">
         {goals === undefined ? <Loading /> : <SelectGoals goals={goals} />}
       </Item>
     </Row>

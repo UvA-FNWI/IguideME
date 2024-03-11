@@ -9,10 +9,10 @@ import { type ReactElement } from 'react';
  */
 function App(): ReactElement {
 	return (
-		<div className="App">
+		<>
 			<Header />
 			<Outlet />
-		</div>
+		</>
 	);
 }
 

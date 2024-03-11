@@ -10,26 +10,34 @@ const PeerComparison: FC<Grades> = ({
   type,
 }): ReactElement => {
   return (
-    <div style={{ color: "#7c7c7c" }}>
-      <Row justify={"center"} align={"middle"} style={{ paddingTop: 4 }}>
+    <div className='text-neutral-500'>
+      <Row
+        align="middle"
+        className='pt-1'
+        justify="center"
+      >
         <Col>
-          <span style={{ fontSize: 12, fontWeight: 450 }}>Peer Comparison</span>
+          <span
+            className='text-xs font-normal'>Peer Comparison</span>
         </Col>
       </Row>
-      <Row justify={"space-around"} align={"middle"}>
-        <Col style={{ textAlign: "center" }}>
+      <Row
+        align="middle"
+        justify="space-around"
+      >
+        <Col className="text-center">
           <div>
             <small>min.</small>
           </div>
           <small>{printGrade(type, peerMin, max, false)}</small>
         </Col>
-        <Col style={{ textAlign: "center" }}>
+        <Col className="text-center">
           <div>
             <small>avg.</small>
           </div>
           <small>{printGrade(type, peerAvg, max, false)}</small>
         </Col>
-        <Col style={{ textAlign: "center" }}>
+        <Col className="text-center">
           <div>
             <small>max.</small>
           </div>

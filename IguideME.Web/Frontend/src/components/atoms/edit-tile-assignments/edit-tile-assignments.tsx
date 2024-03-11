@@ -22,9 +22,9 @@ const EditTileAssignments: FC = (): ReactElement => {
   const { data: assignments } = useQuery("assignments", getAssignments);
   return (
     <>
-      <Row align="middle" style={{ height: "3em" }}>
+      <Row align="middle" className='h-10'>
         <Col span={4}>
-          <div style={{ height: "100%" }}>Grading:</div>
+          <div className='h-full'>Grading:</div>
         </Col>
         <Col span={8}>
           <Item name="gradingType" noStyle>
@@ -35,17 +35,17 @@ const EditTileAssignments: FC = (): ReactElement => {
                   value: val,
                   label: printGradingType(val),
                 }))}
-              style={{ width: "100%" }}
+              className="w-full"
             />
           </Item>
         </Col>
         <Col span={4} offset={1}>
-          <div style={{ height: "100%" }}>Weight:</div>
+          <div className='h-full'>Weight:</div>
         </Col>
         <Col span={7}>
           <Item name="weight" noStyle>
             <InputNumber<number>
-              style={{ width: "100%" }}
+              className="w-full"
               formatter={(value) => `${(value ?? 0) * 100}%`}
               parser={(value) =>
                 +parseFloat(value!.replace("%", "")).toFixed(1) / 100
@@ -54,9 +54,9 @@ const EditTileAssignments: FC = (): ReactElement => {
           </Item>
         </Col>
       </Row>
-      <Row style={{ marginTop: "1em" }}>
+      <Row className="h-5">
         <p>Assignments:</p>
-        <Item name="entries" style={{ width: "100%" }}>
+        <Item name="entries" className="w-full">
           {assignments === undefined ? (
             <Loading />
           ) : (

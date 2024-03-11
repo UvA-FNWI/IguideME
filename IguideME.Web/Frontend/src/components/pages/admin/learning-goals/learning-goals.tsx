@@ -7,30 +7,15 @@ import {
   patchLearningGoal,
   postGoalRequirement,
   postLearningGoal,
-} from "@/api/entries";
-import AdminTitle from "@/components/atoms/admin-titles/admin-titles";
-import {
-  LogicalExpression,
-  type LearningGoal,
-  type GoalRequirement,
-} from "@/types/tile";
-import { DeleteFilled, PlusOutlined } from "@ant-design/icons";
-import {
-  Button,
-  Col,
-  Divider,
-  Form,
-  Input,
-  InputNumber,
-  Row,
-  Select,
-  Space,
-} from "antd";
-import { useState, type FC, type ReactElement } from "react";
-import { useMutation, useQuery, useQueryClient } from "react-query";
+} from '@/api/entries';
+import AdminTitle from '@/components/atoms/admin-titles/admin-titles';
+import { LogicalExpression, type LearningGoal, type GoalRequirement } from '@/types/tile';
+import { DeleteFilled, PlusOutlined } from '@ant-design/icons';
+import { Button, Col, Divider, Form, Input, InputNumber, Row, Select, Space } from 'antd';
+import { useState, type FC, type ReactElement } from 'react';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
 
-import "./style.scss";
-import Loading from "@/components/particles/loading";
+import Loading from '@/components/particles/loading';
 
 const { Item } = Form;
 
@@ -42,34 +27,27 @@ interface ReqProps {
   requirement: GoalRequirement;
 }
 const LearningGoals: FC = (): ReactElement => {
-  const { data: goals } = useQuery("learning-goals", getLearningGoals);
+  const { data: goals } = useQuery('learning-goals', getLearningGoals);
 
   const queryClient = useQueryClient();
   const { mutate: postGoal } = useMutation({
     mutationFn: postLearningGoal,
     onSuccess: async () => {
-      await queryClient.invalidateQueries("learning-goals");
+      await queryClient.invalidateQueries('learning-goals');
     },
   });
 
   const addGoal = (): void => {
     postGoal({
       id: -1,
-      title: "New Goal",
+      title: 'New Goal',
       requirements: [],
     });
   };
   return (
     <div>
-      <AdminTitle
-        title="Learning Goals"
-        description="Configure the learning goals for the course."
-      />
-      {goals === undefined ? (
-        <Loading />
-      ) : (
-        goals.map((goal) => <ViewLearningGoal key={goal.id} goal={goal} />)
-      )}
+      <AdminTitle title="Learning Goals" description="Configure the learning goals for the course." />
+      {goals === undefined ? <Loading /> : goals.map((goal) => <ViewLearningGoal key={goal.id} goal={goal} />)}
       <Button type="dashed" onClick={addGoal} block icon={<PlusOutlined />}>
         Add Goal
       </Button>
@@ -85,20 +63,20 @@ const ViewLearningGoal: FC<GoalProps> = ({ goal }): ReactElement => {
   const { mutate: patchGoal } = useMutation({
     mutationFn: patchLearningGoal,
     onSuccess: async () => {
-      await queryClient.invalidateQueries("learning-goals");
+      await queryClient.invalidateQueries('learning-goals');
     },
   });
   const { mutate: removeGoal } = useMutation({
     mutationFn: deleteLearningGoal,
     onSuccess: async () => {
-      await queryClient.invalidateQueries("learning-goals");
+      await queryClient.invalidateQueries('learning-goals');
     },
   });
 
   const { mutate: postRequirement } = useMutation({
     mutationFn: postGoalRequirement,
     onSuccess: async () => {
-      await queryClient.invalidateQueries("learning-goals");
+      await queryClient.invalidateQueries('learning-goals');
     },
   });
 
@@ -113,14 +91,14 @@ const ViewLearningGoal: FC<GoalProps> = ({ goal }): ReactElement => {
   };
 
   return (
-    <div className="learningGoal">
+    <div className="font-tnum p-[10px] border border-dashed border-zinc-500 rounded-lg bg-white mb-[10px] min-h-[100px]">
       <Row align="middle" justify="space-between">
-        <Col style={{ cursor: "text" }}>
+        <Col className="cursor-text">
           <h2
             onClick={() => {
               setEditing(true);
             }}
-            style={{ padding: 5 }}
+            className="p-1 font-tnum text-lg"
           >
             {!editing
               ? goal.title
@@ -135,7 +113,7 @@ const ViewLearningGoal: FC<GoalProps> = ({ goal }): ReactElement => {
                       setTitle(e.target.value);
                     }}
                     onKeyDown={(e) => {
-                      if (e.key !== "Enter") return;
+                      if (e.key !== 'Enter') return;
                       patchGoal({ ...goal, title });
                       setEditing(false);
                     }}
@@ -148,25 +126,17 @@ const ViewLearningGoal: FC<GoalProps> = ({ goal }): ReactElement => {
             onClick={() => {
               removeGoal(goal.id);
             }}
-            style={{ padding: 5 }}
+            className="p-1"
           />
         </Col>
       </Row>
-      <Divider style={{ margin: "5px 0px 8px 0px" }} />
+      <Divider className="mt-1 mb-2" />
       <Row>
-        <Col style={{ width: "100%" }}>
+        <Col className="w-full">
           {goal.requirements.map((requirement) => (
-            <ViewGoalRequirement
-              key={requirement.id}
-              requirement={requirement}
-            />
+            <ViewGoalRequirement key={requirement.id} requirement={requirement} />
           ))}
-          <Button
-            type="dashed"
-            onClick={addRequirement}
-            block
-            icon={<PlusOutlined />}
-          >
+          <Button type="dashed" onClick={addRequirement} block icon={<PlusOutlined />}>
             Add Requirement
           </Button>
         </Col>
@@ -178,23 +148,23 @@ const ViewLearningGoal: FC<GoalProps> = ({ goal }): ReactElement => {
 const ViewGoalRequirement: FC<ReqProps> = ({ requirement }): ReactElement => {
   const queryClient = useQueryClient();
 
-  const { data: assignments } = useQuery("assignments", getAssignments);
+  const { data: assignments } = useQuery('assignments', getAssignments);
   const { mutate: saveRequirement } = useMutation({
     mutationFn: patchGoalRequirement,
     onSuccess: async () => {
-      await queryClient.invalidateQueries("learning-goals");
+      await queryClient.invalidateQueries('learning-goals');
     },
   });
 
   const { mutate: removeRequirement } = useMutation({
     mutationFn: deleteRequirement,
     onSuccess: async () => {
-      await queryClient.invalidateQueries("learning-goals");
+      await queryClient.invalidateQueries('learning-goals');
     },
   });
   console.log(assignments);
   return (
-    <div className="goalRequirement">
+    <div className="font-tnum w-full p-[10px] border border-solid border-zinc-500 rounded-lg mb-[10px]">
       <Form<GoalRequirement>
         name={`goal_requirement_form_${requirement.id}`}
         initialValues={requirement}
@@ -202,7 +172,7 @@ const ViewGoalRequirement: FC<ReqProps> = ({ requirement }): ReactElement => {
           saveRequirement(data);
         }}
         requiredMark={false}
-        style={{ width: "100%" }}
+        className="w-full"
       >
         <Row gutter={20}>
           <Item name="id" hidden>
@@ -214,7 +184,7 @@ const ViewGoalRequirement: FC<ReqProps> = ({ requirement }): ReactElement => {
           <Col span={6}>
             <Item name="assignment_id" noStyle>
               <Select
-                style={{ width: "100%" }}
+                className="w-full"
                 showSearch
                 optionFilterProp="label"
                 options={
@@ -231,31 +201,31 @@ const ViewGoalRequirement: FC<ReqProps> = ({ requirement }): ReactElement => {
           <Col span={2}>
             <Item name="expression" noStyle>
               <Select
-                style={{ width: "100%" }}
+                className="w-full"
                 options={[
                   {
                     value: LogicalExpression.Equal,
-                    label: "=",
+                    label: '=',
                   },
                   {
                     value: LogicalExpression.Greater,
-                    label: ">",
+                    label: '>',
                   },
                   {
                     value: LogicalExpression.GreaterEqual,
-                    label: "≥",
+                    label: '≥',
                   },
                   {
                     value: LogicalExpression.Less,
-                    label: "<",
+                    label: '<',
                   },
                   {
                     value: LogicalExpression.LessEqual,
-                    label: "≤",
+                    label: '≤',
                   },
                   {
                     value: LogicalExpression.NotEqual,
-                    label: "≠",
+                    label: '≠',
                   },
                 ]}
               />
@@ -269,7 +239,7 @@ const ViewGoalRequirement: FC<ReqProps> = ({ requirement }): ReactElement => {
           <Col offset={8} span={4}>
             <Space>
               <Item noStyle>
-                <Button type="primary" htmlType="submit">
+                <Button className="text-black" type="primary" htmlType="submit">
                   Save
                 </Button>
               </Item>

@@ -1,46 +1,34 @@
-import { useContext, type FC, type ReactElement } from "react";
-import { tileViewContext } from "@/components/pages/student-dashboard/context";
+import { useContext, type FC, type ReactElement } from 'react';
+import { tileViewContext } from '@/components/pages/student-dashboard/context';
 
-import "./style.scss";
-import GraphTile from "@/components/crystals/graph-tile/graph-tile.tsx";
-import GridTile from "@/components/crystals/grid-tile/grid-tile.tsx";
-import { TileType, type Tile, GradingType } from "@/types/tile";
-import { Col, Divider, Row } from "antd";
-import PeerComparison from "@/components/particles/peer-comparison/peercomparison";
-import { getTileGrades } from "@/api/tiles";
-import { useQuery } from "react-query";
-import Loading from "@/components/particles/loading";
+import GraphTile from '@/components/crystals/graph-tile/graph-tile.tsx';
+import GridTile from '@/components/crystals/grid-tile/grid-tile.tsx';
+import { TileType, type Tile, GradingType } from '@/types/tile';
+import { Col, Divider, Row } from 'antd';
+import PeerComparison from '@/components/particles/peer-comparison/peercomparison';
+import { getTileGrades } from '@/api/tiles';
+import { useQuery } from 'react-query';
+import Loading from '@/components/particles/loading';
+import { cn } from '@/utils/cn';
 
 interface Props {
   tile: Tile;
+  textStyle?: string;
 }
 
-const ViewTile: FC<Props> = ({ tile }): ReactElement => {
+const ViewTile: FC<Props> = ({ tile, textStyle }): ReactElement => {
   const context = useContext(tileViewContext);
   const { data: grades } = useQuery(
-    `tiles grades/${context.user.userID}/${tile.id}`,
-    async () =>
-      await getTileGrades(
-        context.user !== undefined ? context.user.userID : "-1",
-        tile.id,
-      ),
+    `tiles grades/${context.user!.userID}/${tile.id}`,
+    async () => await getTileGrades(context.user !== undefined ? context.user.userID : '-1', tile.id),
   );
 
   const max = 100;
 
   return (
-    <div className="tileView">
-      <Row justify={"center"} align={"middle"} style={{ height: "20%" }}>
-        <h3
-          style={{
-            fontSize: 18,
-            fontWeight: 1400,
-            fontFamily: '"Antic Slab", serif',
-            lineHeight: "normal",
-          }}
-        >
-          {tile.title}
-        </h3>
+    <div className="w-[270px] h-[230px] border border-solid border-gray-200 bg-white">
+      <Row justify={'center'} align={'middle'} className="h-1/5">
+        <h3 className={cn('text-lg font-bold font-tileView', textStyle)}>{tile.title}</h3>
       </Row>
       {renderViewType()}
     </div>
@@ -48,13 +36,17 @@ const ViewTile: FC<Props> = ({ tile }): ReactElement => {
 
   function renderViewType(): ReactElement {
     if (grades === undefined) {
-      return <Loading />;
+      return (
+        <div className="w-full h-1/2 grid items-center">
+          <Loading />
+        </div>
+      );
     }
 
     switch (context.viewType) {
-      case "graph":
+      case 'graph':
         return (
-          <Row justify={"center"} align={"middle"} style={{ height: "80%" }}>
+          <Row justify={'center'} align={'middle'} className="h-4/5">
             <GraphTile
               type={tile.type}
               grades={{
@@ -68,10 +60,10 @@ const ViewTile: FC<Props> = ({ tile }): ReactElement => {
             />
           </Row>
         );
-      case "grid":
+      case 'grid':
         return (
           <>
-            <Row justify={"center"} align={"middle"} style={{ height: "50%" }}>
+            <Row justify={'center'} align={'middle'} className="h-1/2">
               <GridTile
                 type={tile.type}
                 grades={{
@@ -84,9 +76,9 @@ const ViewTile: FC<Props> = ({ tile }): ReactElement => {
                 }}
               />
             </Row>
-            <Row justify={"center"} align={"top"} style={{ height: "30%" }}>
-              <Col style={{ width: "100%" }}>
-                <Divider style={{ margin: 0, padding: 0 }} />
+            <Row justify={'center'} align={'top'} className="h-[30%]">
+              <Col className="h-full">
+                <Divider className="m-0 p-0" />
                 <PeerComparison
                   {...{
                     grade: grades.grade,
@@ -94,13 +86,10 @@ const ViewTile: FC<Props> = ({ tile }): ReactElement => {
                     peerMin: grades.peerMin,
                     peerMax: grades.peerMax,
                     max,
-                    type:
-                      tile.type === TileType.assignments
-                        ? tile.gradingType
-                        : GradingType.NotGraded,
+                    type: tile.type === TileType.assignments ? tile.gradingType : GradingType.NotGraded,
                   }}
                 />
-              </Col>{" "}
+              </Col>{' '}
             </Row>
           </>
         );

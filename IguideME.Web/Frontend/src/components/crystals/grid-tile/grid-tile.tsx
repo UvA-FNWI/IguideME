@@ -1,18 +1,13 @@
-import { TileType, type Grades, printGrade } from "@/types/tile";
-import {
-  LikeTwoTone,
-  MessageFilled,
-  MessageOutlined,
-  TrophyFilled,
-  TrophyOutlined,
-  WarningTwoTone,
-} from "@ant-design/icons";
-import { Space } from "antd";
-import { type FC, type ReactElement } from "react";
+import { TileType, type Grades, printGrade } from '@/types/tile';
+import { LikeTwoTone, MessageFilled, TrophyOutlined, WarningTwoTone } from '@ant-design/icons';
+import { Space } from 'antd';
+import { type FC, type ReactElement } from 'react';
+
 interface Props {
   type: TileType;
   grades: Grades;
 }
+
 const GridTile: FC<Props> = ({ type, grades }): ReactElement => {
   let inner = <></>;
   switch (type) {
@@ -26,7 +21,7 @@ const GridTile: FC<Props> = ({ type, grades }): ReactElement => {
       inner = <Learnings {...grades} />;
       break;
   }
-  return <div style={{ fontSize: 18 }}>{inner}</div>;
+  return <div className="text-lg">{inner}</div>;
 };
 
 const Assignments: FC<Grades> = ({ grade, max, type }): ReactElement => {
@@ -34,15 +29,9 @@ const Assignments: FC<Grades> = ({ grade, max, type }): ReactElement => {
     <Space align="end">
       <div>
         {grade > 50 ? (
-          <LikeTwoTone
-            twoToneColor={"rgb(0, 185, 120)"}
-            style={{ fontSize: 18 }}
-          />
+          <LikeTwoTone twoToneColor={'rgb(0, 185, 120)'} className="text-lg" />
         ) : (
-          <WarningTwoTone
-            twoToneColor={"rgb(255, 110, 90)"}
-            style={{ fontSize: 18 }}
-          />
+          <WarningTwoTone twoToneColor={'rgb(255, 110, 90)'} className="text-lg" />
         )}
       </div>
       {printGrade(type, grade, max)}

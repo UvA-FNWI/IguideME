@@ -1,11 +1,11 @@
-import { type Grades, TileType } from "@/types/tile";
-import { type FC, type ReactElement } from "react";
+import { type Grades, TileType } from '@/types/tile';
+import { type FC, type ReactElement } from 'react';
 
-import { Bullet, RadialBar } from "@ant-design/charts";
-import { Col, Row } from "antd";
+import { Bullet, RadialBar } from '@ant-design/charts';
+import { Col, Row } from 'antd';
 
-const BLUE = "rgba(90, 50, 255, .9)";
-const RED = "rgba(255, 50, 50, .8)";
+const BLUE = 'rgba(90, 50, 255, .9)';
+const RED = 'rgba(255, 50, 50, .8)';
 interface Props {
   type: TileType;
   grades: Grades;
@@ -20,30 +20,25 @@ const GraphTile: FC<Props> = ({ type, grades }): ReactElement => {
   }
 };
 
-const GraphGrade: FC<Grades> = ({
-  grade,
-  peerAvg,
-  peerMin,
-  peerMax,
-  max,
-}): ReactElement => {
-  const studentdata = [
+const GraphGrade: FC<Grades> = ({ grade, peerAvg, peerMin, peerMax, max }): ReactElement => {
+  const studentData = [
     {
-      title: "You",
+      title: 'You',
       Grade: grade,
       Max: max,
     },
   ];
-  const peerdata = [
+
+  const peerData = [
     {
-      title: "Peers",
-      "Peer avg": peerAvg,
+      title: 'Peers',
+      'Peer avg': peerAvg,
       ranges: [peerMin, peerMax, max],
     },
   ];
 
   const config = {
-    layout: "vertical",
+    layout: 'vertical',
     padding: 10,
     paddingBottom: 20,
     paddingTop: 0,
@@ -51,12 +46,12 @@ const GraphGrade: FC<Grades> = ({
       y: { label: false, tick: false, grid: false },
     },
     tooltip: {
-      title: "",
+      title: '',
       items: [
         {
-          channel: "y",
+          channel: 'y',
 
-          valueFormatter: ".2f",
+          valueFormatter: '.2f',
         },
       ],
     },
@@ -73,39 +68,39 @@ const GraphGrade: FC<Grades> = ({
     target: {
       sizeField: 30,
     },
-    legend: { color: { position: "bottom" } },
+    legend: { color: { position: 'bottom' } },
   };
 
   return (
-    <Row style={{ height: "100%" }}>
-      <Col span={12} style={{ height: "100%" }}>
+    <Row className="h-full">
+      <Col span={12} className="h-full">
         <Bullet
-          data={studentdata}
+          data={studentData}
           rangeField="Max"
           measureField="Grade"
           color={{
-            Max: ["#f6f8fa"],
+            Max: ['#f6f8fa'],
             Grade: BLUE,
           }}
           {...config}
         />
       </Col>
-      <Col span={12} style={{ height: "100%" }}>
+      <Col span={12} className="h-full">
         <Bullet
-          data={peerdata}
+          data={peerData}
           measureField="Peer avg"
           color={{
-            ranges: ["#f6f8fa", "rgba(255, 50, 50, .3)", "#f6f8fb"],
-            "Peer avg": RED,
+            ranges: ['#f6f8fa', 'rgba(255, 50, 50, .3)', '#f6f8fb'],
+            'Peer avg': RED,
           }}
           {...config}
           mapField={{
-            measures: "Peer avg",
-            ranges: ["Max", "Peer max", "Peer min"],
-            target: "",
+            measures: 'Peer avg',
+            ranges: ['Max', 'Peer max', 'Peer min'],
+            target: '',
           }}
         />
-      </Col>{" "}
+      </Col>{' '}
     </Row>
   );
 };
@@ -113,11 +108,11 @@ const GraphGrade: FC<Grades> = ({
 const GraphLearning: FC<Grades> = ({ grade, peerAvg, max }): ReactElement => {
   const data = [
     {
-      name: "You",
+      name: 'You',
       Grade: grade,
     },
     {
-      name: "Peer",
+      name: 'Peer',
       Grade: peerAvg,
     },
   ];
@@ -126,8 +121,9 @@ const GraphLearning: FC<Grades> = ({ grade, peerAvg, max }): ReactElement => {
     padding: 0,
     margin: 0,
     paddingBottom: 20,
-    xField: "name",
-    yField: "Grade",
+    xField: 'name',
+    yField: 'Grade',
+    startAngle: 0,
     maxAngle: 360,
     radius: 1.4,
     innerRadius: 0.3,
@@ -138,7 +134,7 @@ const GraphLearning: FC<Grades> = ({ grade, peerAvg, max }): ReactElement => {
     },
     style: {
       fill: (data: any) => {
-        if (data.name === "You") {
+        if (data.name === 'You') {
           return BLUE;
         }
         return RED;
@@ -147,20 +143,20 @@ const GraphLearning: FC<Grades> = ({ grade, peerAvg, max }): ReactElement => {
     axis: {
       y: { label: false, tick: false, grid: false },
     },
-    markBackground: { color: "color", opacity: 0.15 },
+    markBackground: { color: 'color', opacity: 0.15 },
     tooltip: {
-      title: "",
+      title: '',
       items: [
         {
-          name: "Completed",
-          field: "Grade",
-          valueFormatter: (d: number) => d.toFixed(0) + "/" + max,
+          name: 'Completed',
+          field: 'Grade',
+          valueFormatter: (d: number) => d.toFixed(0) + '/' + max,
         },
       ],
     },
   };
   return (
-    <div style={{ height: "100%", margin: 0 }}>
+    <div className="h-full">
       <RadialBar {...config} />
     </div>
   );

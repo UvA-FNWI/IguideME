@@ -1,31 +1,25 @@
-import { getGroupTiles } from "@/api/tiles";
-import { type TileGroup } from "@/types/tile";
-import { Row, Col } from "antd";
-import { type FC, type ReactElement } from "react";
-import { useQuery } from "react-query";
-import TileView from "../tile-view/tile-view";
-import "./syle.scss";
+import { getGroupTiles } from '@/api/tiles';
+import { type TileGroup } from '@/types/tile';
+import { Row, Col } from 'antd';
+import { type FC, type ReactElement } from 'react';
+import { useQuery } from 'react-query';
+import TileView from '../tile-view/tile-view';
+
 interface Props {
   group: TileGroup;
 }
+
 const ViewTileGroup: FC<Props> = ({ group }): ReactElement => {
-  const { data: tiles } = useQuery(
-    "tiles" + group.id,
-    async () => await getGroupTiles(group.id),
-  );
+  const { data: tiles } = useQuery('tiles' + group.id, async () => await getGroupTiles(group.id));
   return (
-    <div className="tileGroupView">
-      <div style={{ margin: 12 }}>
-        <h2>{group.title}</h2>
+    <div className="rounded-md bg-slate-50 border border-solid border-gray-200 min-h-[300px] h-full">
+      <div className="m-3">
+        <h2 className="text-center overflow-hidden text-ellipsis whitespace-nowrap">{group.title}</h2>
       </div>
-      <Row
-        justify="space-evenly"
-        gutter={[10, 78]}
-        style={{ marginTop: "10px", marginBottom: "10px" }}
-      >
+      <Row justify="space-evenly" gutter={[10, 78]} className="my-[10px]">
         {tiles?.map((tile) => (
           <Col key={tile.id}>
-            <TileView tile={tile} />
+            <TileView textStyle="text-center overflow-hidden text-ellipsis whitespace-nowrap" tile={tile} />
           </Col>
         ))}
       </Row>

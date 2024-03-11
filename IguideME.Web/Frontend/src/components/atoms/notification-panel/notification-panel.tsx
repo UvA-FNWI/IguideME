@@ -1,9 +1,9 @@
-import { type FC, type ReactElement } from "react";
-import { Popover, Button } from "antd";
-import { BellOutlined } from "@ant-design/icons";
-import { type User } from "@/types/user";
-import Notifications from "@/components/particles/notifications/notifications";
-import Loading from "@/components/particles/loading";
+import { type FC, type ReactElement } from 'react';
+import { Popover, Button } from 'antd';
+import { BellOutlined } from '@ant-design/icons';
+import { type User } from '@/types/user';
+import Notifications from '@/components/particles/notifications/notifications';
+import Loading from '@/components/particles/loading';
 
 interface Props {
   user: User | undefined;
@@ -13,20 +13,23 @@ const NotificationPanel: FC<Props> = ({ user }): ReactElement => {
     <div>
       <Popover
         content={
-          user !== undefined ? <Notifications user={user} /> : <Loading />
+          user !== undefined ? (
+            <Notifications user={user} />
+          ) : (
+            <div className="h-16 grid items-center">
+              <Loading />
+            </div>
+          )
         }
         title="Notifications"
         trigger="click"
         placement="leftTop"
       >
         <Button
-          className="headerButton"
+          className="flex flex-col justify-center items-center h-10 border border-solid border-white align-middle text-white rounded-3xl w-10 p-0"
           type="link"
-          style={{ borderRadius: 20, width: 38, padding: 0 }}
         >
-          <h2 style={{ fontSize: 19 }}>
-            <BellOutlined />{" "}
-          </h2>
+          <BellOutlined className="[&>svg]:w-4 [&>svg]:h-4" />
         </Button>
       </Popover>
     </div>

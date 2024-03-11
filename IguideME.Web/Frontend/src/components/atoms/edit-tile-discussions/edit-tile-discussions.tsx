@@ -12,9 +12,9 @@ const EditTileDiscussions: FC = (): ReactElement => {
 	const { data: topics } = useQuery('topics', getTopics);
 
 	return (
-		<Row style={{ marginTop: '1em' }}>
+		<Row className='mt-3'>
 			<p>Discussions:</p>
-			<Item name="entries" style={{ width: '100%' }}>
+			<Item name="entries" className='w-full'>
 				{topics === undefined ? <Loading /> : <SelectTopics topics={topics} />}
 			</Item>
 		</Row>

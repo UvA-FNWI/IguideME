@@ -28,7 +28,11 @@ const ConsentSettingsForm: FC<Props> = ({ name, text }): ReactElement => {
 
 	return (
 		<div>
-			<Form name="consent_settings_form" initialValues={{ name, text }} onFinish={saveConsent}>
+			<Form
+        initialValues={{ name, text }}
+        name="consent_settings_form"
+        onFinish={saveConsent}
+      >
 				<Form.Item name="text" valuePropName="text" noStyle>
 					TODO
 				</Form.Item>

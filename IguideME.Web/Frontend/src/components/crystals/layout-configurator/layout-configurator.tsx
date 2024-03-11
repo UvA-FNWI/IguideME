@@ -1,11 +1,11 @@
-import { Button, Col, Row } from "antd";
-import { type FC, type ReactElement, useMemo, useState } from "react";
+import { Button, Col, Row } from 'antd';
+import { type FC, type ReactElement, useMemo, useState } from 'react';
 
-import ConfigLayoutColumn from "@/components/atoms/layout-column/layout-column";
-import { useMutation, useQuery, useQueryClient } from "react-query";
-import { getLayoutColumns, postLayoutColumns } from "@/api/tiles";
-import { type LayoutColumn } from "@/types/tile";
-import { PlusOutlined } from "@ant-design/icons";
+import ConfigLayoutColumn from '@/components/atoms/layout-column/layout-column';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
+import { getLayoutColumns, postLayoutColumns } from '@/api/tiles';
+import { type LayoutColumn } from '@/types/tile';
+import { PlusOutlined } from '@ant-design/icons';
 import {
   DndContext,
   type DragEndEvent,
@@ -14,13 +14,13 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
-} from "@dnd-kit/core";
-import { SortableContext, arrayMove } from "@dnd-kit/sortable";
-import { createPortal } from "react-dom";
-import Loading from "@/components/particles/loading";
+} from '@dnd-kit/core';
+import { SortableContext, arrayMove } from '@dnd-kit/sortable';
+import { createPortal } from 'react-dom';
+import Loading from '@/components/particles/loading';
 
 const LayoutConfigurator: FC = (): ReactElement => {
-  const { data, isFetching } = useQuery("layout-columns", getLayoutColumns);
+  const { data, isFetching } = useQuery('layout-columns', getLayoutColumns);
 
   if (isFetching || data === undefined) {
     return <Loading />;
@@ -36,14 +36,12 @@ interface Props {
 const LayoutConfiguratorInner: FC<Props> = ({ data }): ReactElement => {
   const queryClient = useQueryClient();
 
-  const [columns, setColumns] = useState<LayoutColumn[]>(
-    JSON.parse(JSON.stringify(data)),
-  );
+  const [columns, setColumns] = useState<LayoutColumn[]>(JSON.parse(JSON.stringify(data)));
 
   const { mutate: saveLayout } = useMutation({
     mutationFn: postLayoutColumns,
     onSuccess: async () => {
-      await queryClient.invalidateQueries("layout-columns");
+      await queryClient.invalidateQueries('layout-columns');
     },
   });
   const [active, setActive] = useState<LayoutColumn | null>(null);
@@ -62,10 +60,7 @@ const LayoutConfiguratorInner: FC<Props> = ({ data }): ReactElement => {
     }
   };
 
-  const columnIds = useMemo(
-    () => columns.map((column) => column.id),
-    [columns],
-  );
+  const columnIds = useMemo(() => columns.map((column) => column.id), [columns]);
 
   const addColumn = (): void => {
     setColumns([
@@ -84,11 +79,7 @@ const LayoutConfiguratorInner: FC<Props> = ({ data }): ReactElement => {
   };
 
   return (
-    <DndContext
-      sensors={sensors}
-      onDragStart={onDragStart}
-      onDragEnd={onDragEnd}
-    >
+    <DndContext sensors={sensors} onDragStart={onDragStart} onDragEnd={onDragEnd}>
       <SortableContext items={columnIds}>
         <Row>
           {columns.map((column) => (
@@ -97,8 +88,7 @@ const LayoutConfiguratorInner: FC<Props> = ({ data }): ReactElement => {
                 column={column}
                 remove={removeColumn}
                 parentOnChange={(column) => {
-                  columns[columns.findIndex((col) => col.id === column.id)] =
-                    column;
+                  columns[columns.findIndex((col) => col.id === column.id)] = column;
                   setColumns(columns);
                 }}
               />
@@ -106,21 +96,16 @@ const LayoutConfiguratorInner: FC<Props> = ({ data }): ReactElement => {
           ))}
         </Row>
         <Row>
-          <Button
-            type="dashed"
-            onClick={addColumn}
-            block
-            icon={<PlusOutlined />}
-          >
+          <Button type="dashed" onClick={addColumn} block icon={<PlusOutlined />}>
             Add Column
           </Button>
         </Row>
       </SortableContext>
-      <Button onClick={save}>Save</Button>
+      <Button className="mt-2" onClick={save}>
+        Save
+      </Button>
       {createPortal(
-        <DragOverlay>
-          {active !== null && <ConfigLayoutColumn column={active} />}
-        </DragOverlay>,
+        <DragOverlay>{active !== null && <ConfigLayoutColumn column={active} />}</DragOverlay>,
         document.body,
       )}
     </DndContext>
