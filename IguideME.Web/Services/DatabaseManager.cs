@@ -670,6 +670,70 @@ namespace IguideME.Web.Services
             return users;
         }
 
+        public List<User> GetUsersWithSettings(
+            int courseID,
+            UserRoles role = UserRoles.student,
+            long syncID = 0
+        )
+        {
+            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
+            if (activeSync == 0)
+            {
+                _logger.LogWarning("Hash is null, returning empty user list.");
+                return new List<User>() { };
+            }
+
+            List<User> users = new();
+
+            using (
+                SQLiteDataReader r = Query(
+                    DatabaseQueries.QUERY_USERS_WITH_ROLE_FOR_COURSE,
+                    new SQLiteParameter("courseID", courseID),
+                    new SQLiteParameter("role", role),
+                    new SQLiteParameter("syncID", activeSync)
+                )
+            )
+            {
+                while (r.Read())
+                {
+                    User user =
+                        new(
+                            r.GetValue(0).ToString(),
+                            courseID,
+                            r.GetInt32(1),
+                            r.GetValue(2).ToString(),
+                            r.GetValue(3).ToString(),
+                            role == UserRoles.student ? r.GetInt32(4) : 1
+                        );
+                    users.Add(user);
+                }
+            }
+
+            foreach (User user in users)
+            {
+                using (
+                    SQLiteDataReader r2 = Query(
+                        DatabaseQueries.QUERY_LAST_STUDENT_SETTINGS,
+                        new SQLiteParameter("courseID", courseID),
+                        new SQLiteParameter("userID", user.UserID)
+                    )
+                )
+                {
+                    if (r2.Read())
+                    {
+                        user.Settings = new(
+                            r2.GetInt32(0),
+                            r2.GetDouble(1),
+                            r2.GetDouble(2),
+                            r2.GetBoolean(3),
+                            r2.GetBoolean(4)
+                        );
+                    }
+                }
+            }
+            return users;
+        }
+
         public string GetUserID(int studentNumber)
         {
             using (

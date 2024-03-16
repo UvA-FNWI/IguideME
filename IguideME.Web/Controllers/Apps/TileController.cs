@@ -89,7 +89,10 @@ namespace IguideME.Web.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public ActionResult GetTileGrades(string tileID, string userID)
         {
-            // TODO: implement body, see Frontend/src/types/tile.tsx -> tilegrades for the expected format
+            if (!IsAdministrator() && userID != GetUserID())
+            {
+                return Unauthorized();
+            }
 
             bool success = int.TryParse(tileID, out int id);
             if (success)

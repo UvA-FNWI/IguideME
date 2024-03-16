@@ -1,7 +1,7 @@
 import { type FC, type ReactElement } from "react";
 import { Col, Row, Table, Tooltip } from "antd";
 import { useQuery } from "react-query";
-import { getStudents } from "@/api/users";
+import { getStudentsWithSettings } from "@/api/users";
 import Loading from "@/components/particles/loading";
 import { type User } from "@/types/user";
 import { type ColumnsType } from "antd/lib/table";
@@ -16,7 +16,10 @@ const GradesTable: FC = (): ReactElement => {
   console.log("tile_grades", tileGrades);
 
   // Deze hieronder laat ik staan zodat de voorbeeld tabel werkt, maar zal uiteindelijk niet nodig zijn vgm
-  const { data: students } = useQuery("students", getStudents);
+  const { data: students } = useQuery(
+    "students + settings",
+    getStudentsWithSettings,
+  );
 
   if (students === undefined) {
     return <Loading />;
@@ -24,7 +27,7 @@ const GradesTable: FC = (): ReactElement => {
 
   return (
     <div
-      id={"gradesTable"}
+      id={"settingsTable"}
       style={{ position: "relative", overflow: "visible" }}
     >
       <Row
@@ -33,7 +36,12 @@ const GradesTable: FC = (): ReactElement => {
         style={{ paddingBottom: "10px" }}
       >
         <Col>
-          <h2>Grades Overview</h2>
+          <h2>General Overview</h2>
+        </Col>
+        <Col>
+          Consent Given: &ensp;{" "}
+          {students.filter((student: User) => student.settings?.consent).length}
+          /{students.length}
         </Col>
       </Row>
 
@@ -60,7 +68,6 @@ interface DataType {
   notifications: boolean | undefined;
 }
 function getData(students: User[]): DataType[] {
-  console.log(students);
   return students.map((student) => ({
     student,
     key: student.userID,
@@ -82,12 +89,12 @@ function getColumns(): any {
       width: 80,
       sorter: (a, b) => a.name.localeCompare(b.name),
       defaultSortOrder: "ascend",
-      render: (text: string, record: any) => {
+      render: (text: string, record: DataType) => {
         return (
           <span>
             {text}
             <br />
-            <small>{record.userID}</small>
+            <small>{record.student.userID}</small>
           </span>
         );
       },
@@ -97,11 +104,11 @@ function getColumns(): any {
       dataIndex: "total",
       width: 50,
       sorter: (a, b) => (a.total ?? -1) - (b.total ?? -1),
-      render: (text: string, _: any) => {
+      render: (text: string, record: DataType) => {
         if (Number(text) !== -1) {
           return (
             <span>
-              {text}
+              {((record.total ?? 0) / 10).toFixed(1)}
               <br />
             </span>
           );

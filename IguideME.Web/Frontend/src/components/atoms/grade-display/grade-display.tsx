@@ -25,7 +25,7 @@ const GradeDisplay: FC<displayProps> = ({ self }): ReactElement => {
   }
 
   const goal = self.settings.goal_grade;
-  const total = self.settings.total_grade;
+  const total = self.settings.total_grade / 10;
   const pred = self.settings.predicted_grade;
 
   switch (context.viewType) {
@@ -62,7 +62,7 @@ const GridGrades: FC<Props> = ({ goal, total, pred }): ReactElement => {
         <h2>
           <Space>
             {total > goal ? happy : total >= 5.5 ? meh : unhappy}
-            {total}
+            {total.toFixed(1)}
           </Space>
         </h2>
       </div>

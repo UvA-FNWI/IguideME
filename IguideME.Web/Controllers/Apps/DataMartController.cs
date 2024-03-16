@@ -189,7 +189,6 @@ namespace IguideME.Web.Controllers
             return IsAdministrator();
         }
 
-        // TODO: move to different controller.
         [Authorize(Policy = "IsInstructor")]
         [HttpGet]
         [Route("/students")]
@@ -200,6 +199,20 @@ namespace IguideME.Web.Controllers
             return Json(
                 _databaseManager
                     .GetUsersWithGrantedConsent(this.GetCourseID(), UserRoles.student)
+                    .ToArray()
+            );
+        }
+
+        [Authorize(Policy = "IsInstructor")]
+        [HttpGet]
+        [Route("/students/settings")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public ActionResult GetStudentsWithSettings()
+        {
+            return Json(
+                _databaseManager
+                    .GetUsersWithSettings(this.GetCourseID(), UserRoles.student)
                     .ToArray()
             );
         }
@@ -289,9 +302,9 @@ namespace IguideME.Web.Controllers
         //             this.GetCourseID(),
         //             this.GetUserID(),
         //             (int)JObject.Parse(body)["goal_grade"],
-        //             null, 
-        //             null, 
-        //             null, 
+        //             null,
+        //             null,
+        //             null,
         //             0
         //         );
 
