@@ -10,6 +10,7 @@ import PeerComparison from "@/components/particles/peer-comparison/peercompariso
 import { getTileGrades } from "@/api/tiles";
 import { useQuery } from "react-query";
 import Loading from "@/components/particles/loading";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
   tile: Tile;
@@ -25,11 +26,18 @@ const ViewTile: FC<Props> = ({ tile }): ReactElement => {
         tile.id,
       ),
   );
+  const navigate = useNavigate();
 
   const max = 100;
 
   return (
-    <div className="tileView">
+    <div
+      className="tileView"
+      style={{ cursor: "pointer" }}
+      onClick={() => {
+        navigate(tile.id + "/");
+      }}
+    >
       <Row justify={"center"} align={"middle"} style={{ height: "20%" }}>
         <h3
           style={{

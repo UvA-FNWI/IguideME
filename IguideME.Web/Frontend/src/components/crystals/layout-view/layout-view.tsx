@@ -15,7 +15,7 @@ const ViewLayout: FC = (): ReactElement => {
     return <Loading />;
   }
   return (
-    <Row justify="space-evenly">
+    <Row justify="space-evenly" style={{ padding: 5 }}>
       {columns.map((column) => (
         <Col key={column.id} span={Math.round((24 * column.width) / 100)}>
           <div className="layoutColumnView">

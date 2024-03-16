@@ -13,9 +13,11 @@ import Dashboard from "@/components/pages/admin/dashboard/dashboard.tsx";
 import Analytics from "@/components/pages/admin/analytics/analytics.tsx";
 import GradeAnalyzer from "@/components/pages/admin/analyzer/analyzer.tsx";
 import AdminPanel from "@/components/crystals/admin-panel/admin-panel.tsx";
+import ViewLayout from "./components/crystals/layout-view/layout-view.tsx";
 import DataWizard from "@/components/pages/admin/datawizard/datawizard.tsx";
-import LearningGoals from "@/components/pages/admin/learning-goals/learning-goals.tsx";
 import GradePredictor from "@/components/pages/admin/predictor/predictor.tsx";
+import TileDetailView from "./components/pages/tile-detail-view/tile-detail-view.tsx";
+import LearningGoals from "@/components/pages/admin/learning-goals/learning-goals.tsx";
 import StudentDashboard from "@/components/pages/student-dashboard/student-dashboard.tsx";
 import StudentOverview from "@/components/pages/admin/studentoverview/studentoverview.tsx";
 import NotificationCentre from "@/components/pages/admin/notificationcentre/notificationcentre.tsx";
@@ -68,7 +70,10 @@ enableMocking()
               <Routes>
                 <Route path="/" element={<App />} errorElement={<ErrorPage />}>
                   <Route path="" element={<Home />} />
-                  <Route path=":id" element={<StudentDashboard />} />
+                  <Route path=":id" element={<StudentDashboard />}>
+                    <Route path="" element={<ViewLayout />} />
+                    <Route path=":tid" element={<TileDetailView />} />
+                  </Route>
                   <Route path="admin" element={<AdminPanel />}>
                     <Route path="" element={<Dashboard />} />
                     <Route path="tiles" element={<Tiles />} />

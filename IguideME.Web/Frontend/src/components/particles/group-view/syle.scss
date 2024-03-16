@@ -1,6 +1,6 @@
-@import '@/base.scss';
+@import "@/base.scss";
 
-.tileGroupView {
+.groupView {
   border-radius: 5px;
   background: #f6f8fa;
   border: 1px solid #ebebeb;
@@ -12,6 +12,6 @@
     text-align: center;
     overflow: hidden;
     text-overflow: ellipsis;
-    white-space: nowrap
+    white-space: nowrap;
   }
 }

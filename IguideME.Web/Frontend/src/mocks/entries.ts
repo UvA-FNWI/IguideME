@@ -18,6 +18,13 @@ export const entriesHandlers = [
   http.get("/topics", () => {
     return HttpResponse.json<Discussion[]>(MOCK_TOPICS);
   }),
+  http.get("/discussions/*/*", ({ params }) => {
+    return HttpResponse.json<Discussion>(
+      MOCK_DISCUSSIONS.find(
+        (disc) => disc.id.toString() === params[0] && disc.author === params[1],
+      ),
+    );
+  }),
   http.get("/learning-goals", () => {
     return HttpResponse.json<LearningGoal[]>(MOCK_GOALS);
   }),
@@ -241,7 +248,7 @@ export const MOCK_TOPICS: Discussion[] = [
     parent_id: 0,
     course_id: 994,
     title: "Third discussion",
-    author: "Adena Spraggins",
+    author: "46647543",
     date: 1602173738,
     message: "Discussion number 3",
   },
@@ -251,7 +258,7 @@ export const MOCK_TOPICS: Discussion[] = [
     parent_id: 0,
     course_id: 994,
     title: "Second discussion",
-    author: "Adria Laven",
+    author: "55571292",
     date: 1602173834,
     message: "Discussion number 2",
   },
@@ -261,11 +268,14 @@ export const MOCK_TOPICS: Discussion[] = [
     parent_id: 0,
     course_id: 994,
     title: "First discussion",
-    author: "Alyson Burkey",
+    author: "45476233",
     date: 1602173991,
     message: "Discussion number 1",
   },
 ];
+
+// TODO: Add replies etc
+export const MOCK_DISCUSSIONS: Discussion[] = [...MOCK_TOPICS];
 
 export const MOCK_GOALS: LearningGoal[] = [
   {

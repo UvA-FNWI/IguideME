@@ -2,8 +2,6 @@ import { TileType, type Grades, printGrade } from "@/types/tile";
 import {
   LikeTwoTone,
   MessageFilled,
-  MessageOutlined,
-  TrophyFilled,
   TrophyOutlined,
   WarningTwoTone,
 } from "@ant-design/icons";
@@ -17,7 +15,7 @@ const GridTile: FC<Props> = ({ type, grades }): ReactElement => {
   let inner = <></>;
   switch (type) {
     case TileType.assignments:
-      inner = <Assignments {...grades} />;
+      inner = <GradeView {...grades} />;
       break;
     case TileType.discussions:
       inner = <Discussions {...grades} />;
@@ -29,7 +27,7 @@ const GridTile: FC<Props> = ({ type, grades }): ReactElement => {
   return <div style={{ fontSize: 18 }}>{inner}</div>;
 };
 
-const Assignments: FC<Grades> = ({ grade, max, type }): ReactElement => {
+export const GradeView: FC<Grades> = ({ grade, max, type }): ReactElement => {
   return (
     <Space align="end">
       <div>

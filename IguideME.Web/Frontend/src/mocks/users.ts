@@ -23,7 +23,7 @@ export const userHandlers = [
   }),
 ];
 
-const MOCK_STUDENTS: User[] = [
+export const MOCK_STUDENTS: User[] = [
   {
     course_id: 994,
     studentnumber: 28332183,

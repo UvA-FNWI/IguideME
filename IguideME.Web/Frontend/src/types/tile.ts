@@ -25,7 +25,7 @@ export interface Tile {
 }
 
 export interface TileGrades {
-  tileID: number;
+  tile_id: number;
   grade: number;
   peerMin: number;
   peerAvg: number;
@@ -166,6 +166,6 @@ export interface Submission {
   id: number;
   assignmentID: number;
   userID: string;
-  grade: number;
+  grades: Grades;
   date: number;
 }

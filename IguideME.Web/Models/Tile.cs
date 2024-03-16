@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-
+﻿using System.Collections.Generic;
 using IguideME.Web.Models.App;
-using IguideME.Web.Services;
-
 using Newtonsoft.Json;
 
 namespace IguideME.Web.Models
 {
     public class Tile
     {
-
         public enum Tile_type
         {
             assignments,
@@ -57,7 +52,8 @@ namespace IguideME.Web.Models
             double weight,
             AppGradingType gradingType,
             bool visible,
-            bool notifications)
+            bool notifications
+        )
         {
             this.ID = id;
             this.GroupID = groupID;
@@ -86,16 +82,39 @@ namespace IguideME.Web.Models
         [JsonProperty(PropertyName = "weight")]
         public double Weight { get; set; }
 
-        public TileEntry(
-            int tileID,
-            int ContentID,
-            string title,
-            double weight)
+        public TileEntry(int tileID, int ContentID, string title, double weight)
         {
             this.TileID = tileID;
             this.ContentID = ContentID;
             this.Title = title;
             this.Weight = weight;
+        }
+    }
+
+    public class TileGrades
+    {
+        [JsonProperty(PropertyName = "tile_id")]
+        public int TileID { get; set; }
+
+        [JsonProperty(PropertyName = "grade")]
+        public double grade { get; set; }
+
+        [JsonProperty(PropertyName = "peerMin")]
+        public double peerMin { get; set; }
+
+        [JsonProperty(PropertyName = "peerAvg")]
+        public double peerAvg { get; set; }
+
+        [JsonProperty(PropertyName = "peerMax")]
+        public double peerMax { get; set; }
+
+        public TileGrades(int tileID, double grade, double peerMin, double peerAvg, double peerMax)
+        {
+            this.TileID = tileID;
+            this.grade = grade;
+            this.peerMin = peerMin;
+            this.peerAvg = peerAvg;
+            this.peerMax = peerMax;
         }
     }
 }

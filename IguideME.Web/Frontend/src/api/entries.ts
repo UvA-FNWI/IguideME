@@ -3,6 +3,7 @@ import {
   type Assignment,
   type LearningGoal,
   type GoalRequirement,
+  type Submission,
 } from "@/types/tile";
 import apiClient from "./axios";
 
@@ -17,6 +18,14 @@ export const getAssignments: () => Promise<
 
 export const getTopics: () => Promise<Discussion[]> = async () =>
   await apiClient.get(`topics`).then((response) => response.data);
+
+export const getDiscussion: (
+  cid: number,
+  uid: string,
+) => Promise<Discussion> = async (cid: number, studentnr: string) =>
+  await apiClient
+    .get(`discussions/${cid}/${studentnr}`)
+    .then((response) => response.data);
 
 export const getLearningGoals: () => Promise<LearningGoal[]> = async () =>
   await apiClient.get(`learning-goals`).then((response) => response.data);
@@ -62,3 +71,11 @@ export const deleteRequirement: (id: number) => Promise<void> = async (
 ) => {
   await apiClient.delete(`learning-goals/requirements/${id}`);
 };
+
+export const getAssignmentSubmission: (
+  cid: number,
+  uid: string,
+) => Promise<Submission> = async (cid: number, uid: string) =>
+  await apiClient
+    .get(`assignments/${cid}/submissions/${uid}`)
+    .then((response) => (response.data !== "" ? response.data : undefined));

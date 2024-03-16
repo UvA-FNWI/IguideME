@@ -1,9 +1,9 @@
 // /------------------------- Module imports -------------------------/
-import NotificationPanel from '@/components/atoms/notification-panel/notification-panel';
-import { Button, Col, ConfigProvider, Row, Select, Space } from 'antd';
-import { getSelf, getStudents } from '@/api/users';
-import { useQuery } from 'react-query';
-import './style.scss';
+import NotificationPanel from "@/components/atoms/notification-panel/notification-panel";
+import { Button, Col, ConfigProvider, Row, Select, Space } from "antd";
+import { getSelf, getStudents } from "@/api/users";
+import { useQuery } from "react-query";
+import "./style.scss";
 import { type NavigateFunction, useNavigate } from "react-router-dom";
 import {
   type Dispatch,
@@ -15,7 +15,6 @@ import {
 
 // /-------------------------- Own imports ---------------------------/
 import { type User, UserRoles } from "@/types/user";
-
 
 /**
  * Helper function for the student selector component.
@@ -30,7 +29,6 @@ const selector = (
   setCurrentUser: Dispatch<SetStateAction<User | undefined>>,
   navigate: NavigateFunction,
 ): ReactElement => {
-
   const { data } = useQuery("students", getStudents, { enabled: isAdmin });
 
   const students = data
@@ -103,7 +101,6 @@ const Header: FC = (): ReactElement => {
   const [currentUser, setCurrentUser] = useState<User | undefined>(self);
   const [inHome, setInHome] = useState<boolean>(true);
 
-  // TODO: change to request from is-admin route.
   const isAdmin: boolean = self?.role === UserRoles.instructor;
 
   const goHome = (): void => {

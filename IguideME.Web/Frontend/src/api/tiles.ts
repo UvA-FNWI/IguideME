@@ -3,7 +3,7 @@ import {
   type Tile,
   type LayoutColumn,
   type TileGroup,
-  TileGrades,
+  type TileGrades,
 } from "@/types/tile";
 
 export const getLayoutColumns: () => Promise<LayoutColumn[]> = async () =>
@@ -51,6 +51,10 @@ export const getGroupTiles: (id: number) => Promise<Tile[]> = async (
 
 export const getTiles: () => Promise<Tile[]> = async () =>
   await apiClient.get(`tiles`).then((response) => response.data);
+
+export const getTile: (tid: number | string) => Promise<Tile> = async (
+  tid: number | string,
+) => await apiClient.get(`tile/${tid}`).then((response) => response.data);
 
 export const getTileGrades: (
   userID: string,

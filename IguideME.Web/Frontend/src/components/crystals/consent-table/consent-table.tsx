@@ -57,7 +57,6 @@ interface DataType {
   notifications: boolean | undefined;
 }
 function getData(students: User[]): DataType[] {
-  console.log(students);
   return students.map((student) => ({
     student,
     key: student.userID,

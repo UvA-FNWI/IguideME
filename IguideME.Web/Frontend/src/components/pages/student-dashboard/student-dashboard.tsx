@@ -1,13 +1,13 @@
 import { getSelf, getStudent } from "@/api/users";
 import GradeDisplay from "@/components/atoms/grade-display/grade-display";
 import StudentInfo from "@/components/atoms/student-info/student-info";
-import ViewLayout from "@/components/crystals/layout-view/layout-view";
+// import ViewLayout from "@/components/crystals/layout-view/layout-view";
 import { type User, UserRoles } from "@/types/user";
 import { AppstoreOutlined, BarChartOutlined } from "@ant-design/icons";
 import { Col, Radio, Row } from "antd";
 import { useState, type FC, type ReactElement } from "react";
 import { useQuery } from "react-query";
-import { useParams } from "react-router-dom";
+import { Outlet, useParams } from "react-router-dom";
 import { tileViewContext, type viewType } from "./context";
 
 const StudentDashboard: FC = (): ReactElement => {
@@ -70,7 +70,7 @@ const Dashboard: FC<Props> = ({ self }): ReactElement => {
           </Radio.Group>
         </Col>
       </Row>
-      <ViewLayout />
+      <Outlet />
     </tileViewContext.Provider>
   );
 };

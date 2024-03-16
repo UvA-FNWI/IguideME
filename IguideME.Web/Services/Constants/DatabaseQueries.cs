@@ -834,6 +834,25 @@ public static class DatabaseQueries
     LIMIT       1;
     ";
 
+    public const string QUERY_TILE_GRADE =
+        @"SELECT    `grade`
+        FROM        `tile_grades`
+        WHERE       `tile_id`=@tileID
+        AND         `sync_id`=@syncID
+        AND         `user_id`=@userID;";
+
+    public const string QUERY_TILE_PEER_GRADES =
+        @"SELECT    `peer_groups`.`min_grade`,
+                    `peer_groups`.`avg_grade`,
+                    `peer_groups`.`max_grade`
+        FROM        `peer_groups`
+        INNER JOIN  `student_settings`
+            USING   (`goal_grade`)
+        WHERE       `peer_groups`.`component_id`=@tileID
+        AND         `peer_groups`.`sync_id`=@syncID
+        AND         `peer_groups`.`component_type`=@type
+        AND         `student_settings`.`user_id`=@userID;";
+
     public const string QUERY_TILE_GROUP =
         @"SELECT    `group_id`,
                     `title`,

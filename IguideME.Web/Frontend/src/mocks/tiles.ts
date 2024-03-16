@@ -40,6 +40,11 @@ export const tileHandlers = [
   http.get("/tiles", () => {
     return HttpResponse.json<Tile[]>(MOCK_TILES);
   }),
+  http.get("/tile/*", ({ params }) => {
+    return HttpResponse.json<Tile | undefined>(
+      MOCK_TILES.find((tile) => tile.id.toString() === params[0]),
+    );
+  }),
   http.post("/tiles/*", () => {
     return new HttpResponse(null, { status: 200 });
   }),

@@ -9,9 +9,9 @@ if [ ! -d $FRONTEND_ROOT/node_modules ]; then
 fi
 
 
-alias frontend-dev='yarn --cwd $FRONTEND_ROOT dev'
-alias mock-frontend='yarn --cwd $FRONTEND_ROOT mock'
-alias iguideme-packages='yarn --cwd $FRONTEND_ROOT'
+alias frontend-dev='pnpm -C $FRONTEND_ROOT dev'
+alias mock-frontend='pnpm -C $FRONTEND_ROOT mock'
+alias iguideme-packages='pnpm -C $FRONTEND_ROOT'
 alias backend-dev='dotnet watch --project $PROJECT_ROOT/IguideME.Web/ --no-hot-reload';
 alias enter-db='litecli $PROJECT_ROOT/IguideME.Web/db.sqlite';
 alias bright-db='litecli $PROJECT_ROOT/IguideME.Web/brightspace.db';

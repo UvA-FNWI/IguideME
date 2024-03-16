@@ -192,7 +192,6 @@ const ViewGoalRequirement: FC<ReqProps> = ({ requirement }): ReactElement => {
       await queryClient.invalidateQueries("learning-goals");
     },
   });
-  console.log(assignments);
   return (
     <div className="goalRequirement">
       <Form<GoalRequirement>

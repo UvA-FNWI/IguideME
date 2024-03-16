@@ -7,7 +7,6 @@ import { syncingHandlers } from "./syncing";
 import { tileHandlers } from "./tiles";
 import { userHandlers } from "./users";
 
-console.log("hello?");
 export const handlers = [
   ...setupHandlers,
   ...userHandlers,
