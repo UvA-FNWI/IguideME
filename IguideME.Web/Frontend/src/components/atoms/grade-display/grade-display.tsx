@@ -50,7 +50,7 @@ const GridGrades: FC<Props> = ({ goal, total, pred }): ReactElement => {
     >
       <div className="text-center">
         <p className='m-0'>Goal</p>
-        <h2 className='font-gradeDisplay'>
+        <h2 className=' '>
           <Space>
             {goal >= 7 ? happy : goal >= 5.5 ? meh : unhappy}
             {goal}
@@ -59,7 +59,7 @@ const GridGrades: FC<Props> = ({ goal, total, pred }): ReactElement => {
       </div>
       <div className="text-center">
         <p className='m-0'>Current</p>
-        <h2 className='font-gradeDisplay'>
+        <h2 className=' '>
           <Space>
             {total > goal ? happy : total >= 5.5 ? meh : unhappy}
             {total}
@@ -68,7 +68,7 @@ const GridGrades: FC<Props> = ({ goal, total, pred }): ReactElement => {
       </div>
       <div className="text-center">
         <p className='m-0'>Predicted</p>
-        <h2 className='font-gradeDisplay'>
+        <h2 className=' '>
           <Space>
             {pred > goal ? happy : pred >= 5.5 ? meh : unhappy}
             {pred}

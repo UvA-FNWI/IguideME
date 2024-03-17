@@ -1,5 +1,5 @@
 // /------------------------- Module imports -------------------------/
-import { ConfigProvider, Divider, Spin, Table } from 'antd';
+import { Divider, Spin, Table } from 'antd';
 import { useQuery } from 'react-query';
 import { type FC, type ReactElement } from 'react';
 
@@ -66,18 +66,7 @@ const Dashboard: FC = (): ReactElement => {
       <SyncManager />
       <h1 className="mt-5">Historic versions</h1>
       <Divider className="mt-1 mb-5" />
-      <ConfigProvider
-        theme={{
-          components: {
-            Table: {
-              fontWeightStrong: 500,
-              fontFamily: 'Maitree, serif',
-            },
-          },
-        }}
-      >
         <Table scroll={{ x: 240 }} dataSource={syncs} columns={columns} />
-      </ConfigProvider>
     </>
   );
 };

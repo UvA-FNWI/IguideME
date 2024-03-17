@@ -19,19 +19,19 @@ const statusColors = new Map<string, LiteralUnion<'red' | 'orange' | 'yellow' | 
 
 const StatusCard: FC<Props> = ({ title, description, status }): ReactElement => {
 	return (
-		<div className='w-full h-full p-4 bg-slate-200 rounded-md shadow-statusCard font-[500] font-maitree'>
+		<div className='w-full h-full p-4 bg-primary-gray rounded-md shadow-statusCard   font-tnum'>
 			<Row justify="space-between">
 				<Col>
-					<h4>{title}</h4>
+					<h4 className='  font-tnum'>{title}</h4>
 				</Col>
 				<Col>
-					<span className='font-normal tracking-wider text-xs text-black'>
+					<span className='  font-tnum font-normal tracking-wider text-xs text-black'>
 						<Badge color={statusColors.get(status ?? JobStatus.Success)} text={status ?? JobStatus.Success} />
 					</span>
 				</Col>
 			</Row>
 			<Row>
-				<span className='font-normal tracking-wider text-xs text-black'>
+				<span className='  font-tnum font-normal tracking-wider text-xs text-gray-600'>
           {description}
         </span>
 			</Row>

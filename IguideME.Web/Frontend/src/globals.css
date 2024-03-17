@@ -14,12 +14,8 @@
   }
 }
 
-body {
+*, html, body {
   font-family: Maitree, serif !important;
-}
-
-body > h2 {
-  font-family: 'Antic Slab', serif;
 }
 
 .font-tnum {

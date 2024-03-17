@@ -15,7 +15,7 @@ import {
   TeamOutlined,
   TrophyOutlined,
 } from "@ant-design/icons";
-import { ConfigProvider, Layout, Menu, type MenuProps } from "antd";
+import {  Layout, Menu, type MenuProps } from "antd";
 import { Link, Outlet } from "react-router-dom";
 
 const { Content, Sider } = Layout;
@@ -89,50 +89,42 @@ const AdminPanel: FC = (): ReactElement => {
   const [collapsed, setCollapsed] = useState(false);
 
   return (
-    <ConfigProvider
-      theme={{
-        token: {
-          colorBgContainer: "white",
-        },
-      }}
-    >
-      <Layout className='min-h-[90dvh]'>
-        <Sider
-          breakpoint="lg"
-          trigger={null}
-          collapsedWidth="80px"
-          collapsible
-          collapsed={collapsed}
-          onCollapse={(value) => {
-            setCollapsed(value);
-          }}
-          className="bg-white"
-        >
-          <div className='flex content-center flex-col justify-center font-maitree p-4 border-b border-solid border-b-gray-200 h-header'>
-            {!collapsed ? (
-              <>
-                <div>
-                  <h3>{!isLoading ? self?.name : "Loading profile..."}</h3>
-                  <strong>
-                    <UserOutlined /> Instructor
-                  </strong>
-                </div>
-              </>
-            ) : (
-              <h3>
-                <UserOutlined />
-              </h3>
-            )}
-          </div>
-          <Menu defaultSelectedKeys={["1"]} mode="inline" items={items} />
-        </Sider>
-        <Content
-          className='relative bg-slate-50 p-5 font-maitree'
-        >
-          <Outlet />
-        </Content>
-      </Layout>
-    </ConfigProvider>
+    <Layout className='min-h-[90dvh]'>
+      <Sider
+        breakpoint="lg"
+        trigger={null}
+        collapsedWidth="80px"
+        collapsible
+        collapsed={collapsed}
+        onCollapse={(value) => {
+          setCollapsed(value);
+        }}
+        className="!bg-white"
+      >
+        <div className='flex content-center flex-col justify-center bg-white p-4 border-b border-solid border-b-gray-200 h-header'>
+          {!collapsed ? (
+            <>
+              <div>
+                <h3>{!isLoading ? self?.name : "Loading profile..."}</h3>
+                <strong>
+                  <UserOutlined /> Instructor
+                </strong>
+              </div>
+            </>
+          ) : (
+            <h3>
+              <UserOutlined />
+            </h3>
+          )}
+        </div>
+        <Menu defaultSelectedKeys={["1"]} mode="inline" items={items} />
+      </Sider>
+      <Content
+        className='relative bg-slate- p-5'
+      >
+        <Outlet />
+      </Content>
+    </Layout>
   );
 };
 

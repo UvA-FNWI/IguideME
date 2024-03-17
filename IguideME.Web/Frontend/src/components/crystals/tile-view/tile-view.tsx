@@ -28,7 +28,7 @@ const ViewTile: FC<Props> = ({ tile, textStyle }): ReactElement => {
   return (
     <div className="w-[270px] h-[230px] border border-solid border-gray-200 bg-white">
       <Row justify={'center'} align={'middle'} className="h-1/5">
-        <h3 className={cn('text-lg font-bold font-tileView', textStyle)}>{tile.title}</h3>
+        <h3 className={cn('text-lg font-bold', textStyle)}>{tile.title}</h3>
       </Row>
       {renderViewType()}
     </div>

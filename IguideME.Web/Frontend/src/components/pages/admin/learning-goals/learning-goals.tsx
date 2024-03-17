@@ -91,7 +91,7 @@ const ViewLearningGoal: FC<GoalProps> = ({ goal }): ReactElement => {
   };
 
   return (
-    <div className="font-tnum p-[10px] border border-dashed border-zinc-500 rounded-lg bg-white mb-[10px] min-h-[100px]">
+    <div className="font-tnum p-[10px] border border-dashed border-zinc-400 rounded-lg bg-white mb-[10px] min-h-[100px]">
       <Row align="middle" justify="space-between">
         <Col className="cursor-text">
           <h2
@@ -164,7 +164,7 @@ const ViewGoalRequirement: FC<ReqProps> = ({ requirement }): ReactElement => {
   });
   console.log(assignments);
   return (
-    <div className="font-tnum w-full p-[10px] border border-solid border-zinc-500 rounded-lg mb-[10px]">
+    <div className="font-tnum w-full p-[10px] border border-solid border-zinc-200 rounded-lg mb-[10px]">
       <Form<GoalRequirement>
         name={`goal_requirement_form_${requirement.id}`}
         initialValues={requirement}

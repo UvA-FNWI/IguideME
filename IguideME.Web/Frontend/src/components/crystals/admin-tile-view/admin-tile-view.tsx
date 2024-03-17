@@ -175,14 +175,14 @@ const AdminTileView: FC<Props> = ({ tile, move }): ReactElement => {
         <Col className="h-[30px]">
           {tile.type === TileType.assignments && (
             <>
-              <h4 className="font-maitree">Grading:</h4>
+              <h4 className=" ">Grading:</h4>
               <p>{printGradingType(tile.gradingType)}</p>
             </>
           )}
         </Col>
         {tile.weight > 0 && (
           <Col className="text-center h-[30px]">
-            <h4 className="font-maitree">Weight:</h4>
+            <h4 className=" ">Weight:</h4>
             <p>{tile.weight * 100}%</p>
           </Col>
         )}
@@ -202,7 +202,7 @@ const TileTypeView: FC<{ tileType: TileType }> = ({ tileType }): ReactElement =>
       return (
         <Tooltip title="Assignment tiles group together assignments and quizzes completed by the students. These can be obtained from an LMS or uploaded manually">
           <Space align="center" size={3}>
-            <FormOutlined /> <h4 className="font-maitree">Assignments</h4>
+            <FormOutlined /> <h4 className=" ">Assignments</h4>
           </Space>
         </Tooltip>
       );
@@ -210,7 +210,7 @@ const TileTypeView: FC<{ tileType: TileType }> = ({ tileType }): ReactElement =>
       return (
         <Tooltip title="Discussion tiles give an overview of the messages the students have posted as well as the number of messages.">
           <Space align="center" size={3}>
-            <CommentOutlined /> <h4 className="font-maitree">Discussions</h4>
+            <CommentOutlined /> <h4 className=" ">Discussions</h4>
           </Space>
         </Tooltip>
       );
@@ -218,7 +218,7 @@ const TileTypeView: FC<{ tileType: TileType }> = ({ tileType }): ReactElement =>
       return (
         <Tooltip title="Learning Goal tiles keep track of requirements or goals the students should complete during the course. Some examples of these are: the average of the partial exams must exceed X, students need to submit 10 discussions for participation, passing an extra assignments for honours, etc.">
           <Space align="center" size={3}>
-            <CarryOutOutlined /> <h4 className="font-maitree">Learning Goals</h4>
+            <CarryOutOutlined /> <h4 className=" ">Learning Goals</h4>
           </Space>
         </Tooltip>
       );

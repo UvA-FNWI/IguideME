@@ -14,10 +14,10 @@ const ViewLayout: FC = (): ReactElement => {
     return <Loading />;
   }
   return (
-    <Row justify="space-evenly" className="px-3 flex gap-1 flex-nowrap">
+    <Row justify="space-evenly" gutter={[10,10]} className='p-[10px]'>
       {columns.map((column) => (
-        <Col key={column.id} span={Math.round((24 * column.width) / 100)}>
-          <div className="h-full grid gap-1">
+        <Col key={column.id} span={Math.round(24 * column.width / 100)}>
+          <div className="h-full grid gap-3">
             {column.groups.map((id) => {
               const group = tilegroups.find((group) => group.id === id);
               return (

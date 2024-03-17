@@ -2,7 +2,7 @@
 import Swal from 'sweetalert2';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { type FC, type ReactElement, useContext, useEffect } from 'react';
-import { Button, Col, ConfigProvider, Row } from 'antd';
+import { Button, Col, Row } from 'antd';
 
 import { pollSync, startNewSync, stopCurrentSync } from '@/api/syncing';
 import { syncContext } from '@/components/crystals/syncmanager/types';
@@ -50,23 +50,12 @@ const SyncClock: FC = (): ReactElement => {
   };
 
   return (
-    <ConfigProvider
-      theme={{
-        components: {
-          Button: {
-            colorPrimaryHover: 'rgb(0, 185, 120)',
-            colorPrimary: 'rgb(0, 185, 120)',
-            colorPrimaryActive: 'rgb(0, 185, 120)',
-            colorPrimaryTextHover: 'rgb(0, 185, 120)',
-          },
-        },
-      }}
-    >
+    <>
       <Row className="mb-5" gutter={10} justify="center">
         <Col>
           <div
             className={cn(
-              `w-[180px] h-[180px] rounded-full bg-slate-200 flex justify-center items-center text-center shadow-syncClock ${
+              `w-[180px] h-[180px] rounded-full bg-primary-gray flex justify-center items-center text-center shadow-syncClock ${
                 elapsed !== undefined ? 'before:animate-spin' : ''
               }`,
               styles.syncClock,
@@ -75,11 +64,11 @@ const SyncClock: FC = (): ReactElement => {
             <div className="border-none">
               <span>
                 <h3>
-                  <small>elapsed time</small>
+                  <small className='  font-tnum'>elapsed time</small>
                 </h3>
               </span>
               <span>
-                <h3>{elapsed ?? 'Idle'}</h3>
+                <h3 className='  font-tnum'>{elapsed ?? 'Idle'}</h3>
               </span>
             </div>
           </div>
@@ -90,7 +79,7 @@ const SyncClock: FC = (): ReactElement => {
         <Col xs={12}>
           <Button
             block
-            className="text-emerald-500 uppercase bg-slate-200 shadow-syncButton border-none rounded-[4px] m-[10px] hover:enabled:shadow-statusCard disabled:bg-slate-100 disabled:shadow-statusCard"
+            className="text-emerald-500 hover:!text-emerald-500 uppercase bg-primary-gray hover:!bg-primary-gray shadow-syncButton border-none rounded-[4px] m-[10px] hover:enabled:shadow-statusCard disabled:bg-primary-disabled disabled:hover:!text-black/25 disabled:hover:!bg-primary-disabled disabled:shadow-statusCard"
             disabled={elapsed !== undefined}
             onClick={startSync}
           >
@@ -100,7 +89,7 @@ const SyncClock: FC = (): ReactElement => {
 
         <Col xs={12}>
           <Button
-            className="text-emerald-500 uppercase bg-slate-200 shadow-syncButton border-none rounded-[4px] m-[10px] hover:enabled:shadow-statusCard disabled:bg-slate-100 disabled:shadow-statusCard"
+            className="text-emerald-500 hover:!text-emerald-500 uppercase bg-primary-gray hover:!bg-primary-gray shadow-syncButton border-none rounded-[4px] m-[10px] hover:enabled:shadow-statusCard disabled:bg-primary-disabled disabled:hover:!text-black/25 disabled:hover:!bg-primary-disabled disabled:shadow-statusCard"
             disabled={elapsed === undefined}
             block
             onClick={() => {
@@ -129,7 +118,7 @@ const SyncClock: FC = (): ReactElement => {
           </Button>
         </Col>
       </Row>
-    </ConfigProvider>
+    </>
   );
 };
 

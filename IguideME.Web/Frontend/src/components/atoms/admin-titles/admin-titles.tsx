@@ -11,8 +11,8 @@ const AdminTitle: FC<Props> = ({ title, description }): ReactElement => {
   return (
     <>
       <div>
-        <h1 className="font-semibold pb-2">{title}</h1>
-        <p className="text-black">{description}</p>
+        <h1 className="pb-2 text-[2em] font-tnum">{title}</h1>
+        <p className="text-black font-tnum">{description}</p>
       </div>
       <Divider className="my-5" />
     </>

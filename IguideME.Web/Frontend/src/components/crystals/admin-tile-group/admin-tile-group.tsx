@@ -81,7 +81,7 @@ const AdminTileGroupView: FC<Props> = ({ group }): ReactElement => {
 
   return (
     <div
-      className="p-[10px] border border-dashed border-zinc-500 rounded-lg bg-white min-h-[235px] my-1"
+      className="p-[10px] border border-dashed border-zinc-400 rounded-lg bg-white min-h-[235px] my-1"
       ref={setNodeRef}
       style={style}
     >
@@ -159,7 +159,7 @@ const AdminTileGroupView: FC<Props> = ({ group }): ReactElement => {
             }}
             block
             icon={<PlusOutlined />}
-            className="h-full !w-60 m-0"
+            className="h-full !w-60 m-0 min-h-[150px]"
           >
             New Tile
           </Button>

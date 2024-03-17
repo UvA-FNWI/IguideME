@@ -1,6 +1,6 @@
 // /------------------------- Module imports -------------------------/
 import { useQuery } from 'react-query';
-import { Button, Col, ConfigProvider, Row, Select, Space } from 'antd';
+import { Button, Col, Row, Select, Space } from 'antd';
 import { type NavigateFunction, useNavigate } from 'react-router-dom';
 import { type Dispatch, type FC, type ReactElement, type SetStateAction, useState } from 'react';
 
@@ -39,20 +39,6 @@ const selector = (
   }
 
   return (
-    <ConfigProvider
-      theme={{
-        token: {
-          controlOutlineWidth: 0,
-          controlHeight: 38,
-          colorText: 'white',
-          colorBorder: 'white',
-          colorTextSecondary: 'white',
-          colorTextQuaternary: 'white',
-          colorBgBase: 'rgb(90, 50, 255)',
-          motion: false,
-        },
-      }}
-    >
       <Select
         placeholder={'Choose a student'}
         value={currentUser?.name}
@@ -64,9 +50,8 @@ const selector = (
           value: student.userID,
         }))}
         allowClear={true}
-        className="w-[40vw] max-w-[400px] [&>div]:!bg-indigo-600"
+        className="w-[40vw] max-w-[400px] [&>div]:!bg-primary-purple [&>div>span]:!text-white [&_span_*]:!text-white"
       />
-    </ConfigProvider>
   );
 };
 
@@ -109,16 +94,16 @@ const Header: FC = (): ReactElement => {
   };
 
   return (
-    <header className="bg-indigo-600 table w-full align-middle font-header text-white">
+    <header className="bg-primary-purple table w-full align-middle text-white">
       <Row align="middle" className="h-header px-4" justify="space-between">
-        <Col>
+        <Col span={4}>
           <Button className="p-0 m-0" onClick={goHome} type="link">
-            <h1 className="text-white align-middle font-semibold inline-block text-2xl">IguideME</h1>
+            <h1 className="text-white align-middle font-semibold inline-block text-2xl  ">IguideME</h1>
           </Button>
         </Col>
         <Col>{selector(isAdmin && inHome, currentUser, setCurrentUser, navigate)}</Col>
-        <Col>
-          <Space>
+        <Col span={4} className='flex justify-end'>
+          <Space >
             <div className="min-w-[30px]">
               <NotificationPanel user={currentUser} />
             </div>
@@ -140,7 +125,7 @@ const Header: FC = (): ReactElement => {
       </Row>
       {import.meta.env.MODE === 'mock' && (
         <Row>
-          <div className="w-full p-2 bg-orange-500 text-center font-header">
+          <div className="w-full p-2 bg-primary-orange text-center   text-black">
             Application is running in <strong>demo</strong> mode. Changes will not be saved!
           </div>
         </Row>
