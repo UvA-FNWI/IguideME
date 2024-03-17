@@ -16,14 +16,6 @@ namespace IguideME.Web.Services.Workers
         learning_goal
     }
 
-    public enum Notification_Types
-    {
-        outperforming,
-        closing_gap,
-        falling_behind,
-        more_effort
-    }
-
     /// <summary>
     /// Class <a>PeerGroupWorker</a> models a worker that handles the creation of peer groups and their stats.
     /// </summary>
@@ -219,13 +211,14 @@ namespace IguideME.Web.Services.Workers
 
                     // Store the user's Total grade and add this to the list of all grades across the peergroup (peerTotalAvg)
                     _databaseManager.UpdateUserSettings(
-                                        _courseID, 
-                                        peerID,
-                                        null, 
-                                        userTotal, 
-                                        null, 
-                                        null, 
-                                        _syncID);
+                        _courseID,
+                        peerID,
+                        null,
+                        userTotal,
+                        null,
+                        null,
+                        _syncID
+                    );
                     peerTotalAvg.Add(userTotal);
                 }
 

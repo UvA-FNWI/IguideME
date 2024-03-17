@@ -2186,20 +2186,15 @@ namespace IguideME.Web.Services
             return notifications;
         }
 
-        public List<Notification> GetAllUserNotifications(
-            int courseID,
-            string userID,
-            long syncID = 0
-        )
+        public Notifications GetAllUserNotifications(int courseID, string userID, long syncID = 0)
         {
             long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
 
-            List<Notification> notifications = new();
+            Notifications notifications = new();
 
             using (
                 SQLiteDataReader r = Query(
                     DatabaseQueries.QUERY_ALL_USER_NOTIFICATIONS,
-                    new SQLiteParameter("courseID", courseID),
                     new SQLiteParameter("userID", userID),
                     new SQLiteParameter("syncID", activeSync)
                 )
@@ -2207,9 +2202,50 @@ namespace IguideME.Web.Services
             {
                 while (r.Read())
                 {
-                    notifications.Add(
-                        new Notification(userID, r.GetInt32(0), r.GetInt32(1), r.GetBoolean(2))
-                    );
+                    Notification_Types status = (Notification_Types)r.GetInt32(1);
+                    switch (status)
+                    {
+                        case Notification_Types.outperforming:
+                            notifications.Outperforming.Add(
+                                new Notification(
+                                    userID,
+                                    r.GetInt32(0),
+                                    r.GetInt32(1),
+                                    r.GetBoolean(2)
+                                )
+                            );
+                            break;
+                        case Notification_Types.closing_gap:
+                            notifications.Closing.Add(
+                                new Notification(
+                                    userID,
+                                    r.GetInt32(0),
+                                    r.GetInt32(1),
+                                    r.GetBoolean(2)
+                                )
+                            );
+                            break;
+                        case Notification_Types.falling_behind:
+                            notifications.Falling.Add(
+                                new Notification(
+                                    userID,
+                                    r.GetInt32(0),
+                                    r.GetInt32(1),
+                                    r.GetBoolean(2)
+                                )
+                            );
+                            break;
+                        case Notification_Types.more_effort:
+                            notifications.Effort.Add(
+                                new Notification(
+                                    userID,
+                                    r.GetInt32(0),
+                                    r.GetInt32(1),
+                                    r.GetBoolean(2)
+                                )
+                            );
+                            break;
+                    }
                 }
             }
 
@@ -2229,7 +2265,6 @@ namespace IguideME.Web.Services
             using (
                 SQLiteDataReader r = Query(
                     DatabaseQueries.QUERY_PENDING_USER_NOTIFICATIONS,
-                    new SQLiteParameter("courseID", courseID),
                     new SQLiteParameter("userID", userID),
                     new SQLiteParameter("syncID", activeSync)
                 )

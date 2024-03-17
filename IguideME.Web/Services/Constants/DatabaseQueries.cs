@@ -747,16 +747,15 @@ public static class DatabaseQueries
                         `status`,
                         `sent`
         FROM            `notifications`
-        WHERE           `course_id`=@courseID
-        AND             `user_id`=@userID
+        WHERE           `user_id`=@userID
         AND             `sync_id`=@syncID;";
 
     public const string QUERY_PENDING_USER_NOTIFICATIONS =
         @"SELECT        `tile_id`,
                         `status`
         FROM            `notifications`
-        WHERE           `course_id`=@courseID
-        AND             `user_id`=@userID
+        INNER JOIN      `user_settings`
+        WHERE           `user_id`=@userID
         AND             `sync_id`=@syncID
         AND             `sent`=false;";
 

@@ -18,6 +18,7 @@ const Notifications: FC<Props> = ({ user }): ReactElement => {
     `notifications/${user.userID}`,
     async () => await getStudentNotifications(user.userID),
   );
+  console.log("noti", notifications);
   if (notifications === undefined) {
     return <Loading />;
   }
