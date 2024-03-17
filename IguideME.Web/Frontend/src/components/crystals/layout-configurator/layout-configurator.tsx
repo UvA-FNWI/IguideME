@@ -96,12 +96,12 @@ const LayoutConfiguratorInner: FC<Props> = ({ data }): ReactElement => {
           ))}
         </Row>
         <Row>
-          <Button type="dashed" onClick={addColumn} block icon={<PlusOutlined />}>
+          <Button type="dashed" onClick={addColumn} block icon={<PlusOutlined />} className='bg-white'>
             Add Column
           </Button>
         </Row>
       </SortableContext>
-      <Button className="mt-2" onClick={save}>
+      <Button className="mt-2 bg-white" onClick={save}>
         Save
       </Button>
       {createPortal(

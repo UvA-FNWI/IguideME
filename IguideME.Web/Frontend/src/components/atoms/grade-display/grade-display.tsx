@@ -45,12 +45,12 @@ const GridGrades: FC<Props> = ({ goal, total, pred }): ReactElement => {
   const unhappy = <FrownTwoTone size={10} twoToneColor={"rgb(255, 110, 90)"} />;
   return (
     <Space
-      className='justify-center w-full'
+      className='justify-center h-full w-full'
       size="large"
     >
       <div className="text-center">
-        <p className='m-0'>Goal</p>
-        <h2 className=' '>
+        <p>Goal</p>
+        <h2 className='text-lg font-semibold'>
           <Space>
             {goal >= 7 ? happy : goal >= 5.5 ? meh : unhappy}
             {goal}
@@ -58,8 +58,8 @@ const GridGrades: FC<Props> = ({ goal, total, pred }): ReactElement => {
         </h2>
       </div>
       <div className="text-center">
-        <p className='m-0'>Current</p>
-        <h2 className=' '>
+        <p>Current</p>
+        <h2 className='text-lg font-semibold'>
           <Space>
             {total > goal ? happy : total >= 5.5 ? meh : unhappy}
             {total}
@@ -67,8 +67,8 @@ const GridGrades: FC<Props> = ({ goal, total, pred }): ReactElement => {
         </h2>
       </div>
       <div className="text-center">
-        <p className='m-0'>Predicted</p>
-        <h2 className=' '>
+        <p>Predicted</p>
+        <h2 className='text-lg font-semibold'>
           <Space>
             {pred > goal ? happy : pred >= 5.5 ? meh : unhappy}
             {pred}
@@ -139,7 +139,7 @@ const GraphGrades: FC<Props> = ({ goal, total: avg, pred }): ReactElement => {
     ],
   };
   return (
-    <div className='h-[50px] w-full'>
+    <div className='h-[50px]'>
       <Bar {...config} marginTop={20} marginBottom={30} />
     </div>
   );

@@ -13,7 +13,7 @@ const PeerComparison: FC<Grades> = ({
     <div className='text-neutral-500'>
       <Row
         align="middle"
-        className='pt-1'
+        className='p-1'
         justify="center"
       >
         <Col>

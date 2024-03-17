@@ -51,7 +51,7 @@ const PeerSettingsForm: FC<Props> = ({ minSize, personalizedPeers }): ReactEleme
           </Form.Item>
         </Col>
         <Col>
-          <Form.Item name="personalized_peers" label="Personalized" valuePropName="checked" className="m-[10px]">
+          <Form.Item name="personalized_peers" label="Personalized" valuePropName="checked" className="m-[10px] [&_button]:bg-black/25">
             <Switch defaultChecked checkedChildren={<CheckOutlined />} unCheckedChildren={<CloseOutlined />} />
           </Form.Item>
         </Col>

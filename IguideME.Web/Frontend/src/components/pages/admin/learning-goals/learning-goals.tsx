@@ -48,7 +48,7 @@ const LearningGoals: FC = (): ReactElement => {
     <div>
       <AdminTitle title="Learning Goals" description="Configure the learning goals for the course." />
       {goals === undefined ? <Loading /> : goals.map((goal) => <ViewLearningGoal key={goal.id} goal={goal} />)}
-      <Button type="dashed" onClick={addGoal} block icon={<PlusOutlined />}>
+      <Button type="dashed" onClick={addGoal} block icon={<PlusOutlined />} className='bg-white'>
         Add Goal
       </Button>
     </div>
@@ -239,7 +239,7 @@ const ViewGoalRequirement: FC<ReqProps> = ({ requirement }): ReactElement => {
           <Col offset={8} span={4}>
             <Space>
               <Item noStyle>
-                <Button className="text-black" type="primary" htmlType="submit">
+                <Button className="text-white bg-primary-blue" type="primary" htmlType="submit">
                   Save
                 </Button>
               </Item>

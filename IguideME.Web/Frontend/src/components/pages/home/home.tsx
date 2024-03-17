@@ -5,7 +5,7 @@ import { type FC, type ReactElement } from 'react';
 const Home: FC = (): ReactElement => {
   return (
     <Result
-      icon={<SmileOutlined className='text-primary-purple stroke-primary-purple' />}
+      icon={<SmileOutlined className='!text-primary-purple' />}
       title={
         <div>
           <h2>Pick a student to start!</h2>

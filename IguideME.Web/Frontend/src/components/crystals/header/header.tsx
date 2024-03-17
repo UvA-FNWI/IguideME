@@ -125,7 +125,7 @@ const Header: FC = (): ReactElement => {
       </Row>
       {import.meta.env.MODE === 'mock' && (
         <Row>
-          <div className="w-full p-2 bg-primary-orange text-center   text-black">
+          <div className="w-full p-2 bg-primary-orange text-center text-black">
             Application is running in <strong>demo</strong> mode. Changes will not be saved!
           </div>
         </Row>

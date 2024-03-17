@@ -43,11 +43,11 @@ const Dashboard: FC<Props> = ({ self }): ReactElement => {
 
   return (
     <tileViewContext.Provider value={context}>
-      <Row justify="space-between" align="top" className="p-3">
+      <Row justify='space-between' align="top" className="px-3 pt-3 relative flex items-center">
         <Col>
           <StudentInfo self={self} />
         </Col>
-        <Col span={14}>
+        <Col className='absolute left-0 right-0 top-3 bottom-0 m-auto h-full flex justify-center items-center'>
           <GradeDisplay self={self} />
         </Col>
         <Col>

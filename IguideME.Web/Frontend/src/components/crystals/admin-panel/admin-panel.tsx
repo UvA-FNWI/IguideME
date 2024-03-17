@@ -105,7 +105,7 @@ const AdminPanel: FC = (): ReactElement => {
           {!collapsed ? (
             <>
               <div>
-                <h3>{!isLoading ? self?.name : "Loading profile..."}</h3>
+                <h3 className='text-lg'>{!isLoading ? self?.name : "Loading profile..."}</h3>
                 <strong>
                   <UserOutlined /> Instructor
                 </strong>

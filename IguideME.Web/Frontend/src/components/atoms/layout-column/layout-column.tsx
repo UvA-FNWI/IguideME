@@ -78,7 +78,7 @@ const ConfigLayoutColumn: FC<Props> = ({ column, remove, parentOnChange }): Reac
         {...listeners}
       >
 				<Col>
-					<h3>Column</h3>
+					<h3 className='text-lg'>Column</h3>
 				</Col>
 				<Col>
 					<DeleteFilled onClick={() => remove?.(column.id)} />

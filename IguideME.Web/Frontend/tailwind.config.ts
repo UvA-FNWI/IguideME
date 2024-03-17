@@ -11,10 +11,11 @@ module.exports = {
       },
       colors: {
         primary: {
-          purple: '#5a32ff',
-          orange: '#ff6e5a',
-          gray: '#e4ebf5',
+          blue: '#1677ff',
           disabled: '#ebf0f6',
+          gray: '#e4ebf5',
+          orange: '#ff6e5a',
+          purple: '#5a32ff',
         },
       },
       cursor: {
