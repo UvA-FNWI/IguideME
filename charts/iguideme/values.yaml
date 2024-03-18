@@ -7,7 +7,7 @@ canvasUrl: canvas.instructure.com
 clientId: 104410000000000150
 authenticateUrl: https://uvadlo-dev.instructure.com/api/lti/authorize_redirect
 jwksUrl: https://canvas.instructure.com/api/lti/security/jwks
-lmsBackend: Brightspace
+lmsBackend: Canvas
 brightspaceHost: 178.21.117.23,
 brightspacePort: 5433;,
 brightspaceDatabase: bds,

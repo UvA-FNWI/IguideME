@@ -1,0 +1,48 @@
+trigger:
+  - master
+
+variables:
+  - group: k8s
+
+pool: k8s
+
+jobs:
+  - job: build
+    steps:
+      - script: |
+          set -euxo pipefail
+          docker build -f Dockerfile -t "fnwicr.azurecr.io/iguideme:latest" .
+          docker push "fnwicr.azurecr.io/iguideme:latest"
+        displayName: Build Docker container
+        workingDirectory: ./IguideME.Web
+        condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+
+      - script: |
+          set -euxo pipefail
+          docker build -f Dockerfile -t "fnwicr.azurecr.io/iguideme-demo:latest" .
+          docker push "fnwicr.azurecr.io/iguideme-demo:latest"
+        displayName: Build Docker container for demo app
+        workingDirectory: ./IguideME.Web/wwwroot
+        condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+
+      - script: |
+          set -euxo pipefail
+          VERSION="0.${BUILD_BUILDNUMBER}"
+          helm package --version "${VERSION}" --app-version "${VERSION}" charts/iguideme-demo
+          helm push "iguideme-demo-${VERSION}.tgz" oci://fnwicr.azurecr.io/helm
+          curl "https://k8s.datanose.nl/gitops-updater?name=iguideme-demo&secret=${UPDATER_SECRET}&version=${VERSION}"
+        displayName: Build Helm chart for demo app and push to registry
+        condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+        env:
+          UPDATER_SECRET: $(DEPLOY_SECRET)
+
+      - script: |
+          set -euxo pipefail
+          VERSION="0.${BUILD_BUILDNUMBER}"
+          helm package --version "${VERSION}" --app-version "${VERSION}" charts/iguideme
+          helm push "iguideme-${VERSION}.tgz" oci://fnwicr.azurecr.io/helm
+          curl "https://k8s.datanose.nl/gitops-updater?name=iguideme&secret=${UPDATER_SECRET}&version=${VERSION}"
+        displayName: Build Helm chart and push to registry
+        condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+        env:
+          UPDATER_SECRET: $(DEPLOY_SECRET)

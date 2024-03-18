@@ -27,7 +27,7 @@ spec:
             - name: IGUIDEME_VERSION
               value: "{{ .Chart.AppVersion }}"
             - name: LMS__Backend
-              value: "{{ .Values.lmsBackend}}"
+              value: "{{ .Values.lmsBackend }}"
             - name: LMS__Canvas__Url
               value: "{{ .Values.canvasUrl }}"
             - name: LMS__Brightspace__Host
