@@ -1,21 +1,20 @@
 using System;
-using UvA.LTI;
-using System.Text;
+using System.Collections.Generic;
 using System.Linq;
-using StackExchange.Redis;
 using System.Security.Claims;
+using System.Text;
 using IguideME.Web.Services;
 using IguideME.Web.Services.Data;
-using System.Collections.Generic;
-using Microsoft.Extensions.Hosting;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Server.Kestrel.Core;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using IguideME.Web.Services.LMSHandlers;
-
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
+using StackExchange.Redis;
+using UvA.LTI;
 
 // //======================== Builder configuration =========================//
 
@@ -24,12 +23,12 @@ using IguideME.Web.Services.LMSHandlers;
 
 // Create a new WebApplicationBuilder for setting up the application.
 WebApplicationBuilder builder = WebApplication.CreateBuilder(
-    new WebApplicationOptions{
+    new WebApplicationOptions
+    {
         Args = args, // command-line arguments passed to the app
         WebRootPath = "wwwroot/build" // specifies the path to the web root directory
     }
 );
-
 
 //    /------------------------ Read appsettings.json -------------------------/
 
@@ -41,19 +40,20 @@ if (!Backends.TryParse(builder.Configuration.GetSection("LMS:Backend").Value, ou
 }
 
 // "UnsecureApplicationSettings:UseRedisCache" - indicates whether to use Redis cache or not.
-bool useRedisCache = bool.Parse(builder.Configuration.GetSection(
-    "UnsecureApplicationSettings:UseRedisCache").Value);
+bool useRedisCache = bool.Parse(
+    builder.Configuration.GetSection("UnsecureApplicationSettings:UseRedisCache").Value
+);
 
 // "UnsecureApplicationSettings:RedisCacheConnectionString" - contains the Redis cache connection string.
-string redisCacheConnectionString = builder.Configuration.GetSection(
-"UnsecureApplicationSettings:RedisCacheConnectionString").Value;
+string redisCacheConnectionString = builder
+    .Configuration.GetSection("UnsecureApplicationSettings:RedisCacheConnectionString")
+    .Value;
 
 // "LTI:SigningKey" - is the key used for LTI authentication and to generate own key.
 string key = builder.Configuration.GetSection("LTI:SigningKey").Value;
 
 // Use the specified key to create a symmetric security key for own authorization using JWTs.
 SymmetricSecurityKey signingKey = new(Encoding.ASCII.GetBytes(key));
-
 
 //    /----------------------- Configure services ------------------------/
 
@@ -73,7 +73,8 @@ if (useRedisCache && !string.IsNullOrWhiteSpace(redisCacheConnectionString))
 {
     // setup redis cache for horizontally scaled services
     builder.Services.AddSingleton<IConnectionMultiplexer>(
-        ConnectionMultiplexer.Connect(redisCacheConnectionString));
+        ConnectionMultiplexer.Connect(redisCacheConnectionString)
+    );
 
     // job status service, CRUD operations on jobs stored in redis cache.
     builder.Services.AddTransient<IJobStorageService, RedisCacheJobStorageService>();
@@ -85,9 +86,11 @@ else
 }
 
 // Add authorization (validating the JWT)
-builder.Services
-    .AddAuthorization()
-    .AddAuthentication(opt => opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme)
+builder
+    .Services.AddAuthorization()
+    .AddAuthentication(opt =>
+        opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme
+    )
     .AddJwtBearer(opt =>
     {
         opt.TokenValidationParameters.ValidateAudience = false;
@@ -97,8 +100,8 @@ builder.Services
 
 // Add a policy that checks whether a user is an admin.
 builder.Services.AddAuthorization(options =>
-    options.AddPolicy("IsInstructor",
-            policy => policy.RequireRole("Teacher")));
+    options.AddPolicy("IsInstructor", policy => policy.RequireRole("Teacher"))
+);
 
 builder.Services.Configure<ForwardedHeadersOptions>(opt =>
 {
@@ -124,13 +127,11 @@ switch (lms)
 }
 builder.Services.AddHttpClient();
 
-builder.Services.AddControllers()
-    .AddJsonOptions(options =>
-        options.JsonSerializerOptions.PropertyNamingPolicy = null);
-
+builder
+    .Services.AddControllers()
+    .AddJsonOptions(options => options.JsonSerializerOptions.PropertyNamingPolicy = null);
 
 builder.Services.AddControllers().AddNewtonsoftJson();
-
 
 // //========================== App configuration ===========================//
 
@@ -140,26 +141,39 @@ WebApplication app = builder.Build();
 var ltiConfig = builder.Configuration.GetSection("LTI");
 app.UseForwardedHeaders();
 
-app.UseLti(new LtiOptions
-{
-    ClientId = ltiConfig["ClientId"] ?? throw new Exception("Client id not set"),
-    AuthenticateUrl = ltiConfig["AuthenticateUrl"] ?? throw new Exception("Authenticate url not set"),
-    JwksUrl = ltiConfig["JwksUrl"] ?? throw new Exception("Jwks url not set"),
-    SigningKey = key,
-    ClaimsMapping = p => new Dictionary<string, object>
+app.UseLti(
+    new LtiOptions
     {
-        [ClaimTypes.NameIdentifier] = p.NameIdentifier!.Split("_").Last(),
-        ["contextLabel"] = p.Context.Label,
-        ["courseName"] = p.Context.Title,
-        ["user_name"] = p.Name,
-        ["courseid"] = p.CustomClaims?.GetProperty("courseid").ToString(),
-        ["userid"] = p.CustomClaims?.GetProperty("userid").ToString(),
-        [ClaimTypes.Role] = p.Roles.Any(e => e.Contains("http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor"))
-            ? "Teacher" : "Student",
-        [ClaimTypes.Email] = p.Email,
+        ClientId = ltiConfig["ClientId"] ?? throw new Exception("Client id not set"),
+        AuthenticateUrl =
+            ltiConfig["AuthenticateUrl"] ?? throw new Exception("Authenticate url not set"),
+        JwksUrl = ltiConfig["JwksUrl"] ?? throw new Exception("Jwks url not set"),
+        SigningKey = key,
+        ClaimsMapping = p =>
+        {
+            string courseID = p.CustomClaims?.GetProperty("courseid").ToString();
+            if (courseID.IsNullOrEmpty())
+            {
+                courseID = p.Context.Id;
+            }
+            return new Dictionary<string, object>
+            {
+                [ClaimTypes.NameIdentifier] = p.NameIdentifier!.Split("_").Last(),
+                ["contextLabel"] = p.Context.Label,
+                ["courseName"] = p.Context.Title,
+                ["user_name"] = p.Name,
+                ["courseid"] = courseID,
+                ["userid"] = p.CustomClaims?.GetProperty("userid").ToString(),
+                [ClaimTypes.Role] = p.Roles.Any(e =>
+                    e.Contains("http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor")
+                )
+                    ? "Teacher"
+                    : "Student",
+                [ClaimTypes.Email] = p.Email,
+            };
+        }
     }
-});
-
+);
 
 if (app.Environment.IsDevelopment())
 {
@@ -182,10 +196,7 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapControllerRoute(
-        name: "default",
-        pattern: "{controller}/{action=Index}/{id?}");
-
+app.MapControllerRoute(name: "default", pattern: "{controller}/{action=Index}/{id?}");
 
 // //=============================== Run app ================================//
 
