@@ -2,7 +2,7 @@ name: build and push container
 
 on:
   push:
-    branches: [ "main", "github-packages" ]
+    branches: [ "master" ]
 
 env:
   REGISTRY: ghcr.io

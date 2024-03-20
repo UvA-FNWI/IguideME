@@ -2,7 +2,7 @@ name: build and release chart
 
 on:
   push:
-    branches: [ "main", "github-packages" ]
+    branches: [ "master" ]
 
 jobs:
   build:    
