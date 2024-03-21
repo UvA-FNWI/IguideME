@@ -4,6 +4,9 @@ on:
   push:
     branches: [ "master" ]
 
+env:
+  UPDATER_SECRET: ${{ secrets.UPDATER_SECRET }}
+
 jobs:
   build:    
     runs-on: ubuntu-latest
@@ -27,6 +30,12 @@ jobs:
         uses: azure/setup-helm@v3
 
       - name: Run chart-releaser
+        id: chart
         uses: helm/chart-releaser-action@v1.6.0
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          
+      - name: Deploy latest version
+        run: |
+          VERSION="${{ steps.chart.outputs.chart_version }}"
+          curl "https://k8s.datanose.nl/gitops-updater?name=iguideme&secret=${UPDATER_SECRET}&version=${VERSION}"
