@@ -31,11 +31,12 @@ jobs:
 
       - name: Run chart-releaser
         id: chart
-        uses: helm/chart-releaser-action@v1.6.0
+        uses: helm/chart-releaser-action@v1.6.1
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
           
       - name: Deploy latest version
         run: |
-          VERSION="${{ steps.chart.outputs.chart_version }}"
+          CHART="${{ steps.chart.outputs.changed_charts }}"
+          VERSION=${CHART#*-}
           curl "https://k8s.datanose.nl/gitops-updater?name=iguideme&secret=${UPDATER_SECRET}&version=${VERSION}"
