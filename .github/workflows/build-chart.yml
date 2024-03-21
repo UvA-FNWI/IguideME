@@ -1,8 +1,10 @@
 name: build and release chart
 
 on:
-  push:
-    branches: [ "master" ]
+  workflow_run:
+    workflows: ["build and push container"]
+    types:
+      - completed
 
 env:
   UPDATER_SECRET: ${{ secrets.UPDATER_SECRET }}
@@ -37,6 +39,5 @@ jobs:
           
       - name: Deploy latest version
         run: |
-          CHART="${{ steps.chart.outputs.changed_charts }}"
-          VERSION=${CHART#*-}
+          VERSION=$(grep version charts/iguideme/Chart.yaml | cut -d " " -f2)
           curl "https://k8s.datanose.nl/gitops-updater?name=iguideme&secret=${UPDATER_SECRET}&version=${VERSION}"
