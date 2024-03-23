@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
 using IguideME.Web.Models;
 using IguideME.Web.Models.App;
 using IguideME.Web.Models.Impl;
@@ -72,19 +70,21 @@ namespace IguideME.Web.Services.Workers
         /// <param name="gradingTypes">A map of tile id's to the max grades and grading types.</param>
         private void RegisterSubmissions(
             IEnumerable<AssignmentSubmission> submissions,
-            Dictionary<int, (double, AppGradingType)> gradingTypes
+            Dictionary<int, (double, AppGradingType, int)> gradingTypes
         )
         {
             double max;
             AppGradingType type;
-            (double, AppGradingType) elem;
+            int entry_id;
+            (double, AppGradingType, int) elem;
 
             foreach (AssignmentSubmission submission in submissions)
             {
                 double grade;
                 if (gradingTypes.TryGetValue(submission.AssignmentID.Value, out elem))
                 {
-                    (max, type) = elem;
+                    (max, type, entry_id) = elem;
+                    submission.EntryID = entry_id;
                     switch (type)
                     {
                         case AppGradingType.Points:
@@ -129,13 +129,14 @@ namespace IguideME.Web.Services.Workers
                             );
                             break;
                     }
-                }
 
-                DatabaseManager.Instance.CreateUserSubmission(
-                    this._courseID,
-                    submission,
-                    _hashCode
-                );
+                    _logger.LogInformation("processing entryid {}", submission.EntryID);
+                    DatabaseManager.Instance.CreateUserSubmission(
+                        this._courseID,
+                        submission,
+                        _hashCode
+                    );
+                }
             }
         }
 
@@ -157,7 +158,7 @@ namespace IguideME.Web.Services.Workers
                 this._courseID,
                 users
             );
-            Dictionary<int, (double, AppGradingType)> gradingTypes = new();
+            Dictionary<int, (double, AppGradingType, int)> gradingTypes = new();
 
             foreach (AppAssignment assignment in assignments)
             {
@@ -172,7 +173,7 @@ namespace IguideME.Web.Services.Workers
 
                 gradingTypes.Add(
                     assignment.AssignmentID,
-                    (assignment.PointsPossible, assignment.GradingType)
+                    (assignment.PointsPossible, assignment.GradingType, entry.ID)
                 );
             }
             this.RegisterSubmissions(submissions, gradingTypes);

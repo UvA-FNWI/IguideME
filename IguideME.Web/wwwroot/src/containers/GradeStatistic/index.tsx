@@ -5,23 +5,34 @@ import "./style.scss";
 
 export default class GradeStatistic extends Component<
   { grade: string },
-  { loading: boolean; passed: boolean }
+  { loading: boolean }
 > {
-  state = { loading: true, passed: false };
+  state = { loading: true };
 
   componentDidMount(): void {
     this.setup();
   }
 
   setup = () => {
-    const { grade } = this.props;
+    this.setState({ loading: false });
+  };
 
-    this.setState({ loading: false, passed: parseFloat(grade) >= 5.5 });
+  renderIcon = (grade: number): React.ReactNode => {
+    if (grade <= 0) {
+      return <></>;
+    }
+    if (grade >= 5.5) {
+      return <LikeOutlined className={"pass"} />;
+    }
+
+    return <WarningOutlined className={"fail"} />;
   };
 
   render(): React.ReactNode {
-    const { loading, passed } = this.state;
+    const { loading } = this.state;
     const { grade } = this.props;
+
+    const prefix = this.renderIcon(parseFloat(grade));
 
     return (
       <div className={"gradeStatistic"}>
@@ -29,13 +40,7 @@ export default class GradeStatistic extends Component<
           title={"Grade"}
           value={grade}
           loading={loading}
-          prefix={
-            passed ? (
-              <LikeOutlined className={"pass"} />
-            ) : (
-              <WarningOutlined className={"fail"} />
-            )
-          }
+          prefix={prefix}
           suffix={""}
         />
       </div>

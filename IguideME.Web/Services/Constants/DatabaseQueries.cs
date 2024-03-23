@@ -6,10 +6,7 @@ public static class DatabaseQueries
      * Dictionary containing migrations to be run. Migrations should have a
      * unique name and a sqlite query and is only run once.
      */
-    public static readonly Dictionary<string, string> MIGRATIONS =
-        new()
-        {
-        };
+    public static readonly Dictionary<string, string> MIGRATIONS = new() { };
 
     // //================================ Tables ================================//
 
@@ -61,7 +58,6 @@ public static class DatabaseQueries
             `accepted`            BOOLEAN
         );";
 
-
     /**
      * The user interface can be customized by the course's teachers. The "Tile"
      * visualisation places groups of tiles in columns. The columns are stored
@@ -87,7 +83,6 @@ public static class DatabaseQueries
             `position`        INTEGER,
             `column_id`       INTEGER NULL
         );";
-
 
     // -------------------- Application configuration --------------------
 
@@ -178,7 +173,6 @@ public static class DatabaseQueries
             `expression`          STRING
         );";
 
-
     // /------------------------- User Settings --------------------------/
 
     /**
@@ -215,7 +209,6 @@ public static class DatabaseQueries
             UNIQUE(course_id, user_id)
         );";
 
-
     // /--------------------------- User Data ----------------------------/
 
 
@@ -224,7 +217,7 @@ public static class DatabaseQueries
      * grade belong to as well as the grade statistics of that group.
      */
     public const string CREATE_TABLE_PEER_GROUP =
-    @"CREATE TABLE IF NOT EXISTS `peer_group` (
+        @"CREATE TABLE IF NOT EXISTS `peer_group` (
         `id`                INTEGER PRIMARY KEY AUTOINCREMENT,
         `course_id`         INTEGER,
         `goal_grade`        INTEGER,
@@ -259,7 +252,6 @@ public static class DatabaseQueries
             `sent`                BOOLEAN
         );";
 
-
     // /------------------------ Grade Prediction ------------------------/
 
     public const string CREATE_TABLE_GRADE_PREDICTION_MODEL =
@@ -287,7 +279,6 @@ public static class DatabaseQueries
             `parameter_id`        INTEGER,
             `weight`              FLOAT
         );";
-
 
     // /------------------------- Data registry --------------------------/
 
@@ -371,7 +362,6 @@ public static class DatabaseQueries
             `end_timestamp`   STRING NULL
         );";
 
-
     // /--------------------------- Migrations ---------------------------/
 
     public const string CREATE_TABLE_MIGRATIONS =
@@ -379,7 +369,6 @@ public static class DatabaseQueries
             `id`                  INTEGER PRIMARY KEY AUTOINCREMENT,
             `migration_id`        STRING
         );";
-
 
     // //=========================== Register Values ============================//
 
@@ -401,7 +390,7 @@ public static class DatabaseQueries
           ON CONFLICT (`course_id`, `user_id`, `date`) DO UPDATE SET `grade`=`excluded`.`grade`;";
 
     public const string REGISTER_USER_PEER =
-    @"INSERT INTO   `peer_group` (  `course_id`,
+        @"INSERT INTO   `peer_group` (  `course_id`,
                                     `goal_grade`,
                                     `user_ids`,
                                     `tile_id`,
@@ -474,7 +463,7 @@ public static class DatabaseQueries
         );";
 
     public const string REGISTER_TILE_GROUP =
-    @"INSERT INTO       `layout_tile_group`
+        @"INSERT INTO       `layout_tile_group`
                             (   `course_id`,
                                 `column_id`,
                                 `title`,
@@ -509,7 +498,6 @@ public static class DatabaseQueries
             @graph_view,
             @wildcard
         );";
-
 
     public const string REGISTER_LEARNING_GOAL =
         @"INSERT INTO       `learning_goal`
@@ -740,7 +728,6 @@ public static class DatabaseQueries
             @id
           );";
 
-
     // //============================= Query Values =============================//
 
     public const string QUERY_DOES_COURSE_EXIST =
@@ -748,8 +735,7 @@ public static class DatabaseQueries
         FROM course_settings
         WHERE course_id = @courseID;";
 
-    public const string QUERY_COURSE_IDS =
-        @"SELECT `course_id` FROM `course_settings`;";
+    public const string QUERY_COURSE_IDS = @"SELECT `course_id` FROM `course_settings`;";
 
     public const string QUERY_PREDICTED_GRADES_FOR_USER =
         @"SELECT    `user_id`,
@@ -865,7 +851,7 @@ public static class DatabaseQueries
         ";
 
     public const string QUERY_NOTIFICATION_DATES_FOR_COURSE =
-    @"SELECT    `notification_dates`
+        @"SELECT    `notification_dates`
     FROM        `course_settings`
     WHERE       `course_id`=@courseID
     LIMIT       1;
@@ -1202,7 +1188,8 @@ public static class DatabaseQueries
         ORDER BY    `name` ASC
         LIMIT       1;";
 
-    public const string QUERY_CONSENTED_STUDENTS_FOR_COURSE = /// ^^^ WITH CONSENT ^^^ //NoTotalAverage
+    public const string QUERY_CONSENTED_STUDENTS_FOR_COURSE =
+        /// ^^^ WITH CONSENT ^^^ //NoTotalAverage
         @"SELECT    `canvas_users`.`id`,
                     `canvas_users`.`studentnumber`,
                     `canvas_users`.`user_id`,
@@ -1345,6 +1332,7 @@ public static class DatabaseQueries
             ON      `tile_entry_submission`.`entry_id`=`tile_entry`.`id`
         WHERE       `tile_entry`.`tile_id`=@tileID
         AND         `tile_entry_submission`.`sync_hash`=@hash;";
+
     public const string QUERY_USER_SUBMISSIONS_FOR_TILE_FOR_USER =
         @"SELECT    `tile_entry_submission`.`id`,
                     `tile_entry_submission`.`entry_id`,
@@ -1443,7 +1431,6 @@ public static class DatabaseQueries
         AND         `goal_grade`=@goalGrade
         AND         `sync_hash`=@hash;";
 
-
     public const string QUERY_GRADE_COMPARISSON_HISTORY =
         @"SELECT    `peer_group`.`tile_id`,
                     avg(`tile_entry_submission`.`grade`),
@@ -1462,7 +1449,6 @@ public static class DatabaseQueries
         AND         `tile_entry_submission`.`user_id` = @userID
         GROUP BY    `peer_group`.`tile_id`, `peer_group`.`sync_hash`
         ORDER BY    `peer_group`.`tile_id`;";
-
 
     public const string QUERY_USER_RESULTS =
         @"SELECT   `tile`.`id`,
@@ -1527,7 +1513,6 @@ public static class DatabaseQueries
         @"SELECT    `migration_id`
           FROM      `migrations`
           WHERE     `migration_id`=@id;";
-
 
     // //============================ Update Values =============================//
 
@@ -1639,6 +1624,7 @@ public static class DatabaseQueries
         AND             `posted_at`=@postedAt
         AND             `message`=@message
         AND             `sync_hash`=@hash;";
+
     // AND             `posted_by`=@userName
 
     public const string RECYCLE_EXTERNAL_DATA =
@@ -1654,7 +1640,6 @@ public static class DatabaseQueries
             WHERE   `layout_tile_group`.`course_id`=@courseID
             AND     `tile`.`tile_type`='EXTERNAL_DATA'
           );";
-
 
     // //============================ Delete Values =============================//
 
@@ -1686,7 +1671,7 @@ public static class DatabaseQueries
           AND               `id` = @id;";
 
     public const string DELETE_TILE_ENTRY =
-         @"DELETE FROM       `tile_entry`
+        @"DELETE FROM       `tile_entry`
           WHERE             `id`=@entryID;";
 
     public const string DELETE_INCOMPLETE_SYNCS =
@@ -1695,9 +1680,8 @@ public static class DatabaseQueries
           WHERE         `course_id` = @courseID
           AND           `end_timestamp` IS NULL;";
 
-
     public const string INSERT_USER_ACTION =
-    @"INSERT INTO   `user_tracker` (`user_id`,`action`)
+        @"INSERT INTO   `user_tracker` (`user_id`,`action`)
           VALUES        (
             @userID,
             @action

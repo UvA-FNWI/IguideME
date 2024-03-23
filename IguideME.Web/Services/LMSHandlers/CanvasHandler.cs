@@ -123,7 +123,6 @@ namespace IguideME.Web.Services
             _logger.LogInformation("Course = {course}", course);
 
             IEnumerable<CanvasUser> students = course.GetUsersByType(EnrollmentType.Student);
-            _logger.LogInformation("Getting users {students}", students);
 
             return students.Select(student => new User(
                 -1,
@@ -256,15 +255,16 @@ namespace IguideME.Web.Services
             return Connector
                 .FindCourseById(courseID)
                 .GetSubmissions(userIDs, false)
-                .SelectMany(group => group.Submissions)
-                .Select(sub => new AssignmentSubmission(
-                    -1,
-                    sub.ID ?? -1,
-                    sub.AssignmentID,
-                    sub.User != null ? sub.User.SISUserID : sub.UserID, // FIXME: fsr both the .User and .UserID fields are always null
-                    sub.Grade,
-                    sub.SubmittedAt.HasValue ? sub.SubmittedAt.Value.ToShortDateString() : ""
-                ));
+                .SelectMany(group =>
+                    group.Submissions.Select(sub => new AssignmentSubmission(
+                        -1,
+                        -1,
+                        sub.AssignmentID,
+                        group.SISUserID.ToString(),
+                        sub.Grade,
+                        sub.SubmittedAt.HasValue ? sub.SubmittedAt.Value.ToShortDateString() : ""
+                    ))
+                );
         }
 
         /// <inheritdoc />
