@@ -70,7 +70,6 @@ namespace IguideME.Web.Controllers
             // tmp for brightspace until we have an environment
             // return 83337;
             // returns the ID of course in which the IguideME instance is loaded
-            _logger.LogInformation("User identity: {}", User.Identity);
             return int.Parse((User.Identity as ClaimsIdentity).FindFirst("courseid").Value);
         }
 

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using IguideME.Web.Models;
 using IguideME.Web.Models.App;
 using IguideME.Web.Models.Impl;
@@ -162,7 +163,6 @@ namespace IguideME.Web.Services.Workers
                 users
             );
             Dictionary<int, (double, AppGradingType, int)> gradingTypes = new();
-            List<AssignmentSubmission> assignmentSubmissionsWithTiles = new ();
 
             foreach (AppAssignment assignment in assignments)
             {
@@ -179,18 +179,9 @@ namespace IguideME.Web.Services.Workers
                     assignment.AssignmentID,
                     (assignment.PointsPossible, assignment.GradingType, entry.ID)
                 );
-
-                // We find all submissions for this assignment, and save them with the corresponding entryID that we found
-                foreach (AssignmentSubmission sub in submissions) {
-                    if(sub.AssignmentID == assignment.AssignmentID){
-                        sub.EntryID = entry.ID;
-                        assignmentSubmissionsWithTiles.Add(sub);
-                    }
-                }
             }
 
-            // Finally we register the submissions
-            this.RegisterSubmissions(assignmentSubmissionsWithTiles, gradingTypes);
+            this.RegisterSubmissions(submissions, gradingTypes);
         }
     }
 }

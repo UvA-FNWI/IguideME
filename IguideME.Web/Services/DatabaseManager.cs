@@ -779,8 +779,6 @@ namespace IguideME.Web.Services
             if (activeHash == null)
                 return null;
 
-            // _logger.LogInformation("Trying to get user {u} for course {c} using hash {h}, {ah}", userID, courseID, hash, activeHash);
-
             User user = null;
             using (
                 SQLiteDataReader r = Query(

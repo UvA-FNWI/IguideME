@@ -54,7 +54,6 @@ namespace IguideME.Web.Services.Workers
                     this._courseID,
                     Int32.Parse(sub.UserID)
                 );
-                _logger.LogInformation("entryid {}", entry.ID);
                 sub.EntryID = entry.ID;
                 DatabaseManager.Instance.CreateUserSubmission(this._courseID, sub, this._hashCode);
             }
