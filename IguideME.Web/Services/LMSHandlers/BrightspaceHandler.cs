@@ -28,11 +28,11 @@ namespace IguideME.Web.Services
                 + ";Database = "
                 + config["LMS:Brightspace:Connection:Database"]
                 + ";User ID = "
-                + config["LMS:Brightspace:Connection:User ID"]
+                + config["LMS:Brightspace:Connection:UserID"]
                 + ";Password = "
                 + config["LMS:Brightspace:Connection:Password"]
                 + ";Search Path = "
-                + config["LMS:Brightspace:Connection:Search Path"]
+                + config["LMS:Brightspace:Connection:SearchPath"]
                 + ";"
                 + config["LMS:Brightspace:Connection:Rest"];
             _logger = logger;
@@ -129,10 +129,7 @@ namespace IguideME.Web.Services
                         INNER JOIN  user_enrollments
                             ON      users.user_id = user_enrollments.user_id
                         WHERE       user_enrollments.org_unit_id = @courseID
-                        AND         users.username= @userID
-                        AND        (user_enrollments.role_id = 110
-                        OR          user_enrollments.role_id = 130
-                        OR          user_enrollments.role_id = 134)",
+                        AND         users.user_id= @userID",
                     new NpgsqlParameter("userID", int.Parse(userID)),
                     new NpgsqlParameter("courseID", courseID)
                 )
@@ -355,17 +352,18 @@ namespace IguideME.Web.Services
 
             using (
                 NpgsqlDataReader r = Query(
-                    @$"SELECT  grade_object_id,
-                                user_id,
-                                points_numerator,
-                                points_denominator,
-                                grade_text,
-                                grade_released_date
-                        FROM    grade_results
-                        WHERE   org_unit_id = @courseID
-                        AND     is_released = TRUE
-                        AND     user_id
-                            IN  ({string.Join(",", users.Select((_, index) => $"@userID{index}"))})",
+                    @$"SELECT       grade_results.grade_object_id,
+                                    users.username,
+                                    grade_results.points_numerator,
+                                    grade_results.points_denominator,
+                                    grade_results.grade_text,
+                                    grade_results.grade_released_date
+                        FROM        grade_results
+                        INNER JOIN  users
+                            ON      users.user_id = grade_results.user_id
+                        WHERE       grade_results.org_unit_id = @courseID
+                        AND         grade_results.user_id
+                            IN      ({string.Join(",", users.Select((_, index) => $"@userID{index}"))})",
                     parameters
                 )
             )
