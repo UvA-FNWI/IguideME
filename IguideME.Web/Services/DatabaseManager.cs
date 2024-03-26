@@ -625,6 +625,24 @@ namespace IguideME.Web.Services
             );
         }
 
+        public void GetUsage(int courseID, string hash)
+        {
+            _logger.LogInformation("userID: #actions");
+            using (
+                SQLiteDataReader r = Query(
+                    DatabaseQueries.QUERY_USAGE,
+                    new SQLiteParameter("courseID", courseID),
+                    new SQLiteParameter("hash", hash)
+                )
+            )
+            {
+                while (r.Read())
+                {
+                    _logger.LogInformation("{}: {}", r.GetValue(0).ToString(), r.GetInt32(1));
+                }
+            }
+        }
+
         public List<User> GetUsers(int courseID, string role = "%", string hash = null)
         {
             string activeHash = hash ?? this.GetCurrentHash(courseID);

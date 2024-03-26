@@ -1150,6 +1150,17 @@ public static class DatabaseQueries
         AND         `sync_hash`='{1}'
         ORDER BY    `name` ASC;";
 
+    public const string QUERY_USAGE =
+        @"SELECT    `user_tracker`.`user_id`,
+                    count(`user_tracker`.`user_id`)
+            FROM    `user_tracker`
+        INNER JOIN  `canvas_users`
+            ON      `canvas_users`.`user_id`=`user_tracker`.`user_id`
+            WHERE   `canvas_users`.`sync_hash`=@hash
+            AND     `canvas_users`.`course_id`=@courseID
+            GROUP BY `user_tracker`.`user_id`
+        ;";
+
     public const string QUERY_USERS_WITH_ROLE_FOR_COURSE =
         @"SELECT    `id`,
                     `studentnumber`,

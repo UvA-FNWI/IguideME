@@ -13,8 +13,11 @@ namespace IguideME.Web.Services
     // Not strictly necessary since we only have 1 class but apparently good practice for DI and testing.
     public interface ICanvasSyncService
     {
-        Task<JobResultModel> DoWorkAsync(string jobId, JobParametersModel work,
-            CancellationToken cancellationToken);
+        Task<JobResultModel> DoWorkAsync(
+            string jobId,
+            JobParametersModel work,
+            CancellationToken cancellationToken
+        );
     }
 
     /// <summary>
@@ -36,7 +39,8 @@ namespace IguideME.Web.Services
         public CanvasSyncService(
             IComputationJobStatusService computationJobStatus,
             ILMSHandler lmsHandler,
-            ILogger<SyncManager> logger)
+            ILogger<SyncManager> logger
+        )
         {
             _logger = logger;
             _computationJobStatus = computationJobStatus;
@@ -50,8 +54,11 @@ namespace IguideME.Web.Services
         /// <param name="work">Data for the service.</param>
         /// <param name="cancellationToken">Token used to cancel the sync.</param>
         /// <returns>A task containging the result of the sync</returns>
-        public async Task<JobResultModel> DoWorkAsync(string jobId, JobParametersModel work,
-            CancellationToken cancellationToken)
+        public async Task<JobResultModel> DoWorkAsync(
+            string jobId,
+            JobParametersModel work,
+            CancellationToken cancellationToken
+        )
         {
             JobResultModel result = new();
             int courseID = work.CourseID;
@@ -62,14 +69,22 @@ namespace IguideME.Web.Services
                 return (input >= startDate && input <= endDate);
             }
 
-            List<string> notificationDates = DatabaseManager.Instance.GetNotificationDates(courseID);
+            List<string> notificationDates = DatabaseManager.Instance.GetNotificationDates(
+                courseID
+            );
             if (notificationDates[0].Contains("-"))
             {
                 // We are looking in a range of dates
                 foreach (string datepair in notificationDates)
                 {
                     string[] splittedDates = datepair.Split("-");
-                    if (isBetweenDates(DateTime.Parse(String.Format("{0:yyyy/MM/dd}", DateTime.Now)), DateTime.Parse(splittedDates[0]), DateTime.Parse(splittedDates[1])))
+                    if (
+                        isBetweenDates(
+                            DateTime.Parse(String.Format("{0:yyyy/MM/dd}", DateTime.Now)),
+                            DateTime.Parse(splittedDates[0]),
+                            DateTime.Parse(splittedDates[1])
+                        )
+                    )
                     {
                         notifications_bool = work.Notifications_bool; // What is this bool??
                         break;
@@ -77,9 +92,15 @@ namespace IguideME.Web.Services
                 }
             }
             else
-                notifications_bool = work.Notifications_bool && notificationDates.Contains(String.Format("{0:yyyy/MM/dd}", DateTime.Now));
+                notifications_bool =
+                    work.Notifications_bool
+                    && notificationDates.Contains(String.Format("{0:yyyy/MM/dd}", DateTime.Now));
 
-            _logger.LogInformation("{Time}: Starting sync for course {CourseID}", DateTime.Now, courseID);
+            _logger.LogInformation(
+                "{Time}: Starting sync for course {CourseID}",
+                DateTime.Now,
+                courseID
+            );
 
             string timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
 
@@ -99,47 +120,54 @@ namespace IguideME.Web.Services
             sw.Start();
 
             new UserWorker(courseID, timestamp, _lmsHandler, _logger).Start();
-            await _computationJobStatus.UpdateJobProgressInformationAsync(
-                jobId, $"tasks.students", 0
-            ).ConfigureAwait(false);
+            await _computationJobStatus
+                .UpdateJobProgressInformationAsync(jobId, $"tasks.students", 0)
+                .ConfigureAwait(false);
 
             new QuizWorker(courseID, timestamp, _lmsHandler, _logger).Start();
-            await _computationJobStatus.UpdateJobProgressInformationAsync(
-                jobId, $"tasks.quizzes", 0
-            ).ConfigureAwait(false);
+            await _computationJobStatus
+                .UpdateJobProgressInformationAsync(jobId, $"tasks.quizzes", 0)
+                .ConfigureAwait(false);
 
             new DiscussionWorker(courseID, timestamp, _lmsHandler, _logger).Start();
-            await _computationJobStatus.UpdateJobProgressInformationAsync(
-                jobId, $"tasks.discussions", 0
-            ).ConfigureAwait(false);
+            await _computationJobStatus
+                .UpdateJobProgressInformationAsync(jobId, $"tasks.discussions", 0)
+                .ConfigureAwait(false);
 
             new AssignmentWorker(courseID, timestamp, _lmsHandler, _logger).Start();
-            await _computationJobStatus.UpdateJobProgressInformationAsync(
-                jobId, $"tasks.assignments", 0
-            ).ConfigureAwait(false);
+            await _computationJobStatus
+                .UpdateJobProgressInformationAsync(jobId, $"tasks.assignments", 0)
+                .ConfigureAwait(false);
 
             _logger.LogInformation("Starting recycleexternaldata");
             DatabaseManager.Instance.RecycleExternalData(courseID, timestamp);
 
             new GradePredictorWorker(courseID, timestamp, _logger).Start();
-            await _computationJobStatus.UpdateJobProgressInformationAsync(
-                jobId, $"tasks.grade-predictor", 0
-            ).ConfigureAwait(false);
+            await _computationJobStatus
+                .UpdateJobProgressInformationAsync(jobId, $"tasks.grade-predictor", 0)
+                .ConfigureAwait(false);
 
             new PeerGroupWorker(courseID, timestamp, _logger).Start();
-            await _computationJobStatus.UpdateJobProgressInformationAsync(
-                jobId, $"tasks.peer-groups", 0
-            ).ConfigureAwait(false);
+            await _computationJobStatus
+                .UpdateJobProgressInformationAsync(jobId, $"tasks.peer-groups", 0)
+                .ConfigureAwait(false);
 
-            new NotificationsWorker(courseID, timestamp, _lmsHandler, notifications_bool, _logger).Start();
-            await _computationJobStatus.UpdateJobProgressInformationAsync(
-                jobId, $"tasks.notifications", 0
-            ).ConfigureAwait(false);
+            new NotificationsWorker(
+                courseID,
+                timestamp,
+                _lmsHandler,
+                notifications_bool,
+                _logger
+            ).Start();
+            await _computationJobStatus
+                .UpdateJobProgressInformationAsync(jobId, $"tasks.notifications", 0)
+                .ConfigureAwait(false);
 
+            DatabaseManager.Instance.GetUsage(courseID, timestamp);
             _logger.LogInformation("Finishing sync");
-            await _computationJobStatus.UpdateJobProgressInformationAsync(
-                jobId, $"tasks.done", 0
-            ).ConfigureAwait(false);
+            await _computationJobStatus
+                .UpdateJobProgressInformationAsync(jobId, $"tasks.done", 0)
+                .ConfigureAwait(false);
 
             long duration = sw.ElapsedMilliseconds;
             Console.WriteLine("Took: " + duration.ToString() + "ms");

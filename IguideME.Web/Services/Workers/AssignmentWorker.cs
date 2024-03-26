@@ -134,7 +134,6 @@ namespace IguideME.Web.Services.Workers
                             break;
                     }
 
-                    _logger.LogInformation("processing entryid {}", submission.EntryID);
                     DatabaseManager.Instance.CreateUserSubmission(
                         this._courseID,
                         submission,
