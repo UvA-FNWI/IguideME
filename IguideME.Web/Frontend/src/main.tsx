@@ -1,34 +1,33 @@
 // /----------------------------- React ------------------------------/
-import AdminPanel from '@/components/crystals/admin-panel/admin-panel.tsx';
-import Analytics from '@/components/pages/admin/analytics/analytics.tsx';
 import App from './App.tsx';
-import Dashboard from '@/components/pages/admin/dashboard/dashboard.tsx';
-import DataWizard from '@/components/pages/admin/datawizard/datawizard.tsx';
-import EditLayout from '@/components/pages/admin/layout/layout.tsx';
-import ErrorPage from '@/components/pages/error';
-import GradeAnalyzer from '@/components/pages/admin/analyzer/analyzer.tsx';
-import GradePredictor from '@/components/pages/admin/predictor/predictor.tsx';
-import Home from '@/components/pages/home/home.tsx';
-import LearningGoals from '@/components/pages/admin/learning-goals/learning-goals.tsx';
-import NotificationCentre from '@/components/pages/admin/notificationcentre/notificationcentre.tsx';
-import React from 'react';
+import Loading from './components/particles/loading.tsx';
+import React, { lazy, Suspense } from 'react';
 import ReactDOM from 'react-dom/client';
-import Settings from '@/components/pages/admin/settings/settings.tsx';
 import setup from '@/api/setup.ts';
-import StudentDashboard from '@/components/pages/student-dashboard/student-dashboard.tsx';
-import StudentOverview from '@/components/pages/admin/studentoverview/studentoverview.tsx';
-import TileDetailView from './components/pages/tile-detail-view/tile-detail-view.tsx';
-import Tiles from '@/components/pages/admin/tiles/tiles.tsx';
-import ViewLayout from './components/crystals/layout-view/layout-view.tsx';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import './globals.css';
 
-// /--------------------------- Components ---------------------------/
-
-// /----------------------------- Misc. ------------------------------/
-
-// Loads the base style sheet for the app.
+// /--------------------------- Pages ---------------------------/
+const ErrorPage = lazy(async () => await import('@/components/pages/error.tsx'));
+const Home = lazy(async () => await import('@/components/pages/home/home.tsx'));
+const Tiles = lazy(async () => await import('@/components/pages/admin/tiles/tiles.tsx'));
+const EditLayout = lazy(async () => await import('@/components/pages/admin/layout/layout.tsx'));
+const Settings = lazy(async () => await import('@/components/pages/admin/settings/settings.tsx'));
+const Dashboard = lazy(async () => await import('@/components/pages/admin/dashboard/dashboard.tsx'));
+const Analytics = lazy(async () => await import('@/components/pages/admin/analytics/analytics.tsx'));
+const GradeAnalyzer = lazy(async () => await import('@/components/pages/admin/analyzer/analyzer.tsx'));
+const AdminPanel = lazy(async () => await import('@/components/crystals/admin-panel/admin-panel.tsx'));
+const DataWizard = lazy(async () => await import('@/components/pages/admin/datawizard/datawizard.tsx'));
+const LearningGoals = lazy(async () => await import('@/components/pages/admin/learning-goals/learning-goals.tsx'));
+const GradePredictor = lazy(async () => await import('@/components/pages/admin/predictor/predictor.tsx'));
+const StudentDashboard = lazy(async () => await import('@/components/pages/student-dashboard/student-dashboard.tsx'));
+const StudentOverview = lazy(async () => await import('@/components/pages/admin/studentoverview/studentoverview.tsx'));
+const NotificationCentre = lazy(
+  async () => await import('@/components/pages/admin/notificationcentre/notificationcentre.tsx'),
+);
+const ViewLayout = lazy(async () => await import('@/components/crystals/layout-view/layout-view.tsx'));
+const TileDetailView = lazy(async () => await import('@/components/pages/tile-detail-view/tile-detail-view.tsx'));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -66,28 +65,30 @@ enableMocking()
         <React.StrictMode>
           <QueryClientProvider client={queryClient}>
             <BrowserRouter>
-              <Routes>
-                <Route path="/" element={<App />} errorElement={<ErrorPage />}>
-                  <Route path="" element={<Home />} />
-                  <Route path=":id" element={<StudentDashboard />}>
-                    <Route path="" element={<ViewLayout />} />
-                    <Route path=":tid" element={<TileDetailView />} />
+              <Suspense fallback={<Loading />}>
+                <Routes>
+                  <Route path="/" element={<App />} errorElement={<ErrorPage />}>
+                    <Route path="" element={<Home />} />
+                    <Route path=":id" element={<StudentDashboard />}>
+                      <Route path="" element={<ViewLayout />} />
+                      <Route path=":tid" element={<TileDetailView />} />
+                    </Route>
+                    <Route path="admin" element={<AdminPanel />}>
+                      <Route path="" element={<Dashboard />} />
+                      <Route path="tiles" element={<Tiles />} />
+                      <Route path="layout" element={<EditLayout />} />
+                      <Route path="student-overview" element={<StudentOverview />} />
+                      <Route path="grade-predictor" element={<GradePredictor />} />
+                      <Route path="grade-analyzer" element={<GradeAnalyzer />} />
+                      <Route path="data-wizard" element={<DataWizard />} />
+                      <Route path="learning-goals" element={<LearningGoals />} />
+                      <Route path="analytics" element={<Analytics />} />
+                      <Route path="notification-centre" element={<NotificationCentre />} />
+                      <Route path="settings" element={<Settings />} />
+                    </Route>
                   </Route>
-                  <Route path="admin" element={<AdminPanel />}>
-                    <Route path="" element={<Dashboard />} />
-                    <Route path="tiles" element={<Tiles />} />
-                    <Route path="layout" element={<EditLayout />} />
-                    <Route path="student-overview" element={<StudentOverview />} />
-                    <Route path="grade-predictor" element={<GradePredictor />} />
-                    <Route path="grade-analyzer" element={<GradeAnalyzer />} />
-                    <Route path="data-wizard" element={<DataWizard />} />
-                    <Route path="learning-goals" element={<LearningGoals />} />
-                    <Route path="analytics" element={<Analytics />} />
-                    <Route path="notification-centre" element={<NotificationCentre />} />
-                    <Route path="settings" element={<Settings />} />
-                  </Route>
-                </Route>
-              </Routes>
+                </Routes>
+              </Suspense>
             </BrowserRouter>
           </QueryClientProvider>
         </React.StrictMode>,
