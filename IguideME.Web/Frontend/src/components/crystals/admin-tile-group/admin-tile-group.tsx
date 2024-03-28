@@ -1,14 +1,13 @@
+import AdminTileView from '@/components/crystals/admin-tile-view/admin-tile-view';
+import Loading from '@/components/particles/loading';
+import { Button, Col, Divider, Input, Row } from 'antd';
+import { CSS } from '@dnd-kit/utilities';
+import { DeleteFilled, PlusOutlined } from '@ant-design/icons';
+import { deleteTileGroup, getTiles, patchTileGroup, postTile } from '@/api/tiles';
+import { SortableContext, useSortable } from '@dnd-kit/sortable';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { useState, type FC, type ReactElement, useMemo } from 'react';
 import { TileType, type TileGroup, GradingType } from '@/types/tile';
-
-import { Button, Col, Divider, Input, Row } from 'antd';
-import { SortableContext, useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-import { useMutation, useQuery, useQueryClient } from 'react-query';
-import { deleteTileGroup, getTiles, patchTileGroup, postTile } from '@/api/tiles';
-import { DeleteFilled, PlusOutlined } from '@ant-design/icons';
-import Loading from '@/components/particles/loading';
-import AdminTileView from '@/components/crystals/admin-tile-view/admin-tile-view';
 
 interface Props {
   group: TileGroup;
@@ -85,7 +84,7 @@ const AdminTileGroupView: FC<Props> = ({ group }): ReactElement => {
       ref={setNodeRef}
       style={style}
     >
-      <Row align="middle" className="cursor-grab" justify="space-between" {...attributes} {...listeners}>
+      <Row className="content-center cursor-grab justify-between" {...attributes} {...listeners}>
         <Col className="cursor-text">
           <h2
             className="text-lg p-1"
@@ -128,7 +127,7 @@ const AdminTileGroupView: FC<Props> = ({ group }): ReactElement => {
         </Col>
       </Row>
       <Divider className="mt-1 mb-2" />
-      <Row gutter={[20, 20]} className="p-[10px]" justify="start">
+      <Row gutter={[20, 20]} className="p-[10px] justify-start">
         <SortableContext items={tileIds}>
           {tiles === undefined ? (
             <Loading />

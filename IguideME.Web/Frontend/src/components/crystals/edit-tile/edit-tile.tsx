@@ -1,15 +1,15 @@
-import { deleteTile, patchTile } from '@/api/tiles';
-import { TileType, type Tile } from '@/types/tile';
-import { Button, Col, Form, Input, Row, Select, Space } from 'antd';
-import { useContext, type FC, type ReactElement, useState } from 'react';
-import { useMutation, useQueryClient } from 'react-query';
-import { DrawerContext } from '../tile-group-board/contexts';
-import Swal from 'sweetalert2';
-import { BellTwoTone, CheckCircleTwoTone, StopTwoTone } from '@ant-design/icons';
 import EditTileAssignments from '@/components/atoms/edit-tile-assignments/edit-tile-assignments';
 import EditTileDiscussions from '@/components/atoms/edit-tile-discussions/edit-tile-discussions';
 import EditTileGoals from '@/components/atoms/edit-tile-goals/edit-tile-goals';
+import Swal from 'sweetalert2';
+import { BellTwoTone, CheckCircleTwoTone, StopTwoTone } from '@ant-design/icons';
+import { Button, Col, Form, Input, Row, Select, Space } from 'antd';
+import { deleteTile, patchTile } from '@/api/tiles';
+import { DrawerContext } from '../tile-group-board/contexts';
 import { useForm, useWatch } from 'antd/es/form/Form';
+import { useMutation, useQueryClient } from 'react-query';
+import { TileType, type Tile } from '@/types/tile';
+import { useContext, type FC, type ReactElement, useState } from 'react';
 
 interface Props {
   tile: Tile;
@@ -49,6 +49,7 @@ const EditTile: FC<Props> = ({ tile }): ReactElement => {
         saveTile(data);
       }}
       requiredMark={false}
+      className="flex flex-col gap-2"
     >
       <Item name="id" hidden>
         <Input type="hidden" />
@@ -59,9 +60,9 @@ const EditTile: FC<Props> = ({ tile }): ReactElement => {
       <Item name="position" hidden>
         <Input type="hidden" />
       </Item>
-      <Row align="middle" className="h-4">
-        <Col span={4}>
-          <div className="h-full">Title:</div>
+      <Row className="content-center">
+        <Col span={4} className="grid items-center">
+          Title:
         </Col>
         <Col span={8}>
           <Item name="title" rules={[{ required: true, message: 'Please insert a title for the tile' }]} noStyle>
@@ -80,9 +81,9 @@ const EditTile: FC<Props> = ({ tile }): ReactElement => {
         </Col>
       </Row>
 
-      <Row align="middle" className="h-4">
-        <Col span={4}>
-          <div className="h-full">Type:</div>
+      <Row className="content-center">
+        <Col span={4} className="grid items-center">
+          Type:
         </Col>
         <Col span={8}>
           <Item name="type" noStyle>
@@ -101,16 +102,16 @@ const EditTile: FC<Props> = ({ tile }): ReactElement => {
         </Col>
       </Row>
       {renderTypeSettings()}
-      <Row>
+      <Row className="flex gap-1 [&_*]:m-0">
         <Col>
-          <Item className="mr-[10px] mb-[5px]">
+          <Item>
             <Button type="primary" htmlType="submit">
               Save
             </Button>
           </Item>
         </Col>
         <Col>
-          <Item className="mr-[10px] mb-[5px]">
+          <Item>
             <Button
               type="primary"
               danger

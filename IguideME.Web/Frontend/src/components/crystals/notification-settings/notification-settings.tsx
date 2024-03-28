@@ -1,10 +1,10 @@
-import { getNotificationSettings, postNotificationSettings } from '@/api/course_settings';
+import DatePicker from 'react-multi-date-picker';
 import Loading from '@/components/particles/loading';
 import { Button, Checkbox, Col, Form, Row } from 'antd';
+import { getNotificationSettings, postNotificationSettings } from '@/api/course_settings';
 import { useForm } from 'antd/es/form/Form';
-import { useState, type FC, type ReactElement } from 'react';
-import DatePicker from 'react-multi-date-picker';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
+import { useState, type FC, type ReactElement } from 'react';
 
 const { Item } = Form;
 
@@ -58,7 +58,7 @@ const NotificationSettingsForm: FC<{
   };
   return (
     <Form<Data> form={form} name="notification_settings_form" initialValues={{ dates }} onFinish={submit}>
-      <Row align="middle" className="py-[10px]">
+      <Row className="py-[10px] content-center">
         <Col span={6}>
           <Item name="dates" label="Dates" className="m-0">
             <DatePicker multiple={true} range={range} />

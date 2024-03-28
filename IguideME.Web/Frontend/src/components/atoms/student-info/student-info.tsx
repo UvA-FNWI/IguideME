@@ -1,6 +1,6 @@
-import type { User } from '@/types/user';
-import { SmileTwoTone } from '@ant-design/icons';
 import { Col, Row } from 'antd';
+import { SmileTwoTone } from '@ant-design/icons';
+import type { User } from '@/types/user';
 import { type FC, type ReactElement } from 'react';
 
 interface Props {
@@ -11,7 +11,7 @@ const StudentInfo: FC<Props> = ({ self }): ReactElement => {
   // TODO: need to fix align, fsr the height of the second column is wrong
   return (
     <div className="min-w-[250px] h-[50px] grid items-center">
-      <Row align="middle" gutter={35}>
+      <Row className="content-center" gutter={35}>
         <Col span={4}>
           <SmileTwoTone twoToneColor="#00cc66" className="text-4xl" />
         </Col>

@@ -25,7 +25,7 @@ const GridTile: FC<Props> = ({ type, grades }): ReactElement => {
 
 export const GradeView: FC<Grades> = ({ grade, max, type }): ReactElement => {
   return (
-    <Space align="end">
+    <Space className="content-end">
       <div>
         {grade > 50 ? (
           <LikeTwoTone twoToneColor={'rgb(0, 185, 120)'} className="text-lg" />

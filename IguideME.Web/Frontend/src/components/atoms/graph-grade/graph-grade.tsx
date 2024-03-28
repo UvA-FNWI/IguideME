@@ -1,36 +1,29 @@
-import { type Grades } from "@/types/tile";
-import { type FC, type ReactElement } from "react";
+import { Bullet } from '@ant-design/charts';
+import { Col, Row } from 'antd';
+import { type Grades } from '@/types/tile';
+import { type FC, type ReactElement } from 'react';
 
-import { Bullet } from "@ant-design/charts";
-import { Col, Row } from "antd";
+const BLUE = 'rgba(90, 50, 255, .9)';
+const RED = 'rgba(255, 50, 50, .8)';
 
-const BLUE = "rgba(90, 50, 255, .9)";
-const RED = "rgba(255, 50, 50, .8)";
-
-const GraphGrade: FC<Grades> = ({
-  grade,
-  peerAvg,
-  peerMin,
-  peerMax,
-  max,
-}): ReactElement => {
+const GraphGrade: FC<Grades> = ({ grade, peerAvg, peerMin, peerMax, max }): ReactElement => {
   const studentdata = [
     {
-      title: "You",
+      title: 'You',
       Grade: grade,
       Max: max,
     },
   ];
   const peerdata = [
     {
-      title: "Peers",
-      "Peer avg": peerAvg,
+      title: 'Peers',
+      'Peer avg': peerAvg,
       ranges: [peerMin, peerMax, max],
     },
   ];
 
   const config = {
-    layout: "vertical",
+    layout: 'vertical',
     padding: 10,
     paddingBottom: 20,
     paddingTop: 0,
@@ -38,12 +31,12 @@ const GraphGrade: FC<Grades> = ({
       y: { label: false, tick: false, grid: false },
     },
     tooltip: {
-      title: "",
+      title: '',
       items: [
         {
-          channel: "y",
+          channel: 'y',
 
-          valueFormatter: ".2f",
+          valueFormatter: '.2f',
         },
       ],
     },
@@ -60,39 +53,39 @@ const GraphGrade: FC<Grades> = ({
     target: {
       sizeField: 30,
     },
-    legend: { color: { position: "bottom" } },
+    legend: { color: { position: 'bottom' } },
   };
 
   return (
-    <Row style={{ height: "100%" }}>
-      <Col span={12} style={{ height: "100%" }}>
+    <Row className="h-full">
+      <Col span={12} className="h-full">
         <Bullet
           data={studentdata}
           rangeField="Max"
           measureField="Grade"
           color={{
-            Max: ["#f6f8fa"],
+            Max: ['#f6f8fa'],
             Grade: BLUE,
           }}
           {...config}
         />
       </Col>
-      <Col span={12} style={{ height: "100%" }}>
+      <Col span={12} className="h-full">
         <Bullet
           data={peerdata}
           measureField="Peer avg"
           color={{
-            ranges: ["#f6f8fa", "rgba(255, 50, 50, .3)", "#f6f8fb"],
-            "Peer avg": RED,
+            ranges: ['#f6f8fa', 'rgba(255, 50, 50, .3)', '#f6f8fb'],
+            'Peer avg': RED,
           }}
           {...config}
           mapField={{
-            measures: "Peer avg",
-            ranges: ["Max", "Peer max", "Peer min"],
-            target: "",
+            measures: 'Peer avg',
+            ranges: ['Max', 'Peer max', 'Peer min'],
+            target: '',
           }}
         />
-      </Col>{" "}
+      </Col>{' '}
     </Row>
   );
 };

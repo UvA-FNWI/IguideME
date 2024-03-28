@@ -1,11 +1,7 @@
-import {
-  AssignmentDetail,
-  DiscussionDetail,
-  LearningGoalDetail,
-} from "@/components/atoms/entry-details/entry-details";
-import { TileType, type TileEntry } from "@/types/tile";
-import { Row } from "antd";
-import { type FC, type ReactElement } from "react";
+import { AssignmentDetail, DiscussionDetail, LearningGoalDetail } from '@/components/atoms/entry-details/entry-details';
+import { Row } from 'antd';
+import { TileType, type TileEntry } from '@/types/tile';
+import { type FC, type ReactElement } from 'react';
 
 interface Props {
   entry: TileEntry;
@@ -14,13 +10,13 @@ interface Props {
 const EntryView: FC<Props> = ({ entry, type }): ReactElement => {
   return (
     <div className="tileView">
-      <Row justify={"center"} align={"middle"} style={{ height: "20%" }}>
+      <Row className="justify-center content-center h-1/5">
         <h3
           style={{
             fontSize: 18,
             fontWeight: 1400,
             fontFamily: '"Antic Slab", serif',
-            lineHeight: "normal",
+            lineHeight: 'normal',
           }}
         >
           {entry.title}

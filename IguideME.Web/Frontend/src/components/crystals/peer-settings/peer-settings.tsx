@@ -1,11 +1,10 @@
+import Loading from '@/components/particles/loading';
 import { Button, Col, Form, InputNumber, Row, Switch } from 'antd';
-
-import { type FC, type ReactElement } from 'react';
 import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
-
 import { getPeerSettings, postPeerSettings } from '@/api/course_settings';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
-import Loading from '@/components/particles/loading';
+
+import { type FC, type ReactElement } from 'react';
 
 const PeerSettings: FC = (): ReactElement => {
   const { data } = useQuery('peer-settings', getPeerSettings);
@@ -44,19 +43,24 @@ const PeerSettingsForm: FC<Props> = ({ minSize, personalizedPeers }): ReactEleme
       initialValues={{ min_size: minSize, personalized_peers: personalizedPeers }}
       onFinish={savePeer}
     >
-      <Row justify="space-between" align="middle">
+      <Row className="justify-between content-center">
         <Col>
           <Form.Item name="min_size" label="Minimum group size" className="m-0">
             <InputNumber min={2} />
           </Form.Item>
         </Col>
         <Col>
-          <Form.Item name="personalized_peers" label="Personalized" valuePropName="checked" className="m-[10px] [&_button]:bg-black/25">
+          <Form.Item
+            name="personalized_peers"
+            label="Personalized"
+            valuePropName="checked"
+            className="m-[10px] [&_button]:bg-black/25"
+          >
             <Switch defaultChecked checkedChildren={<CheckOutlined />} unCheckedChildren={<CloseOutlined />} />
           </Form.Item>
         </Col>
       </Row>
-      <Row justify="end">
+      <Row className="justify-end">
         <Col>
           <Form.Item className="mr-[10px] mb-[5px]">
             <Button htmlType="submit">Save</Button>

@@ -2,12 +2,12 @@ import GraphTile from '@/components/crystals/graph-tile/graph-tile.tsx';
 import GridTile from '@/components/crystals/grid-tile/grid-tile.tsx';
 import Loading from '@/components/particles/loading';
 import PeerComparison from '@/components/particles/peer-comparison/peercomparison';
+import { cn } from '@/utils/cn';
 import { Col, Divider, Row } from 'antd';
 import { getTileGrades } from '@/api/tiles';
 import { tileViewContext } from '@/components/pages/student-dashboard/context';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from 'react-query';
-import './style.scss';
 import { useContext, type FC, type ReactElement } from 'react';
 
 import { TileType, type Tile, GradingType } from '@/types/tile';
@@ -29,23 +29,13 @@ const ViewTile: FC<Props> = ({ tile, textStyle }): ReactElement => {
 
   return (
     <div
-      className="tileView"
-      style={{ cursor: 'pointer' }}
+      className="cursor-pointer w-[270px] h-[230px] border border-solid bg-white border-primary-gray"
       onClick={() => {
         navigate(tile.id + '/');
       }}
     >
-      <Row justify={'center'} align={'middle'} style={{ height: '20%' }}>
-        <h3
-          style={{
-            fontSize: 18,
-            fontWeight: 1400,
-            fontFamily: '"Antic Slab", serif',
-            lineHeight: 'normal',
-          }}
-        >
-          {tile.title}
-        </h3>
+      <Row className="h-1/5 justify-center content-center">
+        <h3 className={cn('text-lg', textStyle)}>{tile.title}</h3>
       </Row>
       {renderViewType()}
     </div>
@@ -63,7 +53,7 @@ const ViewTile: FC<Props> = ({ tile, textStyle }): ReactElement => {
     switch (context.viewType) {
       case 'graph':
         return (
-          <Row justify={'center'} align={'middle'} className="h-4/5">
+          <Row className="h-4/5 justify-center content-center">
             <GraphTile
               type={tile.type}
               grades={{
@@ -80,7 +70,7 @@ const ViewTile: FC<Props> = ({ tile, textStyle }): ReactElement => {
       case 'grid':
         return (
           <>
-            <Row justify={'center'} align={'middle'} className="h-1/2">
+            <Row className="h-1/2 justify-center content-center">
               <GridTile
                 type={tile.type}
                 grades={{
@@ -93,7 +83,7 @@ const ViewTile: FC<Props> = ({ tile, textStyle }): ReactElement => {
                 }}
               />
             </Row>
-            <Row justify={'center'} align={'top'} className="w-full h-[30%]">
+            <Row className="w-full h-[30%] justify-center content-start">
               <Col className="h-full w-full">
                 <Divider className="m-0 p-0 w-full" />
                 <PeerComparison

@@ -1,11 +1,10 @@
 import { Col, Divider, InputNumber, Row, Slider, Transfer } from 'antd';
-import { type FC, type ReactElement, useState } from 'react';
-import { useQuery } from 'react-query';
-import { DeleteFilled } from '@ant-design/icons';
-import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-
+import { DeleteFilled } from '@ant-design/icons';
 import { getTileGroups } from '@/api/tiles';
+import { useQuery } from 'react-query';
+import { useSortable } from '@dnd-kit/sortable';
+import { type FC, type ReactElement, useState } from 'react';
 
 import { type LayoutColumn } from '@/types/tile';
 
@@ -14,129 +13,120 @@ const MAX_WIDTH = 100;
 const formatter = (value: number | undefined): string => (value !== undefined ? `${value}%` : '');
 
 interface Props {
-	column: LayoutColumn;
-	remove?: (index: number) => void;
-	parentOnChange?: (column: LayoutColumn) => void;
+  column: LayoutColumn;
+  remove?: (index: number) => void;
+  parentOnChange?: (column: LayoutColumn) => void;
 }
 
 interface RecordType {
-	key: number;
-	title: string;
+  key: number;
+  title: string;
 }
 
 const ConfigLayoutColumn: FC<Props> = ({ column, remove, parentOnChange }): ReactElement => {
-	const [width, setWidth] = useState<number>(column.width);
-	const [targetGroups, setGroups] = useState<string[]>(column.groups.map(String));
-	const [selectedGroups, setSelectedGroups] = useState<string[]>([]);
-	const { data } = useQuery('tile-groups', getTileGroups);
-	const groups: RecordType[] | undefined = data?.map((x) => {
-		return { key: x.id, title: x.title };
-	});
+  const [width, setWidth] = useState<number>(column.width);
+  const [targetGroups, setGroups] = useState<string[]>(column.groups.map(String));
+  const [selectedGroups, setSelectedGroups] = useState<string[]>([]);
+  const { data } = useQuery('tile-groups', getTileGroups);
+  const groups: RecordType[] | undefined = data?.map((x) => {
+    return { key: x.id, title: x.title };
+  });
 
-	const onChange = (): void => {
-		parentOnChange?.(column);
-	};
+  const onChange = (): void => {
+    parentOnChange?.(column);
+  };
 
-	const { setNodeRef, attributes, listeners, transform, transition, isDragging } = useSortable({
-		id: column !== undefined ? column.id : 0,
-	});
+  const { setNodeRef, attributes, listeners, transform, transition, isDragging } = useSortable({
+    id: column !== undefined ? column.id : 0,
+  });
 
-	const style = {
-		transition,
-		transform: CSS.Transform.toString(transform),
-	};
+  const style = {
+    transition,
+    transform: CSS.Transform.toString(transform),
+  };
 
-	const onGroupSelectChange = (source: string[], target: string[]): void => {
-		setSelectedGroups([...source, ...target]);
-	};
+  const onGroupSelectChange = (source: string[], target: string[]): void => {
+    setSelectedGroups([...source, ...target]);
+  };
 
-	const onGroupChange = (targetKeys: string[]): void => {
-		setGroups(targetKeys);
-		column.groups = targetKeys.map(key => +key);
-		onChange();
-	};
+  const onGroupChange = (targetKeys: string[]): void => {
+    setGroups(targetKeys);
+    column.groups = targetKeys.map((key) => +key);
+    onChange();
+  };
 
-	if (isDragging) {
-		return (
+  if (isDragging) {
+    return (
       <div
         className="rounded-md w-[425px] h-[360px] p-3 m-2 bg-white shadow-statusCard"
         ref={setNodeRef}
         style={style}
       />
     );
-	}
-	return (
-		<div
-      className="rounded-md w-[425px] h-[360px] p-3 m-2 bg-white shadow-statusCard"
-      ref={setNodeRef}
-      style={style}
-    >
-			<Row
-        className='cursor-grab'
-        justify={'space-between'}
-        {...attributes}
-        {...listeners}
-      >
-				<Col>
-					<h3 className='text-lg'>Column</h3>
-				</Col>
-				<Col>
-					<DeleteFilled onClick={() => remove?.(column.id)} />
-				</Col>
-			</Row>
+  }
+  return (
+    <div className="rounded-md w-[425px] h-[360px] p-3 m-2 bg-white shadow-statusCard" ref={setNodeRef} style={style}>
+      <Row className="cursor-grab justify-between" {...attributes} {...listeners}>
+        <Col>
+          <h3 className="text-lg">Column</h3>
+        </Col>
+        <Col>
+          <DeleteFilled onClick={() => remove?.(column.id)} />
+        </Col>
+      </Row>
 
-			<Divider className='my-[10px] mr-[10px]' />
+      <Divider className="my-[10px] mr-[10px]" />
 
-			<Row align="middle" justify="space-between">
-				<Col span={3}>
-					<span>Width:</span>
-				</Col>
-				<Col span={15}>
-					<Slider
-						min={MIN_WIDTH}
-						max={MAX_WIDTH}
-						value={width}
-						onChange={(value) => {
-							setWidth(value);
-							column.width = value;
-							onChange();
-						}}
-						tooltip={{ formatter }}
-					/>
-				</Col>
-				<Col span={4}>
-					<InputNumber
-						min={MIN_WIDTH}
-						max={MAX_WIDTH}
-						value={width}
-						onChange={(value) => {
-							setWidth(value ?? MIN_WIDTH);
-							column.width = value ?? MIN_WIDTH;
-							onChange();
-						}}
-						formatter={formatter}
-            className='w-[90%]'
-					/>
-				</Col>
-			</Row>
+      <Row className="content-center justify-between">
+        <Col span={3}>
+          <span>Width:</span>
+        </Col>
+        <Col span={15}>
+          <Slider
+            min={MIN_WIDTH}
+            max={MAX_WIDTH}
+            value={width}
+            onChange={(value) => {
+              setWidth(value);
+              column.width = value;
+              onChange();
+            }}
+            tooltip={{ formatter }}
+          />
+        </Col>
+        <Col span={4}>
+          <InputNumber
+            min={MIN_WIDTH}
+            max={MAX_WIDTH}
+            value={width}
+            onChange={(value) => {
+              setWidth(value ?? MIN_WIDTH);
+              column.width = value ?? MIN_WIDTH;
+              onChange();
+            }}
+            formatter={formatter}
+            className="w-[90%]"
+          />
+        </Col>
+      </Row>
 
-			<Divider className='my-[10px] mr-[10px]' />
-			<div className='mb-[10px]'>Tile Groups:</div>
+      <Divider className="my-[10px] mr-[10px]" />
+      <div className="mb-[10px]">Tile Groups:</div>
 
-			<Row justify="center">
-				<Transfer
-					dataSource={groups?.map((value) => ({ ...value, key: value.key.toString() }))}
-					targetKeys={targetGroups}
-					selectedKeys={selectedGroups}
-					onChange={onGroupChange}
-					onSelectChange={onGroupSelectChange}
-					render={(item) => item.title}
-					oneWay
-					showSearch
-				/>
-			</Row>
-		</div>
-	);
+      <Row className="justify-center">
+        <Transfer
+          dataSource={groups?.map((value) => ({ ...value, key: value.key.toString() }))}
+          targetKeys={targetGroups}
+          selectedKeys={selectedGroups}
+          onChange={onGroupChange}
+          onSelectChange={onGroupSelectChange}
+          render={(item) => item.title}
+          oneWay
+          showSearch
+        />
+      </Row>
+    </div>
+  );
 };
 
 export default ConfigLayoutColumn;

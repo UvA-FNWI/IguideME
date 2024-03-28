@@ -1,9 +1,8 @@
 // /------------------------- Module imports -------------------------/
 import NotificationPanel from '@/components/atoms/notification-panel/notification-panel';
-import { Button, Col, ConfigProvider, Row, Select, Space } from 'antd';
+import { Button, Col, Row, Select, Space } from 'antd';
 import { getSelf, getStudents } from '@/api/users';
 import { useQuery } from 'react-query';
-import './style.scss';
 import { type NavigateFunction, useNavigate } from 'react-router-dom';
 import { type Dispatch, type FC, type ReactElement, type SetStateAction, useState } from 'react';
 
@@ -95,7 +94,7 @@ const Header: FC = (): ReactElement => {
 
   return (
     <header className="bg-primary-purple table w-full align-middle text-white">
-      <Row align="middle" className="h-header px-4" justify="space-between">
+      <Row className="h-header px-4 justify-between content-center">
         <Col span={4}>
           <Button className="p-0 m-0" onClick={goHome} type="link">
             <h1 className="text-white align-middle font-semibold inline-block text-2xl  ">IguideME</h1>

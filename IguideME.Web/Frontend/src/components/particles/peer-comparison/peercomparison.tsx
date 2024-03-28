@@ -1,30 +1,16 @@
-import { type FC, type ReactElement } from "react";
-import { type Grades, printGrade } from "@/types/tile";
-import { Col, Row } from "antd";
+import { Col, Row } from 'antd';
+import { type FC, type ReactElement } from 'react';
+import { type Grades, printGrade } from '@/types/tile';
 
-const PeerComparison: FC<Grades> = ({
-  peerAvg,
-  peerMax,
-  peerMin,
-  max,
-  type,
-}): ReactElement => {
+const PeerComparison: FC<Grades> = ({ peerAvg, peerMax, peerMin, max, type }): ReactElement => {
   return (
-    <div className='text-neutral-500'>
-      <Row
-        align="middle"
-        className='p-1'
-        justify="center"
-      >
+    <div className="text-neutral-500">
+      <Row className="p-1 content-center justify-center">
         <Col>
-          <span
-            className='text-xs font-normal'>Peer Comparison</span>
+          <span className="text-xs font-normal">Peer Comparison</span>
         </Col>
       </Row>
-      <Row
-        align="middle"
-        justify="space-around"
-      >
+      <Row className="content-center justify-around">
         <Col className="text-center">
           <div>
             <small>min.</small>

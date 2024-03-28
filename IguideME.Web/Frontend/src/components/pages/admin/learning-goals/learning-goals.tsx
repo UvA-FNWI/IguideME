@@ -91,7 +91,7 @@ const ViewLearningGoal: FC<GoalProps> = ({ goal }): ReactElement => {
 
   return (
     <div className="font-tnum p-[10px] border border-dashed border-zinc-400 rounded-lg bg-white mb-[10px] min-h-[100px]">
-      <Row align="middle" justify="space-between">
+      <Row className="content-center justify-between">
         <Col className="cursor-text">
           <h2
             onClick={() => {

@@ -1,39 +1,27 @@
-import { type FC, type ReactElement } from "react";
-import { Col, Row, Table, Tooltip } from "antd";
-import { useQuery } from "react-query";
-import { getStudentsWithSettings } from "@/api/users";
-import Loading from "@/components/particles/loading";
-import { type User } from "@/types/user";
-import { type ColumnsType } from "antd/lib/table";
-import { CheckCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
+import Loading from '@/components/particles/loading';
+import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
+import { Col, Row, Table, Tooltip } from 'antd';
+import { getStudentsWithSettings } from '@/api/users';
+import { useQuery } from 'react-query';
+import { type FC, type ReactElement } from 'react';
+import { type User } from '@/types/user';
+import { type ColumnsType } from 'antd/lib/table';
 
 const SettingsTable: FC = (): ReactElement => {
-  const { data: students } = useQuery(
-    "students + settings",
-    getStudentsWithSettings,
-  );
+  const { data: students } = useQuery('students + settings', getStudentsWithSettings);
 
   if (students === undefined) {
     return <Loading />;
   }
 
   return (
-    <div
-      id={"settingsTable"}
-      style={{ position: "relative", overflow: "visible" }}
-    >
-      <Row
-        justify={"space-between"}
-        align={"bottom"}
-        style={{ paddingBottom: "10px" }}
-      >
+    <div className="relative overflow-visible" id={'settingsTable'}>
+      <Row className="justify-between content-end pb-[10px]">
         <Col>
           <h2>General Overview</h2>
         </Col>
         <Col>
-          Consent Given: &ensp;{" "}
-          {students.filter((student: User) => student.settings?.consent).length}
-          /{students.length}
+          Consent Given: &ensp; {students.filter((student: User) => student.settings?.consent).length}/{students.length}
         </Col>
       </Row>
 
@@ -75,12 +63,12 @@ function getData(students: User[]): DataType[] {
 function getColumns(): any {
   const columns: ColumnsType<DataType> = [
     {
-      title: "Student",
-      dataIndex: "name",
+      title: 'Student',
+      dataIndex: 'name',
       fixed: true,
       width: 80,
       sorter: (a, b) => a.name.localeCompare(b.name),
-      defaultSortOrder: "ascend",
+      defaultSortOrder: 'ascend',
       render: (text: string, record: DataType) => {
         return (
           <span>
@@ -92,8 +80,8 @@ function getColumns(): any {
       },
     },
     {
-      title: "Total",
-      dataIndex: "total",
+      title: 'Total',
+      dataIndex: 'total',
       width: 50,
       sorter: (a, b) => (a.total ?? -1) - (b.total ?? -1),
       render: (text: string, record: DataType) => {
@@ -108,8 +96,8 @@ function getColumns(): any {
       },
     },
     {
-      title: "Predicted",
-      dataIndex: "predicted",
+      title: 'Predicted',
+      dataIndex: 'predicted',
       width: 50,
       sorter: (a, b) => (a.predicted ?? -1) - (b.predicted ?? -1),
       render: (text: string, _: any) => {
@@ -124,8 +112,8 @@ function getColumns(): any {
       },
     },
     {
-      title: "Goal",
-      dataIndex: "goal",
+      title: 'Goal',
+      dataIndex: 'goal',
       width: 50,
       sorter: (a, b) => (a.goal ?? -1) - (b.goal ?? -1),
       render: (text: string, _: any) => {
@@ -140,8 +128,8 @@ function getColumns(): any {
       },
     },
     {
-      title: "Consent",
-      dataIndex: "consent",
+      title: 'Consent',
+      dataIndex: 'consent',
       width: 50,
       sorter: (a, b) => {
         const consentA = a.consent === undefined ? 0 : +a.consent;
@@ -150,11 +138,11 @@ function getColumns(): any {
       },
       filters: [
         {
-          text: "Consent given",
+          text: 'Consent given',
           value: true,
         },
         {
-          text: "Consent not given",
+          text: 'Consent not given',
           value: false,
         },
       ],
@@ -162,7 +150,7 @@ function getColumns(): any {
       render: (value: boolean) => {
         if (value) {
           return (
-            <span className={"successText"}>
+            <span className={'successText'}>
               <Tooltip title="Consent given">
                 <CheckCircleOutlined />
               </Tooltip>
@@ -170,7 +158,7 @@ function getColumns(): any {
           );
         } else {
           return (
-            <span className={"dangerText"}>
+            <span className={'dangerText'}>
               <Tooltip title="No consent given">
                 <CloseCircleOutlined />
               </Tooltip>
@@ -180,23 +168,21 @@ function getColumns(): any {
       },
     },
     {
-      title: "Notifications",
-      dataIndex: "notifications",
+      title: 'Notifications',
+      dataIndex: 'notifications',
       width: 50,
       sorter: (a, b) => {
-        const notificationsA =
-          a.notifications === undefined ? 0 : +a.notifications;
-        const notificationsB =
-          b.notifications === undefined ? 0 : +b.notifications;
+        const notificationsA = a.notifications === undefined ? 0 : +a.notifications;
+        const notificationsB = b.notifications === undefined ? 0 : +b.notifications;
         return notificationsB - notificationsA;
       },
       filters: [
         {
-          text: "On",
+          text: 'On',
           value: true,
         },
         {
-          text: "Off",
+          text: 'Off',
           value: false,
         },
       ],
@@ -204,7 +190,7 @@ function getColumns(): any {
       render: (value: boolean) => {
         if (value) {
           return (
-            <span className={"successText"}>
+            <span className={'successText'}>
               <Tooltip title="Notifications turned on">
                 <CheckCircleOutlined />
               </Tooltip>
@@ -212,7 +198,7 @@ function getColumns(): any {
           );
         } else {
           return (
-            <span className={"dangerText"}>
+            <span className={'dangerText'}>
               <Tooltip title="Notifications turned off">
                 <CloseCircleOutlined />
               </Tooltip>

@@ -1,6 +1,4 @@
-import { TileType, type Tile, printGradingType } from '@/types/tile';
-import { useContext, type FC, type ReactElement } from 'react';
-import { Col, Row, Space, Tooltip } from 'antd';
+import Swal from 'sweetalert2';
 import {
   BellTwoTone,
   CarryOutOutlined,
@@ -10,13 +8,14 @@ import {
   EyeTwoTone,
   FormOutlined,
 } from '@ant-design/icons';
-import { deleteTile, patchTile } from '@/api/tiles';
-import { useMutation, useQueryClient } from 'react-query';
+import { Col, Row, Space, Tooltip } from 'antd';
 import { CSS } from '@dnd-kit/utilities';
-
-import { useSortable } from '@dnd-kit/sortable';
+import { deleteTile, patchTile } from '@/api/tiles';
 import { DrawerContext } from '../tile-group-board/contexts';
-import Swal from 'sweetalert2';
+import { useMutation, useQueryClient } from 'react-query';
+import { useSortable } from '@dnd-kit/sortable';
+import { TileType, type Tile, printGradingType } from '@/types/tile';
+import { useContext, type FC, type ReactElement } from 'react';
 
 const GREEN = 'rgb(55, 212, 63)';
 const GREEN_BG = 'rgba(55, 212, 63, 0.1)';
@@ -103,9 +102,9 @@ const AdminTileView: FC<Props> = ({ tile, move }): ReactElement => {
         setEditTile(tile);
       }}
     >
-      <Row align="middle" justify="space-between" gutter={[10, 10]} className="mb-6">
+      <Row gutter={[10, 10]} className="mb-6 justify-between content-center">
         <Col>
-          <Space align="center">
+          <Space className="content-center">
             <Tooltip title={<>This tile is {!tile.visible && <b>not </b>}visible for students</>}>
               {tile.visible ? (
                 <EyeTwoTone
@@ -166,12 +165,12 @@ const AdminTileView: FC<Props> = ({ tile, move }): ReactElement => {
           />
         </Col>
       </Row>
-      <Row justify="space-between" className="mt-[10px]">
+      <Row className="mt-[10px] justify-between">
         <Col>
           <TileTypeView tileType={tile.type} />
         </Col>
       </Row>
-      <Row align="middle" justify="space-between" className="pt-[30px]">
+      <Row className="pt-[30px] justify-between content-center">
         <Col className="h-[30px]">
           {tile.type === TileType.assignments && (
             <>

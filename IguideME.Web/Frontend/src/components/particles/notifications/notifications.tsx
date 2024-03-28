@@ -24,46 +24,58 @@ const Notifications: FC<Props> = ({ user }): ReactElement => {
   return (
     <div>
       {outperforming.length > 0 && (
-        <div>
-          <TrophyOutlined /> You are outperforming your peers in:
-          <ul className="box-border pl-[30px]">
+        <>
+          <div className="flex gap-1">
+            <TrophyOutlined />
+            <p className="text-base">You are outperforming your peers in:</p>
+          </div>
+          <ul className="list-disc pl-9 text-sm">
             {outperforming.map((notification) => (
               <li key={notification.tile_id}>{notification.tile_title}</li>
             ))}
           </ul>
-        </div>
+        </>
       )}
 
       {closing.length > 0 && (
-        <div>
-          <RiseOutlined /> You are closing the gap to your peers in:
-          <ul className="box-border pl-[30px]">
+        <>
+          <div className="flex gap-1">
+            <RiseOutlined />
+            <p className="text-base">You are closing the gap to your peers in:</p>
+          </div>
+          <ul className="list-disc pl-9 text-sm">
             {closing.map((notification) => (
               <li key={notification.tile_id}>{notification.tile_title}</li>
             ))}
           </ul>
-        </div>
+        </>
       )}
 
       {falling.length > 0 && (
-        <div>
-          <WarningOutlined /> You are falling behind in:
-          <ul className="box-border pl-[30px]">
+        <>
+          <div className="flex gap-1">
+            <WarningOutlined />
+            <p className="text-base">You are falling behind in:</p>
+          </div>
+          <ul className="list-disc pl-9 text-sm">
             {falling.map((notification) => (
               <li key={notification.tile_id}>{notification.tile_title}</li>
             ))}
           </ul>
-        </div>
+        </>
       )}
       {effort.length > 0 && (
-        <div>
-          <WarningOutlined /> You have to put more effort in:
-          <ul className="box-border pl-[30px]">
+        <>
+          <div className="flex gap-1">
+            <WarningOutlined />
+            <p className="text-base">You have to put more effort in:</p>
+          </div>
+          <ul className="list-disc pl-9 text-sm">
             {effort.map((notification) => (
               <li key={notification.tile_id}>{notification.tile_title}</li>
             ))}
           </ul>
-        </div>
+        </>
       )}
     </div>
   );

@@ -1,24 +1,16 @@
-import { Row } from "antd";
-import { type PropsWithChildren, type FC, type ReactElement } from "react";
-import "./syle.scss";
+import { Row } from 'antd';
+import { type PropsWithChildren, type FC, type ReactElement } from 'react';
 
 interface Props {
   title: string;
 }
-const GroupView: FC<PropsWithChildren<Props>> = ({
-  title,
-  children,
-}): ReactElement => {
+const GroupView: FC<PropsWithChildren<Props>> = ({ title, children }): ReactElement => {
   return (
-    <div className="groupView">
-      <div style={{ margin: 12 }}>
-        <h2>{title}</h2>
+    <div className="rounded-md bg-slate-50 border border-solid border-primary-gray min-h-[300px] h-full">
+      <div className="m-3">
+        <h2 className="text-center overflow-hidden text-ellipsis whitespace-nowrap">{title}</h2>
       </div>
-      <Row
-        justify="space-evenly"
-        gutter={[10, 78]}
-        style={{ marginTop: "10px", marginBottom: "10px" }}
-      >
+      <Row className="justify-evenly my-[10px]" gutter={[10, 78]}>
         {children}
       </Row>
     </div>

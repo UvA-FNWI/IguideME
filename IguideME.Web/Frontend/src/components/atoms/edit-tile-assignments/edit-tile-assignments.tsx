@@ -1,30 +1,21 @@
-import { Col, Form, InputNumber, Row, Select, Table } from "antd";
-import { useState, type FC, type ReactElement } from "react";
-import { useQuery } from "react-query";
+import Loading from '@/components/particles/loading';
+import { CheckCircleTwoTone, CloseCircleTwoTone, DeleteFilled } from '@ant-design/icons';
+import { Col, Form, InputNumber, Row, Select, Table } from 'antd';
+import { getAssignments } from '@/api/entries';
+import { useQuery } from 'react-query';
+import { useState, type FC, type ReactElement } from 'react';
 
-import { getAssignments } from "@/api/entries";
-import {
-  GradingType,
-  type Assignment,
-  type TileEntry,
-  printGradingType,
-} from "@/types/tile";
-import Loading from "@/components/particles/loading";
-import {
-  CheckCircleTwoTone,
-  CloseCircleTwoTone,
-  DeleteFilled,
-} from "@ant-design/icons";
+import { GradingType, type Assignment, type TileEntry, printGradingType } from '@/types/tile';
 
 const { Item } = Form;
 
 const EditTileAssignments: FC = (): ReactElement => {
-  const { data: assignments } = useQuery("assignments", getAssignments);
+  const { data: assignments } = useQuery('assignments', getAssignments);
   return (
     <>
-      <Row align="middle" className='h-10'>
-        <Col span={4}>
-          <div className='h-full'>Grading:</div>
+      <Row className="content-center">
+        <Col span={4} className="grid items-center">
+          Grading:
         </Col>
         <Col span={8}>
           <Item name="gradingType" noStyle>
@@ -39,29 +30,23 @@ const EditTileAssignments: FC = (): ReactElement => {
             />
           </Item>
         </Col>
-        <Col span={4} offset={1}>
-          <div className='h-full'>Weight:</div>
+        <Col span={4} offset={1} className="grid items-center">
+          Weight:
         </Col>
         <Col span={7}>
           <Item name="weight" noStyle>
             <InputNumber<number>
               className="w-full"
               formatter={(value) => `${(value ?? 0) * 100}%`}
-              parser={(value) =>
-                +parseFloat(value!.replace("%", "")).toFixed(1) / 100
-              }
+              parser={(value) => +parseFloat(value!.replace('%', '')).toFixed(1) / 100}
             />
           </Item>
         </Col>
       </Row>
-      <Row className="h-5">
-        <p>Assignments:</p>
-        <Item name="entries" className="w-full">
-          {assignments === undefined ? (
-            <Loading />
-          ) : (
-            <SelectAssignments assignments={assignments} />
-          )}
+      <Row>
+        <p className="mb-1">Assignments:</p>
+        <Item name="entries" className="w-full m-0">
+          {assignments === undefined ? <Loading /> : <SelectAssignments assignments={assignments} />}
         </Item>
       </Row>
     </>
@@ -74,24 +59,16 @@ interface SelectProps {
   assignments: Map<number, Assignment>;
 }
 
-const SelectAssignments: FC<SelectProps> = ({
-  value: entries,
-  onChange,
-  assignments,
-}): ReactElement => {
+const SelectAssignments: FC<SelectProps> = ({ value: entries, onChange, assignments }): ReactElement => {
   if (entries === undefined) {
     return <Loading />;
   }
 
-  const [selectedAssignments, setSelectedAssignments] = useState<number[]>(
-    entries.map((entry) => entry.content_id),
-  );
+  const [selectedAssignments, setSelectedAssignments] = useState<number[]>(entries.map((entry) => entry.content_id));
   const [open, setOpen] = useState<boolean>(false);
-  const unselectedAssignments: Assignment[] = [...assignments.values()].filter(
-    (ass) => {
-      return !selectedAssignments.some((sel) => sel === ass.id);
-    },
-  );
+  const unselectedAssignments: Assignment[] = [...assignments.values()].filter((ass) => {
+    return !selectedAssignments.some((sel) => sel === ass.id);
+  });
 
   const onSelectChange = (selected: number[]): void => {
     setOpen(false);
@@ -113,10 +90,7 @@ const SelectAssignments: FC<SelectProps> = ({
     if (weight === null) {
       return;
     }
-    onChange?.([
-      ...entries.filter((e) => e.content_id !== entry.content_id),
-      { ...entry, weight },
-    ]);
+    onChange?.([...entries.filter((e) => e.content_id !== entry.content_id), { ...entry, weight }]);
   };
 
   const removeEntry = (rid: number): void => {
@@ -125,19 +99,19 @@ const SelectAssignments: FC<SelectProps> = ({
   };
 
   return (
-    <div>
+    <div className="flex flex-col gap-1">
       <Table
         columns={[
           {
-            title: "Name",
-            dataIndex: "title",
-            key: "title",
+            title: 'Name',
+            dataIndex: 'title',
+            key: 'title',
           },
           {
-            title: "Published",
-            dataIndex: "published",
-            key: "published",
-            align: "center",
+            title: 'Published',
+            dataIndex: 'published',
+            key: 'published',
+            align: 'center',
             render: (_: string, entry: TileEntry) => {
               const assignment = assignments.get(entry.content_id);
               return assignment !== undefined && assignment.published ? (
@@ -148,10 +122,10 @@ const SelectAssignments: FC<SelectProps> = ({
             },
           },
           {
-            title: "Grading",
-            dataIndex: "grading",
-            key: "grading",
-            align: "center",
+            title: 'Grading',
+            dataIndex: 'grading',
+            key: 'grading',
+            align: 'center',
             render: (_: string, entry: TileEntry) => {
               const assignment = assignments.get(entry.content_id);
               if (assignment !== undefined) {
@@ -160,10 +134,10 @@ const SelectAssignments: FC<SelectProps> = ({
             },
           },
           {
-            title: "Weight",
-            dataIndex: "weight",
-            key: "weight",
-            align: "center",
+            title: 'Weight',
+            dataIndex: 'weight',
+            key: 'weight',
+            align: 'center',
             render: (_: string, entry: TileEntry) => {
               return (
                 <InputNumber
@@ -172,18 +146,16 @@ const SelectAssignments: FC<SelectProps> = ({
                     changeWeight(entry, val);
                   }}
                   formatter={(value) => `${(value ?? 0) * 100}%`}
-                  parser={(value) =>
-                    +parseFloat(value!.replace("%", "")).toFixed(1) / 100
-                  }
+                  parser={(value) => +parseFloat(value!.replace('%', '')).toFixed(1) / 100}
                 />
               );
             },
           },
           {
-            title: "",
-            dataIndex: "action",
-            key: "action",
-            align: "center",
+            title: '',
+            dataIndex: 'action',
+            key: 'action',
+            align: 'center',
             render: (_: string, entry: TileEntry) => {
               return (
                 <DeleteFilled
@@ -212,12 +184,10 @@ const SelectAssignments: FC<SelectProps> = ({
           setOpen(visible);
         }}
         onChange={onSelectChange}
-        filterOption={(input, option) =>
-          (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
-        }
+        filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
         tagRender={() => <></>}
         onInputKeyDown={(event) => {
-          if (event.key === "Backspace") {
+          if (event.key === 'Backspace') {
             event.stopPropagation();
           }
         }}

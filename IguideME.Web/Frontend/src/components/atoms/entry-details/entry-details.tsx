@@ -1,14 +1,14 @@
-import { getAssignmentSubmission, getDiscussion } from "@/api/entries";
-import { GradeView } from "@/components/crystals/grid-tile/grid-tile";
-import { tileViewContext } from "@/components/pages/student-dashboard/context";
-import Loading from "@/components/particles/loading";
-import PeerComparison from "@/components/particles/peer-comparison/peercomparison";
-import { type TileEntry } from "@/types/tile";
-import { Divider, Row } from "antd";
-import { Col } from "antd/lib";
-import { useContext, type FC, type ReactElement } from "react";
-import { useQuery } from "react-query";
-import GraphGrade from "../graph-grade/graph-grade";
+import GraphGrade from '../graph-grade/graph-grade';
+import Loading from '@/components/particles/loading';
+import PeerComparison from '@/components/particles/peer-comparison/peercomparison';
+import { Col } from 'antd/lib';
+import { Divider, Row } from 'antd';
+import { getAssignmentSubmission, getDiscussion } from '@/api/entries';
+import { GradeView } from '@/components/crystals/grid-tile/grid-tile';
+import { tileViewContext } from '@/components/pages/student-dashboard/context';
+import { useQuery } from 'react-query';
+import { type TileEntry } from '@/types/tile';
+import { useContext, type FC, type ReactElement } from 'react';
 
 interface Props {
   entry: TileEntry;
@@ -17,8 +17,7 @@ export const AssignmentDetail: FC<Props> = ({ entry }): ReactElement => {
   const context = useContext(tileViewContext);
   const { data: submission } = useQuery(
     `entry/${entry.content_id}/${context.user.studentnumber}`,
-    async () =>
-      await getAssignmentSubmission(entry.content_id, context.user.userID),
+    async () => await getAssignmentSubmission(entry.content_id, context.user.userID),
   );
 
   if (submission === undefined) {
@@ -26,23 +25,23 @@ export const AssignmentDetail: FC<Props> = ({ entry }): ReactElement => {
   }
 
   switch (context.viewType) {
-    case "graph":
+    case 'graph':
       return (
-        <Row justify={"center"} align={"middle"} style={{ height: "80%" }}>
+        <Row className="justify-center content-center h-4/5">
           <GraphGrade {...submission.grades} />
         </Row>
       );
-    case "grid":
+    case 'grid':
       return (
         <>
-          <Row justify={"center"} align={"middle"} style={{ height: "50%" }}>
+          <Row className="justify-center content-center h-1/2">
             <GradeView {...submission.grades} />
           </Row>
-          <Row justify={"center"} align={"top"} style={{ height: "30%" }}>
-            <Col style={{ width: "100%" }}>
-              <Divider style={{ margin: 0, padding: 0 }} />
+          <Row className="justify-center content-start h-[30%]">
+            <Col className="w-full">
+              <Divider className="m-0 p-0" />
               <PeerComparison {...submission.grades} />
-            </Col>{" "}
+            </Col>{' '}
           </Row>
         </>
       );
@@ -58,7 +57,7 @@ export const DiscussionDetail: FC<Props> = ({ entry }): ReactElement => {
   if (discussion === undefined) {
     return <Loading />;
   }
-  console.log("disc", discussion);
+  console.log('disc', discussion);
   return <>{discussion.message}</>;
 };
 export const LearningGoalDetail: FC<Props> = ({ entry }): ReactElement => {
