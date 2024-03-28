@@ -11,11 +11,11 @@ import {
 import { Col, Row, Space, Tooltip } from 'antd';
 import { CSS } from '@dnd-kit/utilities';
 import { deleteTile, patchTile } from '@/api/tiles';
-import { DrawerContext } from '../tile-group-board/contexts';
+import { useDrawerStore } from '../tile-group-board/useDrawerStore';
 import { useMutation, useQueryClient } from 'react-query';
 import { useSortable } from '@dnd-kit/sortable';
 import { TileType, type Tile, printGradingType } from '@/types/tile';
-import { useContext, type FC, type ReactElement } from 'react';
+import { type FC, type ReactElement } from 'react';
 
 const GREEN = 'rgb(55, 212, 63)';
 const GREEN_BG = 'rgba(55, 212, 63, 0.1)';
@@ -43,7 +43,9 @@ const AdminTileView: FC<Props> = ({ tile, move }): ReactElement => {
     },
   });
 
-  const { setEditTile } = useContext(DrawerContext);
+  const { setEditTile } = useDrawerStore((state) => ({
+    setEditTile: state.setEditTile,
+  }));
 
   const { setNodeRef, attributes, listeners, transform, transition, isDragging } = useSortable({
     id: `t${tile.id + 1}`,

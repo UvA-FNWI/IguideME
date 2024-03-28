@@ -6,9 +6,9 @@ import Swal from 'sweetalert2';
 import { arrayMove, SortableContext } from '@dnd-kit/sortable';
 import { Button, Drawer } from 'antd';
 import { createPortal } from 'react-dom';
-import { DrawerContext } from './contexts';
 import { getTileGroups, getTiles, patchTile, patchTileGroupOrder, patchTileOrder, postTileGroup } from '@/api/tiles';
 import { PlusOutlined } from '@ant-design/icons';
+import { useDrawerStore } from './useDrawerStore';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { useMemo, type FC, type ReactElement, useState } from 'react';
 import {
@@ -30,8 +30,9 @@ const TileGroupBoard: FC = (): ReactElement => {
   const { data: tiles } = useQuery('tiles', getTiles);
   const [activeGroup, setActiveGroup] = useState<TileGroup | null>(null);
   const [activeTile, setActiveTile] = useState<Tile | null>(null);
-  const [editTile, setEditTile] = useState<Tile | null>(null);
   const [move, setMove] = useState<boolean>(false);
+
+  const { editTitle, setEditTile } = useDrawerStore();
 
   const queryClient = useQueryClient();
   const { mutate: postGroup } = useMutation({
@@ -81,70 +82,68 @@ const TileGroupBoard: FC = (): ReactElement => {
   }
 
   return (
-    <DrawerContext.Provider value={{ editTile, setEditTile }}>
-      <div className="tileGroupBoard">
-        <Drawer
-          title={'Editing: ' + editTile?.title}
-          placement="right"
-          closable
-          width="45vw"
-          onClose={() => {
-            void Swal.fire({
-              title: 'Warning: any unsaved changes will be deleted!',
-              icon: 'warning',
-              focusCancel: true,
-              showCancelButton: true,
-              confirmButtonText: 'Close',
-              cancelButtonText: 'Cancel',
-              customClass: {},
-            }).then((result) => {
-              if (result.isConfirmed) {
-                setEditTile(null);
-              }
-            });
-          }}
-          open={editTile !== null}
-          rootStyle={{ position: 'absolute' }}
-          getContainer={() => {
-            return document.getElementsByClassName('adminContent')[0];
-          }}
-        >
-          {editTile === null ? '' : <EditTile tile={editTile} />}
-        </Drawer>
-        <DndContext onDragStart={onDragStart} onDragEnd={onDragEnd} onDragOver={onDragOver} sensors={sensors}>
-          <div>
-            <SortableContext items={groupIds}>
-              {tilegroups.map((group, index) => (
-                <div key={index}>
-                  <AdminTileGroupView group={group} />
-                </div>
-              ))}
-            </SortableContext>
-            <Button
-              type="dashed"
-              onClick={() => {
-                postGroup({
-                  title: 'TileGroup',
-                  id: -1,
-                  position: tilegroups.length + 1,
-                });
-              }}
-              block
-              icon={<PlusOutlined />}
-            >
-              New Group
-            </Button>
-          </div>
-          {createPortal(
-            <DragOverlay>
-              {activeGroup !== null && <AdminTileGroupView group={activeGroup} />}
-              {activeTile !== null && <AdminTileView tile={activeTile} move={move} />}
-            </DragOverlay>,
-            document.body,
-          )}
-        </DndContext>
-      </div>
-    </DrawerContext.Provider>
+    <div className="tileGroupBoard">
+      <Drawer
+        title={'Editing: ' + editTitle?.title}
+        placement="right"
+        closable
+        width="45vw"
+        onClose={() => {
+          void Swal.fire({
+            title: 'Warning: any unsaved changes will be deleted!',
+            icon: 'warning',
+            focusCancel: true,
+            showCancelButton: true,
+            confirmButtonText: 'Close',
+            cancelButtonText: 'Cancel',
+            customClass: {},
+          }).then((result) => {
+            if (result.isConfirmed) {
+              setEditTile(null);
+            }
+          });
+        }}
+        open={editTitle !== null}
+        rootStyle={{ position: 'absolute' }}
+        getContainer={() => {
+          return document.getElementsByClassName('adminContent')[0];
+        }}
+      >
+        {editTitle === null ? '' : <EditTile tile={editTitle} />}
+      </Drawer>
+      <DndContext onDragStart={onDragStart} onDragEnd={onDragEnd} onDragOver={onDragOver} sensors={sensors}>
+        <div>
+          <SortableContext items={groupIds}>
+            {tilegroups.map((group, index) => (
+              <div key={index}>
+                <AdminTileGroupView group={group} />
+              </div>
+            ))}
+          </SortableContext>
+          <Button
+            type="dashed"
+            onClick={() => {
+              postGroup({
+                title: 'TileGroup',
+                id: -1,
+                position: tilegroups.length + 1,
+              });
+            }}
+            block
+            icon={<PlusOutlined />}
+          >
+            New Group
+          </Button>
+        </div>
+        {createPortal(
+          <DragOverlay>
+            {activeGroup !== null && <AdminTileGroupView group={activeGroup} />}
+            {activeTile !== null && <AdminTileView tile={activeTile} move={move} />}
+          </DragOverlay>,
+          document.body,
+        )}
+      </DndContext>
+    </div>
   );
 
   function onDragStart(event: DragStartEvent): void {

@@ -1,4 +1,3 @@
-// /------------------------- Module imports -------------------------/
 import styles from './syncclock.module.css';
 import Swal from 'sweetalert2';
 import { Button, Col, Row } from 'antd';
@@ -6,12 +5,11 @@ import { cn } from '@/utils/cn';
 import { getRelativeTimeTimer } from '@/helpers/time';
 import { JobStatus } from '@/types/synchronization';
 import { pollSync, startNewSync, stopCurrentSync } from '@/api/syncing';
-import { syncContext } from '@/components/crystals/syncmanager/types';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
-import { type FC, type ReactElement, useContext, useEffect } from 'react';
+import { type FC, type ReactElement, useEffect, useState } from 'react';
 
 const SyncClock: FC = (): ReactElement => {
-  const { startTime, setStartTime } = useContext(syncContext);
+  const [startTime, setStartTime] = useState<number | null>(null);
   const queryClient = useQueryClient();
 
   let elapsed;

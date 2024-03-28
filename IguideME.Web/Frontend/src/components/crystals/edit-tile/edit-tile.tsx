@@ -5,11 +5,11 @@ import Swal from 'sweetalert2';
 import { BellTwoTone, CheckCircleTwoTone, StopTwoTone } from '@ant-design/icons';
 import { Button, Col, Form, Input, Row, Select, Space } from 'antd';
 import { deleteTile, patchTile } from '@/api/tiles';
-import { DrawerContext } from '../tile-group-board/contexts';
+import { useDrawerStore } from '../tile-group-board/useDrawerStore';
 import { useForm, useWatch } from 'antd/es/form/Form';
 import { useMutation, useQueryClient } from 'react-query';
 import { TileType, type Tile } from '@/types/tile';
-import { useContext, type FC, type ReactElement, useState } from 'react';
+import { type FC, type ReactElement, useState } from 'react';
 
 interface Props {
   tile: Tile;
@@ -23,7 +23,9 @@ const { Item } = Form;
 const EditTile: FC<Props> = ({ tile }): ReactElement => {
   const [form] = useForm<Tile>();
   const queryClient = useQueryClient();
-  const { setEditTile } = useContext(DrawerContext);
+  const { setEditTile } = useDrawerStore((state) => ({
+    setEditTile: state.setEditTile,
+  }));
 
   const { mutate: saveTile } = useMutation({
     mutationFn: patchTile,

@@ -5,10 +5,10 @@ import PeerComparison from '@/components/particles/peer-comparison/peercompariso
 import { cn } from '@/utils/cn';
 import { Col, Divider, Row } from 'antd';
 import { getTileGrades } from '@/api/tiles';
-import { tileViewContext } from '@/components/pages/student-dashboard/context';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from 'react-query';
-import { useContext, type FC, type ReactElement } from 'react';
+import { useTileViewStore } from '@/components/pages/student-dashboard/tileViewContext';
+import { type FC, type ReactElement } from 'react';
 
 import { TileType, type Tile, GradingType } from '@/types/tile';
 
@@ -18,10 +18,14 @@ interface Props {
 }
 
 const ViewTile: FC<Props> = ({ tile, textStyle }): ReactElement => {
-  const context = useContext(tileViewContext);
+  const { user, viewType } = useTileViewStore((state) => ({
+    user: state.user,
+    viewType: state.viewType,
+  }));
+
   const { data: grades } = useQuery(
-    `tiles grades/${context.user!.userID}/${tile.id}`,
-    async () => await getTileGrades(context.user !== undefined ? context.user.userID : '-1', tile.id),
+    `tiles grades/${user!.userID}/${tile.id}`,
+    async () => await getTileGrades(user.userID, tile.id),
   );
   const navigate = useNavigate();
 
@@ -50,7 +54,7 @@ const ViewTile: FC<Props> = ({ tile, textStyle }): ReactElement => {
       );
     }
 
-    switch (context.viewType) {
+    switch (viewType) {
       case 'graph':
         return (
           <Row className="h-4/5 justify-center content-center">
@@ -100,6 +104,9 @@ const ViewTile: FC<Props> = ({ tile, textStyle }): ReactElement => {
             </Row>
           </>
         );
+      default:
+        // TODO: Add a default case
+        return <></>;
     }
   }
 };

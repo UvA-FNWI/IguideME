@@ -1,8 +1,8 @@
 import Loading from '@/components/particles/loading';
 import { FrownTwoTone, MehTwoTone, SmileTwoTone } from '@ant-design/icons';
 import { Space } from 'antd';
-import { tileViewContext } from '@/components/pages/student-dashboard/context';
-import { useContext, type FC, type ReactElement } from 'react';
+import { useTileViewStore } from '@/components/pages/student-dashboard/tileViewContext';
+import { type FC, type ReactElement } from 'react';
 
 import { Bar, type BarConfig } from '@ant-design/charts';
 import { type User } from '@/types/user';
@@ -15,7 +15,9 @@ interface displayProps {
 }
 
 const GradeDisplay: FC<displayProps> = ({ self }): ReactElement => {
-  const context = useContext(tileViewContext);
+  const { viewType } = useTileViewStore((state) => ({
+    viewType: state.viewType,
+  }));
 
   if (self.settings === undefined) {
     return <Loading />;
@@ -25,11 +27,14 @@ const GradeDisplay: FC<displayProps> = ({ self }): ReactElement => {
   const total = self.settings.total_grade / 10;
   const pred = self.settings.predicted_grade;
 
-  switch (context.viewType) {
+  switch (viewType) {
     case 'grid':
       return <GridGrades goal={goal} total={total} pred={pred} />;
     case 'graph':
       return <GraphGrades goal={goal} total={total} pred={pred} />;
+    default:
+      // TODO: Add a default case
+      return <></>;
   }
 };
 

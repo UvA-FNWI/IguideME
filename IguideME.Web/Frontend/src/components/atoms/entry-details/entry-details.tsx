@@ -5,26 +5,30 @@ import { Col } from 'antd/lib';
 import { Divider, Row } from 'antd';
 import { getAssignmentSubmission, getDiscussion } from '@/api/entries';
 import { GradeView } from '@/components/crystals/grid-tile/grid-tile';
-import { tileViewContext } from '@/components/pages/student-dashboard/context';
 import { useQuery } from 'react-query';
+import { useTileViewStore } from '@/components/pages/student-dashboard/tileViewContext';
 import { type TileEntry } from '@/types/tile';
-import { useContext, type FC, type ReactElement } from 'react';
+import { type FC, type ReactElement } from 'react';
 
 interface Props {
   entry: TileEntry;
 }
 export const AssignmentDetail: FC<Props> = ({ entry }): ReactElement => {
-  const context = useContext(tileViewContext);
+  const { user, viewType } = useTileViewStore((state) => ({
+    user: state.user,
+    viewType: state.viewType,
+  }));
+
   const { data: submission } = useQuery(
-    `entry/${entry.content_id}/${context.user.studentnumber}`,
-    async () => await getAssignmentSubmission(entry.content_id, context.user.userID),
+    `entry/${entry.content_id}/${user.studentnumber}`,
+    async () => await getAssignmentSubmission(entry.content_id, user.userID),
   );
 
   if (submission === undefined) {
     return <Loading />;
   }
 
-  switch (context.viewType) {
+  switch (viewType) {
     case 'graph':
       return (
         <Row className="justify-center content-center h-4/5">
@@ -45,14 +49,18 @@ export const AssignmentDetail: FC<Props> = ({ entry }): ReactElement => {
           </Row>
         </>
       );
+    default:
+      // TODO: Add a default case
+      return <></>;
   }
 };
 
 export const DiscussionDetail: FC<Props> = ({ entry }): ReactElement => {
-  const context = useContext(tileViewContext);
+  const user = useTileViewStore((state) => state.user);
+
   const { data: discussion } = useQuery(
-    `entry/${entry.content_id}/${context.user.userID}`,
-    async () => await getDiscussion(entry.content_id, context.user.userID),
+    `entry/${entry.content_id}/${user.userID}`,
+    async () => await getDiscussion(entry.content_id, user.userID),
   );
   if (discussion === undefined) {
     return <Loading />;
@@ -60,6 +68,7 @@ export const DiscussionDetail: FC<Props> = ({ entry }): ReactElement => {
   console.log('disc', discussion);
   return <>{discussion.message}</>;
 };
+
 export const LearningGoalDetail: FC<Props> = ({ entry }): ReactElement => {
   return <></>;
 };
