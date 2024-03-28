@@ -84,13 +84,22 @@ namespace IguideME.Web.Controllers
 
         [Authorize]
         [HttpGet]
-        [Route("tiles/{tileID}/grades/{userID}")]
+        [Route("/tiles/{tileID}/grades/{userID}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public ActionResult GetTileGrades(string tileID, string userID)
         {
-            // TODO: implement body, see Frontend/src/types/tile.tsx -> tilegrades for the expected format
-            return Json("");
+            if (!IsAdministrator() && userID != GetUserID())
+            {
+                return Unauthorized();
+            }
+
+            bool success = int.TryParse(tileID, out int id);
+            if (success)
+            {
+                return Json(_databaseManager.GetTileGrade(id, userID, GetCourseID()));
+            }
+            return BadRequest();
         }
 
         [Authorize]

@@ -1,9 +1,10 @@
-import { getGroupTiles } from '@/api/tiles';
-import { type TileGroup } from '@/types/tile';
-import { Row, Col } from 'antd';
-import { type FC, type ReactElement } from 'react';
-import { useQuery } from 'react-query';
+import GroupView from '@/components/particles/group-view/group-view';
 import TileView from '../tile-view/tile-view';
+import { Col } from 'antd';
+import { getGroupTiles } from '@/api/tiles';
+import { useQuery } from 'react-query';
+import { type TileGroup } from '@/types/tile';
+import { type FC, type ReactElement } from 'react';
 
 interface Props {
   group: TileGroup;
@@ -12,18 +13,13 @@ interface Props {
 const ViewTileGroup: FC<Props> = ({ group }): ReactElement => {
   const { data: tiles } = useQuery('tiles' + group.id, async () => await getGroupTiles(group.id));
   return (
-    <div className="rounded-md bg-slate-50 border border-solid border-gray-100 min-h-[300px] h-full">
-      <div className="m-3">
-        <h2 className="text-xl text-center overflow-hidden text-ellipsis whitespace-nowrap">{group.title}</h2>
-      </div>
-      <Row justify="space-evenly" gutter={[10, 78]} className="my-[10px]">
-        {tiles?.map((tile) => (
-          <Col key={tile.id}>
-            <TileView textStyle="text-center overflow-hidden text-ellipsis whitespace-nowrap !font-tnum" tile={tile} />
-          </Col>
-        ))}
-      </Row>
-    </div>
+    <GroupView title={group.title}>
+      {tiles?.map((tile) => (
+        <Col key={tile.id}>
+          <TileView tile={tile} />
+        </Col>
+      ))}
+    </GroupView>
   );
 };
 

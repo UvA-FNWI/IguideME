@@ -1,14 +1,14 @@
 // /------------------------- Module imports -------------------------/
+import NotificationPanel from '@/components/atoms/notification-panel/notification-panel';
+import { Button, Col, ConfigProvider, Row, Select, Space } from 'antd';
+import { getSelf, getStudents } from '@/api/users';
 import { useQuery } from 'react-query';
-import { Button, Col, Row, Select, Space } from 'antd';
+import './style.scss';
 import { type NavigateFunction, useNavigate } from 'react-router-dom';
 import { type Dispatch, type FC, type ReactElement, type SetStateAction, useState } from 'react';
 
 // /-------------------------- Own imports ---------------------------/
 import { type User, UserRoles } from '@/types/user';
-import { getSelf, getStudents } from '@/api/users';
-
-import NotificationPanel from '@/components/atoms/notification-panel/notification-panel';
 
 /**
  * Helper function for the student selector component.
@@ -24,6 +24,7 @@ const selector = (
   navigate: NavigateFunction,
 ): ReactElement => {
   const { data } = useQuery('students', getStudents, { enabled: isAdmin });
+
   const students = data
     ?.sort((a, b) => a.sortable_name.localeCompare(b.sortable_name))
     .filter((student) => student.userID !== currentUser?.userID);
@@ -39,19 +40,19 @@ const selector = (
   }
 
   return (
-      <Select
-        placeholder={'Choose a student'}
-        value={currentUser?.name}
-        onChange={changeStudent}
-        showSearch={true}
-        optionFilterProp="label"
-        options={students?.map((student) => ({
-          label: student.name,
-          value: student.userID,
-        }))}
-        allowClear={true}
-        className="w-[40vw] max-w-[400px] [&>div]:!bg-primary-purple [&>div>span]:!text-white [&_span_*]:!text-white"
-      />
+    <Select
+      placeholder={'Choose a student'}
+      value={currentUser?.name}
+      onChange={changeStudent}
+      showSearch={true}
+      optionFilterProp="label"
+      options={students?.map((student) => ({
+        label: student.name,
+        value: student.userID,
+      }))}
+      allowClear={true}
+      className="w-[40vw] max-w-[400px] [&>div]:!bg-primary-purple [&>div>span]:!text-white [&_span_*]:!text-white"
+    />
   );
 };
 
@@ -79,7 +80,6 @@ const Header: FC = (): ReactElement => {
   const [currentUser, setCurrentUser] = useState<User | undefined>(self);
   const [inHome, setInHome] = useState<boolean>(true);
 
-  // TODO: change to request from is-admin route.
   const isAdmin: boolean = self?.role === UserRoles.instructor;
 
   const goHome = (): void => {
@@ -102,8 +102,8 @@ const Header: FC = (): ReactElement => {
           </Button>
         </Col>
         <Col>{selector(isAdmin && inHome, currentUser, setCurrentUser, navigate)}</Col>
-        <Col span={4} className='flex justify-end'>
-          <Space >
+        <Col span={4} className="flex justify-end">
+          <Space>
             <div className="min-w-[30px]">
               <NotificationPanel user={currentUser} />
             </div>

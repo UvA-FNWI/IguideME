@@ -6,6 +6,7 @@ using System.Linq;
 using IguideME.Web.Models;
 using IguideME.Web.Models.App;
 using IguideME.Web.Models.Impl;
+using IguideME.Web.Services.Workers;
 using Microsoft.Extensions.Logging;
 using DiscussionEntry = UvA.DataNose.Connectors.Canvas.DiscussionEntry;
 
@@ -669,6 +670,70 @@ namespace IguideME.Web.Services
             return users;
         }
 
+        public List<User> GetUsersWithSettings(
+            int courseID,
+            UserRoles role = UserRoles.student,
+            long syncID = 0
+        )
+        {
+            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
+            if (activeSync == 0)
+            {
+                _logger.LogWarning("Hash is null, returning empty user list.");
+                return new List<User>() { };
+            }
+
+            List<User> users = new();
+
+            using (
+                SQLiteDataReader r = Query(
+                    DatabaseQueries.QUERY_USERS_WITH_ROLE_FOR_COURSE,
+                    new SQLiteParameter("courseID", courseID),
+                    new SQLiteParameter("role", role),
+                    new SQLiteParameter("syncID", activeSync)
+                )
+            )
+            {
+                while (r.Read())
+                {
+                    User user =
+                        new(
+                            r.GetValue(0).ToString(),
+                            courseID,
+                            r.GetInt32(1),
+                            r.GetValue(2).ToString(),
+                            r.GetValue(3).ToString(),
+                            role == UserRoles.student ? r.GetInt32(4) : 1
+                        );
+                    users.Add(user);
+                }
+            }
+
+            foreach (User user in users)
+            {
+                using (
+                    SQLiteDataReader r2 = Query(
+                        DatabaseQueries.QUERY_LAST_STUDENT_SETTINGS,
+                        new SQLiteParameter("courseID", courseID),
+                        new SQLiteParameter("userID", user.UserID)
+                    )
+                )
+                {
+                    if (r2.Read())
+                    {
+                        user.Settings = new(
+                            r2.GetInt32(0),
+                            r2.GetDouble(1),
+                            r2.GetDouble(2),
+                            r2.GetBoolean(3),
+                            r2.GetBoolean(4)
+                        );
+                    }
+                }
+            }
+            return users;
+        }
+
         public string GetUserID(int studentNumber)
         {
             using (
@@ -982,7 +1047,6 @@ namespace IguideME.Web.Services
             }
         }
 
-
         public bool GetNotificationEnable(int courseID, string userID, long syncID)
         {
             bool result = true;
@@ -1009,19 +1073,19 @@ namespace IguideME.Web.Services
             }
         }
 
-    public void UpdateUserSettings(
-        int courseID, 
-        string userID, 
-        int? goalGrade, 
-        double? totalGrade, 
-        double? predictedGrade, 
-        bool? notifications, 
-        long syncID)
+        public void UpdateUserSettings(
+            int courseID,
+            string userID,
+            int? goalGrade,
+            double? totalGrade,
+            double? predictedGrade,
+            bool? notifications,
+            long syncID
+        )
         {
             // When it is done by the user, we get the last available syncID, to replace the settings instead of register them
             long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
-            User tempUser = new User(userID,courseID,-1,"","-1",(int)UserRoles.student);
-            
+            User tempUser = new User(userID, courseID, -1, "", "-1", (int)UserRoles.student);
 
             using (
                 SQLiteDataReader r = Query(
@@ -1036,11 +1100,12 @@ namespace IguideME.Web.Services
                     try
                     {
                         tempUser.Settings = new UserSettings(
-                        goalGrade??         r.GetInt32(0),
-                        totalGrade??        r.GetDouble(1),
-                        predictedGrade ??   r.GetDouble(2),
-                                            r.GetBoolean(3),
-                        notifications??     r.GetBoolean(4));
+                            goalGrade ?? r.GetInt32(0),
+                            totalGrade ?? r.GetDouble(1),
+                            predictedGrade ?? r.GetDouble(2),
+                            r.GetBoolean(3),
+                            notifications ?? r.GetBoolean(4)
+                        );
                     }
                     catch (Exception e)
                     {
@@ -2121,20 +2186,15 @@ namespace IguideME.Web.Services
             return notifications;
         }
 
-        public List<Notification> GetAllUserNotifications(
-            int courseID,
-            string userID,
-            long syncID = 0
-        )
+        public Notifications GetAllUserNotifications(int courseID, string userID, long syncID = 0)
         {
             long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
 
-            List<Notification> notifications = new();
+            Notifications notifications = new();
 
             using (
                 SQLiteDataReader r = Query(
                     DatabaseQueries.QUERY_ALL_USER_NOTIFICATIONS,
-                    new SQLiteParameter("courseID", courseID),
                     new SQLiteParameter("userID", userID),
                     new SQLiteParameter("syncID", activeSync)
                 )
@@ -2142,9 +2202,50 @@ namespace IguideME.Web.Services
             {
                 while (r.Read())
                 {
-                    notifications.Add(
-                        new Notification(userID, r.GetInt32(0), r.GetInt32(1), r.GetBoolean(2))
-                    );
+                    Notification_Types status = (Notification_Types)r.GetInt32(1);
+                    switch (status)
+                    {
+                        case Notification_Types.outperforming:
+                            notifications.Outperforming.Add(
+                                new Notification(
+                                    userID,
+                                    r.GetInt32(0),
+                                    r.GetInt32(1),
+                                    r.GetBoolean(2)
+                                )
+                            );
+                            break;
+                        case Notification_Types.closing_gap:
+                            notifications.Closing.Add(
+                                new Notification(
+                                    userID,
+                                    r.GetInt32(0),
+                                    r.GetInt32(1),
+                                    r.GetBoolean(2)
+                                )
+                            );
+                            break;
+                        case Notification_Types.falling_behind:
+                            notifications.Falling.Add(
+                                new Notification(
+                                    userID,
+                                    r.GetInt32(0),
+                                    r.GetInt32(1),
+                                    r.GetBoolean(2)
+                                )
+                            );
+                            break;
+                        case Notification_Types.more_effort:
+                            notifications.Effort.Add(
+                                new Notification(
+                                    userID,
+                                    r.GetInt32(0),
+                                    r.GetInt32(1),
+                                    r.GetBoolean(2)
+                                )
+                            );
+                            break;
+                    }
                 }
             }
 
@@ -2164,7 +2265,6 @@ namespace IguideME.Web.Services
             using (
                 SQLiteDataReader r = Query(
                     DatabaseQueries.QUERY_PENDING_USER_NOTIFICATIONS,
-                    new SQLiteParameter("courseID", courseID),
                     new SQLiteParameter("userID", userID),
                     new SQLiteParameter("syncID", activeSync)
                 )
@@ -2616,6 +2716,63 @@ namespace IguideME.Web.Services
             }
 
             return tileGroups;
+        }
+
+        public TileGrades GetTileGrade(int tileID, string userID, int courseID)
+        {
+            long syncID = this.GetCurrentSyncID(courseID);
+            double tileGrade = -1;
+            using (
+                SQLiteDataReader r = Query(
+                    DatabaseQueries.QUERY_TILE_GRADE,
+                    new SQLiteParameter("tileID", tileID),
+                    new SQLiteParameter("userID", userID),
+                    new SQLiteParameter("syncID", syncID)
+                )
+            )
+            {
+                if (r.Read())
+                {
+                    try
+                    {
+                        tileGrade = r.GetDouble(0);
+                    }
+                    catch (Exception e)
+                    {
+                        PrintQueryError("GetLayoutTileGroups", 3, r, e);
+                    }
+                }
+            }
+            using (
+                SQLiteDataReader r = Query(
+                    DatabaseQueries.QUERY_TILE_PEER_GRADES,
+                    new SQLiteParameter("tileID", tileID),
+                    new SQLiteParameter("userID", userID),
+                    new SQLiteParameter("type", Comparison_Component_Types.tile),
+                    new SQLiteParameter("syncID", syncID)
+                )
+            )
+            {
+                if (r.Read())
+                {
+                    try
+                    {
+                        return new(
+                            tileID,
+                            tileGrade,
+                            r.GetDouble(0),
+                            r.GetDouble(1),
+                            r.GetDouble(2)
+                        );
+                    }
+                    catch (Exception e)
+                    {
+                        PrintQueryError("GetLayoutTileGroups", 3, r, e);
+                    }
+                }
+            }
+
+            return null;
         }
 
         public Dictionary<int, AppAssignment> GetAssignmentsMap(int courseID)

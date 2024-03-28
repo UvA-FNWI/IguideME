@@ -1,35 +1,33 @@
-import { type User, UserRoles } from "@/types/user";
-import { http, HttpResponse } from "msw";
+import { http, HttpResponse } from 'msw';
+import { type User, UserRoles } from '@/types/user';
 
 export const userHandlers = [
-  http.get("/app/self", () => {
+  http.get('/app/self', () => {
     return HttpResponse.json<User>({
       course_id: 994,
       studentnumber: 42,
-      userID: "42",
-      name: "Course Admin",
-      sortable_name: "Admin, Course",
+      userID: '42',
+      name: 'Course Admin',
+      sortable_name: 'Admin, Course',
       role: UserRoles.instructor,
       settings: undefined,
     });
   }),
-  http.get("/students", () => {
+  http.get('/students', () => {
     return HttpResponse.json<User[]>(MOCK_STUDENTS);
   }),
-  http.get("/student/*", ({ params }) => {
-    return HttpResponse.json<User | undefined>(
-      MOCK_STUDENTS.find((student) => student.userID === params[0]),
-    );
+  http.get('/student/*', ({ params }) => {
+    return HttpResponse.json<User | undefined>(MOCK_STUDENTS.find((student) => student.userID === params[0]));
   }),
 ];
 
-const MOCK_STUDENTS: User[] = [
+export const MOCK_STUDENTS: User[] = [
   {
     course_id: 994,
     studentnumber: 28332183,
-    userID: "28332183",
-    sortable_name: "Dursley, Vernon",
-    name: "Vernon Dursley",
+    userID: '28332183',
+    sortable_name: 'Dursley, Vernon',
+    name: 'Vernon Dursley',
     role: UserRoles.student,
     settings: {
       consent: true,
@@ -42,9 +40,9 @@ const MOCK_STUDENTS: User[] = [
   {
     course_id: 994,
     studentnumber: 95366984,
-    userID: "95366984",
-    sortable_name: "Sakamoto, Tonette",
-    name: "Tonette Sakamoto",
+    userID: '95366984',
+    sortable_name: 'Sakamoto, Tonette',
+    name: 'Tonette Sakamoto',
     role: UserRoles.student,
     settings: {
       consent: true,
@@ -57,9 +55,9 @@ const MOCK_STUDENTS: User[] = [
   {
     course_id: 994,
     studentnumber: 45844627,
-    userID: "45844627",
-    sortable_name: "Stormblessed, Kaladin",
-    name: "Kaladin Stormblessed",
+    userID: '45844627',
+    sortable_name: 'Stormblessed, Kaladin',
+    name: 'Kaladin Stormblessed',
     role: UserRoles.student,
     settings: {
       consent: true,
@@ -72,9 +70,9 @@ const MOCK_STUDENTS: User[] = [
   {
     course_id: 994,
     studentnumber: 54264654,
-    userID: "54264654",
-    sortable_name: "Muff, Carman",
-    name: "Carman Muff",
+    userID: '54264654',
+    sortable_name: 'Muff, Carman',
+    name: 'Carman Muff',
     role: UserRoles.student,
     settings: {
       consent: false,
@@ -87,9 +85,9 @@ const MOCK_STUDENTS: User[] = [
   {
     course_id: 994,
     studentnumber: 46666218,
-    userID: "46666218",
-    sortable_name: "Spengler, Leopoldo",
-    name: "Leopoldo Spengler",
+    userID: '46666218',
+    sortable_name: 'Spengler, Leopoldo',
+    name: 'Leopoldo Spengler',
     role: UserRoles.student,
     settings: {
       consent: true,
@@ -102,9 +100,9 @@ const MOCK_STUDENTS: User[] = [
   {
     course_id: 994,
     studentnumber: 41149744,
-    userID: "41149744",
-    sortable_name: "Stacy, Gwen",
-    name: "Gwen Stacy",
+    userID: '41149744',
+    sortable_name: 'Stacy, Gwen',
+    name: 'Gwen Stacy',
     role: UserRoles.student,
     settings: {
       consent: true,
@@ -117,9 +115,9 @@ const MOCK_STUDENTS: User[] = [
   {
     course_id: 994,
     studentnumber: 35683215,
-    userID: "35683215",
-    sortable_name: "Estell, Felice",
-    name: "Felice Estell",
+    userID: '35683215',
+    sortable_name: 'Estell, Felice',
+    name: 'Felice Estell',
     role: UserRoles.student,
     settings: {
       consent: true,
@@ -132,9 +130,9 @@ const MOCK_STUDENTS: User[] = [
   {
     course_id: 994,
     studentnumber: 50326251,
-    userID: "50326251",
-    sortable_name: "Hadsell, Melissa",
-    name: "Melissa Hadsell",
+    userID: '50326251',
+    sortable_name: 'Hadsell, Melissa',
+    name: 'Melissa Hadsell',
     role: UserRoles.student,
     settings: {
       consent: true,
@@ -147,9 +145,9 @@ const MOCK_STUDENTS: User[] = [
   {
     course_id: 994,
     studentnumber: 96600883,
-    userID: "96600883",
-    sortable_name: "Cupples, Tami",
-    name: "Tami Cupples",
+    userID: '96600883',
+    sortable_name: 'Cupples, Tami',
+    name: 'Tami Cupples',
     role: UserRoles.student,
     settings: {
       consent: true,
@@ -162,9 +160,9 @@ const MOCK_STUDENTS: User[] = [
   {
     course_id: 994,
     studentnumber: 24585559,
-    userID: "24585559",
-    sortable_name: "Templin, Holley",
-    name: "Holley Templin",
+    userID: '24585559',
+    sortable_name: 'Templin, Holley',
+    name: 'Holley Templin',
     role: UserRoles.student,
     settings: {
       consent: true,
@@ -177,9 +175,9 @@ const MOCK_STUDENTS: User[] = [
   {
     course_id: 994,
     studentnumber: 16967126,
-    userID: "16967126",
-    sortable_name: "Rhymer, Barret",
-    name: "Barrett Rhymer",
+    userID: '16967126',
+    sortable_name: 'Rhymer, Barret',
+    name: 'Barrett Rhymer',
     role: UserRoles.student,
     settings: {
       consent: true,
@@ -192,9 +190,9 @@ const MOCK_STUDENTS: User[] = [
   {
     course_id: 994,
     studentnumber: 23744275,
-    userID: "23744275",
-    sortable_name: "Payer, Cayla",
-    name: "Cayla Payer",
+    userID: '23744275',
+    sortable_name: 'Payer, Cayla',
+    name: 'Cayla Payer',
     role: UserRoles.student,
     settings: {
       consent: true,
@@ -207,9 +205,9 @@ const MOCK_STUDENTS: User[] = [
   {
     course_id: 994,
     studentnumber: 53036575,
-    userID: "53036575",
-    sortable_name: "Daughdrill, Donna",
-    name: "Donna Daughdrill",
+    userID: '53036575',
+    sortable_name: 'Daughdrill, Donna',
+    name: 'Donna Daughdrill',
     role: UserRoles.student,
     settings: {
       consent: true,
@@ -222,9 +220,9 @@ const MOCK_STUDENTS: User[] = [
   {
     course_id: 994,
     studentnumber: 41898388,
-    userID: "41898388",
-    sortable_name: "Kubicek, Dayna",
-    name: "Dayna Kubicek",
+    userID: '41898388',
+    sortable_name: 'Kubicek, Dayna',
+    name: 'Dayna Kubicek',
     role: UserRoles.student,
     settings: {
       consent: true,
@@ -237,9 +235,9 @@ const MOCK_STUDENTS: User[] = [
   {
     course_id: 994,
     studentnumber: 59540503,
-    userID: "59540503",
-    sortable_name: "Gathright, Analisa",
-    name: "Analisa Gathright",
+    userID: '59540503',
+    sortable_name: 'Gathright, Analisa',
+    name: 'Analisa Gathright',
     role: UserRoles.student,
     settings: {
       consent: true,
@@ -252,9 +250,9 @@ const MOCK_STUDENTS: User[] = [
   {
     course_id: 994,
     studentnumber: 45476233,
-    userID: "45476233",
-    sortable_name: "Burkey, Alyson",
-    name: "Alyson Burkey",
+    userID: '45476233',
+    sortable_name: 'Burkey, Alyson',
+    name: 'Alyson Burkey',
     role: UserRoles.student,
     settings: {
       consent: true,
@@ -267,9 +265,9 @@ const MOCK_STUDENTS: User[] = [
   {
     course_id: 994,
     studentnumber: 29376337,
-    userID: "29376337",
-    sortable_name: "Habib, Loretta",
-    name: "Loretta Habib",
+    userID: '29376337',
+    sortable_name: 'Habib, Loretta',
+    name: 'Loretta Habib',
     role: UserRoles.student,
     settings: {
       consent: true,
@@ -282,9 +280,9 @@ const MOCK_STUDENTS: User[] = [
   {
     course_id: 994,
     studentnumber: 27034712,
-    userID: "27034712",
-    sortable_name: "Lindenberg, Franklin",
-    name: "Franklin Lindenberg",
+    userID: '27034712',
+    sortable_name: 'Lindenberg, Franklin',
+    name: 'Franklin Lindenberg',
     role: UserRoles.student,
     settings: {
       consent: true,
@@ -297,9 +295,9 @@ const MOCK_STUDENTS: User[] = [
   {
     course_id: 994,
     studentnumber: 74114284,
-    userID: "74114284",
-    sortable_name: "Gwyn, Felipe",
-    name: "Felipe Gwyn",
+    userID: '74114284',
+    sortable_name: 'Gwyn, Felipe',
+    name: 'Felipe Gwyn',
     role: UserRoles.student,
     settings: {
       consent: true,
@@ -312,9 +310,9 @@ const MOCK_STUDENTS: User[] = [
   {
     course_id: 994,
     studentnumber: 55249485,
-    userID: "55249485",
-    sortable_name: "Foran, Stan",
-    name: "Stan Foran",
+    userID: '55249485',
+    sortable_name: 'Foran, Stan',
+    name: 'Stan Foran',
     role: UserRoles.student,
     settings: {
       consent: true,
@@ -327,9 +325,9 @@ const MOCK_STUDENTS: User[] = [
   {
     course_id: 994,
     studentnumber: 43219917,
-    userID: "43219917",
-    sortable_name: "Bomba, Dollie",
-    name: "Dollie Bomba",
+    userID: '43219917',
+    sortable_name: 'Bomba, Dollie',
+    name: 'Dollie Bomba',
     role: UserRoles.student,
     settings: {
       consent: true,
@@ -342,9 +340,9 @@ const MOCK_STUDENTS: User[] = [
   {
     course_id: 994,
     studentnumber: 23400528,
-    userID: "23400528",
-    sortable_name: "Sperber, Xochitl",
-    name: "Xochitl Sperber",
+    userID: '23400528',
+    sortable_name: 'Sperber, Xochitl',
+    name: 'Xochitl Sperber',
     role: UserRoles.student,
     settings: {
       consent: true,
@@ -357,9 +355,9 @@ const MOCK_STUDENTS: User[] = [
   {
     course_id: 994,
     studentnumber: 95372011,
-    userID: "95372011",
-    sortable_name: "Rape, Quiana",
-    name: "Quiana Rape",
+    userID: '95372011',
+    sortable_name: 'Rape, Quiana',
+    name: 'Quiana Rape',
     role: UserRoles.student,
     settings: {
       consent: false,
@@ -372,9 +370,9 @@ const MOCK_STUDENTS: User[] = [
   {
     course_id: 994,
     studentnumber: 46647543,
-    userID: "46647543",
-    sortable_name: "Spraggins, Adena",
-    name: "Adena Spraggins",
+    userID: '46647543',
+    sortable_name: 'Spraggins, Adena',
+    name: 'Adena Spraggins',
     role: UserRoles.student,
     settings: {
       consent: false,
@@ -387,9 +385,9 @@ const MOCK_STUDENTS: User[] = [
   {
     course_id: 994,
     studentnumber: 20936679,
-    userID: "20936679",
-    sortable_name: "Hur, Jung",
-    name: "Jung Hur",
+    userID: '20936679',
+    sortable_name: 'Hur, Jung',
+    name: 'Jung Hur',
     role: UserRoles.student,
     settings: {
       consent: true,
@@ -402,9 +400,9 @@ const MOCK_STUDENTS: User[] = [
   {
     course_id: 994,
     studentnumber: 70805720,
-    userID: "70805720",
-    sortable_name: "Kaye, Lorita",
-    name: "Lorita Kaye",
+    userID: '70805720',
+    sortable_name: 'Kaye, Lorita',
+    name: 'Lorita Kaye',
     role: UserRoles.student,
     settings: {
       consent: false,
@@ -417,9 +415,9 @@ const MOCK_STUDENTS: User[] = [
   {
     course_id: 994,
     studentnumber: 32324131,
-    userID: "32324131",
-    sortable_name: "Yepez, Galina",
-    name: "Galina Yepez",
+    userID: '32324131',
+    sortable_name: 'Yepez, Galina',
+    name: 'Galina Yepez',
     role: UserRoles.student,
     settings: {
       consent: false,
@@ -432,9 +430,9 @@ const MOCK_STUDENTS: User[] = [
   {
     course_id: 994,
     studentnumber: 66889858,
-    userID: "66889858",
-    sortable_name: "Dorrell, Genn",
-    name: "Gwenn Dorrell",
+    userID: '66889858',
+    sortable_name: 'Dorrell, Genn',
+    name: 'Gwenn Dorrell',
     role: UserRoles.student,
     settings: {
       consent: false,
@@ -447,9 +445,9 @@ const MOCK_STUDENTS: User[] = [
   {
     course_id: 994,
     studentnumber: 90434281,
-    userID: "90434281",
-    sortable_name: "Demayo, Ana",
-    name: "Ana Demayo",
+    userID: '90434281',
+    sortable_name: 'Demayo, Ana',
+    name: 'Ana Demayo',
     role: UserRoles.student,
     settings: {
       consent: true,
@@ -462,9 +460,9 @@ const MOCK_STUDENTS: User[] = [
   {
     course_id: 994,
     studentnumber: 22976781,
-    userID: "22976781",
-    sortable_name: "Guilbault, Austing",
-    name: "Austin Guilbault",
+    userID: '22976781',
+    sortable_name: 'Guilbault, Austing',
+    name: 'Austin Guilbault',
     role: UserRoles.student,
     settings: {
       consent: false,
@@ -477,9 +475,9 @@ const MOCK_STUDENTS: User[] = [
   {
     course_id: 994,
     studentnumber: 86899376,
-    userID: "86899376",
-    sortable_name: "Elder, Regenia",
-    name: "Regenia Elder",
+    userID: '86899376',
+    sortable_name: 'Elder, Regenia',
+    name: 'Regenia Elder',
     role: UserRoles.student,
     settings: {
       consent: false,
@@ -492,9 +490,9 @@ const MOCK_STUDENTS: User[] = [
   {
     course_id: 994,
     studentnumber: 48470625,
-    userID: "48470625",
-    sortable_name: "Buch, Marceline",
-    name: "Marceline Buch",
+    userID: '48470625',
+    sortable_name: 'Buch, Marceline',
+    name: 'Marceline Buch',
     role: UserRoles.student,
     settings: {
       consent: false,
@@ -507,9 +505,9 @@ const MOCK_STUDENTS: User[] = [
   {
     course_id: 994,
     studentnumber: 18298956,
-    userID: "18298956",
-    sortable_name: "Curlin, Louetta",
-    name: "Louetta Curlin",
+    userID: '18298956',
+    sortable_name: 'Curlin, Louetta',
+    name: 'Louetta Curlin',
     role: UserRoles.student,
     settings: {
       consent: true,
@@ -522,9 +520,9 @@ const MOCK_STUDENTS: User[] = [
   {
     course_id: 994,
     studentnumber: 74886921,
-    userID: "74886921",
-    sortable_name: "Kutz, Debrah",
-    name: "Debrah Kutz",
+    userID: '74886921',
+    sortable_name: 'Kutz, Debrah',
+    name: 'Debrah Kutz',
     role: UserRoles.student,
     settings: {
       consent: false,
@@ -537,9 +535,9 @@ const MOCK_STUDENTS: User[] = [
   {
     course_id: 994,
     studentnumber: 77161172,
-    userID: "77161172",
-    sortable_name: "Soto, Winifred",
-    name: "Winifred Soto",
+    userID: '77161172',
+    sortable_name: 'Soto, Winifred',
+    name: 'Winifred Soto',
     role: UserRoles.student,
     settings: {
       consent: false,
@@ -552,9 +550,9 @@ const MOCK_STUDENTS: User[] = [
   {
     course_id: 994,
     studentnumber: 81888190,
-    userID: "81888190",
-    sortable_name: "Arteaga, Mozell",
-    name: "Mozell Arteaga",
+    userID: '81888190',
+    sortable_name: 'Arteaga, Mozell',
+    name: 'Mozell Arteaga',
     role: UserRoles.student,
     settings: {
       consent: true,
@@ -567,9 +565,9 @@ const MOCK_STUDENTS: User[] = [
   {
     course_id: 994,
     studentnumber: 31665008,
-    userID: "31665008",
-    sortable_name: "Phu, Donte",
-    name: "Donte Phu",
+    userID: '31665008',
+    sortable_name: 'Phu, Donte',
+    name: 'Donte Phu',
     role: UserRoles.student,
     settings: {
       consent: false,
@@ -582,9 +580,9 @@ const MOCK_STUDENTS: User[] = [
   {
     course_id: 994,
     studentnumber: 35251913,
-    userID: "35251913",
-    sortable_name: "Birt, Darleen",
-    name: "Darleen Birt",
+    userID: '35251913',
+    sortable_name: 'Birt, Darleen',
+    name: 'Darleen Birt',
     role: UserRoles.student,
     settings: {
       consent: false,
@@ -597,9 +595,9 @@ const MOCK_STUDENTS: User[] = [
   {
     course_id: 994,
     studentnumber: 27817769,
-    userID: "27817769",
-    sortable_name: "Speegle, Connie",
-    name: "Connie Speegle",
+    userID: '27817769',
+    sortable_name: 'Speegle, Connie',
+    name: 'Connie Speegle',
     role: UserRoles.student,
     settings: {
       consent: false,
@@ -612,9 +610,9 @@ const MOCK_STUDENTS: User[] = [
   {
     course_id: 994,
     studentnumber: 41393783,
-    userID: "41393783",
-    sortable_name: "Roger, Suzi",
-    name: "Suzi Roger",
+    userID: '41393783',
+    sortable_name: 'Roger, Suzi',
+    name: 'Suzi Roger',
     role: UserRoles.student,
     settings: {
       consent: true,
@@ -627,9 +625,9 @@ const MOCK_STUDENTS: User[] = [
   {
     course_id: 994,
     studentnumber: 28624178,
-    userID: "28624178",
-    sortable_name: "Saini, Elroy",
-    name: "Elroy Saini",
+    userID: '28624178',
+    sortable_name: 'Saini, Elroy',
+    name: 'Elroy Saini',
     role: UserRoles.student,
     settings: {
       consent: false,
@@ -642,9 +640,9 @@ const MOCK_STUDENTS: User[] = [
   {
     course_id: 994,
     studentnumber: 97222205,
-    userID: "97222205",
-    sortable_name: "Zerr, Terrence",
-    name: "Terrence Zerr",
+    userID: '97222205',
+    sortable_name: 'Zerr, Terrence',
+    name: 'Terrence Zerr',
     role: UserRoles.student,
     settings: {
       consent: true,
@@ -657,9 +655,9 @@ const MOCK_STUDENTS: User[] = [
   {
     course_id: 994,
     studentnumber: 21276717,
-    userID: "21276717",
-    sortable_name: "Heitz, Norman",
-    name: "Norman Heitz",
+    userID: '21276717',
+    sortable_name: 'Heitz, Norman',
+    name: 'Norman Heitz',
     role: UserRoles.student,
     settings: {
       consent: false,
@@ -672,9 +670,9 @@ const MOCK_STUDENTS: User[] = [
   {
     course_id: 994,
     studentnumber: 81005245,
-    userID: "81005245",
-    sortable_name: "Defrancisco, Robbin",
-    name: "Robbin Defrancisco",
+    userID: '81005245',
+    sortable_name: 'Defrancisco, Robbin',
+    name: 'Robbin Defrancisco',
     role: UserRoles.student,
     settings: {
       consent: false,
@@ -687,9 +685,9 @@ const MOCK_STUDENTS: User[] = [
   {
     course_id: 994,
     studentnumber: 38152009,
-    userID: "38152009",
-    sortable_name: "Uhrig, Paula",
-    name: "Paula Uhrig",
+    userID: '38152009',
+    sortable_name: 'Uhrig, Paula',
+    name: 'Paula Uhrig',
     role: UserRoles.student,
     settings: {
       consent: false,
@@ -702,9 +700,9 @@ const MOCK_STUDENTS: User[] = [
   {
     course_id: 994,
     studentnumber: 76262947,
-    userID: "76262947",
-    sortable_name: "Pan, Chrissy",
-    name: "Chrissy Pan",
+    userID: '76262947',
+    sortable_name: 'Pan, Chrissy',
+    name: 'Chrissy Pan',
     role: UserRoles.student,
     settings: {
       consent: false,
@@ -717,9 +715,9 @@ const MOCK_STUDENTS: User[] = [
   {
     course_id: 994,
     studentnumber: 20380320,
-    userID: "20380320",
-    sortable_name: "Loken, Cris",
-    name: "Cris Loken",
+    userID: '20380320',
+    sortable_name: 'Loken, Cris',
+    name: 'Cris Loken',
     role: UserRoles.student,
     settings: {
       consent: true,
@@ -732,9 +730,9 @@ const MOCK_STUDENTS: User[] = [
   {
     course_id: 994,
     studentnumber: 48905367,
-    userID: "48905367",
-    sortable_name: "Bank, Tad",
-    name: "Tad Bank",
+    userID: '48905367',
+    sortable_name: 'Bank, Tad',
+    name: 'Tad Bank',
     role: UserRoles.student,
     settings: {
       consent: true,
@@ -747,9 +745,9 @@ const MOCK_STUDENTS: User[] = [
   {
     course_id: 994,
     studentnumber: 42345728,
-    userID: "42345728",
-    sortable_name: "Rivers, Bree",
-    name: "Bree Rivers",
+    userID: '42345728',
+    sortable_name: 'Rivers, Bree',
+    name: 'Bree Rivers',
     role: UserRoles.student,
     settings: {
       consent: true,
@@ -762,9 +760,9 @@ const MOCK_STUDENTS: User[] = [
   {
     course_id: 994,
     studentnumber: 96955357,
-    userID: "96955357",
-    sortable_name: "Marrone, Edythe",
-    name: "Edythe Marrone",
+    userID: '96955357',
+    sortable_name: 'Marrone, Edythe',
+    name: 'Edythe Marrone',
     role: UserRoles.student,
     settings: {
       consent: true,
@@ -777,9 +775,9 @@ const MOCK_STUDENTS: User[] = [
   {
     course_id: 994,
     studentnumber: 43754947,
-    userID: "43754947",
-    sortable_name: "Lombardi, Judie",
-    name: "Judie Lombardi",
+    userID: '43754947',
+    sortable_name: 'Lombardi, Judie',
+    name: 'Judie Lombardi',
     role: UserRoles.student,
     settings: {
       consent: false,
@@ -792,9 +790,9 @@ const MOCK_STUDENTS: User[] = [
   {
     course_id: 994,
     studentnumber: 41803722,
-    userID: "41803722",
-    sortable_name: "Keeling, Marth",
-    name: "Marth Keeling",
+    userID: '41803722',
+    sortable_name: 'Keeling, Marth',
+    name: 'Marth Keeling',
     role: UserRoles.student,
     settings: {
       consent: true,
@@ -807,9 +805,9 @@ const MOCK_STUDENTS: User[] = [
   {
     course_id: 994,
     studentnumber: 55571292,
-    userID: "55571292",
-    sortable_name: "Laven, Adria",
-    name: "Adria Laven",
+    userID: '55571292',
+    sortable_name: 'Laven, Adria',
+    name: 'Adria Laven',
     role: UserRoles.student,
     settings: {
       consent: true,
@@ -822,9 +820,9 @@ const MOCK_STUDENTS: User[] = [
   {
     course_id: 994,
     studentnumber: 52682411,
-    userID: "52682411",
-    sortable_name: "Glickman, Su",
-    name: "Su Glickman",
+    userID: '52682411',
+    sortable_name: 'Glickman, Su',
+    name: 'Su Glickman',
     role: UserRoles.student,
     settings: {
       consent: true,
@@ -877,9 +875,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 52682411,
-      userID: "52682411",
-      sortable_name: "Glickman, Su",
-      name: "Su Glickman",
+      userID: '52682411',
+      sortable_name: 'Glickman, Su',
+      name: 'Su Glickman',
       role: 0,
       settings: {
         consent: true,
@@ -892,9 +890,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 28332183,
-      userID: "28332183",
-      sortable_name: "Dursley, Vernon",
-      name: "Vernon Dursley",
+      userID: '28332183',
+      sortable_name: 'Dursley, Vernon',
+      name: 'Vernon Dursley',
       role: 0,
       settings: {
         consent: true,
@@ -907,9 +905,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 31665008,
-      userID: "31665008",
-      sortable_name: "Phu, Donte",
-      name: "Donte Phu",
+      userID: '31665008',
+      sortable_name: 'Phu, Donte',
+      name: 'Donte Phu',
       role: 0,
       settings: {
         consent: false,
@@ -922,9 +920,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 50326251,
-      userID: "50326251",
-      sortable_name: "Hadsell, Melissa",
-      name: "Melissa Hadsell",
+      userID: '50326251',
+      sortable_name: 'Hadsell, Melissa',
+      name: 'Melissa Hadsell',
       role: 0,
       settings: {
         consent: true,
@@ -937,9 +935,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 18298956,
-      userID: "18298956",
-      sortable_name: "Curlin, Louetta",
-      name: "Louetta Curlin",
+      userID: '18298956',
+      sortable_name: 'Curlin, Louetta',
+      name: 'Louetta Curlin',
       role: 0,
       settings: {
         consent: true,
@@ -954,9 +952,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 28332183,
-      userID: "28332183",
-      sortable_name: "Dursley, Vernon",
-      name: "Vernon Dursley",
+      userID: '28332183',
+      sortable_name: 'Dursley, Vernon',
+      name: 'Vernon Dursley',
       role: 0,
       settings: {
         consent: true,
@@ -969,9 +967,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 31665008,
-      userID: "31665008",
-      sortable_name: "Phu, Donte",
-      name: "Donte Phu",
+      userID: '31665008',
+      sortable_name: 'Phu, Donte',
+      name: 'Donte Phu',
       role: 0,
       settings: {
         consent: false,
@@ -984,9 +982,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 50326251,
-      userID: "50326251",
-      sortable_name: "Hadsell, Melissa",
-      name: "Melissa Hadsell",
+      userID: '50326251',
+      sortable_name: 'Hadsell, Melissa',
+      name: 'Melissa Hadsell',
       role: 0,
       settings: {
         consent: true,
@@ -999,9 +997,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 18298956,
-      userID: "18298956",
-      sortable_name: "Curlin, Louetta",
-      name: "Louetta Curlin",
+      userID: '18298956',
+      sortable_name: 'Curlin, Louetta',
+      name: 'Louetta Curlin',
       role: 0,
       settings: {
         consent: true,
@@ -1018,9 +1016,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 31665008,
-      userID: "31665008",
-      sortable_name: "Phu, Donte",
-      name: "Donte Phu",
+      userID: '31665008',
+      sortable_name: 'Phu, Donte',
+      name: 'Donte Phu',
       role: 0,
       settings: {
         consent: false,
@@ -1033,9 +1031,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 50326251,
-      userID: "50326251",
-      sortable_name: "Hadsell, Melissa",
-      name: "Melissa Hadsell",
+      userID: '50326251',
+      sortable_name: 'Hadsell, Melissa',
+      name: 'Melissa Hadsell',
       role: 0,
       settings: {
         consent: true,
@@ -1048,9 +1046,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 18298956,
-      userID: "18298956",
-      sortable_name: "Curlin, Louetta",
-      name: "Louetta Curlin",
+      userID: '18298956',
+      sortable_name: 'Curlin, Louetta',
+      name: 'Louetta Curlin',
       role: 0,
       settings: {
         consent: true,
@@ -1063,9 +1061,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 35683215,
-      userID: "35683215",
-      sortable_name: "Estell, Felice",
-      name: "Felice Estell",
+      userID: '35683215',
+      sortable_name: 'Estell, Felice',
+      name: 'Felice Estell',
       role: 0,
       settings: {
         consent: true,
@@ -1078,9 +1076,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 74114284,
-      userID: "74114284",
-      sortable_name: "Gwyn, Felipe",
-      name: "Felipe Gwyn",
+      userID: '74114284',
+      sortable_name: 'Gwyn, Felipe',
+      name: 'Felipe Gwyn',
       role: 0,
       settings: {
         consent: true,
@@ -1093,9 +1091,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 95372011,
-      userID: "95372011",
-      sortable_name: "Rape, Quiana",
-      name: "Quiana Rape",
+      userID: '95372011',
+      sortable_name: 'Rape, Quiana',
+      name: 'Quiana Rape',
       role: 0,
       settings: {
         consent: false,
@@ -1108,9 +1106,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 48470625,
-      userID: "48470625",
-      sortable_name: "Buch, Marceline",
-      name: "Marceline Buch",
+      userID: '48470625',
+      sortable_name: 'Buch, Marceline',
+      name: 'Marceline Buch',
       role: 0,
       settings: {
         consent: false,
@@ -1123,9 +1121,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 41393783,
-      userID: "41393783",
-      sortable_name: "Roger, Suzi",
-      name: "Suzi Roger",
+      userID: '41393783',
+      sortable_name: 'Roger, Suzi',
+      name: 'Suzi Roger',
       role: 0,
       settings: {
         consent: true,
@@ -1138,9 +1136,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 38152009,
-      userID: "38152009",
-      sortable_name: "Uhrig, Paula",
-      name: "Paula Uhrig",
+      userID: '38152009',
+      sortable_name: 'Uhrig, Paula',
+      name: 'Paula Uhrig',
       role: 0,
       settings: {
         consent: false,
@@ -1153,9 +1151,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 48905367,
-      userID: "48905367",
-      sortable_name: "Bank, Tad",
-      name: "Tad Bank",
+      userID: '48905367',
+      sortable_name: 'Bank, Tad',
+      name: 'Tad Bank',
       role: 0,
       settings: {
         consent: true,
@@ -1170,9 +1168,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 50326251,
-      userID: "50326251",
-      sortable_name: "Hadsell, Melissa",
-      name: "Melissa Hadsell",
+      userID: '50326251',
+      sortable_name: 'Hadsell, Melissa',
+      name: 'Melissa Hadsell',
       role: 0,
       settings: {
         consent: true,
@@ -1185,9 +1183,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 18298956,
-      userID: "18298956",
-      sortable_name: "Curlin, Louetta",
-      name: "Louetta Curlin",
+      userID: '18298956',
+      sortable_name: 'Curlin, Louetta',
+      name: 'Louetta Curlin',
       role: 0,
       settings: {
         consent: true,
@@ -1200,9 +1198,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 35683215,
-      userID: "35683215",
-      sortable_name: "Estell, Felice",
-      name: "Felice Estell",
+      userID: '35683215',
+      sortable_name: 'Estell, Felice',
+      name: 'Felice Estell',
       role: 0,
       settings: {
         consent: true,
@@ -1215,9 +1213,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 74114284,
-      userID: "74114284",
-      sortable_name: "Gwyn, Felipe",
-      name: "Felipe Gwyn",
+      userID: '74114284',
+      sortable_name: 'Gwyn, Felipe',
+      name: 'Felipe Gwyn',
       role: 0,
       settings: {
         consent: true,
@@ -1230,9 +1228,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 95372011,
-      userID: "95372011",
-      sortable_name: "Rape, Quiana",
-      name: "Quiana Rape",
+      userID: '95372011',
+      sortable_name: 'Rape, Quiana',
+      name: 'Quiana Rape',
       role: 0,
       settings: {
         consent: false,
@@ -1245,9 +1243,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 48470625,
-      userID: "48470625",
-      sortable_name: "Buch, Marceline",
-      name: "Marceline Buch",
+      userID: '48470625',
+      sortable_name: 'Buch, Marceline',
+      name: 'Marceline Buch',
       role: 0,
       settings: {
         consent: false,
@@ -1260,9 +1258,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 41393783,
-      userID: "41393783",
-      sortable_name: "Roger, Suzi",
-      name: "Suzi Roger",
+      userID: '41393783',
+      sortable_name: 'Roger, Suzi',
+      name: 'Suzi Roger',
       role: 0,
       settings: {
         consent: true,
@@ -1275,9 +1273,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 38152009,
-      userID: "38152009",
-      sortable_name: "Uhrig, Paula",
-      name: "Paula Uhrig",
+      userID: '38152009',
+      sortable_name: 'Uhrig, Paula',
+      name: 'Paula Uhrig',
       role: 0,
       settings: {
         consent: false,
@@ -1290,9 +1288,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 48905367,
-      userID: "48905367",
-      sortable_name: "Bank, Tad",
-      name: "Tad Bank",
+      userID: '48905367',
+      sortable_name: 'Bank, Tad',
+      name: 'Tad Bank',
       role: 0,
       settings: {
         consent: true,
@@ -1307,9 +1305,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 35683215,
-      userID: "35683215",
-      sortable_name: "Estell, Felice",
-      name: "Felice Estell",
+      userID: '35683215',
+      sortable_name: 'Estell, Felice',
+      name: 'Felice Estell',
       role: 0,
       settings: {
         consent: true,
@@ -1322,9 +1320,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 74114284,
-      userID: "74114284",
-      sortable_name: "Gwyn, Felipe",
-      name: "Felipe Gwyn",
+      userID: '74114284',
+      sortable_name: 'Gwyn, Felipe',
+      name: 'Felipe Gwyn',
       role: 0,
       settings: {
         consent: true,
@@ -1337,9 +1335,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 95372011,
-      userID: "95372011",
-      sortable_name: "Rape, Quiana",
-      name: "Quiana Rape",
+      userID: '95372011',
+      sortable_name: 'Rape, Quiana',
+      name: 'Quiana Rape',
       role: 0,
       settings: {
         consent: false,
@@ -1352,9 +1350,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 48470625,
-      userID: "48470625",
-      sortable_name: "Buch, Marceline",
-      name: "Marceline Buch",
+      userID: '48470625',
+      sortable_name: 'Buch, Marceline',
+      name: 'Marceline Buch',
       role: 0,
       settings: {
         consent: false,
@@ -1367,9 +1365,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 41393783,
-      userID: "41393783",
-      sortable_name: "Roger, Suzi",
-      name: "Suzi Roger",
+      userID: '41393783',
+      sortable_name: 'Roger, Suzi',
+      name: 'Suzi Roger',
       role: 0,
       settings: {
         consent: true,
@@ -1382,9 +1380,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 38152009,
-      userID: "38152009",
-      sortable_name: "Uhrig, Paula",
-      name: "Paula Uhrig",
+      userID: '38152009',
+      sortable_name: 'Uhrig, Paula',
+      name: 'Paula Uhrig',
       role: 0,
       settings: {
         consent: false,
@@ -1397,9 +1395,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 48905367,
-      userID: "48905367",
-      sortable_name: "Bank, Tad",
-      name: "Tad Bank",
+      userID: '48905367',
+      sortable_name: 'Bank, Tad',
+      name: 'Tad Bank',
       role: 0,
       settings: {
         consent: true,
@@ -1414,9 +1412,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 59540503,
-      userID: "59540503",
-      sortable_name: "Gathright, Analisa",
-      name: "Analisa Gathright",
+      userID: '59540503',
+      sortable_name: 'Gathright, Analisa',
+      name: 'Analisa Gathright',
       role: 0,
       settings: {
         consent: true,
@@ -1429,9 +1427,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 45476233,
-      userID: "45476233",
-      sortable_name: "Burkey, Alyson",
-      name: "Alyson Burkey",
+      userID: '45476233',
+      sortable_name: 'Burkey, Alyson',
+      name: 'Alyson Burkey',
       role: 0,
       settings: {
         consent: true,
@@ -1444,9 +1442,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 29376337,
-      userID: "29376337",
-      sortable_name: "Habib, Loretta",
-      name: "Loretta Habib",
+      userID: '29376337',
+      sortable_name: 'Habib, Loretta',
+      name: 'Loretta Habib',
       role: 0,
       settings: {
         consent: true,
@@ -1459,9 +1457,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 27034712,
-      userID: "27034712",
-      sortable_name: "Lindenberg, Franklin",
-      name: "Franklin Lindenberg",
+      userID: '27034712',
+      sortable_name: 'Lindenberg, Franklin',
+      name: 'Franklin Lindenberg',
       role: 0,
       settings: {
         consent: true,
@@ -1474,9 +1472,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 90434281,
-      userID: "90434281",
-      sortable_name: "Demayo, Ana",
-      name: "Ana Demayo",
+      userID: '90434281',
+      sortable_name: 'Demayo, Ana',
+      name: 'Ana Demayo',
       role: 0,
       settings: {
         consent: true,
@@ -1489,9 +1487,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 22976781,
-      userID: "22976781",
-      sortable_name: "Guilbault, Austing",
-      name: "Austin Guilbault",
+      userID: '22976781',
+      sortable_name: 'Guilbault, Austing',
+      name: 'Austin Guilbault',
       role: 0,
       settings: {
         consent: false,
@@ -1504,9 +1502,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 35251913,
-      userID: "35251913",
-      sortable_name: "Birt, Darleen",
-      name: "Darleen Birt",
+      userID: '35251913',
+      sortable_name: 'Birt, Darleen',
+      name: 'Darleen Birt',
       role: 0,
       settings: {
         consent: false,
@@ -1519,9 +1517,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 28624178,
-      userID: "28624178",
-      sortable_name: "Saini, Elroy",
-      name: "Elroy Saini",
+      userID: '28624178',
+      sortable_name: 'Saini, Elroy',
+      name: 'Elroy Saini',
       role: 0,
       settings: {
         consent: false,
@@ -1534,9 +1532,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 76262947,
-      userID: "76262947",
-      sortable_name: "Pan, Chrissy",
-      name: "Chrissy Pan",
+      userID: '76262947',
+      sortable_name: 'Pan, Chrissy',
+      name: 'Chrissy Pan',
       role: 0,
       settings: {
         consent: false,
@@ -1549,9 +1547,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 41803722,
-      userID: "41803722",
-      sortable_name: "Keeling, Marth",
-      name: "Marth Keeling",
+      userID: '41803722',
+      sortable_name: 'Keeling, Marth',
+      name: 'Marth Keeling',
       role: 0,
       settings: {
         consent: true,
@@ -1566,9 +1564,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 41149744,
-      userID: "41149744",
-      sortable_name: "Stacy, Gwen",
-      name: "Gwen Stacy",
+      userID: '41149744',
+      sortable_name: 'Stacy, Gwen',
+      name: 'Gwen Stacy',
       role: 0,
       settings: {
         consent: true,
@@ -1581,9 +1579,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 16967126,
-      userID: "16967126",
-      sortable_name: "Rhymer, Barret",
-      name: "Barrett Rhymer",
+      userID: '16967126',
+      sortable_name: 'Rhymer, Barret',
+      name: 'Barrett Rhymer',
       role: 0,
       settings: {
         consent: true,
@@ -1596,9 +1594,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 41898388,
-      userID: "41898388",
-      sortable_name: "Kubicek, Dayna",
-      name: "Dayna Kubicek",
+      userID: '41898388',
+      sortable_name: 'Kubicek, Dayna',
+      name: 'Dayna Kubicek',
       role: 0,
       settings: {
         consent: true,
@@ -1611,9 +1609,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 23400528,
-      userID: "23400528",
-      sortable_name: "Sperber, Xochitl",
-      name: "Xochitl Sperber",
+      userID: '23400528',
+      sortable_name: 'Sperber, Xochitl',
+      name: 'Xochitl Sperber',
       role: 0,
       settings: {
         consent: true,
@@ -1626,9 +1624,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 20936679,
-      userID: "20936679",
-      sortable_name: "Hur, Jung",
-      name: "Jung Hur",
+      userID: '20936679',
+      sortable_name: 'Hur, Jung',
+      name: 'Jung Hur',
       role: 0,
       settings: {
         consent: true,
@@ -1641,9 +1639,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 81005245,
-      userID: "81005245",
-      sortable_name: "Defrancisco, Robbin",
-      name: "Robbin Defrancisco",
+      userID: '81005245',
+      sortable_name: 'Defrancisco, Robbin',
+      name: 'Robbin Defrancisco',
       role: 0,
       settings: {
         consent: false,
@@ -1656,9 +1654,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 42345728,
-      userID: "42345728",
-      sortable_name: "Rivers, Bree",
-      name: "Bree Rivers",
+      userID: '42345728',
+      sortable_name: 'Rivers, Bree',
+      name: 'Bree Rivers',
       role: 0,
       settings: {
         consent: true,
@@ -1671,9 +1669,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 43754947,
-      userID: "43754947",
-      sortable_name: "Lombardi, Judie",
-      name: "Judie Lombardi",
+      userID: '43754947',
+      sortable_name: 'Lombardi, Judie',
+      name: 'Judie Lombardi',
       role: 0,
       settings: {
         consent: false,
@@ -1686,9 +1684,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 55571292,
-      userID: "55571292",
-      sortable_name: "Laven, Adria",
-      name: "Adria Laven",
+      userID: '55571292',
+      sortable_name: 'Laven, Adria',
+      name: 'Adria Laven',
       role: 0,
       settings: {
         consent: true,
@@ -1703,9 +1701,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 54264654,
-      userID: "54264654",
-      sortable_name: "Muff, Carman",
-      name: "Carman Muff",
+      userID: '54264654',
+      sortable_name: 'Muff, Carman',
+      name: 'Carman Muff',
       role: 0,
       settings: {
         consent: false,
@@ -1718,9 +1716,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 24585559,
-      userID: "24585559",
-      sortable_name: "Templin, Holley",
-      name: "Holley Templin",
+      userID: '24585559',
+      sortable_name: 'Templin, Holley',
+      name: 'Holley Templin',
       role: 0,
       settings: {
         consent: true,
@@ -1733,9 +1731,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 23744275,
-      userID: "23744275",
-      sortable_name: "Payer, Cayla",
-      name: "Cayla Payer",
+      userID: '23744275',
+      sortable_name: 'Payer, Cayla',
+      name: 'Cayla Payer',
       role: 0,
       settings: {
         consent: true,
@@ -1748,9 +1746,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 43219917,
-      userID: "43219917",
-      sortable_name: "Bomba, Dollie",
-      name: "Dollie Bomba",
+      userID: '43219917',
+      sortable_name: 'Bomba, Dollie',
+      name: 'Dollie Bomba',
       role: 0,
       settings: {
         consent: true,
@@ -1763,9 +1761,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 74886921,
-      userID: "74886921",
-      sortable_name: "Kutz, Debrah",
-      name: "Debrah Kutz",
+      userID: '74886921',
+      sortable_name: 'Kutz, Debrah',
+      name: 'Debrah Kutz',
       role: 0,
       settings: {
         consent: false,
@@ -1778,9 +1776,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 81888190,
-      userID: "81888190",
-      sortable_name: "Arteaga, Mozell",
-      name: "Mozell Arteaga",
+      userID: '81888190',
+      sortable_name: 'Arteaga, Mozell',
+      name: 'Mozell Arteaga',
       role: 0,
       settings: {
         consent: true,
@@ -1793,9 +1791,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 27817769,
-      userID: "27817769",
-      sortable_name: "Speegle, Connie",
-      name: "Connie Speegle",
+      userID: '27817769',
+      sortable_name: 'Speegle, Connie',
+      name: 'Connie Speegle',
       role: 0,
       settings: {
         consent: false,
@@ -1808,9 +1806,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 21276717,
-      userID: "21276717",
-      sortable_name: "Heitz, Norman",
-      name: "Norman Heitz",
+      userID: '21276717',
+      sortable_name: 'Heitz, Norman',
+      name: 'Norman Heitz',
       role: 0,
       settings: {
         consent: false,
@@ -1825,9 +1823,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 46666218,
-      userID: "46666218",
-      sortable_name: "Spengler, Leopoldo",
-      name: "Leopoldo Spengler",
+      userID: '46666218',
+      sortable_name: 'Spengler, Leopoldo',
+      name: 'Leopoldo Spengler',
       role: 0,
       settings: {
         consent: true,
@@ -1840,9 +1838,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 96600883,
-      userID: "96600883",
-      sortable_name: "Cupples, Tami",
-      name: "Tami Cupples",
+      userID: '96600883',
+      sortable_name: 'Cupples, Tami',
+      name: 'Tami Cupples',
       role: 0,
       settings: {
         consent: true,
@@ -1855,9 +1853,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 53036575,
-      userID: "53036575",
-      sortable_name: "Daughdrill, Donna",
-      name: "Donna Daughdrill",
+      userID: '53036575',
+      sortable_name: 'Daughdrill, Donna',
+      name: 'Donna Daughdrill',
       role: 0,
       settings: {
         consent: true,
@@ -1870,9 +1868,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 55249485,
-      userID: "55249485",
-      sortable_name: "Foran, Stan",
-      name: "Stan Foran",
+      userID: '55249485',
+      sortable_name: 'Foran, Stan',
+      name: 'Stan Foran',
       role: 0,
       settings: {
         consent: true,
@@ -1885,9 +1883,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 46647543,
-      userID: "46647543",
-      sortable_name: "Spraggins, Adena",
-      name: "Adena Spraggins",
+      userID: '46647543',
+      sortable_name: 'Spraggins, Adena',
+      name: 'Adena Spraggins',
       role: 0,
       settings: {
         consent: false,
@@ -1900,9 +1898,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 70805720,
-      userID: "70805720",
-      sortable_name: "Kaye, Lorita",
-      name: "Lorita Kaye",
+      userID: '70805720',
+      sortable_name: 'Kaye, Lorita',
+      name: 'Lorita Kaye',
       role: 0,
       settings: {
         consent: false,
@@ -1915,9 +1913,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 77161172,
-      userID: "77161172",
-      sortable_name: "Soto, Winifred",
-      name: "Winifred Soto",
+      userID: '77161172',
+      sortable_name: 'Soto, Winifred',
+      name: 'Winifred Soto',
       role: 0,
       settings: {
         consent: false,
@@ -1930,9 +1928,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 97222205,
-      userID: "97222205",
-      sortable_name: "Zerr, Terrence",
-      name: "Terrence Zerr",
+      userID: '97222205',
+      sortable_name: 'Zerr, Terrence',
+      name: 'Terrence Zerr',
       role: 0,
       settings: {
         consent: true,
@@ -1945,9 +1943,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 20380320,
-      userID: "20380320",
-      sortable_name: "Loken, Cris",
-      name: "Cris Loken",
+      userID: '20380320',
+      sortable_name: 'Loken, Cris',
+      name: 'Cris Loken',
       role: 0,
       settings: {
         consent: true,
@@ -1960,9 +1958,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 96955357,
-      userID: "96955357",
-      sortable_name: "Marrone, Edythe",
-      name: "Edythe Marrone",
+      userID: '96955357',
+      sortable_name: 'Marrone, Edythe',
+      name: 'Edythe Marrone',
       role: 0,
       settings: {
         consent: true,
@@ -1977,9 +1975,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 95366984,
-      userID: "95366984",
-      sortable_name: "Sakamoto, Tonette",
-      name: "Tonette Sakamoto",
+      userID: '95366984',
+      sortable_name: 'Sakamoto, Tonette',
+      name: 'Tonette Sakamoto',
       role: 0,
       settings: {
         consent: true,
@@ -1992,9 +1990,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 45844627,
-      userID: "45844627",
-      sortable_name: "Stormblessed, Kaladin",
-      name: "Kaladin Stormblessed",
+      userID: '45844627',
+      sortable_name: 'Stormblessed, Kaladin',
+      name: 'Kaladin Stormblessed',
       role: 0,
       settings: {
         consent: true,
@@ -2007,9 +2005,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 32324131,
-      userID: "32324131",
-      sortable_name: "Yepez, Galina",
-      name: "Galina Yepez",
+      userID: '32324131',
+      sortable_name: 'Yepez, Galina',
+      name: 'Galina Yepez',
       role: 0,
       settings: {
         consent: false,
@@ -2022,9 +2020,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 66889858,
-      userID: "66889858",
-      sortable_name: "Dorrell, Genn",
-      name: "Gwenn Dorrell",
+      userID: '66889858',
+      sortable_name: 'Dorrell, Genn',
+      name: 'Gwenn Dorrell',
       role: 0,
       settings: {
         consent: false,
@@ -2037,9 +2035,9 @@ export const MOCK_PEER_GROUPS: User[][] = [
     {
       course_id: 994,
       studentnumber: 86899376,
-      userID: "86899376",
-      sortable_name: "Elder, Regenia",
-      name: "Regenia Elder",
+      userID: '86899376',
+      sortable_name: 'Elder, Regenia',
+      name: 'Regenia Elder',
       role: 0,
       settings: {
         consent: false,

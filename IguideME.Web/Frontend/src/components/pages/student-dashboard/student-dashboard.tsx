@@ -1,13 +1,13 @@
-import { getSelf, getStudent } from '@/api/users';
 import GradeDisplay from '@/components/atoms/grade-display/grade-display';
 import StudentInfo from '@/components/atoms/student-info/student-info';
-import ViewLayout from '@/components/crystals/layout-view/layout-view';
-import { type User, UserRoles } from '@/types/user';
 import { AppstoreOutlined, BarChartOutlined } from '@ant-design/icons';
 import { Col, Radio, Row } from 'antd';
-import { useState, type FC, type ReactElement } from 'react';
+import { getSelf, getStudent } from '@/api/users';
+import { Outlet, useParams } from 'react-router-dom';
 import { useQuery } from 'react-query';
-import { useParams } from 'react-router-dom';
+// import ViewLayout from "@/components/crystals/layout-view/layout-view";
+import { type User, UserRoles } from '@/types/user';
+import { useState, type FC, type ReactElement } from 'react';
 import { tileViewContext, type viewType } from './context';
 
 const StudentDashboard: FC = (): ReactElement => {
@@ -43,11 +43,11 @@ const Dashboard: FC<Props> = ({ self }): ReactElement => {
 
   return (
     <tileViewContext.Provider value={context}>
-      <Row justify='space-between' align="top" className="px-3 pt-3 relative flex items-center">
+      <Row justify="space-between" align="top" className="px-3 pt-3 relative flex items-center">
         <Col>
           <StudentInfo self={self} />
         </Col>
-        <Col className='absolute left-0 right-0 top-3 bottom-0 m-auto h-full flex justify-center items-center'>
+        <Col className="absolute left-0 right-0 top-3 bottom-0 m-auto h-full flex justify-center items-center">
           <GradeDisplay self={self} />
         </Col>
         <Col>
@@ -67,7 +67,7 @@ const Dashboard: FC<Props> = ({ self }): ReactElement => {
           </Radio.Group>
         </Col>
       </Row>
-      <ViewLayout />
+      <Outlet />
     </tileViewContext.Provider>
   );
 };

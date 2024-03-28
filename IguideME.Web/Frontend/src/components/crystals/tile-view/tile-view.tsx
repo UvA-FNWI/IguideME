@@ -1,15 +1,16 @@
-import { useContext, type FC, type ReactElement } from 'react';
-import { tileViewContext } from '@/components/pages/student-dashboard/context';
-
 import GraphTile from '@/components/crystals/graph-tile/graph-tile.tsx';
 import GridTile from '@/components/crystals/grid-tile/grid-tile.tsx';
-import { TileType, type Tile, GradingType } from '@/types/tile';
-import { Col, Divider, Row } from 'antd';
-import PeerComparison from '@/components/particles/peer-comparison/peercomparison';
-import { getTileGrades } from '@/api/tiles';
-import { useQuery } from 'react-query';
 import Loading from '@/components/particles/loading';
-import { cn } from '@/utils/cn';
+import PeerComparison from '@/components/particles/peer-comparison/peercomparison';
+import { Col, Divider, Row } from 'antd';
+import { getTileGrades } from '@/api/tiles';
+import { tileViewContext } from '@/components/pages/student-dashboard/context';
+import { useNavigate } from 'react-router-dom';
+import { useQuery } from 'react-query';
+import './style.scss';
+import { useContext, type FC, type ReactElement } from 'react';
+
+import { TileType, type Tile, GradingType } from '@/types/tile';
 
 interface Props {
   tile: Tile;
@@ -22,13 +23,29 @@ const ViewTile: FC<Props> = ({ tile, textStyle }): ReactElement => {
     `tiles grades/${context.user!.userID}/${tile.id}`,
     async () => await getTileGrades(context.user !== undefined ? context.user.userID : '-1', tile.id),
   );
+  const navigate = useNavigate();
 
   const max = 100;
 
   return (
-    <div className="w-[270px] h-[230px] border border-solid border-gray-200 bg-white">
-      <Row justify={'center'} align={'middle'} className="h-1/5">
-        <h3 className={cn('text-lg', textStyle)}>{tile.title}</h3>
+    <div
+      className="tileView"
+      style={{ cursor: 'pointer' }}
+      onClick={() => {
+        navigate(tile.id + '/');
+      }}
+    >
+      <Row justify={'center'} align={'middle'} style={{ height: '20%' }}>
+        <h3
+          style={{
+            fontSize: 18,
+            fontWeight: 1400,
+            fontFamily: '"Antic Slab", serif',
+            lineHeight: 'normal',
+          }}
+        >
+          {tile.title}
+        </h3>
       </Row>
       {renderViewType()}
     </div>

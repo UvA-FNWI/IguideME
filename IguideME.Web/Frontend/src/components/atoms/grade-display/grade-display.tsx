@@ -1,14 +1,14 @@
-import { Space } from "antd";
-import { useContext, type FC, type ReactElement } from "react";
-import { FrownTwoTone, MehTwoTone, SmileTwoTone } from "@ant-design/icons";
-import { tileViewContext } from "@/components/pages/student-dashboard/context";
+import Loading from '@/components/particles/loading';
+import { FrownTwoTone, MehTwoTone, SmileTwoTone } from '@ant-design/icons';
+import { Space } from 'antd';
+import { tileViewContext } from '@/components/pages/student-dashboard/context';
+import { useContext, type FC, type ReactElement } from 'react';
 
-import { Bar, type BarConfig } from "@ant-design/charts";
-import Loading from "@/components/particles/loading";
-import { type User } from "@/types/user";
+import { Bar, type BarConfig } from '@ant-design/charts';
+import { type User } from '@/types/user';
 
-const BLUE = "rgba(90, 50, 255, .9)";
-const GREEN = "rgba(13, 204, 204, 1)";
+const BLUE = 'rgba(90, 50, 255, .9)';
+const GREEN = 'rgba(13, 204, 204, 1)';
 
 interface displayProps {
   self: User;
@@ -22,13 +22,13 @@ const GradeDisplay: FC<displayProps> = ({ self }): ReactElement => {
   }
 
   const goal = self.settings.goal_grade;
-  const total = self.settings.total_grade;
+  const total = self.settings.total_grade / 10;
   const pred = self.settings.predicted_grade;
 
   switch (context.viewType) {
-    case "grid":
+    case 'grid':
       return <GridGrades goal={goal} total={total} pred={pred} />;
-    case "graph":
+    case 'graph':
       return <GraphGrades goal={goal} total={total} pred={pred} />;
   }
 };
@@ -42,15 +42,12 @@ interface Props {
 const GridGrades: FC<Props> = ({ goal, total, pred }): ReactElement => {
   const happy = <SmileTwoTone size={10} twoToneColor="rgb(0, 185, 120)" />;
   const meh = <MehTwoTone size={10} twoToneColor="rgb(245, 226, 54)" />;
-  const unhappy = <FrownTwoTone size={10} twoToneColor={"rgb(255, 110, 90)"} />;
+  const unhappy = <FrownTwoTone size={10} twoToneColor={'rgb(255, 110, 90)'} />;
   return (
-    <Space
-      className='justify-center h-full w-full'
-      size="large"
-    >
+    <Space className="justify-center h-full w-full" size="large">
       <div className="text-center">
         <p>Goal</p>
-        <h2 className='text-lg font-semibold'>
+        <h2 className="text-lg font-semibold">
           <Space>
             {goal >= 7 ? happy : goal >= 5.5 ? meh : unhappy}
             {goal}
@@ -59,16 +56,16 @@ const GridGrades: FC<Props> = ({ goal, total, pred }): ReactElement => {
       </div>
       <div className="text-center">
         <p>Current</p>
-        <h2 className='text-lg font-semibold'>
+        <h2 className="text-lg font-semibold">
           <Space>
             {total > goal ? happy : total >= 5.5 ? meh : unhappy}
-            {total}
+            {total.toFixed(1)}
           </Space>
         </h2>
       </div>
       <div className="text-center">
         <p>Predicted</p>
-        <h2 className='text-lg font-semibold'>
+        <h2 className="text-lg font-semibold">
           <Space>
             {pred > goal ? happy : pred >= 5.5 ? meh : unhappy}
             {pred}
@@ -83,11 +80,11 @@ const GraphGrades: FC<Props> = ({ goal, total: avg, pred }): ReactElement => {
   const max = 10;
   const data = [
     {
-      name: "Current grade",
+      name: 'Current grade',
       grade: avg,
     },
     {
-      name: "Predicted grade",
+      name: 'Predicted grade',
       grade: pred,
     },
   ];
@@ -99,14 +96,14 @@ const GraphGrades: FC<Props> = ({ goal, total: avg, pred }): ReactElement => {
     paddingLeft: 0,
     padding: 20,
     insetLeft: 70,
-    colorField: "name",
+    colorField: 'name',
     color: [BLUE, GREEN],
-    xField: "name",
-    yField: "grade",
+    xField: 'name',
+    yField: 'grade',
     legend: false,
     sort: {
       // @ts-expect-error I think that the type bindings are incorrect, as this works but the suggested type doesn't
-      reverse: "true",
+      reverse: 'true',
     },
     scale: {
       y: { domainMax: max },
@@ -116,21 +113,21 @@ const GraphGrades: FC<Props> = ({ goal, total: avg, pred }): ReactElement => {
       x: {
         label: true,
         tick: false,
-        labelFormatter: (label: string) => label.split(" ")[0] + ":",
+        labelFormatter: (label: string) => label.split(' ')[0] + ':',
       },
       y: { label: false, tick: false },
     },
     tooltip: {
-      title: "",
-      items: [{ channel: "y", valueFormatter: ".1f" }],
+      title: '',
+      items: [{ channel: 'y', valueFormatter: '.1f' }],
     },
     annotations: [
       {
-        type: "lineY",
+        type: 'lineY',
         // @ts-expect-error I think that the type bindings are incorrect, as this works but the suggested type doesn't
         yField: goal,
         style: {
-          stroke: "black",
+          stroke: 'black',
           strokeOpacity: 1,
           lineWidth: 1,
           lineDash: [8, 3],
@@ -139,7 +136,7 @@ const GraphGrades: FC<Props> = ({ goal, total: avg, pred }): ReactElement => {
     ],
   };
   return (
-    <div className='h-[50px]'>
+    <div className="h-[50px]">
       <Bar {...config} marginTop={20} marginBottom={30} />
     </div>
   );

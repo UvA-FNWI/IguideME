@@ -1,8 +1,7 @@
-import { TileType, type Grades, printGrade } from '@/types/tile';
 import { LikeTwoTone, MessageFilled, TrophyOutlined, WarningTwoTone } from '@ant-design/icons';
 import { Space } from 'antd';
+import { TileType, type Grades, printGrade } from '@/types/tile';
 import { type FC, type ReactElement } from 'react';
-
 interface Props {
   type: TileType;
   grades: Grades;
@@ -12,7 +11,7 @@ const GridTile: FC<Props> = ({ type, grades }): ReactElement => {
   let inner = <></>;
   switch (type) {
     case TileType.assignments:
-      inner = <Assignments {...grades} />;
+      inner = <GradeView {...grades} />;
       break;
     case TileType.discussions:
       inner = <Discussions {...grades} />;
@@ -24,7 +23,7 @@ const GridTile: FC<Props> = ({ type, grades }): ReactElement => {
   return <div className="text-lg">{inner}</div>;
 };
 
-const Assignments: FC<Grades> = ({ grade, max, type }): ReactElement => {
+export const GradeView: FC<Grades> = ({ grade, max, type }): ReactElement => {
   return (
     <Space align="end">
       <div>

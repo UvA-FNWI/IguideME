@@ -1,3 +1,7 @@
+import AdminTitle from '@/components/atoms/admin-titles/admin-titles';
+import Loading from '@/components/particles/loading';
+import { Button, Col, Divider, Form, Input, InputNumber, Row, Select, Space } from 'antd';
+import { DeleteFilled, PlusOutlined } from '@ant-design/icons';
 import {
   deleteLearningGoal,
   deleteRequirement,
@@ -8,14 +12,9 @@ import {
   postGoalRequirement,
   postLearningGoal,
 } from '@/api/entries';
-import AdminTitle from '@/components/atoms/admin-titles/admin-titles';
-import { LogicalExpression, type LearningGoal, type GoalRequirement } from '@/types/tile';
-import { DeleteFilled, PlusOutlined } from '@ant-design/icons';
-import { Button, Col, Divider, Form, Input, InputNumber, Row, Select, Space } from 'antd';
-import { useState, type FC, type ReactElement } from 'react';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
-
-import Loading from '@/components/particles/loading';
+import { LogicalExpression, type LearningGoal, type GoalRequirement } from '@/types/tile';
+import { useState, type FC, type ReactElement } from 'react';
 
 const { Item } = Form;
 
@@ -48,7 +47,7 @@ const LearningGoals: FC = (): ReactElement => {
     <div>
       <AdminTitle title="Learning Goals" description="Configure the learning goals for the course." />
       {goals === undefined ? <Loading /> : goals.map((goal) => <ViewLearningGoal key={goal.id} goal={goal} />)}
-      <Button type="dashed" onClick={addGoal} block icon={<PlusOutlined />} className='bg-white'>
+      <Button type="dashed" onClick={addGoal} block icon={<PlusOutlined />} className="bg-white">
         Add Goal
       </Button>
     </div>
@@ -162,7 +161,6 @@ const ViewGoalRequirement: FC<ReqProps> = ({ requirement }): ReactElement => {
       await queryClient.invalidateQueries('learning-goals');
     },
   });
-  console.log(assignments);
   return (
     <div className="font-tnum w-full p-[10px] border border-solid border-zinc-200 rounded-lg mb-[10px]">
       <Form<GoalRequirement>

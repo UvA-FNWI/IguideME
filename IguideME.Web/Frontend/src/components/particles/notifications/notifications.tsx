@@ -1,9 +1,9 @@
-import { type FC, type ReactElement } from 'react';
-import { WarningOutlined, RiseOutlined, TrophyOutlined } from '@ant-design/icons';
-import { type User } from '@/types/user';
-import { getStudentNotifications } from '@/api/users';
-import { useQuery } from 'react-query';
 import Loading from '../loading';
+import { getStudentNotifications } from '@/api/users';
+import { RiseOutlined, TrophyOutlined, WarningOutlined } from '@ant-design/icons';
+import { useQuery } from 'react-query';
+import { type FC, type ReactElement } from 'react';
+import { type User } from '@/types/user';
 
 interface Props {
   user: User;

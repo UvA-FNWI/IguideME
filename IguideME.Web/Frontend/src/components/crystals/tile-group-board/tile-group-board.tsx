@@ -1,7 +1,16 @@
-import { useMemo, type FC, type ReactElement, useState } from 'react';
-import { useMutation, useQuery, useQueryClient } from 'react-query';
+import AdminTileGroupView from '@/components/crystals/admin-tile-group/admin-tile-group';
+import AdminTileView from '@/components/crystals/admin-tile-view/admin-tile-view';
+import EditTile from '@/components/crystals/edit-tile/edit-tile';
+import Loading from '@/components/particles/loading';
+import Swal from 'sweetalert2';
+import { arrayMove, SortableContext } from '@dnd-kit/sortable';
 import { Button, Drawer } from 'antd';
+import { createPortal } from 'react-dom';
+import { DrawerContext } from './contexts';
+import { getTileGroups, getTiles, patchTile, patchTileGroupOrder, patchTileOrder, postTileGroup } from '@/api/tiles';
 import { PlusOutlined } from '@ant-design/icons';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
+import { useMemo, type FC, type ReactElement, useState } from 'react';
 import {
   DndContext,
   type DragEndEvent,
@@ -13,17 +22,8 @@ import {
   type DragOverEvent,
   type UniqueIdentifier,
 } from '@dnd-kit/core';
-import { SortableContext, arrayMove } from '@dnd-kit/sortable';
-import { createPortal } from 'react-dom';
 
-import Loading from '@/components/particles/loading';
 import { type Tile, type TileGroup } from '@/types/tile';
-import EditTile from '@/components/crystals/edit-tile/edit-tile';
-import AdminTileView from '@/components/crystals/admin-tile-view/admin-tile-view';
-import AdminTileGroupView from '@/components/crystals/admin-tile-group/admin-tile-group';
-import { getTileGroups, getTiles, patchTile, patchTileGroupOrder, patchTileOrder, postTileGroup } from '@/api/tiles';
-import { DrawerContext } from './contexts';
-import Swal from 'sweetalert2';
 
 const TileGroupBoard: FC = (): ReactElement => {
   const { data: tilegroups, isFetching } = useQuery('tile-groups', getTileGroups);
@@ -123,7 +123,11 @@ const TileGroupBoard: FC = (): ReactElement => {
             <Button
               type="dashed"
               onClick={() => {
-                postGroup({ title: 'TileGroup', id: -1, position: tilegroups.length + 1 });
+                postGroup({
+                  title: 'TileGroup',
+                  id: -1,
+                  position: tilegroups.length + 1,
+                });
               }}
               block
               icon={<PlusOutlined />}
@@ -203,7 +207,7 @@ const TileGroupBoard: FC = (): ReactElement => {
         dropTile(activeID, overID, activeData, overData);
         return;
       default:
-        console.log('Unknown active object type encountered during drop', activeData.type);
+        console.warn('Unknown active object type encountered during drop', activeData.type);
     }
   }
 
@@ -229,7 +233,7 @@ const TileGroupBoard: FC = (): ReactElement => {
           : moveTileToGroup(activeData.tile, overData.tile.group_id);
         return;
       default:
-        console.log('Unknown over object type encountered during drop', activeData.type);
+        console.warn('Unknown over object type encountered during drop', activeData.type);
     }
   }
 

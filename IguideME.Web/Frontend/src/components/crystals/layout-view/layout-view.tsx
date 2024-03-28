@@ -1,10 +1,9 @@
-import { getLayoutColumns, getTileGroups } from '@/api/tiles';
 import Loading from '@/components/particles/loading';
-import { Col, Row } from 'antd';
-import { type FC, type ReactElement } from 'react';
-import { useQuery } from 'react-query';
-
 import ViewTileGroup from '../tile-group-view/tile-group-view';
+import { Col, Row } from 'antd';
+import { getLayoutColumns, getTileGroups } from '@/api/tiles';
+import { useQuery } from 'react-query';
+import { type FC, type ReactElement } from 'react';
 
 const ViewLayout: FC = (): ReactElement => {
   const { data: columns } = useQuery('layout-columns', getLayoutColumns);
@@ -14,9 +13,9 @@ const ViewLayout: FC = (): ReactElement => {
     return <Loading />;
   }
   return (
-    <Row justify="space-evenly" gutter={[10,10]} className='p-[10px]'>
+    <Row justify="space-evenly" style={{ padding: 5 }}>
       {columns.map((column) => (
-        <Col key={column.id} span={Math.round(24 * column.width / 100)}>
+        <Col key={column.id} span={Math.round((24 * column.width) / 100)}>
           <div className="h-full grid gap-3">
             {column.groups.map((id) => {
               const group = tilegroups.find((group) => group.id === id);

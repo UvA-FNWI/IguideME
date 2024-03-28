@@ -1,33 +1,34 @@
 // /----------------------------- React ------------------------------/
+import AdminPanel from '@/components/crystals/admin-panel/admin-panel.tsx';
+import Analytics from '@/components/pages/admin/analytics/analytics.tsx';
+import App from './App.tsx';
+import Dashboard from '@/components/pages/admin/dashboard/dashboard.tsx';
+import DataWizard from '@/components/pages/admin/datawizard/datawizard.tsx';
+import EditLayout from '@/components/pages/admin/layout/layout.tsx';
+import ErrorPage from '@/components/pages/error';
+import GradeAnalyzer from '@/components/pages/admin/analyzer/analyzer.tsx';
+import GradePredictor from '@/components/pages/admin/predictor/predictor.tsx';
+import Home from '@/components/pages/home/home.tsx';
+import LearningGoals from '@/components/pages/admin/learning-goals/learning-goals.tsx';
+import NotificationCentre from '@/components/pages/admin/notificationcentre/notificationcentre.tsx';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
-
-// /--------------------------- Components ---------------------------/
-import ErrorPage from '@/components/pages/error';
-import Home from '@/components/pages/home/home.tsx';
-import Tiles from '@/components/pages/admin/tiles/tiles.tsx';
-import EditLayout from '@/components/pages/admin/layout/layout.tsx';
 import Settings from '@/components/pages/admin/settings/settings.tsx';
-import Dashboard from '@/components/pages/admin/dashboard/dashboard.tsx';
-import Analytics from '@/components/pages/admin/analytics/analytics.tsx';
-import GradeAnalyzer from '@/components/pages/admin/analyzer/analyzer.tsx';
-import AdminPanel from '@/components/crystals/admin-panel/admin-panel.tsx';
-import DataWizard from '@/components/pages/admin/datawizard/datawizard.tsx';
-import LearningGoals from '@/components/pages/admin/learning-goals/learning-goals.tsx';
-import GradePredictor from '@/components/pages/admin/predictor/predictor.tsx';
+import setup from '@/api/setup.ts';
 import StudentDashboard from '@/components/pages/student-dashboard/student-dashboard.tsx';
 import StudentOverview from '@/components/pages/admin/studentoverview/studentoverview.tsx';
-import NotificationCentre from '@/components/pages/admin/notificationcentre/notificationcentre.tsx';
-
-// /----------------------------- Misc. ------------------------------/
-import App from './App.tsx';
-import setup from '@/api/setup.ts';
-
-// Loads the base style sheet for the app.
+import TileDetailView from './components/pages/tile-detail-view/tile-detail-view.tsx';
+import Tiles from '@/components/pages/admin/tiles/tiles.tsx';
+import ViewLayout from './components/crystals/layout-view/layout-view.tsx';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from 'react-query';
 import './globals.css';
 
-import { QueryClient, QueryClientProvider } from 'react-query';
+// /--------------------------- Components ---------------------------/
+
+// /----------------------------- Misc. ------------------------------/
+
+// Loads the base style sheet for the app.
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -68,7 +69,10 @@ enableMocking()
               <Routes>
                 <Route path="/" element={<App />} errorElement={<ErrorPage />}>
                   <Route path="" element={<Home />} />
-                  <Route path=":id" element={<StudentDashboard />} />
+                  <Route path=":id" element={<StudentDashboard />}>
+                    <Route path="" element={<ViewLayout />} />
+                    <Route path=":tid" element={<TileDetailView />} />
+                  </Route>
                   <Route path="admin" element={<AdminPanel />}>
                     <Route path="" element={<Dashboard />} />
                     <Route path="tiles" element={<Tiles />} />

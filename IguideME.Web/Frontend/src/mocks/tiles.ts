@@ -1,55 +1,50 @@
-import {
-  type TileGroup,
-  type LayoutColumn,
-  type Tile,
-  TileType,
-  GradingType,
-} from "@/types/tile";
-import { http, HttpResponse } from "msw";
-import { MOCK_ASSIGNMENTS, MOCK_GOALS, MOCK_TOPICS } from "./entries";
+import { http, HttpResponse } from 'msw';
+import { MOCK_ASSIGNMENTS, MOCK_GOALS, MOCK_TOPICS } from './entries';
+import { type TileGroup, type LayoutColumn, type Tile, TileType, GradingType } from '@/types/tile';
 
 export const tileHandlers = [
-  http.get("/layout/columns", () => {
+  http.get('/layout/columns', () => {
     return HttpResponse.json<LayoutColumn[]>(MOCK_COLUMNS);
   }),
-  http.post("/layout/columns", () => {
+  http.post('/layout/columns', () => {
     return new HttpResponse(null, { status: 200 });
   }),
-  http.get("/tiles/groups", () => {
+  http.get('/tiles/groups', () => {
     return HttpResponse.json<TileGroup[]>(MOCK_GROUPS);
   }),
-  http.post("/tiles/groups/*", () => {
+  http.post('/tiles/groups/*', () => {
     return new HttpResponse(null, { status: 200 });
   }),
-  http.delete("/tiles/groups/*", () => {
+  http.delete('/tiles/groups/*', () => {
     return new HttpResponse(null, { status: 200 });
   }),
-  http.patch("/tiles/groups/*", () => {
+  http.patch('/tiles/groups/*', () => {
     return new HttpResponse(null, { status: 200 });
   }),
-  http.patch("/tiles/groups/order", () => {
+  http.patch('/tiles/groups/order', () => {
     return new HttpResponse(null, { status: 200 });
   }),
-  http.get("tilegroup/*/tiles", ({ params }) => {
+  http.get('tilegroup/*/tiles', ({ params }) => {
     return HttpResponse.json<Tile[]>(
-      MOCK_TILES.filter(
-        (tile) => tile.visible && tile.group_id.toString() === params[0],
-      ),
+      MOCK_TILES.filter((tile) => tile.visible && tile.group_id.toString() === params[0]),
     );
   }),
-  http.get("/tiles", () => {
+  http.get('/tiles', () => {
     return HttpResponse.json<Tile[]>(MOCK_TILES);
   }),
-  http.post("/tiles/*", () => {
+  http.get('/tile/*', ({ params }) => {
+    return HttpResponse.json<Tile | undefined>(MOCK_TILES.find((tile) => tile.id.toString() === params[0]));
+  }),
+  http.post('/tiles/*', () => {
     return new HttpResponse(null, { status: 200 });
   }),
-  http.patch("/tiles/*", () => {
+  http.patch('/tiles/*', () => {
     return new HttpResponse(null, { status: 200 });
   }),
-  http.delete("/tiles/*", () => {
+  http.delete('/tiles/*', () => {
     return new HttpResponse(null, { status: 200 });
   }),
-  http.patch("/tiles/order", () => {
+  http.patch('/tiles/order', () => {
     return new HttpResponse(null, { status: 200 });
   }),
 ];
@@ -72,17 +67,17 @@ const MOCK_COLUMNS: LayoutColumn[] = [
 const MOCK_GROUPS: TileGroup[] = [
   {
     id: 1,
-    title: "Activities",
+    title: 'Activities',
     position: 1,
   },
   {
     id: 2,
-    title: "Course Grades",
+    title: 'Course Grades',
     position: 1,
   },
   {
     id: 3,
-    title: "Learning Outcome",
+    title: 'Learning Outcome',
     position: 2,
   },
 ];
@@ -91,7 +86,7 @@ export const MOCK_TILES: Tile[] = [
   {
     id: 1,
     group_id: 1,
-    title: "Quizzes",
+    title: 'Quizzes',
     position: 1,
     weight: 0.1,
     type: TileType.assignments,
@@ -128,7 +123,7 @@ export const MOCK_TILES: Tile[] = [
   {
     id: 2,
     group_id: 1,
-    title: "Perusall",
+    title: 'Perusall',
     position: 2,
     weight: 0.1,
     type: TileType.assignments,
@@ -159,7 +154,7 @@ export const MOCK_TILES: Tile[] = [
   {
     id: 3,
     group_id: 1,
-    title: "Attendance",
+    title: 'Attendance',
     position: 4,
     weight: 0,
     type: TileType.assignments,
@@ -171,7 +166,7 @@ export const MOCK_TILES: Tile[] = [
   {
     id: 4,
     group_id: 1,
-    title: "Practice Sessions",
+    title: 'Practice Sessions',
     position: 3,
     weight: 0,
     type: TileType.assignments,
@@ -232,7 +227,7 @@ export const MOCK_TILES: Tile[] = [
   {
     id: 5,
     group_id: 2,
-    title: "Exam Grades",
+    title: 'Exam Grades',
     position: 1,
     weight: 0.8,
     type: TileType.assignments,
@@ -269,7 +264,7 @@ export const MOCK_TILES: Tile[] = [
   {
     id: 6,
     group_id: 1,
-    title: "Preparation Time",
+    title: 'Preparation Time',
     position: 5,
     weight: 0,
     type: TileType.assignments,
@@ -281,7 +276,7 @@ export const MOCK_TILES: Tile[] = [
   {
     id: 7,
     group_id: 1,
-    title: "Send in Questions",
+    title: 'Send in Questions',
     position: 6,
     weight: 0,
     type: TileType.discussions,
@@ -312,7 +307,7 @@ export const MOCK_TILES: Tile[] = [
   {
     id: 9,
     group_id: 3,
-    title: "Learning Outcomes",
+    title: 'Learning Outcomes',
     position: 2,
     weight: 0,
     type: TileType.learning_outcomes,
@@ -331,7 +326,7 @@ export const MOCK_TILES: Tile[] = [
   {
     id: 10,
     group_id: 2,
-    title: "Hidden",
+    title: 'Hidden',
     position: 2,
     weight: 0,
     type: TileType.assignments,
