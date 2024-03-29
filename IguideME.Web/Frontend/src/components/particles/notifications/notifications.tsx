@@ -1,7 +1,7 @@
 import Loading from '../loading';
 import { getStudentNotifications } from '@/api/users';
 import { RiseOutlined, TrophyOutlined, WarningOutlined } from '@ant-design/icons';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { type FC, type ReactElement } from 'react';
 import { type User } from '@/types/user';
 
@@ -10,10 +10,10 @@ interface Props {
 }
 
 const Notifications: FC<Props> = ({ user }): ReactElement => {
-  const { data: notifications } = useQuery(
-    `notifications/${user.userID}`,
-    async () => await getStudentNotifications(user.userID),
-  );
+  const { data: notifications } = useQuery({
+    queryKey: [`notifications/${user.userID}`],
+    queryFn: async () => await getStudentNotifications(user.userID),
+  });
 
   if (notifications === undefined) {
     return <Loading />;

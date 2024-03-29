@@ -1,20 +1,25 @@
 import Loading from '@/components/particles/loading';
+import QueryError from '@/components/particles/QueryError';
 import { DeleteFilled } from '@ant-design/icons';
 import { Form, Row, Select, Table } from 'antd';
 import { getLearningGoals } from '@/api/entries';
 import type { LearningGoal, TileEntry } from '@/types/tile';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useState, type FC, type ReactElement } from 'react';
 
 const { Item } = Form;
 
 const EditTileGoals: FC = (): ReactElement => {
-  const { data: goals } = useQuery('learning-goals', getLearningGoals);
+  const { data, isError, isLoading } = useQuery({
+    queryKey: ['learning-goals'],
+    queryFn: getLearningGoals,
+  });
+
   return (
     <Row>
       <p className="mb-1">Goals:</p>
       <Item name="entries" className="w-full m-0">
-        {goals === undefined ? <Loading /> : <SelectGoals goals={goals} />}
+        {isError ? <QueryError /> : isLoading ? <Loading /> : <SelectGoals goals={data!} />}
       </Item>
     </Row>
   );

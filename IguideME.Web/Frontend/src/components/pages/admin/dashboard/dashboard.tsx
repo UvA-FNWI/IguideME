@@ -1,16 +1,19 @@
 // /------------------------- Module imports -------------------------/
+import AdminTitle from '@/components/atoms/admin-titles/admin-titles';
+import SyncManager from '@/components/crystals/syncmanager/syncmanager';
 import { Divider, Spin, Table } from 'antd';
-import { useQuery } from 'react-query';
+import { getRelativeTimeString, getRelativeTimeTimer } from '@/helpers/time';
+import { getSynchronizations } from '@/api/syncing';
+import { useQuery } from '@tanstack/react-query';
 import { type FC, type ReactElement } from 'react';
 
 // /-------------------------- Own imports ---------------------------/
-import { getSynchronizations } from '@/api/syncing';
-import SyncManager from '@/components/crystals/syncmanager/syncmanager';
-import { getRelativeTimeString, getRelativeTimeTimer } from '@/helpers/time';
-import AdminTitle from '@/components/atoms/admin-titles/admin-titles';
 
 const Dashboard: FC = (): ReactElement => {
-  const { isLoading: loadingSyncs, data } = useQuery('syncs', getSynchronizations);
+  const { isLoading: loadingSyncs, data } = useQuery({
+    queryKey: ['syncs'],
+    queryFn: getSynchronizations,
+  });
 
   const synchronizations = data?.sort((a, b) => b.start_timestamp - a.start_timestamp);
 
@@ -66,7 +69,7 @@ const Dashboard: FC = (): ReactElement => {
       <SyncManager />
       <h1 className="mt-5">Historic versions</h1>
       <Divider className="mt-1 mb-5" />
-        <Table scroll={{ x: 240 }} dataSource={syncs} columns={columns} />
+      <Table scroll={{ x: 240 }} dataSource={syncs} columns={columns} />
     </>
   );
 };

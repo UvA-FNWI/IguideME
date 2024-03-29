@@ -1,11 +1,14 @@
+import ConfigLayoutColumn from '@/components/atoms/layout-column/layout-column';
+import Loading from '@/components/particles/loading';
+import { arrayMove, SortableContext } from '@dnd-kit/sortable';
 import { Button, Col, Row } from 'antd';
+import { createPortal } from 'react-dom';
+import { getLayoutColumns, postLayoutColumns } from '@/api/tiles';
+import { PlusOutlined } from '@ant-design/icons';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { type FC, type ReactElement, useMemo, useState } from 'react';
 
-import ConfigLayoutColumn from '@/components/atoms/layout-column/layout-column';
-import { useMutation, useQuery, useQueryClient } from 'react-query';
-import { getLayoutColumns, postLayoutColumns } from '@/api/tiles';
 import { type LayoutColumn } from '@/types/tile';
-import { PlusOutlined } from '@ant-design/icons';
 import {
   DndContext,
   type DragEndEvent,
@@ -15,12 +18,12 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
-import { SortableContext, arrayMove } from '@dnd-kit/sortable';
-import { createPortal } from 'react-dom';
-import Loading from '@/components/particles/loading';
 
 const LayoutConfigurator: FC = (): ReactElement => {
-  const { data, isFetching } = useQuery('layout-columns', getLayoutColumns);
+  const { data, isFetching } = useQuery({
+    queryKey: ['layout-columns'],
+    queryFn: getLayoutColumns,
+  });
 
   if (isFetching || data === undefined) {
     return <Loading />;
@@ -41,7 +44,7 @@ const LayoutConfiguratorInner: FC<Props> = ({ data }): ReactElement => {
   const { mutate: saveLayout } = useMutation({
     mutationFn: postLayoutColumns,
     onSuccess: async () => {
-      await queryClient.invalidateQueries('layout-columns');
+      await queryClient.invalidateQueries({ queryKey: ['layout-columns'] });
     },
   });
   const [active, setActive] = useState<LayoutColumn | null>(null);
@@ -96,7 +99,7 @@ const LayoutConfiguratorInner: FC<Props> = ({ data }): ReactElement => {
           ))}
         </Row>
         <Row>
-          <Button type="dashed" onClick={addColumn} block icon={<PlusOutlined />} className='bg-white'>
+          <Button type="dashed" onClick={addColumn} block icon={<PlusOutlined />} className="bg-white">
             Add Column
           </Button>
         </Row>

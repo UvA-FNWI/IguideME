@@ -3,13 +3,17 @@ import Loading from '@/components/particles/loading';
 import { Button, Checkbox, Col, Form, Row } from 'antd';
 import { getNotificationSettings, postNotificationSettings } from '@/api/course_settings';
 import { useForm } from 'antd/es/form/Form';
-import { useMutation, useQuery, useQueryClient } from 'react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState, type FC, type ReactElement } from 'react';
 
 const { Item } = Form;
 
 const NotificationSettings: FC = (): ReactElement => {
-  const { data } = useQuery('notification-settings', getNotificationSettings);
+  const { data } = useQuery({
+    queryKey: ['notification-settings'],
+    queryFn: getNotificationSettings,
+  });
+
   if (data === undefined) {
     return <Loading />;
   }
@@ -35,7 +39,7 @@ const NotificationSettingsForm: FC<{
   const { mutate: saveDates } = useMutation({
     mutationFn: postNotificationSettings,
     onSuccess: async () => {
-      await queryClient.invalidateQueries('notification-settings');
+      await queryClient.invalidateQueries({ queryKey: ['notification-settings'] });
     },
   });
 

@@ -1,11 +1,12 @@
 // /----------------------------- React ------------------------------/
 import App from './App.tsx';
-import Loading from './components/particles/loading.tsx';
+import LoadingPage from './components/pages/loading.tsx';
 import React, { lazy, Suspense } from 'react';
 import ReactDOM from 'react-dom/client';
 import setup from '@/api/setup.ts';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from 'react-query';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import './globals.css';
 
 // /--------------------------- Pages ---------------------------/
@@ -65,7 +66,7 @@ enableMocking()
         <React.StrictMode>
           <QueryClientProvider client={queryClient}>
             <BrowserRouter>
-              <Suspense fallback={<Loading />}>
+              <Suspense fallback={<LoadingPage />}>
                 <Routes>
                   <Route path="/" element={<App />} errorElement={<ErrorPage />}>
                     <Route path="" element={<Home />} />
@@ -90,6 +91,7 @@ enableMocking()
                 </Routes>
               </Suspense>
             </BrowserRouter>
+            {import.meta.env.MODE === 'mock' && <ReactQueryDevtools initialIsOpen={false} />}
           </QueryClientProvider>
         </React.StrictMode>,
       );

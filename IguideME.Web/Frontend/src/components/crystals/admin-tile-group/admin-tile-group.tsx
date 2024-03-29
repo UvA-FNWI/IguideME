@@ -1,11 +1,12 @@
 import AdminTileView from '@/components/crystals/admin-tile-view/admin-tile-view';
 import Loading from '@/components/particles/loading';
+import QueryError from '@/components/particles/QueryError';
 import { Button, Col, Divider, Input, Row } from 'antd';
 import { CSS } from '@dnd-kit/utilities';
 import { DeleteFilled, PlusOutlined } from '@ant-design/icons';
 import { deleteTileGroup, getTiles, patchTileGroup, postTile } from '@/api/tiles';
 import { SortableContext, useSortable } from '@dnd-kit/sortable';
-import { useMutation, useQuery, useQueryClient } from 'react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState, type FC, type ReactElement, useMemo } from 'react';
 import { TileType, type TileGroup, GradingType } from '@/types/tile';
 
@@ -15,7 +16,11 @@ interface Props {
 const AdminTileGroupView: FC<Props> = ({ group }): ReactElement => {
   const [editing, setEditing] = useState<boolean>(false);
   const [title, setTitle] = useState<string>(group.title);
-  const { data, isFetching } = useQuery('tiles', getTiles);
+
+  const { data, isError, isLoading } = useQuery({
+    queryKey: ['tiles'],
+    queryFn: getTiles,
+  });
 
   const tiles = data?.filter((tile) => tile.group_id === group.id);
 
@@ -24,21 +29,21 @@ const AdminTileGroupView: FC<Props> = ({ group }): ReactElement => {
   const { mutate: addTile } = useMutation({
     mutationFn: postTile,
     onSuccess: async () => {
-      await queryClient.invalidateQueries('tiles');
+      await queryClient.invalidateQueries({ queryKey: ['tiles'] });
     },
   });
 
   const { mutate: patchGroup } = useMutation({
     mutationFn: patchTileGroup,
     onSuccess: async () => {
-      await queryClient.invalidateQueries('tile-groups');
+      await queryClient.invalidateQueries({ queryKey: ['tile-groups'] });
     },
   });
 
   const { mutate: deleteGroup } = useMutation({
     mutationFn: deleteTileGroup,
     onSuccess: async () => {
-      await queryClient.invalidateQueries('tile-groups');
+      await queryClient.invalidateQueries({ queryKey: ['tile-groups'] });
     },
   });
 
@@ -70,10 +75,16 @@ const AdminTileGroupView: FC<Props> = ({ group }): ReactElement => {
     );
   }
 
-  if (tiles === undefined || isFetching) {
+  if (tiles === undefined || isLoading) {
     return (
       <Row>
         <Loading />
+      </Row>
+    );
+  } else if (isError) {
+    return (
+      <Row>
+        <QueryError />
       </Row>
     );
   }

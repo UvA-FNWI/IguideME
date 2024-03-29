@@ -12,7 +12,7 @@ import {
   postGoalRequirement,
   postLearningGoal,
 } from '@/api/entries';
-import { useMutation, useQuery, useQueryClient } from 'react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { LogicalExpression, type LearningGoal, type GoalRequirement } from '@/types/tile';
 import { useState, type FC, type ReactElement } from 'react';
 
@@ -26,13 +26,16 @@ interface ReqProps {
   requirement: GoalRequirement;
 }
 const LearningGoals: FC = (): ReactElement => {
-  const { data: goals } = useQuery('learning-goals', getLearningGoals);
+  const { data: goals } = useQuery({
+    queryKey: ['learning-goals'],
+    queryFn: getLearningGoals,
+  });
 
   const queryClient = useQueryClient();
   const { mutate: postGoal } = useMutation({
     mutationFn: postLearningGoal,
     onSuccess: async () => {
-      await queryClient.invalidateQueries('learning-goals');
+      await queryClient.invalidateQueries({ queryKey: ['learning-goals'] });
     },
   });
 
@@ -62,20 +65,20 @@ const ViewLearningGoal: FC<GoalProps> = ({ goal }): ReactElement => {
   const { mutate: patchGoal } = useMutation({
     mutationFn: patchLearningGoal,
     onSuccess: async () => {
-      await queryClient.invalidateQueries('learning-goals');
+      await queryClient.invalidateQueries({ queryKey: ['learning-goals'] });
     },
   });
   const { mutate: removeGoal } = useMutation({
     mutationFn: deleteLearningGoal,
     onSuccess: async () => {
-      await queryClient.invalidateQueries('learning-goals');
+      await queryClient.invalidateQueries({ queryKey: ['learning-goals'] });
     },
   });
 
   const { mutate: postRequirement } = useMutation({
     mutationFn: postGoalRequirement,
     onSuccess: async () => {
-      await queryClient.invalidateQueries('learning-goals');
+      await queryClient.invalidateQueries({ queryKey: ['learning-goals'] });
     },
   });
 
@@ -147,18 +150,22 @@ const ViewLearningGoal: FC<GoalProps> = ({ goal }): ReactElement => {
 const ViewGoalRequirement: FC<ReqProps> = ({ requirement }): ReactElement => {
   const queryClient = useQueryClient();
 
-  const { data: assignments } = useQuery('assignments', getAssignments);
+  const { data: assignments } = useQuery({
+    queryKey: ['assignments'],
+    queryFn: getAssignments,
+  });
+
   const { mutate: saveRequirement } = useMutation({
     mutationFn: patchGoalRequirement,
     onSuccess: async () => {
-      await queryClient.invalidateQueries('learning-goals');
+      await queryClient.invalidateQueries({ queryKey: ['learning-goals'] });
     },
   });
 
   const { mutate: removeRequirement } = useMutation({
     mutationFn: deleteRequirement,
     onSuccess: async () => {
-      await queryClient.invalidateQueries('learning-goals');
+      await queryClient.invalidateQueries({ queryKey: ['learning-goals'] });
     },
   });
   return (

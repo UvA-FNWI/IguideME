@@ -9,7 +9,7 @@ import { createPortal } from 'react-dom';
 import { getTileGroups, getTiles, patchTile, patchTileGroupOrder, patchTileOrder, postTileGroup } from '@/api/tiles';
 import { PlusOutlined } from '@ant-design/icons';
 import { useDrawerStore } from './useDrawerStore';
-import { useMutation, useQuery, useQueryClient } from 'react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useMemo, type FC, type ReactElement, useState } from 'react';
 import {
   DndContext,
@@ -26,8 +26,16 @@ import {
 import { type Tile, type TileGroup } from '@/types/tile';
 
 const TileGroupBoard: FC = (): ReactElement => {
-  const { data: tilegroups, isFetching } = useQuery('tile-groups', getTileGroups);
-  const { data: tiles } = useQuery('tiles', getTiles);
+  const { data: tilegroups, isFetching } = useQuery({
+    queryKey: ['tile-groups'],
+    queryFn: getTileGroups,
+  });
+
+  const { data: tiles } = useQuery({
+    queryKey: ['tiles'],
+    queryFn: getTiles,
+  });
+
   const [activeGroup, setActiveGroup] = useState<TileGroup | null>(null);
   const [activeTile, setActiveTile] = useState<Tile | null>(null);
   const [move, setMove] = useState<boolean>(false);
@@ -38,28 +46,28 @@ const TileGroupBoard: FC = (): ReactElement => {
   const { mutate: postGroup } = useMutation({
     mutationFn: postTileGroup,
     onSuccess: async () => {
-      await queryClient.invalidateQueries('tile-groups');
+      await queryClient.invalidateQueries({ queryKey: ['tile-groups'] });
     },
   });
 
   const { mutate: updateTileGroupOrder } = useMutation({
     mutationFn: patchTileGroupOrder,
     onSuccess: async () => {
-      await queryClient.invalidateQueries('tile-groups');
+      await queryClient.invalidateQueries({ queryKey: ['tile-groups'] });
     },
   });
 
   const { mutate: updateTileOrder } = useMutation({
     mutationFn: patchTileOrder,
     onSuccess: async () => {
-      await queryClient.invalidateQueries('tiles');
+      await queryClient.invalidateQueries({ queryKey: ['tiles'] });
     },
   });
 
   const { mutate: updateTile } = useMutation({
     mutationFn: patchTile,
     onSuccess: async () => {
-      await queryClient.invalidateQueries('tiles');
+      await queryClient.invalidateQueries({ queryKey: ['tiles'] });
     },
   });
 

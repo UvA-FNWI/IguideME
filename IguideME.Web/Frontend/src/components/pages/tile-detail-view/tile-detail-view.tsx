@@ -5,7 +5,7 @@ import { ArrowLeftOutlined } from '@ant-design/icons';
 import { Button, Col, Row } from 'antd';
 import { getTile } from '@/api/tiles';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useTileViewStore } from '../student-dashboard/tileViewContext';
 import { type ReactElement, useCallback, useEffect } from 'react';
 
@@ -15,7 +15,10 @@ function TileDetailView(): ReactElement {
     user: state.user,
   }));
 
-  const { data: tile } = useQuery(`tile/${tid}/${user.userID}`, async () => await getTile(tid ?? -1));
+  const { data: tile } = useQuery({
+    queryKey: [`tile/${tid}/${user.userID}`],
+    queryFn: async () => await getTile(tid ?? -1),
+  });
 
   const navigate = useNavigate();
   const back = (): void => {

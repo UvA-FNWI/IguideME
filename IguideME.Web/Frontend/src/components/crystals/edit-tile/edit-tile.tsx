@@ -7,7 +7,7 @@ import { Button, Col, Form, Input, Row, Select, Space } from 'antd';
 import { deleteTile, patchTile } from '@/api/tiles';
 import { useDrawerStore } from '../tile-group-board/useDrawerStore';
 import { useForm, useWatch } from 'antd/es/form/Form';
-import { useMutation, useQueryClient } from 'react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { TileType, type Tile } from '@/types/tile';
 import { type FC, type ReactElement, useState } from 'react';
 
@@ -30,14 +30,14 @@ const EditTile: FC<Props> = ({ tile }): ReactElement => {
   const { mutate: saveTile } = useMutation({
     mutationFn: patchTile,
     onSuccess: async () => {
-      await queryClient.invalidateQueries('tiles');
+      await queryClient.invalidateQueries({ queryKey: ['tiles'] });
     },
   });
 
   const { mutate: removeTile } = useMutation({
     mutationFn: deleteTile,
     onSuccess: async () => {
-      await queryClient.invalidateQueries('tiles');
+      await queryClient.invalidateQueries({ queryKey: ['tiles'] });
     },
   });
 

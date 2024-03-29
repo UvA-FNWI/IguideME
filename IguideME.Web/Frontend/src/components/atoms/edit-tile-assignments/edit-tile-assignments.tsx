@@ -1,8 +1,9 @@
 import Loading from '@/components/particles/loading';
+import QueryError from '@/components/particles/QueryError';
 import { CheckCircleTwoTone, CloseCircleTwoTone, DeleteFilled } from '@ant-design/icons';
 import { Col, Form, InputNumber, Row, Select, Table } from 'antd';
 import { getAssignments } from '@/api/entries';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useState, type FC, type ReactElement } from 'react';
 
 import { GradingType, type Assignment, type TileEntry, printGradingType } from '@/types/tile';
@@ -10,7 +11,11 @@ import { GradingType, type Assignment, type TileEntry, printGradingType } from '
 const { Item } = Form;
 
 const EditTileAssignments: FC = (): ReactElement => {
-  const { data: assignments } = useQuery('assignments', getAssignments);
+  const { data, isError, isLoading } = useQuery({
+    queryKey: ['assignments'],
+    queryFn: getAssignments,
+  });
+
   return (
     <>
       <Row className="content-center">
@@ -46,7 +51,7 @@ const EditTileAssignments: FC = (): ReactElement => {
       <Row>
         <p className="mb-1">Assignments:</p>
         <Item name="entries" className="w-full m-0">
-          {assignments === undefined ? <Loading /> : <SelectAssignments assignments={assignments} />}
+          {isError ? <QueryError /> : isLoading ? <Loading /> : <SelectAssignments assignments={data!} />}
         </Item>
       </Row>
     </>

@@ -1,8 +1,10 @@
+import Loading from '@/components/particles/loading';
+import QueryError from '@/components/particles/QueryError';
 import { Col, Divider, InputNumber, Row, Slider, Transfer } from 'antd';
 import { CSS } from '@dnd-kit/utilities';
 import { DeleteFilled } from '@ant-design/icons';
 import { getTileGroups } from '@/api/tiles';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useSortable } from '@dnd-kit/sortable';
 import { type FC, type ReactElement, useState } from 'react';
 
@@ -27,7 +29,15 @@ const ConfigLayoutColumn: FC<Props> = ({ column, remove, parentOnChange }): Reac
   const [width, setWidth] = useState<number>(column.width);
   const [targetGroups, setGroups] = useState<string[]>(column.groups.map(String));
   const [selectedGroups, setSelectedGroups] = useState<string[]>([]);
-  const { data } = useQuery('tile-groups', getTileGroups);
+
+  const { data, isError, isLoading } = useQuery({
+    queryKey: ['tile-groups'],
+    queryFn: getTileGroups,
+  });
+
+  if (isError) return <QueryError />;
+  else if (isLoading) return <Loading />;
+
   const groups: RecordType[] | undefined = data?.map((x) => {
     return { key: x.id, title: x.title };
   });

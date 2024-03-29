@@ -1,33 +1,33 @@
-import { getSelf } from "@/api/users";
-import { type FC, type ReactElement, useState } from "react";
-import { useQuery } from "react-query";
 import {
   AppstoreOutlined,
-  ControlOutlined,
   CloudUploadOutlined,
   ClusterOutlined,
+  ControlOutlined,
+  DatabaseOutlined,
   DotChartOutlined,
   FundProjectionScreenOutlined,
   LaptopOutlined,
   NotificationOutlined,
-  DatabaseOutlined,
-  UserOutlined,
   TeamOutlined,
   TrophyOutlined,
-} from "@ant-design/icons";
-import {  Layout, Menu, type MenuProps } from "antd";
-import { Link, Outlet } from "react-router-dom";
+  UserOutlined,
+} from '@ant-design/icons';
+import { getSelf } from '@/api/users';
+import { Link, Outlet } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import { type FC, type ReactElement, useState } from 'react';
+import { Layout, Menu, type MenuProps } from 'antd';
 
 const { Content, Sider } = Layout;
 
-type MenuItem = Required<MenuProps>["items"][number];
+type MenuItem = Required<MenuProps>['items'][number];
 
 function getItem(
   label: React.ReactNode,
   key: React.Key,
   icon?: React.ReactNode,
   children?: MenuItem[],
-  type?: "group",
+  type?: 'group',
 ): MenuItem {
   return {
     key,
@@ -39,57 +39,33 @@ function getItem(
 }
 
 const items: MenuItem[] = [
-  getItem(<Link to={"/admin"}> Dashboard </Link>, "1", <DatabaseOutlined />),
-  getItem(<Link to={"/admin/tiles"}> Tiles </Link>, "2", <AppstoreOutlined />),
-  getItem(<Link to={"/admin/layout"}> Layout </Link>, "3", <LaptopOutlined />),
-  getItem(
-    <Link to={"/admin/student-overview"}> Student Overview </Link>,
-    "4",
-    <TeamOutlined />,
-  ),
-  getItem(
-    <Link to={"/admin/grade-predictor"}> Grade Predictor </Link>,
-    "5",
-    <FundProjectionScreenOutlined />,
-  ),
-  getItem(
-    <Link to={"/admin/grade-analyzer"}> Grade Analyzer </Link>,
-    "6",
-    <DotChartOutlined />,
-  ),
-  getItem(
-    <Link to={"/admin/learning-goals"}> Learning Goals </Link>,
-    "7",
-    <TrophyOutlined />,
-  ),
-  getItem(
-    <Link to={"/admin/data-wizard"}> Data Wizard </Link>,
-    "8",
-    <CloudUploadOutlined />,
-  ),
-  getItem(
-    <Link to={"/admin/analytics"}> Usage Analytics </Link>,
-    "9",
-    <ClusterOutlined />,
-  ),
-  getItem(
-    <Link to={"/admin/notification-centre"}> Notification Centre </Link>,
-    "10",
-    <NotificationOutlined />,
-  ),
-  getItem(
-    <Link to={"/admin/settings"}> Settings </Link>,
-    "11",
-    <ControlOutlined />,
-  ),
+  getItem(<Link to={'/admin'}> Dashboard </Link>, '1', <DatabaseOutlined />),
+  getItem(<Link to={'/admin/tiles'}> Tiles </Link>, '2', <AppstoreOutlined />),
+  getItem(<Link to={'/admin/layout'}> Layout </Link>, '3', <LaptopOutlined />),
+  getItem(<Link to={'/admin/student-overview'}> Student Overview </Link>, '4', <TeamOutlined />),
+  getItem(<Link to={'/admin/grade-predictor'}> Grade Predictor </Link>, '5', <FundProjectionScreenOutlined />),
+  getItem(<Link to={'/admin/grade-analyzer'}> Grade Analyzer </Link>, '6', <DotChartOutlined />),
+  getItem(<Link to={'/admin/learning-goals'}> Learning Goals </Link>, '7', <TrophyOutlined />),
+  getItem(<Link to={'/admin/data-wizard'}> Data Wizard </Link>, '8', <CloudUploadOutlined />),
+  getItem(<Link to={'/admin/analytics'}> Usage Analytics </Link>, '9', <ClusterOutlined />),
+  getItem(<Link to={'/admin/notification-centre'}> Notification Centre </Link>, '10', <NotificationOutlined />),
+  getItem(<Link to={'/admin/settings'}> Settings </Link>, '11', <ControlOutlined />),
 ];
 
 const AdminPanel: FC = (): ReactElement => {
-  const { isLoading, data: self } = useQuery("self", getSelf);
+  const {
+    data: self,
+    isError,
+    isLoading,
+  } = useQuery({
+    queryKey: ['self'],
+    queryFn: getSelf,
+  });
+
   const [collapsed, setCollapsed] = useState(false);
 
   return (
-    <Layout className='min-h-[90dvh]'>
+    <Layout className="min-h-[90dvh]">
       <Sider
         breakpoint="lg"
         trigger={null}
@@ -101,11 +77,15 @@ const AdminPanel: FC = (): ReactElement => {
         }}
         className="!bg-white"
       >
-        <div className='flex content-center flex-col justify-center bg-white p-4 border-b border-solid border-b-gray-200 h-header'>
+        <div className="flex content-center flex-col justify-center bg-white p-4 border-b border-solid border-b-gray-200 h-header">
           {!collapsed ? (
             <>
               <div>
-                <h3 className='text-lg'>{!isLoading ? self?.name : "Loading profile..."}</h3>
+                <h3 className="text-lg">
+                  {!isLoading ? self?.name : 'Loading profile...'}
+                  {/* // TODO: Add a better error message */}
+                  {isError ? 'Error loading profile' : ''}
+                </h3>
                 <strong>
                   <UserOutlined /> Instructor
                 </strong>
@@ -117,11 +97,9 @@ const AdminPanel: FC = (): ReactElement => {
             </h3>
           )}
         </div>
-        <Menu defaultSelectedKeys={["1"]} mode="inline" items={items} />
+        <Menu defaultSelectedKeys={['1']} mode="inline" items={items} />
       </Sider>
-      <Content
-        className='relative bg-slate- p-5'
-      >
+      <Content className="relative bg-slate- p-5">
         <Outlet />
       </Content>
     </Layout>

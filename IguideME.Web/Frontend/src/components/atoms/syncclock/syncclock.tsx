@@ -5,7 +5,7 @@ import { cn } from '@/utils/cn';
 import { getRelativeTimeTimer } from '@/helpers/time';
 import { JobStatus } from '@/types/synchronization';
 import { pollSync, startNewSync, stopCurrentSync } from '@/api/syncing';
-import { useMutation, useQuery, useQueryClient } from 'react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { type FC, type ReactElement, useEffect, useState } from 'react';
 
 const SyncClock: FC = (): ReactElement => {
@@ -17,10 +17,24 @@ const SyncClock: FC = (): ReactElement => {
     elapsed = getRelativeTimeTimer(startTime, Date.now());
   }
 
-  // const elapsed = null;
-  const { mutate: initiateSync } = useMutation(startNewSync);
-  const { mutate: abortSync } = useMutation(stopCurrentSync);
-  const { data } = useQuery('syncPoll', pollSync, {
+  // ?: Maybe use the onSuccess callback to show a success message
+  const { mutate: initiateSync } = useMutation({
+    mutationFn: startNewSync,
+    // onSuccess: () => {
+    //   void Swal.fire('Synchronization started!', 'The synchronization has started.', 'success');
+    // },
+  });
+
+  const { mutate: abortSync } = useMutation({
+    mutationFn: stopCurrentSync,
+    // onSuccess: () => {
+    //   void Swal.fire('Synchronization aborted!', 'The synchronization has stopped.', 'success');
+    // },
+  });
+
+  const { data, isError, isLoading } = useQuery({
+    queryKey: ['syncPoll'],
+    queryFn: pollSync,
     refetchInterval: elapsed === undefined ? false : 100,
   });
 

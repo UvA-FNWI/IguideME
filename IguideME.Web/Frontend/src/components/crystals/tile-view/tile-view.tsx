@@ -6,7 +6,7 @@ import { cn } from '@/utils/cn';
 import { Col, Divider, Row } from 'antd';
 import { getTileGrades } from '@/api/tiles';
 import { useNavigate } from 'react-router-dom';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useTileViewStore } from '@/components/pages/student-dashboard/tileViewContext';
 import { type FC, type ReactElement } from 'react';
 
@@ -23,10 +23,11 @@ const ViewTile: FC<Props> = ({ tile, textStyle }): ReactElement => {
     viewType: state.viewType,
   }));
 
-  const { data: grades } = useQuery(
-    `tiles grades/${user!.userID}/${tile.id}`,
-    async () => await getTileGrades(user.userID, tile.id),
-  );
+  const { data: grades } = useQuery({
+    queryKey: [user.userID, tile.id],
+    queryFn: async () => await getTileGrades(user.userID, tile.id),
+  });
+
   const navigate = useNavigate();
 
   const max = 100;

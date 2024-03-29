@@ -1,22 +1,39 @@
 import Loading from '@/components/particles/loading';
+import QueryError from '@/components/particles/QueryError';
 import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import { Col, Row, Table, Tooltip } from 'antd';
 import { getAllTileGrades, getTiles } from '@/api/tiles';
 import { getStudentsWithSettings } from '@/api/users';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { type FC, type ReactElement } from 'react';
 import { type User } from '@/types/user';
 import { type ColumnsType } from 'antd/lib/table';
 
 const GradesTable: FC = (): ReactElement => {
   // In principe zijn deze 2 routes voor nu genoeg denk ik
-  const { data: tiles } = useQuery('tiles', getTiles);
-  const { data: tileGrades } = useQuery('tilegrades', getAllTileGrades);
-  console.log('tiles', tiles);
-  console.log('tile_grades', tileGrades);
+  const { data: tiles } = useQuery({
+    queryKey: ['tiles'],
+    queryFn: getTiles,
+  });
+
+  const { data: tileGrades } = useQuery({
+    queryKey: ['tilegrades'],
+    queryFn: getAllTileGrades,
+  });
 
   // Deze hieronder laat ik staan zodat de voorbeeld tabel werkt, maar zal uiteindelijk niet nodig zijn vgm
-  const { data: students } = useQuery('students + settings', getStudentsWithSettings);
+  const {
+    data: students,
+    isError,
+    isLoading,
+  } = useQuery({
+    queryKey: ['students', 'settings'],
+    queryFn: getStudentsWithSettings,
+  });
+
+  // ? Maybe add this for all queries
+  if (isError) return <QueryError />;
+  else if (isLoading) return <Loading />;
 
   if (students === undefined) {
     return <Loading />;

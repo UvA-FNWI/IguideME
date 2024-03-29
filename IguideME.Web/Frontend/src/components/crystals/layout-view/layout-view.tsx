@@ -2,12 +2,19 @@ import Loading from '@/components/particles/loading';
 import ViewTileGroup from '../tile-group-view/tile-group-view';
 import { Col, Row } from 'antd';
 import { getLayoutColumns, getTileGroups } from '@/api/tiles';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { type FC, type ReactElement } from 'react';
 
 const ViewLayout: FC = (): ReactElement => {
-  const { data: columns } = useQuery('layout-columns', getLayoutColumns);
-  const { data: tilegroups } = useQuery('tile-groups', getTileGroups);
+  const { data: columns } = useQuery({
+    queryKey: ['layout-columns'],
+    queryFn: getLayoutColumns,
+  });
+
+  const { data: tilegroups } = useQuery({
+    queryKey: ['tile-groups'],
+    queryFn: getTileGroups,
+  });
 
   if (columns === undefined || tilegroups === undefined) {
     return <Loading />;

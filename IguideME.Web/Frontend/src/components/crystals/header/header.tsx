@@ -2,9 +2,9 @@
 import NotificationPanel from '@/components/atoms/notification-panel/notification-panel';
 import { Button, Col, Row, Select, Space } from 'antd';
 import { getSelf, getStudents } from '@/api/users';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { type NavigateFunction, useNavigate } from 'react-router-dom';
-import { type Dispatch, type FC, type ReactElement, type SetStateAction, useState } from 'react';
+import { type Dispatch, type FC, type ReactElement, type SetStateAction, useEffect, useState } from 'react';
 
 // /-------------------------- Own imports ---------------------------/
 import { type User, UserRoles } from '@/types/user';
@@ -22,7 +22,11 @@ const selector = (
   setCurrentUser: Dispatch<SetStateAction<User | undefined>>,
   navigate: NavigateFunction,
 ): ReactElement => {
-  const { data } = useQuery('students', getStudents, { enabled: isAdmin });
+  const { data } = useQuery({
+    queryKey: ['students'],
+    queryFn: getStudents,
+    enabled: isAdmin,
+  });
 
   const students = data
     ?.sort((a, b) => a.sortable_name.localeCompare(b.sortable_name))
@@ -64,17 +68,26 @@ const Header: FC = (): ReactElement => {
   const navigate = useNavigate();
 
   // Get the current user from the backend and updates the route if the user is a student.
-  const { data: self } = useQuery('self', getSelf, {
-    onSuccess: (data) => {
-      if (data === null) {
+  const {
+    data: self,
+    isError,
+    isLoading,
+    isSuccess,
+  } = useQuery({
+    queryKey: ['self'],
+    queryFn: getSelf,
+  });
+
+  useEffect(() => {
+    if (isSuccess) {
+      if (self === null) {
         // navigate(errorpage) TODO:
         return;
+      } else if (self.role === UserRoles.student) {
+        navigate(self.userID ?? '/');
       }
-      if (data.role === UserRoles.student) {
-        navigate(data.userID ?? '/');
-      }
-    },
-  });
+    }
+  }, [isSuccess]);
 
   const [currentUser, setCurrentUser] = useState<User | undefined>(self);
   const [inHome, setInHome] = useState<boolean>(true);

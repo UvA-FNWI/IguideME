@@ -12,7 +12,7 @@ import { Col, Row, Space, Tooltip } from 'antd';
 import { CSS } from '@dnd-kit/utilities';
 import { deleteTile, patchTile } from '@/api/tiles';
 import { useDrawerStore } from '../tile-group-board/useDrawerStore';
-import { useMutation, useQueryClient } from 'react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSortable } from '@dnd-kit/sortable';
 import { TileType, type Tile, printGradingType } from '@/types/tile';
 import { type FC, type ReactElement } from 'react';
@@ -32,14 +32,14 @@ const AdminTileView: FC<Props> = ({ tile, move }): ReactElement => {
   const { mutate: removeTile } = useMutation({
     mutationFn: deleteTile,
     onSuccess: async () => {
-      await queryClient.invalidateQueries('tiles');
+      await queryClient.invalidateQueries({ queryKey: ['tiles'] });
     },
   });
 
   const { mutate: updateTile } = useMutation({
     mutationFn: patchTile,
     onSuccess: async () => {
-      await queryClient.invalidateQueries('tiles');
+      await queryClient.invalidateQueries({ queryKey: ['tiles'] });
     },
   });
 

@@ -5,18 +5,24 @@ import { Col, Radio, Row } from 'antd';
 import { getSelf, getStudent } from '@/api/users';
 import { Outlet, useParams } from 'react-router-dom';
 import { TileViewStoreProvider, useTileViewStore } from './tileViewContext';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { type User, UserRoles } from '@/types/user';
 import { type FC, type ReactElement } from 'react';
 
 const StudentDashboard: FC = (): ReactElement => {
   const { id } = useParams();
-  const { data: self } = useQuery('self', getSelf);
+  const { data: self } = useQuery({
+    queryKey: ['self'],
+    queryFn: getSelf,
+  });
 
   if (self?.role === UserRoles.student) return <DashboardWrapper self={self} />;
   else if (id === undefined) return <p>Something went wrong, could not load user</p>;
 
-  const { data: student } = useQuery('student' + id, async () => await getStudent(id));
+  const { data: student } = useQuery({
+    queryKey: ['student', id],
+    queryFn: async () => await getStudent(id),
+  });
 
   if (student !== undefined) return <DashboardWrapper self={student} />;
   else return <p>Something went wrong, could not load user</p>;

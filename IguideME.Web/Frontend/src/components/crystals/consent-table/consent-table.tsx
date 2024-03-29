@@ -1,18 +1,25 @@
 import Loading from '@/components/particles/loading';
+import QueryError from '@/components/particles/QueryError';
 import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import { Col, Row, Table, Tooltip } from 'antd';
 import { getStudentsWithSettings } from '@/api/users';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { type FC, type ReactElement } from 'react';
 import { type User } from '@/types/user';
 import { type ColumnsType } from 'antd/lib/table';
 
 const SettingsTable: FC = (): ReactElement => {
-  const { data: students } = useQuery('students + settings', getStudentsWithSettings);
+  const {
+    data: students,
+    isError,
+    isLoading,
+  } = useQuery({
+    queryKey: ['students', 'settings'],
+    queryFn: getStudentsWithSettings,
+  });
 
-  if (students === undefined) {
-    return <Loading />;
-  }
+  if (isError) return <QueryError />;
+  else if (isLoading) return <Loading />;
 
   return (
     <div className="relative overflow-visible" id={'settingsTable'}>
@@ -21,14 +28,15 @@ const SettingsTable: FC = (): ReactElement => {
           <h2>General Overview</h2>
         </Col>
         <Col>
-          Consent Given: &ensp; {students.filter((student: User) => student.settings?.consent).length}/{students.length}
+          Consent Given: &ensp; {students!.filter((student: User) => student.settings?.consent).length}/
+          {students!.length}
         </Col>
       </Row>
 
       <Table
         size="middle"
         columns={getColumns()}
-        dataSource={getData(students)}
+        dataSource={getData(students!)}
         scroll={{ x: 900, y: 600 }}
         pagination={{ pageSize: 50 }}
         bordered

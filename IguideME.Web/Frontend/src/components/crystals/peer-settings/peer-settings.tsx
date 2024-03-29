@@ -2,12 +2,15 @@ import Loading from '@/components/particles/loading';
 import { Button, Col, Form, InputNumber, Row, Switch } from 'antd';
 import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
 import { getPeerSettings, postPeerSettings } from '@/api/course_settings';
-import { useMutation, useQuery, useQueryClient } from 'react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { type FC, type ReactElement } from 'react';
 
 const PeerSettings: FC = (): ReactElement => {
-  const { data } = useQuery('peer-settings', getPeerSettings);
+  const { data } = useQuery({
+    queryKey: ['peer-settings'],
+    queryFn: getPeerSettings,
+  });
 
   if (data === undefined) {
     return (
@@ -34,7 +37,7 @@ const PeerSettingsForm: FC<Props> = ({ minSize, personalizedPeers }): ReactEleme
   const { mutate: savePeer } = useMutation({
     mutationFn: postPeerSettings,
     onSuccess: async () => {
-      await queryClient.invalidateQueries('peer-settings');
+      await queryClient.invalidateQueries({ queryKey: ['peer-settings'] });
     },
   });
   return (

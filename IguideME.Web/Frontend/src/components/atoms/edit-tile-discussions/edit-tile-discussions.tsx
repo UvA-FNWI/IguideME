@@ -1,21 +1,25 @@
 import Loading from '@/components/particles/loading';
+import QueryError from '@/components/particles/QueryError';
 import { DeleteFilled } from '@ant-design/icons';
 import { Form, Row, Select, Table } from 'antd';
 import { getTopics } from '@/api/entries';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { type Discussion, type TileEntry } from '@/types/tile';
 import { useState, type FC, type ReactElement } from 'react';
 
 const { Item } = Form;
 
 const EditTileDiscussions: FC = (): ReactElement => {
-  const { data: topics } = useQuery('topics', getTopics);
+  const { data, isError, isLoading } = useQuery({
+    queryKey: ['topics'],
+    queryFn: getTopics,
+  });
 
   return (
     <Row>
       <p className="mb-1">Discussions:</p>
       <Item name="entries" className="w-full m-0">
-        {topics === undefined ? <Loading /> : <SelectTopics topics={topics} />}
+        {isError ? <QueryError /> : isLoading ? <Loading /> : <SelectTopics topics={data!} />}
       </Item>
     </Row>
   );
