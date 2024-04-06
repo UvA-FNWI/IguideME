@@ -1,10 +1,10 @@
 // /------------------------- Module imports -------------------------/
 import NotificationPanel from '@/components/atoms/notification-panel/notification-panel';
 import { Button, Col, Row, Select, Space } from 'antd';
-import { getSelf, getStudents } from '@/api/users';
+import { getStudents } from '@/api/users';
 import { useQuery } from '@tanstack/react-query';
 import { type NavigateFunction, useNavigate } from 'react-router-dom';
-import { type Dispatch, type FC, type ReactElement, type SetStateAction, useEffect, useState } from 'react';
+import { type Dispatch, type FC, type ReactElement, type SetStateAction, useState } from 'react';
 
 // /-------------------------- Own imports ---------------------------/
 import { type User, UserRoles } from '@/types/user';
@@ -17,7 +17,6 @@ import { type User, UserRoles } from '@/types/user';
  * @returns {React.ReactElement} The student selector
  */
 const selector = (
-  isAdmin: boolean,
   currentUser: User | undefined,
   setCurrentUser: Dispatch<SetStateAction<User | undefined>>,
   navigate: NavigateFunction,
@@ -25,7 +24,6 @@ const selector = (
   const { data } = useQuery({
     queryKey: ['students'],
     queryFn: getStudents,
-    enabled: isAdmin,
   });
 
   const students = data
@@ -36,11 +34,6 @@ const selector = (
     setCurrentUser(students?.find((student) => student.userID === userID));
     navigate(userID ?? '/');
   };
-
-  // Don't show the selector to students.
-  if (!isAdmin) {
-    return <></>;
-  }
 
   return (
     <Select
@@ -59,35 +52,12 @@ const selector = (
   );
 };
 
-/**
- * Header component.
- * @returns {React.ReactElement} The header
- */
-const Header: FC = (): ReactElement => {
-  // Set up the navigator, used to change the route.
+interface HeaderProps {
+  self: User;
+}
+
+const Header: FC<HeaderProps> = ({ self }): ReactElement => {
   const navigate = useNavigate();
-
-  // Get the current user from the backend and updates the route if the user is a student.
-  const {
-    data: self,
-    isError,
-    isLoading,
-    isSuccess,
-  } = useQuery({
-    queryKey: ['self'],
-    queryFn: getSelf,
-  });
-
-  useEffect(() => {
-    if (isSuccess) {
-      if (self === null) {
-        // navigate(errorpage) TODO:
-        return;
-      } else if (self.role === UserRoles.student) {
-        navigate(self.userID ?? '/');
-      }
-    }
-  }, [isSuccess]);
 
   const [currentUser, setCurrentUser] = useState<User | undefined>(self);
   const [inHome, setInHome] = useState<boolean>(true);
@@ -113,14 +83,14 @@ const Header: FC = (): ReactElement => {
             <h1 className="text-white align-middle font-semibold inline-block text-2xl  ">IguideME</h1>
           </Button>
         </Col>
-        <Col>{selector(isAdmin && inHome, currentUser, setCurrentUser, navigate)}</Col>
+        <Col>{isAdmin && inHome && selector(currentUser, setCurrentUser, navigate)}</Col>
         <Col span={4} className="flex justify-end">
           <Space>
             <div className="min-w-[30px]">
               <NotificationPanel user={currentUser} />
             </div>
-            <div className="min-w-[100px]">
-              {isAdmin && (
+            {isAdmin && (
+              <div className="min-w-[100px]">
                 <Button
                   className="flex flex-col justify-center items-center h-10 border border-solid border-white align-middle rounded-md w-32 p-2 text-white"
                   type="link"
@@ -130,8 +100,8 @@ const Header: FC = (): ReactElement => {
                 >
                   <h3>{inHome ? 'Admin Panel' : 'Home'}</h3>
                 </Button>
-              )}
-            </div>
+              </div>
+            )}
           </Space>
         </Col>
       </Row>
