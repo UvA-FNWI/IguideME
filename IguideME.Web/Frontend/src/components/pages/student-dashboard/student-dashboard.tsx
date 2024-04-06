@@ -48,34 +48,33 @@ const Dashboard: FC = (): ReactElement => {
   }));
 
   return (
-    <div className="w-screen flex justify-center items-center">
-      <div className="px-3 w-fit">
-        <Row className="relative flex items-center justify-between content-start py-3">
-          <Col>
-            <StudentInfo self={user} />
-          </Col>
-          <Col className="absolute left-0 right-0 top-3 bottom-0 m-auto h-full flex justify-center items-center">
-            <GradeDisplay self={user} />
-          </Col>
-          <Col>
-            <Radio.Group
-              value={viewType}
-              buttonStyle="solid"
-              onChange={(e) => {
-                setViewType(e.target.value);
-              }}
-            >
-              <Radio.Button value="graph">
-                <BarChartOutlined /> Graph
-              </Radio.Button>
-              <Radio.Button value="grid">
-                <AppstoreOutlined /> Grid
-              </Radio.Button>
-            </Radio.Group>
-          </Col>
-        </Row>
-        <Outlet />
-      </div>
+    <div className="w-screen px-3">
+      <Row className="w-full h-header flex justify-between">
+        <Col className="w-32 h-full grid place-content-center">
+          <StudentInfo self={user} />
+        </Col>
+        <Col className="w-[640px] h-full grid place-content-center">
+          <GradeDisplay self={user} />
+        </Col>
+        <Col className="w-fit h-full grid place-content-center">
+          <Radio.Group
+            className=""
+            value={viewType}
+            buttonStyle="solid"
+            onChange={(e) => {
+              setViewType(e.target.value);
+            }}
+          >
+            <Radio.Button value="graph">
+              <BarChartOutlined /> Graph
+            </Radio.Button>
+            <Radio.Button value="grid">
+              <AppstoreOutlined /> Grid
+            </Radio.Button>
+          </Radio.Group>
+        </Col>
+      </Row>
+      <Outlet />
     </div>
   );
 };

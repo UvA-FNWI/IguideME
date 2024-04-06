@@ -7,9 +7,6 @@ import { type FC, type ReactElement } from 'react';
 import { Bar, type BarConfig } from '@ant-design/charts';
 import { type User } from '@/types/user';
 
-const BLUE = 'rgba(90, 50, 255, .9)';
-const GREEN = 'rgba(13, 204, 204, 1)';
-
 interface displayProps {
   self: User;
 }
@@ -33,8 +30,7 @@ const GradeDisplay: FC<displayProps> = ({ self }): ReactElement => {
     case 'graph':
       return <GraphGrades goal={goal} total={total} pred={pred} />;
     default:
-      // TODO: Add a default case
-      return <></>;
+      throw new Error('Invalid view type');
   }
 };
 
@@ -82,67 +78,40 @@ const GridGrades: FC<Props> = ({ goal, total, pred }): ReactElement => {
 };
 
 const GraphGrades: FC<Props> = ({ goal, total: avg, pred }): ReactElement => {
-  const max = 10;
-  const data = [
-    {
-      name: 'Current grade',
-      grade: avg,
-    },
-    {
-      name: 'Predicted grade',
-      grade: pred,
-    },
-  ];
-
   const config: BarConfig = {
-    data,
-    autoFit: true,
-    margin: 0,
-    paddingLeft: 0,
-    padding: 20,
-    insetLeft: 70,
-    colorField: 'name',
-    color: [BLUE, GREEN],
+    data: [
+      { name: 'Current grade', grade: avg },
+      { name: 'Predicted grade', grade: pred },
+    ],
     xField: 'name',
     yField: 'grade',
+    colorField: 'name',
+    height: 80,
     legend: false,
-    sort: {
-      // @ts-expect-error I think that the type bindings are incorrect, as this works but the suggested type doesn't
-      reverse: 'true',
-    },
     scale: {
-      y: { domainMax: max },
-    },
-    axis: {
-      // x should have label true, but fsr it wants to overlap with the graph
-      x: {
-        label: true,
-        tick: false,
-        labelFormatter: (label: string) => label.split(' ')[0] + ':',
-      },
-      y: { label: false, tick: false },
-    },
-    tooltip: {
-      title: '',
-      items: [{ channel: 'y', valueFormatter: '.1f' }],
+      y: { domainMax: 10 },
     },
     annotations: [
       {
         type: 'lineY',
-        // @ts-expect-error I think that the type bindings are incorrect, as this works but the suggested type doesn't
-        yField: goal,
+        data: [goal],
         style: {
           stroke: 'black',
           strokeOpacity: 1,
           lineWidth: 1,
           lineDash: [8, 3],
         },
+        label: {
+          position: 'top',
+          dy: -17,
+          text: 'goal',
+        },
       },
     ],
   };
   return (
-    <div className="h-[50px]">
-      <Bar {...config} marginTop={20} marginBottom={30} />
+    <div className="w-full h-full overflow-hidden">
+      <Bar {...config} />
     </div>
   );
 };
