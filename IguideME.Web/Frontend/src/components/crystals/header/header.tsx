@@ -4,7 +4,7 @@ import { Button, Col, Row, Select, Space } from 'antd';
 import { getStudents } from '@/api/users';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate, useParams } from 'react-router-dom';
-import { type Dispatch, type FC, type ReactElement, type SetStateAction, useState } from 'react';
+import { type Dispatch, type FC, type ReactElement, type SetStateAction, useEffect, useState } from 'react';
 
 // /-------------------------- Own imports ---------------------------/
 import { type User, UserRoles } from '@/types/user';
@@ -29,9 +29,11 @@ const Selector: FC<SelectorProps> = ({ selectedStudent, setSelectedStudent }): R
   });
 
   const { id } = useParams();
-  if (id) {
-    setSelectedStudent(data?.find((student) => student.userID === id));
-  }
+  useEffect(() => {
+    if (id) {
+      setSelectedStudent(data?.find((student) => student.userID === id));
+    }
+  }, [id, data]);
 
   const students = data
     ?.sort((a, b) => a.sortable_name.localeCompare(b.sortable_name))
