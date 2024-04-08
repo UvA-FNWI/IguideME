@@ -1,6 +1,5 @@
 import GraphTile from '@/components/crystals/graph-tile/graph-tile.tsx';
 import GridTile from '@/components/crystals/grid-tile/grid-tile.tsx';
-import Loading from '@/components/particles/loading';
 import PeerComparison from '@/components/particles/peer-comparison/peercomparison';
 import { cn } from '@/utils/cn';
 import { Col, Divider, Row } from 'antd';
@@ -9,9 +8,9 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useTileViewStore } from '@/components/pages/student-dashboard/tileViewContext';
 import { type FC, type ReactElement } from 'react';
-
 import { TileType, type Tile, GradingType } from '@/types/tile';
 import QueryError from '@/components/particles/QueryError';
+import QueryLoading from '@/components/particles/QueryLoading';
 
 interface Props {
   tile: Tile;
@@ -38,29 +37,28 @@ const ViewTile: FC<Props> = ({ tile, textStyle }): ReactElement => {
   const max = 100;
 
   return (
-    <div
-      className='cursor-pointer w-[270px] h-[230px] border border-solid bg-white border-primary-gray'
-      onClick={() => {
-        navigate(tile.id + '/');
-      }}
-    >
-      <Row className='h-1/5 justify-center content-center'>
-        <h3 className={cn('text-lg', textStyle)}>{tile.title}</h3>
-      </Row>
-      {renderViewType()}
-    </div>
+    <QueryLoading isLoading={isLoading}>
+      <div
+        aria-disabled={isLoading || isError}
+        className={`${
+          isError ? 'cursor-not-allowed' : 'cursor-pointer'
+        } w-[270px] h-[230px] border border-solid bg-white border-primary-gray relative`}
+        onClick={() => {
+          if (isError || isLoading) return;
+          else navigate(tile.id + '/');
+        }}
+      >
+        <Row className='h-1/5 justify-center content-center'>
+          <h3 className={cn('text-lg', textStyle)}>{tile.title}</h3>
+        </Row>
+        {renderViewType()}
+      </div>
+    </QueryLoading>
   );
 
   function renderViewType(): ReactElement {
-    if (isError || isLoading || grades === undefined) {
-      return (
-        <div className='w-full h-1/2 grid place-content-center'>
-          {isError ?
-            <QueryError />
-          : <Loading />}
-        </div>
-      );
-    }
+    if (isError) return <QueryError title='Failed to load grades' />;
+    else if (grades === undefined) return <></>;
 
     switch (viewType) {
       case 'graph':
