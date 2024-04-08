@@ -30,32 +30,36 @@ export const AssignmentDetail: FC<Props> = ({ entry }): ReactElement => {
   });
 
   if (isError) return <QueryError />;
-  else if (isLoading) return <Loading />;
+  else if (isLoading)
+    return (
+      <div className='w-full h-[calc(100%-24px)] grid place-content-center'>
+        <Loading />{' '}
+      </div>
+    );
 
   switch (viewType) {
     case 'graph':
       return (
-        <Row className="justify-center content-center h-4/5">
+        <Row className='justify-center content-center h-4/5'>
           <GraphGrade {...submission!.grades} />
         </Row>
       );
     case 'grid':
       return (
         <>
-          <Row className="justify-center content-center h-1/2">
+          <Row className='justify-center content-center h-1/2'>
             <GradeView {...submission!.grades} />
           </Row>
-          <Row className="justify-center content-start h-[30%]">
-            <Col className="w-full">
-              <Divider className="m-0 p-0" />
+          <Row className='justify-center content-start h-[30%]'>
+            <Col className='w-full'>
+              <Divider className='m-0 p-0' />
               <PeerComparison {...submission!.grades} />
             </Col>{' '}
           </Row>
         </>
       );
     default:
-      // TODO: Add a default case
-      return <></>;
+      throw new Error('Unknown view type');
   }
 };
 

@@ -9,18 +9,9 @@ interface Props {
 }
 const EntryView: FC<Props> = ({ entry, type }): ReactElement => {
   return (
-    <div className="tileView">
-      <Row className="justify-center content-center h-1/5">
-        <h3
-          style={{
-            fontSize: 18,
-            fontWeight: 1400,
-            fontFamily: '"Antic Slab", serif',
-            lineHeight: 'normal',
-          }}
-        >
-          {entry.title}
-        </h3>
+    <div className='border border-solid w-[270px] h-[230px] bg-white border-primary-gray'>
+      <Row className='p-2 w-full flex justify-center items-center overflow-hidden'>
+        <h3 className='whitespace-nowrap overflow-ellipsis overflow-hidden text-base font-bold'>{entry.title}</h3>
       </Row>
       {renderViewType()}
     </div>
@@ -34,6 +25,8 @@ const EntryView: FC<Props> = ({ entry, type }): ReactElement => {
         return <DiscussionDetail entry={entry} />;
       case TileType.learning_outcomes:
         return <LearningGoalDetail entry={entry} />;
+      default:
+        throw new Error('Unknown tile type');
     }
   }
 };

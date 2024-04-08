@@ -11,6 +11,7 @@ import { useTileViewStore } from '@/components/pages/student-dashboard/tileViewC
 import { type FC, type ReactElement } from 'react';
 
 import { TileType, type Tile, GradingType } from '@/types/tile';
+import QueryError from '@/components/particles/QueryError';
 
 interface Props {
   tile: Tile;
@@ -23,7 +24,11 @@ const ViewTile: FC<Props> = ({ tile, textStyle }): ReactElement => {
     viewType: state.viewType,
   }));
 
-  const { data: grades } = useQuery({
+  const {
+    data: grades,
+    isError,
+    isLoading,
+  } = useQuery({
     queryKey: [user.userID, tile.id],
     queryFn: async () => await getTileGrades(user.userID, tile.id),
   });
@@ -34,12 +39,12 @@ const ViewTile: FC<Props> = ({ tile, textStyle }): ReactElement => {
 
   return (
     <div
-      className="cursor-pointer w-[270px] h-[230px] border border-solid bg-white border-primary-gray"
+      className='cursor-pointer w-[270px] h-[230px] border border-solid bg-white border-primary-gray'
       onClick={() => {
         navigate(tile.id + '/');
       }}
     >
-      <Row className="h-1/5 justify-center content-center">
+      <Row className='h-1/5 justify-center content-center'>
         <h3 className={cn('text-lg', textStyle)}>{tile.title}</h3>
       </Row>
       {renderViewType()}
@@ -47,10 +52,12 @@ const ViewTile: FC<Props> = ({ tile, textStyle }): ReactElement => {
   );
 
   function renderViewType(): ReactElement {
-    if (grades === undefined) {
+    if (isError || isLoading || grades === undefined) {
       return (
-        <div className="w-full h-1/2 grid items-center">
-          <Loading />
+        <div className='w-full h-1/2 grid place-content-center'>
+          {isError ?
+            <QueryError />
+          : <Loading />}
         </div>
       );
     }
@@ -58,7 +65,7 @@ const ViewTile: FC<Props> = ({ tile, textStyle }): ReactElement => {
     switch (viewType) {
       case 'graph':
         return (
-          <Row className="h-4/5 justify-center content-center">
+          <Row className='h-4/5 justify-center content-center'>
             <GraphTile
               type={tile.type}
               grades={{
@@ -75,7 +82,7 @@ const ViewTile: FC<Props> = ({ tile, textStyle }): ReactElement => {
       case 'grid':
         return (
           <>
-            <Row className="h-1/2 justify-center content-center">
+            <Row className='h-1/2 justify-center content-center'>
               <GridTile
                 type={tile.type}
                 grades={{
@@ -88,9 +95,9 @@ const ViewTile: FC<Props> = ({ tile, textStyle }): ReactElement => {
                 }}
               />
             </Row>
-            <Row className="w-full h-[30%] justify-center content-start">
-              <Col className="h-full w-full">
-                <Divider className="m-0 p-0 w-full" />
+            <Row className='w-full h-[30%] justify-center content-start'>
+              <Col className='h-full w-full'>
+                <Divider className='m-0 p-0 w-full' />
                 <PeerComparison
                   {...{
                     grade: grades.grade,
@@ -106,8 +113,7 @@ const ViewTile: FC<Props> = ({ tile, textStyle }): ReactElement => {
           </>
         );
       default:
-        // TODO: Add a default case
-        return <></>;
+        throw new Error('Unknown tile type');
     }
   }
 };

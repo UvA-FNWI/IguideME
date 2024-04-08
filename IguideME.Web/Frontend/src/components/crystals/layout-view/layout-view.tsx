@@ -20,10 +20,10 @@ const ViewLayout: FC = (): ReactElement => {
     return <Loading />;
   }
   return (
-    <Row className="flex gap-3 flex-nowrap mx-auto">
+    <Row className='flex gap-3 flex-nowrap mx-auto'>
       {columns.map((column) => (
-        <Col key={column.id} span={Math.round((24 * column.width) / 100)} className="flex-shrink">
-          <div className="h-full grid gap-3">
+        <Col key={column.id} span={Math.round((24 * column.width) / 100)} className='flex-shrink'>
+          <div className='h-full grid gap-3'>
             {column.groups.map((id) => {
               const group = tilegroups.find((group) => group.id === id);
               return (

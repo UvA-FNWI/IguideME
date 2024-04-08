@@ -41,34 +41,46 @@ interface Props {
 }
 
 const GridGrades: FC<Props> = ({ goal, total, pred }): ReactElement => {
-  const happy = <SmileTwoTone size={10} twoToneColor="rgb(0, 185, 120)" />;
-  const meh = <MehTwoTone size={10} twoToneColor="rgb(245, 226, 54)" />;
+  const happy = <SmileTwoTone size={10} twoToneColor='rgb(0, 185, 120)' />;
+  const meh = <MehTwoTone size={10} twoToneColor='rgb(245, 226, 54)' />;
   const unhappy = <FrownTwoTone size={10} twoToneColor={'rgb(255, 110, 90)'} />;
   return (
-    <Space className="justify-center h-full w-full" size="large">
-      <div className="text-center">
+    <Space className='justify-center h-full w-full' size='large'>
+      <div className='text-center'>
         <p>Goal</p>
-        <h2 className="text-lg font-semibold">
+        <h2 className='text-lg font-semibold'>
           <Space>
-            {goal >= 7 ? happy : goal >= 5.5 ? meh : unhappy}
+            {goal >= 7 ?
+              happy
+            : goal >= 5.5 ?
+              meh
+            : unhappy}
             {goal}
           </Space>
         </h2>
       </div>
-      <div className="text-center">
+      <div className='text-center'>
         <p>Current</p>
-        <h2 className="text-lg font-semibold">
+        <h2 className='text-lg font-semibold'>
           <Space>
-            {total > goal ? happy : total >= 5.5 ? meh : unhappy}
+            {total > goal ?
+              happy
+            : total >= 5.5 ?
+              meh
+            : unhappy}
             {total.toFixed(1)}
           </Space>
         </h2>
       </div>
-      <div className="text-center">
+      <div className='text-center'>
         <p>Predicted</p>
-        <h2 className="text-lg font-semibold">
+        <h2 className='text-lg font-semibold'>
           <Space>
-            {pred > goal ? happy : pred >= 5.5 ? meh : unhappy}
+            {pred > goal ?
+              happy
+            : pred >= 5.5 ?
+              meh
+            : unhappy}
             {pred}
           </Space>
         </h2>
@@ -86,10 +98,20 @@ const GraphGrades: FC<Props> = ({ goal, total: avg, pred }): ReactElement => {
     xField: 'name',
     yField: 'grade',
     colorField: 'name',
-    height: 80,
+    height: 70,
     legend: false,
     scale: {
       y: { domainMax: 10 },
+    },
+    axis: {
+      y: {
+        label: false,
+        tick: false,
+      },
+    },
+    tooltip: {
+      title: 0,
+      items: [{ channel: 'y', valueFormatter: '.1f' }],
     },
     annotations: [
       {
@@ -110,7 +132,7 @@ const GraphGrades: FC<Props> = ({ goal, total: avg, pred }): ReactElement => {
     ],
   };
   return (
-    <div className="w-full h-full overflow-hidden">
+    <div className='w-full h-full'>
       <Bar {...config} />
     </div>
   );

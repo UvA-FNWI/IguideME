@@ -18,6 +18,11 @@ function App(): ReactElement {
   const { data, isError, isLoading, isSuccess } = useQuery({
     queryKey: ['self'],
     queryFn: getSelf,
+
+    // Since the user data is sensitive and important for all pages, we want to always refetch it.
+    refetchOnMount: true,
+    refetchOnReconnect: true,
+    refetchOnWindowFocus: true,
   });
 
   useEffect(() => {
