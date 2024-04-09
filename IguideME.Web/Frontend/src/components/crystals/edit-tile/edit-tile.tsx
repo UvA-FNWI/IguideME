@@ -23,7 +23,8 @@ const { Item } = Form;
 const EditTile: FC<Props> = ({ tile }): ReactElement => {
   const [form] = useForm<Tile>();
   const queryClient = useQueryClient();
-  const { setEditTile } = useDrawerStore((state) => ({
+  const { setIsChanged, setEditTile } = useDrawerStore((state) => ({
+    setIsChanged: state.setIsChanged,
     setEditTile: state.setEditTile,
   }));
 
@@ -44,53 +45,54 @@ const EditTile: FC<Props> = ({ tile }): ReactElement => {
   return (
     <Form<Tile>
       form={form}
-      name="edit_tile_form"
+      name='edit_tile_form'
       initialValues={tile}
       onFinish={(data: Tile) => {
         setEditTile(null);
         saveTile(data);
       }}
       requiredMark={false}
-      className="flex flex-col gap-2"
+      className='flex flex-col gap-2'
+      onValuesChange={() => setIsChanged(true)}
     >
-      <Item name="id" hidden>
-        <Input type="hidden" />
+      <Item name='id' hidden>
+        <Input type='hidden' />
       </Item>
-      <Item name="group_id" hidden>
-        <Input type="hidden" />
+      <Item name='group_id' hidden>
+        <Input type='hidden' />
       </Item>
-      <Item name="position" hidden>
-        <Input type="hidden" />
+      <Item name='position' hidden>
+        <Input type='hidden' />
       </Item>
-      <Row className="content-center">
-        <Col span={4} className="grid items-center">
+      <Row className='content-center'>
+        <Col span={4} className='grid items-center'>
           Title:
         </Col>
         <Col span={8}>
-          <Item name="title" rules={[{ required: true, message: 'Please insert a title for the tile' }]} noStyle>
-            <Input className="w-full" />
+          <Item name='title' rules={[{ required: true, message: 'Please insert a title for the tile' }]} noStyle>
+            <Input className='w-full' />
           </Item>
         </Col>
         <Col span={4} offset={8}>
           <Space>
-            <Item name="notifications" noStyle>
+            <Item name='notifications' noStyle>
               <Notification />
             </Item>
-            <Item name="visible" noStyle>
+            <Item name='visible' noStyle>
               <Visible />
             </Item>
           </Space>
         </Col>
       </Row>
 
-      <Row className="content-center">
-        <Col span={4} className="grid items-center">
+      <Row className='content-center'>
+        <Col span={4} className='grid items-center'>
           Type:
         </Col>
         <Col span={8}>
-          <Item name="type" noStyle>
+          <Item name='type' noStyle>
             <Select
-              className="w-full"
+              className='w-full'
               options={[
                 { value: TileType.assignments, label: 'Assignments' },
                 { value: TileType.discussions, label: 'Discussions' },
@@ -104,10 +106,10 @@ const EditTile: FC<Props> = ({ tile }): ReactElement => {
         </Col>
       </Row>
       {renderTypeSettings()}
-      <Row className="flex gap-1 [&_*]:m-0">
+      <Row className='flex gap-1 [&_*]:m-0'>
         <Col>
           <Item>
-            <Button type="primary" htmlType="submit">
+            <Button type='primary' htmlType='submit'>
               Save
             </Button>
           </Item>
@@ -115,7 +117,7 @@ const EditTile: FC<Props> = ({ tile }): ReactElement => {
         <Col>
           <Item>
             <Button
-              type="primary"
+              type='primary'
               danger
               onClick={() => {
                 void Swal.fire({
@@ -147,11 +149,13 @@ const EditTile: FC<Props> = ({ tile }): ReactElement => {
     const type = useWatch('type', form);
     switch (type) {
       case TileType.assignments:
-        return <EditTileAssignments></EditTileAssignments>;
+        return <EditTileAssignments />;
       case TileType.discussions:
-        return <EditTileDiscussions></EditTileDiscussions>;
+        return <EditTileDiscussions />;
       case TileType.learning_outcomes:
-        return <EditTileGoals></EditTileGoals>;
+        return <EditTileGoals />;
+      default:
+        return <></>;
     }
   }
 };
@@ -164,7 +168,7 @@ const Notification: FC<{
 
   return (
     <Button
-      shape="circle"
+      shape='circle'
       icon={<BellTwoTone twoToneColor={notifications === true ? GREEN : RED} />}
       onClick={() => {
         if (notifications === undefined) return;
@@ -180,13 +184,11 @@ const Visible: FC<{ value?: boolean; onChange?: (value: boolean) => void }> = ({
 
   return (
     <Button
-      shape="circle"
+      shape='circle'
       icon={
-        visible === true ? (
-          <CheckCircleTwoTone twoToneColor={GREEN} className="text-xs" />
-        ) : (
-          <StopTwoTone twoToneColor={RED} className="text-xs" />
-        )
+        visible === true ?
+          <CheckCircleTwoTone twoToneColor={GREEN} className='text-xs' />
+        : <StopTwoTone twoToneColor={RED} className='text-xs' />
       }
       onClick={() => {
         if (visible === undefined) return;

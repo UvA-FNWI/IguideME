@@ -1,7 +1,6 @@
 import AdminTileView from '@/components/crystals/admin-tile-view/admin-tile-view';
-import Loading from '@/components/particles/loading';
 import QueryError from '@/components/particles/QueryError';
-import { Button, Col, Divider, Input, Row } from 'antd';
+import { Button, Col, Divider, Input, Row, Spin } from 'antd';
 import { CSS } from '@dnd-kit/utilities';
 import { DeleteFilled, PlusOutlined } from '@ant-design/icons';
 import { deleteTileGroup, getTiles, patchTileGroup, postTile } from '@/api/tiles';
@@ -68,91 +67,97 @@ const AdminTileGroupView: FC<Props> = ({ group }): ReactElement => {
   if (isDragging) {
     return (
       <div
-        className="p-[10px] border border-dashed border-zinc-500 rounded-lg bg-white min-h-[235px]"
+        className='p-[10px] border border-dashed border-zinc-500 rounded-lg bg-white min-h-[235px]'
         ref={setNodeRef}
         style={style}
       />
     );
   }
 
-  if (tiles === undefined || isLoading) {
-    return (
-      <Row>
-        <Loading />
-      </Row>
-    );
-  } else if (isError) {
-    return (
-      <Row>
-        <QueryError />
-      </Row>
-    );
-  }
+  const loadingState = Array(Math.floor(Math.random() * 5) + 1)
+    .fill(0)
+    .map((_, i) => (
+      <Spin key={i} spinning={isLoading}>
+        <Col>
+          <div className='w-60 h-[150px] border border-solid border-zinc-300 rounded-md m-0 bg-white' />
+        </Col>
+      </Spin>
+    ));
+
+  const errorState = (
+    <Col>
+      <div className='w-60 h-[150px] border border-solid border-zinc-300 rounded-md m-0 bg-white relative'>
+        <QueryError className='grid place-content-center' title='Error: Could not load tile' />
+      </div>
+    </Col>
+  );
 
   return (
     <div
-      className="p-[10px] border border-dashed border-zinc-400 rounded-lg bg-white min-h-[235px] my-1"
+      className='p-[10px] border border-dashed border-zinc-400 rounded-lg bg-white min-h-[235px] my-1'
       ref={setNodeRef}
       style={style}
     >
-      <Row className="content-center cursor-grab justify-between" {...attributes} {...listeners}>
-        <Col className="cursor-text">
+      <Row className='content-center cursor-grab justify-between' {...attributes} {...listeners}>
+        <Col className='cursor-text'>
           <h2
-            className="text-lg p-1"
+            className='text-lg p-1'
             onClick={() => {
               setEditing(true);
             }}
           >
-            {!editing
-              ? group.title
-              : editing && (
-                  <Input
-                    value={title}
-                    autoFocus
-                    onBlur={() => {
-                      setEditing(false);
-                    }}
-                    onChange={(e) => {
-                      setTitle(e.target.value);
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key !== 'Enter') return;
-                      patchGroup({
-                        id: group.id,
-                        title,
-                        position: group.position,
-                      });
-                      setEditing(false);
-                    }}
-                  />
-                )}
+            {!editing ?
+              group.title
+            : editing && (
+                <Input
+                  value={title}
+                  autoFocus
+                  onBlur={() => {
+                    setEditing(false);
+                  }}
+                  onChange={(e) => {
+                    setTitle(e.target.value);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key !== 'Enter') return;
+                    patchGroup({
+                      id: group.id,
+                      title,
+                      position: group.position,
+                    });
+                    setEditing(false);
+                  }}
+                />
+              )
+            }
           </h2>
         </Col>
         <Col>
           <DeleteFilled
-            className="p-1"
+            className='p-1'
             onClick={() => {
               deleteGroup(group.id);
             }}
           />
         </Col>
       </Row>
-      <Divider className="mt-1 mb-2" />
-      <Row gutter={[20, 20]} className="p-[10px] justify-start">
+      <Divider className='mt-1 mb-2' />
+      <Row gutter={[20, 20]} className='p-[10px] justify-start'>
         <SortableContext items={tileIds}>
-          {tiles === undefined ? (
-            <Loading />
-          ) : (
-            tiles.map((tile, index) => (
+          {isLoading ?
+            loadingState
+          : isError || tiles === undefined ?
+            errorState
+          : tiles.map((tile, index) => (
               <Col key={index}>
                 <AdminTileView tile={tile} />
               </Col>
             ))
-          )}
+          }
         </SortableContext>
         <Col>
           <Button
-            type="dashed"
+            type='dashed'
             onClick={() => {
               addTile({
                 id: -1,
@@ -169,7 +174,7 @@ const AdminTileGroupView: FC<Props> = ({ group }): ReactElement => {
             }}
             block
             icon={<PlusOutlined />}
-            className="h-full !w-60 m-0 min-h-[150px]"
+            className='h-full !w-60 m-0 min-h-[150px]'
           >
             New Tile
           </Button>

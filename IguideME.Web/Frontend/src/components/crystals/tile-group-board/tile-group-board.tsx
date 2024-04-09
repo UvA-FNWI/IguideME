@@ -1,10 +1,10 @@
 import AdminTileGroupView from '@/components/crystals/admin-tile-group/admin-tile-group';
 import AdminTileView from '@/components/crystals/admin-tile-view/admin-tile-view';
 import EditTile from '@/components/crystals/edit-tile/edit-tile';
-import Loading from '@/components/particles/loading';
+import QueryError from '@/components/particles/QueryError';
 import Swal from 'sweetalert2';
 import { arrayMove, SortableContext } from '@dnd-kit/sortable';
-import { Button, Drawer } from 'antd';
+import { Button, Drawer, Row, Spin } from 'antd';
 import { createPortal } from 'react-dom';
 import { getTileGroups, getTiles, patchTile, patchTileGroupOrder, patchTileOrder, postTileGroup } from '@/api/tiles';
 import { PlusOutlined } from '@ant-design/icons';
@@ -26,7 +26,11 @@ import {
 import { type Tile, type TileGroup } from '@/types/tile';
 
 const TileGroupBoard: FC = (): ReactElement => {
-  const { data: tilegroups, isFetching } = useQuery({
+  const {
+    data: tilegroups,
+    isError,
+    isLoading,
+  } = useQuery({
     queryKey: ['tile-groups'],
     queryFn: getTileGroups,
   });
@@ -40,7 +44,7 @@ const TileGroupBoard: FC = (): ReactElement => {
   const [activeTile, setActiveTile] = useState<Tile | null>(null);
   const [move, setMove] = useState<boolean>(false);
 
-  const { editTitle, setEditTile } = useDrawerStore();
+  const { isChanged, editTitle, setEditTile } = useDrawerStore();
 
   const queryClient = useQueryClient();
   const { mutate: postGroup } = useMutation({
@@ -85,31 +89,47 @@ const TileGroupBoard: FC = (): ReactElement => {
     }),
   );
 
-  if (tilegroups === undefined || isFetching) {
-    return <Loading />;
-  }
+  const loadingState = Array(2)
+    .fill(0)
+    .map((_, i) => (
+      <Spin key={i} spinning={isLoading} tip='Loading tile groups...'>
+        <div className='p-[10px] border border-dashed border-zinc-400 rounded-lg bg-white min-h-[235px] my-1'>
+          <Row />
+        </div>
+      </Spin>
+    ));
+
+  const errorState = (
+    <div className='relative p-[10px] border border-dashed border-zinc-400 rounded-lg bg-white min-h-[235px] my-1'>
+      <QueryError className='grid place-content-center' title='Error: Could not load tile group(s)' />
+    </div>
+  );
 
   return (
-    <div className="tileGroupBoard">
+    <>
       <Drawer
         title={'Editing: ' + editTitle?.title}
-        placement="right"
+        placement='right'
         closable
-        width="45vw"
+        width='45vw'
         onClose={() => {
-          void Swal.fire({
-            title: 'Warning: any unsaved changes will be deleted!',
-            icon: 'warning',
-            focusCancel: true,
-            showCancelButton: true,
-            confirmButtonText: 'Close',
-            cancelButtonText: 'Cancel',
-            customClass: {},
-          }).then((result) => {
-            if (result.isConfirmed) {
-              setEditTile(null);
-            }
-          });
+          if (isChanged) {
+            void Swal.fire({
+              title: 'Warning: any unsaved changes will be deleted!',
+              icon: 'warning',
+              focusCancel: true,
+              showCancelButton: true,
+              confirmButtonText: 'Close',
+              cancelButtonText: 'Cancel',
+              customClass: {},
+            }).then((result) => {
+              if (result.isConfirmed) {
+                setEditTile(null);
+              }
+            });
+          } else {
+            setEditTile(null);
+          }
         }}
         open={editTitle !== null}
         rootStyle={{ position: 'absolute' }}
@@ -119,39 +139,42 @@ const TileGroupBoard: FC = (): ReactElement => {
       >
         {editTitle === null ? '' : <EditTile tile={editTitle} />}
       </Drawer>
-      <DndContext onDragStart={onDragStart} onDragEnd={onDragEnd} onDragOver={onDragOver} sensors={sensors}>
-        <div>
-          <SortableContext items={groupIds}>
-            {tilegroups.map((group, index) => (
-              <div key={index}>
-                <AdminTileGroupView group={group} />
-              </div>
-            ))}
-          </SortableContext>
-          <Button
-            type="dashed"
-            onClick={() => {
-              postGroup({
-                title: 'TileGroup',
-                id: -1,
-                position: tilegroups.length + 1,
-              });
-            }}
-            block
-            icon={<PlusOutlined />}
-          >
-            New Group
-          </Button>
-        </div>
-        {createPortal(
-          <DragOverlay>
-            {activeGroup !== null && <AdminTileGroupView group={activeGroup} />}
-            {activeTile !== null && <AdminTileView tile={activeTile} move={move} />}
-          </DragOverlay>,
-          document.body,
-        )}
-      </DndContext>
-    </div>
+      {isLoading ?
+        loadingState
+      : isError || tilegroups === undefined ?
+        errorState
+      : <DndContext onDragStart={onDragStart} onDragEnd={onDragEnd} onDragOver={onDragOver} sensors={sensors}>
+          <>
+            <SortableContext items={groupIds}>
+              {tilegroups.map((group, index) => (
+                <AdminTileGroupView key={index} group={group} />
+              ))}
+            </SortableContext>
+            <Button
+              type='dashed'
+              onClick={() => {
+                postGroup({
+                  title: 'TileGroup',
+                  id: -1,
+                  position: tilegroups.length + 1,
+                });
+              }}
+              block
+              icon={<PlusOutlined />}
+            >
+              New Group
+            </Button>
+          </>
+          {createPortal(
+            <DragOverlay>
+              {activeGroup !== null && <AdminTileGroupView group={activeGroup} />}
+              {activeTile !== null && <AdminTileView tile={activeTile} move={move} />}
+            </DragOverlay>,
+            document.body,
+          )}
+        </DndContext>
+      }
+    </>
   );
 
   function onDragStart(event: DragStartEvent): void {
@@ -161,6 +184,9 @@ const TileGroupBoard: FC = (): ReactElement => {
         return;
       case 'Tile':
         setActiveTile(event.active.data.current.tile);
+        return;
+      default:
+        throw new Error('Unknown drag start type encountered');
     }
   }
 
@@ -235,9 +261,9 @@ const TileGroupBoard: FC = (): ReactElement => {
         activeData.tile.group_id !== +overID - 1 && moveTileToGroup(activeData.tile, +overID - 1);
         return;
       case 'Tile':
-        activeData.tile.group_id === overData.tile.group_id
-          ? swapTiles(+(activeID as string).substring(1) - 1, +(overID as string).substring(1) - 1, overData)
-          : moveTileToGroup(activeData.tile, overData.tile.group_id);
+        activeData.tile.group_id === overData.tile.group_id ?
+          swapTiles(+(activeID as string).substring(1) - 1, +(overID as string).substring(1) - 1, overData)
+        : moveTileToGroup(activeData.tile, overData.tile.group_id);
         return;
       default:
         console.warn('Unknown over object type encountered during drop', activeData.type);
