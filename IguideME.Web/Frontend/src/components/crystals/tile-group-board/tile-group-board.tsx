@@ -2,9 +2,10 @@ import AdminTileGroupView from '@/components/crystals/admin-tile-group/admin-til
 import AdminTileView from '@/components/crystals/admin-tile-view/admin-tile-view';
 import EditTile from '@/components/crystals/edit-tile/edit-tile';
 import QueryError from '@/components/particles/QueryError';
+import QueryLoading from '@/components/particles/QueryLoading';
 import Swal from 'sweetalert2';
 import { arrayMove, SortableContext } from '@dnd-kit/sortable';
-import { Button, Drawer, Row, Spin } from 'antd';
+import { Button, Drawer, Row } from 'antd';
 import { createPortal } from 'react-dom';
 import { getTileGroups, getTiles, patchTile, patchTileGroupOrder, patchTileOrder, postTileGroup } from '@/api/tiles';
 import { PlusOutlined } from '@ant-design/icons';
@@ -92,11 +93,11 @@ const TileGroupBoard: FC = (): ReactElement => {
   const loadingState = Array(2)
     .fill(0)
     .map((_, i) => (
-      <Spin key={i} spinning={isLoading} tip='Loading tile groups...'>
+      <QueryLoading key={i} isLoading={isLoading} tip='Loading tile groups...'>
         <div className='p-[10px] border border-dashed border-zinc-400 rounded-lg bg-white min-h-[235px] my-1'>
           <Row />
         </div>
-      </Spin>
+      </QueryLoading>
     ));
 
   const errorState = (

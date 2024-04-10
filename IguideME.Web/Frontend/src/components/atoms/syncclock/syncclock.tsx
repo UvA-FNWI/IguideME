@@ -17,22 +17,15 @@ const SyncClock: FC = (): ReactElement => {
     elapsed = getRelativeTimeTimer(startTime, Date.now());
   }
 
-  // ?: Maybe use the onSuccess callback to show a success message
   const { mutate: initiateSync } = useMutation({
     mutationFn: startNewSync,
-    // onSuccess: () => {
-    //   void Swal.fire('Synchronization started!', 'The synchronization has started.', 'success');
-    // },
   });
 
   const { mutate: abortSync } = useMutation({
     mutationFn: stopCurrentSync,
-    // onSuccess: () => {
-    //   void Swal.fire('Synchronization aborted!', 'The synchronization has stopped.', 'success');
-    // },
   });
 
-  const { data, isError, isLoading } = useQuery({
+  const { data, isError } = useQuery({
     queryKey: ['syncPoll'],
     queryFn: pollSync,
     refetchInterval: elapsed === undefined ? false : 100,
@@ -60,9 +53,19 @@ const SyncClock: FC = (): ReactElement => {
     setStartTime(null);
   };
 
+  useEffect(() => {
+    if (isError) {
+      stopSync();
+      void Swal.fire({
+        title: 'Failed to fetch synchronization status',
+        icon: 'error',
+      });
+    }
+  }, [isError]);
+
   return (
     <>
-      <Row className="mb-5 justify-center" gutter={10}>
+      <Row className='mb-5 justify-center' gutter={10}>
         <Col>
           <div
             className={cn(
@@ -72,14 +75,14 @@ const SyncClock: FC = (): ReactElement => {
               styles.syncClock,
             )}
           >
-            <div className="border-none">
+            <div className='border-none'>
               <span>
                 <h3>
-                  <small className="  font-tnum">elapsed time</small>
+                  <small className='font-tnum'>elapsed time</small>
                 </h3>
               </span>
               <span>
-                <h3 className="  font-tnum">{elapsed ?? 'Idle'}</h3>
+                <h3 className='font-tnum'>{elapsed ?? 'Idle'}</h3>
               </span>
             </div>
           </div>
@@ -90,7 +93,7 @@ const SyncClock: FC = (): ReactElement => {
         <Col xs={12}>
           <Button
             block
-            className="text-emerald-500 hover:!text-emerald-500 uppercase bg-primary-gray hover:!bg-primary-gray shadow-syncButton border-none rounded-[4px] m-[10px] hover:enabled:shadow-statusCard disabled:bg-primary-disabled disabled:hover:!text-black/25 disabled:hover:!bg-primary-disabled disabled:shadow-statusCard"
+            className='text-emerald-500 hover:!text-emerald-500 uppercase bg-primary-gray hover:!bg-primary-gray shadow-syncButton border-none rounded-[4px] m-[10px] hover:enabled:shadow-statusCard disabled:bg-primary-disabled disabled:hover:!text-black/25 disabled:hover:!bg-primary-disabled disabled:shadow-statusCard'
             disabled={elapsed !== undefined}
             onClick={startSync}
           >
@@ -100,7 +103,7 @@ const SyncClock: FC = (): ReactElement => {
 
         <Col xs={12}>
           <Button
-            className="text-emerald-500 hover:!text-emerald-500 uppercase bg-primary-gray hover:!bg-primary-gray shadow-syncButton border-none rounded-[4px] m-[10px] hover:enabled:shadow-statusCard disabled:bg-primary-disabled disabled:hover:!text-black/25 disabled:hover:!bg-primary-disabled disabled:shadow-statusCard"
+            className='text-emerald-500 hover:!text-emerald-500 uppercase bg-primary-gray hover:!bg-primary-gray shadow-syncButton border-none rounded-[4px] m-[10px] hover:enabled:shadow-statusCard disabled:bg-primary-disabled disabled:hover:!text-black/25 disabled:hover:!bg-primary-disabled disabled:shadow-statusCard'
             disabled={elapsed === undefined}
             block
             onClick={() => {

@@ -1,6 +1,5 @@
-import Loading from '@/components/particles/loading';
 import { FrownTwoTone, MehTwoTone, SmileTwoTone } from '@ant-design/icons';
-import { Space } from 'antd';
+import { Space, Spin } from 'antd';
 import { useTileViewStore } from '@/components/pages/student-dashboard/tileViewContext';
 import { type FC, type ReactElement } from 'react';
 
@@ -17,7 +16,7 @@ const GradeDisplay: FC<displayProps> = ({ self }): ReactElement => {
   }));
 
   if (self.settings === undefined) {
-    return <Loading />;
+    return <Spin spinning />;
   }
 
   const goal = self.settings.goal_grade;

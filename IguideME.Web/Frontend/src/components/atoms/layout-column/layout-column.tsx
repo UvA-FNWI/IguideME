@@ -1,5 +1,5 @@
-import Loading from '@/components/particles/loading';
 import QueryError from '@/components/particles/QueryError';
+import QueryLoading from '@/components/particles/QueryLoading';
 import { Col, Divider, InputNumber, Row, Slider, Transfer } from 'antd';
 import { CSS } from '@dnd-kit/utilities';
 import { DeleteFilled } from '@ant-design/icons';
@@ -35,9 +35,6 @@ const ConfigLayoutColumn: FC<Props> = ({ column, remove, parentOnChange }): Reac
     queryFn: getTileGroups,
   });
 
-  if (isError) return <QueryError />;
-  else if (isLoading) return <Loading />;
-
   const groups: RecordType[] | undefined = data?.map((x) => {
     return { key: x.id, title: x.title };
   });
@@ -65,78 +62,93 @@ const ConfigLayoutColumn: FC<Props> = ({ column, remove, parentOnChange }): Reac
     onChange();
   };
 
+  if (isLoading) {
+    return (
+      <QueryLoading isLoading={isLoading}>
+        <div className='rounded-md w-[425px] h-[360px] p-3 m-2 bg-white shadow-statusCard' />
+      </QueryLoading>
+    );
+  } else if (isError || data === undefined) {
+    return (
+      <div className='relative [&>div]:grid [&>div]:place-content-center rounded-md w-[425px] h-[360px] p-3 m-2 bg-white shadow-statusCard'>
+        <QueryError title='Error: Failed to load tile groups' />
+      </div>
+    );
+  }
+
   if (isDragging) {
     return (
       <div
-        className="rounded-md w-[425px] h-[360px] p-3 m-2 bg-white shadow-statusCard"
+        className='rounded-md w-[425px] h-[360px] p-3 m-2 bg-white shadow-statusCard'
         ref={setNodeRef}
         style={style}
       />
     );
+  } else {
+    return (
+      <div className='rounded-md w-[425px] h-[360px] p-3 m-2 bg-white shadow-statusCard' ref={setNodeRef} style={style}>
+        <Row className='cursor-grab justify-between' {...attributes} {...listeners}>
+          <Col>
+            <h3 className='text-lg'>Column</h3>
+          </Col>
+          <Col>
+            <DeleteFilled onClick={() => remove?.(column.id)} />
+          </Col>
+        </Row>
+
+        <Divider className='my-[10px] mr-[10px]' />
+
+        <Row className='content-center justify-between'>
+          <Col span={3}>
+            <span>Width:</span>
+          </Col>
+          <Col span={15}>
+            <Slider
+              min={MIN_WIDTH}
+              max={MAX_WIDTH}
+              value={width}
+              onChange={(value) => {
+                setWidth(value);
+                column.width = value;
+                onChange();
+              }}
+              tooltip={{ formatter }}
+            />
+          </Col>
+          <Col span={4}>
+            <InputNumber
+              min={MIN_WIDTH}
+              max={MAX_WIDTH}
+              value={width}
+              onChange={(value) => {
+                setWidth(value ?? MIN_WIDTH);
+                column.width = value ?? MIN_WIDTH;
+                onChange();
+              }}
+              formatter={formatter}
+              className='w-[90%]'
+            />
+          </Col>
+        </Row>
+
+        <Divider className='my-[10px] mr-[10px]' />
+        <div className='mb-[10px]'>Tile Groups:</div>
+
+        <Row className='justify-center'>
+          <Transfer
+            dataSource={groups?.map((value) => ({ ...value, key: value.key.toString() }))}
+            targetKeys={targetGroups}
+            selectedKeys={selectedGroups}
+            onChange={onGroupChange}
+            onSelectChange={onGroupSelectChange}
+            render={(item) => item.title}
+            oneWay
+            showSearch
+          />
+        </Row>
+      </div>
+    );
   }
-  return (
-    <div className="rounded-md w-[425px] h-[360px] p-3 m-2 bg-white shadow-statusCard" ref={setNodeRef} style={style}>
-      <Row className="cursor-grab justify-between" {...attributes} {...listeners}>
-        <Col>
-          <h3 className="text-lg">Column</h3>
-        </Col>
-        <Col>
-          <DeleteFilled onClick={() => remove?.(column.id)} />
-        </Col>
-      </Row>
-
-      <Divider className="my-[10px] mr-[10px]" />
-
-      <Row className="content-center justify-between">
-        <Col span={3}>
-          <span>Width:</span>
-        </Col>
-        <Col span={15}>
-          <Slider
-            min={MIN_WIDTH}
-            max={MAX_WIDTH}
-            value={width}
-            onChange={(value) => {
-              setWidth(value);
-              column.width = value;
-              onChange();
-            }}
-            tooltip={{ formatter }}
-          />
-        </Col>
-        <Col span={4}>
-          <InputNumber
-            min={MIN_WIDTH}
-            max={MAX_WIDTH}
-            value={width}
-            onChange={(value) => {
-              setWidth(value ?? MIN_WIDTH);
-              column.width = value ?? MIN_WIDTH;
-              onChange();
-            }}
-            formatter={formatter}
-            className="w-[90%]"
-          />
-        </Col>
-      </Row>
-
-      <Divider className="my-[10px] mr-[10px]" />
-      <div className="mb-[10px]">Tile Groups:</div>
-
-      <Row className="justify-center">
-        <Transfer
-          dataSource={groups?.map((value) => ({ ...value, key: value.key.toString() }))}
-          targetKeys={targetGroups}
-          selectedKeys={selectedGroups}
-          onChange={onGroupChange}
-          onSelectChange={onGroupSelectChange}
-          render={(item) => item.title}
-          oneWay
-          showSearch
-        />
-      </Row>
-    </div>
-  );
 };
 
 export default ConfigLayoutColumn;

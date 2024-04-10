@@ -68,24 +68,24 @@ enableMocking()
             <BrowserRouter>
               <Suspense fallback={<LoadingPage />}>
                 <Routes>
-                  <Route path="/" element={<App />} errorElement={<ErrorPage />}>
-                    <Route path="" element={<Home />} />
-                    <Route path=":id" element={<StudentDashboard />}>
-                      <Route path="" element={<ViewLayout />} />
-                      <Route path=":tid" element={<TileDetailView />} />
+                  <Route path='/' element={<App />} errorElement={<ErrorPage />}>
+                    <Route path='' element={<Home />} />
+                    <Route path=':id' element={<StudentDashboard />}>
+                      <Route path='' element={<ViewLayout />} />
+                      <Route path=':tid' element={<TileDetailView />} />
                     </Route>
-                    <Route path="admin" element={<AdminPanel />}>
-                      <Route path="" element={<Dashboard />} />
-                      <Route path="tiles" element={<Tiles />} />
-                      <Route path="layout" element={<EditLayout />} />
-                      <Route path="student-overview" element={<StudentOverview />} />
-                      <Route path="grade-predictor" element={<GradePredictor />} />
-                      <Route path="grade-analyzer" element={<GradeAnalyzer />} />
-                      <Route path="data-wizard" element={<DataWizard />} />
-                      <Route path="learning-goals" element={<LearningGoals />} />
-                      <Route path="analytics" element={<Analytics />} />
-                      <Route path="notification-centre" element={<NotificationCentre />} />
-                      <Route path="settings" element={<Settings />} />
+                    <Route path='admin' element={<AdminPanel />}>
+                      <Route path='' element={<Dashboard />} />
+                      <Route path='tiles' element={<Tiles />} />
+                      <Route path='layout' element={<EditLayout />} />
+                      <Route path='student-overview' element={<StudentOverview />} />
+                      <Route path='grade-predictor' element={<GradePredictor />} />
+                      <Route path='grade-analyzer' element={<GradeAnalyzer />} />
+                      <Route path='data-wizard' element={<DataWizard />} />
+                      <Route path='learning-goals' element={<LearningGoals />} />
+                      <Route path='analytics' element={<Analytics />} />
+                      <Route path='notification-centre' element={<NotificationCentre />} />
+                      <Route path='settings' element={<Settings />} />
                     </Route>
                   </Route>
                 </Routes>

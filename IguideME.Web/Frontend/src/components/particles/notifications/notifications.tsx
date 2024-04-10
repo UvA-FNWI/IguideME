@@ -1,35 +1,23 @@
-import Loading from '../loading';
-import { getStudentNotifications } from '@/api/users';
 import { RiseOutlined, TrophyOutlined, WarningOutlined } from '@ant-design/icons';
-import { useQuery } from '@tanstack/react-query';
 import { type FC, type ReactElement } from 'react';
-import { type User } from '@/types/user';
+import { type Notifications } from '@/types/notifications';
 
 interface Props {
-  user: User;
+  notifications: Notifications;
 }
 
-const Notifications: FC<Props> = ({ user }): ReactElement => {
-  const { data: notifications } = useQuery({
-    queryKey: [`notifications/${user.userID}`],
-    queryFn: async () => await getStudentNotifications(user.userID),
-  });
-
-  if (notifications === undefined) {
-    return <Loading />;
-  }
-
+const Notifications: FC<Props> = ({ notifications }): ReactElement => {
   const { outperforming, closing, falling, effort } = notifications;
 
   return (
     <div>
       {outperforming.length > 0 && (
         <>
-          <div className="flex gap-1">
+          <div className='flex gap-1'>
             <TrophyOutlined />
-            <p className="text-base">You are outperforming your peers in:</p>
+            <p className='text-base'>You are outperforming your peers in:</p>
           </div>
-          <ul className="list-disc pl-9 text-sm">
+          <ul className='list-disc pl-9 text-sm'>
             {outperforming.map((notification) => (
               <li key={notification.tile_id}>{notification.tile_title}</li>
             ))}
@@ -39,11 +27,11 @@ const Notifications: FC<Props> = ({ user }): ReactElement => {
 
       {closing.length > 0 && (
         <>
-          <div className="flex gap-1">
+          <div className='flex gap-1'>
             <RiseOutlined />
-            <p className="text-base">You are closing the gap to your peers in:</p>
+            <p className='text-base'>You are closing the gap to your peers in:</p>
           </div>
-          <ul className="list-disc pl-9 text-sm">
+          <ul className='list-disc pl-9 text-sm'>
             {closing.map((notification) => (
               <li key={notification.tile_id}>{notification.tile_title}</li>
             ))}
@@ -53,11 +41,11 @@ const Notifications: FC<Props> = ({ user }): ReactElement => {
 
       {falling.length > 0 && (
         <>
-          <div className="flex gap-1">
+          <div className='flex gap-1'>
             <WarningOutlined />
-            <p className="text-base">You are falling behind in:</p>
+            <p className='text-base'>You are falling behind in:</p>
           </div>
-          <ul className="list-disc pl-9 text-sm">
+          <ul className='list-disc pl-9 text-sm'>
             {falling.map((notification) => (
               <li key={notification.tile_id}>{notification.tile_title}</li>
             ))}
@@ -66,11 +54,11 @@ const Notifications: FC<Props> = ({ user }): ReactElement => {
       )}
       {effort.length > 0 && (
         <>
-          <div className="flex gap-1">
+          <div className='flex gap-1'>
             <WarningOutlined />
-            <p className="text-base">You have to put more effort in:</p>
+            <p className='text-base'>You have to put more effort in:</p>
           </div>
-          <ul className="list-disc pl-9 text-sm">
+          <ul className='list-disc pl-9 text-sm'>
             {effort.map((notification) => (
               <li key={notification.tile_id}>{notification.tile_title}</li>
             ))}

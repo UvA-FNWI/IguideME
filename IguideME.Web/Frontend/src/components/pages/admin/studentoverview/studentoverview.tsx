@@ -7,7 +7,7 @@ import { type FC, type ReactElement } from 'react';
 const StudentOverview: FC = (): ReactElement => {
   return (
     <div>
-      <AdminTitle description="An overview of students grades and consent." title="Student Overview" />
+      <AdminTitle description='An overview of students grades and consent.' title='Student Overview' />
       <SettingsTable />
       <Divider />
       <GradesTable />

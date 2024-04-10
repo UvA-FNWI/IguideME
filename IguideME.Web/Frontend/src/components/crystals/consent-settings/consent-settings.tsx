@@ -1,5 +1,5 @@
-import Loading from '@/components/particles/loading';
 import QueryError from '@/components/particles/QueryError';
+import QueryLoading from '@/components/particles/QueryLoading';
 import { Button, Form } from 'antd';
 import { getConsentSettings, postConsentSettings } from '@/api/course_settings';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -11,18 +11,6 @@ const ConsentSettings: FC = (): ReactElement => {
     queryFn: getConsentSettings,
   });
 
-  if (isError) return <QueryError />;
-  else if (isLoading) return <Loading />;
-
-  return <ConsentSettingsForm name={data!.course_name} text={data!.text} />;
-};
-
-interface Props {
-  name: string;
-  text: string;
-}
-
-const ConsentSettingsForm: FC<Props> = ({ name, text }): ReactElement => {
   const queryClient = useQueryClient();
   const { mutate: saveConsent } = useMutation({
     mutationFn: postConsentSettings,
@@ -31,18 +19,25 @@ const ConsentSettingsForm: FC<Props> = ({ name, text }): ReactElement => {
     },
   });
 
-  return (
-    <div>
-      <Form initialValues={{ name, text }} name="consent_settings_form" onFinish={saveConsent}>
-        <Form.Item name="text" valuePropName="text" noStyle>
-          TODO
-        </Form.Item>
-        <Form.Item>
-          <Button htmlType="submit">Save</Button>
-        </Form.Item>
-      </Form>
-    </div>
-  );
+  if (isError) return <QueryError title='Failed to load consent settings' />;
+  else {
+    return (
+      <QueryLoading isLoading={isLoading}>
+        <Form
+          initialValues={data ? { course_name: data.course_name, text: data.text } : undefined}
+          name='consent_settings_form'
+          onFinish={saveConsent}
+        >
+          <Form.Item name='text' valuePropName='text' noStyle>
+            TODO
+          </Form.Item>
+          <Form.Item>
+            <Button htmlType='submit'>Save</Button>
+          </Form.Item>
+        </Form>
+      </QueryLoading>
+    );
+  }
 };
 
 export default ConsentSettings;

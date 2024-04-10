@@ -2,6 +2,7 @@ import GraphGrade from '../graph-grade/graph-grade';
 import Loading from '@/components/particles/loading';
 import PeerComparison from '@/components/particles/peer-comparison/peercomparison';
 import QueryError from '@/components/particles/QueryError';
+import QueryLoading from '@/components/particles/QueryLoading';
 import { Col } from 'antd/lib';
 import { Divider, Row } from 'antd';
 import { getAssignmentSubmission, getDiscussion } from '@/api/entries';
@@ -14,6 +15,7 @@ import { type FC, type ReactElement } from 'react';
 interface Props {
   entry: TileEntry;
 }
+
 export const AssignmentDetail: FC<Props> = ({ entry }): ReactElement => {
   const { user, viewType } = useTileViewStore((state) => ({
     user: state.user,
@@ -29,31 +31,33 @@ export const AssignmentDetail: FC<Props> = ({ entry }): ReactElement => {
     queryFn: async () => await getAssignmentSubmission(entry.content_id, user.userID),
   });
 
-  if (isError) return <QueryError />;
-  else if (isLoading)
+  if (isLoading) {
     return (
-      <div className='w-full h-[calc(100%-24px)] grid place-content-center'>
-        <Loading />{' '}
-      </div>
+      <QueryLoading isLoading={isLoading}>
+        <div className='w-[270px] h-[180px]' />
+      </QueryLoading>
     );
+  } else if (isError || submission === undefined) {
+    return <QueryError className='grid place-content-center' title='No submission found' />;
+  }
 
   switch (viewType) {
     case 'graph':
       return (
         <Row className='justify-center content-center h-4/5'>
-          <GraphGrade {...submission!.grades} />
+          <GraphGrade {...submission.grades} />
         </Row>
       );
     case 'grid':
       return (
         <>
           <Row className='justify-center content-center h-1/2'>
-            <GradeView {...submission!.grades} />
+            <GradeView {...submission.grades} />
           </Row>
           <Row className='justify-center content-start h-[30%]'>
             <Col className='w-full'>
               <Divider className='m-0 p-0' />
-              <PeerComparison {...submission!.grades} />
+              <PeerComparison {...submission.grades} />
             </Col>{' '}
           </Row>
         </>

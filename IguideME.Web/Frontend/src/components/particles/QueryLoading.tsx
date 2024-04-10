@@ -1,10 +1,10 @@
-import { Spin } from 'antd';
 import { FC, ReactNode } from 'react';
+import { Spin, SpinProps } from 'antd';
 
-type QueryLoadingProps = {
+interface QueryLoadingProps extends SpinProps {
   children: ReactNode;
   isLoading: boolean;
-};
+}
 
 const QueryLoading: FC<QueryLoadingProps> = ({ children, isLoading }) => {
   return (

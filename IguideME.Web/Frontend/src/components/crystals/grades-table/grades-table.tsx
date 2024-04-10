@@ -1,5 +1,5 @@
-import Loading from '@/components/particles/loading';
 import QueryError from '@/components/particles/QueryError';
+import QueryLoading from '@/components/particles/QueryLoading';
 import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import { Col, Row, Table, Tooltip } from 'antd';
 import { getAllTileGrades, getTiles } from '@/api/tiles';
@@ -31,34 +31,36 @@ const GradesTable: FC = (): ReactElement => {
     queryFn: getStudentsWithSettings,
   });
 
-  // ? Maybe add this for all queries
-  if (isError) return <QueryError />;
-  else if (isLoading) return <Loading />;
-
-  if (students === undefined) {
-    return <Loading />;
-  }
-
   return (
-    <div className="relative overflow-visible" id={'settingsTable'}>
-      <Row className="justify-between content-end pb-[10px]">
-        <Col>
-          <h2>General Overview</h2>
-        </Col>
-        <Col>
-          Consent Given: &ensp; {students.filter((student: User) => student.settings?.consent).length}/{students.length}
-        </Col>
-      </Row>
+    <div className='relative overflow-visible' id={'settingsTable'}>
+      <QueryLoading isLoading={isLoading}>
+        <Row className='justify-between content-end pb-[10px]'>
+          <Col>
+            <h2>General Overview</h2>
+          </Col>
+          <Col>
+            Consent Given:{' '}
+            {!isError && students ?
+              <>
+                {students.filter((student: User) => student.settings?.consent).length}/{students.length}
+              </>
+            : <>0/0</>}
+          </Col>
+        </Row>
 
-      <Table
-        size="middle"
-        columns={getColumns()}
-        dataSource={getData(students)}
-        scroll={{ x: 900, y: 600 }}
-        pagination={{ pageSize: 50 }}
-        bordered
-        sticky={true}
-      />
+        {isError ?
+          <QueryError className='static' title='Failed to load students' />
+        : <Table
+            size='middle'
+            columns={getColumns()}
+            dataSource={getData(students ?? [])}
+            scroll={{ x: 900, y: 600 }}
+            pagination={{ pageSize: 50 }}
+            bordered
+            sticky={true}
+          />
+        }
+      </QueryLoading>
     </div>
   );
 };
@@ -176,7 +178,7 @@ function getColumns(): any {
         if (value) {
           return (
             <span className={'successText'}>
-              <Tooltip title="Consent given">
+              <Tooltip title='Consent given'>
                 <CheckCircleOutlined />
               </Tooltip>
             </span>
@@ -184,7 +186,7 @@ function getColumns(): any {
         } else {
           return (
             <span className={'dangerText'}>
-              <Tooltip title="No consent given">
+              <Tooltip title='No consent given'>
                 <CloseCircleOutlined />
               </Tooltip>
             </span>
@@ -216,7 +218,7 @@ function getColumns(): any {
         if (value) {
           return (
             <span className={'successText'}>
-              <Tooltip title="Notifications turned on">
+              <Tooltip title='Notifications turned on'>
                 <CheckCircleOutlined />
               </Tooltip>
             </span>
@@ -224,7 +226,7 @@ function getColumns(): any {
         } else {
           return (
             <span className={'dangerText'}>
-              <Tooltip title="Notifications turned off">
+              <Tooltip title='Notifications turned off'>
                 <CloseCircleOutlined />
               </Tooltip>
             </span>

@@ -57,12 +57,12 @@ const GraphGrade: FC<Grades> = ({ grade, peerAvg, peerMin, peerMax, max }): Reac
   };
 
   return (
-    <Row className="h-full">
-      <Col span={12} className="h-full">
+    <Row className='h-full'>
+      <Col span={12} className='h-full'>
         <Bullet
           data={studentdata}
-          rangeField="Max"
-          measureField="Grade"
+          rangeField='Max'
+          measureField='Grade'
           color={{
             Max: ['#f6f8fa'],
             Grade: BLUE,
@@ -70,10 +70,10 @@ const GraphGrade: FC<Grades> = ({ grade, peerAvg, peerMin, peerMax, max }): Reac
           {...config}
         />
       </Col>
-      <Col span={12} className="h-full">
+      <Col span={12} className='h-full'>
         <Bullet
           data={peerdata}
-          measureField="Peer avg"
+          measureField='Peer avg'
           color={{
             ranges: ['#f6f8fa', 'rgba(255, 50, 50, .3)', '#f6f8fb'],
             'Peer avg': RED,

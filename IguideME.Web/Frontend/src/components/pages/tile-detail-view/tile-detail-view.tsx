@@ -1,6 +1,7 @@
 import EntryView from '@/components/crystals/entry-view/entry-view';
 import GroupView from '@/components/particles/group-view/group-view';
-import Loading from '@/components/particles/loading';
+import QueryError from '@/components/particles/QueryError';
+import QueryLoading from '@/components/particles/QueryLoading';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import { Button, Col, Row } from 'antd';
 import { getTile } from '@/api/tiles';
@@ -8,7 +9,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useTileViewStore } from '../student-dashboard/tileViewContext';
 import { type ReactElement, useCallback, useEffect } from 'react';
-import QueryError from '@/components/particles/QueryError';
 
 function TileDetailView(): ReactElement {
   const { tid } = useParams();
@@ -48,9 +48,6 @@ function TileDetailView(): ReactElement {
     };
   });
 
-  if (isLoading) return <Loading />;
-  else if (isError || tile === undefined) return <QueryError />;
-
   return (
     <>
       <Row>
@@ -65,16 +62,21 @@ function TileDetailView(): ReactElement {
           />
         </Col>
       </Row>
-      <Row className='min-h-[60vh] p-1'>
-        <Col className='p-1' span={24}>
-          <GroupView title={tile.title}>
-            {tile.entries.map((entry) => (
-              <Col key={entry.content_id}>
-                <EntryView entry={entry} type={tile.type} />
-              </Col>
-            ))}
-          </GroupView>
-        </Col>
+      <Row className='min-h-[60vh] p-1 [&>div]:w-full'>
+        <QueryLoading isLoading={isLoading}>
+          <Col className='p-1' span={24}>
+            <GroupView title={tile ? tile.title : ''}>
+              {isError ?
+                <QueryError className='grid place-content-center' title='Failed to load tile' />
+              : tile?.entries.map((entry) => (
+                  <Col key={entry.content_id}>
+                    <EntryView entry={entry} type={tile.type} />
+                  </Col>
+                ))
+              }
+            </GroupView>
+          </Col>
+        </QueryLoading>
       </Row>
     </>
   );

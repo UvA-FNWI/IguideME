@@ -1,4 +1,6 @@
 import GroupView from '@/components/particles/group-view/group-view';
+import QueryError from '@/components/particles/QueryError';
+import QueryLoading from '@/components/particles/QueryLoading';
 import TileView from '../tile-view/tile-view';
 import { Col } from 'antd';
 import { getGroupTiles } from '@/api/tiles';
@@ -11,19 +13,28 @@ interface Props {
 }
 
 const ViewTileGroup: FC<Props> = ({ group }): ReactElement => {
-  const { data: tiles } = useQuery({
+  const {
+    data: tiles,
+    isError,
+    isLoading,
+  } = useQuery({
     queryKey: ['tiles', group.id],
     queryFn: async () => await getGroupTiles(group.id),
   });
 
   return (
-    <GroupView title={group.title}>
-      {tiles?.map((tile) => (
-        <Col key={tile.id}>
-          <TileView tile={tile} />
-        </Col>
-      ))}
-    </GroupView>
+    <QueryLoading isLoading={isLoading}>
+      <GroupView title={group.title}>
+        {isError ?
+          <QueryError className='grid place-content-center' title='Error: Unable to load tiles' />
+        : tiles?.map((tile) => (
+            <Col key={tile.id}>
+              <TileView tile={tile} />
+            </Col>
+          ))
+        }
+      </GroupView>
+    </QueryLoading>
   );
 };
 

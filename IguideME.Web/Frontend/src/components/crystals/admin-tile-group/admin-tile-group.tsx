@@ -1,6 +1,7 @@
 import AdminTileView from '@/components/crystals/admin-tile-view/admin-tile-view';
 import QueryError from '@/components/particles/QueryError';
-import { Button, Col, Divider, Input, Row, Spin } from 'antd';
+import QueryLoading from '@/components/particles/QueryLoading';
+import { Button, Col, Divider, Input, Row } from 'antd';
 import { CSS } from '@dnd-kit/utilities';
 import { DeleteFilled, PlusOutlined } from '@ant-design/icons';
 import { deleteTileGroup, getTiles, patchTileGroup, postTile } from '@/api/tiles';
@@ -77,11 +78,11 @@ const AdminTileGroupView: FC<Props> = ({ group }): ReactElement => {
   const loadingState = Array(Math.floor(Math.random() * 5) + 1)
     .fill(0)
     .map((_, i) => (
-      <Spin key={i} spinning={isLoading}>
+      <QueryLoading key={i} isLoading={isLoading}>
         <Col>
           <div className='w-60 h-[150px] border border-solid border-zinc-300 rounded-md m-0 bg-white' />
         </Col>
-      </Spin>
+      </QueryLoading>
     ));
 
   const errorState = (

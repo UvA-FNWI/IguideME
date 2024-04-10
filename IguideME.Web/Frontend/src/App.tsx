@@ -4,7 +4,7 @@ import { getSelf } from './api/users';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { UserRoles } from './types/user';
-import { useEffect, type ReactElement } from 'react';
+import { Suspense, useEffect, type ReactElement } from 'react';
 
 /**
  * The main entry point to the app. Adds a header and the contents of the app
@@ -26,6 +26,7 @@ function App(): ReactElement {
   });
 
   useEffect(() => {
+    // TODO: If data is null or undefined print an error message. The backend needs one synchronize before data can be fetched.
     if (isSuccess && data.role === UserRoles.student) {
       navigate(data.userID ?? '/');
     }
@@ -37,16 +38,17 @@ function App(): ReactElement {
     </header>
   );
 
-  if (isLoading) {
-    return (
-      <>
-        {HeaderLoader}
-        <div className='h-[calc(100vh-70px)] bg-white grid items-center'>
-          <Loading />
-        </div>
-      </>
-    );
-  } else if (isError || data === undefined) {
+  const GlobalLoadingState = (
+    <>
+      {HeaderLoader}
+      <div className='h-[calc(100vh-70px)] bg-white grid items-center'>
+        <Loading />
+      </div>
+    </>
+  );
+
+  if (isLoading) return GlobalLoadingState;
+  else if (isError || data === undefined) {
     return (
       <>
         {HeaderLoader}
@@ -66,10 +68,10 @@ function App(): ReactElement {
   }
 
   return (
-    <>
+    <Suspense fallback={GlobalLoadingState}>
       <Header self={data} />
       <Outlet />
-    </>
+    </Suspense>
   );
 }
 

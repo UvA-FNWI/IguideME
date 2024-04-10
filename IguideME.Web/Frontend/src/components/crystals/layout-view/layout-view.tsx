@@ -1,20 +1,49 @@
 import Loading from '@/components/particles/loading';
+import QueryError from '@/components/particles/QueryError';
 import ViewTileGroup from '../tile-group-view/tile-group-view';
-import { Col, Row } from 'antd';
+import { Col, Row, Spin } from 'antd';
 import { getLayoutColumns, getTileGroups } from '@/api/tiles';
 import { useQuery } from '@tanstack/react-query';
 import { type FC, type ReactElement } from 'react';
 
 const ViewLayout: FC = (): ReactElement => {
-  const { data: columns } = useQuery({
+  const {
+    data: columns,
+    isLoading: LoadingLayoutColumns,
+    isError: ErrorLayoutColumns,
+  } = useQuery({
     queryKey: ['layout-columns'],
     queryFn: getLayoutColumns,
   });
 
-  const { data: tilegroups } = useQuery({
+  const {
+    data: tilegroups,
+    isLoading: LoadingTileGroups,
+    isError: ErrorTileGroups,
+  } = useQuery({
     queryKey: ['tile-groups'],
     queryFn: getTileGroups,
   });
+
+  const loading = LoadingLayoutColumns || LoadingTileGroups;
+  const error = ErrorLayoutColumns || ErrorTileGroups || columns === undefined || tilegroups === undefined;
+
+  if (loading || error) {
+    return (
+      <div className='w-screen h-screen absolute inset-0 grid place-content-center'>
+        {loading ?
+          <Spin
+            className='[&>div]:min-w-max [&>div]:right-[-45px]'
+            spinning={loading}
+            size='large'
+            tip='Loading layout'
+          >
+            <></>
+          </Spin>
+        : <QueryError className='grid place-content-center' title='Error loading layout' />}
+      </div>
+    );
+  }
 
   if (columns === undefined || tilegroups === undefined) {
     return <Loading />;

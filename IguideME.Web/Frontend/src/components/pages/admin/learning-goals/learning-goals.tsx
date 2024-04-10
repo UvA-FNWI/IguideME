@@ -1,5 +1,6 @@
 import AdminTitle from '@/components/atoms/admin-titles/admin-titles';
-import Loading from '@/components/particles/loading';
+import QueryError from '@/components/particles/QueryError';
+import QueryLoading from '@/components/particles/QueryLoading';
 import { Button, Col, Divider, Form, Input, InputNumber, Row, Select, Space } from 'antd';
 import { DeleteFilled, PlusOutlined } from '@ant-design/icons';
 import {
@@ -14,7 +15,7 @@ import {
 } from '@/api/entries';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { LogicalExpression, type LearningGoal, type GoalRequirement } from '@/types/tile';
-import { useState, type FC, type ReactElement } from 'react';
+import { useEffect, useState, type FC, type ReactElement } from 'react';
 
 const { Item } = Form;
 
@@ -26,7 +27,11 @@ interface ReqProps {
   requirement: GoalRequirement;
 }
 const LearningGoals: FC = (): ReactElement => {
-  const { data: goals } = useQuery({
+  const {
+    data: goals,
+    isError,
+    isLoading,
+  } = useQuery({
     queryKey: ['learning-goals'],
     queryFn: getLearningGoals,
   });
@@ -46,15 +51,30 @@ const LearningGoals: FC = (): ReactElement => {
       requirements: [],
     });
   };
-  return (
-    <div>
-      <AdminTitle title="Learning Goals" description="Configure the learning goals for the course." />
-      {goals === undefined ? <Loading /> : goals.map((goal) => <ViewLearningGoal key={goal.id} goal={goal} />)}
-      <Button type="dashed" onClick={addGoal} block icon={<PlusOutlined />} className="bg-white">
-        Add Goal
-      </Button>
-    </div>
-  );
+
+  if (isLoading) {
+    return (
+      <QueryLoading isLoading={isLoading}>
+        <article className='w-full h-[100px] rounded-lg' />
+      </QueryLoading>
+    );
+  } else if (isError) {
+    return (
+      <article className='w-full h-[100px] rounded-lg'>
+        <QueryError title='Error: Unable to load learning goals' />
+      </article>
+    );
+  } else {
+    return (
+      <>
+        <AdminTitle title='Learning Goals' description='Configure the learning goals for the course.' />
+        {goals?.map((goal) => <ViewLearningGoal key={goal.id} goal={goal} />)}
+        <Button type='dashed' onClick={addGoal} block icon={<PlusOutlined />} className='bg-white'>
+          Add Goal
+        </Button>
+      </>
+    );
+  }
 };
 
 const ViewLearningGoal: FC<GoalProps> = ({ goal }): ReactElement => {
@@ -93,34 +113,35 @@ const ViewLearningGoal: FC<GoalProps> = ({ goal }): ReactElement => {
   };
 
   return (
-    <div className="font-tnum p-[10px] border border-dashed border-zinc-400 rounded-lg bg-white mb-[10px] min-h-[100px]">
-      <Row className="content-center justify-between">
-        <Col className="cursor-text">
+    <div className='font-tnum p-[10px] border border-dashed border-zinc-400 rounded-lg bg-white mb-[10px] min-h-[100px]'>
+      <Row className='content-center justify-between'>
+        <Col className='cursor-text'>
           <h2
             onClick={() => {
               setEditing(true);
             }}
-            className="p-1 font-tnum text-lg"
+            className='p-1 font-tnum text-lg'
           >
-            {!editing
-              ? goal.title
-              : editing && (
-                  <Input
-                    value={title}
-                    autoFocus
-                    onBlur={() => {
-                      setEditing(false);
-                    }}
-                    onChange={(e) => {
-                      setTitle(e.target.value);
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key !== 'Enter') return;
-                      patchGoal({ ...goal, title });
-                      setEditing(false);
-                    }}
-                  />
-                )}
+            {!editing ?
+              goal.title
+            : editing && (
+                <Input
+                  value={title}
+                  autoFocus
+                  onBlur={() => {
+                    setEditing(false);
+                  }}
+                  onChange={(e) => {
+                    setTitle(e.target.value);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key !== 'Enter') return;
+                    patchGoal({ ...goal, title });
+                    setEditing(false);
+                  }}
+                />
+              )
+            }
           </h2>
         </Col>
         <Col>
@@ -128,17 +149,17 @@ const ViewLearningGoal: FC<GoalProps> = ({ goal }): ReactElement => {
             onClick={() => {
               removeGoal(goal.id);
             }}
-            className="p-1"
+            className='p-1'
           />
         </Col>
       </Row>
-      <Divider className="mt-1 mb-2" />
+      <Divider className='mt-1 mb-2' />
       <Row>
-        <Col className="w-full">
-          {goal.requirements.map((requirement) => (
-            <ViewGoalRequirement key={requirement.id} requirement={requirement} />
+        <Col className='w-full'>
+          {goal.requirements.map((requirement, index) => (
+            <ViewGoalRequirement key={index} requirement={requirement} />
           ))}
-          <Button type="dashed" onClick={addRequirement} block icon={<PlusOutlined />}>
+          <Button type='dashed' onClick={addRequirement} block icon={<PlusOutlined />}>
             Add Requirement
           </Button>
         </Col>
@@ -150,7 +171,11 @@ const ViewLearningGoal: FC<GoalProps> = ({ goal }): ReactElement => {
 const ViewGoalRequirement: FC<ReqProps> = ({ requirement }): ReactElement => {
   const queryClient = useQueryClient();
 
-  const { data: assignments } = useQuery({
+  const {
+    data: assignments,
+    isError,
+    isLoading,
+  } = useQuery({
     queryKey: ['assignments'],
     queryFn: getAssignments,
   });
@@ -168,45 +193,67 @@ const ViewGoalRequirement: FC<ReqProps> = ({ requirement }): ReactElement => {
       await queryClient.invalidateQueries({ queryKey: ['learning-goals'] });
     },
   });
+
+  const [form] = Form.useForm<GoalRequirement>();
+  useEffect(() => {
+    if (!isLoading && !isError) {
+      form.setFieldsValue(requirement);
+    } else {
+      form.resetFields();
+    }
+  }, [isLoading, isError, requirement, form]);
+
   return (
-    <div className="font-tnum w-full p-[10px] border border-solid border-zinc-200 rounded-lg mb-[10px]">
+    <div className='font-tnum w-full p-[10px] border border-solid border-zinc-200 rounded-lg mb-[10px]'>
       <Form<GoalRequirement>
+        form={form}
         name={`goal_requirement_form_${requirement.id}`}
-        initialValues={requirement}
+        initialValues={{}}
         onFinish={(data: GoalRequirement) => {
+          if (isError || isLoading) return;
           saveRequirement(data);
         }}
         requiredMark={false}
-        className="w-full"
+        className='w-full'
       >
         <Row gutter={20}>
-          <Item name="id" hidden>
-            <Input type="hidden" />
+          <Item name='id' hidden>
+            <Input type='hidden' />
           </Item>
-          <Item name="goal_id" hidden>
-            <Input type="hidden" />
+          <Item name='goal_id' hidden>
+            <Input type='hidden' />
           </Item>
           <Col span={6}>
-            <Item name="assignment_id" noStyle>
+            <Item name='assignment_id' noStyle>
               <Select
-                className="w-full"
+                aria-disabled={isLoading || isError}
+                className='w-full'
+                disabled={isLoading || isError}
                 showSearch
-                optionFilterProp="label"
+                optionFilterProp='label'
                 options={
-                  assignments === undefined
-                    ? []
-                    : [...assignments.values()].map((ass) => ({
-                        value: ass.id,
-                        label: ass.title,
-                      }))
+                  assignments === undefined ?
+                    []
+                  : [...assignments.values()].map((ass) => ({
+                      value: ass.id,
+                      label: ass.title,
+                    }))
+                }
+                placeholder={
+                  isLoading ? 'Loading assignments ...'
+                  : isError ?
+                    'Failed to load assignments'
+                  : undefined
                 }
               />
             </Item>
           </Col>
           <Col span={2}>
-            <Item name="expression" noStyle>
+            <Item name='expression' noStyle>
               <Select
-                className="w-full"
+                aria-disabled={isLoading || isError}
+                className='w-full'
+                disabled={isLoading || isError}
                 options={[
                   {
                     value: LogicalExpression.Equal,
@@ -237,19 +284,19 @@ const ViewGoalRequirement: FC<ReqProps> = ({ requirement }): ReactElement => {
             </Item>
           </Col>
           <Col span={4}>
-            <Item name="value" noStyle>
-              <InputNumber />
+            <Item name='value' noStyle>
+              <InputNumber aria-disabled={isLoading || isError} disabled={isLoading || isError} />
             </Item>
           </Col>
           <Col offset={8} span={4}>
             <Space>
               <Item noStyle>
-                <Button className="text-white bg-primary-blue" type="primary" htmlType="submit">
+                <Button className='text-white bg-primary-blue' type='primary' htmlType='submit'>
                   Save
                 </Button>
               </Item>
               <Button
-                type="primary"
+                type='primary'
                 danger
                 onClick={() => {
                   removeRequirement(requirement.id);

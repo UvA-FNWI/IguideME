@@ -13,93 +13,80 @@ import {
   UserOutlined,
 } from '@ant-design/icons';
 import { getSelf } from '@/api/users';
+import { Layout, Menu } from 'antd';
 import { Link, Outlet } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { type FC, type ReactElement, useState } from 'react';
-import { Layout, Menu, type MenuProps } from 'antd';
+import { type FC, type ReactElement, useMemo, useState } from 'react';
 
 const { Content, Sider } = Layout;
 
-type MenuItem = Required<MenuProps>['items'][number];
-
-function getItem(
-  label: React.ReactNode,
-  key: React.Key,
-  icon?: React.ReactNode,
-  children?: MenuItem[],
-  type?: 'group',
-): MenuItem {
-  return {
-    key,
-    icon,
-    children,
-    label,
-    type,
-  };
-}
-
-const items: MenuItem[] = [
-  getItem(<Link to={'/admin'}> Dashboard </Link>, '1', <DatabaseOutlined />),
-  getItem(<Link to={'/admin/tiles'}> Tiles </Link>, '2', <AppstoreOutlined />),
-  getItem(<Link to={'/admin/layout'}> Layout </Link>, '3', <LaptopOutlined />),
-  getItem(<Link to={'/admin/student-overview'}> Student Overview </Link>, '4', <TeamOutlined />),
-  getItem(<Link to={'/admin/grade-predictor'}> Grade Predictor </Link>, '5', <FundProjectionScreenOutlined />),
-  getItem(<Link to={'/admin/grade-analyzer'}> Grade Analyzer </Link>, '6', <DotChartOutlined />),
-  getItem(<Link to={'/admin/learning-goals'}> Learning Goals </Link>, '7', <TrophyOutlined />),
-  getItem(<Link to={'/admin/data-wizard'}> Data Wizard </Link>, '8', <CloudUploadOutlined />),
-  getItem(<Link to={'/admin/analytics'}> Usage Analytics </Link>, '9', <ClusterOutlined />),
-  getItem(<Link to={'/admin/notification-centre'}> Notification Centre </Link>, '10', <NotificationOutlined />),
-  getItem(<Link to={'/admin/settings'}> Settings </Link>, '11', <ControlOutlined />),
+const menuItems = [
+  { label: 'Dashboard', key: '1', icon: <DatabaseOutlined />, route: '/admin' },
+  { label: 'Tiles', key: '2', icon: <AppstoreOutlined />, route: '/admin/tiles' },
+  { label: 'Layout', key: '3', icon: <LaptopOutlined />, route: '/admin/layout' },
+  { label: 'Student Overview', key: '4', icon: <TeamOutlined />, route: '/admin/student-overview' },
+  { label: 'Grade Predictor', key: '5', icon: <FundProjectionScreenOutlined />, route: '/admin/grade-predictor' },
+  { label: 'Grade Analyzer', key: '6', icon: <DotChartOutlined />, route: '/admin/grade-analyzer' },
+  { label: 'Learning Goals', key: '7', icon: <TrophyOutlined />, route: '/admin/learning-goals' },
+  { label: 'Data Wizard', key: '8', icon: <CloudUploadOutlined />, route: '/admin/data-wizard' },
+  { label: 'Usage Analytics', key: '9', icon: <ClusterOutlined />, route: '/admin/analytics' },
+  { label: 'Notification Centre', key: '10', icon: <NotificationOutlined />, route: '/admin/notification-centre' },
+  { label: 'Settings', key: '11', icon: <ControlOutlined />, route: '/admin/settings' },
 ];
 
+const routeToKeyMap: { [key: string]: string } = menuItems.reduce(
+  (map, item) => ({ ...map, [item.route]: item.key }),
+  {},
+);
+const getKeyFromLocation = (location: string): string => routeToKeyMap[location] || '1';
+
 const AdminPanel: FC = (): ReactElement => {
-  const {
-    data: self,
-    isError,
-    isLoading,
-  } = useQuery({
+  // This data is already fetched in the App component.
+  // Meaning that it is readily available for use in the AdminPanel component.
+  const { data: self } = useQuery({
     queryKey: ['self'],
     queryFn: getSelf,
   });
 
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState<boolean>(false);
+
+  const items = useMemo(
+    () =>
+      menuItems.map((item) => ({
+        key: item.key,
+        icon: item.icon,
+        label: <Link to={item.route}>{item.label}</Link>,
+      })),
+    [],
+  );
 
   return (
-    <Layout className="min-h-[90dvh]">
+    <Layout className='min-h-[90dvh]'>
       <Sider
-        breakpoint="lg"
+        breakpoint='lg'
         trigger={null}
-        collapsedWidth="80px"
+        collapsedWidth='80px'
         collapsible
         collapsed={collapsed}
-        onCollapse={(value) => {
-          setCollapsed(value);
-        }}
-        className="!bg-white"
+        onCollapse={(value) => setCollapsed(value)}
+        className='!bg-white'
       >
-        <div className="flex content-center flex-col justify-center bg-white p-4 border-b border-solid border-b-gray-200 h-header">
-          {!collapsed ? (
+        <div className='flex content-center flex-col justify-center bg-white p-4 border-b border-solid border-b-gray-200 h-header'>
+          {!collapsed ?
             <>
-              <div>
-                <h3 className="text-lg">
-                  {!isLoading ? self?.name : 'Loading profile...'}
-                  {/* // TODO: Add a better error message */}
-                  {isError ? 'Error loading profile' : ''}
-                </h3>
-                <strong>
-                  <UserOutlined /> Instructor
-                </strong>
-              </div>
+              <h3 className='text-lg'>{self?.name}</h3>
+              <strong>
+                <UserOutlined /> Instructor
+              </strong>
             </>
-          ) : (
-            <h3>
+          : <h3 className='text-center'>
               <UserOutlined />
             </h3>
-          )}
+          }
         </div>
-        <Menu defaultSelectedKeys={['1']} mode="inline" items={items} />
+        <Menu defaultSelectedKeys={[getKeyFromLocation(location.pathname)]} mode='inline' items={items} />
       </Sider>
-      <Content className="relative bg-slate- p-5">
+      <Content className='relative bg-slate- p-5'>
         <Outlet />
       </Content>
     </Layout>
