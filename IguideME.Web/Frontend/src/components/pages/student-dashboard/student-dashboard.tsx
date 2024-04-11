@@ -1,4 +1,5 @@
 import GradeDisplay from '@/components/atoms/grade-display/grade-display';
+import Loading from '@/components/particles/loading';
 import StudentInfo from '@/components/atoms/student-info/student-info';
 import { AppstoreOutlined, BarChartOutlined } from '@ant-design/icons';
 import { Col, Radio, Row } from 'antd';
@@ -7,19 +8,26 @@ import { Outlet, useNavigate, useParams } from 'react-router-dom';
 import { TileViewStoreProvider, useTileViewStore } from './tileViewContext';
 import { useQuery } from '@tanstack/react-query';
 import { type User, UserRoles } from '@/types/user';
-import { type FC, type ReactElement } from 'react';
-import Loading from '@/components/particles/loading';
+import { useEffect, type FC, type ReactElement } from 'react';
+
+const LoadingState: FC = () => (
+  <div className='absolute inset-0 w-screen h-screen grid place-content-center'>
+    <Loading />
+  </div>
+);
+
+const ErrorMessage: FC = () => <p>Something went wrong, could not load user</p>;
+
+const DashboardView: FC<{ user: User }> = ({ user }) => (
+  <TileViewStoreProvider user={user}>
+    <Dashboard self={user} />
+  </TileViewStoreProvider>
+);
 
 const StudentDashboard: FC = (): ReactElement => {
-  const loadingState = (
-    <div className='absolute inset-0 w-screen h-screen grid place-content-center'>
-      <Loading />
-    </div>
-  );
-
-  const errorMessage = <p>Something went wrong, could not load user</p>;
-
   const { id } = useParams();
+  const navigate = useNavigate();
+
   const {
     data: self,
     isError: selfIsError,
@@ -29,16 +37,11 @@ const StudentDashboard: FC = (): ReactElement => {
     queryFn: getSelf,
   });
 
-  const navigate = useNavigate();
-  if (selfIsLoading) {
-    return loadingState;
-  } else if (selfIsError || self === undefined || id === undefined) {
-    return errorMessage;
-  } else if (self.role === UserRoles.student) {
-    return <DashboardWrapper self={self} />;
-  } else if (self.role === UserRoles.instructor && id === self.userID) {
-    navigate('/');
-  }
+  if (selfIsLoading) return <LoadingState />;
+  if (selfIsError || self === undefined || id === undefined) return <ErrorMessage />;
+
+  if (self.role === UserRoles.student) return <DashboardView user={self} />;
+  if (self.role === UserRoles.instructor && id === self.userID) navigate('/');
 
   const {
     data: student,
@@ -49,42 +52,35 @@ const StudentDashboard: FC = (): ReactElement => {
     queryFn: async () => await getStudent(id),
   });
 
-  if (studentIsLoading) {
-    return loadingState;
-  } else if (studentIsError || student === undefined) {
-    return errorMessage;
-  } else {
-    return <DashboardWrapper self={student} />;
-  }
+  if (studentIsLoading) return <LoadingState />;
+  if (studentIsError || student === undefined) return <ErrorMessage />;
+
+  return <DashboardView user={student} />;
 };
 
-interface Props {
+interface DashboardProps {
   self: User;
 }
 
-const DashboardWrapper: FC<Props> = ({ self }): ReactElement => {
-  return (
-    <TileViewStoreProvider user={self}>
-      <Dashboard />
-    </TileViewStoreProvider>
-  );
-};
-
-const Dashboard: FC = (): ReactElement => {
-  const { user, viewType, setViewType } = useTileViewStore((state) => ({
-    user: state.user,
+const Dashboard: FC<DashboardProps> = ({ self }): ReactElement => {
+  const { setUser, viewType, setViewType } = useTileViewStore((state) => ({
+    setUser: state.setUser,
     viewType: state.viewType,
     setViewType: state.setViewType,
   }));
+
+  useEffect(() => {
+    setUser(self);
+  }, [self]);
 
   return (
     <div className='w-screen px-3'>
       <Row className='w-full h-header flex justify-between'>
         <Col className='h-full grid place-content-center'>
-          <StudentInfo self={user} />
+          <StudentInfo />
         </Col>
         <Col className='grid place-content-center'>
-          <GradeDisplay self={user} />
+          <GradeDisplay />
         </Col>
         <Col className='h-full grid place-content-center'>
           <Radio.Group

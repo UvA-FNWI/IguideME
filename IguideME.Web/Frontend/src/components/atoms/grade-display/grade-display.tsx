@@ -4,24 +4,20 @@ import { useTileViewStore } from '@/components/pages/student-dashboard/tileViewC
 import { type FC, type ReactElement } from 'react';
 
 import { Bar, type BarConfig } from '@ant-design/charts';
-import { type User } from '@/types/user';
 
-interface displayProps {
-  self: User;
-}
-
-const GradeDisplay: FC<displayProps> = ({ self }): ReactElement => {
-  const { viewType } = useTileViewStore((state) => ({
+const GradeDisplay: FC = (): ReactElement => {
+  const { user, viewType } = useTileViewStore((state) => ({
+    user: state.user,
     viewType: state.viewType,
   }));
 
-  if (self.settings === undefined) {
+  if (user.settings === undefined) {
     return <Spin spinning />;
   }
 
-  const goal = self.settings.goal_grade;
-  const total = self.settings.total_grade / 10;
-  const pred = self.settings.predicted_grade;
+  const goal = user.settings.goal_grade;
+  const total = user.settings.total_grade / 10;
+  const pred = user.settings.predicted_grade;
 
   switch (viewType) {
     case 'grid':

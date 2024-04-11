@@ -1,4 +1,5 @@
 import { createContext, PropsWithChildren, useContext, useRef } from 'react';
+import { createJSONStorage, devtools, persist } from 'zustand/middleware';
 import { createStore, useStore } from 'zustand';
 import { type User } from '@/types/user';
 
@@ -20,13 +21,26 @@ export const createTileViewStore = (initProps: { user: User; viewType?: viewType
     viewType: 'graph' as viewType,
   };
 
-  return createStore<tileViewState>((set) => ({
-    ...DEFAULT_PROPS,
-    ...initProps,
+  return createStore<tileViewState>()(
+    devtools(
+      persist(
+        (set) =>
+          ({
+            ...DEFAULT_PROPS,
+            ...initProps,
 
-    setViewType: (viewType) => set({ viewType }),
-    setUser: (user) => set({ user }),
-  }));
+            setViewType: (viewType) => set({ viewType }),
+            setUser: (user) => set({ user }),
+          }) satisfies tileViewState,
+        {
+          name: 'tileViewStore',
+          storage: createJSONStorage(() => sessionStorage),
+          // only persist viewType. Never save user data in localStorage
+          partialize: (state) => ({ viewType: state.viewType }),
+        },
+      ),
+    ),
+  );
 };
 
 const tileViewContext = createContext<tileViewStore | undefined>(undefined);

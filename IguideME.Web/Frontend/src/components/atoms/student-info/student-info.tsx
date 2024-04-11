@@ -1,20 +1,20 @@
 import { SmileTwoTone } from '@ant-design/icons';
-import type { User } from '@/types/user';
+import { useTileViewStore } from '@/components/pages/student-dashboard/tileViewContext';
 import { type FC, type ReactElement } from 'react';
 
-interface Props {
-  self: User;
-}
+const StudentInfo: FC = (): ReactElement => {
+  const { user } = useTileViewStore((state) => ({
+    user: state.user,
+  }));
 
-const StudentInfo: FC<Props> = ({ self }): ReactElement => {
   return (
-    <div className="flex gap-2">
-      <SmileTwoTone className="text-4xl" twoToneColor="#00cc66" />
-      <div className="text-xs h-9 grid place-content-center">
+    <div className='flex gap-2'>
+      <SmileTwoTone className='text-4xl' twoToneColor='#00cc66' />
+      <div className='text-xs h-9 grid place-content-center'>
         <p>
-          {self?.name}
+          {user.name}
           <br />
-          {self?.userID}
+          {user.userID}
         </p>
       </div>
     </div>
