@@ -1273,6 +1273,19 @@ public static class DatabaseQueries
             ORDER BY    `users`.`name` ASC
             ;";
 
+    public const string QUERY_STUDENT_IDS_WITH_GOAL_GRADE = //NoTotalAverage
+        @"SELECT    `users`.`user_id`,
+                    max(`student_settings`.`sync_id`)
+            FROM    `users`
+                LEFT JOIN   `student_settings`
+                    USING   (`user_id`)
+            WHERE       `student_settings`.`course_id`= @courseID
+            AND         `student_settings`.`goal_grade`=@goalGrade
+            AND         `student_settings`.`consent`= true
+            GROUP BY    `users`.`user_id`
+            ORDER BY    `users`.`name` ASC
+            ;";
+
     public const string QUERY_NOTIFICATIONS_ENABLE =
         @"SELECT    `notifications`,
                     max(`student_settings`.`sync_id`)

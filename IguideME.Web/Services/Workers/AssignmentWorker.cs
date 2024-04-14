@@ -156,14 +156,14 @@ namespace IguideME.Web.Services.Workers
                 this._courseID,
                 users
             );
-            Console.WriteLine("test0");
+
+            Dictionary<int, (double, AppGradingType)> gradingTypes = new();
+            List<AssignmentSubmission> assignmentSubmissionsWithTiles = new();
             _logger.LogWarning("test0 {}", submissions.Any());
 
             _logger.LogInformation("test1 {}", submissions);
             _logger.LogInformation("test {}", submissions.Select(sub => sub.UserID));
 
-            Dictionary<int, (double, AppGradingType)> gradingTypes = new();
-            List<AssignmentSubmission> assignmentSubmissionsWithTiles = new();
 
             foreach (AppAssignment assignment in assignments)
             {

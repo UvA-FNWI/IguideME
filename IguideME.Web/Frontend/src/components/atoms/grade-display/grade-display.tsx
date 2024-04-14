@@ -84,10 +84,11 @@ const GridGrades: FC<Props> = ({ goal, total, pred }): ReactElement => {
   );
 };
 
-const GraphGrades: FC<Props> = ({ goal, total: avg, pred }): ReactElement => {
+const GraphGrades: FC<Props> = ({ goal, total, pred }): ReactElement => {
+
   const config: BarConfig = {
     data: [
-      { name: 'Current grade', grade: avg },
+      { name: 'Current grade', grade: total },
       { name: 'Predicted grade', grade: pred },
     ],
     xField: 'name',
@@ -105,7 +106,6 @@ const GraphGrades: FC<Props> = ({ goal, total: avg, pred }): ReactElement => {
       },
     },
     tooltip: {
-      title: 0,
       items: [{ channel: 'y', valueFormatter: '.1f' }],
     },
     annotations: [

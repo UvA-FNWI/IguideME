@@ -20,6 +20,7 @@ import {
   useSensors,
 } from '@dnd-kit/core';
 
+// TODO: Let the user know that the layout has been saved succesfully
 const LayoutConfigurator: FC = (): ReactElement => {
   const queryClient = useQueryClient();
   const { data, isError, isLoading } = useQuery({

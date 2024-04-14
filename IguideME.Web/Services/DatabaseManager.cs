@@ -884,6 +884,33 @@ namespace IguideME.Web.Services
             return users;
         }
 
+        public List<string> GetUserIDsWithGoalGrade(int courseID, int goalGrade, long syncID = 0)
+        {
+            List<string> users = new();
+
+            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
+            if (activeSync == 0)
+                return users;
+
+
+            using (
+                SQLiteDataReader r = Query(
+                    DatabaseQueries.QUERY_STUDENT_IDS_WITH_GOAL_GRADE,
+                    new SQLiteParameter("courseID", courseID),
+                    new SQLiteParameter("goalGrade", goalGrade)
+                )
+            )
+            {
+                // collect all users
+                while (r.Read())
+                {
+                    users.Add(r.GetValue(0).ToString());
+                }
+            }
+
+            return users;
+        }
+
         public int CreateGradePredictionModel(int courseID, float intercept)
         {
             NonQuery($"UPDATE `grade_prediction_model` SET `enabled`=False"); // TODO: Choose model in a UI.
@@ -1179,6 +1206,7 @@ namespace IguideME.Web.Services
             }
         }
 
+        /// 0 means that we don't compare for assignment/tile/etc., but total average
         public void CreateUserPeer(
             int goalGrade,
             List<string> userIDs,
@@ -1657,7 +1685,7 @@ namespace IguideME.Web.Services
             );
         }
 
-        public Dictionary<int, double> GetUserAssignmentGrades(int courseID, string userID)
+        public Dictionary<int, double> GetUserEntryGrades(int courseID, string userID)
         {
             Dictionary<int, double> grades = new();
 

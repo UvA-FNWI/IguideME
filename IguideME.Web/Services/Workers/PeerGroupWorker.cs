@@ -26,6 +26,9 @@ namespace IguideME.Web.Services.Workers
         private readonly DatabaseManager _databaseManager;
         private readonly int _courseID;
         private readonly long _syncID;
+        private Dictionary<int, List<double>> peerEntryGradesMap;
+        private Dictionary<int, List<double>> peerTileGradesMap;
+        private List<double> peerTotalGrades;
 
         /// <summary>
         /// This constructor initializes the new PeerGroupWorker to
@@ -53,34 +56,31 @@ namespace IguideME.Web.Services.Workers
         public void Start()
         {
             this._logger.LogInformation("Creating peer groups");
-            CreatePeerGroupsForCourse();
+            CreatePeerGroups();
 
             // TODO: Lets move this to the notification worker as it's not part of the same loop now anyway.
-            this._logger.LogInformation("Creating performance notifications");
+            // this._logger.LogInformation("Creating performance notifications");
             // CreateNotifications();
         }
 
         /// <summary>
-        /// Creates an array of lists of users, where the array is indexed by the goal grade of the users.
+        /// Groups users into an array indexed by their goal grade.
         /// </summary>
-        /// <returns>A list of users per goal grade.</returns>
-        List<string>[] GetUsersGroupedByGoalGrade()
+        /// <returns>An array of lists of userIDs.</returns>
+        List<string>[] groupUsers()
         {
-            List<string>[] usersWithSameGoalGrade = new List<string>[11];
+            List<string>[] groupedUsers = new List<string>[11];
 
-            for (int goalGradeClass = 1; goalGradeClass <= 10; goalGradeClass++)
+            for (int goalGrade = 1; goalGrade <= 10; goalGrade++)
             {
-                usersWithSameGoalGrade[goalGradeClass] = new List<string>();
-
-                List<User> sameGraders = _databaseManager.GetUsersWithGoalGrade(
+                groupedUsers[goalGrade] = _databaseManager.GetUserIDsWithGoalGrade(
                     this._courseID,
-                    goalGradeClass,
+                    goalGrade,
                     this._syncID
                 );
-                sameGraders.ForEach(x => usersWithSameGoalGrade[goalGradeClass].Add(x.UserID));
             }
 
-            return usersWithSameGoalGrade;
+            return groupedUsers;
         }
 
         /// <summary>
@@ -89,7 +89,7 @@ namespace IguideME.Web.Services.Workers
         /// <param name="groupedUsers">An array of lists of users indexed by their goal grades.</param>
         /// <param name="goalGrade">The goal grade to create a peer group for.</param>
         /// <param name="minPeerGroupSize">The minimum group size a peer group needs to have.</param>
-        /// <returns></returns>
+        /// <returns>A list of userIDs in the group</returns>
         static List<string> CreatePeerGroup(
             List<string>[] groupedUsers,
             int goalGrade,
@@ -98,28 +98,26 @@ namespace IguideME.Web.Services.Workers
         {
             List<string> peerGroup = new(groupedUsers[goalGrade]);
 
-            // if noone selected this goal grade, no point in creating the peer group
+            // Skip if grade hasn't been selected at all.
             if (peerGroup.Count() == 0)
                 return new List<string>();
 
             // Look for peers until minimum size is reached or untill the offset exceeds the range of valid grades.
             for (int offset = 1; peerGroup.Count < minPeerGroupSize && offset < 10; offset++)
             {
-                // Check if there are peers with higher grades.
+                // Check upwards.
                 if (goalGrade + offset <= 10)
                 {
-                    // Fill with found peers
                     peerGroup.AddRange(groupedUsers[goalGrade + offset]);
                 }
 
-                // Check if no more peers are required
+                // Exit if already satisfied.
                 if (peerGroup.Count >= minPeerGroupSize)
                     break;
 
-                // Check if there are peers with lower grades.
+                // Check downwards.
                 if (goalGrade - offset >= 1)
                 {
-                    // Fill with found peers
                     peerGroup.AddRange(groupedUsers[goalGrade - offset]);
                 }
             }
@@ -127,140 +125,173 @@ namespace IguideME.Web.Services.Workers
         }
 
         /// <summary>
-        /// Create  all the peer groups for the course.
+        /// Calculate the total grade of a tile for a user.
         /// </summary>
-        void CreatePeerGroupsForCourse()
+        /// <param name="tile"> The tile to calculate the average for.</param>
+        /// <param name="userID">The id of the user.</param>
+        /// <param name="userEntryGradesMap">A dictionary mapping assignments to lists of grades for the total course grade.</param>
+        /// <returns>The grade of the tile.</returns>
+        double CalculateTileGrade(Tile tile, string userID, Dictionary<int, double> userEntryGradesMap)
         {
-            // We find all students of the course and classify them according to their goal grade
-            List<string>[] groupedUsers = this.GetUsersGroupedByGoalGrade();
+            double tileGrade = 0;
 
-            int minPeerGroupSize = _databaseManager.GetMinimumPeerGroupSize(this._courseID);
-            List<Tile> tiles = _databaseManager.GetTiles(_courseID, true);
-
-            // We create the peer groups for each goal grade classification
-            for (int goalGradeClass = 1; goalGradeClass <= 10; goalGradeClass++)
+            foreach (TileEntry entry in tile.Entries)
             {
-                // We initiallize the peer group by filling it with the users of the same goal grade
-                List<string> peerGroup = CreatePeerGroup(
-                    groupedUsers,
-                    goalGradeClass,
-                    minPeerGroupSize
-                );
-
-                // If noone is this peerGroup, we skip the calculations
-                if (peerGroup.Count() == 0)
+                double entryGrade;
+                if (userEntryGradesMap.TryGetValue(entry.ContentID, out entryGrade))
                 {
-                    this._logger.LogInformation(
-                        "No students in Peer Group: {goalgrade}. Skipping...",
-                        goalGradeClass
-                    );
-                    continue;
+                    tileGrade += entryGrade * entry.Weight;
+
+                    // Store the entry grade for the peer statistics.
+                    if (peerEntryGradesMap.ContainsKey(entry.ContentID))
+                        peerEntryGradesMap[entry.ContentID].Add(entryGrade);
+                    else
+                        peerEntryGradesMap[entry.ContentID] = new();
                 }
-                this._logger.LogInformation("Creating Peer Group: {goalgrade}", goalGradeClass);
+            }
 
-                Dictionary<int, List<double>> peerAssignmentDict = new();
-                Dictionary<int, List<double>> peerTileDict = new();
-                List<double> peerTotalAvg = new();
+            _databaseManager.CreateTileGradeForUser(
+                userID,
+                tile.ID,
+                tileGrade,
+                _syncID
+            );
 
-                foreach (string peerID in peerGroup)
-                {
-                    Dictionary<int, double> userAssignmentGrades =
-                        _databaseManager.GetUserAssignmentGrades(_courseID, peerID);
-                    double userTotal = 0;
+            return tileGrade;
+        }
 
-                    foreach (Tile tile in tiles)
-                    {
-                        double userTileGrade = 0;
+        /// <summary>
+        /// Calculate the current overal grade for the course for a user.
+        /// </summary>
+        /// <param name="tiles">A list of the tiles in the course.</param>
+        /// <param name="userID">The id of the user.</param>
+        /// <returns>The total grade of the user.</returns>
+        double CalculateUserTotalGrade(List<Tile> tiles, string userID)
+        {
+            double userTotal = 0;
+            Dictionary<int, double> userEntryGradesMap =
+                _databaseManager.GetUserEntryGrades(_courseID, userID);
 
-                        // We get the user's submissions one by one (if they exists in their gradelist)
-                        foreach (TileEntry entry in tile.Entries)
-                        {
-                            double singleEntryGrade = userAssignmentGrades.ContainsKey(
-                                entry.ContentID
-                            )
-                                ? userAssignmentGrades[entry.ContentID]
-                                : 0d;
-                            // and by summing them (multiplying by weight) we get the total of the user's Tile Grade
-                            userTileGrade += singleEntryGrade * entry.Weight;
+            foreach (Tile tile in tiles)
+            {
+                double userTileGrade = CalculateTileGrade(tile, userID, userEntryGradesMap);
+                userTotal += userTileGrade * tile.Weight;
 
-                            // Also, we store the grade of each submission to a List of the Assignment Dictionary, accross all users of the same peergroup
-                            if (!peerAssignmentDict.ContainsKey(entry.ContentID))
-                                peerAssignmentDict[entry.ContentID] = new();
-                            peerAssignmentDict[entry.ContentID].Add(singleEntryGrade);
-                            // peerAssignmentDict[entry.ContentID] =  peerAssignmentDict[entry.ContentID] < grade ? grade : peerAssignmentDict[entry.ContentID];
-                        }
-                        // After we're done with all entries of that tile, we register the Tile Grade for this peer
-                        _databaseManager.CreateTileGradeForUser(
-                            peerID,
-                            tile.ID,
-                            userTileGrade,
-                            _syncID
-                        );
+                // Store the tile grade for the peer statistics.
+                if (peerTileGradesMap.ContainsKey(tile.ID))
+                    peerTileGradesMap[tile.ID].Add(userTileGrade);
+                else
+                    peerTileGradesMap[tile.ID] = new();
 
-                        // And then we add this to the Tile Dictionary (again accross peers)
-                        if (!peerTileDict.ContainsKey(tile.ID))
-                            peerTileDict[tile.ID] = new();
-                        peerTileDict[tile.ID].Add(userTileGrade);
+            }
 
-                        // FInaly we add to the user's total grade
-                        userTotal += userTileGrade * tile.Weight;
-                    }
+            userTotal /= 10;
 
-                    // For consistency with the goal and predicted grade display we divide it by 10.
-                    userTotal /= 10;
+            _databaseManager.UpdateUserSettings(
+                _courseID,
+                userID,
+                null,
+                userTotal,
+                null,
+                null,
+                _syncID
+            );
 
-                    // Store the user's Total grade and add this to the list of all grades across the peergroup (peerTotalAvg)
-                    _databaseManager.UpdateUserSettings(
-                        _courseID,
-                        peerID,
-                        null,
-                        userTotal,
-                        null,
-                        null,
-                        _syncID
-                    );
-                    peerTotalAvg.Add(userTotal);
-                }
+            return userTotal;
 
-                // Finally, since we went through all peers of the current peer group, we store all the gathered values
-                foreach (KeyValuePair<int, List<double>> assignment in peerAssignmentDict)
-                    _databaseManager.CreateUserPeer(
-                        goalGradeClass,
-                        peerGroup,
-                        assignment.Key,
-                        assignment.Value.Average(),
-                        assignment.Value.Min(),
-                        assignment.Value.Max(),
-                        (int)Comparison_Component_Types.assignment,
-                        _syncID
-                    );
+        }
 
-                foreach (KeyValuePair<int, List<double>> tile in peerTileDict)
-                    _databaseManager.CreateUserPeer(
-                        goalGradeClass,
-                        peerGroup,
-                        tile.Key,
-                        tile.Value.Average(),
-                        tile.Value.Min(),
-                        tile.Value.Max(),
-                        (int)Comparison_Component_Types.tile,
-                        _syncID
-                    );
-
+        /// <summary>
+        /// Stores the calculated peer statistics in the database
+        /// </summary>
+        /// <param name="goalGrade">the goal grade of the current peergroup.</param>
+        /// <param name="peerGroup">the users in the current peergroup.</param>
+        void StorePeerStatistics(int goalGrade, List<string> peerGroup)
+        {
+            foreach ((int key, List<double> value) in peerEntryGradesMap)
                 _databaseManager.CreateUserPeer(
-                    goalGradeClass,
+                    goalGrade,
                     peerGroup,
-                    0,
-                    /// 0 means that we don't compare for assignment/tile/etc., but total average
-                    peerTotalAvg.Average(),
-                    peerTotalAvg.Min(),
-                    peerTotalAvg.Max(),
-                    (int)Comparison_Component_Types.total,
+                    key,
+                    value.Average(),
+                    value.Min(),
+                    value.Max(),
+                    (int)Comparison_Component_Types.assignment,
                     _syncID
                 );
 
-                // Finally, we can create the notifications in the DB for that peer group
-                CreateNotifications(groupedUsers[goalGradeClass], peerAssignmentDict);
+            foreach ((int key, List<double> value) in peerTileGradesMap)
+                _databaseManager.CreateUserPeer(
+                    goalGrade,
+                    peerGroup,
+                    key,
+                    value.Average(),
+                    value.Min(),
+                    value.Max(),
+                    (int)Comparison_Component_Types.tile,
+                    _syncID
+                );
+
+            _databaseManager.CreateUserPeer(
+                goalGrade,
+                peerGroup,
+                0,
+                peerTotalGrades.Average(),
+                peerTotalGrades.Min(),
+                peerTotalGrades.Max(),
+                (int)Comparison_Component_Types.total,
+                _syncID
+            );
+
+        }
+
+        /// <summary>
+        /// Calculates the peer statiscs and average grades for the students in a peergroup.
+        /// Both tile and total averages are calculated.
+        /// </summary>
+        /// <param name="peerGroup">the users in the current peergroup.</param>
+        /// <param name="tiles">A list of the tiles in the course</param>
+        void CalculateGrades(List<string> peerGroup, List<Tile> tiles)
+        {
+            this.peerEntryGradesMap = new();
+            this.peerTileGradesMap = new();
+            this.peerTotalGrades = new();
+
+            foreach (string peerID in peerGroup)
+            {
+                double userTotal = CalculateUserTotalGrade(tiles, peerID);
+                peerTotalGrades.Add(userTotal);
+            }
+
+        }
+
+        /// <summary>
+        /// Create  all the peer groups for the course.
+        /// </summary>
+        void CreatePeerGroups()
+        {
+            List<string>[] groupedUsers = this.groupUsers();
+            int minGroupSize = _databaseManager.GetMinimumPeerGroupSize(this._courseID);
+            List<Tile> tiles = _databaseManager.GetTiles(_courseID, true);
+
+            for (int goalGrade = 1; goalGrade <= 10; goalGrade++)
+            {
+                this._logger.LogInformation("Creating Peer Group: {goalgrade}", goalGrade);
+                List<string> peerGroup = CreatePeerGroup(
+                    groupedUsers,
+                    goalGrade,
+                    minGroupSize
+                );
+
+                if (peerGroup.Count() == 0)
+                {
+                    this._logger.LogInformation("No students in Peer Group: {goalgrade}. Skipping...", goalGrade);
+                    continue;
+                }
+
+                CalculateGrades(peerGroup, tiles);
+                StorePeerStatistics(goalGrade, peerGroup);
+                CreateNotifications(groupedUsers[goalGrade], peerEntryGradesMap);
             }
         }
 

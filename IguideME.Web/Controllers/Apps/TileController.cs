@@ -373,22 +373,22 @@ namespace IguideME.Web.Controllers
         //         : BadRequest();
         // }
 
-        // [Authorize]
-        // [HttpGet]
-        // [Route("/tiles/{tileID}")]
-        // [ProducesResponseType(StatusCodes.Status200OK)]
-        // [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        // [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        // public ActionResult GetTile(string tileID)
-        // {
-        //     bool success = int.TryParse(tileID, out int id);
+        [Authorize]
+        [HttpGet]
+        [Route("/tile/{tileID}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public ActionResult GetTile(string tileID)
+        {
+            bool success = int.TryParse(tileID, out int id);
 
-        //     return success
-        //         ? Json(
-        //             _databaseManager
-        //             .GetTile(GetCourseID(), id))
-        //         : BadRequest();
-        // }
+            return success
+                ? Json(
+                    _databaseManager
+                    .GetTile(GetCourseID(), id))
+                : BadRequest();
+        }
 
         // [Authorize]
         // [HttpGet]
