@@ -109,7 +109,7 @@ const TileGroupBoard: FC = (): ReactElement => {
   return (
     <>
       <Drawer
-        title={'Editing: ' + editTitle?.title}
+        title={editTitle && 'Editing: ' + editTitle.title}
         placement='right'
         closable
         width='45vw'
