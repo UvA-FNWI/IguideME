@@ -18,7 +18,7 @@ const EditTileDiscussions: FC = (): ReactElement => {
   if (isError) return <QueryError className='static [&_span]:!text-2xl' title={'Error: Could not load discussions'} />;
 
   return (
-    <Row>
+    <Row className='flex-col'>
       <p className='mb-1'>Discussions:</p>
       <QueryLoading isLoading={isLoading}>
         <Item name='entries' className='w-full m-0'>
