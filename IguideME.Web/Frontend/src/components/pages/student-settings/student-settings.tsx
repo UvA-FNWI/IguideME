@@ -1,35 +1,54 @@
-import { getNotificationSettings, postNotificationSettings } from '@/api/student_settings';
+import { getSelf } from '@/api/users';
+import { postConsentSettings, postNotificationSettings, postGoalGrade } from '@/api/student_settings';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import Loading from '@/components/particles/loading';
 import { Checkbox, Divider, Radio, Space, Switch } from 'antd';
 import { FC, ReactElement, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
+const LoadingState: FC = () => (
+  <div className='absolute inset-0 w-screen h-screen grid place-content-center'>
+    <Loading />
+  </div>
+);
+const ErrorMessage: FC = () => <p>Something went wrong, could not load user</p>;
 const StudentSettings: FC = (): ReactElement => {
+  const {
+    data: self,
+    isError: selfIsError,
+    isLoading: selfIsLoading,
+  } = useQuery({
+    queryKey: ['self'],
+    queryFn: getSelf,
+  });
+
+  if (selfIsLoading) return <LoadingState />;
+  if (selfIsError || self === undefined || self.settings === undefined ) return <ErrorMessage />;
+
   return (
     <div className='w-full p-4'>
       <div className='w-3/4 mx-auto'>
         <h1 className='text-4xl mb-4 text-left'>Settings</h1>
-        <Notifications />
+        <Notifications notifications={self.settings.notifications}/>
         <Divider />
-        <GoalGrade />
+        <GoalGrade goalGrade={self.settings.goal_grade}/>
         <Divider />
-        <Consent />
+        <Consent consent={self.settings.consent}/>
       </div>
     </div>
   );
 };
 
-const Notifications: FC = (): ReactElement => {
-  const { data, isError, isLoading } = useQuery({
-    queryKey: ['student-notifications'],
-    queryFn: getNotificationSettings,
-  });
+interface NotificationProps {
+  notifications: boolean
+}
+const Notifications: FC<NotificationProps> = ({notifications}): ReactElement => {
 
   const queryClient = useQueryClient();
   const { mutate: saveNotifications, status } = useMutation({
     mutationFn: postNotificationSettings,
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['student-notifications'] });
+      await queryClient.invalidateQueries({ queryKey: ['self'] });
     },
   });
 
@@ -37,7 +56,7 @@ const Notifications: FC = (): ReactElement => {
 
   useEffect(() => {
     if (status === 'success') {
-      toast.success('Successfully updated your notification settings.', {
+      toast.success(`Successfully ${notifications ? 'enabled' : 'disabled'} your notifications.`, {
         closeButton: true,
       });
     }
@@ -46,24 +65,40 @@ const Notifications: FC = (): ReactElement => {
   return (
     <>
       <h1 className='text-2xl text-left'>Notifications</h1>
-      {isError || status === 'error' ?
-        <p className='text-base text-red-500'>Failed to load your notifications settings. Please try again later.</p>
-      : <div className='flex gap-2 text-left'>
+       <div className='flex gap-2 text-left'>
           <p>Enable notifications:</p>
           <Switch
-            aria-disabled={isLoading || status === 'pending'}
-            disabled={isLoading || status === 'pending'}
-            checked={data ?? false}
+            checked={notifications ?? false}
             onChange={(val) => saveNotifications(val)}
           />
         </div>
-      }
+      
     </>
   );
 };
 
-const GoalGrade: FC = (): ReactElement => {
-  const [goalGrade, setGoalGrade] = useState<number>(5);
+interface GoalProps {
+  goalGrade: number
+}
+
+const GoalGrade: FC<GoalProps> = ({goalGrade}): ReactElement => {
+
+  const queryClient = useQueryClient();
+  const { mutate: saveGoalGrade, status } = useMutation({
+    mutationFn: postGoalGrade,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['self'] });
+    },
+  });
+
+  useEffect(() => {
+    if (status === 'success') {
+      toast.success(`Successfully updated your goal grade to ${goalGrade}.`, {
+        closeButton: true,
+      });
+    }
+  }, [status]);
+
   return (
     <div id={'desiredGrade'}>
       <h1 className='text-2xl text-left'>Goal Grade</h1>
@@ -74,7 +109,7 @@ const GoalGrade: FC = (): ReactElement => {
         <Space className='mx-auto' direction={'vertical'}>
           <Radio.Group
             value={goalGrade}
-            onChange={(val) => setGoalGrade(val.target.value)}
+            onChange={(val) => saveGoalGrade(val.target.value)}
             options={[
               { label: '1', value: 1 },
               { label: '2', value: 2 },
@@ -95,8 +130,25 @@ const GoalGrade: FC = (): ReactElement => {
   );
 };
 
-const Consent: FC = (): ReactElement => {
-  const [hasRead, setHasRead] = useState<boolean>(false);
+interface ConsentProps {
+  consent: boolean
+}
+const Consent: FC<ConsentProps> = ({consent}): ReactElement => {
+  const queryClient = useQueryClient();
+  const { mutate: saveConsent, status } = useMutation({
+    mutationFn: postConsentSettings,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['self'] });
+    },
+  });
+
+  useEffect(() => {
+    if (status === 'success') {
+      toast.success(`Successfully ${consent ? 'registered' : 'withdrawn'} your consent.`, {
+        closeButton: true,
+      });
+    }
+  }, [status]);
   return (
     <>
       <h2 className='text-2xl text-left'>Informed Consent</h2>
@@ -166,7 +218,7 @@ const Consent: FC = (): ReactElement => {
         </p>
       </div>
 
-      <Checkbox checked={hasRead} onChange={(e) => setHasRead(e.target.checked)}>
+      <Checkbox checked={consent} onChange={(e) => saveConsent(e.target.checked)}>
         I have read and understood the informed consent
       </Checkbox>
     </>

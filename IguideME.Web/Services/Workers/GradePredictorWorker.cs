@@ -87,12 +87,13 @@ namespace IguideME.Web.Services.Workers
             //----------------------------------------------------------------------------------------------------------------------
 
             _databaseManager.UpdateUserSettings(
-                                        _courseID, 
+                                        _courseID,
                                         student.UserID,
-                                        null, 
-                                        null, 
-                                        wGrade, 
-                                        null, 
+                                        null,
+                                        null,
+                                        null,
+                                        wGrade,
+                                        null,
                                         _syncID);
         }
     }

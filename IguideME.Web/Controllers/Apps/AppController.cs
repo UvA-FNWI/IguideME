@@ -40,21 +40,6 @@ namespace IguideME.Web.Controllers
         }
 
         [Authorize]
-        [HttpGet]
-        [Route("/student/settings/notifications")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public ActionResult GetNotificationEnable()
-        {
-            return Json(
-                _databaseManager.GetNotificationEnable(
-                    this.GetCourseID(),
-                    this.GetUserID(),
-                    this.GetHashCode()));
-        }
-
-        [Authorize]
         [HttpPost]
         [Route("/student/settings/notifications")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -68,7 +53,48 @@ namespace IguideME.Web.Controllers
                     null,
                     null,
                     null,
+                    null,
                     (bool)JObject.Parse(body)["enabled"],
+                    0
+                    );
+        }
+
+        [Authorize]
+        [HttpPost]
+        [Route("/student/settings/consent")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public void UpdateConsent()
+        {
+            var body = new StreamReader(Request.Body).ReadToEnd();
+            _databaseManager.UpdateUserSettings(
+                    this.GetCourseID(),
+                    this.GetUserID(),
+                    (bool)JObject.Parse(body)["enabled"],
+                    null,
+                    null,
+                    null,
+                    null,
+                    0
+                    );
+        }
+
+        [Authorize]
+        [HttpPost]
+        [Route("/student/settings/goal-grade")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public void UpdateGoalGrade()
+        {
+            var body = new StreamReader(Request.Body).ReadToEnd();
+            _databaseManager.UpdateUserSettings(
+                    this.GetCourseID(),
+                    this.GetUserID(),
+                    null,
+                    (int)JObject.Parse(body)["grade"],
+                    null,
+                    null,
+                    null,
                     0
                     );
         }

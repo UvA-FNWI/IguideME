@@ -1103,6 +1103,7 @@ namespace IguideME.Web.Services
         public void UpdateUserSettings(
             int courseID,
             string userID,
+            bool? consent,
             int? goalGrade,
             double? totalGrade,
             double? predictedGrade,
@@ -1130,7 +1131,7 @@ namespace IguideME.Web.Services
                             goalGrade ?? r.GetInt32(0),
                             totalGrade ?? r.GetDouble(1),
                             predictedGrade ?? r.GetDouble(2),
-                            r.GetBoolean(3),
+                            consent ?? r.GetBoolean(3),
                             notifications ?? r.GetBoolean(4)
                         );
                     }

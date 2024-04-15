@@ -112,7 +112,7 @@ const Header: FC<HeaderProps> = ({ self }): ReactElement => {
         <Col span={4} className='flex justify-end'>
           <Space>
             <div className='min-w-[30px]'>
-              <NotificationPanel user={selectedStudent} />
+              <NotificationPanel user={selectedStudent ?? self} />
             </div>
             <div className='min-w-[100px]'>
               <Button

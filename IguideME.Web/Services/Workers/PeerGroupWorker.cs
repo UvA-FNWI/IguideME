@@ -191,6 +191,7 @@ namespace IguideME.Web.Services.Workers
                 _courseID,
                 userID,
                 null,
+                null,
                 userTotal,
                 null,
                 null,
