@@ -1,14 +1,14 @@
-import GradeDisplay from '@/components/atoms/grade-display/grade-display';
-import Loading from '@/components/particles/loading';
-import StudentInfo from '@/components/atoms/student-info/student-info';
-import { AppstoreOutlined, BarChartOutlined } from '@ant-design/icons';
-import { Col, Radio, Row } from 'antd';
 import { getSelf, getStudent } from '@/api/users';
+import GradeDisplay from '@/components/atoms/grade-display/grade-display';
+import StudentInfo from '@/components/atoms/student-info/student-info';
+import Loading from '@/components/particles/loading';
+import { UserRoles, type User } from '@/types/user';
+import { AppstoreOutlined, BarChartOutlined } from '@ant-design/icons';
+import { useQuery } from '@tanstack/react-query';
+import { Col, Radio, Row } from 'antd';
+import { useEffect, type FC, type ReactElement } from 'react';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
 import { TileViewStoreProvider, useTileViewStore } from './tileViewContext';
-import { useQuery } from '@tanstack/react-query';
-import { type User, UserRoles } from '@/types/user';
-import { useEffect, type FC, type ReactElement } from 'react';
 
 const LoadingState: FC = () => (
   <div className='absolute inset-0 w-screen h-screen grid place-content-center'>
@@ -17,12 +17,6 @@ const LoadingState: FC = () => (
 );
 
 const ErrorMessage: FC = () => <p>Something went wrong, could not load user</p>;
-
-const DashboardView: FC<{ user: User }> = ({ user }) => (
-  <TileViewStoreProvider user={user}>
-    <Dashboard self={user} />
-  </TileViewStoreProvider>
-);
 
 const StudentDashboard: FC = (): ReactElement => {
   const { id } = useParams();
@@ -57,6 +51,12 @@ const StudentDashboard: FC = (): ReactElement => {
 
   return <DashboardView user={student} />;
 };
+
+const DashboardView: FC<{ user: User }> = ({ user }) => (
+  <TileViewStoreProvider user={user}>
+    <Dashboard self={user} />
+  </TileViewStoreProvider>
+);
 
 interface DashboardProps {
   self: User;

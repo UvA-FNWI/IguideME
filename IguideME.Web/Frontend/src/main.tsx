@@ -2,11 +2,10 @@
 import setup from '@/api/setup.ts';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import React, { lazy, Suspense } from 'react';
+import React, { lazy } from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import App from './App.tsx';
-import LoadingPage from './components/pages/loading.tsx';
 import './globals.css';
 
 // /--------------------------- Pages ---------------------------/
@@ -14,7 +13,8 @@ const ErrorPage = lazy(async () => await import('@/components/pages/error.tsx'))
 const Home = lazy(async () => await import('@/components/pages/home/home.tsx'));
 const Tiles = lazy(async () => await import('@/components/pages/admin/tiles/tiles.tsx'));
 const EditLayout = lazy(async () => await import('@/components/pages/admin/layout/layout.tsx'));
-const Settings = lazy(async () => await import('@/components/pages/admin/settings/settings.tsx'));
+const AdminSettings = lazy(async () => await import('@/components/pages/admin/settings/settings.tsx'));
+const StudentSettings = lazy(async () => await import('@/components/pages/student-settings/student-settings.tsx'));
 const Dashboard = lazy(async () => await import('@/components/pages/admin/dashboard/dashboard.tsx'));
 const Analytics = lazy(async () => await import('@/components/pages/admin/analytics/analytics.tsx'));
 const GradeAnalyzer = lazy(async () => await import('@/components/pages/admin/analyzer/analyzer.tsx'));
@@ -66,32 +66,31 @@ enableMocking()
         <React.StrictMode>
           <QueryClientProvider client={queryClient}>
             <BrowserRouter>
-              <Suspense fallback={<LoadingPage />}>
-                <Routes>
-                  <Route path='/' element={<App />} errorElement={<ErrorPage />}>
-                    <Route path='' element={<Home />} />
-                    <Route path=':id' element={<StudentDashboard />}>
-                      <Route path='' element={<ViewLayout />} />
-                      <Route path=':tid' element={<TileDetailView />} />
-                    </Route>
-                    <Route path='admin' element={<AdminPanel />}>
-                      <Route path='' element={<Dashboard />} />
-                      <Route path='tiles' element={<Tiles />} />
-                      <Route path='layout' element={<EditLayout />} />
-                      <Route path='student-overview' element={<StudentOverview />} />
-                      <Route path='grade-predictor' element={<GradePredictor />} />
-                      <Route path='grade-analyzer' element={<GradeAnalyzer />} />
-                      <Route path='data-wizard' element={<DataWizard />} />
-                      <Route path='learning-goals' element={<LearningGoals />} />
-                      <Route path='analytics' element={<Analytics />} />
-                      <Route path='notification-centre' element={<NotificationCentre />} />
-                      <Route path='settings' element={<Settings />} />
-                    </Route>
+              <Routes>
+                <Route path='/' element={<App />} errorElement={<ErrorPage />}>
+                  <Route path='' element={<Home />} />
+                  <Route path='student-settings' element={<StudentSettings />} />
+                  <Route path=':id' element={<StudentDashboard />}>
+                    <Route path='' element={<ViewLayout />} />
+                    <Route path=':tid' element={<TileDetailView />} />
                   </Route>
-                </Routes>
-              </Suspense>
+                  <Route path='admin' element={<AdminPanel />}>
+                    <Route path='' element={<Dashboard />} />
+                    <Route path='tiles' element={<Tiles />} />
+                    <Route path='layout' element={<EditLayout />} />
+                    <Route path='student-overview' element={<StudentOverview />} />
+                    <Route path='grade-predictor' element={<GradePredictor />} />
+                    <Route path='grade-analyzer' element={<GradeAnalyzer />} />
+                    <Route path='data-wizard' element={<DataWizard />} />
+                    <Route path='learning-goals' element={<LearningGoals />} />
+                    <Route path='analytics' element={<Analytics />} />
+                    <Route path='notification-centre' element={<NotificationCentre />} />
+                    <Route path='settings' element={<AdminSettings />} />
+                  </Route>
+                </Route>
+              </Routes>
             </BrowserRouter>
-            {import.meta.env.MODE === 'mock' && <ReactQueryDevtools initialIsOpen={false} />}
+            {import.meta.env.MODE !== 'mock' && <ReactQueryDevtools initialIsOpen={false} />}
           </QueryClientProvider>
         </React.StrictMode>,
       );

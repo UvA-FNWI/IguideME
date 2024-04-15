@@ -1,10 +1,11 @@
 import Header from '@/components/crystals/header/header';
-import Loading from './components/particles/loading';
-import { getSelf } from './api/users';
-import { Outlet, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { UserRoles } from './types/user';
 import { Suspense, useEffect, type ReactElement } from 'react';
+import { Outlet, useNavigate } from 'react-router-dom';
+import { Toaster } from 'sonner';
+import { getSelf } from './api/users';
+import Loading from './components/particles/loading';
+import { UserRoles } from './types/user';
 
 /**
  * The main entry point to the app. Adds a header and the contents of the app
@@ -35,6 +36,10 @@ function App(): ReactElement {
   const HeaderLoader = (
     <header className='h-header bg-primary-purple flex justify-between items-center px-4'>
       <p className='text-white align-middle font-semibold inline-block text-2xl'>IguideME</p>
+      <div className='flex gap-2'>
+        <div className='h-10 border border-solid border-white text-white rounded-3xl w-10 p-0' />
+        <div className='h-10 w-32 border border-solid border-white rounded-md p-2' />
+      </div>
     </header>
   );
 
@@ -50,7 +55,7 @@ function App(): ReactElement {
   if (isLoading) return GlobalLoadingState;
   else if (isError || data === undefined) {
     return (
-      <>
+      <Suspense fallback={GlobalLoadingState}>
         {HeaderLoader}
         <div className='h-[calc(100vh-70px)] bg-white flex flex-col items-center justify-center text-justify gap-2'>
           <h1 className='w-full text-2xl max-w-lg tracking-normal'>
@@ -63,12 +68,13 @@ function App(): ReactElement {
             }
           </p>
         </div>
-      </>
+      </Suspense>
     );
   }
 
   return (
     <Suspense fallback={GlobalLoadingState}>
+      <Toaster richColors />
       <Header self={data} />
       <Outlet />
     </Suspense>

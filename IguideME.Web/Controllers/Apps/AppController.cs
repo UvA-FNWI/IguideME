@@ -26,8 +26,6 @@ namespace IguideME.Web.Controllers
             this._databaseManager = databaseManager;
         }
 
-        // [Authorize(Policy = "IsInstructor")]
-
         [Authorize]
         [Route("/app/self")]
         [HttpGet]
@@ -39,6 +37,40 @@ namespace IguideME.Web.Controllers
              * Returns information of the logged in user.
              */
             return Json(_databaseManager.GetUser(GetCourseID(), GetUserID()));
+        }
+
+        [Authorize]
+        [HttpGet]
+        [Route("/student/settings/notifications")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public ActionResult GetNotificationEnable()
+        {
+            return Json(
+                _databaseManager.GetNotificationEnable(
+                    this.GetCourseID(),
+                    this.GetUserID(),
+                    this.GetHashCode()));
+        }
+
+        [Authorize]
+        [HttpPost]
+        [Route("/student/settings/notifications")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public void UpdateNotificationEnable()
+        {
+            var body = new StreamReader(Request.Body).ReadToEnd();
+            _databaseManager.UpdateUserSettings(
+                    this.GetCourseID(),
+                    this.GetUserID(),
+                    null,
+                    null,
+                    null,
+                    (bool)JObject.Parse(body)["enabled"],
+                    0
+                    );
         }
 
         [Authorize(Policy = "IsInstructor")]
@@ -73,45 +105,7 @@ namespace IguideME.Web.Controllers
             }
         }
 
-        // [Authorize]
-        // [HttpGet]
-        // [Route("/app/notification")]
-        // [ProducesResponseType(StatusCodes.Status204NoContent)]
-        // [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        // [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        // public ActionResult GetNotificationEnable()
-        // {
-        //     return Json(
-        //         _databaseManager.GetNotificationEnable(
-        //             this.GetCourseID(),
-        //             this.GetUserID(),
-        //             this.GetHashCode()));
-        // }
 
-        // [Authorize]
-        // [HttpPost]
-        // [Route("/app/notification")]
-        // [ProducesResponseType(StatusCodes.Status200OK)]
-        // [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        // public ActionResult UpdateNotificationEnable()
-        // {
-        //     var body = new StreamReader(Request.Body).ReadToEnd();
-        //     _databaseManager.UpdateUserSettings(
-        //             this.GetCourseID(),
-        //             this.GetUserID(),
-        //             null,
-        //             null,
-        //             null,
-        //             (bool)JObject.Parse(body)["enable"],
-        //             0
-        //             );
-
-        //     return Json(
-        //         _databaseManager.GetNotificationEnable(
-        //             this.GetCourseID(),
-        //             this.GetUserID(),
-        //             this.GetHashCode()));
-        // }
 
         [Authorize]
         [Route("/app/course")]
