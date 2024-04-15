@@ -7,6 +7,7 @@ import { BellTwoTone, CheckCircleTwoTone, StopTwoTone } from '@ant-design/icons'
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button, Col, Form, Input, Row, Select, Space } from 'antd';
 import { useForm, useWatch } from 'antd/es/form/Form';
+import { FormInstance } from 'antd/lib/form/Form';
 import { useState, type FC, type ReactElement } from 'react';
 import Swal from 'sweetalert2';
 import { useDrawerStore } from '../tile-group-board/useDrawerStore';
@@ -48,7 +49,6 @@ const EditTile: FC<Props> = ({ tile }): ReactElement => {
       name='edit_tile_form'
       initialValues={tile}
       onFinish={(data: Tile) => {
-        console.log(data);
         setEditTile(null);
         saveTile(data);
         setIsChanged(false);
@@ -95,17 +95,7 @@ const EditTile: FC<Props> = ({ tile }): ReactElement => {
         </Col>
         <Col span={8}>
           <Item name='type' noStyle>
-            <Select
-              className='w-full'
-              options={[
-                { value: TileType.assignments, label: 'Assignments' },
-                { value: TileType.discussions, label: 'Discussions' },
-                {
-                  value: TileType.learning_outcomes,
-                  label: 'Learning Outcomes',
-                },
-              ]}
-            />
+            <TypeSelector value={0} onChange={() => {}} form={form} />
           </Item>
         </Col>
       </Row>
@@ -162,6 +152,35 @@ const EditTile: FC<Props> = ({ tile }): ReactElement => {
         return <></>;
     }
   }
+};
+
+type TypeSelectorPrps = {
+  value: number;
+  onChange: (value: number) => void;
+  form: FormInstance<Tile>;
+};
+
+const TypeSelector: FC<TypeSelectorPrps> = ({ value, onChange, form }): ReactElement => {
+  const update = (args: number) => {
+    form.setFieldValue('entries', []);
+    onChange(args);
+  };
+
+  return (
+    <Select
+      className='w-full'
+      options={[
+        { value: TileType.assignments, label: 'Assignments' },
+        { value: TileType.discussions, label: 'Discussions' },
+        {
+          value: TileType.learning_outcomes,
+          label: 'Learning Outcomes',
+        },
+      ]}
+      value={value}
+      onChange={update}
+    />
+  );
 };
 
 const Notification: FC<{
