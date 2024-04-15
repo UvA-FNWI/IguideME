@@ -1,16 +1,16 @@
+import { getTileGrades } from '@/api/tiles';
 import GraphTile from '@/components/crystals/graph-tile/graph-tile.tsx';
 import GridTile from '@/components/crystals/grid-tile/grid-tile.tsx';
-import PeerComparison from '@/components/particles/peer-comparison/peercomparison';
-import { cn } from '@/utils/cn';
-import { Col, Divider, Row } from 'antd';
-import { getTileGrades } from '@/api/tiles';
-import { useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
 import { useTileViewStore } from '@/components/pages/student-dashboard/tileViewContext';
-import { type FC, type ReactElement } from 'react';
-import { TileType, type Tile, GradingType } from '@/types/tile';
+import PeerComparison from '@/components/particles/peer-comparison/peercomparison';
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
+import { GradingType, TileType, type Tile } from '@/types/tile';
+import { cn } from '@/utils/cn';
+import { useQuery } from '@tanstack/react-query';
+import { Col, Divider, Row } from 'antd';
+import { type FC, type ReactElement } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface Props {
   tile: Tile;
@@ -58,7 +58,7 @@ const ViewTile: FC<Props> = ({ tile, textStyle }): ReactElement => {
 
   function renderViewType(): ReactElement {
     if (isError) return <QueryError title='Failed to load grades' />;
-    else if (grades === undefined) return <></>;
+    else if (!grades) return <></>;
 
     switch (viewType) {
       case 'graph':

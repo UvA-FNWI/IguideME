@@ -1,10 +1,10 @@
+import { getLayoutColumns, getTileGroups } from '@/api/tiles';
 import Loading from '@/components/particles/loading';
 import QueryError from '@/components/particles/QueryError';
-import ViewTileGroup from '../tile-group-view/tile-group-view';
-import { Col, Row, Spin } from 'antd';
-import { getLayoutColumns, getTileGroups } from '@/api/tiles';
 import { useQuery } from '@tanstack/react-query';
+import { Col, Row, Spin } from 'antd';
 import { type FC, type ReactElement } from 'react';
+import ViewTileGroup from '../tile-group-view/tile-group-view';
 
 const ViewLayout: FC = (): ReactElement => {
   const {
@@ -49,12 +49,28 @@ const ViewLayout: FC = (): ReactElement => {
     return <Loading />;
   }
 
-  if (  columns.find(col => col.groups.length > 0) === undefined) {
-    // TODO: add error here stating that the course hasn't been set up yet.
-    return <div>Error </div>
+  if (columns.find((col) => col.groups.length > 0) === undefined) {
+    return (
+      <div className='absolute inset-0 w-screen h-screen grid place-content-center pointer-events-none'>
+        <QueryError
+          className='grid place-content-center'
+          title='The dashboard has not been set up yet.'
+          subTitle={
+            <p>
+              If you are an instructor, you can modify the layout and tiles in the course settings.
+              <br />
+              If you are an student, please notify your instructor.
+            </p>
+          }
+        />
+      </div>
+    );
   }
 
-  console.log("test", columns.find(col => col.groups.length >= 0))
+  console.log(
+    'test',
+    columns.find((col) => col.groups.length >= 0),
+  );
   return (
     <Row className='flex gap-3 flex-nowrap mx-auto'>
       {columns.map((column) => (

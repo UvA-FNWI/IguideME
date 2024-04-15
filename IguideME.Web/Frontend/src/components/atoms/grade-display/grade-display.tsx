@@ -1,6 +1,6 @@
+import { useTileViewStore } from '@/components/pages/student-dashboard/tileViewContext';
 import { FrownTwoTone, MehTwoTone, SmileTwoTone } from '@ant-design/icons';
 import { Space, Spin } from 'antd';
-import { useTileViewStore } from '@/components/pages/student-dashboard/tileViewContext';
 import { type FC, type ReactElement } from 'react';
 
 import { Bar, type BarConfig } from '@ant-design/charts';
@@ -63,7 +63,7 @@ const GridGrades: FC<Props> = ({ goal, total, pred }): ReactElement => {
             : total >= 5.5 ?
               meh
             : unhappy}
-            {total.toFixed(1)}
+            {total}
           </Space>
         </h2>
       </div>
@@ -85,7 +85,6 @@ const GridGrades: FC<Props> = ({ goal, total, pred }): ReactElement => {
 };
 
 const GraphGrades: FC<Props> = ({ goal, total, pred }): ReactElement => {
-
   const config: BarConfig = {
     data: [
       { name: 'Current grade', grade: total },
