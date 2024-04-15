@@ -1,15 +1,15 @@
+import { deleteTile, patchTile } from '@/api/tiles';
 import EditTileAssignments from '@/components/atoms/edit-tile-assignments/edit-tile-assignments';
 import EditTileDiscussions from '@/components/atoms/edit-tile-discussions/edit-tile-discussions';
 import EditTileGoals from '@/components/atoms/edit-tile-goals/edit-tile-goals';
-import Swal from 'sweetalert2';
-import { BellTwoTone, CheckCircleTwoTone, StopTwoTone } from '@ant-design/icons';
-import { Button, Col, Form, Input, Row, Select, Space } from 'antd';
-import { deleteTile, patchTile } from '@/api/tiles';
-import { useDrawerStore } from '../tile-group-board/useDrawerStore';
-import { useForm, useWatch } from 'antd/es/form/Form';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { TileType, type Tile } from '@/types/tile';
-import { type FC, type ReactElement, useState } from 'react';
+import { BellTwoTone, CheckCircleTwoTone, StopTwoTone } from '@ant-design/icons';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { Button, Col, Form, Input, Row, Select, Space } from 'antd';
+import { useForm, useWatch } from 'antd/es/form/Form';
+import { useState, type FC, type ReactElement } from 'react';
+import Swal from 'sweetalert2';
+import { useDrawerStore } from '../tile-group-board/useDrawerStore';
 
 interface Props {
   tile: Tile;
@@ -48,12 +48,16 @@ const EditTile: FC<Props> = ({ tile }): ReactElement => {
       name='edit_tile_form'
       initialValues={tile}
       onFinish={(data: Tile) => {
+        console.log(data);
         setEditTile(null);
         saveTile(data);
+        setIsChanged(false);
       }}
       requiredMark={false}
       className='flex flex-col gap-2'
-      onValuesChange={() => setIsChanged(true)}
+      onValuesChange={() => {
+        setIsChanged(true);
+      }}
     >
       <Item name='id' hidden>
         <Input type='hidden' />

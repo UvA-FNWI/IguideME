@@ -1,7 +1,7 @@
-import SelectAssignments from './SelectAssignments';
-import { Col, Form, InputNumber, Row, Select } from 'antd';
 import { GradingType, printGradingType } from '@/types/tile';
+import { Col, Form, InputNumber, Row, Select } from 'antd';
 import { type FC, type ReactElement } from 'react';
+import SelectAssignments from './SelectAssignments';
 
 const { Item } = Form;
 
@@ -41,7 +41,7 @@ const EditTileAssignments: FC = (): ReactElement => {
       <Row>
         <p className='mb-1'>Assignments:</p>
         <Item name='entries' className='w-full m-0'>
-          <SelectAssignments />
+          <SelectAssignments value={[]} onChange={() => {}} />
         </Item>
       </Row>
     </>

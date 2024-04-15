@@ -1,21 +1,25 @@
+import { getAssignments } from '@/api/entries';
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
 import { CheckCircleTwoTone, CloseCircleTwoTone, DeleteFilled } from '@ant-design/icons';
-import { getAssignments } from '@/api/entries';
-import { InputNumber, Select, Table } from 'antd';
 import { useQuery } from '@tanstack/react-query';
+import { InputNumber, Select, Table } from 'antd';
 import { useCallback, useEffect, useMemo, useState, type FC, type ReactElement } from 'react';
 
-import { type Assignment, type TileEntry, printGradingType } from '@/types/tile';
+import { printGradingType, type Assignment, type TileEntry } from '@/types/tile';
 
-const SelectAssignments: FC = (): ReactElement => {
+type SelectAssignmentsProps = {
+  value: TileEntry[];
+  onChange: (value: TileEntry[]) => void;
+};
+
+const SelectAssignments: FC<SelectAssignmentsProps> = ({ value: entries, onChange: setEntries }): ReactElement => {
   const { data, isError, isLoading } = useQuery({
     queryKey: ['assignments'],
     queryFn: getAssignments,
   });
 
   const [assignments, setAssignments] = useState<Map<number, Assignment>>(new Map<number, Assignment>());
-  const [entries, setEntries] = useState<TileEntry[]>([]);
   const [selectedAssignments, setSelectedAssignments] = useState<number[]>([]);
   const [open, setOpen] = useState<boolean>(false);
 

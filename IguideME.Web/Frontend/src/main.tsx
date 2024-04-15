@@ -1,12 +1,12 @@
 // /----------------------------- React ------------------------------/
-import App from './App.tsx';
-import LoadingPage from './components/pages/loading.tsx';
-import React, { lazy, Suspense } from 'react';
-import ReactDOM from 'react-dom/client';
 import setup from '@/api/setup.ts';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import React, { lazy, Suspense } from 'react';
+import ReactDOM from 'react-dom/client';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import App from './App.tsx';
+import LoadingPage from './components/pages/loading.tsx';
 import './globals.css';
 
 // /--------------------------- Pages ---------------------------/
