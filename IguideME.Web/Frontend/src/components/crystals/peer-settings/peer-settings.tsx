@@ -22,17 +22,16 @@ const PeerSettings: FC = (): ReactElement => {
 
   return (
     <div>
-      <PeerSettingsForm minSize={data.min_size} personalizedPeers={data.personalized_peers} />
+      <PeerSettingsForm minSize={data.min_size} />
     </div>
   );
 };
 
 interface Props {
   minSize: number;
-  personalizedPeers: boolean;
 }
 
-const PeerSettingsForm: FC<Props> = ({ minSize, personalizedPeers }): ReactElement => {
+const PeerSettingsForm: FC<Props> = ({ minSize }): ReactElement => {
   const queryClient = useQueryClient();
   const { mutate: savePeer } = useMutation({
     mutationFn: postPeerSettings,
@@ -43,23 +42,13 @@ const PeerSettingsForm: FC<Props> = ({ minSize, personalizedPeers }): ReactEleme
   return (
     <Form
       name="peer_settings_form"
-      initialValues={{ min_size: minSize, personalized_peers: personalizedPeers }}
+      initialValues={{ min_size: minSize }}
       onFinish={savePeer}
     >
       <Row className="justify-between content-center">
         <Col>
           <Form.Item name="min_size" label="Minimum group size" className="m-0">
             <InputNumber min={2} />
-          </Form.Item>
-        </Col>
-        <Col>
-          <Form.Item
-            name="personalized_peers"
-            label="Personalized"
-            valuePropName="checked"
-            className="m-[10px] [&_button]:bg-black/25"
-          >
-            <Switch defaultChecked checkedChildren={<CheckOutlined />} unCheckedChildren={<CloseOutlined />} />
           </Form.Item>
         </Col>
       </Row>
