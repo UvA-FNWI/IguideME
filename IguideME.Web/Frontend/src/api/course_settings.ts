@@ -2,13 +2,11 @@ import apiClient from './axios';
 
 export const getPeerSettings: () => Promise<{
   min_size: number;
-  personalized_peers: boolean;
 }> = async () => await apiClient.get(`app/peer-groups`).then((response) => response.data);
 
 export const postPeerSettings: (data: {
   min_size: number;
-  personalized_peers: boolean;
-}) => Promise<void> = async (data: { min_size: number; personalized_peers: boolean }) => {
+}) => Promise<void> = async (data: { min_size: number }) => {
   await apiClient.patch('app/peer-groups', data);
 };
 

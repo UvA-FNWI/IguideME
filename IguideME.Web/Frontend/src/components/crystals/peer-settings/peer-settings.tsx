@@ -25,15 +25,14 @@ const PeerSettings: FC = (): ReactElement => {
     );
   }
 
-  return <PeerSettingsForm minSize={data.min_size} personalizedPeers={data.personalized_peers} />;
+  return <PeerSettingsForm minSize={data.min_size} />;
 };
 
 interface Props {
   minSize: number;
-  personalizedPeers: boolean;
 }
 
-const PeerSettingsForm: FC<Props> = ({ minSize, personalizedPeers }): ReactElement => {
+const PeerSettingsForm: FC<Props> = ({ minSize }): ReactElement => {
   const queryClient = useQueryClient();
   const { mutate: savePeer, status } = useMutation({
     mutationFn: postPeerSettings,
@@ -55,11 +54,7 @@ const PeerSettingsForm: FC<Props> = ({ minSize, personalizedPeers }): ReactEleme
   }, [status]);
 
   return (
-    <Form
-      name='peer_settings_form'
-      initialValues={{ min_size: minSize, personalized_peers: personalizedPeers }}
-      onFinish={savePeer}
-    >
+    <Form name='peer_settings_form' initialValues={{ min_size: minSize }} onFinish={savePeer}>
       <Row className='justify-between content-center'>
         <Col>
           <Form.Item name='min_size' label='Minimum group size' className='m-0'>
