@@ -492,7 +492,7 @@ namespace IguideME.Web.Services
                 )
             )
                 if (r.Read())
-                    return r.GetString(0);
+                    return r.GetValue(0).ToString();
 
             return null;
         }
