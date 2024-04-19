@@ -1,14 +1,14 @@
+import { deleteTileGroup, getTiles, patchTileGroup, postTile } from '@/api/tiles';
 import AdminTileView from '@/components/crystals/admin-tile-view/admin-tile-view';
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
-import { Button, Col, Divider, Input, Row } from 'antd';
-import { CSS } from '@dnd-kit/utilities';
+import { GradingType, TileType, type TileGroup } from '@/types/tile';
 import { DeleteFilled, PlusOutlined } from '@ant-design/icons';
-import { deleteTileGroup, getTiles, patchTileGroup, postTile } from '@/api/tiles';
 import { SortableContext, useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useState, type FC, type ReactElement, useMemo } from 'react';
-import { TileType, type TileGroup, GradingType } from '@/types/tile';
+import { Button, Col, Divider, Input, Row } from 'antd';
+import { useMemo, useState, type FC, type ReactElement } from 'react';
 
 interface Props {
   group: TileGroup;

@@ -483,9 +483,8 @@ namespace IguideME.Web.Services
             return 1;
         }
 
-        public List<string> GetNotificationDates(int courseID)
+        public string GetNotificationDates(int courseID)
         {
-            List<string> dates = new();
             using (
                 SQLiteDataReader r = Query(
                     DatabaseQueries.QUERY_NOTIFICATION_DATES_FOR_COURSE,
@@ -493,9 +492,9 @@ namespace IguideME.Web.Services
                 )
             )
                 if (r.Read())
-                    return r.GetValue(0).ToString().Split(',').ToList();
+                    return r.GetString(0);
 
-            return dates;
+            return null;
         }
 
         public void RegisterUser(User user)

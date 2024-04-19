@@ -1,8 +1,3 @@
-import AdminTitle from '@/components/atoms/admin-titles/admin-titles';
-import QueryError from '@/components/particles/QueryError';
-import QueryLoading from '@/components/particles/QueryLoading';
-import { Button, Col, Divider, Form, Input, InputNumber, Row, Select, Space } from 'antd';
-import { DeleteFilled, PlusOutlined } from '@ant-design/icons';
 import {
   deleteLearningGoal,
   deleteRequirement,
@@ -13,9 +8,15 @@ import {
   postGoalRequirement,
   postLearningGoal,
 } from '@/api/entries';
+import AdminTitle from '@/components/atoms/admin-titles/admin-titles';
+import QueryError from '@/components/particles/QueryError';
+import QueryLoading from '@/components/particles/QueryLoading';
+import { LogicalExpression, type GoalRequirement, type LearningGoal } from '@/types/tile';
+import { DeleteFilled, PlusOutlined } from '@ant-design/icons';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { LogicalExpression, type LearningGoal, type GoalRequirement } from '@/types/tile';
+import { Button, Col, Divider, Form, Input, InputNumber, Row, Select } from 'antd';
 import { useEffect, useState, type FC, type ReactElement } from 'react';
+import { toast } from 'sonner';
 
 const { Item } = Form;
 
@@ -180,19 +181,43 @@ const ViewGoalRequirement: FC<ReqProps> = ({ requirement }): ReactElement => {
     queryFn: getAssignments,
   });
 
-  const { mutate: saveRequirement } = useMutation({
+  const { mutate: saveRequirement, status: saveStatus } = useMutation({
     mutationFn: patchGoalRequirement,
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['learning-goals'] });
     },
   });
 
-  const { mutate: removeRequirement } = useMutation({
+  const { mutate: removeRequirement, status: deleteStatus } = useMutation({
     mutationFn: deleteRequirement,
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['learning-goals'] });
     },
   });
+
+  useEffect(() => {
+    if (saveStatus === 'success') {
+      toast.success('Requirement saved successfully', {
+        closeButton: true,
+      });
+    } else if (saveStatus === 'error') {
+      toast.error('Error saving requirement', {
+        closeButton: true,
+      });
+    }
+  }, [saveStatus]);
+
+  useEffect(() => {
+    if (deleteStatus === 'success') {
+      toast.success('Requirement deleted successfully', {
+        closeButton: true,
+      });
+    } else if (deleteStatus === 'error') {
+      toast.error('Error deleting requirement', {
+        closeButton: true,
+      });
+    }
+  }, [deleteStatus]);
 
   const [form] = Form.useForm<GoalRequirement>();
   useEffect(() => {
@@ -216,80 +241,82 @@ const ViewGoalRequirement: FC<ReqProps> = ({ requirement }): ReactElement => {
         requiredMark={false}
         className='w-full'
       >
-        <Row gutter={20}>
-          <Item name='id' hidden>
-            <Input type='hidden' />
-          </Item>
-          <Item name='goal_id' hidden>
-            <Input type='hidden' />
-          </Item>
-          <Col span={6}>
-            <Item name='assignment_id' noStyle>
-              <Select
-                aria-disabled={isLoading || isError}
-                className='w-full'
-                disabled={isLoading || isError}
-                showSearch
-                optionFilterProp='label'
-                options={
-                  assignments === undefined ?
-                    []
-                  : [...assignments.values()].map((ass) => ({
-                      value: ass.id,
-                      label: ass.title,
-                    }))
-                }
-                placeholder={
-                  isLoading ? 'Loading assignments ...'
-                  : isError ?
-                    'Failed to load assignments'
-                  : undefined
-                }
-              />
+        <Row className='justify-between'>
+          <div className='flex gap-1'>
+            <Item name='id' hidden>
+              <Input type='hidden' />
             </Item>
-          </Col>
-          <Col span={2}>
-            <Item name='expression' noStyle>
-              <Select
-                aria-disabled={isLoading || isError}
-                className='w-full'
-                disabled={isLoading || isError}
-                options={[
-                  {
-                    value: LogicalExpression.Equal,
-                    label: '=',
-                  },
-                  {
-                    value: LogicalExpression.Greater,
-                    label: '>',
-                  },
-                  {
-                    value: LogicalExpression.GreaterEqual,
-                    label: '≥',
-                  },
-                  {
-                    value: LogicalExpression.Less,
-                    label: '<',
-                  },
-                  {
-                    value: LogicalExpression.LessEqual,
-                    label: '≤',
-                  },
-                  {
-                    value: LogicalExpression.NotEqual,
-                    label: '≠',
-                  },
-                ]}
-              />
+            <Item name='goal_id' hidden>
+              <Input type='hidden' />
             </Item>
-          </Col>
-          <Col span={4}>
-            <Item name='value' noStyle>
-              <InputNumber aria-disabled={isLoading || isError} disabled={isLoading || isError} />
-            </Item>
-          </Col>
-          <Col offset={8} span={4}>
-            <Space>
+            <Col>
+              <Item name='assignment_id' noStyle>
+                <Select
+                  aria-disabled={isLoading || isError}
+                  className='w-full'
+                  disabled={isLoading || isError}
+                  showSearch
+                  optionFilterProp='label'
+                  options={
+                    assignments === undefined ?
+                      []
+                    : [...assignments.values()].map((ass) => ({
+                        value: ass.id,
+                        label: ass.title,
+                      }))
+                  }
+                  placeholder={
+                    isLoading ? 'Loading assignments ...'
+                    : isError ?
+                      'Failed to load assignments'
+                    : undefined
+                  }
+                />
+              </Item>
+            </Col>
+            <Col>
+              <Item name='expression' noStyle>
+                <Select
+                  aria-disabled={isLoading || isError}
+                  className='w-full'
+                  disabled={isLoading || isError}
+                  options={[
+                    {
+                      value: LogicalExpression.Equal,
+                      label: '=',
+                    },
+                    {
+                      value: LogicalExpression.Greater,
+                      label: '>',
+                    },
+                    {
+                      value: LogicalExpression.GreaterEqual,
+                      label: '≥',
+                    },
+                    {
+                      value: LogicalExpression.Less,
+                      label: '<',
+                    },
+                    {
+                      value: LogicalExpression.LessEqual,
+                      label: '≤',
+                    },
+                    {
+                      value: LogicalExpression.NotEqual,
+                      label: '≠',
+                    },
+                  ]}
+                />
+              </Item>
+            </Col>
+            <Col>
+              <Item name='value' noStyle>
+                <InputNumber aria-disabled={isLoading || isError} disabled={isLoading || isError} />
+              </Item>
+            </Col>
+          </div>
+          <Col>
+            <div className='flex gap-1'>
               <Item noStyle>
                 <Button className='text-white bg-primary-blue' type='primary' htmlType='submit'>
                   Save
@@ -304,7 +331,7 @@ const ViewGoalRequirement: FC<ReqProps> = ({ requirement }): ReactElement => {
               >
                 Delete
               </Button>
-            </Space>
+            </div>
           </Col>
         </Row>
       </Form>

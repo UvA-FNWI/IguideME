@@ -193,27 +193,21 @@ namespace IguideME.Web.Controllers
             return peerGroup != null ? Json(peerGroup) : NotFound();
         }
 
-        // [Authorize(Policy = "IsInstructor")]
-        // [Route("/app/peer-groups")]
-        // [HttpPatch]
-        // [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        // [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        // [ProducesResponseType(StatusCodes.Status200OK)]
-        // public ActionResult PatchCoursePeerGroups([FromBody] PeerGroup obj)
-        // {
-        //     _logger.LogInformation("size {s}", obj.MinSize);
-        //     /**
-        //      * Endpoint is used to allow instructors to change the informed
-        //      * consent policy for their course.
-        //      */
-        //     _databaseManager.UpdateCoursePeerGroups(
-        //         GetCourseID(), obj.MinSize);
-
-        //     // return newly fetched consent object
-        //     return Json(
-        //        _databaseManager
-        //         .GetPeerGroup(GetCourseID()));
-        // }
+        [Authorize(Policy = "IsInstructor")]
+        [Route("/app/peer-groups")]
+        [HttpPatch]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public void PatchCoursePeerGroups([FromBody] PeerGroup obj)
+        {
+            /**
+             * Endpoint is used to allow instructors to change the informed
+             * consent policy for their course.
+             */
+            _databaseManager.UpdateCoursePeerGroups(
+                GetCourseID(), obj.MinSize);
+        }
 
 
         // TODO: check if possible to have separate routes for seperate authorizes.
@@ -264,8 +258,7 @@ namespace IguideME.Web.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult GetNotificationDates()
         {
-            List<string> allDates = _databaseManager.GetNotificationDates(GetCourseID());
-
+            string allDates = _databaseManager.GetNotificationDates(GetCourseID());
             return allDates != null ? Json(allDates) : NotFound();
         }
     }

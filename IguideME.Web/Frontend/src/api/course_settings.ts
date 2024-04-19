@@ -24,7 +24,7 @@ export const postConsentSettings: (data: { course_name: string; text: string }) 
   await apiClient.patch(`app/consent`, data);
 };
 
-export const getNotificationSettings: () => Promise<string[]> = async () =>
+export const getNotificationSettings: () => Promise<string> = async () =>
   await apiClient.get('app/notifications').then((response) => response.data);
 
 export const postNotificationSettings: (dates: string) => Promise<void> = async (dates: string) => {

@@ -1,91 +1,202 @@
-import DatePicker from 'react-multi-date-picker';
-import Loading from '@/components/particles/loading';
-import { Button, Checkbox, Col, Form, Row } from 'antd';
 import { getNotificationSettings, postNotificationSettings } from '@/api/course_settings';
-import { useForm } from 'antd/es/form/Form';
+import QueryError from '@/components/particles/QueryError';
+import QueryLoading from '@/components/particles/QueryLoading';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useState, type FC, type ReactElement } from 'react';
-
-const { Item } = Form;
+import { Button, Checkbox, DatePicker, Divider, Form, Radio } from 'antd';
+import { CheckboxChangeEvent } from 'antd/es/checkbox';
+import { CheckboxValueType } from 'antd/es/checkbox/Group';
+import { useForm } from 'antd/es/form/Form';
+import dayjs from 'dayjs';
+import { memo, useCallback, useEffect, useMemo, useState, type FC, type ReactElement } from 'react';
+import { DateObject } from 'react-multi-date-picker';
+import { toast } from 'sonner';
 
 const NotificationSettings: FC = (): ReactElement => {
-  const { data } = useQuery({
+  const { data, isError, isLoading } = useQuery({
     queryKey: ['notification-settings'],
     queryFn: getNotificationSettings,
   });
 
-  if (data === undefined) {
-    return <Loading />;
+  // The dates are stored in the format 'Range=<boolean>;SelectedDays=<string[] | null>;SelectedDates=<Date[]>'
+  const { range, selectedDays, selectedDates } = useMemo(() => {
+    if (data) {
+      const range = data.includes('Range=true') ? true : false;
+      const selectedDays =
+        data.includes('SelectedDays=null') ? null
+        : data.includes('SelectedDays=') ? data.split('SelectedDays=')[1].split(';')[0].split(',')
+        : null;
+      const selectedDates =
+        data.includes('SelectedDates=') ?
+          data
+            .split('SelectedDates=')[1]
+            .split(', ')
+            .map((dateString: string) => dayjs(dateString, 'YYYY-MM-DD'))
+        : [];
+      return { range, selectedDays, selectedDates };
+    }
+    return { range: false, selectedDays: null, selectedDates: [] };
+  }, [data]);
+
+  if (isError || isLoading || data === undefined) {
+    return (
+      <QueryLoading isLoading={isLoading}>
+        <div className='h-20 bg-white'>
+          {(isError || (data === undefined && !isLoading)) && (
+            <QueryError className='top-[-30px]' title='Failed to load peer settings' />
+          )}
+        </div>
+      </QueryLoading>
+    );
   }
-  const isRange = data[0].includes('-');
-  const dates = data.map((element) =>
-    isRange ? element.split('-').map((v) => new Date(Date.parse(v))) : new Date(Date.parse(element)),
-  );
-  // dates.map((value) => Date.parse(value)),
-  return <NotificationSettingsForm dates={dates} isRange={isRange} />;
+
+  return <NotificationSettingsForm isRange={range} selectedDays={selectedDays} selectedDates={selectedDates} />;
 };
 
 interface Data {
-  dates: Array<Date | Date[]>;
+  selectedDates: DateObject[] | [DateObject, DateObject];
 }
 
 const NotificationSettingsForm: FC<{
-  dates: Array<Date | Date[]>;
   isRange: boolean;
-}> = ({ dates, isRange }): ReactElement => {
+  selectedDays: string[] | null;
+  // ! If you change the type of selectedDates to the correct type (DayJS[]), the form will not work
+  selectedDates: any;
+}> = memo(({ isRange, selectedDays, selectedDates }): ReactElement => {
   const [form] = useForm<Data>();
   const [range, setRange] = useState<boolean>(isRange);
+
+  const [checkedList, setCheckedList] = useState<CheckboxValueType[]>(selectedDays ?? ['Tue', 'Thu']);
+
+  const rangeChangeHandler = useCallback(() => {
+    form.resetFields();
+    setRange((prev) => !prev);
+  }, [form]);
+
   const queryClient = useQueryClient();
-  const { mutate: saveDates } = useMutation({
+  const { mutate: saveDates, status } = useMutation({
     mutationFn: postNotificationSettings,
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['notification-settings'] });
     },
   });
 
-  const submit = (data: Data): void => {
-    const dates = data.dates;
-    if (range) {
-      const datelist = dates
-        .toString()
-        .split(',')
-        .reduce(
-          (acc, val, idx) => (idx % 2 === 0 ? (acc.length !== 0 ? `${acc},${val}` : `${val}`) : `${acc}-${val}`),
-          '',
-        );
-
-      console.log('test', datelist);
-      saveDates(datelist);
-    } else {
-      saveDates(dates.toString());
+  useEffect(() => {
+    if (status === 'success') {
+      toast.success('Notification settings saved successfully', {
+        closeButton: true,
+      });
+    } else if (status === 'error') {
+      toast.error('Failed to save notification settings', {
+        closeButton: true,
+      });
     }
-  };
+  }, [status]);
+
+  const submit = useCallback(
+    (data: Data): void => {
+      // The dates are saved in the format 'Range=<boolean>;SelectedDays=<string[] | null>;SelectedDates=<moment[]>'
+      const selectedDates = data.selectedDates.map((date) => date.format('YYYY-MM-DD')).join(', ');
+      const formattedDates = `Range=${range};SelectedDays=${checkedList.length === 0 ? null : checkedList};SelectedDates=${selectedDates}`;
+      saveDates(formattedDates);
+    },
+    [checkedList, range, saveDates],
+  );
+
   return (
-    <Form<Data> form={form} name="notification_settings_form" initialValues={{ dates }} onFinish={submit}>
-      <Row className="py-[10px] content-center">
-        <Col span={6}>
-          <Item name="dates" label="Dates" className="m-0">
-            <DatePicker multiple={true} range={range} />
-          </Item>
-        </Col>
-        <Col span={4}>
-          <Item label="Range" className="m-0">
-            <Checkbox
-              checked={range}
-              onChange={(e) => {
-                setRange(e.target.checked);
-              }}
-            />
-          </Item>
-        </Col>
-        <Col span={2} offset={12} className="flex justify-end pr-[10px]">
-          <Item className="mr-[10px] mb-[5px]" noStyle>
-            <Button htmlType="submit">Save</Button>
-          </Item>
-        </Col>
-      </Row>
+    <Form<Data>
+      className='flex flex-col gap-2'
+      initialValues={{ ['selectedDates']: selectedDates }}
+      form={form}
+      name='notification_settings_form'
+      onFinish={submit}
+    >
+      <p className='text-sm mb-2'>
+        Select the dates or the range of dates that the students will receive notifications.
+      </p>
+      <Radio.Group buttonStyle='solid' defaultValue={range} onChange={rangeChangeHandler}>
+        <Radio.Button value={false}>Select Dates</Radio.Button>
+        <Radio.Button value={true}>Select Range</Radio.Button>
+      </Radio.Group>
+      <DatePickers isRange={range} checkedList={checkedList} setCheckedList={setCheckedList} />
+      <div className='flex justify-end'>
+        <Button className='w-16 right-0 mr-[10px]' htmlType='submit'>
+          Save
+        </Button>
+      </div>
     </Form>
   );
-};
+});
 
 export default NotificationSettings;
+
+type DatePickersProps = {
+  isRange: boolean;
+  checkedList: CheckboxValueType[];
+  setCheckedList: (list: CheckboxValueType[]) => void;
+};
+
+const DatePickers: FC<DatePickersProps> = memo(({ isRange, checkedList, setCheckedList }): ReactElement => {
+  const checkBoxOptions = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const [error, setError] = useState<string | null>(null);
+
+  const onGroupChange = useCallback((list: CheckboxValueType[]) => {
+    setCheckedList(list);
+
+    if (list.length === 0) {
+      setError('Please select at least one day');
+    } else {
+      setError(null);
+    }
+  }, []);
+
+  const onCheckAllChange = useCallback((e: CheckboxChangeEvent) => {
+    setCheckedList(e.target.checked ? checkBoxOptions : []);
+  }, []);
+
+  const Range = (
+    <>
+      <Form.Item
+        className='m-0'
+        name='selectedDates'
+        rules={[{ required: true, message: 'Please select a date range' }]}
+      >
+        <DatePicker.RangePicker
+          className='!w-72'
+          disabledDate={(current) => current && current.toDate() < new Date()}
+          format='YYYY-MM-DD'
+          picker='week'
+        />
+      </Form.Item>
+      <Divider />
+      <p className='text-sm'>On which days of the week do you want to send notifications?</p>
+      <div className='flex h-14 align-top'>
+        <Checkbox
+          className='h-fit'
+          indeterminate={checkedList.length > 0 && checkedList.length < checkBoxOptions.length}
+          onChange={onCheckAllChange}
+          checked={checkBoxOptions.length === checkedList.length}
+        >
+          Check all
+        </Checkbox>
+        <Divider type='vertical' className='h-6' />
+        <Form.Item className='m-0 [&_div]:!min-h-0' validateStatus={error ? 'error' : ''} help={error}>
+          <Checkbox.Group options={checkBoxOptions} value={checkedList} onChange={onGroupChange} />
+        </Form.Item>
+      </div>
+    </>
+  );
+
+  const Single = (
+    <Form.Item className='m-0' name='selectedDates' rules={[{ required: true, message: 'Please select a date' }]}>
+      <DatePicker
+        className='!w-72'
+        disabledDate={(current) => current && current.toDate() < new Date()}
+        format='YYYY-MM-DD'
+        multiple
+        maxTagCount='responsive'
+      />
+    </Form.Item>
+  );
+
+  return isRange ? Range : Single;
+});

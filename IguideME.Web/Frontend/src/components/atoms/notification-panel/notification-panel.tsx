@@ -1,10 +1,10 @@
-import Notifications from '@/components/particles/notifications/notifications';
-import { BellOutlined, ExclamationOutlined, LoadingOutlined } from '@ant-design/icons';
-import { Button, Popover, Tooltip } from 'antd';
 import { getStudentNotifications } from '@/api/users';
-import { useQuery } from '@tanstack/react-query';
-import { type FC, type ReactElement } from 'react';
+import Notifications from '@/components/particles/notifications/notifications';
 import { type User } from '@/types/user';
+import { BellOutlined, ExclamationOutlined, LoadingOutlined } from '@ant-design/icons';
+import { useQuery } from '@tanstack/react-query';
+import { Button, Popover, Tooltip } from 'antd';
+import { type FC, type ReactElement } from 'react';
 
 interface Props {
   user: User | undefined;
@@ -16,7 +16,7 @@ const NotificationPanel: FC<Props> = ({ user }): ReactElement => {
     isLoading,
   } = useQuery({
     enabled: user !== undefined,
-    queryKey: [`notifications/${user?.userID}`],
+    queryKey: [`notifications/${user!.userID}`],
     queryFn: async () => await getStudentNotifications(user!.userID),
   });
 

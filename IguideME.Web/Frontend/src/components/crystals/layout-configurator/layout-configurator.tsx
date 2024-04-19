@@ -1,13 +1,13 @@
+import { getLayoutColumns, postLayoutColumns } from '@/api/tiles';
 import ConfigLayoutColumn from '@/components/atoms/layout-column/layout-column';
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
-import { arrayMove, SortableContext } from '@dnd-kit/sortable';
-import { Button, Col, Row } from 'antd';
-import { createPortal } from 'react-dom';
-import { getLayoutColumns, postLayoutColumns } from '@/api/tiles';
 import { PlusOutlined } from '@ant-design/icons';
+import { arrayMove, SortableContext } from '@dnd-kit/sortable';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Button, Col, Row } from 'antd';
 import { type FC, type ReactElement, useCallback, useEffect, useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 import { type LayoutColumn } from '@/types/tile';
 import {
@@ -19,6 +19,7 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
+import { toast } from 'sonner';
 
 // TODO: Let the user know that the layout has been saved succesfully
 const LayoutConfigurator: FC = (): ReactElement => {
@@ -28,12 +29,24 @@ const LayoutConfigurator: FC = (): ReactElement => {
     queryFn: getLayoutColumns,
   });
 
-  const { mutate: saveLayout } = useMutation({
+  const { mutate: saveLayout, status } = useMutation({
     mutationFn: postLayoutColumns,
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['layout-columns'] });
     },
   });
+
+  useEffect(() => {
+    if (status === 'success') {
+      toast.success('Layout saved successfully', {
+        closeButton: true,
+      });
+    } else if (status === 'error') {
+      toast.error('Error saving layout', {
+        closeButton: true,
+      });
+    }
+  }, [status]);
 
   const [active, setActive] = useState<LayoutColumn | null>(null);
   const [columns, setColumns] = useState<LayoutColumn[]>([]);

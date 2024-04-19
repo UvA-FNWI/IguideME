@@ -112,28 +112,24 @@ namespace IguideME.Web.Services.Workers
 
         private bool checkSend()
         {
-            List<string> notificationDates = _databaseManager.GetNotificationDates(_courseID);
-            if (notificationDates.Count == 0) {
-                return false;
-            }
-            if (notificationDates[0].Contains("-"))
-            {
-                // We are looking in a range of dates
-                foreach (string datepair in notificationDates)
-                {
-                    string[] splittedDates = datepair.Split("-");
-                    // DateTime today = DateTime.Parse(string.Format("{0:yyyy/MM/dd}", DateTime.Now));
+            string notificationDates = _databaseManager.GetNotificationDates(_courseID);
+            if (string.IsNullOrEmpty(notificationDates)) return false;
 
-                    if (DateTime.Now >= DateTime.Parse(splittedDates[0]) && DateTime.Now <= DateTime.Parse(splittedDates[1]))
-                    {
-                        return _sendNotifications;
-                    }
+            // Check if any of the dates are in the future
+            string[] splitted = notificationDates.Split(";");
+            string[] dates = splitted[2].Split("=")[1].Split(",");
+
+            bool send = false;
+            foreach (string date in dates)
+            {
+                if (DateTime.Now <= DateTime.Parse(date))
+                {
+                    send = true;
+                    break;
                 }
             }
-            else
-                return _sendNotifications && notificationDates.Contains(string.Format("{0:yyyy/MM/dd}", DateTime.Now));
 
-            return false;
+            return _sendNotifications && send;
         }
 
         /// <summary>
