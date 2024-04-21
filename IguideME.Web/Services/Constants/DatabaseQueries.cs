@@ -1008,6 +1008,15 @@ public static class DatabaseQueries
         WHERE       ``submission_id`=@submissionID
         ;";
 
+    public const string QUERY_CONTENT_HAS_ENTRY =
+        @"SELECT    `content_id`
+        FROM        `tile_entries`
+        INNER JOIN  `tiles`
+            USING   (`tile_id`)
+        WHERE       `tile_entries`.`content_id`= @assignmentID
+        AND         `tiles`.`type`=@contentType
+        ;";
+
     public const string QUERY_ASSIGNMENT_ID_FROM_EXTERNAL =
         @"SELECT    `assignment_id`
         FROM        `assignments`
@@ -1027,6 +1036,21 @@ public static class DatabaseQueries
                     `grading_type`
         FROM        `assignments`
         WHERE       `course_id`=@courseID
+        ;";
+
+    public const string QUERY_ASSIGNMENT =
+        @"SELECT    `assignment_id`,
+                    `course_id`,
+                    `title`,
+                    `external_id`,
+                    `published`,
+                    `muted`,
+                    `due_date`,
+                    `max_grade`,
+                    `grading_type`
+        FROM        `assignments`
+        WHERE       `course_id`=@courseID
+        AND         `assignment_id`=@internalID
         ;";
 
     public const string QUERY_COURSE_DISCUSSIONS =
@@ -1517,30 +1541,14 @@ public static class DatabaseQueries
         GROUP BY    `peer_groups`.`component_id`, `peer_groups`.`sync_id`
         ORDER BY    `peer_groups`.`component_id`;";
 
-    public const string QUERY_USER_RESULTS = // half done , does it work though?????
-        @"SELECT   `tiles`.`tile_id`,
-                    AVG(`grade`),
-                    MIN(`grade`),
-                    MAX(`grade`)
-        FROM        `submissions`
-        INNER JOIN  `tile_entries`
-            ON      `submissions`.`assignment_id`=`tile_entries`.`content_id`
-        INNER JOIN  `tiles`
-            USING   (`tile_id`)
-        INNER JOIN  `tile_groups`
-            USING   (`group_id`)
-        WHERE       `tile_groups`.`course_id`=@courseID
-        AND         `submissions`.`user_id`=@userID
-	    GROUP BY `tiles`.`tile_id`;";
-
-    public const string QUERY_USER_SUBMISSIONS_FOR_ENTRY_FOR_USER =
-        @"SELECT    `id`,
-                    `entry_id`,
+    public const string QUERY_USER_SUBMISSION_FOR_ENTRY_FOR_USER =
+        @"SELECT    `submission_id`,
+                    `assignment_id`,
                     `user_id`,
                     `grade`,
-                    `submitted`
+                    `date`
         FROM        `submissions`
-        WHERE       `entry_id`=@entryID
+        WHERE       `assignment_id`=@entryID
         AND         `user_id`=@userID
         ;";
 

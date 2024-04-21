@@ -386,7 +386,7 @@ namespace IguideME.Web.Controllers
             return success
                 ? Json(
                     _databaseManager
-                    .GetTile(GetCourseID(), id))
+                    .GetTile(GetCourseID(), id, true))
                 : BadRequest();
         }
 
@@ -447,27 +447,27 @@ namespace IguideME.Web.Controllers
             return BadRequest();
         }
 
-        // [Authorize]
-        // [HttpGet]
-        // [Route("/tiles/{tileID}/submissions/{userID}")]
-        // [ProducesResponseType(StatusCodes.Status204NoContent)]
-        // [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        // [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        // public ActionResult GetSubmissions(string tileID, string userID)
-        // {
-        //     // Only instructors may view submissions of other students
-        //     if (this.GetUserID() != userID &&
-        //         !this.IsAdministrator())
-        //         return Unauthorized();
+        [Authorize]
+        [HttpGet]
+        [Route("/assignments/{entryID}/submissions/{userID}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public ActionResult GetSubmissions(string entryID, string userID)
+        {
+            // Only instructors may view submissions of other students
+            if (this.GetUserID() != userID &&
+                !this.IsAdministrator())
+                return Unauthorized();
 
-        //     bool success = int.TryParse(tileID, out int id);
+            bool success = int.TryParse(entryID, out int id);
 
-        //     return success
-        //         ? Json(
-        //             _databaseManager.GetTileSubmissionsForUser(
-        //                 this.GetCourseID(), id, userID))
-        //         : BadRequest();
-        // }
+            return success
+                ? Json(
+                    _databaseManager.GetAssignmentSubmissionForUser(
+                        this.GetCourseID(), id, userID))
+                : BadRequest();
+        }
 
         // [Authorize]
         // [HttpGet]

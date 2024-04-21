@@ -67,10 +67,6 @@ const ViewLayout: FC = (): ReactElement => {
     );
   }
 
-  console.log(
-    'test',
-    columns.find((col) => col.groups.length >= 0),
-  );
   return (
     <Row className='flex gap-3 flex-nowrap mx-auto'>
       {columns.map((column) => (
