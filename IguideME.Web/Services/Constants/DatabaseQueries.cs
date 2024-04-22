@@ -31,13 +31,27 @@ public static class DatabaseQueries
      */
     public const string CREATE_TABLE_COURSE_SETTINGS =
         @"CREATE TABLE IF NOT EXISTS `course_settings` (
+            `course_id`             INTEGER PRIMARY KEY,
+            `name`                  STRING,
+            `start_date`            DATE NULL,
+            `end_date`              DATE NULL,
+            `consent`               TEXT NULL,
+            `peer_group_size`       INTEGER DEFAULT 5,
+            `notification_settings` INTEGER
+        );";
+
+    public const string CREATE_TABLE_NOTIFICATIONS_COURSE_SETTINGS =
+        @"CREATE TABLE IF NOT EXISTS `notifications_course_settings` (
             `course_id`           INTEGER PRIMARY KEY,
-            `name`                STRING,
-            `start_date`          DATE NULL,
-            `end_date`            DATE NULL,
-            `consent`             TEXT NULL,
-            `peer_group_size`     INTEGER DEFAULT 5,
-            `notification_dates`  TEXT NULL
+            `is_range`            BOOLEAN DEFAULT false,
+            `selected_days`       TEXT NULL,
+            `selected_dates`      TEXT NULL,
+            FOREIGN KEY(`course_id`) REFERENCES `course_settings`(`course_id`)
+        );";
+
+    public const string CREATE_INDEX_NOTIFICATIONS_COURSE_SETTINGS =
+        @"CREATE INDEX IF NOT EXISTS `index_notifications_course_settings_on_course_id`
+            ON `notifications_course_settings` (`course_id`
         );";
 
     public const string CREATE_TABLE_USER_TRACKER =
@@ -421,7 +435,7 @@ public static class DatabaseQueries
           FROM      `tile_grades`
           WHERE     `user_id` = @userID
           AND       `tile_id` = @tileID
-          ORDER BY  `sync_id` 
+          ORDER BY  `sync_id`
             DESC
           LIMIT 1;";
     public const string REGISTER_USER_NOTIFICATIONS =
@@ -497,7 +511,7 @@ public static class DatabaseQueries
         );";
 
     public const string REGISTER_LEARNING_GOAL =
-        @"INSERT OR REPLACE 
+        @"INSERT OR REPLACE
             INTO            `learning_goals`
                             (   `course_id`,
                                 `title`  )
@@ -827,10 +841,10 @@ public static class DatabaseQueries
         LIMIT       1;";
 
     public const string QUERY_NOTIFICATION_DATES_FOR_COURSE =
-        @"SELECT    `notification_dates`
-    FROM        `course_settings`
-    WHERE       `course_id`=@courseID
-    LIMIT       1;
+        @"SELECT    `is_range`, `selected_days`, `selected_dates`
+        FROM        `notifications_course_settings`
+        WHERE       `course_id`=@courseID
+        LIMIT       1;
     ";
 
     public const string QUERY_TILE_GRADE =
@@ -1596,12 +1610,13 @@ public static class DatabaseQueries
         SET         `peer_group_size`=@groupSize
         WHERE       `course_id`=@courseID;";
     public const string UPDATE_NOTIFICATION_DATES_FOR_COURSE =
-        @"UPDATE    `course_settings`
-        SET         `notification_dates`=@notificationDates
-        WHERE       `course_id`=@courseID;";
+        @"INSERT OR REPLACE
+        INTO        `notifications_course_settings`
+                    (`course_id`, `is_range`, `selected_days`, `selected_dates`)
+        VALUES      (@courseID, @isRange, @selectedDays, @selectedDates);";
 
     public const string TIE_TILE_GROUP_TO_COLUMN =
-        @"UPDATE   `tile_groups`
+        @"UPDATE    `tile_groups`
         SET         `column_id`=@columnID
         WHERE       `group_id`=@groupID;";
 

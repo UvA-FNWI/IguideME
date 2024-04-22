@@ -189,6 +189,8 @@ namespace IguideME.Web.Services
             {
                 DatabaseQueries.CREATE_TABLE_USERS,
                 DatabaseQueries.CREATE_TABLE_COURSE_SETTINGS,
+                DatabaseQueries.CREATE_TABLE_NOTIFICATIONS_COURSE_SETTINGS,
+                DatabaseQueries.CREATE_INDEX_NOTIFICATIONS_COURSE_SETTINGS,
                 DatabaseQueries.CREATE_TABLE_SYNC_HISTORY,
                 DatabaseQueries.CREATE_TABLE_STUDENT_SETTINGS,
                 DatabaseQueries.CREATE_TABLE_USER_TRACKER,
@@ -482,7 +484,7 @@ namespace IguideME.Web.Services
             return 1;
         }
 
-        public string GetNotificationDates(int courseID)
+        public dynamic GetNotificationDates(int courseID)
         {
             using (
                 SQLiteDataReader r = Query(
@@ -491,9 +493,16 @@ namespace IguideME.Web.Services
                 )
             )
                 if (r.Read())
-                    return r.GetValue(0).ToString();
-
-            return null;
+                    return new {
+                        isRange = r.GetBoolean(0),
+                        selectedDays = r.GetValue(1).ToString(),
+                        selectedDates = r.GetValue(2).ToString()
+                    };
+            return new {
+                isRange = false,
+                selectedDays = "",
+                selectedDates = ""
+            };
         }
 
         public void RegisterUser(User user)
@@ -1553,22 +1562,19 @@ namespace IguideME.Web.Services
             }
         }
 
-        public void UpdateNotificationDates(int courseID, string notificationDates)
+        public void UpdateNotificationDates(int courseID,
+                                            bool isRange,
+                                            string selectedDays,
+                                            string selectedDates)
         {
             NonQuery(
                 DatabaseQueries.UPDATE_NOTIFICATION_DATES_FOR_COURSE,
                 new SQLiteParameter("courseID", courseID),
-                new SQLiteParameter("notificationDates", notificationDates)
+                new SQLiteParameter("isRange", isRange),
+                new SQLiteParameter("selectedDays", selectedDays),
+                new SQLiteParameter("selectedDates", selectedDates)
             );
         }
-
-        // public void RecycleExternalData(int courseID, long syncID)
-        // {
-        //     NonQuery(DatabaseQueries.RECYCLE_EXTERNAL_DATA,
-        //         new SQLiteParameter("courseID", courseID),
-        //         new SQLiteParameter("syncID", syncID)
-        //     );
-        // }
 
         public void UpdateCoursePeerGroups(int courseID, int groupSize)
         {
@@ -1707,29 +1713,6 @@ namespace IguideME.Web.Services
             }
 
             return predictions;
-        }
-
-        public PeerComparisonData[] GetUserResults(int courseID, string userID)
-        {
-            List<PeerComparisonData> submissions = new();
-
-            using (
-                SQLiteDataReader r1 = Query(
-                    DatabaseQueries.QUERY_USER_RESULTS,
-                    new SQLiteParameter("courseID", courseID),
-                    new SQLiteParameter("userID", userID)
-                )
-            )
-            {
-                while (r1.Read())
-                {
-                    PeerComparisonData submission =
-                        new(r1.GetInt32(0), r1.GetDouble(1), r1.GetDouble(2), r1.GetDouble(3));
-                    submissions.Add(submission);
-                }
-            }
-
-            return submissions.ToArray();
         }
 
         // TODO: probably switch to using grades version of submissions instead of grade.

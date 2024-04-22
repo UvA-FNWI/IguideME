@@ -11,27 +11,24 @@ import { memo, useCallback, useEffect, useMemo, useState, type FC, type ReactEle
 import { DateObject } from 'react-multi-date-picker';
 import { toast } from 'sonner';
 
+export type NotificationAdminSettings = {
+  isRange: boolean;
+  selectedDays: string | null;
+  selectedDates: string | null;
+};
+
 const NotificationSettings: FC = (): ReactElement => {
   const { data, isError, isLoading } = useQuery({
     queryKey: ['notification-settings'],
     queryFn: getNotificationSettings,
   });
 
-  // The dates are stored in the format 'Range=<boolean>;SelectedDays=<string[] | null>;SelectedDates=<Date[]>'
   const { range, selectedDays, selectedDates } = useMemo(() => {
     if (data) {
-      const range = data.includes('Range=true') ? true : false;
-      const selectedDays =
-        data.includes('SelectedDays=null') ? null
-        : data.includes('SelectedDays=') ? data.split('SelectedDays=')[1].split(';')[0].split(',')
-        : null;
-      const selectedDates =
-        data.includes('SelectedDates=') ?
-          data
-            .split('SelectedDates=')[1]
-            .split(', ')
-            .map((dateString: string) => dayjs(dateString, 'YYYY-MM-DD'))
-        : [];
+      const range = data.isRange;
+      const selectedDays = data.selectedDays ? data.selectedDays.split(', ') : null;
+      const selectedDates = data.selectedDates ? data.selectedDates.split(', ').map((date) => dayjs(date)) : [];
+
       return { range, selectedDays, selectedDates };
     }
     return { range: false, selectedDays: null, selectedDates: [] };
@@ -73,7 +70,7 @@ const NotificationSettingsForm: FC<{
   }, [form]);
 
   const queryClient = useQueryClient();
-  const { mutate: saveDates, status } = useMutation({
+  const { mutate, status } = useMutation({
     mutationFn: postNotificationSettings,
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['notification-settings'] });
@@ -94,12 +91,15 @@ const NotificationSettingsForm: FC<{
 
   const submit = useCallback(
     (data: Data): void => {
-      // The dates are saved in the format 'Range=<boolean>;SelectedDays=<string[] | null>;SelectedDates=<moment[]>'
-      const selectedDates = data.selectedDates.map((date) => date.format('YYYY-MM-DD')).join(', ');
-      const formattedDates = `Range=${range};SelectedDays=${checkedList.length === 0 ? null : checkedList};SelectedDates=${selectedDates}`;
-      saveDates(formattedDates);
+      const notificationSettingsData = {
+        isRange: range,
+        selectedDays: checkedList.length === 0 ? null : checkedList.map((day) => day.toString()).join(', '),
+        selectedDates: data.selectedDates.map((date) => date.format('YYYY-MM-DD')).join(', '),
+      };
+
+      mutate(notificationSettingsData);
     },
-    [checkedList, range, saveDates],
+    [checkedList, range, mutate],
   );
 
   return (

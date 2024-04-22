@@ -90,7 +90,7 @@ enableMocking()
                 </Route>
               </Routes>
             </BrowserRouter>
-            {import.meta.env.MODE === 'mock' && <ReactQueryDevtools initialIsOpen={false} />}
+            {import.meta.env.MODE !== 'mock' && <ReactQueryDevtools initialIsOpen={false} />}
           </QueryClientProvider>
         </React.StrictMode>,
       );
