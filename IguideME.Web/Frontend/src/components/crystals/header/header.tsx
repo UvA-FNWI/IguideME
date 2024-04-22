@@ -2,7 +2,7 @@
 import { getStudents } from '@/api/users';
 import NotificationPanel from '@/components/atoms/notification-panel/notification-panel';
 import { useQuery } from '@tanstack/react-query';
-import { Button, Col, Row, Select, Space } from 'antd';
+import { Button, Select } from 'antd';
 import { type Dispatch, type FC, type ReactElement, type SetStateAction, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -48,7 +48,7 @@ const Selector: FC<SelectorProps> = ({ selectedStudent, setSelectedStudent }): R
     <Select
       allowClear={true}
       aria-disabled={isLoading || isError}
-      className='w-[40vw] max-w-[400px] [&>div]:!bg-primary-purple [&>div>span]:!text-white [&_span_*]:!text-white'
+      className='w-full md:w-80 lg:w-[400px] h-[40px] [&>div]:!bg-primary-purple [&>div>span]:!text-white [&_span_*]:!text-white'
       disabled={isLoading || isError}
       placeholder={
         isLoading ? 'Loading students...'
@@ -99,47 +99,46 @@ const Header: FC<HeaderProps> = ({ self }): ReactElement => {
   };
 
   return (
-    <header className='bg-primary-purple table w-full align-middle text-white'>
-      <Row className='h-header px-4 justify-between content-center'>
-        <Col span={4}>
-          <Button className='p-0 m-0' onClick={goHome} type='link'>
+    <header className='bg-primary-purple text-white'>
+      <div className='px-3 py-3 flex flex-col gap-3'>
+        <div className='flex justify-between items-center relative'>
+          <Button className='p-0 m-0 border-0' onClick={goHome} type='link'>
             <h1 className='text-white align-middle font-semibold inline-block text-2xl'>IguideME</h1>
           </Button>
-        </Col>
-        <Col>
-          {isAdmin && inHome && <Selector selectedStudent={selectedStudent} setSelectedStudent={setSelectedStudent} />}
-        </Col>
-        <Col span={4} className='flex justify-end'>
-          <Space>
-            <div className='min-w-[30px]'>
-              <NotificationPanel user={selectedStudent ?? self} />
+          {isAdmin && inHome && (
+            <div className='hidden md:block absolute w-fit left-0 right-0 top-0 bottom-0 m-auto'>
+              <Selector selectedStudent={selectedStudent} setSelectedStudent={setSelectedStudent} />
             </div>
-            <div className='min-w-[100px]'>
-              <Button
-                className='flex flex-col justify-center items-center h-10 border border-solid border-white align-middle rounded-md w-32 p-2 text-white'
-                type='link'
-                onClick={() => {
-                  inHome ? toggleHome(isAdmin ? '/admin' : '/student-settings') : goHome();
-                }}
-              >
-                <h3>
-                  {inHome ?
-                    isAdmin ?
-                      'Admin Panel'
-                    : 'Settings'
-                  : 'Home'}
-                </h3>
-              </Button>
-            </div>
-          </Space>
-        </Col>
-      </Row>
-      {import.meta.env.MODE === 'mock' && (
-        <Row>
-          <div className='w-full p-2 bg-primary-orange text-center text-black'>
-            Application is running in <strong>demo</strong> mode. Changes will not be saved!
+          )}
+          <div className='flex gap-2'>
+            <NotificationPanel user={selectedStudent ?? self} />
+            <Button
+              className='flex flex-col justify-center items-center h-10 border border-solid border-white align-middle rounded-md w-32 p-2 text-white'
+              type='link'
+              onClick={() => {
+                inHome ? toggleHome(isAdmin ? '/admin' : '/student-settings') : goHome();
+              }}
+            >
+              <h3>
+                {inHome ?
+                  isAdmin ?
+                    'Admin Panel'
+                  : 'Settings'
+                : 'Home'}
+              </h3>
+            </Button>
           </div>
-        </Row>
+        </div>
+        {isAdmin && inHome && (
+          <div className='md:hidden'>
+            <Selector selectedStudent={selectedStudent} setSelectedStudent={setSelectedStudent} />
+          </div>
+        )}
+      </div>
+      {import.meta.env.MODE !== 'mock' && (
+        <div className='w-full p-2 bg-primary-orange text-center text-black'>
+          Application is running in <strong>demo</strong> mode. Changes will not be saved!
+        </div>
       )}{' '}
     </header>
   );

@@ -1,5 +1,4 @@
 import { getLayoutColumns, getTileGroups } from '@/api/tiles';
-import Loading from '@/components/particles/loading';
 import QueryError from '@/components/particles/QueryError';
 import { useQuery } from '@tanstack/react-query';
 import { Col, Row, Spin } from 'antd';
@@ -45,10 +44,6 @@ const ViewLayout: FC = (): ReactElement => {
     );
   }
 
-  if (columns === undefined || tilegroups === undefined) {
-    return <Loading />;
-  }
-
   if (columns.find((col) => col.groups.length > 0) === undefined) {
     return (
       <div className='absolute inset-0 w-screen h-screen grid place-content-center pointer-events-none'>
@@ -68,22 +63,39 @@ const ViewLayout: FC = (): ReactElement => {
   }
 
   return (
-    <Row className='flex gap-3 flex-nowrap mx-auto'>
+    <Row className='flex flex-col lg:flex-row gap-3 flex-nowrap mx-auto mb-3'>
       {columns.map((column) => (
-        <Col key={column.id} span={Math.round((24 * column.width) / 100)} className='flex-shrink'>
-          <div className='h-full grid gap-3'>
+        <>
+          <div className='lg:hidden flex flex-col gap-3'>
             {column.groups.map((id) => {
               const group = tilegroups.find((group) => group.id === id);
               return (
                 group !== undefined && (
-                  <div className={`h-[calc(100%/${column.groups.length})]`} key={id}>
+                  <div className='space-y-3' key={id}>
                     <ViewTileGroup key={id} group={group} />
                   </div>
                 )
               );
             })}
           </div>
-        </Col>
+          <Col key={column.id} span={Math.round((24 * column.width) / 100)} className='hidden lg:block flex-shrink '>
+            <div className='h-full grid gap-3'>
+              {column.groups.map((id) => {
+                const group = tilegroups.find((group) => group.id === id);
+                return (
+                  group !== undefined && (
+                    <div
+                      className={`h-[calc(100%/${column.groups.length})] [&>div]:!h-full [&>div>div]:!h-full`}
+                      key={id}
+                    >
+                      <ViewTileGroup key={id} group={group} />
+                    </div>
+                  )
+                );
+              })}
+            </div>
+          </Col>
+        </>
       ))}
     </Row>
   );

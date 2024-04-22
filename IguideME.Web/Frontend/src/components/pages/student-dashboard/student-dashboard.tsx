@@ -5,7 +5,7 @@ import Loading from '@/components/particles/loading';
 import { UserRoles, type User } from '@/types/user';
 import { AppstoreOutlined, BarChartOutlined } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
-import { Col, Radio, Row } from 'antd';
+import { Radio } from 'antd';
 import { useEffect, type FC, type ReactElement } from 'react';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
 import { TileViewStoreProvider, useTileViewStore } from './tileViewContext';
@@ -75,16 +75,13 @@ const Dashboard: FC<DashboardProps> = ({ self }): ReactElement => {
 
   return (
     <div className='w-screen px-3'>
-      <Row className='w-full h-header flex justify-between'>
-        <Col className='h-full grid place-content-center'>
+      <div className='flex flex-col gap-3 py-3 lg:p-0'>
+        <div className='flex justify-between items-center'>
           <StudentInfo />
-        </Col>
-        <Col className='grid place-content-center'>
-          <GradeDisplay />
-        </Col>
-        <Col className='h-full grid place-content-center'>
+          <div className='hidden lg:block'>
+            <GradeDisplay />
+          </div>
           <Radio.Group
-            className=''
             value={viewType}
             buttonStyle='solid'
             onChange={(e) => {
@@ -92,14 +89,19 @@ const Dashboard: FC<DashboardProps> = ({ self }): ReactElement => {
             }}
           >
             <Radio.Button value='graph'>
-              <BarChartOutlined /> Graph
+              <BarChartOutlined />
+              <span> Graph</span>
             </Radio.Button>
             <Radio.Button value='grid'>
-              <AppstoreOutlined /> Grid
+              <AppstoreOutlined />
+              <span> Grid</span>
             </Radio.Button>
           </Radio.Group>
-        </Col>
-      </Row>
+        </div>
+        <div className='lg:hidden'>
+          <GradeDisplay />
+        </div>
+      </div>
       <Outlet />
     </div>
   );
