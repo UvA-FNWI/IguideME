@@ -2,7 +2,6 @@ import { getSelf, getStudent } from '@/api/users';
 import GradeDisplay from '@/components/atoms/grade-display/grade-display';
 import StudentInfo from '@/components/atoms/student-info/student-info';
 import Loading from '@/components/particles/loading';
-import { ViewType } from '@/types/tile';
 import { UserRoles, type User } from '@/types/user';
 import { AppstoreOutlined, BarChartOutlined } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
@@ -83,9 +82,11 @@ const Dashboard: FC<DashboardProps> = ({ self }): ReactElement => {
             <GradeDisplay />
           </div>
           <Radio.Group
+            className=''
             value={viewType}
-            onChange={(value: ViewType) => {
-              setViewType(value);
+            buttonStyle='solid'
+            onChange={(e) => {
+              setViewType(e.target.value);
             }}
           >
             <Radio.Button value='graph'>
