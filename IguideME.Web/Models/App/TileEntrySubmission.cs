@@ -74,22 +74,22 @@ namespace IguideME.Web.Models.App
 
     public class AssignmentGrades
     {
-        [JsonProperty(PropertyName = "grade ")]
+        [JsonProperty(PropertyName = "grade")]
         public double Grade { get; set; }
 
-        [JsonProperty(PropertyName = "peerAvg ")]
+        [JsonProperty(PropertyName = "peerAvg")]
         public double PeerAvg { get; set; }
 
-        [JsonProperty(PropertyName = "peerMin ")]
+        [JsonProperty(PropertyName = "peerMin")]
         public double PeerMin { get; set; }
 
-        [JsonProperty(PropertyName = "peerMax ")]
+        [JsonProperty(PropertyName = "peerMax")]
         public double PeerMax { get; set; }
 
-        [JsonProperty(PropertyName = "max ")]
+        [JsonProperty(PropertyName = "max")]
         public double Max { get; set; }
 
-        [JsonProperty(PropertyName = "type ")]
+        [JsonProperty(PropertyName = "type")]
         public AppGradingType Type { get; set; }
 
         public AssignmentGrades(

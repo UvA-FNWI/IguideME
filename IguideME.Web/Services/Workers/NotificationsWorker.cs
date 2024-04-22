@@ -112,12 +112,14 @@ namespace IguideME.Web.Services.Workers
 
         private bool checkSend()
         {
-            string notificationDates = _databaseManager.GetNotificationDates(_courseID);
-            if (string.IsNullOrEmpty(notificationDates)) return false;
+            var notificationDates = _databaseManager.GetNotificationDates(_courseID);
+
+            string dataDates = notificationDates.selectedDates;
+            if (string.IsNullOrEmpty(dataDates))
+                return false;
 
             // Check if any of the dates are in the future
-            string[] splitted = notificationDates.Split(";");
-            string[] dates = splitted[2].Split("=")[1].Split(",");
+            string[] dates = dataDates.Split(", ");
 
             bool send = false;
             foreach (string date in dates)

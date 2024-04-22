@@ -36,8 +36,7 @@ public static class DatabaseQueries
             `start_date`            DATE NULL,
             `end_date`              DATE NULL,
             `consent`               TEXT NULL,
-            `peer_group_size`       INTEGER DEFAULT 5,
-            `notification_settings` INTEGER
+            `peer_group_size`       INTEGER DEFAULT 5
         );";
 
     public const string CREATE_TABLE_NOTIFICATIONS_COURSE_SETTINGS =
@@ -1524,14 +1523,13 @@ public static class DatabaseQueries
         ;";
 
     public const string QUERY_PEER_GROUP_RESULTS =
-        @"SELECT    `component_id`,
-                    `avg_grade`,
+        @"SELECT    `avg_grade`,
                     `min_grade`,
                     `max_grade`
         FROM        `peer_groups`
-        WHERE       `course_id`= @courseID
-        AND         `goal_grade`= @goalGrade
+        WHERE       `goal_grade`= @goalGrade
         AND         `component_type`= @componentType
+        AND         `component_id`= @componentID
         AND         `sync_id`= @syncID;";
 
     public const string QUERY_GRADE_COMPARISSON_HISTORY = // half done ?????

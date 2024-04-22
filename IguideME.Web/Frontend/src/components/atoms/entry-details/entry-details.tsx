@@ -1,16 +1,16 @@
-import GraphGrade from '../graph-grade/graph-grade';
+import { getAssignmentSubmission, getDiscussion } from '@/api/entries';
+import { GradeView } from '@/components/crystals/grid-tile/grid-tile';
+import { useTileViewStore } from '@/components/pages/student-dashboard/tileViewContext';
 import Loading from '@/components/particles/loading';
 import PeerComparison from '@/components/particles/peer-comparison/peercomparison';
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
-import { Col } from 'antd/lib';
-import { Divider, Row } from 'antd';
-import { getAssignmentSubmission, getDiscussion } from '@/api/entries';
-import { GradeView } from '@/components/crystals/grid-tile/grid-tile';
-import { useQuery } from '@tanstack/react-query';
-import { useTileViewStore } from '@/components/pages/student-dashboard/tileViewContext';
 import { type TileEntry } from '@/types/tile';
+import { useQuery } from '@tanstack/react-query';
+import { Divider, Row } from 'antd';
+import { Col } from 'antd/lib';
 import { type FC, type ReactElement } from 'react';
+import GraphGrade from '../graph-grade/graph-grade';
 
 interface Props {
   entry: TileEntry;
@@ -30,7 +30,7 @@ export const AssignmentDetail: FC<Props> = ({ entry }): ReactElement => {
     queryKey: [`entry/${entry.content_id}/${user.studentnumber}`],
     queryFn: async () => await getAssignmentSubmission(entry.content_id, user.userID),
   });
-  console.log("sub", submission)
+  console.log('sub', submission);
 
   if (isLoading) {
     return (
@@ -38,7 +38,7 @@ export const AssignmentDetail: FC<Props> = ({ entry }): ReactElement => {
         <div className='w-[270px] h-[180px]' />
       </QueryLoading>
     );
-  } else if (isError || submission === undefined) {
+  } else if (isError || !submission) {
     return <QueryError className='grid place-content-center' title='No submission found' />;
   }
 

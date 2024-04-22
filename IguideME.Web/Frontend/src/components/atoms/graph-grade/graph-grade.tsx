@@ -1,24 +1,24 @@
+import { printGrade, type Grades } from '@/types/tile';
 import { Bullet } from '@ant-design/charts';
 import { Col, Row } from 'antd';
-import { type Grades } from '@/types/tile';
 import { type FC, type ReactElement } from 'react';
 
 const BLUE = 'rgba(90, 50, 255, .9)';
 const RED = 'rgba(255, 50, 50, .8)';
 
-const GraphGrade: FC<Grades> = ({ grade, peerAvg, peerMin, peerMax, max }): ReactElement => {
+const GraphGrade: FC<Grades> = ({ grade, peerAvg, peerMin, peerMax, max, type }): ReactElement => {
   const studentdata = [
     {
       title: 'You',
       Grade: grade,
-      Max: max,
+      Max: 100,
     },
   ];
   const peerdata = [
     {
       title: 'Peers',
       'Peer avg': peerAvg,
-      ranges: [peerMin, peerMax, max],
+      ranges: [peerMin, peerMax, 100],
     },
   ];
 
@@ -35,8 +35,7 @@ const GraphGrade: FC<Grades> = ({ grade, peerAvg, peerMin, peerMax, max }): Reac
       items: [
         {
           channel: 'y',
-
-          valueFormatter: '.2f',
+          valueFormatter: (val: number) => printGrade(type, val, max),
         },
       ],
     },

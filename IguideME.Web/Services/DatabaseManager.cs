@@ -1074,7 +1074,7 @@ namespace IguideME.Web.Services
                     }
                     catch (Exception e)
                     {
-                        PrintQueryError("GetUserGoalGrade", 0, r, e);
+                        PrintQueryError("GetTileNotificationState", 0, r, e);
                     }
                 }
                 return result;
@@ -1100,7 +1100,7 @@ namespace IguideME.Web.Services
                     }
                     catch (Exception e)
                     {
-                        PrintQueryError("GetUserGoalGrade", 0, r, e);
+                        PrintQueryError("GetNotificationEnable", 0, r, e);
                     }
                 }
                 return result;
@@ -1459,8 +1459,11 @@ namespace IguideME.Web.Services
             int courseID,
             int entryID,
             string userID
-        )
-        {
+        ) {
+            int goal = GetUserGoalGrade(courseID, userID, GetCurrentSyncID(courseID));
+            PeerComparisonData comparison = GetUserPeerComparison(courseID, goal, Comparison_Component_Types.assignment, entryID);
+            AppAssignment ass = GetAssignment(courseID, entryID);
+
             using (
                 SQLiteDataReader r = Query(
                     DatabaseQueries.QUERY_USER_SUBMISSION_FOR_ENTRY_FOR_USER,
@@ -1472,12 +1475,19 @@ namespace IguideME.Web.Services
                 if (r.Read())
                 {
                     return new(
-                            r.GetInt32(0),
-                            r.GetInt32(1),
-                            r.GetValue(2).ToString(),
+                        r.GetInt32(0),
+                        r.GetInt32(1),
+                        r.GetValue(2).ToString(),
+                        new AssignmentGrades(
                             r.GetDouble(3),
-                            r.GetInt64(4)
-                        );
+                            comparison.Average,
+                            comparison.Minimum,
+                            comparison.Maximum,
+                            ass.MaxGrade,
+                            ass.GradingType
+                        ),
+                        r.GetInt64(4)
+                    );
                 }
             }
 
@@ -1647,42 +1657,34 @@ namespace IguideME.Web.Services
             return discussionCounters;
         }
 
-        public PeerComparisonData[] GetUserPeerComparison(
+        public PeerComparisonData GetUserPeerComparison(
             int courseID,
-            string loginID,
-            int componentType,
+            long goalGrade,
+            Comparison_Component_Types componentType,
+            int componentID,
             long syncID = 0
         )
         {
             long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
             if (activeSync == 0)
-                return new PeerComparisonData[]
-                {
-                    PeerComparisonData.FromGrades(0, Array.Empty<double>())
-                };
+                return null;
 
-            List<PeerComparisonData> submissions = new();
-
-            // First we need to find the user's goal grade to find their peer-group
-            int goalGrade = GetUserGoalGrade(courseID, loginID, syncID);
 
             using (
                 SQLiteDataReader r = Query(
                     DatabaseQueries.QUERY_PEER_GROUP_RESULTS,
-                    new SQLiteParameter("courseID", courseID),
                     new SQLiteParameter("goalGrade", goalGrade),
                     new SQLiteParameter("componentType", componentType),
+                    new SQLiteParameter("componentID", componentID),
                     new SQLiteParameter("syncID", activeSync)
                 )
             )
             {
-                while (r.Read())
+                if (r.Read())
                 {
                     try
                     {
-                        PeerComparisonData submission =
-                            new(r.GetInt32(0), r.GetDouble(1), r.GetDouble(2), r.GetDouble(3));
-                        submissions.Add(submission);
+                        return new(componentID, r.GetDouble(0), r.GetDouble(1), r.GetDouble(2));
                     }
                     catch (Exception e)
                     {
@@ -1690,8 +1692,8 @@ namespace IguideME.Web.Services
                     }
                 }
             }
-            return submissions.ToArray();
-        }
+            return new(componentID, 0, 0, 0);
+       }
 
         public List<PredictedGrade> GetPredictedGrades(int courseID, string userID)
         {
@@ -2342,6 +2344,7 @@ namespace IguideME.Web.Services
             }
             return keys;
         }
+
 
         public Dictionary<string, string> GetEntryMeta(int submissionID)
         {
