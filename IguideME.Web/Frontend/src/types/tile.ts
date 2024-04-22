@@ -1,3 +1,6 @@
+
+export type ViewType = 'graph' | 'grid';
+
 export interface LayoutColumn {
   id: number;
   width: number;

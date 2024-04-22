@@ -5,10 +5,11 @@ import Loading from '@/components/particles/loading';
 import { UserRoles, type User } from '@/types/user';
 import { AppstoreOutlined, BarChartOutlined } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
-import { Col, Radio, Row } from 'antd';
+import { Col, Row, Segmented } from 'antd';
 import { useEffect, type FC, type ReactElement } from 'react';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
 import { TileViewStoreProvider, useTileViewStore } from './tileViewContext';
+import { ViewType } from '@/types/tile';
 
 const LoadingState: FC = () => (
   <div className='absolute inset-0 w-screen h-screen grid place-content-center'>
@@ -83,21 +84,16 @@ const Dashboard: FC<DashboardProps> = ({ self }): ReactElement => {
           <GradeDisplay />
         </Col>
         <Col className='h-full grid place-content-center'>
-          <Radio.Group
-            className=''
+          <Segmented
+            options={[
+            {label: 'Graph', value: 'graph', icon: <BarChartOutlined />},
+            {label: 'Grid', value: 'grid', icon: <AppstoreOutlined />},
+          ]}
             value={viewType}
-            buttonStyle='solid'
-            onChange={(e) => {
-              setViewType(e.target.value);
+            onChange={(value: ViewType) => {
+              setViewType(value);
             }}
-          >
-            <Radio.Button value='graph'>
-              <BarChartOutlined /> Graph
-            </Radio.Button>
-            <Radio.Button value='grid'>
-              <AppstoreOutlined /> Grid
-            </Radio.Button>
-          </Radio.Group>
+          />
         </Col>
       </Row>
       <Outlet />

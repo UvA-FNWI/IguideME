@@ -6,7 +6,7 @@ module.exports = {
   },
   extends: [
     "eslint:recommended",
-    "standard-with-typescript",
+    "eslint-config-love",
     "plugin:react/recommended",
     "prettier",
   ],
