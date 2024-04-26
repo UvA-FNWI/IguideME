@@ -4,15 +4,15 @@ using Newtonsoft.Json;
 
 namespace IguideME.Web.Models
 {
+    public enum TileType
+    {
+        assignments,
+        discussions,
+        learning_outcomes
+    }
+
     public class Tile
     {
-        public enum Tile_type
-        {
-            assignments,
-            discussions,
-            learning_outcomes
-        }
-
         [JsonProperty(PropertyName = "id")]
         public int ID { get; private set; }
 
@@ -26,7 +26,7 @@ namespace IguideME.Web.Models
         public int Order { get; set; }
 
         [JsonProperty(PropertyName = "type")]
-        public Tile_type Type { get; set; }
+        public TileType Type { get; set; }
 
         [JsonProperty(PropertyName = "weight")]
         public double Weight { get; set; }
@@ -48,7 +48,7 @@ namespace IguideME.Web.Models
             int groupID,
             string title,
             int order,
-            Tile_type type,
+            TileType type,
             double weight,
             AppGradingType gradingType,
             bool visible,

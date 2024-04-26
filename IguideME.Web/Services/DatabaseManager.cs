@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SQLite;
-using System.Linq;
 using IguideME.Web.Models;
 using IguideME.Web.Models.App;
 using IguideME.Web.Models.Impl;
@@ -190,6 +189,8 @@ namespace IguideME.Web.Services
             {
                 DatabaseQueries.CREATE_TABLE_USERS,
                 DatabaseQueries.CREATE_TABLE_COURSE_SETTINGS,
+                DatabaseQueries.CREATE_TABLE_NOTIFICATIONS_COURSE_SETTINGS,
+                DatabaseQueries.CREATE_INDEX_NOTIFICATIONS_COURSE_SETTINGS,
                 DatabaseQueries.CREATE_TABLE_SYNC_HISTORY,
                 DatabaseQueries.CREATE_TABLE_STUDENT_SETTINGS,
                 DatabaseQueries.CREATE_TABLE_USER_TRACKER,
@@ -483,7 +484,7 @@ namespace IguideME.Web.Services
             return 1;
         }
 
-        public string GetNotificationDates(int courseID)
+        public dynamic GetNotificationDates(int courseID)
         {
             using (
                 SQLiteDataReader r = Query(
@@ -492,9 +493,16 @@ namespace IguideME.Web.Services
                 )
             )
                 if (r.Read())
-                    return r.GetString(0);
-
-            return null;
+                    return new {
+                        isRange = r.GetBoolean(0),
+                        selectedDays = r.GetValue(1).ToString(),
+                        selectedDates = r.GetValue(2).ToString()
+                    };
+            return new {
+                isRange = false,
+                selectedDays = "",
+                selectedDates = ""
+            };
         }
 
         public void RegisterUser(User user)
@@ -1066,7 +1074,7 @@ namespace IguideME.Web.Services
                     }
                     catch (Exception e)
                     {
-                        PrintQueryError("GetUserGoalGrade", 0, r, e);
+                        PrintQueryError("GetTileNotificationState", 0, r, e);
                     }
                 }
                 return result;
@@ -1092,7 +1100,7 @@ namespace IguideME.Web.Services
                     }
                     catch (Exception e)
                     {
-                        PrintQueryError("GetUserGoalGrade", 0, r, e);
+                        PrintQueryError("GetNotificationEnable", 0, r, e);
                     }
                 }
                 return result;
@@ -1318,6 +1326,26 @@ namespace IguideME.Web.Services
             return 0;
         }
 
+        public bool AssignmentHasEntry(int courseID, int assignmentID)
+        {
+            using (
+                SQLiteDataReader r = Query(
+                    DatabaseQueries.QUERY_CONTENT_HAS_ENTRY,
+                    new SQLiteParameter("assignmentID", assignmentID),
+                    new SQLiteParameter("contentType", TileType.assignments)
+                )
+            )
+            {
+                // If we find anything then it has an entry.
+                if (r.Read())
+                {
+                    return true;
+                }
+            }
+            return false;
+
+        }
+
         public int CreateUserSubmission(AssignmentSubmission submission)
         {
             return IDNonQuery(
@@ -1339,39 +1367,7 @@ namespace IguideME.Web.Services
             );
         }
 
-        public List<AssignmentSubmission> GetAssignmentSubmissions(int courseID, int entryID)
-        {
-            List<AssignmentSubmission> submissions = new();
-
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_SUBMISSIONS_FOR_ENTRY,
-                    new SQLiteParameter("entryID", entryID)
-                )
-            )
-            {
-                while (r.Read())
-                {
-                    AssignmentSubmission submission =
-                        new(
-                            r.GetInt32(0),
-                            r.GetInt32(1),
-                            r.GetValue(2).ToString(),
-                            r.GetDouble(3),
-                            r.GetInt64(4)
-                        );
-                    submissions.Add(submission);
-                }
-            }
-
-            foreach (AssignmentSubmission sub in submissions)
-            {
-                sub.Meta = GetEntryMeta(sub.ID);
-            }
-
-            return submissions;
-        }
-
+        // TODO: probably switch to using grades version of submissions instead of grade.
         public List<AssignmentSubmission> GetCourseSubmissions(int courseID, long syncID = 0)
         {
             long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
@@ -1459,126 +1455,43 @@ namespace IguideME.Web.Services
             return submissions;
         }
 
-        public List<AssignmentSubmission> GetAssignmentSubmissionsForUser(
+        public AssignmentSubmission GetAssignmentSubmissionForUser(
             int courseID,
             int entryID,
             string userID
-        )
-        {
-            List<AssignmentSubmission> submissions = new();
+        ) {
+            int goal = GetUserGoalGrade(courseID, userID, GetCurrentSyncID(courseID));
+            PeerComparisonData comparison = GetUserPeerComparison(courseID, goal, Comparison_Component_Types.assignment, entryID);
+            AppAssignment ass = GetAssignment(courseID, entryID);
 
             using (
                 SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_USER_SUBMISSIONS_FOR_ENTRY_FOR_USER,
+                    DatabaseQueries.QUERY_USER_SUBMISSION_FOR_ENTRY_FOR_USER,
                     new SQLiteParameter("entryID", entryID),
                     new SQLiteParameter("userID", userID)
                 )
             )
             {
-                while (r.Read())
+                if (r.Read())
                 {
-                    AssignmentSubmission submission =
-                        new(
-                            r.GetInt32(0),
-                            r.GetInt32(1),
-                            r.GetValue(2).ToString(),
+                    return new(
+                        r.GetInt32(0),
+                        r.GetInt32(1),
+                        r.GetValue(2).ToString(),
+                        new AssignmentGrades(
                             r.GetDouble(3),
-                            r.GetInt64(4)
-                        );
-                    submissions.Add(submission);
+                            comparison.Average,
+                            comparison.Minimum,
+                            comparison.Maximum,
+                            ass.MaxGrade,
+                            ass.GradingType
+                        ),
+                        r.GetInt64(4)
+                    );
                 }
             }
 
-            foreach (AssignmentSubmission sub in submissions)
-            {
-                sub.Meta = GetEntryMeta(sub.ID);
-            }
-
-            return submissions;
-        }
-
-        public List<AssignmentSubmission> GetTileSubmissions(
-            int courseID,
-            int tileID,
-            long syncID = 0
-        )
-        {
-            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
-            if (activeSync == 0)
-                return new List<AssignmentSubmission>() { };
-
-            List<AssignmentSubmission> submissions = new();
-
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_ALL_USER_SUBMISSIONS_FOR_TILE,
-                    new SQLiteParameter("tileID", tileID)
-                )
-            )
-            {
-                while (r.Read())
-                {
-                    AssignmentSubmission submission =
-                        new(
-                            r.GetInt32(0),
-                            r.GetInt32(1),
-                            r.GetValue(2).ToString(),
-                            r.GetInt32(3),
-                            r.GetInt32(4)
-                        );
-                    submissions.Add(submission);
-                }
-            }
-
-            foreach (AssignmentSubmission sub in submissions)
-            {
-                sub.Meta = GetEntryMeta(sub.ID);
-            }
-
-            return submissions;
-        }
-
-        public List<AssignmentSubmission> GetTileSubmissionsForUser(
-            int courseID,
-            int tileID,
-            string userID,
-            long syncID = 0
-        )
-        {
-            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
-            if (activeSync == 0)
-                return new List<AssignmentSubmission>() { };
-
-            List<AssignmentSubmission> submissions = new();
-
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_SUBMISSIONS_FOR_TILE_FOR_USER,
-                    new SQLiteParameter("tileID", tileID),
-                    new SQLiteParameter("userID", userID)
-                )
-            )
-            {
-                while (r.Read())
-                {
-                    AssignmentSubmission submission =
-                        new(
-                            r.GetInt32(0),
-                            r.GetInt32(1),
-                            r.GetValue(2).ToString(),
-                            r.GetInt32(3),
-                            r.GetInt32(4)
-                        );
-                    submissions.Add(submission);
-                }
-            }
-
-            foreach (AssignmentSubmission sub in submissions)
-            {
-                sub.Meta = GetEntryMeta(sub.ID);
-            }
-
-            return submissions;
+            return null;
         }
 
         public PeerGroup GetPeerGroup(int courseID)
@@ -1659,22 +1572,19 @@ namespace IguideME.Web.Services
             }
         }
 
-        public void UpdateNotificationDates(int courseID, string notificationDates)
+        public void UpdateNotificationDates(int courseID,
+                                            bool isRange,
+                                            string selectedDays,
+                                            string selectedDates)
         {
             NonQuery(
                 DatabaseQueries.UPDATE_NOTIFICATION_DATES_FOR_COURSE,
                 new SQLiteParameter("courseID", courseID),
-                new SQLiteParameter("notificationDates", notificationDates)
+                new SQLiteParameter("isRange", isRange),
+                new SQLiteParameter("selectedDays", selectedDays),
+                new SQLiteParameter("selectedDates", selectedDates)
             );
         }
-
-        // public void RecycleExternalData(int courseID, long syncID)
-        // {
-        //     NonQuery(DatabaseQueries.RECYCLE_EXTERNAL_DATA,
-        //         new SQLiteParameter("courseID", courseID),
-        //         new SQLiteParameter("syncID", syncID)
-        //     );
-        // }
 
         public void UpdateCoursePeerGroups(int courseID, int groupSize)
         {
@@ -1747,42 +1657,34 @@ namespace IguideME.Web.Services
             return discussionCounters;
         }
 
-        public PeerComparisonData[] GetUserPeerComparison(
+        public PeerComparisonData GetUserPeerComparison(
             int courseID,
-            string loginID,
-            int componentType,
+            long goalGrade,
+            Comparison_Component_Types componentType,
+            int componentID,
             long syncID = 0
         )
         {
             long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
             if (activeSync == 0)
-                return new PeerComparisonData[]
-                {
-                    PeerComparisonData.FromGrades(0, Array.Empty<double>())
-                };
+                return null;
 
-            List<PeerComparisonData> submissions = new();
-
-            // First we need to find the user's goal grade to find their peer-group
-            int goalGrade = GetUserGoalGrade(courseID, loginID, syncID);
 
             using (
                 SQLiteDataReader r = Query(
                     DatabaseQueries.QUERY_PEER_GROUP_RESULTS,
-                    new SQLiteParameter("courseID", courseID),
                     new SQLiteParameter("goalGrade", goalGrade),
                     new SQLiteParameter("componentType", componentType),
+                    new SQLiteParameter("componentID", componentID),
                     new SQLiteParameter("syncID", activeSync)
                 )
             )
             {
-                while (r.Read())
+                if (r.Read())
                 {
                     try
                     {
-                        PeerComparisonData submission =
-                            new(r.GetInt32(0), r.GetDouble(1), r.GetDouble(2), r.GetDouble(3));
-                        submissions.Add(submission);
+                        return new(componentID, r.GetDouble(0), r.GetDouble(1), r.GetDouble(2));
                     }
                     catch (Exception e)
                     {
@@ -1790,8 +1692,8 @@ namespace IguideME.Web.Services
                     }
                 }
             }
-            return submissions.ToArray();
-        }
+            return new(componentID, 0, 0, 0);
+       }
 
         public List<PredictedGrade> GetPredictedGrades(int courseID, string userID)
         {
@@ -1815,29 +1717,7 @@ namespace IguideME.Web.Services
             return predictions;
         }
 
-        public PeerComparisonData[] GetUserResults(int courseID, string userID)
-        {
-            List<PeerComparisonData> submissions = new();
-
-            using (
-                SQLiteDataReader r1 = Query(
-                    DatabaseQueries.QUERY_USER_RESULTS,
-                    new SQLiteParameter("courseID", courseID),
-                    new SQLiteParameter("userID", userID)
-                )
-            )
-            {
-                while (r1.Read())
-                {
-                    PeerComparisonData submission =
-                        new(r1.GetInt32(0), r1.GetDouble(1), r1.GetDouble(2), r1.GetDouble(3));
-                    submissions.Add(submission);
-                }
-            }
-
-            return submissions.ToArray();
-        }
-
+        // TODO: probably switch to using grades version of submissions instead of grade.
         public List<AssignmentSubmission> GetTileSubmissionsForUser(
             int courseID,
             string userID,
@@ -2336,6 +2216,7 @@ namespace IguideME.Web.Services
                 {
                     try
                     {
+                        // TODO: Title??
                         entries.Add(
                             new TileEntry(
                                 r.GetInt32(0),
@@ -2464,6 +2345,7 @@ namespace IguideME.Web.Services
             return keys;
         }
 
+
         public Dictionary<string, string> GetEntryMeta(int submissionID)
         {
             Dictionary<string, string> meta = new();
@@ -2539,7 +2421,7 @@ namespace IguideME.Web.Services
                                 r.GetInt32(1),
                                 r.GetValue(2).ToString(),
                                 r.GetInt32(3),
-                                (Tile.Tile_type)r.GetInt32(4),
+                                (TileType)r.GetInt32(4),
                                 r.GetDouble(5),
                                 (AppGradingType)r.GetInt32(6),
                                 r.GetBoolean(7),
@@ -2585,7 +2467,7 @@ namespace IguideME.Web.Services
                                 r.GetInt32(1),
                                 r.GetValue(2).ToString(),
                                 r.GetInt32(3),
-                                (Tile.Tile_type)r.GetInt32(4),
+                                (TileType)r.GetInt32(4),
                                 r.GetDouble(5),
                                 (AppGradingType)r.GetInt32(6),
                                 r.GetBoolean(7),
@@ -2840,6 +2722,42 @@ namespace IguideME.Web.Services
             }
 
             return assignments;
+        }
+
+        public AppAssignment GetAssignment(int courseID, int internalID)
+        {
+            using (
+                SQLiteDataReader r = Query(
+                    DatabaseQueries.QUERY_ASSIGNMENT,
+                    new SQLiteParameter("courseID", courseID),
+                    new SQLiteParameter("internalID", internalID)
+                )
+            )
+            {
+                if (r.Read())
+                {
+                    try
+                    {
+                        return new(
+                                r.GetInt32(0),
+                                r.GetInt32(1),
+                                r.GetValue(2).ToString(),
+                                r.GetInt32(3),
+                                r.GetBoolean(4),
+                                r.GetBoolean(5),
+                                r.GetInt64(6),
+                                r.GetDouble(7),
+                                (AppGradingType)r.GetInt32(8)
+                            );
+                    }
+                    catch (Exception e)
+                    {
+                        PrintQueryError("GetAssignments", 9, r, e);
+                    }
+                }
+            }
+
+            return null;
         }
 
         public List<AppDiscussion> GetDiscussions(int courseID)
@@ -3111,8 +3029,9 @@ namespace IguideME.Web.Services
             }
         }
 
-        public Tile GetTile(int courseID, int tileID)
+        public Tile GetTile(int courseID, int tileID, bool autoLoadEntries = false)
         {
+            Tile tile;
             using (
                 SQLiteDataReader r = Query(
                     DatabaseQueries.QUERY_TILE,
@@ -3122,17 +3041,24 @@ namespace IguideME.Web.Services
             )
             {
                 if (r.Read())
-                    return new Tile(
-                        r.GetInt32(0),
-                        r.GetInt32(1),
-                        r.GetValue(2).ToString(),
-                        r.GetInt32(3),
-                        (Tile.Tile_type)r.GetInt32(4),
-                        r.GetDouble(5),
-                        (AppGradingType)r.GetInt32(6),
-                        r.GetBoolean(7),
-                        r.GetBoolean(8)
-                    );
+                {
+                    tile = new(
+                                        r.GetInt32(0),
+                                        r.GetInt32(1),
+                                        r.GetValue(2).ToString(),
+                                        r.GetInt32(3),
+                                        (TileType)r.GetInt32(4),
+                                        r.GetDouble(5),
+                                        (AppGradingType)r.GetInt32(6),
+                                        r.GetBoolean(7),
+                                        r.GetBoolean(8)
+                                    );
+                    if (autoLoadEntries)
+                    {
+                        tile.Entries = GetTileEntries(tile.ID);
+                    }
+                    return tile;
+                }
             }
 
             return null;

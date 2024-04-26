@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection.Metadata;
 using IguideME.Web.Models;
 using IguideME.Web.Models.App;
 using IguideME.Web.Services.LMSHandlers;
 using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
 
 namespace IguideME.Web.Services.Workers
 {
@@ -144,7 +142,6 @@ namespace IguideME.Web.Services.Workers
             IEnumerable<AppAssignment> assignments = this._ILMSHandler.GetAssignments(
                 this._courseID
             );
-            List<TileEntry> entries = _databaseManager.GetAllTileEntries(this._courseID);
 
             // Get the consented users and only ask for their submissions
             List<Models.Impl.User> users = _databaseManager.GetUsersWithGrantedConsent(
@@ -159,20 +156,17 @@ namespace IguideME.Web.Services.Workers
 
             Dictionary<int, (double, AppGradingType)> gradingTypes = new();
             List<AssignmentSubmission> assignmentSubmissionsWithTiles = new();
-            _logger.LogWarning("test0 {}", submissions.Any());
 
-            _logger.LogInformation("test1 {}", submissions);
             _logger.LogInformation("test {}", submissions.Select(sub => sub.UserID));
-
 
             foreach (AppAssignment assignment in assignments)
             {
                 _logger.LogInformation("Processing assignment: {Name}", assignment.Title);
+                // The internal id is obtained after the assignment is registered in the database.
                 assignment.ID = _databaseManager.RegisterAssignment(assignment);
 
                 // Don't register submissions that aren't assigned to tiles (as entries).
-                TileEntry entry = entries.Find(e => e.ContentID == assignment.ID);
-                if (entry == null)
+                if (!_databaseManager.AssignmentHasEntry(this._courseID, assignment.ID))
                     continue;
 
                 // We register the internal assignmentID in the submission entity

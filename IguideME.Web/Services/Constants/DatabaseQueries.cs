@@ -31,13 +31,26 @@ public static class DatabaseQueries
      */
     public const string CREATE_TABLE_COURSE_SETTINGS =
         @"CREATE TABLE IF NOT EXISTS `course_settings` (
+            `course_id`             INTEGER PRIMARY KEY,
+            `name`                  STRING,
+            `start_date`            DATE NULL,
+            `end_date`              DATE NULL,
+            `consent`               TEXT NULL,
+            `peer_group_size`       INTEGER DEFAULT 5
+        );";
+
+    public const string CREATE_TABLE_NOTIFICATIONS_COURSE_SETTINGS =
+        @"CREATE TABLE IF NOT EXISTS `notifications_course_settings` (
             `course_id`           INTEGER PRIMARY KEY,
-            `name`                STRING,
-            `start_date`          DATE NULL,
-            `end_date`            DATE NULL,
-            `consent`             TEXT NULL,
-            `peer_group_size`     INTEGER DEFAULT 5,
-            `notification_dates`  TEXT NULL
+            `is_range`            BOOLEAN DEFAULT false,
+            `selected_days`       TEXT NULL,
+            `selected_dates`      TEXT NULL,
+            FOREIGN KEY(`course_id`) REFERENCES `course_settings`(`course_id`)
+        );";
+
+    public const string CREATE_INDEX_NOTIFICATIONS_COURSE_SETTINGS =
+        @"CREATE INDEX IF NOT EXISTS `index_notifications_course_settings_on_course_id`
+            ON `notifications_course_settings` (`course_id`
         );";
 
     public const string CREATE_TABLE_USER_TRACKER =
@@ -421,7 +434,7 @@ public static class DatabaseQueries
           FROM      `tile_grades`
           WHERE     `user_id` = @userID
           AND       `tile_id` = @tileID
-          ORDER BY  `sync_id` 
+          ORDER BY  `sync_id`
             DESC
           LIMIT 1;";
     public const string REGISTER_USER_NOTIFICATIONS =
@@ -497,7 +510,7 @@ public static class DatabaseQueries
         );";
 
     public const string REGISTER_LEARNING_GOAL =
-        @"INSERT OR REPLACE 
+        @"INSERT OR REPLACE
             INTO            `learning_goals`
                             (   `course_id`,
                                 `title`  )
@@ -827,10 +840,10 @@ public static class DatabaseQueries
         LIMIT       1;";
 
     public const string QUERY_NOTIFICATION_DATES_FOR_COURSE =
-        @"SELECT    `notification_dates`
-    FROM        `course_settings`
-    WHERE       `course_id`=@courseID
-    LIMIT       1;
+        @"SELECT    `is_range`, `selected_days`, `selected_dates`
+        FROM        `notifications_course_settings`
+        WHERE       `course_id`=@courseID
+        LIMIT       1;
     ";
 
     public const string QUERY_TILE_GRADE =
@@ -1008,6 +1021,15 @@ public static class DatabaseQueries
         WHERE       ``submission_id`=@submissionID
         ;";
 
+    public const string QUERY_CONTENT_HAS_ENTRY =
+        @"SELECT    `content_id`
+        FROM        `tile_entries`
+        INNER JOIN  `tiles`
+            USING   (`tile_id`)
+        WHERE       `tile_entries`.`content_id`= @assignmentID
+        AND         `tiles`.`type`=@contentType
+        ;";
+
     public const string QUERY_ASSIGNMENT_ID_FROM_EXTERNAL =
         @"SELECT    `assignment_id`
         FROM        `assignments`
@@ -1027,6 +1049,21 @@ public static class DatabaseQueries
                     `grading_type`
         FROM        `assignments`
         WHERE       `course_id`=@courseID
+        ;";
+
+    public const string QUERY_ASSIGNMENT =
+        @"SELECT    `assignment_id`,
+                    `course_id`,
+                    `title`,
+                    `external_id`,
+                    `published`,
+                    `muted`,
+                    `due_date`,
+                    `max_grade`,
+                    `grading_type`
+        FROM        `assignments`
+        WHERE       `course_id`=@courseID
+        AND         `assignment_id`=@internalID
         ;";
 
     public const string QUERY_COURSE_DISCUSSIONS =
@@ -1486,14 +1523,13 @@ public static class DatabaseQueries
         ;";
 
     public const string QUERY_PEER_GROUP_RESULTS =
-        @"SELECT    `component_id`,
-                    `avg_grade`,
+        @"SELECT    `avg_grade`,
                     `min_grade`,
                     `max_grade`
         FROM        `peer_groups`
-        WHERE       `course_id`= @courseID
-        AND         `goal_grade`= @goalGrade
+        WHERE       `goal_grade`= @goalGrade
         AND         `component_type`= @componentType
+        AND         `component_id`= @componentID
         AND         `sync_id`= @syncID;";
 
     public const string QUERY_GRADE_COMPARISSON_HISTORY = // half done ?????
@@ -1517,30 +1553,14 @@ public static class DatabaseQueries
         GROUP BY    `peer_groups`.`component_id`, `peer_groups`.`sync_id`
         ORDER BY    `peer_groups`.`component_id`;";
 
-    public const string QUERY_USER_RESULTS = // half done , does it work though?????
-        @"SELECT   `tiles`.`tile_id`,
-                    AVG(`grade`),
-                    MIN(`grade`),
-                    MAX(`grade`)
-        FROM        `submissions`
-        INNER JOIN  `tile_entries`
-            ON      `submissions`.`assignment_id`=`tile_entries`.`content_id`
-        INNER JOIN  `tiles`
-            USING   (`tile_id`)
-        INNER JOIN  `tile_groups`
-            USING   (`group_id`)
-        WHERE       `tile_groups`.`course_id`=@courseID
-        AND         `submissions`.`user_id`=@userID
-	    GROUP BY `tiles`.`tile_id`;";
-
-    public const string QUERY_USER_SUBMISSIONS_FOR_ENTRY_FOR_USER =
-        @"SELECT    `id`,
-                    `entry_id`,
+    public const string QUERY_USER_SUBMISSION_FOR_ENTRY_FOR_USER =
+        @"SELECT    `submission_id`,
+                    `assignment_id`,
                     `user_id`,
                     `grade`,
-                    `submitted`
+                    `date`
         FROM        `submissions`
-        WHERE       `entry_id`=@entryID
+        WHERE       `assignment_id`=@entryID
         AND         `user_id`=@userID
         ;";
 
@@ -1588,12 +1608,13 @@ public static class DatabaseQueries
         SET         `peer_group_size`=@groupSize
         WHERE       `course_id`=@courseID;";
     public const string UPDATE_NOTIFICATION_DATES_FOR_COURSE =
-        @"UPDATE    `course_settings`
-        SET         `notification_dates`=@notificationDates
-        WHERE       `course_id`=@courseID;";
+        @"INSERT OR REPLACE
+        INTO        `notifications_course_settings`
+                    (`course_id`, `is_range`, `selected_days`, `selected_dates`)
+        VALUES      (@courseID, @isRange, @selectedDays, @selectedDates);";
 
     public const string TIE_TILE_GROUP_TO_COLUMN =
-        @"UPDATE   `tile_groups`
+        @"UPDATE    `tile_groups`
         SET         `column_id`=@columnID
         WHERE       `group_id`=@groupID;";
 

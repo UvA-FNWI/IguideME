@@ -142,7 +142,7 @@ namespace IguideME.Web.Services.Workers
             // Get all the discussion tiles.
             IEnumerable<Tile> tiles = _databaseManager
                 .GetTiles(this._courseID)
-                .Where(tile => tile.Type == Tile.Tile_type.discussions);
+                .Where(tile => tile.Type == TileType.discussions);
 
             foreach (Tile tile in tiles)
             {

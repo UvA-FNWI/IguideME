@@ -223,7 +223,7 @@ namespace IguideME.Web.Services
                                 -1,
                                 quiz.ID ?? -1,
                                 sub.UserID.ToString(),
-                                sub.Score ?? 1,
+                                sub.Score.ToString(),
                                 ((DateTimeOffset)sub.FinishedDate.Value).ToUnixTimeMilliseconds()
                             ))
                     )

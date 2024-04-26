@@ -81,6 +81,9 @@ const Dashboard: FC<DashboardProps> = ({ self }): ReactElement => {
           <div className='hidden lg:block'>
             <GradeDisplay />
           </div>
+          <div className='hidden lg:block'>
+            <GradeDisplay />
+          </div>
           <Radio.Group
             className=''
             value={viewType}
@@ -92,12 +95,21 @@ const Dashboard: FC<DashboardProps> = ({ self }): ReactElement => {
             <Radio.Button value='graph'>
               <BarChartOutlined />
               <span> Graph</span>
+              <BarChartOutlined />
+              <span> Graph</span>
             </Radio.Button>
             <Radio.Button value='grid'>
               <AppstoreOutlined />
               <span> Grid</span>
+              <AppstoreOutlined />
+              <span> Grid</span>
             </Radio.Button>
           </Radio.Group>
+        </div>
+        <div className='lg:hidden'>
+          <GradeDisplay />
+        </div>
+      </div>
         </div>
         <div className='lg:hidden'>
           <GradeDisplay />

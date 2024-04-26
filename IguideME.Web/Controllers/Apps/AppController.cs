@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
+using System;
+using Newtonsoft.Json;
 
 namespace IguideME.Web.Controllers
 {
@@ -240,12 +242,22 @@ namespace IguideME.Web.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult UpdateNotificationDates()
         {
-            int courseID = this.GetCourseID();
 
-            var body = new StreamReader(Request.Body).ReadToEnd();
-            string dates = (string)JObject.Parse(body)["dates"];
+            var body = JObject.Parse(new StreamReader(Request.Body).ReadToEnd());
 
-            _databaseManager.UpdateNotificationDates(courseID, dates);
+            // Check if all required fields are present
+            if (!body.ContainsKey("isRange") ||
+                !body.ContainsKey("selectedDays") ||
+                !body.ContainsKey("selectedDates"))
+            {
+                return BadRequest();
+            }
+
+            bool isRange = (bool)body["isRange"];
+            string selectedDays = (string)body["selectedDays"];
+            string selectedDates = (string)body["selectedDates"];
+
+            _databaseManager.UpdateNotificationDates(GetCourseID(), isRange, selectedDays, selectedDates);
 
             return Ok();
         }
@@ -258,8 +270,8 @@ namespace IguideME.Web.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult GetNotificationDates()
         {
-            string allDates = _databaseManager.GetNotificationDates(GetCourseID());
-            return allDates != null ? Json(allDates) : NotFound();
+            var notificationSettings = _databaseManager.GetNotificationDates(GetCourseID());
+            return Json(notificationSettings);
         }
     }
 }

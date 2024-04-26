@@ -17,6 +17,12 @@ export type NotificationAdminSettings = {
   selectedDates: string | null;
 };
 
+export type NotificationAdminSettings = {
+  isRange: boolean;
+  selectedDays: string | null;
+  selectedDates: string | null;
+};
+
 const NotificationSettings: FC = (): ReactElement => {
   const { data, isError, isLoading } = useQuery({
     queryKey: ['notification-settings'],

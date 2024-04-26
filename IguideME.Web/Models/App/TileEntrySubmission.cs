@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using IguideME.Web.Services;
 using Newtonsoft.Json;
 
 namespace IguideME.Web.Models.App
@@ -15,10 +14,11 @@ namespace IguideME.Web.Models.App
         [JsonProperty(PropertyName = "assignment_id")]
         public int AssignmentID { get; set; }
 
-        [JsonProperty(PropertyName = "grade")]
         public double? Grade { get; set; }
-
         public string RawGrade { get; set; }
+
+        [JsonProperty(PropertyName = "grades")]
+        public AssignmentGrades Grades { get; set; }
 
         [JsonProperty(PropertyName = "date")]
         public long Date { get; set; }
@@ -55,5 +55,59 @@ namespace IguideME.Web.Models.App
             Grade = grade;
             Date = date;
         }
+
+        public AssignmentSubmission(
+            int id,
+            int assignmentID,
+            string userID,
+            AssignmentGrades grades,
+            long date
+        )
+        {
+            ID = id;
+            UserID = userID;
+            AssignmentID = assignmentID;
+            Grades = grades;
+            Date = date;
+        }
+    }
+
+    public class AssignmentGrades
+    {
+        [JsonProperty(PropertyName = "grade")]
+        public double Grade { get; set; }
+
+        [JsonProperty(PropertyName = "peerAvg")]
+        public double PeerAvg { get; set; }
+
+        [JsonProperty(PropertyName = "peerMin")]
+        public double PeerMin { get; set; }
+
+        [JsonProperty(PropertyName = "peerMax")]
+        public double PeerMax { get; set; }
+
+        [JsonProperty(PropertyName = "max")]
+        public double Max { get; set; }
+
+        [JsonProperty(PropertyName = "type")]
+        public AppGradingType Type { get; set; }
+
+        public AssignmentGrades(
+            double grade,
+            double peerAvg,
+            double peerMin,
+            double peerMax,
+            double max,
+            AppGradingType type
+        )
+        {
+            Grade = grade;
+            PeerAvg = peerAvg;
+            PeerMin = peerMin;
+            PeerMax = peerMax;
+            Max = max;
+            Type = type;
+        }
+
     }
 }
