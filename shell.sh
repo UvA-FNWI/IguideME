@@ -3,10 +3,8 @@
 PROJECT_ROOT=$PWD;
 FRONTEND_ROOT="$PROJECT_ROOT/IguideME.Web/Frontend"
 
-if [ ! -d $FRONTEND_ROOT/node_modules ]; then
-  echo "Fetching node modules..."
-  yarn --cwd $FRONTEND_ROOT;
-fi
+echo "Checking node modules..."
+pnpm --cwd $FRONTEND_ROOT;
 
 
 alias frontend-dev='pnpm -C $FRONTEND_ROOT dev'
