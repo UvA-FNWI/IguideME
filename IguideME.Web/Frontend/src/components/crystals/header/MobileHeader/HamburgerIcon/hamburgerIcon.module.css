@@ -1,0 +1,32 @@
+.hamburger_icon {
+  position: relative;
+  z-index: 20;
+}
+
+.hamburger_icon[aria-expanded='false'] rect {
+  transform-origin: center;
+  transition:
+    y 200ms ease-in 300ms,
+    rotate 300ms ease-in,
+    opacity 0ms 300ms;
+}
+
+.hamburger_icon[aria-expanded='true'] rect {
+  transform-origin: center;
+  transition:
+    y 200ms ease-in,
+    rotate 300ms ease-in 200ms,
+    opacity 0ms 300ms;
+}
+
+.hamburger_icon[aria-expanded='true'] rect:first-child {
+  rotate: 45deg;
+}
+
+.hamburger_icon[aria-expanded='true'] rect:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger_icon[aria-expanded='true'] rect:last-child {
+  rotate: 135deg;
+}

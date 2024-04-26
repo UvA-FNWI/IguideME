@@ -1,5 +1,5 @@
 import { Row } from 'antd';
-import { type PropsWithChildren, type FC, type ReactElement } from 'react';
+import { type FC, type PropsWithChildren, type ReactElement } from 'react';
 
 interface Props {
   title: string;

@@ -1,3 +1,6 @@
+
+export type ViewType = 'graph' | 'grid';
+
 export interface LayoutColumn {
   id: number;
   width: number;
@@ -105,7 +108,7 @@ export const printGrade = (type: GradingType, grade: number, max: number, ng: bo
     case GradingType.Letters:
       return letterGrade(grade);
     case GradingType.Points:
-      return ((grade * max) / 100).toFixed(2) + '/' + max;
+      return ((grade * max) / 100).toFixed(1) + '/' + max.toFixed(1);
     case GradingType.NotGraded:
       return ng ? 'N/A' : grade.toFixed(0);
   }

@@ -1,11 +1,11 @@
-import { getLearningGoals } from '@/api/entries';
-import { useDrawerStore } from '@/components/crystals/tile-group-board/useDrawerStore';
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
-import type { LearningGoal, TileEntry } from '@/types/tile';
 import { DeleteFilled } from '@ant-design/icons';
+import { Form, Select, Table } from 'antd';
+import { getLearningGoals } from '@/api/entries';
+import type { LearningGoal, TileEntry } from '@/types/tile';
+import { useDrawerStore } from '@/components/crystals/tile-group-board/useDrawerStore';
 import { useQuery } from '@tanstack/react-query';
-import { Form, Row, Select, Table } from 'antd';
 import { useCallback, useState, type FC, type ReactElement } from 'react';
 
 const { Item } = Form;
@@ -19,14 +19,14 @@ const EditTileGoals: FC = (): ReactElement => {
   if (isError) return <QueryError className='static [&_span]:!text-2xl' title={'Error: Could not load goals'} />;
 
   return (
-    <Row className='flex-col'>
+    <div className='col-span-3'>
       <p className='mb-1'>Goals:</p>
       <QueryLoading isLoading={isLoading}>
         <Item name='entries' className='w-full m-0'>
           <TileGoalsSelect goals={data ?? []} value={[]} onChange={() => {}} />
         </Item>
       </QueryLoading>
-    </Row>
+    </div>
   );
 };
 

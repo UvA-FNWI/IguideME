@@ -1,11 +1,11 @@
-import { getPeerSettings, postPeerSettings } from '@/api/course_settings';
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
+import { Button, Form, InputNumber, Switch } from 'antd';
 import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Button, Col, Form, InputNumber, Row, Switch } from 'antd';
-import { useEffect, type FC, type ReactElement } from 'react';
+import { getPeerSettings, postPeerSettings } from '@/api/course_settings';
 import { toast } from 'sonner';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useEffect, type FC, type ReactElement } from 'react';
 
 const PeerSettings: FC = (): ReactElement => {
   const { data, isError, isLoading } = useQuery({
@@ -55,32 +55,20 @@ const PeerSettingsForm: FC<Props> = ({ minSize }): ReactElement => {
 
   return (
     <Form name='peer_settings_form' initialValues={{ min_size: minSize }} onFinish={savePeer}>
-      <Row className='justify-between content-center'>
-        <Col>
-          <Form.Item name='min_size' label='Minimum group size' className='m-0'>
-            <InputNumber min={2} />
-          </Form.Item>
-        </Col>
-        <Col>
-          <Form.Item
-            name='personalized_peers'
-            label='Personalized'
-            valuePropName='checked'
-            className='m-[10px] [&_button]:bg-black/25'
-          >
-            <Switch defaultChecked checkedChildren={<CheckOutlined />} unCheckedChildren={<CloseOutlined />} />
-          </Form.Item>
-        </Col>
-      </Row>
-      <Row className='justify-end'>
-        <Col>
-          <Form.Item className='mr-[10px] mb-[5px]'>
-            <Button className='w-16' htmlType='submit'>
-              Save
-            </Button>
-          </Form.Item>
-        </Col>
-      </Row>
+      <div className='flex justify-between'>
+        <Form.Item name='min_size' label='Minimum group size'>
+          <InputNumber min={2} />
+        </Form.Item>
+        <Form.Item name='personalized_peers' label='Personalized' valuePropName='checked'>
+          <Switch defaultChecked checkedChildren={<CheckOutlined />} unCheckedChildren={<CloseOutlined />} />
+        </Form.Item>
+      </div>
+
+      <Form.Item className='flex justify-end m-0'>
+        <Button className='w-16' htmlType='submit'>
+          Save
+        </Button>
+      </Form.Item>
     </Form>
   );
 };

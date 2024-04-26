@@ -1,11 +1,11 @@
 import Header from '@/components/crystals/header/header';
-import { useQuery } from '@tanstack/react-query';
-import { Suspense, useEffect, type ReactElement } from 'react';
+import Loading from './components/particles/loading';
+import { getSelf } from './api/users';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { Toaster } from 'sonner';
-import { getSelf } from './api/users';
-import Loading from './components/particles/loading';
+import { useQuery } from '@tanstack/react-query';
 import { UserRoles } from './types/user';
+import { Suspense, useEffect, type ReactElement } from 'react';
 
 /**
  * The main entry point to the app. Adds a header and the contents of the app
@@ -34,12 +34,8 @@ function App(): ReactElement {
   }, [isSuccess]);
 
   const HeaderLoader = (
-    <header className='h-header bg-primary-purple flex justify-between items-center px-4'>
+    <header className='h-header bg-primary-purple flex justify-start items-center p-3'>
       <p className='text-white align-middle font-semibold inline-block text-2xl'>IguideME</p>
-      <div className='flex gap-2'>
-        <div className='h-10 border border-solid border-white text-white rounded-3xl w-10 p-0' />
-        <div className='h-10 w-32 border border-solid border-white rounded-md p-2' />
-      </div>
     </header>
   );
 

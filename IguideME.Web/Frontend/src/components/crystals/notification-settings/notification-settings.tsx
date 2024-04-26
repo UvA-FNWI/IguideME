@@ -1,15 +1,21 @@
-import { getNotificationSettings, postNotificationSettings } from '@/api/course_settings';
+import dayjs from 'dayjs';
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button, Checkbox, DatePicker, Divider, Form, Radio } from 'antd';
 import { CheckboxChangeEvent } from 'antd/es/checkbox';
 import { CheckboxValueType } from 'antd/es/checkbox/Group';
-import { useForm } from 'antd/es/form/Form';
-import dayjs from 'dayjs';
-import { memo, useCallback, useEffect, useMemo, useState, type FC, type ReactElement } from 'react';
 import { DateObject } from 'react-multi-date-picker';
+import { getNotificationSettings, postNotificationSettings } from '@/api/course_settings';
 import { toast } from 'sonner';
+import { useForm } from 'antd/es/form/Form';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { memo, useCallback, useEffect, useMemo, useState, type FC, type ReactElement } from 'react';
+
+export type NotificationAdminSettings = {
+  isRange: boolean;
+  selectedDays: string | null;
+  selectedDates: string | null;
+};
 
 const NotificationSettings: FC = (): ReactElement => {
   const { data, isError, isLoading } = useQuery({
@@ -17,21 +23,12 @@ const NotificationSettings: FC = (): ReactElement => {
     queryFn: getNotificationSettings,
   });
 
-  // The dates are stored in the format 'Range=<boolean>;SelectedDays=<string[] | null>;SelectedDates=<Date[]>'
   const { range, selectedDays, selectedDates } = useMemo(() => {
     if (data) {
-      const range = data.includes('Range=true') ? true : false;
-      const selectedDays =
-        data.includes('SelectedDays=null') ? null
-        : data.includes('SelectedDays=') ? data.split('SelectedDays=')[1].split(';')[0].split(',')
-        : null;
-      const selectedDates =
-        data.includes('SelectedDates=') ?
-          data
-            .split('SelectedDates=')[1]
-            .split(', ')
-            .map((dateString: string) => dayjs(dateString, 'YYYY-MM-DD'))
-        : [];
+      const range = data.isRange;
+      const selectedDays = data.selectedDays ? data.selectedDays.split(', ') : null;
+      const selectedDates = data.selectedDates ? data.selectedDates.split(', ').map((date) => dayjs(date)) : [];
+
       return { range, selectedDays, selectedDates };
     }
     return { range: false, selectedDays: null, selectedDates: [] };
@@ -73,7 +70,7 @@ const NotificationSettingsForm: FC<{
   }, [form]);
 
   const queryClient = useQueryClient();
-  const { mutate: saveDates, status } = useMutation({
+  const { mutate, status } = useMutation({
     mutationFn: postNotificationSettings,
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['notification-settings'] });
@@ -94,12 +91,15 @@ const NotificationSettingsForm: FC<{
 
   const submit = useCallback(
     (data: Data): void => {
-      // The dates are saved in the format 'Range=<boolean>;SelectedDays=<string[] | null>;SelectedDates=<moment[]>'
-      const selectedDates = data.selectedDates.map((date) => date.format('YYYY-MM-DD')).join(', ');
-      const formattedDates = `Range=${range};SelectedDays=${checkedList.length === 0 ? null : checkedList};SelectedDates=${selectedDates}`;
-      saveDates(formattedDates);
+      const notificationSettingsData = {
+        isRange: range,
+        selectedDays: checkedList.length === 0 ? null : checkedList.map((day) => day.toString()).join(', '),
+        selectedDates: data.selectedDates.map((date) => date.format('YYYY-MM-DD')).join(', '),
+      };
+
+      mutate(notificationSettingsData);
     },
-    [checkedList, range, saveDates],
+    [checkedList, range, mutate],
   );
 
   return (
@@ -119,7 +119,7 @@ const NotificationSettingsForm: FC<{
       </Radio.Group>
       <DatePickers isRange={range} checkedList={checkedList} setCheckedList={setCheckedList} />
       <div className='flex justify-end'>
-        <Button className='w-16 right-0 mr-[10px]' htmlType='submit'>
+        <Button className='w-16 right-0' htmlType='submit'>
           Save
         </Button>
       </div>

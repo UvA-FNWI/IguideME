@@ -1,3 +1,8 @@
+import AdminTitle from '@/components/atoms/admin-titles/admin-titles';
+import QueryError from '@/components/particles/QueryError';
+import QueryLoading from '@/components/particles/QueryLoading';
+import { Button, Divider, Form, Input, InputNumber, Select } from 'antd';
+import { DeleteFilled, PlusOutlined } from '@ant-design/icons';
 import {
   deleteLearningGoal,
   deleteRequirement,
@@ -8,15 +13,10 @@ import {
   postGoalRequirement,
   postLearningGoal,
 } from '@/api/entries';
-import AdminTitle from '@/components/atoms/admin-titles/admin-titles';
-import QueryError from '@/components/particles/QueryError';
-import QueryLoading from '@/components/particles/QueryLoading';
-import { LogicalExpression, type GoalRequirement, type LearningGoal } from '@/types/tile';
-import { DeleteFilled, PlusOutlined } from '@ant-design/icons';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Button, Col, Divider, Form, Input, InputNumber, Row, Select } from 'antd';
-import { useEffect, useState, type FC, type ReactElement } from 'react';
 import { toast } from 'sonner';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { LogicalExpression, type GoalRequirement, type LearningGoal } from '@/types/tile';
+import { useEffect, useState, type FC, type ReactElement } from 'react';
 
 const { Item } = Form;
 
@@ -69,10 +69,12 @@ const LearningGoals: FC = (): ReactElement => {
     return (
       <>
         <AdminTitle title='Learning Goals' description='Configure the learning goals for the course.' />
-        {goals?.map((goal) => <ViewLearningGoal key={goal.id} goal={goal} />)}
-        <Button type='dashed' onClick={addGoal} block icon={<PlusOutlined />} className='bg-white'>
-          Add Goal
-        </Button>
+        <div className='flex flex-col gap-2'>
+          {goals?.map((goal) => <ViewLearningGoal key={goal.id} goal={goal} />)}
+          <Button type='dashed' onClick={addGoal} block icon={<PlusOutlined />} className='bg-white'>
+            Add Goal
+          </Button>
+        </div>
       </>
     );
   }
@@ -114,57 +116,52 @@ const ViewLearningGoal: FC<GoalProps> = ({ goal }): ReactElement => {
   };
 
   return (
-    <div className='font-tnum p-[10px] border border-dashed border-zinc-400 rounded-lg bg-white mb-[10px] min-h-[100px]'>
-      <Row className='content-center justify-between'>
-        <Col className='cursor-text'>
-          <h2
-            onClick={() => {
-              setEditing(true);
-            }}
-            className='p-1 font-tnum text-lg'
-          >
-            {!editing ?
-              goal.title
-            : editing && (
-                <Input
-                  value={title}
-                  autoFocus
-                  onBlur={() => {
-                    setEditing(false);
-                  }}
-                  onChange={(e) => {
-                    setTitle(e.target.value);
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key !== 'Enter') return;
-                    patchGoal({ ...goal, title });
-                    setEditing(false);
-                  }}
-                />
-              )
-            }
-          </h2>
-        </Col>
-        <Col>
-          <DeleteFilled
-            onClick={() => {
-              removeGoal(goal.id);
-            }}
-            className='p-1'
-          />
-        </Col>
-      </Row>
+    <div className='font-tnum p-[10px] border border-dashed border-zinc-400 rounded-lg bg-white'>
+      <div className='w-full flex justify-between'>
+        <h2
+          onClick={() => {
+            setEditing(true);
+          }}
+          className='p-1 font-tnum text-lg'
+        >
+          {!editing ?
+            goal.title
+          : editing && (
+              <Input
+                value={title}
+                autoFocus
+                onBlur={() => {
+                  setEditing(false);
+                }}
+                onChange={(e) => {
+                  setTitle(e.target.value);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key !== 'Enter') return;
+                  patchGoal({ ...goal, title });
+                  setEditing(false);
+                }}
+              />
+            )
+          }
+        </h2>
+        <DeleteFilled
+          onClick={() => {
+            removeGoal(goal.id);
+          }}
+          className='p-1'
+        />
+      </div>
+
       <Divider className='mt-1 mb-2' />
-      <Row>
-        <Col className='w-full'>
-          {goal.requirements.map((requirement, index) => (
-            <ViewGoalRequirement key={index} requirement={requirement} />
-          ))}
-          <Button type='dashed' onClick={addRequirement} block icon={<PlusOutlined />}>
-            Add Requirement
-          </Button>
-        </Col>
-      </Row>
+
+      {goal.requirements.map((requirement, index) => (
+        <ViewGoalRequirement key={index} requirement={requirement} />
+      ))}
+
+      <Button type='dashed' onClick={addRequirement} block icon={<PlusOutlined />}>
+        Add Requirement
+      </Button>
     </div>
   );
 };
@@ -241,99 +238,97 @@ const ViewGoalRequirement: FC<ReqProps> = ({ requirement }): ReactElement => {
         requiredMark={false}
         className='w-full'
       >
-        <Row className='justify-between'>
-          <div className='flex gap-1'>
-            <Item name='id' hidden>
-              <Input type='hidden' />
+        <Item name='id' hidden>
+          <Input type='hidden' />
+        </Item>
+        <Item name='goal_id' hidden>
+          <Input type='hidden' />
+        </Item>
+
+        <div className='flex flex-col gap-2'>
+          <div
+            className='grid grid-cols-3 gap-1 overflow-x-auto'
+            style={{ gridTemplateColumns: '300px min-content min-content' }}
+          >
+            <Item name='assignment_id' noStyle>
+              <Select
+                aria-disabled={isLoading || isError}
+                className='w-full'
+                disabled={isLoading || isError}
+                showSearch
+                optionFilterProp='label'
+                options={
+                  assignments === undefined ?
+                    []
+                  : [...assignments.values()].map((ass) => ({
+                      value: ass.id,
+                      label: ass.title,
+                    }))
+                }
+                placeholder={
+                  isLoading ? 'Loading assignments ...'
+                  : isError ?
+                    'Failed to load assignments'
+                  : undefined
+                }
+              />
             </Item>
-            <Item name='goal_id' hidden>
-              <Input type='hidden' />
+
+            <Item name='expression' noStyle>
+              <Select
+                aria-disabled={isLoading || isError}
+                className='w-full'
+                disabled={isLoading || isError}
+                options={[
+                  {
+                    value: LogicalExpression.Equal,
+                    label: '=',
+                  },
+                  {
+                    value: LogicalExpression.Greater,
+                    label: '>',
+                  },
+                  {
+                    value: LogicalExpression.GreaterEqual,
+                    label: '≥',
+                  },
+                  {
+                    value: LogicalExpression.Less,
+                    label: '<',
+                  },
+                  {
+                    value: LogicalExpression.LessEqual,
+                    label: '≤',
+                  },
+                  {
+                    value: LogicalExpression.NotEqual,
+                    label: '≠',
+                  },
+                ]}
+              />
             </Item>
-            <Col>
-              <Item name='assignment_id' noStyle>
-                <Select
-                  aria-disabled={isLoading || isError}
-                  className='w-full'
-                  disabled={isLoading || isError}
-                  showSearch
-                  optionFilterProp='label'
-                  options={
-                    assignments === undefined ?
-                      []
-                    : [...assignments.values()].map((ass) => ({
-                        value: ass.id,
-                        label: ass.title,
-                      }))
-                  }
-                  placeholder={
-                    isLoading ? 'Loading assignments ...'
-                    : isError ?
-                      'Failed to load assignments'
-                    : undefined
-                  }
-                />
-              </Item>
-            </Col>
-            <Col>
-              <Item name='expression' noStyle>
-                <Select
-                  aria-disabled={isLoading || isError}
-                  className='w-full'
-                  disabled={isLoading || isError}
-                  options={[
-                    {
-                      value: LogicalExpression.Equal,
-                      label: '=',
-                    },
-                    {
-                      value: LogicalExpression.Greater,
-                      label: '>',
-                    },
-                    {
-                      value: LogicalExpression.GreaterEqual,
-                      label: '≥',
-                    },
-                    {
-                      value: LogicalExpression.Less,
-                      label: '<',
-                    },
-                    {
-                      value: LogicalExpression.LessEqual,
-                      label: '≤',
-                    },
-                    {
-                      value: LogicalExpression.NotEqual,
-                      label: '≠',
-                    },
-                  ]}
-                />
-              </Item>
-            </Col>
-            <Col>
-              <Item name='value' noStyle>
-                <InputNumber aria-disabled={isLoading || isError} disabled={isLoading || isError} />
-              </Item>
-            </Col>
+
+            <Item name='value' noStyle>
+              <InputNumber aria-disabled={isLoading || isError} disabled={isLoading || isError} />
+            </Item>
           </div>
-          <Col>
-            <div className='flex gap-1'>
-              <Item noStyle>
-                <Button className='text-white bg-primary-blue' type='primary' htmlType='submit'>
-                  Save
-                </Button>
-              </Item>
-              <Button
-                type='primary'
-                danger
-                onClick={() => {
-                  removeRequirement(requirement.id);
-                }}
-              >
-                Delete
+          <div className='flex gap-2'>
+            <Item noStyle>
+              <Button className='text-white bg-primary-blue' type='primary' htmlType='submit'>
+                Save
               </Button>
-            </div>
-          </Col>
-        </Row>
+            </Item>
+            <Button
+              type='primary'
+              danger
+              onClick={() => {
+                removeRequirement(requirement.id);
+              }}
+            >
+              Delete
+            </Button>
+          </div>
+        </div>
       </Form>
     </div>
   );

@@ -1,9 +1,9 @@
-import { getAssignments } from '@/api/entries';
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
 import { CheckCircleTwoTone, CloseCircleTwoTone, DeleteFilled } from '@ant-design/icons';
-import { useQuery } from '@tanstack/react-query';
+import { getAssignments } from '@/api/entries';
 import { InputNumber, Select, Table } from 'antd';
+import { useQuery } from '@tanstack/react-query';
 import { useCallback, useEffect, useMemo, useState, type FC, type ReactElement } from 'react';
 
 import { printGradingType, type Assignment, type TileEntry } from '@/types/tile';
@@ -94,7 +94,7 @@ const SelectAssignments: FC<SelectAssignmentsProps> = ({ value: entries, onChang
 
   return (
     <QueryLoading isLoading={isLoading}>
-      <div className='flex flex-col gap-1'>
+      <div className='flex flex-col gap-1 overflow-x-auto'>
         <Table
           columns={[
             {

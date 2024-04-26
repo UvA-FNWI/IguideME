@@ -16,11 +16,9 @@ import { getSelf } from '@/api/users';
 import { Layout, Menu } from 'antd';
 import { Link, Outlet } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { type FC, type ReactElement, useMemo, useState } from 'react';
+import { useMemo, useState, type FC, type ReactElement } from 'react';
 
-const { Content, Sider } = Layout;
-
-const menuItems = [
+export const adminPanelMenuItems = [
   { label: 'Dashboard', key: '1', icon: <DatabaseOutlined />, route: '/admin' },
   { label: 'Tiles', key: '2', icon: <AppstoreOutlined />, route: '/admin/tiles' },
   { label: 'Layout', key: '3', icon: <LaptopOutlined />, route: '/admin/layout' },
@@ -34,7 +32,7 @@ const menuItems = [
   { label: 'Settings', key: '11', icon: <ControlOutlined />, route: '/admin/settings' },
 ];
 
-const routeToKeyMap: { [key: string]: string } = menuItems.reduce(
+const routeToKeyMap: { [key: string]: string } = adminPanelMenuItems.reduce(
   (map, item) => ({ ...map, [item.route]: item.key }),
   {},
 );
@@ -52,7 +50,7 @@ const AdminPanel: FC = (): ReactElement => {
 
   const items = useMemo(
     () =>
-      menuItems.map((item) => ({
+      adminPanelMenuItems.map((item) => ({
         key: item.key,
         icon: item.icon,
         label: <Link to={item.route}>{item.label}</Link>,
@@ -61,34 +59,34 @@ const AdminPanel: FC = (): ReactElement => {
   );
 
   return (
-    <Layout className='min-h-[90dvh]'>
-      <Sider
+    <Layout>
+      <Layout.Sider
         breakpoint='lg'
         trigger={null}
         collapsedWidth='80px'
         collapsible
         collapsed={collapsed}
         onCollapse={(value) => setCollapsed(value)}
-        className='!bg-white'
+        className='max-md:!hidden !bg-white'
       >
         <div className='flex content-center flex-col justify-center bg-white p-4 border-b border-solid border-b-gray-200 h-header'>
-          {!collapsed ?
-            <>
+          {collapsed ?
+            <h3 className='text-center'>
+              <UserOutlined />
+            </h3>
+          : <>
               <h3 className='text-lg'>{self?.name}</h3>
               <strong>
                 <UserOutlined /> Instructor
               </strong>
             </>
-          : <h3 className='text-center'>
-              <UserOutlined />
-            </h3>
           }
         </div>
         <Menu defaultSelectedKeys={[getKeyFromLocation(location.pathname)]} mode='inline' items={items} />
-      </Sider>
-      <Content className='relative bg-slate- p-5'>
+      </Layout.Sider>
+      <Layout.Content className='p-5 relative bg-slate-50 min-h-[calc(100dvh-70px)]'>
         <Outlet />
-      </Content>
+      </Layout.Content>
     </Layout>
   );
 };

@@ -1,146 +1,71 @@
 // /------------------------- Module imports -------------------------/
-import { getStudents } from '@/api/users';
+import MobileHeader from './MobileHeader/MobileHeader';
 import NotificationPanel from '@/components/atoms/notification-panel/notification-panel';
-import { useQuery } from '@tanstack/react-query';
-import { Button, Col, Row, Select, Space } from 'antd';
-import { type Dispatch, type FC, type ReactElement, type SetStateAction, useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import Selector from './Selector';
+import { Button } from 'antd';
+import { HomeOutlined, SettingOutlined } from '@ant-design/icons';
+import { ThemeSwitcherDropdown } from '../ThemeSwitcher/ThemeSwitcher';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useCallback, useState, type FC, type ReactElement } from 'react';
 
 // /-------------------------- Own imports ---------------------------/
-import { type User, UserRoles } from '@/types/user';
-
-type SelectorProps = {
-  /** The currently selected student by the instructor. */
-  selectedStudent: User | undefined;
-  /** Function to set the selected student. */
-  setSelectedStudent: Dispatch<SetStateAction<User | undefined>>;
-};
-
-/**
- * Helper function for the student selector component.
- * @returns {React.ReactElement} The student selector
- */
-const Selector: FC<SelectorProps> = ({ selectedStudent, setSelectedStudent }): ReactElement => {
-  const navigate = useNavigate();
-
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ['students'],
-    queryFn: getStudents,
-  });
-
-  const { id } = useParams();
-  useEffect(() => {
-    if (id) {
-      setSelectedStudent(data?.find((student) => student.userID === id));
-    }
-  }, [id, data]);
-
-  const students = data
-    ?.sort((a, b) => a.sortable_name.localeCompare(b.sortable_name))
-    .filter((student) => student.userID !== selectedStudent?.userID);
-
-  const changeStudent = (userID: string): void => {
-    setSelectedStudent(students?.find((student) => student.userID === userID));
-    navigate(userID ?? '/');
-  };
-
-  return (
-    <Select
-      allowClear={true}
-      aria-disabled={isLoading || isError}
-      className='w-[40vw] max-w-[400px] [&>div]:!bg-primary-purple [&>div>span]:!text-white [&_span_*]:!text-white'
-      disabled={isLoading || isError}
-      placeholder={
-        isLoading ? 'Loading students...'
-        : isError ?
-          'Error loading students'
-        : 'Choose a student'
-      }
-      onChange={changeStudent}
-      optionFilterProp='label'
-      options={students?.map((student) => ({
-        label: student.name,
-        value: student.userID,
-      }))}
-      showSearch={true}
-      value={selectedStudent ? selectedStudent.name : null}
-    />
-  );
-};
+import { UserRoles, type User } from '@/types/user';
 
 interface HeaderProps {
   self: User;
 }
 
 const Header: FC<HeaderProps> = ({ self }): ReactElement => {
+  const inHome: boolean = useLocation().pathname === '/';
+  const [selectedStudent, setSelectedStudent] = useState<User | undefined>(undefined);
   const navigate = useNavigate();
 
-  const [selectedStudent, setSelectedStudent] = useState<User | undefined>(undefined);
-  const [inHome, setInHome] = useState<boolean>(true);
-
-  const isAdmin: boolean = self?.role === UserRoles.instructor;
-
-  const goHome = (): void => {
-    setInHome(true);
-
+  const switchPage = useCallback(() => {
     if (selectedStudent) setSelectedStudent(undefined);
 
     if (self.role === UserRoles.instructor && selectedStudent?.userID !== self.userID) {
-      navigate('/');
+      if (inHome) navigate('/admin');
+      else navigate('/');
     } else {
       // self is a student
-      navigate('/' + self.userID);
+      if (inHome) navigate('/student-settings');
+      else navigate('/' + self.userID);
     }
-  };
-
-  const toggleHome = (path: string): void => {
-    setInHome(!inHome);
-    navigate(path);
-  };
+  }, [inHome, selectedStudent, self]);
 
   return (
-    <header className='bg-primary-purple table w-full align-middle text-white'>
-      <Row className='h-header px-4 justify-between content-center'>
-        <Col span={4}>
-          <Button className='p-0 m-0' onClick={goHome} type='link'>
-            <h1 className='text-white align-middle font-semibold inline-block text-2xl'>IguideME</h1>
-          </Button>
-        </Col>
-        <Col>
-          {isAdmin && inHome && <Selector selectedStudent={selectedStudent} setSelectedStudent={setSelectedStudent} />}
-        </Col>
-        <Col span={4} className='flex justify-end'>
-          <Space>
-            <div className='min-w-[30px]'>
-              <NotificationPanel user={selectedStudent ?? self} />
-            </div>
-            <div className='min-w-[100px]'>
-              <Button
-                className='flex flex-col justify-center items-center h-10 border border-solid border-white align-middle rounded-md w-32 p-2 text-white'
-                type='link'
-                onClick={() => {
-                  inHome ? toggleHome(isAdmin ? '/admin' : '/student-settings') : goHome();
-                }}
-              >
-                <h3>
-                  {inHome ?
-                    isAdmin ?
-                      'Admin Panel'
-                    : 'Settings'
-                  : 'Home'}
-                </h3>
-              </Button>
-            </div>
-          </Space>
-        </Col>
-      </Row>
-      {import.meta.env.MODE === 'mock' && (
-        <Row>
-          <div className='w-full p-2 bg-primary-orange text-center text-black'>
-            Application is running in <strong>demo</strong> mode. Changes will not be saved!
-          </div>
-        </Row>
-      )}{' '}
+    <header className='bg-primary-purple text-white w-screen min-h-header flex justify-between items-center p-3 relative overflow-x-hidden'>
+      <a className='text-white align-middle font-semibold inline-block text-2xl' href='/'>
+        IGuideMe
+      </a>
+      <div className='md:hidden'>
+        <MobileHeader self={self} selectedStudent={selectedStudent} setSelectedStudent={setSelectedStudent} />
+      </div>
+      <div className='hidden absolute w-fit left-0 right-0 top-0 bottom-0 m-auto md:grid place-content-center'>
+        <Selector selectedStudent={selectedStudent} setSelectedStudent={setSelectedStudent} />
+      </div>
+      <div className='hidden md:flex gap-2 border lg:border-none border-white rounded-3xl px-1'>
+        <div className='flex gap-2 lg:outline lg:outline-1 outline-white outline-offset-[-1px] lg:rounded-md'>
+          <ThemeSwitcherDropdown buttonClasses='border-none' />
+          <NotificationPanel buttonClasses='border-none' placement='bottomLeft' user={selectedStudent ?? self} />
+        </div>
+        <Button
+          className='flex flex-col justify-center items-center h-10 border-none border lg:border-solid border-white align-middle rounded-3xl lg:rounded-md w-10 lg:w-32 p-2 text-white'
+          onClick={switchPage}
+          type='link'
+        >
+          <span className='!hidden lg:!inline-block'>
+            {!inHome ?
+              'Home'
+            : self.role === UserRoles.instructor ?
+              'Admin Panel'
+            : 'Settings'}
+          </span>
+          {!inHome ?
+            <HomeOutlined className='lg:!hidden !m-0 [&>svg]:w-4 [&>svg]:h-4' />
+          : <SettingOutlined className='lg:!hidden !m-0 [&>svg]:w-4 [&>svg]:h-4' />}
+        </Button>
+      </div>
     </header>
   );
 };

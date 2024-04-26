@@ -1,16 +1,16 @@
-import { deleteTile, patchTile } from '@/api/tiles';
 import EditTileAssignments from '@/components/atoms/edit-tile-assignments/edit-tile-assignments';
 import EditTileDiscussions from '@/components/atoms/edit-tile-discussions/edit-tile-discussions';
 import EditTileGoals from '@/components/atoms/edit-tile-goals/edit-tile-goals';
-import { TileType, type Tile } from '@/types/tile';
-import { BellTwoTone, CheckCircleTwoTone, StopTwoTone } from '@ant-design/icons';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Button, Col, Form, Input, Row, Select, Space } from 'antd';
-import { useForm, useWatch } from 'antd/es/form/Form';
-import { FormInstance } from 'antd/lib/form/Form';
-import { useState, type FC, type ReactElement } from 'react';
 import Swal from 'sweetalert2';
+import { BellTwoTone, CheckCircleTwoTone, StopTwoTone } from '@ant-design/icons';
+import { Button, Form, Input, Select } from 'antd';
+import { deleteTile, patchTile } from '@/api/tiles';
+import { FormInstance } from 'antd/lib/form/Form';
 import { useDrawerStore } from '../tile-group-board/useDrawerStore';
+import { useForm, useWatch } from 'antd/es/form/Form';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { TileType, type Tile } from '@/types/tile';
+import { useState, type FC, type ReactElement } from 'react';
 
 interface Props {
   tile: Tile;
@@ -54,7 +54,7 @@ const EditTile: FC<Props> = ({ tile }): ReactElement => {
         setIsChanged(false);
       }}
       requiredMark={false}
-      className='flex flex-col gap-2'
+      className='flex flex-col gap-2 w-full'
       onValuesChange={() => {
         setIsChanged(true);
       }}
@@ -68,73 +68,64 @@ const EditTile: FC<Props> = ({ tile }): ReactElement => {
       <Item name='position' hidden>
         <Input type='hidden' />
       </Item>
-      <Row className='content-center'>
-        <Col span={4} className='grid items-center'>
-          Title:
-        </Col>
-        <Col span={8}>
-          <Item name='title' rules={[{ required: true, message: 'Please insert a title for the tile' }]} noStyle>
-            <Input className='w-full' />
+      <div
+        className='grid grid-cols-3 gap-2 items-center'
+        style={{ gridTemplateColumns: 'min-content 1fr min-content' }}
+      >
+        <p>Title:</p>
+        <Item name='title' rules={[{ required: true, message: 'Please insert a title for the tile' }]} noStyle>
+          <Input className='w-full' />
+        </Item>
+        <div className='flex gap-2'>
+          <Item name='notifications' noStyle>
+            <Notification />
           </Item>
-        </Col>
-        <Col span={4} offset={8}>
-          <Space>
-            <Item name='notifications' noStyle>
-              <Notification />
-            </Item>
-            <Item name='visible' noStyle>
-              <Visible />
-            </Item>
-          </Space>
-        </Col>
-      </Row>
+          <Item name='visible' noStyle>
+            <Visible />
+          </Item>
+        </div>
 
-      <Row className='content-center'>
-        <Col span={4} className='grid items-center'>
-          Type:
-        </Col>
-        <Col span={8}>
+        <p>Type:</p>
+        <div className='col-span-2'>
           <Item name='type' noStyle>
             <TypeSelector value={0} onChange={() => {}} form={form} />
           </Item>
-        </Col>
-      </Row>
-      {renderTypeSettings()}
-      <Row className='flex gap-1 [&_*]:m-0'>
-        <Col>
-          <Item>
-            <Button type='primary' htmlType='submit'>
-              Save
-            </Button>
-          </Item>
-        </Col>
-        <Col>
-          <Item>
-            <Button
-              type='primary'
-              danger
-              onClick={() => {
-                void Swal.fire({
-                  title: 'Warning: This will permanently delete the tile!',
-                  icon: 'warning',
-                  focusCancel: true,
-                  showCancelButton: true,
-                  confirmButtonText: 'Delete',
-                  cancelButtonText: 'Cancel',
-                  customClass: {},
-                }).then((result) => {
-                  if (result.isConfirmed) {
-                    setEditTile(null);
-                    removeTile(tile.id);
-                  }
-                });
-              }}
-            >
-              Delete
-            </Button>
-          </Item>
-        </Col>
-      </Row>
+        </div>
+        {renderTypeSettings()}
+      </div>
+      <div className='flex gap-2'>
+        <Item>
+          <Button className='min-w-20' type='primary' htmlType='submit'>
+            Save
+          </Button>
+        </Item>
+
+        <Item>
+          <Button
+            className='min-w-20'
+            type='primary'
+            danger
+            onClick={() => {
+              void Swal.fire({
+                title: 'Warning: This will permanently delete the tile!',
+                icon: 'warning',
+                focusCancel: true,
+                showCancelButton: true,
+                confirmButtonText: 'Delete',
+                cancelButtonText: 'Cancel',
+                customClass: {},
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  setEditTile(null);
+                  removeTile(tile.id);
+                }
+              });
+            }}
+          >
+            Delete
+          </Button>
+        </Item>
+      </div>
     </Form>
   );
 

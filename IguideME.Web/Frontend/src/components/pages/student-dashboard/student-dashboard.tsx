@@ -1,14 +1,14 @@
-import { getSelf, getStudent } from '@/api/users';
 import GradeDisplay from '@/components/atoms/grade-display/grade-display';
-import StudentInfo from '@/components/atoms/student-info/student-info';
 import Loading from '@/components/particles/loading';
-import { UserRoles, type User } from '@/types/user';
+import StudentInfo from '@/components/atoms/student-info/student-info';
 import { AppstoreOutlined, BarChartOutlined } from '@ant-design/icons';
-import { useQuery } from '@tanstack/react-query';
-import { Col, Radio, Row } from 'antd';
-import { useEffect, type FC, type ReactElement } from 'react';
+import { getSelf, getStudent } from '@/api/users';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
+import { Radio } from 'antd';
 import { TileViewStoreProvider, useTileViewStore } from './tileViewContext';
+import { useQuery } from '@tanstack/react-query';
+import { UserRoles, type User } from '@/types/user';
+import { useEffect, type FC, type ReactElement } from 'react';
 
 const LoadingState: FC = () => (
   <div className='absolute inset-0 w-screen h-screen grid place-content-center'>
@@ -75,14 +75,12 @@ const Dashboard: FC<DashboardProps> = ({ self }): ReactElement => {
 
   return (
     <div className='w-screen px-3'>
-      <Row className='w-full h-header flex justify-between'>
-        <Col className='h-full grid place-content-center'>
+      <div className='flex flex-col gap-3 py-3 lg:py-1'>
+        <div className='flex justify-between items-center'>
           <StudentInfo />
-        </Col>
-        <Col className='grid place-content-center'>
-          <GradeDisplay />
-        </Col>
-        <Col className='h-full grid place-content-center'>
+          <div className='hidden lg:block'>
+            <GradeDisplay />
+          </div>
           <Radio.Group
             className=''
             value={viewType}
@@ -92,14 +90,19 @@ const Dashboard: FC<DashboardProps> = ({ self }): ReactElement => {
             }}
           >
             <Radio.Button value='graph'>
-              <BarChartOutlined /> Graph
+              <BarChartOutlined />
+              <span> Graph</span>
             </Radio.Button>
             <Radio.Button value='grid'>
-              <AppstoreOutlined /> Grid
+              <AppstoreOutlined />
+              <span> Grid</span>
             </Radio.Button>
           </Radio.Group>
-        </Col>
-      </Row>
+        </div>
+        <div className='lg:hidden'>
+          <GradeDisplay />
+        </div>
+      </div>
       <Outlet />
     </div>
   );

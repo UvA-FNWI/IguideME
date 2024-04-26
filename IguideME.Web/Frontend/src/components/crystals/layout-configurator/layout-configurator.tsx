@@ -1,13 +1,14 @@
-import { getLayoutColumns, postLayoutColumns } from '@/api/tiles';
 import ConfigLayoutColumn from '@/components/atoms/layout-column/layout-column';
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
-import { PlusOutlined } from '@ant-design/icons';
 import { arrayMove, SortableContext } from '@dnd-kit/sortable';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Button, Col, Row } from 'antd';
-import { type FC, type ReactElement, useCallback, useEffect, useMemo, useState } from 'react';
+import { Button } from 'antd';
 import { createPortal } from 'react-dom';
+import { getLayoutColumns, postLayoutColumns } from '@/api/tiles';
+import { PlusOutlined } from '@ant-design/icons';
+import { toast } from 'sonner';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { type FC, type ReactElement, useCallback, useEffect, useMemo, useState } from 'react';
 
 import { type LayoutColumn } from '@/types/tile';
 import {
@@ -19,9 +20,7 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
-import { toast } from 'sonner';
 
-// TODO: Let the user know that the layout has been saved succesfully
 const LayoutConfigurator: FC = (): ReactElement => {
   const queryClient = useQueryClient();
   const { data, isError, isLoading } = useQuery({
@@ -128,23 +127,23 @@ const LayoutConfigurator: FC = (): ReactElement => {
   return (
     <DndContext sensors={sensors} onDragStart={onDragStart} onDragEnd={onDragEnd}>
       <SortableContext items={columnIds}>
-        <Row>
-          {isLoading ?
-            loadingState
-          : isError ?
-            errorState
-          : columns.map((column) => (
-              <Col key={column.id}>
-                <ConfigLayoutColumn column={column} remove={removeColumn} parentOnChange={parentOnChange} />
-              </Col>
-            ))
-          }
-        </Row>
-        <Row>
+        <div className='flex flex-col gap-2'>
+          <div className='flex gap-2 flex-wrap overflow-x-auto'>
+            {isLoading ?
+              loadingState
+            : isError ?
+              errorState
+            : columns.map((column) => (
+                <div className='min-w-fit' key={column.id}>
+                  <ConfigLayoutColumn column={column} remove={removeColumn} parentOnChange={parentOnChange} />
+                </div>
+              ))
+            }
+          </div>
           <Button type='dashed' onClick={addColumn} block icon={<PlusOutlined />} className='bg-white'>
             Add Column
           </Button>
-        </Row>
+        </div>
       </SortableContext>
       <Button className='mt-2 bg-white' onClick={save}>
         Save

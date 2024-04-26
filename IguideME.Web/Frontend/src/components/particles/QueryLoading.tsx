@@ -1,14 +1,15 @@
-import { FC, ReactNode } from 'react';
+import { cn } from '@/utils/cn';
 import { Spin, SpinProps } from 'antd';
+import { FC, ReactNode } from 'react';
 
 interface QueryLoadingProps extends SpinProps {
   children: ReactNode;
   isLoading: boolean;
 }
 
-const QueryLoading: FC<QueryLoadingProps> = ({ children, isLoading }) => {
+const QueryLoading: FC<QueryLoadingProps> = ({ children, className, isLoading }) => {
   return (
-    <Spin className={isLoading ? 'cursor-wait' : ''} spinning={isLoading}>
+    <Spin className={cn(isLoading ? 'cursor-wait' : '', className)} spinning={isLoading}>
       {children}
     </Spin>
   );

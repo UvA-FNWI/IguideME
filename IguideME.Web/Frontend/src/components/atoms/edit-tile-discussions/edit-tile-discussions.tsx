@@ -1,10 +1,10 @@
-import { getTopics } from '@/api/entries';
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
-import { type Discussion, type TileEntry } from '@/types/tile';
 import { DeleteFilled } from '@ant-design/icons';
+import { Form, Select, Table } from 'antd';
+import { getTopics } from '@/api/entries';
 import { useQuery } from '@tanstack/react-query';
-import { Form, Row, Select, Table } from 'antd';
+import { type Discussion, type TileEntry } from '@/types/tile';
 import { useCallback, useState, type FC, type ReactElement } from 'react';
 
 const { Item } = Form;
@@ -18,14 +18,14 @@ const EditTileDiscussions: FC = (): ReactElement => {
   if (isError) return <QueryError className='static [&_span]:!text-2xl' title={'Error: Could not load discussions'} />;
 
   return (
-    <Row className='flex-col'>
+    <div className='col-span-3'>
       <p className='mb-1'>Discussions:</p>
       <QueryLoading isLoading={isLoading}>
         <Item name='entries' className='w-full m-0'>
           <DiscussionSelect topics={data ?? []} value={[]} onChange={() => {}} />
         </Item>
       </QueryLoading>
-    </Row>
+    </div>
   );
 };
 

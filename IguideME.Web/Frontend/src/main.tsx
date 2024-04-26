@@ -1,11 +1,12 @@
 // /----------------------------- React ------------------------------/
-import setup from '@/api/setup.ts';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import App from './App.tsx';
+import NextThemesProvider from './components/crystals/ThemeSwitcher/NextThemesProvider.tsx';
 import React, { lazy } from 'react';
 import ReactDOM from 'react-dom/client';
+import setup from '@/api/setup.ts';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import App from './App.tsx';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import './globals.css';
 
 // /--------------------------- Pages ---------------------------/
@@ -65,31 +66,39 @@ enableMocking()
       ReactDOM.createRoot(document.getElementById('root')!).render(
         <React.StrictMode>
           <QueryClientProvider client={queryClient}>
-            <BrowserRouter>
-              <Routes>
-                <Route path='/' element={<App />} errorElement={<ErrorPage />}>
-                  <Route path='' element={<Home />} />
-                  <Route path='student-settings' element={<StudentSettings />} />
-                  <Route path=':id' element={<StudentDashboard />}>
-                    <Route path='' element={<ViewLayout />} />
-                    <Route path=':tid' element={<TileDetailView />} />
+            <NextThemesProvider
+              attribute='class'
+              defaultTheme='system'
+              disableTransitionOnChange
+              enableSystem
+              themes={['light', 'dark']}
+            >
+              <BrowserRouter>
+                <Routes>
+                  <Route path='/' element={<App />} errorElement={<ErrorPage />}>
+                    <Route path='' element={<Home />} />
+                    <Route path='student-settings' element={<StudentSettings />} />
+                    <Route path=':id' element={<StudentDashboard />}>
+                      <Route path='' element={<ViewLayout />} />
+                      <Route path=':tid' element={<TileDetailView />} />
+                    </Route>
+                    <Route path='admin' element={<AdminPanel />}>
+                      <Route path='' element={<Dashboard />} />
+                      <Route path='tiles' element={<Tiles />} />
+                      <Route path='layout' element={<EditLayout />} />
+                      <Route path='student-overview' element={<StudentOverview />} />
+                      <Route path='grade-predictor' element={<GradePredictor />} />
+                      <Route path='grade-analyzer' element={<GradeAnalyzer />} />
+                      <Route path='data-wizard' element={<DataWizard />} />
+                      <Route path='learning-goals' element={<LearningGoals />} />
+                      <Route path='analytics' element={<Analytics />} />
+                      <Route path='notification-centre' element={<NotificationCentre />} />
+                      <Route path='settings' element={<AdminSettings />} />
+                    </Route>
                   </Route>
-                  <Route path='admin' element={<AdminPanel />}>
-                    <Route path='' element={<Dashboard />} />
-                    <Route path='tiles' element={<Tiles />} />
-                    <Route path='layout' element={<EditLayout />} />
-                    <Route path='student-overview' element={<StudentOverview />} />
-                    <Route path='grade-predictor' element={<GradePredictor />} />
-                    <Route path='grade-analyzer' element={<GradeAnalyzer />} />
-                    <Route path='data-wizard' element={<DataWizard />} />
-                    <Route path='learning-goals' element={<LearningGoals />} />
-                    <Route path='analytics' element={<Analytics />} />
-                    <Route path='notification-centre' element={<NotificationCentre />} />
-                    <Route path='settings' element={<AdminSettings />} />
-                  </Route>
-                </Route>
-              </Routes>
-            </BrowserRouter>
+                </Routes>
+              </BrowserRouter>
+            </NextThemesProvider>
             {import.meta.env.MODE === 'mock' && <ReactQueryDevtools initialIsOpen={false} />}
           </QueryClientProvider>
         </React.StrictMode>,

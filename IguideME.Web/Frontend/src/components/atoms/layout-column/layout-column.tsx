@@ -65,12 +65,12 @@ const ConfigLayoutColumn: FC<Props> = ({ column, remove, parentOnChange }): Reac
   if (isLoading) {
     return (
       <QueryLoading isLoading={isLoading}>
-        <div className='rounded-md w-[425px] h-[360px] p-3 m-2 bg-white shadow-statusCard' />
+        <div className='rounded-md w-[425px] h-[360px] p-3 bg-white shadow-statusCard' />
       </QueryLoading>
     );
   } else if (isError || data === undefined) {
     return (
-      <div className='relative [&>div]:grid [&>div]:place-content-center rounded-md w-[425px] h-[360px] p-3 m-2 bg-white shadow-statusCard'>
+      <div className='relative [&>div]:grid [&>div]:place-content-center rounded-md w-[425px] h-[360px] p-3 bg-white shadow-statusCard'>
         <QueryError title='Error: Failed to load tile groups' />
       </div>
     );
@@ -78,15 +78,11 @@ const ConfigLayoutColumn: FC<Props> = ({ column, remove, parentOnChange }): Reac
 
   if (isDragging) {
     return (
-      <div
-        className='rounded-md w-[425px] h-[360px] p-3 m-2 bg-white shadow-statusCard'
-        ref={setNodeRef}
-        style={style}
-      />
+      <div className='rounded-md w-[425px] h-[360px] p-3 bg-white shadow-statusCard' ref={setNodeRef} style={style} />
     );
   } else {
     return (
-      <div className='rounded-md w-[425px] h-[360px] p-3 m-2 bg-white shadow-statusCard' ref={setNodeRef} style={style}>
+      <div className='rounded-md w-[425px] h-[360px] p-3 bg-white shadow-statusCard' ref={setNodeRef} style={style}>
         <Row className='cursor-grab justify-between' {...attributes} {...listeners}>
           <Col>
             <h3 className='text-lg'>Column</h3>
