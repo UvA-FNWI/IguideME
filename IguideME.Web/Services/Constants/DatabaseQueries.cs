@@ -1564,6 +1564,13 @@ public static class DatabaseQueries
         AND         `user_id`=@userID
         ;";
 
+    public const string QUERY_ASSIGNMENT_GRADE =
+        @"SELECT    `grade`
+        FROM        `submissions`
+        WHERE       `assignment_id`=@assignmentID
+        AND         `user_id`=@userID
+        ;";
+
     public const string QUERY_SUBMISSIONS_FOR_ENTRY =
         @"SELECT    `id`,
                     `entry_id`,

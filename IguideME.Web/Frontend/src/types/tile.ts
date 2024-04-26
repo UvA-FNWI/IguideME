@@ -74,7 +74,10 @@ export interface LearningGoal {
   id: number;
   title: string;
   requirements: GoalRequirement[];
+  results?: boolean[]
 }
+
+
 
 export enum GradingType {
   PassFail,
@@ -150,6 +153,23 @@ export enum LogicalExpression {
   GreaterEqual,
   Greater,
   NotEqual,
+}
+
+export const printLogicalExpression = (expression: LogicalExpression): string => {
+  switch (expression) {
+    case LogicalExpression.NotEqual:
+      return '≠'
+    case LogicalExpression.Less:
+      return '<'
+    case LogicalExpression.LessEqual:
+      return '≤'
+    case LogicalExpression.Equal:
+      return '='
+    case LogicalExpression.GreaterEqual:
+      return '≥'
+    case LogicalExpression.Greater:
+      return '>'
+  }
 }
 
 export interface GoalRequirement {

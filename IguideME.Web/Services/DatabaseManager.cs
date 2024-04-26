@@ -493,12 +493,14 @@ namespace IguideME.Web.Services
                 )
             )
                 if (r.Read())
-                    return new {
+                    return new
+                    {
                         isRange = r.GetBoolean(0),
                         selectedDays = r.GetValue(1).ToString(),
                         selectedDates = r.GetValue(2).ToString()
                     };
-            return new {
+            return new
+            {
                 isRange = false,
                 selectedDays = "",
                 selectedDates = ""
@@ -1455,11 +1457,52 @@ namespace IguideME.Web.Services
             return submissions;
         }
 
+        public LearningGoal GetLearningGoalForUser(int courseID, int entryID, string userID)
+        {
+            LearningGoal goal = new(entryID, "Backend only title, use the entry title instead");
+            goal.Requirements = GetGoalRequirements(entryID);
+            foreach (GoalRequirement requirement in goal.Requirements)
+            {
+                goal.Results.Add(GetGoalRequirementResult(requirement, userID));
+            };
+            return goal;
+        }
+
+        public bool GetGoalRequirementResult(GoalRequirement requirement, string userID)
+        {
+            using (
+                SQLiteDataReader r = Query(
+                    DatabaseQueries.QUERY_ASSIGNMENT_GRADE,
+                    new SQLiteParameter("assignmentID", requirement.AssignmentID),
+                    new SQLiteParameter("userID", userID)
+
+                )
+            )
+            {
+                if (r.Read())
+                {
+                    double grade = r.GetDouble(0);
+                    return requirement.Expression switch
+                    {
+                        LogicalExpressions.NotEqual => grade != requirement.Value,
+                        LogicalExpressions.Less => grade < requirement.Value,
+                        LogicalExpressions.LessEqual => grade <= requirement.Value,
+                        LogicalExpressions.Equal => grade == requirement.Value,
+                        LogicalExpressions.GreaterEqual => grade > requirement.Value,
+                        LogicalExpressions.Greater => grade >= requirement.Value,
+                    };
+                }
+            }
+
+            return false;
+        }
+
         public AssignmentSubmission GetAssignmentSubmissionForUser(
             int courseID,
             int entryID,
             string userID
-        ) {
+        )
+        {
             int goal = GetUserGoalGrade(courseID, userID, GetCurrentSyncID(courseID));
             PeerComparisonData comparison = GetUserPeerComparison(courseID, goal, Comparison_Component_Types.assignment, entryID);
             AppAssignment ass = GetAssignment(courseID, entryID);
@@ -1693,7 +1736,7 @@ namespace IguideME.Web.Services
                 }
             }
             return new(componentID, 0, 0, 0);
-       }
+        }
 
         public List<PredictedGrade> GetPredictedGrades(int courseID, string userID)
         {

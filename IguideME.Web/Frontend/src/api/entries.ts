@@ -58,3 +58,9 @@ export const getAssignmentSubmission: (cid: number, uid: string) => Promise<Subm
   await apiClient
     .get(`assignments/${cid}/submissions/${uid}`)
     .then((response) => (response.data !== '' ? response.data : undefined));
+
+export const getLearningGoal: (cid: number, uid: string) => Promise<LearningGoal> = async (
+  cid: number,
+  studentnr: string,
+) => await apiClient.get(`learning-goals/${cid}/${studentnr}`).then((response) => response.data);
+

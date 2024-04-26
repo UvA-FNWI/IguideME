@@ -1,16 +1,16 @@
-import { getAssignmentSubmission, getDiscussion } from '@/api/entries';
+import { getAssignmentSubmission, getAssignments, getDiscussion, getLearningGoal } from '@/api/entries';
 import { GradeView } from '@/components/crystals/grid-tile/grid-tile';
 import { useTileViewStore } from '@/components/pages/student-dashboard/tileViewContext';
-import Loading from '@/components/particles/loading';
 import PeerComparison from '@/components/particles/peer-comparison/peercomparison';
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
-import { type TileEntry } from '@/types/tile';
+import { printLogicalExpression, type TileEntry } from '@/types/tile';
 import { useQuery } from '@tanstack/react-query';
 import { Divider, Row } from 'antd';
 import { Col } from 'antd/lib';
 import { type FC, type ReactElement } from 'react';
 import GraphGrade from '../graph-grade/graph-grade';
+import { CheckCircleOutlined, CheckCircleTwoTone, CheckOutlined, CloseCircleTwoTone, CloseOutlined } from '@ant-design/icons';
 
 interface Props {
   entry: TileEntry;
@@ -30,7 +30,6 @@ export const AssignmentDetail: FC<Props> = ({ entry }): ReactElement => {
     queryKey: [`entry/${entry.content_id}/${user.studentnumber}`],
     queryFn: async () => await getAssignmentSubmission(entry.content_id, user.userID),
   });
-  console.log('sub', submission);
 
   if (isLoading) {
     return (
@@ -80,11 +79,70 @@ export const DiscussionDetail: FC<Props> = ({ entry }): ReactElement => {
     queryFn: async () => await getDiscussion(entry.content_id, user.userID),
   });
 
-  if (isError) return <QueryError />;
-  else if (isLoading) return <Loading />;
-  else return <>{discussion!.message}</>;
+  if (isLoading) {
+    return (
+      <QueryLoading isLoading={isLoading}>
+        <div className='w-[270px] h-[180px]' />
+      </QueryLoading>
+    );
+  } else if (isError || !discussion) {
+    return <QueryError className='grid place-content-center' title='No submission found' />;
+  }
+
+  else return <>{discussion.message}</>;
 };
 
 export const LearningGoalDetail: FC<Props> = ({ entry }): ReactElement => {
-  return <></>;
+  const user = useTileViewStore((state) => state.user);
+  const {
+    data: learningGoal,
+    isError,
+    isLoading,
+  } = useQuery({
+    // TODO: I think using entry.content_id might give conflicts
+    queryKey: [`entry/${entry.content_id}/${user.userID}`],
+    queryFn: async () => await getLearningGoal(entry.content_id, user.userID),
+  });
+
+  const { data: assignments, isError: assIsError, isLoading: assIsLoading } = useQuery({
+    queryKey: ['assignments'],
+    queryFn: getAssignments,
+  });
+  
+
+  if (isLoading || assIsLoading) {
+    return (
+      <QueryLoading isLoading={isLoading}>
+        <div className='w-[270px] h-[180px]' />
+      </QueryLoading>
+    );
+  } else if (isError || !learningGoal || assIsError || !assignments) {
+    return <QueryError className='grid place-content-center' title='No submission found' />;
+  }
+
+  
+  return <>
+      <Row className='justify-center content-center h-2/5'>
+        {learningGoal.results?.every(b => b) ? 
+          <>Passed
+      <CheckCircleTwoTone className='text-2xl'/></> : 
+      <>Failed<CloseCircleTwoTone className='text-2xl' /></>}
+      </Row>
+    <Row className='justify-center content-center h-2/5 overflow-y-scroll'>
+        {
+    learningGoal.requirements.map((req, i) => {
+      const result = learningGoal.results?.[i]
+      const ass = assignments.get(req.assignment_id)
+      if (!ass) {
+        return <></>
+      }
+      return <div key={i}>
+        {ass.title} {printLogicalExpression(req.expression)} {req.value}
+        {result ? <CheckOutlined /> : <CloseOutlined />}
+        </div>
+    })
+  }      
+    </Row>
+  </>
+;
 };
