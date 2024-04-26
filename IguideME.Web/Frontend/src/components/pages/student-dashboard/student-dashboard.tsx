@@ -74,6 +74,7 @@ const Dashboard: FC<DashboardProps> = ({ self }): ReactElement => {
   }, [self]);
 
   return (
+    <>
     <div className='w-screen px-3'>
       <div className='flex flex-col gap-3 py-3 lg:py-1'>
         <div className='flex justify-between items-center'>
@@ -95,12 +96,8 @@ const Dashboard: FC<DashboardProps> = ({ self }): ReactElement => {
             <Radio.Button value='graph'>
               <BarChartOutlined />
               <span> Graph</span>
-              <BarChartOutlined />
-              <span> Graph</span>
             </Radio.Button>
             <Radio.Button value='grid'>
-              <AppstoreOutlined />
-              <span> Grid</span>
               <AppstoreOutlined />
               <span> Grid</span>
             </Radio.Button>
@@ -114,9 +111,8 @@ const Dashboard: FC<DashboardProps> = ({ self }): ReactElement => {
         <div className='lg:hidden'>
           <GradeDisplay />
         </div>
-      </div>
       <Outlet />
-    </div>
+  </>
   );
 };
 

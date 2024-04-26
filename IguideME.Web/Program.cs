@@ -235,7 +235,7 @@ if (app.Environment.IsDevelopment())
     app.UseDeveloperExceptionPage();
     app.UseSpa(spa =>
     {
-        spa.UseProxyToSpaDevelopmentServer("http://localhost:3000/");
+        spa.UseProxyToSpaDevelopmentServer("https://localhost:3000/");
     });
 }
 else
