@@ -7,6 +7,11 @@
 
 @layer base {
   :root {
+    --primary-blue: #1677ff;
+    --primary-disabled: #ebf0f6;
+    --primary-gray: #e4ebf5;
+    --primary-orange: #ff6e5a;
+    --primary-purple: #5a32ff;
   }
 
   /* Maybe add a dark mode later? */
@@ -14,7 +19,9 @@
   }
 }
 
-*, html, body {
+*,
+html,
+body {
   font-family: Maitree, serif !important;
 }
 

@@ -11,18 +11,20 @@ module.exports = {
       },
       colors: {
         primary: {
-          blue: '#1677ff',
-          disabled: '#ebf0f6',
-          gray: '#e4ebf5',
-          orange: '#ff6e5a',
-          purple: '#5a32ff',
+          blue: 'var(--primary-blue)',
+          disabled: 'var(--primary-disabled)',
+          gray: 'var(--primary-gray)',
+          orange: 'var(--primary-orange)',
+          purple: 'var(--primary-purple)',
         },
+        background: 'var(--background)',
+        text: 'var(--text)',
       },
       cursor: {
         brand:
           "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'  width='40' height='48' viewport='0 0 100 100' style='fill:black;font-size:24px;'><text y='50%'>❤️</text></svg>\") 8 0,auto;",
       },
-      height: {
+      spacing: {
         header: '70px',
       },
     },

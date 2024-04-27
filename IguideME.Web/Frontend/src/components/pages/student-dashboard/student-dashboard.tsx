@@ -7,6 +7,7 @@ import { Outlet, useNavigate, useParams } from 'react-router-dom';
 import { Radio } from 'antd';
 import { TileViewStoreProvider, useTileViewStore } from './tileViewContext';
 import { useQuery } from '@tanstack/react-query';
+import { type ViewType } from '@/types/tile';
 import { UserRoles, type User } from '@/types/user';
 import { useEffect, type FC, type ReactElement } from 'react';
 
@@ -75,44 +76,38 @@ const Dashboard: FC<DashboardProps> = ({ self }): ReactElement => {
 
   return (
     <>
-    <div className='w-screen px-3'>
-      <div className='flex flex-col gap-3 py-3 lg:py-1'>
-        <div className='flex justify-between items-center'>
-          <StudentInfo />
-          <div className='hidden lg:block'>
-            <GradeDisplay />
+      <div className='w-screen px-3'>
+        <div className='flex flex-col gap-3 py-3 lg:py-0 min-h-header justify-center'>
+          <div className='flex justify-between items-center'>
+            <StudentInfo />
+            <div className='hidden lg:block'>
+              <GradeDisplay />
+            </div>
+            <Radio.Group
+              className=''
+              value={viewType}
+              buttonStyle='solid'
+              onChange={(e) => {
+                setViewType(e.target.value as ViewType);
+              }}
+            >
+              <Radio.Button value='graph'>
+                <BarChartOutlined />
+                <span> Graph</span>
+              </Radio.Button>
+              <Radio.Button value='grid'>
+                <AppstoreOutlined />
+                <span> Grid</span>
+              </Radio.Button>
+            </Radio.Group>
           </div>
-          <div className='hidden lg:block'>
-            <GradeDisplay />
-          </div>
-          <Radio.Group
-            className=''
-            value={viewType}
-            buttonStyle='solid'
-            onChange={(e) => {
-              setViewType(e.target.value);
-            }}
-          >
-            <Radio.Button value='graph'>
-              <BarChartOutlined />
-              <span> Graph</span>
-            </Radio.Button>
-            <Radio.Button value='grid'>
-              <AppstoreOutlined />
-              <span> Grid</span>
-            </Radio.Button>
-          </Radio.Group>
         </div>
         <div className='lg:hidden'>
           <GradeDisplay />
         </div>
+        <Outlet />
       </div>
-        </div>
-        <div className='lg:hidden'>
-          <GradeDisplay />
-        </div>
-      <Outlet />
-  </>
+    </>
   );
 };
 
