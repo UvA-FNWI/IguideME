@@ -71,7 +71,13 @@ const LearningGoals: FC = (): ReactElement => {
         <AdminTitle title='Learning Goals' description='Configure the learning goals for the course.' />
         <div className='flex flex-col gap-2'>
           {goals?.map((goal) => <ViewLearningGoal key={goal.id} goal={goal} />)}
-          <Button type='dashed' onClick={addGoal} block icon={<PlusOutlined />} className='bg-white'>
+          <Button
+            type='dashed'
+            onClick={addGoal}
+            block
+            icon={<PlusOutlined />}
+            className='bg-cardBackground hover:!bg-dropdownBackground hover:!border-primary-500 [&_span]:!text-text'
+          >
             Add Goal
           </Button>
         </div>
@@ -116,7 +122,7 @@ const ViewLearningGoal: FC<GoalProps> = ({ goal }): ReactElement => {
   };
 
   return (
-    <div className='font-tnum p-[10px] border border-dashed border-zinc-400 rounded-lg bg-white'>
+    <div className='font-tnum p-[10px] border border-dashed border-text rounded-lg bg-cardBackground'>
       <div className='w-full flex justify-between'>
         <h2
           onClick={() => {
@@ -128,6 +134,7 @@ const ViewLearningGoal: FC<GoalProps> = ({ goal }): ReactElement => {
             goal.title
           : editing && (
               <Input
+                className='!border-primary-500 hover:!border-primary-500 !bg-cardBackground hover:!bg-dropdownBackground text-text'
                 value={title}
                 autoFocus
                 onBlur={() => {
@@ -149,7 +156,7 @@ const ViewLearningGoal: FC<GoalProps> = ({ goal }): ReactElement => {
           onClick={() => {
             removeGoal(goal.id);
           }}
-          className='p-1'
+          className='p-1 text-primary-red'
         />
       </div>
 
@@ -159,7 +166,13 @@ const ViewLearningGoal: FC<GoalProps> = ({ goal }): ReactElement => {
         <ViewGoalRequirement key={index} requirement={requirement} />
       ))}
 
-      <Button type='dashed' onClick={addRequirement} block icon={<PlusOutlined />}>
+      <Button
+        className='bg-cardBackground hover:!bg-dropdownBackground hover:!border-primary-500 [&_span]:!text-text'
+        type='dashed'
+        onClick={addRequirement}
+        block
+        icon={<PlusOutlined />}
+      >
         Add Requirement
       </Button>
     </div>
@@ -253,7 +266,8 @@ const ViewGoalRequirement: FC<ReqProps> = ({ requirement }): ReactElement => {
             <Item name='assignment_id' noStyle>
               <Select
                 aria-disabled={isLoading || isError}
-                className='w-full'
+                className='w-full [&>div]:!bg-cardBackground [&>div]:!border-primary-500 [&>div]:hover:!bg-dropdownBackground [&_span]:!text-text'
+                dropdownClassName='bg-dropdownBackground [&_div]:!text-text selectionSelected'
                 disabled={isLoading || isError}
                 showSearch
                 optionFilterProp='label'
@@ -277,7 +291,8 @@ const ViewGoalRequirement: FC<ReqProps> = ({ requirement }): ReactElement => {
             <Item name='expression' noStyle>
               <Select
                 aria-disabled={isLoading || isError}
-                className='w-full'
+                className='w-full [&>div]:!bg-cardBackground [&>div]:!border-primary-500 [&>div]:hover:!bg-dropdownBackground [&_span]:!text-text'
+                dropdownClassName='bg-dropdownBackground [&_div]:!text-text selectionSelected'
                 disabled={isLoading || isError}
                 options={[
                   {
@@ -309,16 +324,25 @@ const ViewGoalRequirement: FC<ReqProps> = ({ requirement }): ReactElement => {
             </Item>
 
             <Item name='value' noStyle>
-              <InputNumber aria-disabled={isLoading || isError} disabled={isLoading || isError} />
+              <InputNumber
+                className='w-12 !border-primary-500 hover:!border-primary-500 !bg-cardBackground hover:!bg-dropdownBackground [&_input]:!text-text antNumberInput'
+                aria-disabled={isLoading || isError}
+                disabled={isLoading || isError}
+              />
             </Item>
           </div>
           <div className='flex gap-2'>
             <Item noStyle>
-              <Button className='text-white bg-primary-blue' type='primary' htmlType='submit'>
+              <Button
+                className='min-w-20 bg-primary-500 hover:!bg-primary-600 [&_span]:text-text'
+                type='primary'
+                htmlType='submit'
+              >
                 Save
               </Button>
             </Item>
             <Button
+              className='min-w-20 bg-primary-red hover:!bg-red-400 [&_span]:text-text'
               type='primary'
               danger
               onClick={() => {

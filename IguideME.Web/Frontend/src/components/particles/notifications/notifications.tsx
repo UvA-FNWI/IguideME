@@ -1,9 +1,9 @@
 import { RiseOutlined, TrophyOutlined, WarningOutlined } from '@ant-design/icons';
 import { type FC, type ReactElement } from 'react';
-import { type Notifications } from '@/types/notifications';
+import { type Notifications as NotificationsType } from '@/types/notifications';
 
 interface Props {
-  notifications: Notifications;
+  notifications: NotificationsType;
 }
 
 const Notifications: FC<Props> = ({ notifications }): ReactElement => {
@@ -13,7 +13,8 @@ const Notifications: FC<Props> = ({ notifications }): ReactElement => {
       <div className='h-16 grid items-center'>
         <p>No notifications found</p>
       </div>
-  )}
+    );
+  }
 
   return (
     <div>
@@ -25,7 +26,9 @@ const Notifications: FC<Props> = ({ notifications }): ReactElement => {
           </div>
           <ul className='list-disc pl-9 text-sm'>
             {outperforming.map((notification) => (
-              <li key={notification.tile_id}>{notification.tile_title}</li>
+              <li className='text-text' key={notification.tile_id}>
+                {notification.tile_title}
+              </li>
             ))}
           </ul>
         </>
@@ -39,7 +42,9 @@ const Notifications: FC<Props> = ({ notifications }): ReactElement => {
           </div>
           <ul className='list-disc pl-9 text-sm'>
             {closing.map((notification) => (
-              <li key={notification.tile_id}>{notification.tile_title}</li>
+              <li className='text-text' key={notification.tile_id}>
+                {notification.tile_title}
+              </li>
             ))}
           </ul>
         </>
@@ -53,7 +58,9 @@ const Notifications: FC<Props> = ({ notifications }): ReactElement => {
           </div>
           <ul className='list-disc pl-9 text-sm'>
             {falling.map((notification) => (
-              <li key={notification.tile_id}>{notification.tile_title}</li>
+              <li className='text-text' key={notification.tile_id}>
+                {notification.tile_title}
+              </li>
             ))}
           </ul>
         </>
@@ -66,7 +73,9 @@ const Notifications: FC<Props> = ({ notifications }): ReactElement => {
           </div>
           <ul className='list-disc pl-9 text-sm'>
             {effort.map((notification) => (
-              <li key={notification.tile_id}>{notification.tile_title}</li>
+              <li className='text-text' key={notification.tile_id}>
+                {notification.tile_title}
+              </li>
             ))}
           </ul>
         </>

@@ -1,10 +1,13 @@
 import Swal from 'sweetalert2';
 import {
+  BellOutlined,
   BellTwoTone,
   CarryOutOutlined,
   CommentOutlined,
   DeleteFilled,
+  EyeInvisibleOutlined,
   EyeInvisibleTwoTone,
+  EyeOutlined,
   EyeTwoTone,
   FormOutlined,
 } from '@ant-design/icons';
@@ -16,11 +19,6 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSortable } from '@dnd-kit/sortable';
 import { TileType, type Tile, printGradingType } from '@/types/tile';
 import { type FC, type ReactElement } from 'react';
-
-const GREEN = 'rgb(55, 212, 63)';
-const GREEN_BG = 'rgba(55, 212, 63, 0.1)';
-const RED = 'rgb(252, 69, 3)';
-const RED_BG = 'rgba(252, 69, 3, 0.1)';
 
 interface Props {
   tile: Tile;
@@ -58,7 +56,6 @@ const AdminTileView: FC<Props> = ({ tile, move }): ReactElement => {
   const style = {
     transition,
     transform: CSS.Transform.toString(transform),
-    background: tile.visible ? GREEN_BG : RED_BG,
   };
 
   const toggleVisible = (): void => {
@@ -72,7 +69,7 @@ const AdminTileView: FC<Props> = ({ tile, move }): ReactElement => {
   if (isDragging) {
     return (
       <div
-        className="w-60 h-full p-3 border border-solid border-zinc-300 rounded-md m-0 bg-white font-tnum"
+        className={`w-60 h-full p-3 border border-solid border-text rounded-md m-0 font-tnum ${tile.visible ? 'bg-primary-green-background' : 'bg-primary-red-background'}`}
         ref={setNodeRef}
         style={style}
       />
@@ -82,11 +79,11 @@ const AdminTileView: FC<Props> = ({ tile, move }): ReactElement => {
   if (move === true) {
     return (
       <div
-        className="w-60 h-full p-3 border border-solid border-zinc-300 rounded-md m-0 bg-white font-tnum"
+        className={`w-60 h-full p-3 border border-solid border-text rounded-md m-0 font-tnum ${tile.visible ? 'bg-primary-green-background' : 'bg-primary-red-background'}`}
         ref={setNodeRef}
         style={style}
       >
-        <div className="flex justify-center items-center h-full">
+        <div className='flex justify-center items-center h-full'>
           <p>Move here</p>
         </div>
       </div>
@@ -95,7 +92,7 @@ const AdminTileView: FC<Props> = ({ tile, move }): ReactElement => {
 
   return (
     <div
-      className="w-60 h-full p-3 border border-solid border-zinc-300 rounded-md m-0 bg-white font-tnum"
+      className={`w-60 h-full p-3 border border-solid border-text rounded-md m-0 font-tnum ${tile.visible ? 'bg-primary-green-background' : 'bg-primary-red-background'}`}
       ref={setNodeRef}
       style={style}
       {...attributes}
@@ -104,27 +101,24 @@ const AdminTileView: FC<Props> = ({ tile, move }): ReactElement => {
         setEditTile(tile);
       }}
     >
-      <Row gutter={[10, 10]} className="mb-6 justify-between content-center">
+      <Row gutter={[10, 10]} className='mb-6 justify-between content-center'>
         <Col>
-          <Space className="content-center">
+          <Space className='content-center'>
             <Tooltip title={<>This tile is {!tile.visible && <b>not </b>}visible for students</>}>
-              {tile.visible ? (
-                <EyeTwoTone
-                  twoToneColor={GREEN}
-                  className="text-xs"
+              {tile.visible ?
+                <EyeOutlined
+                  className='text-xs text-primary-green'
                   onClick={(event) => {
                     clickThrough(event, toggleVisible);
                   }}
                 />
-              ) : (
-                <EyeInvisibleTwoTone
-                  twoToneColor={RED}
-                  className="text-xs"
+              : <EyeInvisibleOutlined
+                  className='text-xs text-primary-red'
                   onClick={(event) => {
                     clickThrough(event, toggleVisible);
                   }}
                 />
-              )}
+              }
             </Tooltip>
             <Tooltip
               title={
@@ -133,15 +127,14 @@ const AdminTileView: FC<Props> = ({ tile, move }): ReactElement => {
                 </>
               }
             >
-              <BellTwoTone
-                twoToneColor={tile.notifications ? GREEN : RED}
+              <BellOutlined
                 onClick={(event) => {
                   clickThrough(event, toggleNotifications);
                 }}
-                className="text-xs"
+                className={`text-xs ${tile.notifications ? 'text-primary-green' : 'text-primary-red'}`}
               />
             </Tooltip>
-            <h3 className="ml-[10px] pt-[2px]">{tile.title}</h3>
+            <h3 className='ml-[10px] pt-[2px]'>{tile.title}</h3>
           </Space>
         </Col>
         <Col>
@@ -163,28 +156,34 @@ const AdminTileView: FC<Props> = ({ tile, move }): ReactElement => {
                 }
               });
             }}
-            className="pr-1"
+            className='pr-1 text-primary-red'
           />
         </Col>
       </Row>
-      <Row className="mt-[10px] justify-between">
+      <Row className='mt-[10px] justify-between'>
         <Col>
           <TileTypeView tileType={tile.type} />
         </Col>
       </Row>
-      <Row className="pt-[30px] justify-between content-center">
-        <Col className="h-[30px]">
+      <Row className='pt-[30px] justify-between content-center'>
+        <Col className='h-[30px]'>
           {tile.type === TileType.assignments && (
             <>
-              <h4 className=" ">Grading:</h4>
-              <p>{printGradingType(tile.gradingType)}</p>
+              <p className='text-xs'>
+                Grading:
+                <br />
+                {printGradingType(tile.gradingType)}
+              </p>
             </>
           )}
         </Col>
         {tile.weight > 0 && (
-          <Col className="text-center h-[30px]">
-            <h4 className=" ">Weight:</h4>
-            <p>{tile.weight * 100}%</p>
+          <Col className='text-center h-[30px]'>
+            <p className='text-xs'>
+              Weight:
+              <br />
+              {tile.weight * 100}%
+            </p>
           </Col>
         )}
       </Row>
@@ -201,25 +200,25 @@ const TileTypeView: FC<{ tileType: TileType }> = ({ tileType }): ReactElement =>
   switch (tileType) {
     case TileType.assignments:
       return (
-        <Tooltip title="Assignment tiles group together assignments and quizzes completed by the students. These can be obtained from an LMS or uploaded manually">
-          <Space align="center" size={3}>
-            <FormOutlined /> <h4 className=" ">Assignments</h4>
+        <Tooltip title='Assignment tiles group together assignments and quizzes completed by the students. These can be obtained from an LMS or uploaded manually'>
+          <Space align='center' size={3}>
+            <FormOutlined className='text-text' /> <p className='text-sm'>Assignments</p>
           </Space>
         </Tooltip>
       );
     case TileType.discussions:
       return (
-        <Tooltip title="Discussion tiles give an overview of the messages the students have posted as well as the number of messages.">
-          <Space align="center" size={3}>
-            <CommentOutlined /> <h4 className=" ">Discussions</h4>
+        <Tooltip title='Discussion tiles give an overview of the messages the students have posted as well as the number of messages.'>
+          <Space align='center' size={3}>
+            <CommentOutlined className='text-text' /> <p className='text-sm'>Discussions</p>
           </Space>
         </Tooltip>
       );
     case TileType.learning_outcomes:
       return (
-        <Tooltip title="Learning Goal tiles keep track of requirements or goals the students should complete during the course. Some examples of these are: the average of the partial exams must exceed X, students need to submit 10 discussions for participation, passing an extra assignments for honours, etc.">
-          <Space align="center" size={3}>
-            <CarryOutOutlined /> <h4 className=" ">Learning Goals</h4>
+        <Tooltip title='Learning Goal tiles keep track of requirements or goals the students should complete during the course. Some examples of these are: the average of the partial exams must exceed X, students need to submit 10 discussions for participation, passing an extra assignments for honours, etc.'>
+          <Space align='center' size={3}>
+            <CarryOutOutlined className='text-text' /> <p className='text-sm'>Learning Goals</p>
           </Space>
         </Tooltip>
       );

@@ -1,23 +1,23 @@
-import { getTileGrades } from '@/api/tiles';
 import GraphTile from '@/components/crystals/graph-tile/graph-tile.tsx';
 import GridTile from '@/components/crystals/grid-tile/grid-tile.tsx';
-import { useTileViewStore } from '@/components/pages/student-dashboard/tileViewContext';
 import PeerComparison from '@/components/particles/peer-comparison/peercomparison';
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
-import { GradingType, TileType, type Tile } from '@/types/tile';
 import { cn } from '@/utils/cn';
-import { useQuery } from '@tanstack/react-query';
 import { Col, Divider, Row } from 'antd';
-import { type FC, type ReactElement } from 'react';
+import { getTileGrades } from '@/api/tiles';
 import { useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import { useTileViewStore } from '@/components/pages/student-dashboard/tileViewContext';
+import { GradingType, TileType, type Tile } from '@/types/tile';
+import { type FC, type ReactElement, memo } from 'react';
 
 interface Props {
   tile: Tile;
   textStyle?: string;
 }
 
-const ViewTile: FC<Props> = ({ tile, textStyle }): ReactElement => {
+const ViewTile: FC<Props> = memo(({ tile, textStyle }): ReactElement => {
   const { user, viewType } = useTileViewStore((state) => ({
     user: state.user,
     viewType: state.viewType,
@@ -42,10 +42,9 @@ const ViewTile: FC<Props> = ({ tile, textStyle }): ReactElement => {
         aria-disabled={isLoading || isError}
         className={`${
           isError ? 'cursor-not-allowed' : 'cursor-pointer'
-        } w-[270px] h-[230px] border border-solid bg-white border-primary-gray relative`}
+        } w-[270px] h-[230px] border border-solid bg-bodyBackground border-borderColor relative rounded-md`}
         onClick={() => {
-          if (isError || isLoading) return;
-          else navigate(tile.id + '/');
+          if (!(isError || isLoading)) navigate(tile.id + '/');
         }}
       >
         <Row className='h-1/5 justify-center content-center'>
@@ -114,6 +113,6 @@ const ViewTile: FC<Props> = ({ tile, textStyle }): ReactElement => {
         throw new Error('Unknown tile type');
     }
   }
-};
-
+});
+ViewTile.displayName = 'ViewTile';
 export default ViewTile;

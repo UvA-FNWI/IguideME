@@ -7,16 +7,67 @@
 
 @layer base {
   :root {
-    --primary-blue: #1677ff;
-    --primary-disabled: #ebf0f6;
-    --primary-gray: #e4ebf5;
-    --primary-orange: #ff6e5a;
-    --primary-purple: #5a32ff;
+    --body-background: #fff;
+    --card-background: #e4ebf5;
+    --group-background: #f8fafc;
+    --dropdown-background: #fff;
+    --navbar-background: #5a32ff;
+    --hover-background: #f0f2f5;
+    --dialog-background: #a077ff;
+    --border-color: #e4ebf5;
+    --logo: #5a32ff;
+
+    --body: #fff;
+    --text: #333;
+    --card: #e4ebf5;
+
+    --primary: #5a32ff;
+    --primary-light: #a077ff;
+
+    --green: #37d43f;
+    --green-background: #37d43f1a;
+    --red: #fc4503;
+    --red-background: #fc45031a;
   }
 
-  /* Maybe add a dark mode later? */
   .dark {
+    --body-background: #333333;
+    --card-background: #474747;
+    --group-background: #474747;
+    --dropdown-background: #5b5b5b;
+    --navbar-background: #717171;
+    --hover-background: #717171;
+    --border-color: #e4ebf5;
+    --dialog-background: #878787;
+    --logo: #b38dff;
+
+    --body: #333;
+    --text: #fff;
+    --card: #474747;
+
+    --primary: #b38dff;
+    --primary-light: #c4a4ff;
+
+    --green: #37d43f;
+    --green-background: #37d43f1a;
+    --red: #fc4503;
+    --red-background: #fc45031a;
   }
+}
+
+/* Set up default background and text color */
+body {
+  background-color: var(--body-background);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  color: var(--text);
 }
 
 *,
@@ -118,4 +169,133 @@ textarea:not([rows]) {
 /* Anything that has been anchored to should have extra scroll margin */
 :target {
   scroll-margin-block: 5ex;
+}
+
+.selectBackgroundHover .ant-select-item-option-active:hover {
+  background-color: var(--hover-background) !important;
+}
+
+.adminPanelMenuSelect .ant-menu-item-selected {
+  background-color: var(--dialog-background) !important;
+}
+
+.adminPanelMenuSelect .ant-menu-item-active {
+  background-color: var(--navbar-background) !important;
+}
+
+.dashboardTableHover .ant-table-cell-row-hover {
+  background-color: var(--dropdown-background) !important;
+}
+
+.selectionSelected .ant-select-item-option-selected {
+  background-color: var(--navbar-background) !important;
+}
+
+.selectionSelected .ant-select-item-option-active {
+  background-color: var(--dialog-background) !important;
+}
+
+.antNumberInput .ant-input-number-handler-wrap {
+  background-color: var(--card-background) !important;
+}
+
+.antNumberInput .ant-input-number-handler-wrap span {
+  color: var(--text) !important;
+  border-color: #b38dff !important;
+}
+
+.customSlider .ant-slider-track {
+  background-color: #764aff !important;
+}
+
+.customSlider .ant-slider-rail {
+  background-color: #c4a4ff !important;
+}
+
+.customSlider .ant-slider-handle::after {
+  box-shadow: 0 0 0 2px #764aff !important;
+}
+
+.customTransfer .ant-transfer-list {
+  border: 1px solid #b38dff !important;
+}
+
+.customTransfer .ant-transfer-list-header {
+  background-color: var(--dropdown-background);
+}
+
+.customTransfer .ant-transfer-list-body {
+  background-color: var(--navbar-background);
+}
+
+.customTransfer .ant-transfer-operation button {
+  background-color: #b38dff !important;
+}
+
+.customTransfer .ant-transfer-operation button:disabled {
+  border-color: #b38dff !important;
+}
+
+.customTransfer .ant-input-affix-wrapper {
+  background-color: var(--dialog-background) !important;
+}
+
+.customTransfer input::placeholder {
+  color: var(--text) !important;
+}
+
+.customTransfer .ant-transfer-list-content-item-checked {
+  background-color: var(--dialog-background) !important;
+}
+
+.ant-dropdown-menu {
+  background-color: var(--dropdown-background) !important;
+}
+
+.ant-dropdown-menu-item {
+  color: var(--text) !important;
+}
+
+.ant-dropdown-menu-item:hover {
+  background-color: var(--hover-background) !important;
+}
+
+.ant-switch-checked {
+  background-color: #b38dff !important;
+}
+
+.ant-switch[aria-checked='false'] {
+  background: var(--navbar-background) !important;
+}
+
+.ant-radio-button-wrapper-checked {
+  background-color: #b38dff !important;
+}
+
+.ant-radio-button-wrapper {
+  background-color: var(--card-background);
+  color: var(--text);
+  border: 1px solid #b38dff !important;
+}
+
+.ant-radio-button-wrapper:hover {
+  background-color: var(--dropdown-background);
+  color: var(--text);
+}
+
+.ant-picker-outlined {
+  background-color: var(--card-background) !important;
+  border: 1px solid #b38dff !important;
+}
+
+.ant-picker-outlined input::placeholder {
+  color: var(--text) !important;
+}
+
+.ant-picker-outlined span {
+  color: var(--text) !important;
+}
+
+.ant-picker-outlined:hover {
+  background-color: var(--dropdown-background) !important;
 }

@@ -34,7 +34,7 @@ function App(): ReactElement {
   }, [isSuccess]);
 
   const HeaderLoader = (
-    <header className='h-header bg-primary-purple flex justify-start items-center p-3'>
+    <header className='h-header bg-navbarBackground flex justify-start items-center p-3'>
       <p className='text-white align-middle font-semibold inline-block text-2xl'>IguideME</p>
     </header>
   );
@@ -42,7 +42,7 @@ function App(): ReactElement {
   const GlobalLoadingState = (
     <>
       {HeaderLoader}
-      <div className='h-[calc(100vh-70px)] bg-white grid items-center'>
+      <div className='h-[calc(100vh-70px)] bg-bodyBackground grid items-center'>
         <Loading />
       </div>
     </>
@@ -53,7 +53,7 @@ function App(): ReactElement {
     return (
       <Suspense fallback={GlobalLoadingState}>
         {HeaderLoader}
-        <div className='h-[calc(100vh-70px)] bg-white flex flex-col items-center justify-center text-justify gap-2'>
+        <div className='h-[calc(100vh-70px)] bg-bodyBackground flex flex-col items-center justify-center text-justify gap-2'>
           <h1 className='w-full text-2xl max-w-lg tracking-normal'>
             {isError ? 'Something unexpected happened' : "Unfortunately, we couldn't find your account."}
           </h1>

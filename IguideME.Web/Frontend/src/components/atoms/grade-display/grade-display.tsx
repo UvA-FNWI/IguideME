@@ -1,7 +1,8 @@
-import { useTileViewStore } from '@/components/pages/student-dashboard/tileViewContext';
 import { FrownTwoTone, MehTwoTone, SmileTwoTone } from '@ant-design/icons';
 import { Space, Spin } from 'antd';
-import { type FC, type ReactElement } from 'react';
+import { useTheme } from 'next-themes';
+import { useTileViewStore } from '@/components/pages/student-dashboard/tileViewContext';
+import { memo, type FC, type ReactElement } from 'react';
 
 import { Bar, type BarConfig } from '@ant-design/charts';
 
@@ -35,7 +36,7 @@ interface Props {
   pred: number;
 }
 
-const GridGrades: FC<Props> = ({ goal, total, pred }): ReactElement => {
+const GridGrades: FC<Props> = memo(({ goal, total, pred }): ReactElement => {
   const happy = <SmileTwoTone size={10} twoToneColor='rgb(0, 185, 120)' />;
   const meh = <MehTwoTone size={10} twoToneColor='rgb(245, 226, 54)' />;
   const unhappy = <FrownTwoTone size={10} twoToneColor={'rgb(255, 110, 90)'} />;
@@ -82,9 +83,11 @@ const GridGrades: FC<Props> = ({ goal, total, pred }): ReactElement => {
       </div>
     </Space>
   );
-};
+});
+GridGrades.displayName = 'GridGrades';
 
-const GraphGrades: FC<Props> = ({ goal, total, pred }): ReactElement => {
+const GraphGrades: FC<Props> = memo(({ goal, total, pred }): ReactElement => {
+  const { theme } = useTheme();
   const config: BarConfig = {
     data: [
       { name: 'Current grade', grade: total },
@@ -92,13 +95,21 @@ const GraphGrades: FC<Props> = ({ goal, total, pred }): ReactElement => {
     ],
     xField: 'name',
     yField: 'grade',
-    colorField: 'name',
+    style: {
+      fill: ({ name }: { name: 'Current grade' | 'Predicted grade' }) => {
+        if (name === 'Current grade') return '#5a32ff';
+        else return theme === 'dark' ? '#c4a4ff' : '#0dcccc';
+      },
+    },
     height: 70,
     legend: false,
     scale: {
       y: { domainMax: 10 },
     },
     axis: {
+      x: {
+        labelFill: theme === 'light' ? 'black' : 'white',
+      },
       y: {
         label: false,
         tick: false,
@@ -112,24 +123,28 @@ const GraphGrades: FC<Props> = ({ goal, total, pred }): ReactElement => {
         type: 'lineY',
         data: [goal],
         style: {
-          stroke: 'black',
+          stroke: theme === 'light' ? 'black' : 'white',
           strokeOpacity: 1,
           lineWidth: 1,
           lineDash: [8, 3],
         },
         label: {
+          fill: theme === 'light' ? 'black' : 'white',
           position: 'top',
           dy: -17,
           text: 'goal',
         },
       },
     ],
+    optimization: {
+      sideEffects: true,
+    },
   };
   return (
     <div className='w-full h-full'>
       <Bar {...config} />
     </div>
   );
-};
-
+});
+GraphGrades.displayName = 'GraphGrades';
 export default GradeDisplay;

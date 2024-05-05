@@ -1,9 +1,8 @@
-import { createContext, type PropsWithChildren, useContext, useRef, type ReactElement } from 'react';
 import { createJSONStorage, devtools, persist } from 'zustand/middleware';
 import { createStore, useStore } from 'zustand';
+import { createContext, type PropsWithChildren, useContext, useRef, type ReactElement } from 'react';
 import { type User } from '@/types/user';
 import { type ViewType } from '@/types/tile';
-
 
 interface tileViewProps {
   viewType?: ViewType;
@@ -29,8 +28,12 @@ export const createTileViewStore = (initProps: { user: User; viewType?: ViewType
             ...DEFAULT_PROPS,
             ...initProps,
 
-            setViewType: (viewType) => { set({ viewType }); },
-            setUser: (user) => { set({ user }); },
+            setViewType: (viewType) => {
+              set({ viewType });
+            },
+            setUser: (user) => {
+              set({ user });
+            },
           }) satisfies tileViewState,
         {
           name: 'tileViewStore',

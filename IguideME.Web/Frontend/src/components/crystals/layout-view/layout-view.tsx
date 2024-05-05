@@ -1,9 +1,9 @@
-import { getLayoutColumns, getTileGroups } from '@/api/tiles';
 import QueryError from '@/components/particles/QueryError';
-import { useQuery } from '@tanstack/react-query';
-import { Col, Row, Spin } from 'antd';
-import { type FC, type ReactElement } from 'react';
 import ViewTileGroup from '../tile-group-view/tile-group-view';
+import { Col, Row, Spin } from 'antd';
+import { getLayoutColumns, getTileGroups } from '@/api/tiles';
+import { useQuery } from '@tanstack/react-query';
+import { type FC, type ReactElement } from 'react';
 
 const ViewLayout: FC = (): ReactElement => {
   const {
@@ -78,7 +78,7 @@ const ViewLayout: FC = (): ReactElement => {
               );
             })}
           </div>
-          <Col key={column.id} span={Math.round((24 * column.width) / 100)} className='hidden lg:block flex-shrink '>
+          <Col key={column.id} span={Math.round((24 * column.width) / 100)} className='hidden lg:block flex-shrink'>
             <div className='h-full grid gap-3'>
               {column.groups.map((id) => {
                 const group = tilegroups.find((group) => group.id === id);

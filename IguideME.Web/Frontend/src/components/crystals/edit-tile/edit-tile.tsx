@@ -2,22 +2,19 @@ import EditTileAssignments from '@/components/atoms/edit-tile-assignments/edit-t
 import EditTileDiscussions from '@/components/atoms/edit-tile-discussions/edit-tile-discussions';
 import EditTileGoals from '@/components/atoms/edit-tile-goals/edit-tile-goals';
 import Swal from 'sweetalert2';
-import { BellTwoTone, CheckCircleTwoTone, StopTwoTone } from '@ant-design/icons';
+import { BellOutlined, CheckCircleOutlined, StopOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Select } from 'antd';
 import { deleteTile, patchTile } from '@/api/tiles';
-import { FormInstance } from 'antd/lib/form/Form';
 import { useDrawerStore } from '../tile-group-board/useDrawerStore';
 import { useForm, useWatch } from 'antd/es/form/Form';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { type FormInstance } from 'antd/lib/form/Form';
 import { TileType, type Tile } from '@/types/tile';
 import { useState, type FC, type ReactElement } from 'react';
 
 interface Props {
   tile: Tile;
 }
-
-const GREEN = 'rgb(55, 212, 63)';
-const RED = 'rgb(252, 69, 3)';
 
 const { Item } = Form;
 
@@ -74,7 +71,7 @@ const EditTile: FC<Props> = ({ tile }): ReactElement => {
       >
         <p>Title:</p>
         <Item name='title' rules={[{ required: true, message: 'Please insert a title for the tile' }]} noStyle>
-          <Input className='w-full' />
+          <Input className='w-full border-primary-500 hover:border-primary-500 bg-cardBackground hover:bg-dropdownBackground text-text' />
         </Item>
         <div className='flex gap-2'>
           <Item name='notifications' noStyle>
@@ -95,14 +92,18 @@ const EditTile: FC<Props> = ({ tile }): ReactElement => {
       </div>
       <div className='flex gap-2'>
         <Item>
-          <Button className='min-w-20' type='primary' htmlType='submit'>
+          <Button
+            className='min-w-20 bg-primary-500 hover:!bg-primary-600 [&_span]:text-text'
+            type='primary'
+            htmlType='submit'
+          >
             Save
           </Button>
         </Item>
 
         <Item>
           <Button
-            className='min-w-20'
+            className='min-w-20 bg-primary-red hover:!bg-red-400 [&_span]:text-text'
             type='primary'
             danger
             onClick={() => {
@@ -145,21 +146,22 @@ const EditTile: FC<Props> = ({ tile }): ReactElement => {
   }
 };
 
-type TypeSelectorPrps = {
+interface TypeSelectorProps {
   value: number;
   onChange: (value: number) => void;
   form: FormInstance<Tile>;
-};
+}
 
-const TypeSelector: FC<TypeSelectorPrps> = ({ value, onChange, form }): ReactElement => {
-  const update = (args: number) => {
+const TypeSelector: FC<TypeSelectorProps> = ({ value, onChange, form }): ReactElement => {
+  const update = (args: number): void => {
     form.setFieldValue('entries', []);
     onChange(args);
   };
 
   return (
     <Select
-      className='w-full'
+      className='w-full [&>div]:!bg-cardBackground [&>div]:!border-primary-500 [&>div]:hover:!bg-dropdownBackground [&_span]:!text-text'
+      dropdownClassName='bg-dropdownBackground [&_div]:!text-text selectionSelected'
       options={[
         { value: TileType.assignments, label: 'Assignments' },
         { value: TileType.discussions, label: 'Discussions' },
@@ -182,8 +184,9 @@ const Notification: FC<{
 
   return (
     <Button
+      className='border-primary-500 hover:!border-primary-500 bg-cardBackground hover:!bg-dropdownBackground text-text grid place-content-center'
       shape='circle'
-      icon={<BellTwoTone twoToneColor={notifications === true ? GREEN : RED} />}
+      icon={<BellOutlined className={`${notifications ? 'text-primary-green' : 'text-primary-red'}`} />}
       onClick={() => {
         if (notifications === undefined) return;
         setNotifications(!notifications);
@@ -198,11 +201,12 @@ const Visible: FC<{ value?: boolean; onChange?: (value: boolean) => void }> = ({
 
   return (
     <Button
+      className='border-primary-500 hover:!border-primary-500 bg-cardBackground hover:!bg-dropdownBackground text-text grid place-content-center'
       shape='circle'
       icon={
         visible === true ?
-          <CheckCircleTwoTone twoToneColor={GREEN} className='text-xs' />
-        : <StopTwoTone twoToneColor={RED} className='text-xs' />
+          <CheckCircleOutlined className='text-xs text-primary-green' />
+        : <StopOutlined className='text-xs text-primary-red' />
       }
       onClick={() => {
         if (visible === undefined) return;

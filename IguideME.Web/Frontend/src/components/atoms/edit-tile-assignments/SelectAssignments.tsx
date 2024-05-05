@@ -1,6 +1,13 @@
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
-import { CheckCircleTwoTone, CloseCircleTwoTone, DeleteFilled } from '@ant-design/icons';
+import {
+  CheckCircleOutlined,
+  CheckCircleTwoTone,
+  CloseCircleOutlined,
+  CloseCircleTwoTone,
+  DeleteFilled,
+  DeleteOutlined,
+} from '@ant-design/icons';
 import { getAssignments } from '@/api/entries';
 import { InputNumber, Select, Table } from 'antd';
 import { useQuery } from '@tanstack/react-query';
@@ -8,10 +15,10 @@ import { useCallback, useEffect, useMemo, useState, type FC, type ReactElement }
 
 import { printGradingType, type Assignment, type TileEntry } from '@/types/tile';
 
-type SelectAssignmentsProps = {
+interface SelectAssignmentsProps {
   value: TileEntry[];
   onChange: (value: TileEntry[]) => void;
-};
+}
 
 const SelectAssignments: FC<SelectAssignmentsProps> = ({ value: entries, onChange: setEntries }): ReactElement => {
   const { data, isError, isLoading } = useQuery({
@@ -96,6 +103,7 @@ const SelectAssignments: FC<SelectAssignmentsProps> = ({ value: entries, onChang
     <QueryLoading isLoading={isLoading}>
       <div className='flex flex-col gap-1 overflow-x-auto'>
         <Table
+          className='[&_th]:!bg-cardBackground [&_th]:!text-text [&_td]:!bg-dropdownBackground [&_td]:!text-text [&_div]:!text-text'
           columns={[
             {
               title: 'Name',
@@ -110,8 +118,8 @@ const SelectAssignments: FC<SelectAssignmentsProps> = ({ value: entries, onChang
               render: (_: string, entry: TileEntry) => {
                 const assignment = assignments.get(entry.content_id);
                 return assignment !== undefined && assignment.published ?
-                    <CheckCircleTwoTone twoToneColor='rgb(55, 212, 63)' />
-                  : <CloseCircleTwoTone twoToneColor='Red' />;
+                    <CheckCircleOutlined className='text-primary-green' />
+                  : <CloseCircleOutlined className='text-primary-red' />;
               },
             },
             {
@@ -134,6 +142,7 @@ const SelectAssignments: FC<SelectAssignmentsProps> = ({ value: entries, onChang
               render: (_: string, entry: TileEntry) => {
                 return (
                   <InputNumber
+                    className='!border-primary-500 hover:!border-primary-500 !bg-cardBackground hover:!bg-dropdownBackground [&_input]:!text-text antNumberInput'
                     value={entry.weight}
                     onChange={(val) => {
                       changeWeight(entry, val);
@@ -152,6 +161,7 @@ const SelectAssignments: FC<SelectAssignmentsProps> = ({ value: entries, onChang
               render: (_: string, entry: TileEntry) => {
                 return (
                   <DeleteFilled
+                    className='text-primary-red'
                     onClick={() => {
                       removeEntry(entry.content_id);
                     }}
@@ -166,6 +176,8 @@ const SelectAssignments: FC<SelectAssignmentsProps> = ({ value: entries, onChang
         />
 
         <Select
+          className='w-full [&>div]:!bg-cardBackground [&>div]:!border-primary-500 [&>div]:hover:!bg-dropdownBackground [&_span]:!text-text'
+          dropdownClassName='bg-dropdownBackground [&_div]:!text-text selectionSelected'
           value={selectedAssignments}
           mode='multiple'
           options={options}

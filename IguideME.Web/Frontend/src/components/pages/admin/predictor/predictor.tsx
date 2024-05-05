@@ -1,7 +1,7 @@
 import { type FC, type ReactElement } from 'react';
 
 const GradePredictor: FC = (): ReactElement => {
-  return <div>GradePredictor</div>;
+  return <p>GradePredictor</p>;
 };
 
 export default GradePredictor;

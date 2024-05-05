@@ -8,6 +8,7 @@ import { getLayoutColumns, postLayoutColumns } from '@/api/tiles';
 import { PlusOutlined } from '@ant-design/icons';
 import { toast } from 'sonner';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useTheme } from 'next-themes';
 import { type FC, type ReactElement, useCallback, useEffect, useMemo, useState } from 'react';
 
 import { type LayoutColumn } from '@/types/tile';
@@ -112,14 +113,19 @@ const LayoutConfigurator: FC = (): ReactElement => {
     if (columns !== null) saveLayout(columns);
   };
 
+  const { theme } = useTheme();
   const loadingState = Array.from({ length: 2 }).map((_, i) => (
     <QueryLoading isLoading={isLoading} key={i}>
-      <article className='rounded-md w-[425px] h-[360px] p-3 m-2 bg-white shadow-statusCard' />
+      <article
+        className={`rounded-md w-[425px] h-[360px] p-3 m-2 bg-cardBackground ${theme === 'light' ? 'shadow-statusCard' : ''}`}
+      />
     </QueryLoading>
   ));
 
   const errorState = (
-    <article className='rounded-md w-[425px] h-[360px] p-3 m-2 bg-white shadow-statusCard relative'>
+    <article
+      className={`rounded-md w-[425px] h-[360px] p-3 m-2 bg-cardBackground ${theme === 'light' ? 'shadow-statusCard' : ''} relative`}
+    >
       <QueryError className='grid place-content-center' title='Error: Could not load layout columns' />
     </article>
   );
@@ -140,12 +146,21 @@ const LayoutConfigurator: FC = (): ReactElement => {
               ))
             }
           </div>
-          <Button type='dashed' onClick={addColumn} block icon={<PlusOutlined />} className='bg-white'>
+          <Button
+            type='dashed'
+            onClick={addColumn}
+            block
+            icon={<PlusOutlined />}
+            className='bg-cardBackground hover:!bg-dropdownBackground hover:!border-primary-500 [&_span]:!text-text'
+          >
             Add Column
           </Button>
         </div>
       </SortableContext>
-      <Button className='mt-2 bg-white' onClick={save}>
+      <Button
+        className='mt-2 min-w-20 !border-none hover:!border-none bg-primary-500 hover:!bg-primary-600 [&_span]:text-text'
+        onClick={save}
+      >
         Save
       </Button>
       {createPortal(

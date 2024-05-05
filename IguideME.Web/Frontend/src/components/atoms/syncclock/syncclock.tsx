@@ -6,9 +6,12 @@ import { getRelativeTimeTimer } from '@/helpers/time';
 import { JobStatus } from '@/types/synchronization';
 import { pollSync, startNewSync, stopCurrentSync } from '@/api/syncing';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useTheme } from 'next-themes';
 import { type FC, type ReactElement, useEffect, useState } from 'react';
 
 const SyncClock: FC = (): ReactElement => {
+  const { theme } = useTheme();
+
   const [startTime, setStartTime] = useState<number | null>(null);
   const queryClient = useQueryClient();
 
@@ -68,7 +71,7 @@ const SyncClock: FC = (): ReactElement => {
       <div className='w-full grid place-content-center'>
         <div
           className={cn(
-            `w-[180px] h-[180px] rounded-full bg-primary-gray flex justify-center items-center text-center shadow-syncClock ${
+            `w-[180px] h-[180px] rounded-full bg-cardBackground flex justify-center items-center text-center ${theme === 'light' && 'shadow-syncClock'} ${
               elapsed !== undefined ? 'before:animate-spin' : ''
             }`,
             styles.syncClock,
@@ -90,7 +93,7 @@ const SyncClock: FC = (): ReactElement => {
       <div className='flex justify-between gap-2'>
         <Button
           block
-          className='m-0 flex-grow basis-0 text-emerald-500 hover:!text-emerald-500 uppercase bg-primary-gray hover:!bg-primary-gray shadow-syncButton border-none rounded-sm hover:enabled:shadow-statusCard disabled:bg-primary-disabled disabled:hover:!text-black/25 disabled:hover:!bg-primary-disabled disabled:shadow-statusCard'
+          className={`m-0 flex-grow basis-0 text-text hover:!text-text uppercase bg-primary-500 hover:!bg-primary-600 ${theme === 'light' && 'shadow-syncButton hover:enabled:shadow-statusCard disabled:shadow-statusCard'} border-none rounded-sm disabled:bg-cardBackground disabled:!text-text disabled:hover:!text-text disabled:hover:!bg-cardBackground`}
           disabled={elapsed !== undefined}
           onClick={startSync}
         >
@@ -98,7 +101,7 @@ const SyncClock: FC = (): ReactElement => {
         </Button>
 
         <Button
-          className='m-0 flex-grow basis-0 text-emerald-500 hover:!text-emerald-500 uppercase bg-primary-gray hover:!bg-primary-gray shadow-syncButton border-none rounded-sm hover:enabled:shadow-statusCard disabled:bg-primary-disabled disabled:hover:!text-black/25 disabled:hover:!bg-primary-disabled disabled:shadow-statusCard'
+          className={`m-0 flex-grow basis-0 text-text hover:!text-text uppercase bg-primary-500 hover:!bg-primary-600 ${theme === 'light' && 'shadow-syncButton hover:enabled:shadow-statusCard disabled:shadow-statusCard'} border-none rounded-sm disabled:bg-cardBackground disabled:!text-text disabled:hover:!text-text disabled:hover:!bg-cardBackground`}
           disabled={elapsed === undefined}
           block
           onClick={() => {

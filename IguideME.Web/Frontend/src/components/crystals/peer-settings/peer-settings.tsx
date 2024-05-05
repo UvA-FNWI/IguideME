@@ -16,7 +16,7 @@ const PeerSettings: FC = (): ReactElement => {
   if (isError || isLoading || data === undefined) {
     return (
       <QueryLoading isLoading={isLoading}>
-        <div className='h-20 bg-white'>
+        <div className='h-20 bg-cardBackground'>
           {(isError || (data === undefined && !isLoading)) && (
             <QueryError className='top-[-30px]' title='Failed to load peer settings' />
           )}
@@ -56,16 +56,27 @@ const PeerSettingsForm: FC<Props> = ({ minSize }): ReactElement => {
   return (
     <Form name='peer_settings_form' initialValues={{ min_size: minSize }} onFinish={savePeer}>
       <div className='flex justify-between'>
-        <Form.Item name='min_size' label='Minimum group size'>
-          <InputNumber min={2} />
+        <Form.Item className='[&_label]:!text-text [&_label]:!text-sm' name='min_size' label='Minimum group size'>
+          <InputNumber
+            className='!border-primary-500 hover:!border-primary-500 !bg-cardBackground hover:!bg-dropdownBackground [&_input]:!text-text antNumberInput'
+            min={2}
+          />
         </Form.Item>
-        <Form.Item name='personalized_peers' label='Personalized' valuePropName='checked'>
+        <Form.Item
+          className='[&_label]:!text-text [&_label]:!text-sm'
+          name='personalized_peers'
+          label='Personalized'
+          valuePropName='checked'
+        >
           <Switch defaultChecked checkedChildren={<CheckOutlined />} unCheckedChildren={<CloseOutlined />} />
         </Form.Item>
       </div>
 
       <Form.Item className='flex justify-end m-0'>
-        <Button className='w-16' htmlType='submit'>
+        <Button
+          className='min-w-20 bg-primary-500 hover:!bg-primary-600 [&_span]:text-text !border-none hover:!border-none'
+          htmlType='submit'
+        >
           Save
         </Button>
       </Form.Item>

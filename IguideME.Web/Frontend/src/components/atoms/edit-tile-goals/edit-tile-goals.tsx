@@ -76,6 +76,7 @@ const TileGoalsSelect: FC<TileGoalsSelectProps> = ({ goals, value: entries, onCh
   return (
     <div className='flex flex-col gap-1'>
       <Table
+        className='[&_th]:!bg-cardBackground [&_th]:!text-text [&_td]:!bg-dropdownBackground [&_td]:!text-text [&_div]:!text-text'
         columns={[
           {
             title: 'Name',
@@ -100,6 +101,7 @@ const TileGoalsSelect: FC<TileGoalsSelectProps> = ({ goals, value: entries, onCh
             render: (_: string, entry: TileEntry) => {
               return (
                 <DeleteFilled
+                  className='text-primary-red'
                   onClick={() => {
                     removeEntry(entry.content_id);
                   }}
@@ -114,6 +116,8 @@ const TileGoalsSelect: FC<TileGoalsSelectProps> = ({ goals, value: entries, onCh
       />
 
       <Select
+        className='w-full [&>div]:!bg-cardBackground [&>div]:!border-primary-500 [&>div]:hover:!bg-dropdownBackground [&_span]:!text-text'
+        dropdownClassName='bg-dropdownBackground [&_div]:!text-text selectionSelected'
         value={selectedGoals}
         mode='multiple'
         options={unselectedGoals?.map((ass) => ({

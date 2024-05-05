@@ -1,10 +1,11 @@
 import { http, HttpResponse } from 'msw';
 import { MOCK_ATTENDANCE } from './submissions/attendance';
 import { MOCK_EXAMS } from './submissions/exams';
+import { MOCK_GOALS } from './entries';
 import { MOCK_PERUSALL_SUBMISSIONS } from './submissions/perusal';
 import { MOCK_PRACTICE_SESSIONS } from './submissions/practice-sessions';
 import { MOCK_QUIZ_SUBMISSIONS } from './submissions/quizzes';
-import { type Submission, type TileGrades } from '@/types/tile';
+import { type LearningGoal, LogicalExpression, type Submission, type TileGrades } from '@/types/tile';
 // import { MOCK_TILES } from "./tiles";
 // import { MOCK_PEER_GROUPS } from "./users";
 
@@ -39,6 +40,35 @@ export const gradeHandlers = [
     return HttpResponse.json<Submission | undefined>(
       MOCK_SUBMISSIONS.find((sub) => sub.assignmentID.toString() === params[0] && sub.userID === params[1]),
     );
+  }),
+  http.get('/learning-goals/*/*', ({ params }) => {
+    const goal = MOCK_GOALS.find((g) => g.id.toString() === params[0]);
+    if (!goal) {
+      return;
+    }
+
+    goal.results = goal.requirements.map((req) => {
+      const grade =
+        MOCK_SUBMISSIONS.find((sub) => sub.assignmentID === req.assignment_id && sub.userID === params[1])?.grades
+          .grade ?? 0;
+      switch (req.expression) {
+        case LogicalExpression.NotEqual:
+          return grade !== req.value;
+        case LogicalExpression.Less:
+          return grade < req.value;
+        case LogicalExpression.LessEqual:
+          return grade <= req.value;
+        case LogicalExpression.Equal:
+          return grade === req.value;
+        case LogicalExpression.GreaterEqual:
+          return grade > req.value;
+        case LogicalExpression.Greater:
+          return grade >= req.value;
+        default:
+          return false;
+      }
+    });
+    return HttpResponse.json<LearningGoal | undefined>(goal);
   }),
 ];
 

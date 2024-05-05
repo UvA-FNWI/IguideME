@@ -1,8 +1,8 @@
-import { Button, Dropdown, MenuProps, Switch } from 'antd';
 import { cn } from '@/utils/cn';
-import { FC, memo, ReactElement, useMemo } from 'react';
 import { MoonOutlined, SunOutlined } from '@ant-design/icons';
 import { useTheme } from 'next-themes';
+import { Button, Dropdown, type MenuProps, Switch } from 'antd';
+import { type FC, memo, type ReactElement, useMemo } from 'react';
 
 const ThemeSwitcherSwitch: FC = (): ReactElement => {
   const { theme, setTheme } = useTheme();
@@ -14,15 +14,17 @@ const ThemeSwitcherSwitch: FC = (): ReactElement => {
         checkedChildren={<MoonOutlined />}
         unCheckedChildren={<SunOutlined />}
         checked={theme === 'dark'}
-        onChange={() => setTheme(theme === 'light' ? 'dark' : 'light')}
+        onChange={() => {
+          setTheme(theme === 'light' ? 'dark' : 'light');
+        }}
       />
     </div>
   );
 };
 
-type ThemeSwitcherDropdownProps = {
+interface ThemeSwitcherDropdownProps {
   buttonClasses?: string;
-};
+}
 
 const ThemeSwitcherDropdown: FC<ThemeSwitcherDropdownProps> = memo(({ buttonClasses }): ReactElement => {
   const items = useMemo(
@@ -48,10 +50,14 @@ const ThemeSwitcherDropdown: FC<ThemeSwitcherDropdownProps> = memo(({ buttonClas
   };
 
   return (
-    <Dropdown menu={{ items, onClick }} trigger={['click']}>
+    <Dropdown
+      overlayClassName='[&>ul]:!bg-dropdownBackground [&>ul>li]:!text-text'
+      menu={{ items, onClick }}
+      trigger={['click']}
+    >
       <Button
         className={cn(
-          'flex flex-col justify-center items-center h-10 border border-solid border-white align-middle text-white rounded-3xl w-10 p-0',
+          'flex flex-col justify-center items-center h-10 border border-solid border-white align-middle text-white w-10 p-0 hover:!bg-dialogBackground [&>span]:!text-white',
           buttonClasses,
         )}
         type='link'
@@ -63,5 +69,5 @@ const ThemeSwitcherDropdown: FC<ThemeSwitcherDropdownProps> = memo(({ buttonClas
     </Dropdown>
   );
 });
-
+ThemeSwitcherDropdown.displayName = 'ThemeSwitcherDropdown';
 export { ThemeSwitcherDropdown, ThemeSwitcherSwitch };

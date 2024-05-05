@@ -32,7 +32,7 @@ export const adminPanelMenuItems = [
   { label: 'Settings', key: '11', icon: <ControlOutlined />, route: '/admin/settings' },
 ];
 
-const routeToKeyMap: { [key: string]: string } = adminPanelMenuItems.reduce(
+const routeToKeyMap: Record<string, string> = adminPanelMenuItems.reduce(
   (map, item) => ({ ...map, [item.route]: item.key }),
   {},
 );
@@ -66,10 +66,12 @@ const AdminPanel: FC = (): ReactElement => {
         collapsedWidth='80px'
         collapsible
         collapsed={collapsed}
-        onCollapse={(value) => setCollapsed(value)}
-        className='max-md:!hidden !bg-white'
+        onCollapse={(value) => {
+          setCollapsed(value);
+        }}
+        className='max-md:!hidden !bg-dropdownBackground'
       >
-        <div className='flex content-center flex-col justify-center bg-white p-4 border-b border-solid border-b-gray-200 h-header'>
+        <div className='flex content-center flex-col justify-center bg-dropdownBackground p-4 border-b border-solid border-b-text h-header'>
           {collapsed ?
             <h3 className='text-center'>
               <UserOutlined />
@@ -82,9 +84,14 @@ const AdminPanel: FC = (): ReactElement => {
             </>
           }
         </div>
-        <Menu defaultSelectedKeys={[getKeyFromLocation(location.pathname)]} mode='inline' items={items} />
+        <Menu
+          className='!bg-dropdownBackground [&>li]:!text-text adminPanelMenuSelect'
+          defaultSelectedKeys={[getKeyFromLocation(location.pathname)]}
+          mode='inline'
+          items={items}
+        />
       </Layout.Sider>
-      <Layout.Content className='p-5 relative bg-slate-50 min-h-[calc(100dvh-70px)]'>
+      <Layout.Content className='p-5 relative bg-bodyBackground min-h-[calc(100dvh-70px)]'>
         <Outlet />
       </Layout.Content>
     </Layout>

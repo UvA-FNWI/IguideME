@@ -64,9 +64,14 @@ const Dashboard: FC = (): ReactElement => {
       />
 
       <SyncManager />
-      <h1 className='mt-5'>Historic versions</h1>
+      <h2 className='mt-5 text-xl'>Historic versions</h2>
       <Divider className='mt-1 mb-5' />
-      <Table scroll={{ x: 240 }} dataSource={syncs} columns={columns} />
+      <Table
+        className='[&_th]:!bg-cardBackground [&_th]:!text-text [&_td]:!bg-dropdownBackground [&_td]:!text-text [&_div]:!text-text'
+        scroll={{ x: 240 }}
+        dataSource={syncs}
+        columns={columns}
+      />
     </>
   );
 };

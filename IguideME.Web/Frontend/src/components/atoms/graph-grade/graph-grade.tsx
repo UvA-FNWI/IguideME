@@ -1,12 +1,12 @@
-import { printGrade, type Grades } from '@/types/tile';
 import { Bullet } from '@ant-design/charts';
 import { Col, Row } from 'antd';
+import { useTheme } from 'next-themes';
+import { printGrade, type Grades } from '@/types/tile';
 import { type FC, type ReactElement } from 'react';
 
-const BLUE = 'rgba(90, 50, 255, .9)';
-const RED = 'rgba(255, 50, 50, .8)';
-
 const GraphGrade: FC<Grades> = ({ grade, peerAvg, peerMin, peerMax, max, type }): ReactElement => {
+  const { theme } = useTheme();
+
   const studentdata = [
     {
       title: 'You',
@@ -28,6 +28,9 @@ const GraphGrade: FC<Grades> = ({ grade, peerAvg, peerMin, peerMax, max, type })
     paddingBottom: 20,
     paddingTop: 0,
     axis: {
+      x: {
+        labelFill: theme === 'light' ? 'black' : 'white',
+      },
       y: { label: false, tick: false, grid: false },
     },
     tooltip: {
@@ -63,8 +66,8 @@ const GraphGrade: FC<Grades> = ({ grade, peerAvg, peerMin, peerMax, max, type })
           rangeField='Max'
           measureField='Grade'
           color={{
-            Max: ['#f6f8fa'],
-            Grade: BLUE,
+            Max: [theme === 'dark' ? '#878787' : '#f6f8fa'],
+            Grade: '#5a32ff',
           }}
           {...config}
         />
@@ -74,8 +77,9 @@ const GraphGrade: FC<Grades> = ({ grade, peerAvg, peerMin, peerMax, max, type })
           data={peerdata}
           measureField='Peer avg'
           color={{
-            ranges: ['#f6f8fa', 'rgba(255, 50, 50, .3)', '#f6f8fb'],
-            'Peer avg': RED,
+            ranges:
+              theme === 'dark' ? ['#878787', '#8c61ff', '#878787'] : ['#f6f8fa', 'rgba(255, 50, 50, .3)', '#f6f8fa'],
+            'Peer avg': theme === 'dark' ? '#c4a4ff' : 'rgba(255, 50, 50, .8)',
           }}
           {...config}
           mapField={{

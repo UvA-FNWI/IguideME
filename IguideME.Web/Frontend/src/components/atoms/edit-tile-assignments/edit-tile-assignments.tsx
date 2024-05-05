@@ -18,7 +18,8 @@ const EditTileAssignments: FC = (): ReactElement => {
                 value: val,
                 label: printGradingType(val),
               }))}
-            className='w-full'
+            className='w-full [&>div]:!bg-cardBackground [&>div]:!border-primary-500 [&>div]:hover:!bg-dropdownBackground [&_span]:!text-text'
+            dropdownClassName='bg-dropdownBackground [&_div]:!text-text selectionSelected'
           />
         </Item>
       </div>
@@ -26,7 +27,7 @@ const EditTileAssignments: FC = (): ReactElement => {
       <div className='col-span-2'>
         <Item name='weight' noStyle>
           <InputNumber<number>
-            className='w-full'
+            className='w-full !border-primary-500 hover:!border-primary-500 !bg-cardBackground hover:!bg-dropdownBackground [&_input]:!text-text antNumberInput'
             formatter={(value) => `${(value ?? 0) * 100}%`}
             parser={(value) => +parseFloat(value!.replace('%', '')).toFixed(1) / 100}
           />

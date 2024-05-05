@@ -53,7 +53,7 @@ function TileDetailView(): ReactElement {
       <Row>
         <Col>
           <Button
-            className='border border-solid rounded-[20px] !w-[50px] ml-[20px] p-0 border-primary-blue'
+            className='border border-solid rounded-[20px] !w-[50px] ml-[20px] p-0 bg-dropdownBackground [&>span]:!text-text hover:!bg-dialogBackground'
             type={'link'}
             icon={<ArrowLeftOutlined />}
             onClick={() => {
@@ -64,7 +64,7 @@ function TileDetailView(): ReactElement {
       </Row>
       <Row className='min-h-[60vh] p-1 [&>div]:w-full'>
         <QueryLoading isLoading={isLoading}>
-          <Col className='p-1' span={24}>
+          <div className='p-1 flex justify-normal w-full'>
             <GroupView title={tile ? tile.title : ''}>
               {isError ?
                 <QueryError className='grid place-content-center' title='Failed to load tile' />
@@ -75,7 +75,7 @@ function TileDetailView(): ReactElement {
                 ))
               }
             </GroupView>
-          </Col>
+          </div>
         </QueryLoading>
       </Row>
     </>

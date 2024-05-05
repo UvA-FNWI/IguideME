@@ -1,5 +1,6 @@
 import { Badge, Col, Row } from 'antd';
 import { JobStatus } from '@/types/synchronization';
+import { useTheme } from 'next-themes';
 import { type FC, type ReactElement } from 'react';
 
 interface Props {
@@ -17,15 +18,19 @@ const statusColors = new Map<string, string>([
 ]);
 
 const StatusCard: FC<Props> = ({ title, description, status }): ReactElement => {
+  const { theme } = useTheme();
+
   return (
-    <div className='w-full h-full p-4 bg-primary-gray rounded-md shadow-statusCard font-tnum'>
+    <div
+      className={`w-full h-full p-4 bg-dropdownBackground rounded-md ${theme === 'light' && 'shadow-statusCard'} font-tnum`}
+    >
       <Row className='justify-between'>
         <Col>
           <h4 className='font-tnum'>{title}</h4>
         </Col>
         <Col>
           <span className='font-tnum font-normal tracking-wider text-xs text-black'>
-            <Badge color={statusColors.get(status)} text={status} />
+            <Badge className='[&>span]:!text-text' color={statusColors.get(status)} text={status} />
           </span>
         </Col>
       </Row>

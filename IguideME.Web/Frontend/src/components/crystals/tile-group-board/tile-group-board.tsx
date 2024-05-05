@@ -94,14 +94,14 @@ const TileGroupBoard: FC = (): ReactElement => {
     .fill(0)
     .map((_, i) => (
       <QueryLoading key={i} isLoading={isLoading} tip='Loading tile groups...'>
-        <div className='p-[10px] border border-dashed border-zinc-400 rounded-lg bg-white min-h-[235px] my-1'>
+        <div className='p-[10px] border border-dashed border-white rounded-lg bg-cardBackground min-h-[235px] my-1'>
           <Row />
         </div>
       </QueryLoading>
     ));
 
   const errorState = (
-    <div className='relative p-[10px] border border-dashed border-zinc-400 rounded-lg bg-white min-h-[235px] my-1'>
+    <div className='relative p-[10px] border border-dashed border-white rounded-lg bg-cardBackground min-h-[235px] my-1'>
       <QueryError className='grid place-content-center' title='Error: Could not load tile group(s)' />
     </div>
   );
@@ -109,6 +109,7 @@ const TileGroupBoard: FC = (): ReactElement => {
   return (
     <>
       <Drawer
+        className='!bg-bodyBackground [&>div>div>div]:!text-text [&_button]:!text-text'
         title={editTitle && 'Editing: ' + editTitle.title}
         placement='right'
         closable
@@ -153,6 +154,7 @@ const TileGroupBoard: FC = (): ReactElement => {
               ))}
             </SortableContext>
             <Button
+              className='bg-cardBackground hover:!bg-dropdownBackground hover:!border-primary-500 [&_span]:!text-text'
               type='dashed'
               onClick={() => {
                 postGroup({
@@ -182,10 +184,10 @@ const TileGroupBoard: FC = (): ReactElement => {
   function onDragStart(event: DragStartEvent): void {
     switch (event.active.data.current?.type) {
       case 'Group':
-        setActiveGroup(event.active.data.current.group);
+        setActiveGroup(event.active.data.current.group as TileGroup);
         return;
       case 'Tile':
-        setActiveTile(event.active.data.current.tile);
+        setActiveTile(event.active.data.current.tile as Tile);
         return;
       default:
         throw new Error('Unknown drag start type encountered');
@@ -260,12 +262,12 @@ const TileGroupBoard: FC = (): ReactElement => {
 
     switch (overData.type) {
       case 'Group':
-        activeData.tile.group_id !== +overID - 1 && moveTileToGroup(activeData.tile, +overID - 1);
+        (activeData.tile as Tile).group_id !== +overID - 1 && moveTileToGroup(activeData.tile as Tile, +overID - 1);
         return;
       case 'Tile':
-        activeData.tile.group_id === overData.tile.group_id ?
+        (activeData.tile as Tile).group_id === (overData.tile as Tile).group_id ?
           swapTiles(+(activeID as string).substring(1) - 1, +(overID as string).substring(1) - 1, overData)
-        : moveTileToGroup(activeData.tile, overData.tile.group_id);
+        : moveTileToGroup(activeData.tile as Tile, overData.til.group_id as number);
         return;
       default:
         console.warn('Unknown over object type encountered during drop', activeData.type);
@@ -273,14 +275,18 @@ const TileGroupBoard: FC = (): ReactElement => {
   }
 
   function swapTiles(activeID: number, overID: number, overData: any): void {
-    const ids = tiles!.flatMap((tile) => (tile.group_id === overData.tile.group_id ? [tile.id] : []));
+    if (tiles === undefined) return;
+
+    const ids = tiles.flatMap((tile) => (tile.group_id === overData.tile.group_id ? [tile.id] : []));
     const activeIndex = ids.findIndex((id) => id === activeID);
     const overIndex = ids.findIndex((id) => id === overID);
     updateTileOrder(arrayMove(ids, activeIndex, overIndex));
   }
 
   function moveTileToGroup(tile: Tile, gid: number): void {
-    const gtiles = tiles!.filter((tile) => tile.group_id === gid);
+    if (tiles === undefined) return;
+
+    const gtiles = tiles.filter((tile) => tile.group_id === gid);
     // Set the position of the tile to the last of the new group
     updateTile({
       ...tile,

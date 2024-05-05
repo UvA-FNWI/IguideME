@@ -1,13 +1,13 @@
-import { deleteTileGroup, getTiles, patchTileGroup, postTile } from '@/api/tiles';
 import AdminTileView from '@/components/crystals/admin-tile-view/admin-tile-view';
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
-import { GradingType, TileType, type TileGroup } from '@/types/tile';
-import { DeleteFilled, PlusOutlined } from '@ant-design/icons';
-import { SortableContext, useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button, Col, Divider, Input, Row } from 'antd';
+import { CSS } from '@dnd-kit/utilities';
+import { DeleteFilled, PlusOutlined } from '@ant-design/icons';
+import { deleteTileGroup, getTiles, patchTileGroup, postTile } from '@/api/tiles';
+import { SortableContext, useSortable } from '@dnd-kit/sortable';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { GradingType, TileType, type TileGroup } from '@/types/tile';
 import { useMemo, useState, type FC, type ReactElement } from 'react';
 
 interface Props {
@@ -68,7 +68,7 @@ const AdminTileGroupView: FC<Props> = ({ group }): ReactElement => {
   if (isDragging) {
     return (
       <div
-        className='p-[10px] border border-dashed border-zinc-500 rounded-lg bg-white min-h-[235px]'
+        className='p-[10px] border border-dashed border-text rounded-lg bg-cardBackground min-h-[235px]'
         ref={setNodeRef}
         style={style}
       />
@@ -79,15 +79,13 @@ const AdminTileGroupView: FC<Props> = ({ group }): ReactElement => {
     .fill(0)
     .map((_, i) => (
       <QueryLoading key={i} isLoading={isLoading}>
-        <Col>
-          <div className='w-60 h-[150px] border border-solid border-zinc-300 rounded-md m-0 bg-white' />
-        </Col>
+        <div className='w-60 h-[150px] border border-solid border-text rounded-md m-0 bg-cardBackground' />
       </QueryLoading>
     ));
 
   const errorState = (
     <Col>
-      <div className='w-60 h-[150px] border border-solid border-zinc-300 rounded-md m-0 bg-white relative'>
+      <div className='w-60 h-[150px] border border-solid border-text rounded-md m-0 bg-cardBackground relative'>
         <QueryError className='grid place-content-center' title='Error: Could not load tile' />
       </div>
     </Col>
@@ -95,7 +93,7 @@ const AdminTileGroupView: FC<Props> = ({ group }): ReactElement => {
 
   return (
     <div
-      className='p-[10px] border border-dashed border-zinc-400 rounded-lg bg-white min-h-[235px] my-1'
+      className='p-[10px] border border-dashed border-text rounded-lg bg-cardBackground min-h-[235px] my-1'
       ref={setNodeRef}
       style={style}
     >
@@ -111,6 +109,7 @@ const AdminTileGroupView: FC<Props> = ({ group }): ReactElement => {
               group.title
             : editing && (
                 <Input
+                  className='!border-primary-500 hover:!border-primary-500 !bg-cardBackground hover:!bg-dropdownBackground text-text'
                   value={title}
                   autoFocus
                   onBlur={() => {
@@ -135,7 +134,7 @@ const AdminTileGroupView: FC<Props> = ({ group }): ReactElement => {
         </Col>
         <Col>
           <DeleteFilled
-            className='p-1'
+            className='p-1 text-primary-red'
             onClick={() => {
               deleteGroup(group.id);
             }}
@@ -146,7 +145,7 @@ const AdminTileGroupView: FC<Props> = ({ group }): ReactElement => {
       <Row gutter={[20, 20]} className='p-[10px] justify-start'>
         <SortableContext items={tileIds}>
           {isLoading ?
-            loadingState
+            <div className='flex gap-2'>{loadingState}</div>
           : isError || tiles === undefined ?
             errorState
           : tiles.map((tile, index) => (
@@ -175,7 +174,7 @@ const AdminTileGroupView: FC<Props> = ({ group }): ReactElement => {
             }}
             block
             icon={<PlusOutlined />}
-            className='h-full !w-60 m-0 min-h-[150px]'
+            className='h-full !w-60 m-0 min-h-[150px] border border-text bg-cardBackground text-text hover:!bg-dropdownBackground hover:!border-primary-500 hover:!text-text'
           >
             New Tile
           </Button>

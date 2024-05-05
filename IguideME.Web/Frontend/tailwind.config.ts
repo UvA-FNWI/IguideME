@@ -1,5 +1,7 @@
-/** @type {import('tailwindcss').Config} */
-module.exports = {
+import typography from '@tailwindcss/typography';
+import type { Config } from 'tailwindcss';
+
+export default {
   content: ['./src/**/*.{js,ts,jsx,tsx,mdx}'],
   darkMode: ['class'],
   theme: {
@@ -11,13 +13,32 @@ module.exports = {
       },
       colors: {
         primary: {
-          blue: 'var(--primary-blue)',
-          disabled: 'var(--primary-disabled)',
-          gray: 'var(--primary-gray)',
-          orange: 'var(--primary-orange)',
-          purple: 'var(--primary-purple)',
+          100: '#5a32ff',
+          200: '#764aff',
+          300: '#8c61ff',
+          400: '#a077ff',
+          500: '#b38dff',
+          600: '#c4a4ff',
+
+          green: {
+            DEFAULT: 'var(--green)',
+            background: 'var(--green-background)',
+          },
+          red: {
+            DEFAULT: 'var(--red)',
+            background: 'var(--red-background)',
+          },
         },
-        background: 'var(--background)',
+
+        bodyBackground: 'var(--body-background)',
+        borderColor: 'var(--border-color)',
+        cardBackground: 'var(--card-background)',
+        groupBackground: 'var(--group-background)',
+        dropdownBackground: 'var(--dropdown-background)',
+        navbarBackground: 'var(--navbar-background)',
+        hoverBackground: 'var(--hover-background)',
+        dialogBackground: 'var(--dialog-background)',
+        logo: 'var(--logo)',
         text: 'var(--text)',
       },
       cursor: {
@@ -29,5 +50,5 @@ module.exports = {
       },
     },
   },
-  plugins: [require('@tailwindcss/typography')],
-};
+  plugins: [typography],
+} satisfies Config;

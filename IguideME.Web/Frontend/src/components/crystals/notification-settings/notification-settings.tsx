@@ -2,26 +2,20 @@ import dayjs from 'dayjs';
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
 import { Button, Checkbox, DatePicker, Divider, Form, Radio } from 'antd';
-import { CheckboxChangeEvent } from 'antd/es/checkbox';
-import { CheckboxValueType } from 'antd/es/checkbox/Group';
-import { DateObject } from 'react-multi-date-picker';
 import { getNotificationSettings, postNotificationSettings } from '@/api/course_settings';
 import { toast } from 'sonner';
 import { useForm } from 'antd/es/form/Form';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { type CheckboxChangeEvent } from 'antd/es/checkbox';
+import { type CheckboxValueType } from 'antd/es/checkbox/Group';
+import { type DateObject } from 'react-multi-date-picker';
 import { memo, useCallback, useEffect, useMemo, useState, type FC, type ReactElement } from 'react';
 
-export type NotificationAdminSettings = {
+export interface NotificationAdminSettings {
   isRange: boolean;
   selectedDays: string | null;
   selectedDates: string | null;
-};
-
-export type NotificationAdminSettings = {
-  isRange: boolean;
-  selectedDays: string | null;
-  selectedDates: string | null;
-};
+}
 
 const NotificationSettings: FC = (): ReactElement => {
   const { data, isError, isLoading } = useQuery({
@@ -43,7 +37,7 @@ const NotificationSettings: FC = (): ReactElement => {
   if (isError || isLoading || data === undefined) {
     return (
       <QueryLoading isLoading={isLoading}>
-        <div className='h-20 bg-white'>
+        <div className='h-20 bg-cardBackground'>
           {(isError || (data === undefined && !isLoading)) && (
             <QueryError className='top-[-30px]' title='Failed to load peer settings' />
           )}
@@ -52,7 +46,9 @@ const NotificationSettings: FC = (): ReactElement => {
     );
   }
 
-  return <NotificationSettingsForm isRange={range} selectedDays={selectedDays} selectedDates={selectedDates} />;
+  return (
+    <NotificationSettingsForm isRange={range ?? false} selectedDays={selectedDays} selectedDates={selectedDates} />
+  );
 };
 
 interface Data {
@@ -125,21 +121,24 @@ const NotificationSettingsForm: FC<{
       </Radio.Group>
       <DatePickers isRange={range} checkedList={checkedList} setCheckedList={setCheckedList} />
       <div className='flex justify-end'>
-        <Button className='w-16 right-0' htmlType='submit'>
+        <Button
+          className='min-w-20 bg-primary-500 hover:!bg-primary-600 [&_span]:text-text !border-none hover:!border-none right-0'
+          htmlType='submit'
+        >
           Save
         </Button>
       </div>
     </Form>
   );
 });
-
+NotificationSettingsForm.displayName = 'NotificationSettingsForm';
 export default NotificationSettings;
 
-type DatePickersProps = {
+interface DatePickersProps {
   isRange: boolean;
   checkedList: CheckboxValueType[];
   setCheckedList: (list: CheckboxValueType[]) => void;
-};
+}
 
 const DatePickers: FC<DatePickersProps> = memo(({ isRange, checkedList, setCheckedList }): ReactElement => {
   const checkBoxOptions = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -177,7 +176,7 @@ const DatePickers: FC<DatePickersProps> = memo(({ isRange, checkedList, setCheck
       <p className='text-sm'>On which days of the week do you want to send notifications?</p>
       <div className='flex h-14 align-top'>
         <Checkbox
-          className='h-fit'
+          className='h-fit text-text'
           indeterminate={checkedList.length > 0 && checkedList.length < checkBoxOptions.length}
           onChange={onCheckAllChange}
           checked={checkBoxOptions.length === checkedList.length}
@@ -186,7 +185,12 @@ const DatePickers: FC<DatePickersProps> = memo(({ isRange, checkedList, setCheck
         </Checkbox>
         <Divider type='vertical' className='h-6' />
         <Form.Item className='m-0 [&_div]:!min-h-0' validateStatus={error ? 'error' : ''} help={error}>
-          <Checkbox.Group options={checkBoxOptions} value={checkedList} onChange={onGroupChange} />
+          <Checkbox.Group
+            className='[&_span]:!text-text'
+            options={checkBoxOptions}
+            value={checkedList}
+            onChange={onGroupChange}
+          />
         </Form.Item>
       </div>
     </>
@@ -196,7 +200,7 @@ const DatePickers: FC<DatePickersProps> = memo(({ isRange, checkedList, setCheck
     <Form.Item className='m-0' name='selectedDates' rules={[{ required: true, message: 'Please select a date' }]}>
       <DatePicker
         className='!w-72'
-        disabledDate={(current) => current && current.toDate() < new Date()}
+        disabledDate={(current) => current.toDate() < new Date()}
         format='YYYY-MM-DD'
         multiple
         maxTagCount='responsive'
@@ -206,3 +210,4 @@ const DatePickers: FC<DatePickersProps> = memo(({ isRange, checkedList, setCheck
 
   return isRange ? Range : Single;
 });
+DatePickers.displayName = 'DatePickers';

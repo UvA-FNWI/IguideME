@@ -9,9 +9,9 @@ interface Props {
 
 const AdminBlock: FC<Props> = ({ title, children }): ReactElement => {
   return (
-    <div className="border border-solid bg-white my-[10px] p-[10px]">
-      <h2 className="text-lg">{title}</h2>
-      <Divider className="mt-1 mb-2" />
+    <div className='border border-solid border-text bg-cardBackground my-[10px] p-[10px] rounded-lg'>
+      <h2 className='text-lg'>{title}</h2>
+      <Divider className='mt-1 mb-2' />
       {children}
     </div>
   );

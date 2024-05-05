@@ -1,15 +1,15 @@
 import GraphGrade from '@/components/atoms/graph-grade/graph-grade';
 import { RadialBar } from '@ant-design/charts';
+import { useTheme } from 'next-themes';
 import { type Grades, TileType } from '@/types/tile';
-import { type FC, type ReactElement } from 'react';
+import { memo, type FC, type ReactElement } from 'react';
 
-const BLUE = 'rgba(90, 50, 255, .9)';
-const RED = 'rgba(255, 50, 50, .8)';
 interface Props {
   type: TileType;
   grades: Grades;
 }
-const GraphTile: FC<Props> = ({ type, grades }): ReactElement => {
+
+const GraphTile: FC<Props> = memo(({ type, grades }): ReactElement => {
   switch (type) {
     case TileType.assignments:
     case TileType.discussions:
@@ -17,9 +17,12 @@ const GraphTile: FC<Props> = ({ type, grades }): ReactElement => {
     case TileType.learning_outcomes:
       return <GraphLearning {...grades} />;
   }
-};
+});
+GraphTile.displayName = 'GraphTile';
 
-const GraphLearning: FC<Grades> = ({ grade, peerAvg, max }): ReactElement => {
+const GraphLearning: FC<Grades> = memo(({ grade, peerAvg, max }): ReactElement => {
+  const { theme } = useTheme();
+
   const data = [
     {
       name: 'You',
@@ -47,14 +50,15 @@ const GraphLearning: FC<Grades> = ({ grade, peerAvg, max }): ReactElement => {
       },
     },
     style: {
-      fill: (data: any) => {
-        if (data.name === 'You') {
-          return BLUE;
-        }
-        return RED;
+      fill: ({ name }: { name: 'You' | 'Peer' }) => {
+        if (name === 'You') return '#5a32ff';
+        else return theme === 'dark' ? '#b38dff' : 'rgba(255, 50, 50, .8)';
       },
     },
     axis: {
+      x: {
+        labelFill: theme === 'light' ? 'black' : 'white',
+      },
       y: { label: false, tick: false, grid: false },
     },
     markBackground: { color: 'color', opacity: 0.15 },
@@ -70,10 +74,10 @@ const GraphLearning: FC<Grades> = ({ grade, peerAvg, max }): ReactElement => {
     },
   };
   return (
-    <div className="h-full">
+    <div className='h-full'>
       <RadialBar {...config} />
     </div>
   );
-};
-
+});
+GraphLearning.displayName = 'GraphLearning';
 export default GraphTile;

@@ -1,12 +1,12 @@
-import { getStudents } from '@/api/users';
-import { User } from '@/types/user';
 import { cn } from '@/utils/cn';
-import { useQuery } from '@tanstack/react-query';
+import { getStudents } from '@/api/users';
 import { Select } from 'antd';
-import { Dispatch, FC, ReactElement, SetStateAction, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import { type Dispatch, type FC, type ReactElement, type SetStateAction, useEffect } from 'react';
+import { type User } from '@/types/user';
 
-type SelectorProps = {
+interface SelectorProps {
   /** The placeholder text for the select component. */
   placeholder?: string;
   /** Function to call when a student is selected. */
@@ -17,7 +17,7 @@ type SelectorProps = {
   selectedStudent: User | undefined;
   /** Function to set the selected student. */
   setSelectedStudent: Dispatch<SetStateAction<User | undefined>>;
-};
+}
 
 /**
  * Helper function for the student selector component.
@@ -63,9 +63,10 @@ const Selector: FC<SelectorProps> = ({
       allowClear={true}
       aria-disabled={isLoading || isError}
       className={cn(
-        'w-full md:w-80 lg:w-[400px] h-[40px] [&>div]:!bg-primary-purple [&>div>span]:!text-white [&_span_*]:!text-white',
+        'w-full md:w-80 lg:w-[400px] h-[40px] [&>div]:!bg-navbarBackground [&>div]:!border-white [&>div>span]:!text-white [&_span_*]:!text-white',
         selectClasses,
       )}
+      popupClassName='!bg-dropdownBackground [&>div>div>div>div>div>div>div]:!text-text styles.custom-hover selectBackgroundHover'
       disabled={isLoading || isError}
       placeholder={
         isLoading ? 'Loading students...'

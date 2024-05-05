@@ -11,6 +11,9 @@ dependencies:
   '@ant-design/icons':
     specifier: ^5.3.1
     version: 5.3.1(react-dom@18.2.0)(react@18.2.0)
+  '@antv/g-svg':
+    specifier: ^2.0.3
+    version: 2.0.3
   '@dnd-kit/core':
     specifier: ^6.1.0
     version: 6.1.0(react-dom@18.2.0)(react@18.2.0)
@@ -324,8 +327,28 @@ packages:
       tslib: 2.6.2
     dev: false
 
+  /@antv/g-lite@2.0.2:
+    resolution: {integrity: sha512-TaxuUkWIcxe8yGh1rdktjq8QDeOCVQpZcYkoyZz8sISKJU5D7W8qj/up/nGY6ujx+G7LXe2P7TgNLWJe0C7u4Q==}
+    dependencies:
+      '@antv/g-math': 3.0.0
+      '@antv/util': 3.3.7
+      d3-color: 1.4.1
+      eventemitter3: 5.0.1
+      gl-matrix: 3.4.3
+      rbush: 3.0.1
+      tslib: 2.6.2
+    dev: false
+
   /@antv/g-math@2.0.2:
     resolution: {integrity: sha512-uqGU1C+70orjeSUoIzD3TuXjL5dRQCIyjZrBrTmm0FWd6VQJMWHyG5ypuZ2lMiI5MrRajVSE1w+3J4hiNBYSJg==}
+    dependencies:
+      '@antv/util': 3.3.7
+      gl-matrix: 3.4.3
+      tslib: 2.6.2
+    dev: false
+
+  /@antv/g-math@3.0.0:
+    resolution: {integrity: sha512-AkmiNIEL1vgqTPeGY2wtsMdBBqKFwF7SKSgs+D1iOS/rqYMsXdhp/HvtuQ5tx/HdawE/ZzTiicIYopc520ADZw==}
     dependencies:
       '@antv/util': 3.3.7
       gl-matrix: 3.4.3
@@ -372,6 +395,13 @@ packages:
       tslib: 2.6.2
     dev: false
 
+  /@antv/g-plugin-dom-interaction@2.0.2:
+    resolution: {integrity: sha512-r55/aNVrYGT7tS6Rx2z/STB1wp5RIpo9Pe6aa7SItLh2PEVKe9+j7rmaSEripx0b5cGEMt93FDiaJAc4b7TKCA==}
+    dependencies:
+      '@antv/g-lite': 2.0.2
+      tslib: 2.6.2
+    dev: false
+
   /@antv/g-plugin-dragndrop@1.8.22:
     resolution: {integrity: sha512-wiALMQ68bh5z5OYIU8d3X4DvK4kgIFLGM7yXmI2raOF1i1STyFLElTw7ZZzvVVhftZLQ6Yc4jgEuPcnpquMN4A==}
     dependencies:
@@ -395,6 +425,34 @@ packages:
       '@antv/g-lite': 1.2.22
       '@antv/util': 3.3.7
       gl-matrix: 3.4.3
+      tslib: 2.6.2
+    dev: false
+
+  /@antv/g-plugin-svg-picker@2.0.3:
+    resolution: {integrity: sha512-1edB0eAxjrk+HJR+2B3S+BPoausGCvxzcyzHH5AtitvR89v5p4stoYcvqHJtA/wgiB8uMkxh3MjJEHNwx7SD9Q==}
+    dependencies:
+      '@antv/g-lite': 2.0.2
+      '@antv/g-plugin-svg-renderer': 2.0.3
+      tslib: 2.6.2
+    dev: false
+
+  /@antv/g-plugin-svg-renderer@2.0.3:
+    resolution: {integrity: sha512-jb0OZsFAIZu8sxOIoG1opYmvRjT2nOPo9OAyK2dM/9vsgKmDnaNiJKc46UW417wPhjdSXQpNXAXSi5gf5b6epA==}
+    dependencies:
+      '@antv/g-lite': 2.0.2
+      '@antv/util': 3.3.7
+      gl-matrix: 3.4.3
+      tslib: 2.6.2
+    dev: false
+
+  /@antv/g-svg@2.0.3:
+    resolution: {integrity: sha512-Ebes9ZzSfmxjKsRateMweXOxpQardWZYueC1yHuaminwUJjPqTA2lceSE57p+xOrsAWzni6zkWQjXfByE4kwCw==}
+    dependencies:
+      '@antv/g-lite': 2.0.2
+      '@antv/g-plugin-dom-interaction': 2.0.2
+      '@antv/g-plugin-svg-picker': 2.0.3
+      '@antv/g-plugin-svg-renderer': 2.0.3
+      '@antv/util': 3.3.7
       tslib: 2.6.2
     dev: false
 

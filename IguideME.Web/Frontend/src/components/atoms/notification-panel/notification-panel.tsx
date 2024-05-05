@@ -3,15 +3,15 @@ import { BellOutlined, ExclamationOutlined, LoadingOutlined } from '@ant-design/
 import { Button, Popover, Tooltip } from 'antd';
 import { cn } from '@/utils/cn';
 import { getStudentNotifications } from '@/api/users';
-import { TooltipPlacement } from 'antd/lib/tooltip';
 import { useQuery } from '@tanstack/react-query';
+import { type TooltipPlacement } from 'antd/lib/tooltip';
 import { type User } from '@/types/user';
 import { type FC, type ReactElement } from 'react';
 
 interface Props {
   buttonClasses?: string;
   placement?: TooltipPlacement;
-  user: User | undefined;
+  user: User;
 }
 const NotificationPanel: FC<Props> = ({ buttonClasses, placement = 'leftTop', user }): ReactElement => {
   const {
@@ -19,13 +19,13 @@ const NotificationPanel: FC<Props> = ({ buttonClasses, placement = 'leftTop', us
     isError,
     isLoading,
   } = useQuery({
-    enabled: user !== undefined,
-    queryKey: [`notifications/${user!.userID}`],
-    queryFn: async () => await getStudentNotifications(user!.userID),
+    queryKey: [`notifications/${user.userID}`],
+    queryFn: async () => await getStudentNotifications(user.userID),
   });
 
   return (
     <Popover
+      overlayClassName='!bg-dropdownBackground [&_div]:!bg-transparent [&>div]:before:!bg-dropdownBackground [&>div>div>div]:!text-text'
       content={
         user !== undefined ?
           notifications !== undefined ?
@@ -54,7 +54,7 @@ const NotificationPanel: FC<Props> = ({ buttonClasses, placement = 'leftTop', us
         <Button
           aria-disabled={isLoading || isError}
           className={cn(
-            'flex flex-col justify-center items-center h-10 border border-solid border-white align-middle text-white rounded-3xl w-10 p-0',
+            'flex flex-col justify-center items-center h-10 border border-solid border-white align-middle text-white w-10 p-0 hover:!text-white hover:!bg-dialogBackground',
             buttonClasses,
           )}
           disabled={isLoading || isError}

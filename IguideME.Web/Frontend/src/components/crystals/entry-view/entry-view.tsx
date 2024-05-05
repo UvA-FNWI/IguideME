@@ -9,7 +9,7 @@ interface Props {
 }
 const EntryView: FC<Props> = ({ entry, type }): ReactElement => {
   return (
-    <div className='border border-solid w-[270px] h-[230px] bg-white border-primary-gray'>
+    <div className='border border-solid w-[270px] h-[230px] bg-cardBackground border-text rounded-md'>
       <Row className='p-2 w-full flex justify-center items-center overflow-hidden'>
         <h3 className='whitespace-nowrap overflow-ellipsis overflow-hidden text-base font-bold'>{entry.title}</h3>
       </Row>

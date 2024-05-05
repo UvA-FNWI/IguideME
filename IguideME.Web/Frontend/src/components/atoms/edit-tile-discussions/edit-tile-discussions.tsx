@@ -76,6 +76,7 @@ const DiscussionSelect: FC<DiscussionSelectProps> = ({
   return (
     <div className='flex flex-col gap-1'>
       <Table
+        className='[&_th]:!bg-cardBackground [&_th]:!text-text [&_td]:!bg-dropdownBackground [&_td]:!text-text [&_div]:!text-text'
         columns={[
           {
             title: 'Name',
@@ -110,6 +111,7 @@ const DiscussionSelect: FC<DiscussionSelectProps> = ({
             render: (_: string, entry: TileEntry) => {
               return (
                 <DeleteFilled
+                  className='text-primary-red'
                   onClick={() => {
                     removeEntry(entry.content_id);
                   }}
@@ -124,6 +126,8 @@ const DiscussionSelect: FC<DiscussionSelectProps> = ({
       />
 
       <Select
+        className='w-full [&>div]:!bg-cardBackground [&>div]:!border-primary-500 [&>div]:hover:!bg-dropdownBackground [&_span]:!text-text'
+        dropdownClassName='bg-dropdownBackground [&_div]:!text-text selectionSelected'
         value={selectedTopics}
         mode='multiple'
         options={unselectedTopics?.map((ass) => ({

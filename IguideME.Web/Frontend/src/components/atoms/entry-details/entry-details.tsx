@@ -1,16 +1,16 @@
-import { getAssignmentSubmission, getAssignments, getDiscussion, getLearningGoal } from '@/api/entries';
-import { GradeView } from '@/components/crystals/grid-tile/grid-tile';
-import { useTileViewStore } from '@/components/pages/student-dashboard/tileViewContext';
+import GraphGrade from '../graph-grade/graph-grade';
 import PeerComparison from '@/components/particles/peer-comparison/peercomparison';
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
-import { printLogicalExpression, type TileEntry } from '@/types/tile';
-import { useQuery } from '@tanstack/react-query';
-import { Divider, Row } from 'antd';
+import { CheckCircleTwoTone, CheckOutlined, CloseCircleTwoTone, CloseOutlined } from '@ant-design/icons';
 import { Col } from 'antd/lib';
+import { Divider, Row } from 'antd';
+import { getAssignments, getAssignmentSubmission, getDiscussion, getLearningGoal } from '@/api/entries';
+import { GradeView } from '@/components/crystals/grid-tile/grid-tile';
+import { useQuery } from '@tanstack/react-query';
+import { useTileViewStore } from '@/components/pages/student-dashboard/tileViewContext';
+import { printLogicalExpression, type TileEntry } from '@/types/tile';
 import { type FC, type ReactElement } from 'react';
-import GraphGrade from '../graph-grade/graph-grade';
-import { CheckCircleOutlined, CheckCircleTwoTone, CheckOutlined, CloseCircleTwoTone, CloseOutlined } from '@ant-design/icons';
 
 interface Props {
   entry: TileEntry;
@@ -27,7 +27,7 @@ export const AssignmentDetail: FC<Props> = ({ entry }): ReactElement => {
     isError,
     isLoading,
   } = useQuery({
-    queryKey: [`entry/${entry.content_id}/${user.studentnumber}`],
+    queryKey: [`${entry.tile_id}/entry/${entry.content_id}/${user.userID}`],
     queryFn: async () => await getAssignmentSubmission(entry.content_id, user.userID),
   });
 
@@ -75,7 +75,7 @@ export const DiscussionDetail: FC<Props> = ({ entry }): ReactElement => {
     isError,
     isLoading,
   } = useQuery({
-    queryKey: [`entry/${entry.content_id}/${user.userID}`],
+    queryKey: [`${entry.tile_id}/entry/${entry.content_id}/${user.userID}`],
     queryFn: async () => await getDiscussion(entry.content_id, user.userID),
   });
 
@@ -87,9 +87,7 @@ export const DiscussionDetail: FC<Props> = ({ entry }): ReactElement => {
     );
   } else if (isError || !discussion) {
     return <QueryError className='grid place-content-center' title='No submission found' />;
-  }
-
-  else return <>{discussion.message}</>;
+  } else return <>{discussion.message}</>;
 };
 
 export const LearningGoalDetail: FC<Props> = ({ entry }): ReactElement => {
@@ -100,15 +98,19 @@ export const LearningGoalDetail: FC<Props> = ({ entry }): ReactElement => {
     isLoading,
   } = useQuery({
     // TODO: I think using entry.content_id might give conflicts
-    queryKey: [`entry/${entry.content_id}/${user.userID}`],
+    queryKey: [`${entry.tile_id}/entry/${entry.content_id}/${user.userID}`],
     queryFn: async () => await getLearningGoal(entry.content_id, user.userID),
   });
 
-  const { data: assignments, isError: assIsError, isLoading: assIsLoading } = useQuery({
+  console.log('test', learningGoal);
+  const {
+    data: assignments,
+    isError: assIsError,
+    isLoading: assIsLoading,
+  } = useQuery({
     queryKey: ['assignments'],
     queryFn: getAssignments,
   });
-  
 
   if (isLoading || assIsLoading) {
     return (
@@ -120,29 +122,37 @@ export const LearningGoalDetail: FC<Props> = ({ entry }): ReactElement => {
     return <QueryError className='grid place-content-center' title='No submission found' />;
   }
 
-  
-  return <>
+  return (
+    <>
       <Row className='justify-center content-center h-2/5'>
-        {learningGoal.results?.every(b => b) ? 
-          <>Passed
-      <CheckCircleTwoTone className='text-2xl'/></> : 
-      <>Failed<CloseCircleTwoTone className='text-2xl' /></>}
+        {learningGoal.results?.every((b) => b) ?
+          <>
+            Passed
+            <CheckCircleTwoTone className='text-2xl' />
+          </>
+        : <>
+            Failed
+            <CloseCircleTwoTone className='text-2xl' />
+          </>
+        }
       </Row>
-    <Row className='justify-center content-center h-2/5 overflow-y-scroll'>
-        {
-    learningGoal.requirements.map((req, i) => {
-      const result = learningGoal.results?.[i]
-      const ass = assignments.get(req.assignment_id)
-      if (!ass) {
-        return <></>
-      }
-      return <div key={i}>
-        {ass.title} {printLogicalExpression(req.expression)} {req.value}
-        {result ? <CheckOutlined /> : <CloseOutlined />}
-        </div>
-    })
-  }      
-    </Row>
-  </>
-;
+      <Row className='justify-center content-center h-2/5 overflow-y-scroll'>
+        {learningGoal.requirements.map((req, i) => {
+          const result = learningGoal.results?.[i];
+          const ass = assignments.get(req.assignment_id);
+          if (!ass) {
+            return <></>;
+          }
+          return (
+            <div key={i}>
+              {ass.title} {printLogicalExpression(req.expression)} {req.value}
+              {result ?
+                <CheckOutlined />
+              : <CloseOutlined />}
+            </div>
+          );
+        })}
+      </Row>
+    </>
+  );
 };

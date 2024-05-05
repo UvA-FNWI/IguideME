@@ -6,6 +6,7 @@ import { DeleteFilled } from '@ant-design/icons';
 import { getTileGroups } from '@/api/tiles';
 import { useQuery } from '@tanstack/react-query';
 import { useSortable } from '@dnd-kit/sortable';
+import { useTheme } from 'next-themes';
 import { type FC, type ReactElement, useState } from 'react';
 
 import { type LayoutColumn } from '@/types/tile';
@@ -62,15 +63,21 @@ const ConfigLayoutColumn: FC<Props> = ({ column, remove, parentOnChange }): Reac
     onChange();
   };
 
+  const { theme } = useTheme();
+
   if (isLoading) {
     return (
       <QueryLoading isLoading={isLoading}>
-        <div className='rounded-md w-[425px] h-[360px] p-3 bg-white shadow-statusCard' />
+        <div
+          className={`rounded-md w-[425px] h-[360px] p-3 bg-cardBackground ${theme === 'light' ? 'shadow-statusCard' : ''}`}
+        />
       </QueryLoading>
     );
   } else if (isError || data === undefined) {
     return (
-      <div className='relative [&>div]:grid [&>div]:place-content-center rounded-md w-[425px] h-[360px] p-3 bg-white shadow-statusCard'>
+      <div
+        className={`relative [&>div]:grid [&>div]:place-content-center rounded-md w-[425px] h-[360px] p-3 bg-cardBackground ${theme === 'light' ? 'shadow-statusCard' : ''}`}
+      >
         <QueryError title='Error: Failed to load tile groups' />
       </div>
     );
@@ -78,28 +85,37 @@ const ConfigLayoutColumn: FC<Props> = ({ column, remove, parentOnChange }): Reac
 
   if (isDragging) {
     return (
-      <div className='rounded-md w-[425px] h-[360px] p-3 bg-white shadow-statusCard' ref={setNodeRef} style={style} />
+      <div
+        className={`rounded-md w-[425px] h-[360px] p-3 bg-cardBackground ${theme === 'light' ? 'shadow-statusCard' : ''}`}
+        ref={setNodeRef}
+        style={style}
+      />
     );
   } else {
     return (
-      <div className='rounded-md w-[425px] h-[360px] p-3 bg-white shadow-statusCard' ref={setNodeRef} style={style}>
+      <div
+        className={`rounded-md w-[425px] h-[360px] p-3 bg-cardBackground ${theme === 'light' ? 'shadow-statusCard' : ''}`}
+        ref={setNodeRef}
+        style={style}
+      >
         <Row className='cursor-grab justify-between' {...attributes} {...listeners}>
           <Col>
             <h3 className='text-lg'>Column</h3>
           </Col>
           <Col>
-            <DeleteFilled onClick={() => remove?.(column.id)} />
+            <DeleteFilled className='text-primary-red' onClick={() => remove?.(column.id)} />
           </Col>
         </Row>
 
         <Divider className='my-[10px] mr-[10px]' />
 
         <Row className='content-center justify-between'>
-          <Col span={3}>
-            <span>Width:</span>
+          <Col className='grid place-content-center' span={3}>
+            <span className='text-text text-sm'>Width:</span>
           </Col>
           <Col span={15}>
             <Slider
+              className='customSlider'
               min={MIN_WIDTH}
               max={MAX_WIDTH}
               value={width}
@@ -122,13 +138,13 @@ const ConfigLayoutColumn: FC<Props> = ({ column, remove, parentOnChange }): Reac
                 onChange();
               }}
               formatter={formatter}
-              className='w-[90%]'
+              className='w-[90%] !border-primary-500 hover:!border-primary-500 !bg-cardBackground hover:!bg-dropdownBackground [&_input]:!text-text antNumberInput'
             />
           </Col>
         </Row>
 
         <Divider className='my-[10px] mr-[10px]' />
-        <div className='mb-[10px]'>Tile Groups:</div>
+        <div className='mb-[10px] text-text text-sm'>Tile Groups:</div>
 
         <Row className='justify-center'>
           <Transfer
@@ -140,6 +156,7 @@ const ConfigLayoutColumn: FC<Props> = ({ column, remove, parentOnChange }): Reac
             render={(item) => item.title}
             oneWay
             showSearch
+            className='customTransfer [&_span]:!text-text'
           />
         </Row>
       </div>

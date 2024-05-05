@@ -91,11 +91,19 @@ const Dashboard: FC<DashboardProps> = ({ self }): ReactElement => {
                 setViewType(e.target.value as ViewType);
               }}
             >
-              <Radio.Button value='graph'>
+              <Radio.Button
+                className={`${viewType === 'graph' ? '!bg-primary-500 !border-primary-500' : '!bg-dropdownBackground !border-dropdownBackground hover:!bg-dialogBackground'} !text-text`}
+                disabled={viewType === 'graph'}
+                value='graph'
+              >
                 <BarChartOutlined />
                 <span> Graph</span>
               </Radio.Button>
-              <Radio.Button value='grid'>
+              <Radio.Button
+                className={`${viewType === 'grid' ? '!bg-primary-500 !border-primary-500' : '!bg-dropdownBackground !border-dropdownBackground hover:!bg-dialogBackground'} !text-text`}
+                disabled={viewType === 'grid'}
+                value='grid'
+              >
                 <AppstoreOutlined />
                 <span> Grid</span>
               </Radio.Button>

@@ -34,9 +34,9 @@ const Header: FC<HeaderProps> = ({ self }): ReactElement => {
   }, [inHome, selectedStudent, self]);
 
   return (
-    <header className='bg-primary-purple text-white w-screen min-h-header flex justify-between items-center p-3 relative overflow-x-hidden'>
-      <a className='text-white align-middle font-semibold inline-block text-2xl' href='/'>
-        IGuideMe
+    <header className='bg-navbarBackground w-screen min-h-header flex justify-between items-center p-3 relative overflow-x-hidden'>
+      <a className='align-middle text-white font-semibold inline-block text-2xl' href='/'>
+        IguideME
       </a>
       <div className='md:hidden'>
         <MobileHeader self={self} selectedStudent={selectedStudent} setSelectedStudent={setSelectedStudent} />
@@ -45,12 +45,12 @@ const Header: FC<HeaderProps> = ({ self }): ReactElement => {
         <Selector selectedStudent={selectedStudent} setSelectedStudent={setSelectedStudent} />
       </div>
       <div className='hidden md:flex gap-2 border lg:border-none border-white rounded-3xl px-1'>
-        <div className='flex gap-2 lg:outline lg:outline-1 outline-white outline-offset-[-1px] lg:rounded-md'>
+        <div className='flex lg:outline lg:outline-1 outline-white outline-offset-[-1px] lg:rounded-md'>
           <ThemeSwitcherDropdown buttonClasses='border-none' />
           <NotificationPanel buttonClasses='border-none' placement='bottomLeft' user={selectedStudent ?? self} />
         </div>
         <Button
-          className='flex flex-col justify-center items-center h-10 border-none border lg:border-solid border-white align-middle rounded-3xl lg:rounded-md w-10 lg:w-32 p-2 text-white'
+          className='flex flex-col justify-center items-center h-10 border-none border lg:border-solid border-white align-middle rounded-3xl lg:rounded-md w-10 lg:w-32 p-2 text-white hover:!text-white hover:!bg-dialogBackground'
           onClick={switchPage}
           type='link'
         >

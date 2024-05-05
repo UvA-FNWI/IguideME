@@ -36,7 +36,7 @@ const GradesTable: FC = (): ReactElement => {
       <QueryLoading isLoading={isLoading}>
         <Row className='justify-between content-end pb-[10px]'>
           <Col>
-            <h2>General Overview</h2>
+            <h2 className='text-xl'>General Overview</h2>
           </Col>
           <Col>
             Consent Given:{' '}
@@ -51,6 +51,7 @@ const GradesTable: FC = (): ReactElement => {
         {isError ?
           <QueryError className='static' title='Failed to load students' />
         : <Table
+            className='[&_th]:!bg-cardBackground [&_th]:!text-text [&_td]:!bg-dropdownBackground [&_td]:!text-text [&_div]:!text-text'
             size='middle'
             columns={getColumns()}
             dataSource={getData(students ?? [])}
