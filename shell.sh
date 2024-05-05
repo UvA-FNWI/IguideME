@@ -4,7 +4,7 @@ PROJECT_ROOT=$PWD;
 FRONTEND_ROOT="$PROJECT_ROOT/IguideME.Web/Frontend"
 
 echo "Checking node modules..."
-pnpm --cwd $FRONTEND_ROOT;
+pnpm --cwd $FRONTEND_ROOT install;
 
 
 alias frontend-dev='pnpm -C $FRONTEND_ROOT dev'

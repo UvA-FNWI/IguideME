@@ -45,15 +45,7 @@ namespace IguideME.Web.Controllers
                     .Count();
 
                 _databaseManager.CreateTile(
-                    GetCourseID(),
-                    tile.GroupID,
-                    tile.Title,
-                    tilesInGroup + 1,
-                    (int)tile.Type,
-                    tile.Weight,
-                    (int)tile.GradingType,
-                    tile.Visible,
-                    tile.Notifications
+                tile
                 );
                 return Ok();
             }

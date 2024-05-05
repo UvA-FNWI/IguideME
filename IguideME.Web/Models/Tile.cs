@@ -34,6 +34,9 @@ namespace IguideME.Web.Models
         [JsonProperty(PropertyName = "gradingType")]
         public AppGradingType GradingType { get; set; }
 
+        [JsonProperty(PropertyName = "alt")]
+        public bool Alt { get; set; }
+
         [JsonProperty(PropertyName = "visible")]
         public bool Visible { get; set; }
 
@@ -51,6 +54,7 @@ namespace IguideME.Web.Models
             TileType type,
             double weight,
             AppGradingType gradingType,
+            bool alt,
             bool visible,
             bool notifications
         )
@@ -62,6 +66,7 @@ namespace IguideME.Web.Models
             this.Type = type;
             this.Weight = weight;
             this.GradingType = gradingType;
+            this.Alt = alt;
             this.Visible = visible;
             this.Notifications = notifications;
             this.Entries = new();

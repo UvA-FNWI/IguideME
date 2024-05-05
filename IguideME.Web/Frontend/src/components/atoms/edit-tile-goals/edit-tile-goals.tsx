@@ -1,7 +1,7 @@
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
-import { DeleteFilled } from '@ant-design/icons';
-import { Form, Select, Table } from 'antd';
+import { CheckOutlined, CloseOutlined, DeleteFilled } from '@ant-design/icons';
+import { Form, Select, Switch, Table } from 'antd';
 import { getLearningGoals } from '@/api/entries';
 import type { LearningGoal, TileEntry } from '@/types/tile';
 import { useDrawerStore } from '@/components/crystals/tile-group-board/useDrawerStore';
@@ -19,14 +19,21 @@ const EditTileGoals: FC = (): ReactElement => {
   if (isError) return <QueryError className='static [&_span]:!text-2xl' title={'Error: Could not load goals'} />;
 
   return (
-    <div className='col-span-3'>
+    <>
       <p className='mb-1'>Goals:</p>
-      <QueryLoading isLoading={isLoading}>
-        <Item name='entries' className='w-full m-0'>
-          <TileGoalsSelect goals={data ?? []} value={[]} onChange={() => {}} />
+      <div className='col-span-2'>
+        <Item name='alt' noStyle valuePropName='checked'>
+          <Switch className='float-end' checkedChildren={<CheckOutlined />} unCheckedChildren={<CloseOutlined />} />
         </Item>
-      </QueryLoading>
-    </div>
+      </div>
+      <div className='col-span-3'>
+        <QueryLoading isLoading={isLoading}>
+          <Item name='entries' className='w-full m-0'>
+            <TileGoalsSelect goals={data ?? []} value={[]} onChange={() => {}} />
+          </Item>
+        </QueryLoading>
+      </div>
+    </>
   );
 };
 

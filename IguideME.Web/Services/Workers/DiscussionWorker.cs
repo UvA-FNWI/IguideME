@@ -81,34 +81,6 @@ namespace IguideME.Web.Services.Workers
             }
         }
 
-        /// <summary>
-        /// Link discussions to wild card tiles which are tiles that link to all the discussions instead
-        /// of specifying specific discussions.
-        /// </summary>
-        /// <param name="discussions">a list of all the discussions.</param>
-        /// <param name="students">a list of all the students.</param>
-        /// <param name="tile">the tile that's a wild card.</param>
-        private void HandleWildcardTile(
-            IEnumerable<AppDiscussion> discussions,
-            List<User> students,
-            Tile tile
-        )
-        {
-            _logger.LogDebug("wildcard");
-
-            // Filter out the discussions from students who did not give consent. TODO: is this how we want to handle this?
-            IEnumerable<AppDiscussion> postedDiscussions = discussions.Where(d =>
-            {
-                User student = students.Find(s => s.Name == d.Author);
-                return student != null
-                    && _databaseManager.GetUserConsent(this._courseID, student.UserID);
-            });
-
-            foreach (AppDiscussion discussion in postedDiscussions)
-            {
-                _databaseManager.UpdateDiscussion(discussion, tile.ID, this._syncID);
-            }
-        }
 
         /// <summary>
         /// Link discussions that are assigned to a tile to that tile.
@@ -146,14 +118,7 @@ namespace IguideME.Web.Services.Workers
 
             foreach (Tile tile in tiles)
             {
-                // if (tile.Wildcard)
-                // {
-                //     this.HandleWildcardTile(discussions, students, tile);
-                // }
-                // else
-                // {
                 this.HandleTile(discussions, tile);
-                // }
             }
         }
 

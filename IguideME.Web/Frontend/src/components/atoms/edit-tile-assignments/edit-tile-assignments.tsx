@@ -1,11 +1,13 @@
 import SelectAssignments from './SelectAssignments';
-import { Form, InputNumber, Select } from 'antd';
+import { Form, InputNumber, Select, Switch } from 'antd';
 import { GradingType, printGradingType } from '@/types/tile';
 import { type FC, type ReactElement } from 'react';
+import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
 
 const { Item } = Form;
 
 const EditTileAssignments: FC = (): ReactElement => {
+  // TODO the loading handling for entries seems to be different here
   return (
     <>
       <p>Grading:</p>
@@ -33,8 +35,13 @@ const EditTileAssignments: FC = (): ReactElement => {
           />
         </Item>
       </div>
+      <p>Assignments:</p>
+      <div className='col-span-2'>
+        <Item name='alt' noStyle valuePropName='checked'>
+          <Switch className='float-end' checkedChildren={<CheckOutlined />} unCheckedChildren={<CloseOutlined />} />
+        </Item>
+      </div>
       <div className='col-span-3'>
-        <p>Assignments:</p>
         <Item name='entries' className='w-full m-0'>
           <SelectAssignments value={[]} onChange={() => {}} />
         </Item>
@@ -42,5 +49,6 @@ const EditTileAssignments: FC = (): ReactElement => {
     </>
   );
 };
+
 
 export default EditTileAssignments;

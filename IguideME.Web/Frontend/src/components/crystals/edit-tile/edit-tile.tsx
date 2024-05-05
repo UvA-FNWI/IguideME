@@ -46,6 +46,7 @@ const EditTile: FC<Props> = ({ tile }): ReactElement => {
       name='edit_tile_form'
       initialValues={tile}
       onFinish={(data: Tile) => {
+        console.log("data", data)
         setEditTile(null);
         saveTile(data);
         setIsChanged(false);
@@ -195,6 +196,7 @@ const Notification: FC<{
     />
   );
 };
+
 
 const Visible: FC<{ value?: boolean; onChange?: (value: boolean) => void }> = ({ value, onChange }): ReactElement => {
   const [visible, setVisible] = useState<boolean | undefined>(value);

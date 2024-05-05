@@ -21,6 +21,7 @@ export interface Tile {
   position: number;
   type: TileType;
   weight: number;
+  alt: boolean;
   visible: boolean;
   notifications: boolean;
   gradingType: GradingType;

@@ -9,12 +9,12 @@ public static class DatabaseQueries
     public static readonly Dictionary<string, string> MIGRATIONS =
         new()
         {
-            // {
-            // "000_rename_all_old_tables",
-            // @"
-            // ALTER TABLE `foo` RENAME TO `bar`;
-            // ;"
-            // }
+            {
+            "000_add_alt_column_to_tile",
+            @"
+            ALTER TABLE `tiles` ADD COLUMN `alt`
+            ;"
+            }
         };
 
     // //================================ Tables ================================//
@@ -111,6 +111,7 @@ public static class DatabaseQueries
             `type`            INTEGER,
             `weight`          FLOAT default 0.0,
             `grading_type`    INTEGER,
+            `alt`             BOOLEAN DEFUALT false,
             `visible`         BOOLEAN DEFAULT false,
             `notifications`   BOOLEAN DEFAULT false,
             FOREIGN KEY(`group_id`) REFERENCES `tile_groups`(`group_id`)
@@ -495,6 +496,7 @@ public static class DatabaseQueries
                        `type`,
                        `weight`,
                        `grading_type`,
+                       `alt`,
                        `visible`,
                        `notifications`
                     )
@@ -891,6 +893,7 @@ public static class DatabaseQueries
                     `tiles`.`type`,
                     `tiles`.`weight`,
                     `tiles`.`grading_type`,
+                    `tiles`.`alt`,
                     `tiles`.`visible`,
                     `tiles`.`notifications`
         FROM        `tiles`
@@ -908,6 +911,7 @@ public static class DatabaseQueries
                     `tiles`.`type`,
                     `tiles`.`weight`,
                     `tiles`.`grading_type`,
+                    `tiles`.`alt`,
                     `tiles`.`visible`,
                     `tiles`.`notifications`
         FROM        `tiles`
@@ -924,6 +928,7 @@ public static class DatabaseQueries
                     `tiles`.`type`,
                     `tiles`.`weight`,
                     `tiles`.`grading_type`,
+                    `tiles`.`alt`,
                     `tiles`.`visible`,
                     `tiles`.`notifications`
         FROM        `tiles`
@@ -1665,6 +1670,7 @@ public static class DatabaseQueries
                     `type`=@type,
                     `weight`=@weight,
                     `grading_type`=@gradingType,
+                    `alt`=@alt,
                     `visible`=@visible,
                     `notifications`=@notifications
         WHERE       `tiles`.`tile_id`=@tileID;";

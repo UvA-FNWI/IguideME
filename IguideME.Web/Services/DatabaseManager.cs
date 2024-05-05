@@ -2426,6 +2426,7 @@ namespace IguideME.Web.Services
                 new SQLiteParameter("type", (int)tile.Type),
                 new SQLiteParameter("weight", tile.Weight),
                 new SQLiteParameter("gradingType", (int)tile.GradingType),
+                new SQLiteParameter("Alt", tile.Alt),
                 new SQLiteParameter("visible", tile.Visible),
                 new SQLiteParameter("notifications", tile.Notifications)
             );
@@ -2468,7 +2469,8 @@ namespace IguideME.Web.Services
                                 r.GetDouble(5),
                                 (AppGradingType)r.GetInt32(6),
                                 r.GetBoolean(7),
-                                r.GetBoolean(8)
+                                r.GetBoolean(8),
+                                r.GetBoolean(9)
                             );
                         tiles.Add(row);
                     }
@@ -2514,7 +2516,8 @@ namespace IguideME.Web.Services
                                 r.GetDouble(5),
                                 (AppGradingType)r.GetInt32(6),
                                 r.GetBoolean(7),
-                                r.GetBoolean(8)
+                                r.GetBoolean(8),
+                                r.GetBoolean(9)
                             );
                         tiles.Add(row);
                     }
@@ -3094,7 +3097,8 @@ namespace IguideME.Web.Services
                                         r.GetDouble(5),
                                         (AppGradingType)r.GetInt32(6),
                                         r.GetBoolean(7),
-                                        r.GetBoolean(8)
+                                        r.GetBoolean(8),
+                                        r.GetBoolean(9)
                                     );
                     if (autoLoadEntries)
                     {
@@ -3108,27 +3112,20 @@ namespace IguideME.Web.Services
         }
 
         public void CreateTile(
-            int courseID,
-            int groupID,
-            string title,
-            int order,
-            int type,
-            double weight,
-            int gradingType,
-            bool visible,
-            bool notifications
+            Tile tile
         )
         {
             int id = IDNonQuery(
                 DatabaseQueries.REGISTER_TILE,
-                new SQLiteParameter("groupID", groupID),
-                new SQLiteParameter("title", title),
-                new SQLiteParameter("order", order),
-                new SQLiteParameter("type", type),
-                new SQLiteParameter("weight", weight),
-                new SQLiteParameter("gradingType", gradingType),
-                new SQLiteParameter("visible", visible),
-                new SQLiteParameter("notifications", notifications)
+                new SQLiteParameter("groupID", tile.GroupID),
+                new SQLiteParameter("title", tile.Title),
+                new SQLiteParameter("order", tile.Order),
+                new SQLiteParameter("type", tile.Type),
+                new SQLiteParameter("weight", tile.Weight),
+                new SQLiteParameter("gradingType", tile.GradingType),
+                new SQLiteParameter("alt", tile.Alt),
+                new SQLiteParameter("visible", tile.Visible),
+                new SQLiteParameter("notifications.", tile.Notifications)
             );
         }
 

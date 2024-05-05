@@ -1,7 +1,7 @@
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
-import { DeleteFilled } from '@ant-design/icons';
-import { Form, Select, Table } from 'antd';
+import { CheckOutlined, CloseOutlined, DeleteFilled } from '@ant-design/icons';
+import { Form, Select, Switch, Table } from 'antd';
 import { getTopics } from '@/api/entries';
 import { useQuery } from '@tanstack/react-query';
 import { type Discussion, type TileEntry } from '@/types/tile';
@@ -18,14 +18,21 @@ const EditTileDiscussions: FC = (): ReactElement => {
   if (isError) return <QueryError className='static [&_span]:!text-2xl' title={'Error: Could not load discussions'} />;
 
   return (
-    <div className='col-span-3'>
+    <>
       <p className='mb-1'>Discussions:</p>
-      <QueryLoading isLoading={isLoading}>
-        <Item name='entries' className='w-full m-0'>
-          <DiscussionSelect topics={data ?? []} value={[]} onChange={() => {}} />
+      <div className='col-span-2'>
+        <Item name='alt' noStyle valuePropName='checked'>
+          <Switch className='float-end' checkedChildren={<CheckOutlined />} unCheckedChildren={<CloseOutlined />} />
         </Item>
-      </QueryLoading>
-    </div>
+      </div>
+      <div className='col-span-3'>
+        <QueryLoading isLoading={isLoading}>
+          <Item name='entries' className='w-full m-0'>
+            <DiscussionSelect topics={data ?? []} value={[]} onChange={() => {}} />
+          </Item>
+        </QueryLoading>
+      </div>
+    </>
   );
 };
 
