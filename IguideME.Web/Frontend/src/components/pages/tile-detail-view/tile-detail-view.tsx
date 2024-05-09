@@ -1,14 +1,14 @@
+import { getTile } from '@/api/tiles';
 import EntryView from '@/components/crystals/entry-view/entry-view';
 import GroupView from '@/components/particles/group-view/group-view';
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
 import { ArrowLeftOutlined } from '@ant-design/icons';
-import { Button, Col, Row } from 'antd';
-import { getTile } from '@/api/tiles';
-import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { useTileViewStore } from '../student-dashboard/tileViewContext';
+import { Button, Col, Row } from 'antd';
 import { type ReactElement, useCallback, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useTileViewStore } from '../student-dashboard/tileViewContext';
 
 function TileDetailView(): ReactElement {
   const { tid } = useParams();
@@ -53,7 +53,7 @@ function TileDetailView(): ReactElement {
       <Row>
         <Col>
           <Button
-            className='border border-solid rounded-[20px] !w-[50px] ml-[20px] p-0 bg-dropdownBackground [&>span]:!text-text hover:!bg-dialogBackground'
+            className='ml-[20px] !w-[50px] rounded-[20px] border border-solid border-primary bg-body p-0 hover:!bg-text/10 [&>span]:!text-text'
             type={'link'}
             icon={<ArrowLeftOutlined />}
             onClick={() => {
@@ -64,7 +64,7 @@ function TileDetailView(): ReactElement {
       </Row>
       <Row className='min-h-[60vh] p-1 [&>div]:w-full'>
         <QueryLoading isLoading={isLoading}>
-          <div className='p-1 flex justify-normal w-full'>
+          <div className='flex w-full justify-normal p-1'>
             <GroupView title={tile ? tile.title : ''}>
               {isError ?
                 <QueryError className='grid place-content-center' title='Failed to load tile' />

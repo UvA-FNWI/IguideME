@@ -1,24 +1,21 @@
-import Swal from 'sweetalert2';
+import { deleteTile, patchTile } from '@/api/tiles';
+import { printGradingType, TileType, type Tile } from '@/types/tile';
 import {
   BellOutlined,
-  BellTwoTone,
   CarryOutOutlined,
   CommentOutlined,
   DeleteFilled,
   EyeInvisibleOutlined,
-  EyeInvisibleTwoTone,
   EyeOutlined,
-  EyeTwoTone,
   FormOutlined,
 } from '@ant-design/icons';
-import { Col, Row, Space, Tooltip } from 'antd';
-import { CSS } from '@dnd-kit/utilities';
-import { deleteTile, patchTile } from '@/api/tiles';
-import { useDrawerStore } from '../tile-group-board/useDrawerStore';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSortable } from '@dnd-kit/sortable';
-import { TileType, type Tile, printGradingType } from '@/types/tile';
+import { CSS } from '@dnd-kit/utilities';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { Col, Row, Space, Tooltip } from 'antd';
 import { type FC, type ReactElement } from 'react';
+import Swal from 'sweetalert2';
+import { useDrawerStore } from '../tile-group-board/useDrawerStore';
 
 interface Props {
   tile: Tile;
@@ -69,7 +66,7 @@ const AdminTileView: FC<Props> = ({ tile, move }): ReactElement => {
   if (isDragging) {
     return (
       <div
-        className={`w-60 h-full p-3 border border-solid border-text rounded-md m-0 font-tnum ${tile.visible ? 'bg-primary-green-background' : 'bg-primary-red-background'}`}
+        className={`font-tnum m-0 h-full w-60 rounded-md border border-solid border-text p-3 ${tile.visible ? 'bg-success/10' : 'bg-failure/10'}`}
         ref={setNodeRef}
         style={style}
       />
@@ -79,11 +76,11 @@ const AdminTileView: FC<Props> = ({ tile, move }): ReactElement => {
   if (move === true) {
     return (
       <div
-        className={`w-60 h-full p-3 border border-solid border-text rounded-md m-0 font-tnum ${tile.visible ? 'bg-primary-green-background' : 'bg-primary-red-background'}`}
+        className={`font-tnum m-0 h-full w-60 rounded-md border border-solid border-text p-3 ${tile.visible ? 'bg-success/10' : 'bg-failure/10'}`}
         ref={setNodeRef}
         style={style}
       >
-        <div className='flex justify-center items-center h-full'>
+        <div className='flex h-full items-center justify-center'>
           <p>Move here</p>
         </div>
       </div>
@@ -92,7 +89,7 @@ const AdminTileView: FC<Props> = ({ tile, move }): ReactElement => {
 
   return (
     <div
-      className={`w-60 h-full p-3 border border-solid border-text rounded-md m-0 font-tnum ${tile.visible ? 'bg-primary-green-background' : 'bg-primary-red-background'}`}
+      className={`font-tnum m-0 h-full w-60 rounded-md border border-solid border-text p-3 ${tile.visible ? 'bg-success/10' : 'bg-failure/10'}`}
       ref={setNodeRef}
       style={style}
       {...attributes}
@@ -101,19 +98,19 @@ const AdminTileView: FC<Props> = ({ tile, move }): ReactElement => {
         setEditTile(tile);
       }}
     >
-      <Row gutter={[10, 10]} className='mb-6 justify-between content-center'>
+      <Row gutter={[10, 10]} className='mb-6 content-center justify-between'>
         <Col>
           <Space className='content-center'>
             <Tooltip title={<>This tile is {!tile.visible && <b>not </b>}visible for students</>}>
               {tile.visible ?
                 <EyeOutlined
-                  className='text-xs text-primary-green'
+                  className='text-xs text-success'
                   onClick={(event) => {
                     clickThrough(event, toggleVisible);
                   }}
                 />
               : <EyeInvisibleOutlined
-                  className='text-xs text-primary-red'
+                  className='text-xs text-failure'
                   onClick={(event) => {
                     clickThrough(event, toggleVisible);
                   }}
@@ -131,7 +128,7 @@ const AdminTileView: FC<Props> = ({ tile, move }): ReactElement => {
                 onClick={(event) => {
                   clickThrough(event, toggleNotifications);
                 }}
-                className={`text-xs ${tile.notifications ? 'text-primary-green' : 'text-primary-red'}`}
+                className={`text-xs ${tile.notifications ? 'text-success' : 'text-failure'}`}
               />
             </Tooltip>
             <h3 className='ml-[10px] pt-[2px]'>{tile.title}</h3>
@@ -156,7 +153,7 @@ const AdminTileView: FC<Props> = ({ tile, move }): ReactElement => {
                 }
               });
             }}
-            className='pr-1 text-primary-red'
+            className='pr-1 text-failure'
           />
         </Col>
       </Row>
@@ -165,7 +162,7 @@ const AdminTileView: FC<Props> = ({ tile, move }): ReactElement => {
           <TileTypeView tileType={tile.type} />
         </Col>
       </Row>
-      <Row className='pt-[30px] justify-between content-center'>
+      <Row className='content-center justify-between pt-[30px]'>
         <Col className='h-[30px]'>
           {tile.type === TileType.assignments && (
             <>
@@ -178,7 +175,7 @@ const AdminTileView: FC<Props> = ({ tile, move }): ReactElement => {
           )}
         </Col>
         {tile.weight > 0 && (
-          <Col className='text-center h-[30px]'>
+          <Col className='h-[30px] text-center'>
             <p className='text-xs'>
               Weight:
               <br />

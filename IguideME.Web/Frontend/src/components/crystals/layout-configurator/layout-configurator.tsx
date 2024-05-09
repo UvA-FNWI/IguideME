@@ -1,15 +1,15 @@
+import { getLayoutColumns, postLayoutColumns } from '@/api/tiles';
 import ConfigLayoutColumn from '@/components/atoms/layout-column/layout-column';
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
-import { arrayMove, SortableContext } from '@dnd-kit/sortable';
-import { Button } from 'antd';
-import { createPortal } from 'react-dom';
-import { getLayoutColumns, postLayoutColumns } from '@/api/tiles';
 import { PlusOutlined } from '@ant-design/icons';
-import { toast } from 'sonner';
+import { arrayMove, SortableContext } from '@dnd-kit/sortable';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Button } from 'antd';
 import { useTheme } from 'next-themes';
 import { type FC, type ReactElement, useCallback, useEffect, useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { toast } from 'sonner';
 
 import { type LayoutColumn } from '@/types/tile';
 import {
@@ -117,14 +117,14 @@ const LayoutConfigurator: FC = (): ReactElement => {
   const loadingState = Array.from({ length: 2 }).map((_, i) => (
     <QueryLoading isLoading={isLoading} key={i}>
       <article
-        className={`rounded-md w-[425px] h-[360px] p-3 m-2 bg-cardBackground ${theme === 'light' ? 'shadow-statusCard' : ''}`}
+        className={`m-2 h-[360px] w-[425px] rounded-md bg-card p-3 ${theme === 'light' ? 'shadow-statusCard' : ''}`}
       />
     </QueryLoading>
   ));
 
   const errorState = (
     <article
-      className={`rounded-md w-[425px] h-[360px] p-3 m-2 bg-cardBackground ${theme === 'light' ? 'shadow-statusCard' : ''} relative`}
+      className={`m-2 h-[360px] w-[425px] rounded-md bg-card p-3 ${theme === 'light' ? 'shadow-statusCard' : ''} relative`}
     >
       <QueryError className='grid place-content-center' title='Error: Could not load layout columns' />
     </article>
@@ -134,7 +134,7 @@ const LayoutConfigurator: FC = (): ReactElement => {
     <DndContext sensors={sensors} onDragStart={onDragStart} onDragEnd={onDragEnd}>
       <SortableContext items={columnIds}>
         <div className='flex flex-col gap-2'>
-          <div className='flex gap-2 flex-wrap overflow-x-auto'>
+          <div className='flex flex-wrap gap-2 overflow-x-auto'>
             {isLoading ?
               loadingState
             : isError ?
@@ -151,14 +151,14 @@ const LayoutConfigurator: FC = (): ReactElement => {
             onClick={addColumn}
             block
             icon={<PlusOutlined />}
-            className='bg-cardBackground hover:!bg-dropdownBackground hover:!border-primary-500 [&_span]:!text-text'
+            className='bg-card hover:!border-primary hover:!bg-dropdownBackground [&_span]:!text-text'
           >
             Add Column
           </Button>
         </div>
       </SortableContext>
       <Button
-        className='mt-2 min-w-20 !border-none hover:!border-none bg-primary-500 hover:!bg-primary-600 [&_span]:text-text'
+        className='mt-2 min-w-20 !border-none bg-button hover:!border-none hover:!bg-button-hover [&_span]:text-text'
         onClick={save}
       >
         Save

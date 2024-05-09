@@ -13,7 +13,7 @@ const HamburgerIcon: FC<HamburgerIconProps> = memo(({ open, setOpen }): ReactEle
       aria-controls='Main Navigation'
       aria-expanded={open}
       aria-label={open ? 'Close navigation menu' : 'Open navigation menu'}
-      className={cn(styles.hamburger_icon, 'min-w-12 min-h-12')}
+      className={cn(styles.hamburger_icon, 'min-h-12 min-w-12')}
       onClick={() => setOpen(!open)}
     >
       <svg className='fill-white' viewBox='0 0 100 100'>

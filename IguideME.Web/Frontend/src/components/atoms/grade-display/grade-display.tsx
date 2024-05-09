@@ -1,10 +1,11 @@
+import tailwindConfig from '@/../tailwind.config';
+import { useTileViewStore } from '@/components/pages/student-dashboard/tileViewContext';
+import { TooltipProps } from '@/types/reactRecharts';
 import { FrownTwoTone, MehTwoTone, SmileTwoTone } from '@ant-design/icons';
 import { Space, Spin } from 'antd';
-import { useTheme } from 'next-themes';
-import { useTileViewStore } from '@/components/pages/student-dashboard/tileViewContext';
 import { memo, type FC, type ReactElement } from 'react';
-
-import { Bar, type BarConfig } from '@ant-design/charts';
+import { Bar, BarChart, Label, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import resolveConfig from 'tailwindcss/resolveConfig';
 
 const GradeDisplay: FC = (): ReactElement => {
   const { user, viewType } = useTileViewStore((state) => ({
@@ -41,7 +42,7 @@ const GridGrades: FC<Props> = memo(({ goal, total, pred }): ReactElement => {
   const meh = <MehTwoTone size={10} twoToneColor='rgb(245, 226, 54)' />;
   const unhappy = <FrownTwoTone size={10} twoToneColor={'rgb(255, 110, 90)'} />;
   return (
-    <Space className='justify-center h-full w-full' size='large'>
+    <Space className='h-full w-full justify-center' size='large'>
       <div className='text-center'>
         <p>Goal</p>
         <h2 className='text-lg font-semibold'>
@@ -86,64 +87,57 @@ const GridGrades: FC<Props> = memo(({ goal, total, pred }): ReactElement => {
 });
 GridGrades.displayName = 'GridGrades';
 
+const BarTooltip: FC<TooltipProps> = memo(({ active, payload, label }) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className='z-50 rounded-lg border border-solid border-text bg-body p-2'>
+        <p>
+          {label}: {Number(payload[0].value.toFixed(1))}/10
+        </p>
+      </div>
+    );
+  }
+});
+BarTooltip.displayName = 'BarTooltip';
+
 const GraphGrades: FC<Props> = memo(({ goal, total, pred }): ReactElement => {
-  const { theme } = useTheme();
-  const config: BarConfig = {
-    data: [
-      { name: 'Current grade', grade: total },
-      { name: 'Predicted grade', grade: pred },
-    ],
-    xField: 'name',
-    yField: 'grade',
-    style: {
-      fill: ({ name }: { name: 'Current grade' | 'Predicted grade' }) => {
-        if (name === 'Current grade') return '#5a32ff';
-        else return theme === 'dark' ? '#c4a4ff' : '#0dcccc';
-      },
-    },
-    height: 70,
-    legend: false,
-    scale: {
-      y: { domainMax: 10 },
-    },
-    axis: {
-      x: {
-        labelFill: theme === 'light' ? 'black' : 'white',
-      },
-      y: {
-        label: false,
-        tick: false,
-      },
-    },
-    tooltip: {
-      items: [{ channel: 'y', valueFormatter: '.1f' }],
-    },
-    annotations: [
-      {
-        type: 'lineY',
-        data: [goal],
-        style: {
-          stroke: theme === 'light' ? 'black' : 'white',
-          strokeOpacity: 1,
-          lineWidth: 1,
-          lineDash: [8, 3],
-        },
-        label: {
-          fill: theme === 'light' ? 'black' : 'white',
-          position: 'top',
-          dy: -17,
-          text: 'goal',
-        },
-      },
-    ],
-    optimization: {
-      sideEffects: true,
-    },
-  };
+  const fullConfig = resolveConfig(tailwindConfig);
+
   return (
-    <div className='w-full h-full'>
-      <Bar {...config} />
-    </div>
+    <ResponsiveContainer width='100%' minWidth={330} height={40}>
+      <BarChart
+        data={[
+          {
+            name: 'Current Grade',
+            grade: total,
+            fill: fullConfig.theme.colors.graph.you,
+          },
+          {
+            name: 'Predicted Grade',
+            grade: pred,
+            fill: fullConfig.theme.colors.graph.peer,
+          },
+        ]}
+        height={40}
+        layout='vertical'
+        margin={{
+          top: 0,
+          right: 0,
+          left: 0,
+          bottom: 0,
+        }}
+        width={400}
+      >
+        <XAxis hide axisLine={false} type='number' domain={[0, 10]} />
+        <YAxis axisLine dataKey='name' tick={false} tickSize={0} type='category' width={1} />
+        {/* @ts-ignore */}
+        <Tooltip content={<BarTooltip />} />
+        <Bar dataKey='grade' className='[&>g>path]:!fill-graph-max' barSize={15} background={{ fill: '#eee' }} />
+        <ReferenceLine className='stroke-text [&>line]:!stroke-text' strokeDasharray='3 3' strokeWidth={2} x={goal}>
+          <Label value='goal' position='insideLeft' />
+        </ReferenceLine>
+      </BarChart>
+    </ResponsiveContainer>
   );
 });
 GraphGrades.displayName = 'GraphGrades';

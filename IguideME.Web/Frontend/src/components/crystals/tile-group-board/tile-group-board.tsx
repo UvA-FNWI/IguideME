@@ -1,16 +1,10 @@
+import { getTileGroups, getTiles, patchTile, patchTileGroupOrder, patchTileOrder, postTileGroup } from '@/api/tiles';
 import AdminTileGroupView from '@/components/crystals/admin-tile-group/admin-tile-group';
 import AdminTileView from '@/components/crystals/admin-tile-view/admin-tile-view';
 import EditTile from '@/components/crystals/edit-tile/edit-tile';
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
-import Swal from 'sweetalert2';
-import { arrayMove, SortableContext } from '@dnd-kit/sortable';
-import { Button, Drawer, Row } from 'antd';
-import { createPortal } from 'react-dom';
-import { getTileGroups, getTiles, patchTile, patchTileGroupOrder, patchTileOrder, postTileGroup } from '@/api/tiles';
 import { PlusOutlined } from '@ant-design/icons';
-import { useDrawerStore } from './useDrawerStore';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   DndContext,
   type DragEndEvent,
@@ -22,7 +16,13 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
+import { arrayMove, SortableContext } from '@dnd-kit/sortable';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Button, Drawer, Row } from 'antd';
 import { type FC, type ReactElement, useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
+import Swal from 'sweetalert2';
+import { useDrawerStore } from './useDrawerStore';
 
 import { type Tile, type TileGroup } from '@/types/tile';
 
@@ -94,14 +94,14 @@ const TileGroupBoard: FC = (): ReactElement => {
     .fill(0)
     .map((_, i) => (
       <QueryLoading key={i} isLoading={isLoading} tip='Loading tile groups...'>
-        <div className='p-[10px] border border-dashed border-white rounded-lg bg-cardBackground min-h-[235px] my-1'>
+        <div className='my-1 min-h-[235px] rounded-lg border border-dashed border-white bg-card p-[10px]'>
           <Row />
         </div>
       </QueryLoading>
     ));
 
   const errorState = (
-    <div className='relative p-[10px] border border-dashed border-white rounded-lg bg-cardBackground min-h-[235px] my-1'>
+    <div className='relative my-1 min-h-[235px] rounded-lg border border-dashed border-white bg-card p-[10px]'>
       <QueryError className='grid place-content-center' title='Error: Could not load tile group(s)' />
     </div>
   );
@@ -109,7 +109,7 @@ const TileGroupBoard: FC = (): ReactElement => {
   return (
     <>
       <Drawer
-        className='!bg-bodyBackground [&>div>div>div]:!text-text [&_button]:!text-text'
+        className='!bg-body [&>div>div>div]:!text-text [&_button]:!text-text'
         title={editTitle && 'Editing: ' + editTitle.title}
         placement='right'
         closable
@@ -154,8 +154,7 @@ const TileGroupBoard: FC = (): ReactElement => {
               ))}
             </SortableContext>
             <Button
-              className='bg-cardBackground hover:!bg-dropdownBackground hover:!border-primary-500 [&_span]:!text-text'
-              type='dashed'
+              className='border-dashed !bg-button hover:!border-primary hover:!bg-button-hover [&_span]:!text-text'
               onClick={() => {
                 postGroup({
                   title: 'TileGroup',

@@ -1,11 +1,11 @@
+import { getPeerSettings, postPeerSettings } from '@/api/course_settings';
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
-import { Button, Form, InputNumber, Switch } from 'antd';
 import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
-import { getPeerSettings, postPeerSettings } from '@/api/course_settings';
-import { toast } from 'sonner';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Button, Form, InputNumber, Switch } from 'antd';
 import { useEffect, type FC, type ReactElement } from 'react';
+import { toast } from 'sonner';
 
 const PeerSettings: FC = (): ReactElement => {
   const { data, isError, isLoading } = useQuery({
@@ -16,7 +16,7 @@ const PeerSettings: FC = (): ReactElement => {
   if (isError || isLoading || data === undefined) {
     return (
       <QueryLoading isLoading={isLoading}>
-        <div className='h-20 bg-cardBackground'>
+        <div className='h-20 bg-card-background'>
           {(isError || (data === undefined && !isLoading)) && (
             <QueryError className='top-[-30px]' title='Failed to load peer settings' />
           )}
@@ -56,14 +56,15 @@ const PeerSettingsForm: FC<Props> = ({ minSize }): ReactElement => {
   return (
     <Form name='peer_settings_form' initialValues={{ min_size: minSize }} onFinish={savePeer}>
       <div className='flex justify-between'>
-        <Form.Item className='[&_label]:!text-text [&_label]:!text-sm' name='min_size' label='Minimum group size'>
+        <Form.Item className='[&_label]:!text-sm [&_label]:!text-text' name='min_size' label='Minimum group size'>
           <InputNumber
-            className='!border-primary-500 hover:!border-primary-500 !bg-cardBackground hover:!bg-dropdownBackground [&_input]:!text-text antNumberInput'
+            className='antNumberInput w-full !border border-solid !border-primary !bg-card-background hover:!border-primary hover:!bg-card [&_input]:!text-text'
             min={2}
+            variant='borderless'
           />
         </Form.Item>
         <Form.Item
-          className='[&_label]:!text-text [&_label]:!text-sm'
+          className='[&_label]:!text-sm [&_label]:!text-text'
           name='personalized_peers'
           label='Personalized'
           valuePropName='checked'
@@ -72,9 +73,9 @@ const PeerSettingsForm: FC<Props> = ({ minSize }): ReactElement => {
         </Form.Item>
       </div>
 
-      <Form.Item className='flex justify-end m-0'>
+      <Form.Item className='m-0 flex justify-end'>
         <Button
-          className='min-w-20 bg-primary-500 hover:!bg-primary-600 [&_span]:text-text !border-none hover:!border-none'
+          className='min-w-20 !border-none bg-button hover:!border-none hover:!bg-button-hover [&_span]:text-text'
           htmlType='submit'
         >
           Save

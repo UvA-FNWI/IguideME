@@ -1,10 +1,10 @@
+import { pollSync } from '@/api/syncing';
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
 import StatusCard from '@/components/particles/status-card/status-card';
-import { Col, Row } from 'antd';
 import { JobStatus, SyncStateNames, SyncStates } from '@/types/synchronization';
-import { pollSync } from '@/api/syncing';
 import { useQuery } from '@tanstack/react-query';
+import { Col, Row } from 'antd';
 import { useTheme } from 'next-themes';
 import { useEffect, useState, type FC, type ReactElement } from 'react';
 
@@ -36,15 +36,13 @@ const SyncProgressGrid: FC = (): ReactElement => {
 
   if (isError) {
     return (
-      <div className={`w-full h-full p-[10px] rounded-lg ${theme === 'light' && 'shadow-statusCard'}`}>
+      <div className={`h-full w-full rounded-lg p-[10px] ${theme === 'light' && 'shadow-statusCard'}`}>
         <QueryError className='grid place-content-center' title='Failed to fetch synchronization status' />
       </div>
     );
   } else {
     return (
-      <div
-        className={`w-full h-full p-[10px] bg-cardBackground rounded-lg ${theme === 'light' && 'shadow-statusCard'}`}
-      >
+      <div className={`h-full w-full rounded-lg bg-card p-[10px] ${theme === 'light' && 'shadow-statusCard'}`}>
         <Row gutter={[10, 10]}>
           {Object.values(SyncStateNames).map((name: string) => {
             const stateType = SyncStates.get(name);

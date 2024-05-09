@@ -1,9 +1,9 @@
-import QueryError from '@/components/particles/QueryError';
-import ViewTileGroup from '../tile-group-view/tile-group-view';
-import { Col, Row, Spin } from 'antd';
 import { getLayoutColumns, getTileGroups } from '@/api/tiles';
+import QueryError from '@/components/particles/QueryError';
 import { useQuery } from '@tanstack/react-query';
-import { type FC, type ReactElement } from 'react';
+import { Col, Row, Spin } from 'antd';
+import { Fragment, type FC, type ReactElement } from 'react';
+import ViewTileGroup from '../tile-group-view/tile-group-view';
 
 const ViewLayout: FC = (): ReactElement => {
   const {
@@ -29,10 +29,10 @@ const ViewLayout: FC = (): ReactElement => {
 
   if (loading || error) {
     return (
-      <div className='w-screen h-screen absolute inset-0 grid place-content-center'>
+      <div className='absolute inset-0 grid h-screen w-screen place-content-center'>
         {loading ?
           <Spin
-            className='[&>div]:min-w-max [&>div]:right-[-45px]'
+            className='[&>div]:right-[-45px] [&>div]:min-w-max'
             spinning={loading}
             size='large'
             tip='Loading layout'
@@ -46,7 +46,7 @@ const ViewLayout: FC = (): ReactElement => {
 
   if (columns.find((col) => col.groups.length > 0) === undefined) {
     return (
-      <div className='absolute inset-0 w-screen h-screen grid place-content-center pointer-events-none'>
+      <div className='pointer-events-none absolute inset-0 grid h-screen w-screen place-content-center'>
         <QueryError
           className='grid place-content-center'
           title='The dashboard has not been set up yet.'
@@ -63,10 +63,10 @@ const ViewLayout: FC = (): ReactElement => {
   }
 
   return (
-    <Row className='flex flex-col lg:flex-row gap-3 flex-nowrap mx-auto mb-3'>
-      {columns.map((column) => (
-        <>
-          <div className='lg:hidden flex flex-col gap-3'>
+    <Row className='mx-auto mb-3 flex flex-col flex-nowrap gap-3 lg:flex-row'>
+      {columns.map((column, index) => (
+        <Fragment key={index}>
+          <div className='flex flex-col gap-3 lg:hidden'>
             {column.groups.map((id) => {
               const group = tilegroups.find((group) => group.id === id);
               return (
@@ -78,14 +78,14 @@ const ViewLayout: FC = (): ReactElement => {
               );
             })}
           </div>
-          <Col key={column.id} span={Math.round((24 * column.width) / 100)} className='hidden lg:block flex-shrink'>
-            <div className='h-full grid gap-3'>
+          <Col key={column.id} span={Math.round((24 * column.width) / 100)} className='hidden flex-shrink lg:block'>
+            <div className='grid h-full gap-3'>
               {column.groups.map((id) => {
                 const group = tilegroups.find((group) => group.id === id);
                 return (
                   group !== undefined && (
                     <div
-                      className={`h-[calc(100%/${column.groups.length})] [&>div]:!h-full [&>div>div]:!h-full`}
+                      className={`h-[calc(100%/${column.groups.length})] [&>div>div]:!h-full [&>div]:!h-full`}
                       key={id}
                     >
                       <ViewTileGroup key={id} group={group} />
@@ -95,7 +95,7 @@ const ViewLayout: FC = (): ReactElement => {
               })}
             </div>
           </Col>
-        </>
+        </Fragment>
       ))}
     </Row>
   );

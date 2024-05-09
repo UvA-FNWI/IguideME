@@ -1,12 +1,12 @@
 // /----------------------------- React ------------------------------/
-import App from './App.tsx';
-import NextThemesProvider from './components/crystals/ThemeSwitcher/NextThemesProvider.tsx';
-import React, { lazy } from 'react';
-import ReactDOM from 'react-dom/client';
 import setup from '@/api/setup.ts';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import React, { lazy } from 'react';
+import ReactDOM from 'react-dom/client';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import App from './App.tsx';
+import NextThemesProvider from './components/crystals/ThemeSwitcher/NextThemesProvider.tsx';
 import './globals.css';
 
 // /--------------------------- Pages ---------------------------/
@@ -50,7 +50,11 @@ async function enableMocking(): Promise<ServiceWorkerRegistration | undefined> {
 
   // `worker.start()` returns a Promise that resolves
   // once the Service Worker is up and ready to intercept requests.
-  return await worker.start();
+  return await worker.start({
+    // This is going to perform unhandled requests
+    // but print no warning whatsoever when they happen.
+    onUnhandledRequest: 'bypass',
+  });
 }
 
 enableMocking()

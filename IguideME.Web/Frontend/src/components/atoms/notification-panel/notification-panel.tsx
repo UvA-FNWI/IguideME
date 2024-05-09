@@ -1,11 +1,11 @@
-import Notifications from '@/components/particles/notifications/notifications';
-import { BellOutlined, ExclamationOutlined, LoadingOutlined } from '@ant-design/icons';
-import { Button, Popover, Tooltip } from 'antd';
-import { cn } from '@/utils/cn';
 import { getStudentNotifications } from '@/api/users';
-import { useQuery } from '@tanstack/react-query';
-import { type TooltipPlacement } from 'antd/lib/tooltip';
+import Notifications from '@/components/particles/notifications/notifications';
 import { type User } from '@/types/user';
+import { cn } from '@/utils/cn';
+import { BellOutlined, ExclamationOutlined, LoadingOutlined } from '@ant-design/icons';
+import { useQuery } from '@tanstack/react-query';
+import { Button, Popover, Tooltip } from 'antd';
+import { type TooltipPlacement } from 'antd/lib/tooltip';
 import { type FC, type ReactElement } from 'react';
 
 interface Props {
@@ -30,11 +30,11 @@ const NotificationPanel: FC<Props> = ({ buttonClasses, placement = 'leftTop', us
         user !== undefined ?
           notifications !== undefined ?
             <Notifications notifications={notifications} />
-          : <div className='h-16 grid items-center'>
+          : <div className='grid h-16 items-center'>
               <p>No notifications found</p>
             </div>
 
-        : <div className='h-16 grid items-center'>
+        : <div className='grid h-16 items-center'>
             <p>Please select a student</p>
           </div>
       }
@@ -54,17 +54,17 @@ const NotificationPanel: FC<Props> = ({ buttonClasses, placement = 'leftTop', us
         <Button
           aria-disabled={isLoading || isError}
           className={cn(
-            'flex flex-col justify-center items-center h-10 border border-solid border-white align-middle text-white w-10 p-0 hover:!text-white hover:!bg-dialogBackground',
+            'flex h-10 w-10 flex-col items-center justify-center border border-solid border-white p-0 align-middle text-white hover:!bg-navbar-light hover:!text-white',
             buttonClasses,
           )}
           disabled={isLoading || isError}
           type='link'
         >
           {isLoading ?
-            <LoadingOutlined className='[&>svg]:w-4 [&>svg]:h-4 text-white' />
+            <LoadingOutlined className='text-white [&>svg]:h-4 [&>svg]:w-4' />
           : isError ?
-            <ExclamationOutlined className='[&>svg]:w-4 [&>svg]:h-4 text-white' />
-          : <BellOutlined className='[&>svg]:w-4 [&>svg]:h-4' />}
+            <ExclamationOutlined className='text-white [&>svg]:h-4 [&>svg]:w-4' />
+          : <BellOutlined className='[&>svg]:h-4 [&>svg]:w-4' />}
         </Button>
       </Tooltip>
     </Popover>

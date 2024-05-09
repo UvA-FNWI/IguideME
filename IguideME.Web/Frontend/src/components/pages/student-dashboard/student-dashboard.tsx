@@ -1,18 +1,18 @@
-import GradeDisplay from '@/components/atoms/grade-display/grade-display';
-import Loading from '@/components/particles/loading';
-import StudentInfo from '@/components/atoms/student-info/student-info';
-import { AppstoreOutlined, BarChartOutlined } from '@ant-design/icons';
 import { getSelf, getStudent } from '@/api/users';
-import { Outlet, useNavigate, useParams } from 'react-router-dom';
-import { Radio } from 'antd';
-import { TileViewStoreProvider, useTileViewStore } from './tileViewContext';
-import { useQuery } from '@tanstack/react-query';
+import GradeDisplay from '@/components/atoms/grade-display/grade-display';
+import StudentInfo from '@/components/atoms/student-info/student-info';
+import Loading from '@/components/particles/loading';
 import { type ViewType } from '@/types/tile';
 import { UserRoles, type User } from '@/types/user';
+import { AppstoreOutlined, BarChartOutlined } from '@ant-design/icons';
+import { useQuery } from '@tanstack/react-query';
+import { Radio } from 'antd';
 import { useEffect, type FC, type ReactElement } from 'react';
+import { Outlet, useNavigate, useParams } from 'react-router-dom';
+import { TileViewStoreProvider, useTileViewStore } from './tileViewContext';
 
 const LoadingState: FC = () => (
-  <div className='absolute inset-0 w-screen h-screen grid place-content-center'>
+  <div className='absolute inset-0 grid h-screen w-screen place-content-center'>
     <Loading />
   </div>
 );
@@ -77,14 +77,13 @@ const Dashboard: FC<DashboardProps> = ({ self }): ReactElement => {
   return (
     <>
       <div className='w-screen px-3'>
-        <div className='flex flex-col gap-3 py-3 lg:py-0 min-h-header justify-center'>
-          <div className='flex justify-between items-center'>
+        <div className='flex min-h-header flex-col justify-center gap-3 py-3 lg:py-0'>
+          <div className='relative flex items-center justify-between'>
             <StudentInfo />
-            <div className='hidden lg:block'>
+            <div className='absolute bottom-0 left-0 right-0 top-0 m-auto hidden h-full w-[400px] md:block'>
               <GradeDisplay />
             </div>
             <Radio.Group
-              className=''
               value={viewType}
               buttonStyle='solid'
               onChange={(e) => {
@@ -92,7 +91,7 @@ const Dashboard: FC<DashboardProps> = ({ self }): ReactElement => {
               }}
             >
               <Radio.Button
-                className={`${viewType === 'graph' ? '!bg-primary-500 !border-primary-500' : '!bg-dropdownBackground !border-dropdownBackground hover:!bg-dialogBackground'} !text-text`}
+                className={`!border-primary ${viewType === 'graph' ? '!bg-primary !text-white' : '!bg-dropdownBackground text-text hover:!bg-primary-light hover:!text-white'}`}
                 disabled={viewType === 'graph'}
                 value='graph'
               >
@@ -100,7 +99,7 @@ const Dashboard: FC<DashboardProps> = ({ self }): ReactElement => {
                 <span> Graph</span>
               </Radio.Button>
               <Radio.Button
-                className={`${viewType === 'grid' ? '!bg-primary-500 !border-primary-500' : '!bg-dropdownBackground !border-dropdownBackground hover:!bg-dialogBackground'} !text-text`}
+                className={`!border-primary ${viewType === 'grid' ? '!bg-primary !text-white' : '!bg-dropdownBackground text-text hover:!bg-primary-light hover:!text-white'}`}
                 disabled={viewType === 'grid'}
                 value='grid'
               >
@@ -110,7 +109,7 @@ const Dashboard: FC<DashboardProps> = ({ self }): ReactElement => {
             </Radio.Group>
           </div>
         </div>
-        <div className='lg:hidden'>
+        <div className='mb-3 grid h-[40px] w-[330px] place-content-center md:hidden'>
           <GradeDisplay />
         </div>
         <Outlet />

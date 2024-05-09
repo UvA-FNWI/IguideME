@@ -1,16 +1,16 @@
+import { deleteTile, patchTile } from '@/api/tiles';
 import EditTileAssignments from '@/components/atoms/edit-tile-assignments/edit-tile-assignments';
 import EditTileDiscussions from '@/components/atoms/edit-tile-discussions/edit-tile-discussions';
 import EditTileGoals from '@/components/atoms/edit-tile-goals/edit-tile-goals';
-import Swal from 'sweetalert2';
-import { BellOutlined, CheckCircleOutlined, StopOutlined } from '@ant-design/icons';
-import { Button, Form, Input, Select } from 'antd';
-import { deleteTile, patchTile } from '@/api/tiles';
-import { useDrawerStore } from '../tile-group-board/useDrawerStore';
-import { useForm, useWatch } from 'antd/es/form/Form';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { type FormInstance } from 'antd/lib/form/Form';
 import { TileType, type Tile } from '@/types/tile';
+import { BellOutlined, CheckCircleOutlined, StopOutlined } from '@ant-design/icons';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { Button, Form, Input, Select } from 'antd';
+import { useForm, useWatch } from 'antd/es/form/Form';
+import { type FormInstance } from 'antd/lib/form/Form';
 import { useState, type FC, type ReactElement } from 'react';
+import Swal from 'sweetalert2';
+import { useDrawerStore } from '../tile-group-board/useDrawerStore';
 
 interface Props {
   tile: Tile;
@@ -46,13 +46,12 @@ const EditTile: FC<Props> = ({ tile }): ReactElement => {
       name='edit_tile_form'
       initialValues={tile}
       onFinish={(data: Tile) => {
-        console.log("data", data)
         setEditTile(null);
         saveTile(data);
         setIsChanged(false);
       }}
       requiredMark={false}
-      className='flex flex-col gap-2 w-full'
+      className='flex w-full flex-col gap-2'
       onValuesChange={() => {
         setIsChanged(true);
       }}
@@ -67,12 +66,12 @@ const EditTile: FC<Props> = ({ tile }): ReactElement => {
         <Input type='hidden' />
       </Item>
       <div
-        className='grid grid-cols-3 gap-2 items-center'
+        className='grid grid-cols-3 items-center gap-2'
         style={{ gridTemplateColumns: 'min-content 1fr min-content' }}
       >
         <p>Title:</p>
         <Item name='title' rules={[{ required: true, message: 'Please insert a title for the tile' }]} noStyle>
-          <Input className='w-full border-primary-500 hover:border-primary-500 bg-cardBackground hover:bg-dropdownBackground text-text' />
+          <Input className='w-full border-primary bg-card-background text-text hover:border-primary hover:bg-card focus:border-primary focus:shadow-sm focus:shadow-primary aria-invalid:!border-failure aria-invalid:shadow-none aria-invalid:focus:!shadow-sm aria-invalid:focus:!shadow-failure' />
         </Item>
         <div className='flex gap-2'>
           <Item name='notifications' noStyle>
@@ -94,7 +93,7 @@ const EditTile: FC<Props> = ({ tile }): ReactElement => {
       <div className='flex gap-2'>
         <Item>
           <Button
-            className='min-w-20 bg-primary-500 hover:!bg-primary-600 [&_span]:text-text'
+            className='min-w-20 bg-button shadow-none hover:!bg-button-hover [&_span]:text-text'
             type='primary'
             htmlType='submit'
           >
@@ -104,7 +103,7 @@ const EditTile: FC<Props> = ({ tile }): ReactElement => {
 
         <Item>
           <Button
-            className='min-w-20 bg-primary-red hover:!bg-red-400 [&_span]:text-text'
+            className='min-w-20 bg-failure hover:!bg-red-400 [&_span]:text-text'
             type='primary'
             danger
             onClick={() => {
@@ -161,7 +160,7 @@ const TypeSelector: FC<TypeSelectorProps> = ({ value, onChange, form }): ReactEl
 
   return (
     <Select
-      className='w-full [&>div]:!bg-cardBackground [&>div]:!border-primary-500 [&>div]:hover:!bg-dropdownBackground [&_span]:!text-text'
+      className='w-full [&>div]:!border-primary [&>div]:!bg-card-background [&>div]:!shadow-none [&>div]:hover:!bg-card [&_span]:!text-text'
       dropdownClassName='bg-dropdownBackground [&_div]:!text-text selectionSelected'
       options={[
         { value: TileType.assignments, label: 'Assignments' },
@@ -185,9 +184,9 @@ const Notification: FC<{
 
   return (
     <Button
-      className='border-primary-500 hover:!border-primary-500 bg-cardBackground hover:!bg-dropdownBackground text-text grid place-content-center'
+      className='grid place-content-center border-primary bg-card-background text-text hover:!border-primary hover:!bg-card'
       shape='circle'
-      icon={<BellOutlined className={`${notifications ? 'text-primary-green' : 'text-primary-red'}`} />}
+      icon={<BellOutlined className={`${notifications ? 'text-success' : 'text-failure'}`} />}
       onClick={() => {
         if (notifications === undefined) return;
         setNotifications(!notifications);
@@ -197,18 +196,17 @@ const Notification: FC<{
   );
 };
 
-
 const Visible: FC<{ value?: boolean; onChange?: (value: boolean) => void }> = ({ value, onChange }): ReactElement => {
   const [visible, setVisible] = useState<boolean | undefined>(value);
 
   return (
     <Button
-      className='border-primary-500 hover:!border-primary-500 bg-cardBackground hover:!bg-dropdownBackground text-text grid place-content-center'
+      className='grid place-content-center border-primary bg-card-background text-text hover:!border-primary hover:!bg-card'
       shape='circle'
       icon={
         visible === true ?
-          <CheckCircleOutlined className='text-xs text-primary-green' />
-        : <StopOutlined className='text-xs text-primary-red' />
+          <CheckCircleOutlined className='text-xs text-success' />
+        : <StopOutlined className='text-xs text-failure' />
       }
       onClick={() => {
         if (visible === undefined) return;

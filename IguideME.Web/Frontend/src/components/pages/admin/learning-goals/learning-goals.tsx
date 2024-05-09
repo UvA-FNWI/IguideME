@@ -1,8 +1,3 @@
-import AdminTitle from '@/components/atoms/admin-titles/admin-titles';
-import QueryError from '@/components/particles/QueryError';
-import QueryLoading from '@/components/particles/QueryLoading';
-import { Button, Divider, Form, Input, InputNumber, Select } from 'antd';
-import { DeleteFilled, PlusOutlined } from '@ant-design/icons';
 import {
   deleteLearningGoal,
   deleteRequirement,
@@ -13,10 +8,15 @@ import {
   postGoalRequirement,
   postLearningGoal,
 } from '@/api/entries';
-import { toast } from 'sonner';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import AdminTitle from '@/components/atoms/admin-titles/admin-titles';
+import QueryError from '@/components/particles/QueryError';
+import QueryLoading from '@/components/particles/QueryLoading';
 import { LogicalExpression, type GoalRequirement, type LearningGoal } from '@/types/tile';
+import { DeleteFilled, PlusOutlined } from '@ant-design/icons';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Button, Divider, Form, Input, InputNumber, Select } from 'antd';
 import { useEffect, useState, type FC, type ReactElement } from 'react';
+import { toast } from 'sonner';
 
 const { Item } = Form;
 
@@ -56,12 +56,12 @@ const LearningGoals: FC = (): ReactElement => {
   if (isLoading) {
     return (
       <QueryLoading isLoading={isLoading}>
-        <article className='w-full h-[100px] rounded-lg' />
+        <article className='h-[100px] w-full rounded-lg' />
       </QueryLoading>
     );
   } else if (isError) {
     return (
-      <article className='w-full h-[100px] rounded-lg'>
+      <article className='h-[100px] w-full rounded-lg'>
         <QueryError title='Error: Unable to load learning goals' />
       </article>
     );
@@ -76,7 +76,7 @@ const LearningGoals: FC = (): ReactElement => {
             onClick={addGoal}
             block
             icon={<PlusOutlined />}
-            className='bg-cardBackground hover:!bg-dropdownBackground hover:!border-primary-500 [&_span]:!text-text'
+            className='bg-card-background hover:!border-primary hover:!bg-dropdownBackground [&_span]:!text-text'
           >
             Add Goal
           </Button>
@@ -122,19 +122,19 @@ const ViewLearningGoal: FC<GoalProps> = ({ goal }): ReactElement => {
   };
 
   return (
-    <div className='font-tnum p-[10px] border border-dashed border-text rounded-lg bg-cardBackground'>
-      <div className='w-full flex justify-between'>
+    <div className='font-tnum rounded-lg border border-dashed border-text bg-card-background p-[10px]'>
+      <div className='flex w-full justify-between'>
         <h2
           onClick={() => {
             setEditing(true);
           }}
-          className='p-1 font-tnum text-lg'
+          className='font-tnum p-1 text-lg'
         >
           {!editing ?
             goal.title
           : editing && (
               <Input
-                className='!border-primary-500 hover:!border-primary-500 !bg-cardBackground hover:!bg-dropdownBackground text-text'
+                className='w-full border-primary bg-card-background text-text hover:border-primary hover:bg-card focus:border-primary focus:shadow-sm focus:shadow-primary aria-invalid:!border-failure aria-invalid:shadow-none aria-invalid:focus:!shadow-sm aria-invalid:focus:!shadow-failure'
                 value={title}
                 autoFocus
                 onBlur={() => {
@@ -156,18 +156,18 @@ const ViewLearningGoal: FC<GoalProps> = ({ goal }): ReactElement => {
           onClick={() => {
             removeGoal(goal.id);
           }}
-          className='p-1 text-primary-red'
+          className='p-1 text-failure'
         />
       </div>
 
-      <Divider className='mt-1 mb-2' />
+      <Divider className='mb-2 mt-1' />
 
       {goal.requirements.map((requirement, index) => (
         <ViewGoalRequirement key={index} requirement={requirement} />
       ))}
 
       <Button
-        className='bg-cardBackground hover:!bg-dropdownBackground hover:!border-primary-500 [&_span]:!text-text'
+        className='bg-button hover:!border-primary hover:!bg-button-hover [&_span]:!text-text'
         type='dashed'
         onClick={addRequirement}
         block
@@ -239,7 +239,7 @@ const ViewGoalRequirement: FC<ReqProps> = ({ requirement }): ReactElement => {
   }, [isLoading, isError, requirement, form]);
 
   return (
-    <div className='font-tnum w-full p-[10px] border border-solid border-zinc-200 rounded-lg mb-[10px]'>
+    <div className='font-tnum mb-[10px] w-full rounded-lg border border-solid border-text p-[10px]'>
       <Form<GoalRequirement>
         form={form}
         name={`goal_requirement_form_${requirement.id}`}
@@ -258,7 +258,7 @@ const ViewGoalRequirement: FC<ReqProps> = ({ requirement }): ReactElement => {
           <Input type='hidden' />
         </Item>
 
-        <div className='flex flex-col gap-2'>
+        <div className='flex justify-between gap-2'>
           <div
             className='grid grid-cols-3 gap-1 overflow-x-auto'
             style={{ gridTemplateColumns: '300px min-content min-content' }}
@@ -266,7 +266,7 @@ const ViewGoalRequirement: FC<ReqProps> = ({ requirement }): ReactElement => {
             <Item name='assignment_id' noStyle>
               <Select
                 aria-disabled={isLoading || isError}
-                className='w-full [&>div]:!bg-cardBackground [&>div]:!border-primary-500 [&>div]:hover:!bg-dropdownBackground [&_span]:!text-text'
+                className='w-full [&>div]:!border-primary [&>div]:!bg-card-background [&>div]:!shadow-none [&>div]:hover:!bg-card [&_span]:!text-text'
                 dropdownClassName='bg-dropdownBackground [&_div]:!text-text selectionSelected'
                 disabled={isLoading || isError}
                 showSearch
@@ -291,7 +291,7 @@ const ViewGoalRequirement: FC<ReqProps> = ({ requirement }): ReactElement => {
             <Item name='expression' noStyle>
               <Select
                 aria-disabled={isLoading || isError}
-                className='w-full [&>div]:!bg-cardBackground [&>div]:!border-primary-500 [&>div]:hover:!bg-dropdownBackground [&_span]:!text-text'
+                className='w-full [&>div]:!border-primary [&>div]:!bg-card-background [&>div]:!shadow-none [&>div]:hover:!bg-card [&_span]:!text-text'
                 dropdownClassName='bg-dropdownBackground [&_div]:!text-text selectionSelected'
                 disabled={isLoading || isError}
                 options={[
@@ -325,16 +325,17 @@ const ViewGoalRequirement: FC<ReqProps> = ({ requirement }): ReactElement => {
 
             <Item name='value' noStyle>
               <InputNumber
-                className='w-12 !border-primary-500 hover:!border-primary-500 !bg-cardBackground hover:!bg-dropdownBackground [&_input]:!text-text antNumberInput'
+                className='antNumberInput w-12 !border border-solid !border-primary !bg-card-background hover:!border-primary hover:!bg-card [&_input]:!text-text'
                 aria-disabled={isLoading || isError}
                 disabled={isLoading || isError}
+                variant='borderless'
               />
             </Item>
           </div>
           <div className='flex gap-2'>
             <Item noStyle>
               <Button
-                className='min-w-20 bg-primary-500 hover:!bg-primary-600 [&_span]:text-text'
+                className='min-w-20 bg-button hover:!bg-button-hover [&_span]:text-text'
                 type='primary'
                 htmlType='submit'
               >
@@ -342,7 +343,7 @@ const ViewGoalRequirement: FC<ReqProps> = ({ requirement }): ReactElement => {
               </Button>
             </Item>
             <Button
-              className='min-w-20 bg-primary-red hover:!bg-red-400 [&_span]:text-text'
+              className='min-w-20 bg-failure hover:!bg-red-400 [&_span]:text-text'
               type='primary'
               danger
               onClick={() => {

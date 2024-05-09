@@ -6,7 +6,7 @@ const QueryError: FC<ResultProps> = ({ className, title, ...props }): ReactEleme
   return (
     <Result
       className={cn(
-        'w-full h-full absolute inset-0 [&>div]:!text-text [&>div]:!text-base [&_span]:!text-lg [&>div]:!m-0',
+        'absolute inset-0 h-full w-full [&>div]:!m-0 [&>div]:!text-base [&>div]:!text-text [&_span]:!text-lg [&_span]:text-failure',
         className,
       )}
       status='error'

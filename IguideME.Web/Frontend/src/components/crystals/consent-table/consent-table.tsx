@@ -1,12 +1,12 @@
+import { getStudentsWithSettings } from '@/api/users';
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
-import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
-import { Col, Row, Table, Tooltip } from 'antd';
-import { getStudentsWithSettings } from '@/api/users';
-import { useQuery } from '@tanstack/react-query';
-import { type FC, type ReactElement } from 'react';
 import { type User } from '@/types/user';
+import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
+import { useQuery } from '@tanstack/react-query';
+import { Col, Row, Table, Tooltip } from 'antd';
 import { type ColumnsType } from 'antd/lib/table';
+import { type FC, type ReactElement } from 'react';
 
 const SettingsTable: FC = (): ReactElement => {
   const {
@@ -21,7 +21,7 @@ const SettingsTable: FC = (): ReactElement => {
   return (
     <div className='relative overflow-visible' id={'settingsTable'}>
       <QueryLoading isLoading={isLoading}>
-        <Row className='justify-between content-end pb-[10px]'>
+        <Row className='content-end justify-between pb-[10px]'>
           <Col>
             <h2 className='text-xl'>General Overview</h2>
           </Col>
@@ -37,7 +37,7 @@ const SettingsTable: FC = (): ReactElement => {
         {isError ?
           <QueryError className='static' title='Failed to load students' />
         : <Table
-            className='[&_th]:!bg-cardBackground [&_th]:!text-text [&_td]:!bg-dropdownBackground [&_td]:!text-text [&_div]:!text-text'
+            className='[&_div]:!text-text [&_td]:!bg-card-background [&_td]:!text-text [&_th]:!bg-card [&_th]:!text-text'
             size='middle'
             columns={getColumns()}
             dataSource={getData(students ?? [])}
@@ -85,11 +85,11 @@ function getColumns(): any {
       defaultSortOrder: 'ascend',
       render: (text: string, record: DataType) => {
         return (
-          <span>
+          <p>
             {text}
             <br />
             <small>{record.student.userID}</small>
-          </span>
+          </p>
         );
       },
     },
@@ -101,10 +101,10 @@ function getColumns(): any {
       render: (text: string, record: DataType) => {
         if (Number(text) !== -1) {
           return (
-            <span>
+            <p>
               {((record.total ?? 0) / 10).toFixed(1)}
               <br />
-            </span>
+            </p>
           );
         }
       },
@@ -117,10 +117,10 @@ function getColumns(): any {
       render: (text: string, _: any) => {
         if (Number(text) !== -1) {
           return (
-            <span>
+            <p>
               {text}
               <br />
-            </span>
+            </p>
           );
         }
       },
@@ -133,10 +133,10 @@ function getColumns(): any {
       render: (text: string, _: any) => {
         if (Number(text) !== -1) {
           return (
-            <span>
+            <p>
               {text}
               <br />
-            </span>
+            </p>
           );
         }
       },
@@ -164,19 +164,15 @@ function getColumns(): any {
       render: (value: boolean) => {
         if (value) {
           return (
-            <span className={'successText'}>
-              <Tooltip title='Consent given'>
-                <CheckCircleOutlined />
-              </Tooltip>
-            </span>
+            <Tooltip title='Consent given'>
+              <CheckCircleOutlined className='text-success' />
+            </Tooltip>
           );
         } else {
           return (
-            <span className={'dangerText'}>
-              <Tooltip title='No consent given'>
-                <CloseCircleOutlined />
-              </Tooltip>
-            </span>
+            <Tooltip title='No consent given'>
+              <CloseCircleOutlined className='text-failure' />
+            </Tooltip>
           );
         }
       },
@@ -204,19 +200,15 @@ function getColumns(): any {
       render: (value: boolean) => {
         if (value) {
           return (
-            <span className={'successText'}>
-              <Tooltip title='Notifications turned on'>
-                <CheckCircleOutlined />
-              </Tooltip>
-            </span>
+            <Tooltip title='Consent given'>
+              <CheckCircleOutlined className='text-success' />
+            </Tooltip>
           );
         } else {
           return (
-            <span className={'dangerText'}>
-              <Tooltip title='Notifications turned off'>
-                <CloseCircleOutlined />
-              </Tooltip>
-            </span>
+            <Tooltip title='No consent given'>
+              <CloseCircleOutlined className='text-failure' />
+            </Tooltip>
           );
         }
       },

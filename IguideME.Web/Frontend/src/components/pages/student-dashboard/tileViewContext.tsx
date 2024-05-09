@@ -1,8 +1,8 @@
-import { createJSONStorage, devtools, persist } from 'zustand/middleware';
-import { createStore, useStore } from 'zustand';
-import { createContext, type PropsWithChildren, useContext, useRef, type ReactElement } from 'react';
-import { type User } from '@/types/user';
 import { type ViewType } from '@/types/tile';
+import { type User } from '@/types/user';
+import { createContext, useContext, useRef, type PropsWithChildren, type ReactElement } from 'react';
+import { createStore, useStore } from 'zustand';
+import { createJSONStorage, devtools, persist } from 'zustand/middleware';
 
 interface tileViewProps {
   viewType?: ViewType;

@@ -1,20 +1,15 @@
 import { cn } from '@/utils/cn';
-import { FC, ReactNode } from 'react';
 import { Spin, SpinProps } from 'antd';
-import { useTheme } from 'next-themes';
+import { FC, ReactNode } from 'react';
 
 interface QueryLoadingProps extends SpinProps {
   children: ReactNode;
   isLoading: boolean;
 }
 
-const QueryLoading: FC<QueryLoadingProps> = ({ children, className, isLoading }) => {
-  const { theme } = useTheme();
+const QueryLoading: FC<QueryLoadingProps> = ({ children, className, isLoading, ...props }) => {
   return (
-    <Spin
-      className={cn(isLoading ? `cursor-wait ${theme === 'dark' ? '[&_i]:!bg-text' : ''}` : '', className)}
-      spinning={isLoading}
-    >
+    <Spin className={cn(isLoading ? `cursor-wait [&_i]:!bg-primary` : '', className)} spinning={isLoading} {...props}>
       {children}
     </Spin>
   );

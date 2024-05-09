@@ -1,15 +1,15 @@
-import dayjs from 'dayjs';
+import { getNotificationSettings, postNotificationSettings } from '@/api/course_settings';
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
-import { Button, Checkbox, DatePicker, Divider, Form, Radio } from 'antd';
-import { getNotificationSettings, postNotificationSettings } from '@/api/course_settings';
-import { toast } from 'sonner';
-import { useForm } from 'antd/es/form/Form';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Button, Checkbox, DatePicker, Divider, Form, Radio } from 'antd';
 import { type CheckboxChangeEvent } from 'antd/es/checkbox';
 import { type CheckboxValueType } from 'antd/es/checkbox/Group';
-import { type DateObject } from 'react-multi-date-picker';
+import { useForm } from 'antd/es/form/Form';
+import dayjs from 'dayjs';
 import { memo, useCallback, useEffect, useMemo, useState, type FC, type ReactElement } from 'react';
+import { type DateObject } from 'react-multi-date-picker';
+import { toast } from 'sonner';
 
 export interface NotificationAdminSettings {
   isRange: boolean;
@@ -37,7 +37,7 @@ const NotificationSettings: FC = (): ReactElement => {
   if (isError || isLoading || data === undefined) {
     return (
       <QueryLoading isLoading={isLoading}>
-        <div className='h-20 bg-cardBackground'>
+        <div className='h-20 bg-card-background'>
           {(isError || (data === undefined && !isLoading)) && (
             <QueryError className='top-[-30px]' title='Failed to load peer settings' />
           )}
@@ -112,17 +112,29 @@ const NotificationSettingsForm: FC<{
       name='notification_settings_form'
       onFinish={submit}
     >
-      <p className='text-sm mb-2'>
+      <p className='mb-2 text-sm'>
         Select the dates or the range of dates that the students will receive notifications.
       </p>
       <Radio.Group buttonStyle='solid' defaultValue={range} onChange={rangeChangeHandler}>
-        <Radio.Button value={false}>Select Dates</Radio.Button>
-        <Radio.Button value={true}>Select Range</Radio.Button>
+        <Radio.Button
+          className={`!border-primary ${!range ? '!bg-primary !text-white' : '!bg-dropdownBackground text-text hover:!bg-primary-light hover:!text-white'}`}
+          disabled={!range}
+          value={false}
+        >
+          Select Dates
+        </Radio.Button>
+        <Radio.Button
+          className={`!border-primary ${range ? '!bg-primary !text-white' : '!bg-dropdownBackground text-text hover:!bg-primary-light hover:!text-white'}`}
+          disabled={range}
+          value={true}
+        >
+          Select Range
+        </Radio.Button>
       </Radio.Group>
       <DatePickers isRange={range} checkedList={checkedList} setCheckedList={setCheckedList} />
       <div className='flex justify-end'>
         <Button
-          className='min-w-20 bg-primary-500 hover:!bg-primary-600 [&_span]:text-text !border-none hover:!border-none right-0'
+          className='right-0 min-w-20 !border-none bg-button hover:!border-none hover:!bg-button-hover [&_span]:text-text'
           htmlType='submit'
         >
           Save
@@ -166,7 +178,7 @@ const DatePickers: FC<DatePickersProps> = memo(({ isRange, checkedList, setCheck
         rules={[{ required: true, message: 'Please select a date range' }]}
       >
         <DatePicker.RangePicker
-          className='!w-72'
+          className='!w-72 [&_input]:!text-text'
           disabledDate={(current) => current && current.toDate() < new Date()}
           format='YYYY-MM-DD'
           picker='week'

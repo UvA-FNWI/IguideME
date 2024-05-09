@@ -1,11 +1,11 @@
 import Header from '@/components/crystals/header/header';
-import Loading from './components/particles/loading';
-import { getSelf } from './api/users';
+import { useQuery } from '@tanstack/react-query';
+import { Suspense, useEffect, type ReactElement } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { Toaster } from 'sonner';
-import { useQuery } from '@tanstack/react-query';
+import { getSelf } from './api/users';
+import Loading from './components/particles/loading';
 import { UserRoles } from './types/user';
-import { Suspense, useEffect, type ReactElement } from 'react';
 
 /**
  * The main entry point to the app. Adds a header and the contents of the app
@@ -34,15 +34,15 @@ function App(): ReactElement {
   }, [isSuccess]);
 
   const HeaderLoader = (
-    <header className='h-header bg-navbarBackground flex justify-start items-center p-3'>
-      <p className='text-white align-middle font-semibold inline-block text-2xl'>IguideME</p>
+    <header className='flex h-header items-center justify-start bg-navbar p-3'>
+      <p className='inline-block align-middle text-2xl font-semibold text-white'>IguideME</p>
     </header>
   );
 
   const GlobalLoadingState = (
     <>
       {HeaderLoader}
-      <div className='h-[calc(100vh-70px)] bg-bodyBackground grid items-center'>
+      <div className='grid h-[calc(100vh-70px)] items-center bg-body'>
         <Loading />
       </div>
     </>
@@ -53,8 +53,8 @@ function App(): ReactElement {
     return (
       <Suspense fallback={GlobalLoadingState}>
         {HeaderLoader}
-        <div className='h-[calc(100vh-70px)] bg-bodyBackground flex flex-col items-center justify-center text-justify gap-2'>
-          <h1 className='w-full text-2xl max-w-lg tracking-normal'>
+        <div className='flex h-[calc(100vh-70px)] flex-col items-center justify-center gap-2 bg-body text-justify'>
+          <h1 className='w-full max-w-lg text-2xl tracking-normal'>
             {isError ? 'Something unexpected happened' : "Unfortunately, we couldn't find your account."}
           </h1>
           <p className='w-full max-w-lg'>

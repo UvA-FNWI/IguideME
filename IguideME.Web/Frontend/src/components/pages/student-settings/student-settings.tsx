@@ -1,13 +1,13 @@
+import { postConsentSettings, postGoalGrade, postNotificationSettings } from '@/api/student_settings';
 import { getSelf } from '@/api/users';
-import { postConsentSettings, postNotificationSettings, postGoalGrade } from '@/api/student_settings';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Loading from '@/components/particles/loading';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Checkbox, Divider, Radio, Space, Switch } from 'antd';
-import { FC, ReactElement, useEffect, useState } from 'react';
+import { FC, ReactElement, useEffect } from 'react';
 import { toast } from 'sonner';
 
 const LoadingState: FC = () => (
-  <div className='absolute inset-0 w-screen h-screen grid place-content-center'>
+  <div className='absolute inset-0 grid h-screen w-screen place-content-center'>
     <Loading />
   </div>
 );
@@ -23,27 +23,26 @@ const StudentSettings: FC = (): ReactElement => {
   });
 
   if (selfIsLoading) return <LoadingState />;
-  if (selfIsError || self === undefined || self.settings === undefined ) return <ErrorMessage />;
+  if (selfIsError || self === undefined || self.settings === undefined) return <ErrorMessage />;
 
   return (
     <div className='w-full p-4'>
-      <div className='w-3/4 mx-auto'>
-        <h1 className='text-4xl mb-4 text-left'>Settings</h1>
-        <Notifications notifications={self.settings.notifications}/>
+      <div className='mx-auto w-3/4'>
+        <h1 className='mb-4 text-left text-4xl'>Settings</h1>
+        <Notifications notifications={self.settings.notifications} />
         <Divider />
-        <GoalGrade goalGrade={self.settings.goal_grade}/>
+        <GoalGrade goalGrade={self.settings.goal_grade} />
         <Divider />
-        <Consent consent={self.settings.consent}/>
+        <Consent consent={self.settings.consent} />
       </div>
     </div>
   );
 };
 
 interface NotificationProps {
-  notifications: boolean
+  notifications: boolean;
 }
-const Notifications: FC<NotificationProps> = ({notifications}): ReactElement => {
-
+const Notifications: FC<NotificationProps> = ({ notifications }): ReactElement => {
   const queryClient = useQueryClient();
   const { mutate: saveNotifications, status } = useMutation({
     mutationFn: postNotificationSettings,
@@ -64,25 +63,20 @@ const Notifications: FC<NotificationProps> = ({notifications}): ReactElement => 
 
   return (
     <>
-      <h1 className='text-2xl text-left'>Notifications</h1>
-       <div className='flex gap-2 text-left'>
-          <p>Enable notifications:</p>
-          <Switch
-            checked={notifications ?? false}
-            onChange={(val) => saveNotifications(val)}
-          />
-        </div>
-      
+      <h1 className='text-left text-2xl'>Notifications</h1>
+      <div className='flex gap-2 text-left'>
+        <p>Enable notifications:</p>
+        <Switch checked={notifications ?? false} onChange={(val) => saveNotifications(val)} />
+      </div>
     </>
   );
 };
 
 interface GoalProps {
-  goalGrade: number
+  goalGrade: number;
 }
 
-const GoalGrade: FC<GoalProps> = ({goalGrade}): ReactElement => {
-
+const GoalGrade: FC<GoalProps> = ({ goalGrade }): ReactElement => {
   const queryClient = useQueryClient();
   const { mutate: saveGoalGrade, status } = useMutation({
     mutationFn: postGoalGrade,
@@ -101,8 +95,8 @@ const GoalGrade: FC<GoalProps> = ({goalGrade}): ReactElement => {
 
   return (
     <div id={'desiredGrade'}>
-      <h1 className='text-2xl text-left'>Goal Grade</h1>
-      <p className='text-base text-justify'>
+      <h1 className='text-left text-2xl'>Goal Grade</h1>
+      <p className='text-justify text-base'>
         Please indicate the grade you wish to obtain for this course. You can always change your goal at a later stage!
       </p>
       <div className='w-full'>
@@ -131,9 +125,9 @@ const GoalGrade: FC<GoalProps> = ({goalGrade}): ReactElement => {
 };
 
 interface ConsentProps {
-  consent: boolean
+  consent: boolean;
 }
-const Consent: FC<ConsentProps> = ({consent}): ReactElement => {
+const Consent: FC<ConsentProps> = ({ consent }): ReactElement => {
   const queryClient = useQueryClient();
   const { mutate: saveConsent, status } = useMutation({
     mutationFn: postConsentSettings,
@@ -151,13 +145,13 @@ const Consent: FC<ConsentProps> = ({consent}): ReactElement => {
   }, [status]);
   return (
     <>
-      <h2 className='text-2xl text-left'>Informed Consent</h2>
-      <p className='text-base text-justify'>
+      <h2 className='text-left text-2xl'>Informed Consent</h2>
+      <p className='text-justify text-base'>
         Please read the informed consent carefully. You will be asked to accept the informed consent, if declined your
         data will not be processed. You can change your preference at any time.
       </p>
 
-      <div className='prose text-justify m-6 p-2 bg-primary-gray rounded-lg'>
+      <div className='bg-primary-gray prose m-6 rounded-lg p-2 text-justify prose-h1:text-text prose-h2:text-text prose-h3:text-text'>
         <h1>IguideME</h1>
         <h2>INFORMED CONSENT</h2>
         <p>
@@ -202,61 +196,25 @@ const Consent: FC<ConsentProps> = ({consent}): ReactElement => {
           <b>PHONE-NUMBER</b>, e-mail <b>EMAIL@DOMAIN.XYZ</b>
         </p>
         <h2>CONSENT FORM</h2>
-        <p>
-          Here you will be asked to sign the Informed consent.
-          <ul>
-            <li>
-              By choosing <i>"Yes"</i> in this form, you declare that you have read the document entitled “informed
-              consent IguideME”, understood it, and confirm that you agree with the procedure as described.
-              <br />
-            </li>
-            <li>
-              By choosing <i>"No"</i> in the form, you declare that you have read the document entitled “informed
-              consent IguideME”, understood it, and confirm that you do not want to participate in this study.
-            </li>
-          </ul>
-        </p>
+        <p>Here you will be asked to sign the Informed consent.</p>
+        <ul>
+          <li className='text-text'>
+            By choosing <i>"Yes"</i> in this form, you declare that you have read the document entitled “informed
+            consent IguideME”, understood it, and confirm that you agree with the procedure as described.
+            <br />
+          </li>
+          <li className='text-text'>
+            By choosing <i>"No"</i> in the form, you declare that you have read the document entitled “informed consent
+            IguideME”, understood it, and confirm that you do not want to participate in this study.
+          </li>
+        </ul>
       </div>
 
       <Checkbox checked={consent} onChange={(e) => saveConsent(e.target.checked)}>
-        I have read and understood the informed consent
+        <p>I have read and understood the informed consent</p>
       </Checkbox>
     </>
   );
 };
-
-// const Consent: FC = (): ReactElement => {
-//     return <div style={{maxWidth: 700, margin: '0 auto', boxSizing: 'border-box', padding: 20 }}>
-//     <h1>Informed Consent</h1>
-//     <p>Please read the informed consent carefully. You will be asked to accept the informed consent, if declined your data will not be processed. You can change your preference at any time.</p>
-//     <div style={{ backgroundColor: '#eaeaea', padding: 20, borderRadius: 10 }}
-//          dangerouslySetInnerHTML={{__html: consentText}} />
-
-//     <Row justify={"center"} style={{margin: "15px", textAlign: 'center'}}>
-//       <Checkbox
-//         checked={hasRead}
-//         onChange={e => this.setState({ hasRead: e.target.checked })}
-//       >
-//         I have read and understood the informed consent
-//       </Checkbox>
-
-//     </Row>
-
-//     <Row justify={"center"}>
-
-//       <Button style={{ background: color1, borderColor: color1, marginRight: '5px'}} type={"primary"} disabled={!hasRead} onClick={this.handleAccept}>
-//         Accept
-//       </Button>
-
-//       <Button style={{ background: color2, borderColor: color2, marginLeft: '5px' }} disabled={!hasRead} danger onClick={() => {
-//         this.handleDecline();
-//         this.setState({ hasRead: false });
-//       }}>
-//         Decline
-//       </Button>
-//     </Row>
-//   </div>
-
-// }
 
 export default StudentSettings;

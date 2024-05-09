@@ -1,16 +1,16 @@
+import { getTileGrades } from '@/api/tiles';
 import GraphTile from '@/components/crystals/graph-tile/graph-tile.tsx';
 import GridTile from '@/components/crystals/grid-tile/grid-tile.tsx';
+import { useTileViewStore } from '@/components/pages/student-dashboard/tileViewContext';
 import PeerComparison from '@/components/particles/peer-comparison/peercomparison';
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
-import { cn } from '@/utils/cn';
-import { Col, Divider, Row } from 'antd';
-import { getTileGrades } from '@/api/tiles';
-import { useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { useTileViewStore } from '@/components/pages/student-dashboard/tileViewContext';
 import { GradingType, TileType, type Tile } from '@/types/tile';
-import { type FC, type ReactElement, memo } from 'react';
+import { cn } from '@/utils/cn';
+import { useQuery } from '@tanstack/react-query';
+import { Col, Divider, Row } from 'antd';
+import { memo, type FC, type ReactElement } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface Props {
   tile: Tile;
@@ -42,12 +42,12 @@ const ViewTile: FC<Props> = memo(({ tile, textStyle }): ReactElement => {
         aria-disabled={isLoading || isError}
         className={`${
           isError ? 'cursor-not-allowed' : 'cursor-pointer'
-        } w-[270px] h-[230px] border border-solid bg-bodyBackground border-borderColor relative rounded-md`}
+        } relative h-[230px] w-[270px] rounded-md border border-solid border-white bg-card-background`}
         onClick={() => {
           if (!(isError || isLoading)) navigate(tile.id + '/');
         }}
       >
-        <Row className='h-1/5 justify-center content-center'>
+        <Row className='h-1/5 content-center justify-center'>
           <h3 className={cn('text-lg', textStyle)}>{tile.title}</h3>
         </Row>
         {renderViewType()}
@@ -62,7 +62,7 @@ const ViewTile: FC<Props> = memo(({ tile, textStyle }): ReactElement => {
     switch (viewType) {
       case 'graph':
         return (
-          <Row className='h-4/5 justify-center content-center'>
+          <Row className='h-4/5 content-center justify-center'>
             <GraphTile
               type={tile.type}
               grades={{
@@ -79,7 +79,7 @@ const ViewTile: FC<Props> = memo(({ tile, textStyle }): ReactElement => {
       case 'grid':
         return (
           <>
-            <Row className='h-1/2 justify-center content-center'>
+            <Row className='h-1/2 content-center justify-center'>
               <GridTile
                 type={tile.type}
                 grades={{
@@ -92,9 +92,9 @@ const ViewTile: FC<Props> = memo(({ tile, textStyle }): ReactElement => {
                 }}
               />
             </Row>
-            <Row className='w-full h-[30%] justify-center content-start'>
+            <Row className='h-[30%] w-full content-start justify-center'>
               <Col className='h-full w-full'>
-                <Divider className='m-0 p-0 w-full' />
+                <Divider className='m-0 w-full p-0' />
                 <PeerComparison
                   {...{
                     grade: grades.grade,

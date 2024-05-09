@@ -1,13 +1,11 @@
+import { getTopics } from '@/api/entries';
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
-import { CheckOutlined, CloseOutlined, DeleteFilled } from '@ant-design/icons';
-import { Form, Select, Switch, Table } from 'antd';
-import { getTopics } from '@/api/entries';
-import { useQuery } from '@tanstack/react-query';
 import { type Discussion, type TileEntry } from '@/types/tile';
+import { CheckOutlined, CloseOutlined, DeleteFilled } from '@ant-design/icons';
+import { useQuery } from '@tanstack/react-query';
+import { Form, Select, Switch, Table } from 'antd';
 import { useCallback, useState, type FC, type ReactElement } from 'react';
-
-const { Item } = Form;
 
 const EditTileDiscussions: FC = (): ReactElement => {
   const { data, isError, isLoading } = useQuery({
@@ -21,15 +19,15 @@ const EditTileDiscussions: FC = (): ReactElement => {
     <>
       <p className='mb-1'>Discussions:</p>
       <div className='col-span-2'>
-        <Item name='alt' noStyle valuePropName='checked'>
+        <Form.Item name='alt' noStyle valuePropName='checked'>
           <Switch className='float-end' checkedChildren={<CheckOutlined />} unCheckedChildren={<CloseOutlined />} />
-        </Item>
+        </Form.Item>
       </div>
       <div className='col-span-3'>
         <QueryLoading isLoading={isLoading}>
-          <Item name='entries' className='w-full m-0'>
+          <Form.Item name='entries' className='m-0 w-full'>
             <DiscussionSelect topics={data ?? []} value={[]} onChange={() => {}} />
-          </Item>
+          </Form.Item>
         </QueryLoading>
       </div>
     </>
@@ -83,7 +81,7 @@ const DiscussionSelect: FC<DiscussionSelectProps> = ({
   return (
     <div className='flex flex-col gap-1'>
       <Table
-        className='[&_th]:!bg-cardBackground [&_th]:!text-text [&_td]:!bg-dropdownBackground [&_td]:!text-text [&_div]:!text-text'
+        className='[&_div]:!text-text [&_td]:!bg-card-background [&_td]:!text-text [&_th]:!bg-card [&_th]:!text-text'
         columns={[
           {
             title: 'Name',
@@ -118,7 +116,7 @@ const DiscussionSelect: FC<DiscussionSelectProps> = ({
             render: (_: string, entry: TileEntry) => {
               return (
                 <DeleteFilled
-                  className='text-primary-red'
+                  className='text-failure'
                   onClick={() => {
                     removeEntry(entry.content_id);
                   }}
@@ -133,7 +131,7 @@ const DiscussionSelect: FC<DiscussionSelectProps> = ({
       />
 
       <Select
-        className='w-full [&>div]:!bg-cardBackground [&>div]:!border-primary-500 [&>div]:hover:!bg-dropdownBackground [&_span]:!text-text'
+        className='w-full [&>div]:!border-primary [&>div]:!bg-card-background [&>div]:!shadow-none [&>div]:hover:!bg-card [&_span]:!text-text'
         dropdownClassName='bg-dropdownBackground [&_div]:!text-text selectionSelected'
         value={selectedTopics}
         mode='multiple'

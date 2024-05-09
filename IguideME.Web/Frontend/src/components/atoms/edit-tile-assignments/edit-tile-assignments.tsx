@@ -1,18 +1,15 @@
-import SelectAssignments from './SelectAssignments';
-import { Form, InputNumber, Select, Switch } from 'antd';
 import { GradingType, printGradingType } from '@/types/tile';
-import { type FC, type ReactElement } from 'react';
 import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
-
-const { Item } = Form;
+import { Form, InputNumber, Select, Switch } from 'antd';
+import { type FC, type ReactElement } from 'react';
+import SelectAssignments from './SelectAssignments';
 
 const EditTileAssignments: FC = (): ReactElement => {
-  // TODO the loading handling for entries seems to be different here
   return (
     <>
       <p>Grading:</p>
       <div className='col-span-2'>
-        <Item name='gradingType' noStyle>
+        <Form.Item name='gradingType' noStyle>
           <Select
             options={Object.entries(GradingType)
               .filter((key, _) => isNaN(Number(key[0])))
@@ -20,35 +17,35 @@ const EditTileAssignments: FC = (): ReactElement => {
                 value: val,
                 label: printGradingType(val),
               }))}
-            className='w-full [&>div]:!bg-cardBackground [&>div]:!border-primary-500 [&>div]:hover:!bg-dropdownBackground [&_span]:!text-text'
+            className='w-full [&>div]:!border-primary [&>div]:!bg-card-background [&>div]:!shadow-none [&>div]:hover:!bg-card [&_span]:!text-text'
             dropdownClassName='bg-dropdownBackground [&_div]:!text-text selectionSelected'
           />
-        </Item>
+        </Form.Item>
       </div>
       <p>Weight:</p>
       <div className='col-span-2'>
-        <Item name='weight' noStyle>
+        <Form.Item name='weight' noStyle>
           <InputNumber<number>
-            className='w-full !border-primary-500 hover:!border-primary-500 !bg-cardBackground hover:!bg-dropdownBackground [&_input]:!text-text antNumberInput'
+            className='antNumberInput w-full !border border-solid !border-primary !bg-card-background hover:!border-primary hover:!bg-card [&_input]:!text-text'
             formatter={(value) => `${(value ?? 0) * 100}%`}
             parser={(value) => +parseFloat(value!.replace('%', '')).toFixed(1) / 100}
+            variant='borderless'
           />
-        </Item>
+        </Form.Item>
       </div>
       <p>Assignments:</p>
       <div className='col-span-2'>
-        <Item name='alt' noStyle valuePropName='checked'>
+        <Form.Item name='alt' noStyle valuePropName='checked'>
           <Switch className='float-end' checkedChildren={<CheckOutlined />} unCheckedChildren={<CloseOutlined />} />
-        </Item>
+        </Form.Item>
       </div>
       <div className='col-span-3'>
-        <Item name='entries' className='w-full m-0'>
+        <Form.Item name='entries' className='m-0 w-full'>
           <SelectAssignments value={[]} onChange={() => {}} />
-        </Item>
+        </Form.Item>
       </div>
     </>
   );
 };
-
 
 export default EditTileAssignments;

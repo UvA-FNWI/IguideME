@@ -1,10 +1,10 @@
 // /------------------------- Module imports -------------------------/
+import { getSynchronizations } from '@/api/syncing';
 import AdminTitle from '@/components/atoms/admin-titles/admin-titles';
 import SyncManager from '@/components/crystals/syncmanager/syncmanager';
-import { Divider, Table } from 'antd';
 import { getRelativeTimeString, getRelativeTimeTimer } from '@/helpers/time';
-import { getSynchronizations } from '@/api/syncing';
 import { useQuery } from '@tanstack/react-query';
+import { Divider, Table } from 'antd';
 import { type FC, type ReactElement } from 'react';
 
 // /-------------------------- Own imports ---------------------------/
@@ -65,9 +65,9 @@ const Dashboard: FC = (): ReactElement => {
 
       <SyncManager />
       <h2 className='mt-5 text-xl'>Historic versions</h2>
-      <Divider className='mt-1 mb-5' />
+      <Divider className='mb-5 mt-1' />
       <Table
-        className='[&_th]:!bg-cardBackground [&_th]:!text-text [&_td]:!bg-dropdownBackground [&_td]:!text-text [&_div]:!text-text'
+        className='[&_button]:!text-text [&_div]:!text-text [&_td]:!bg-dropdownBackground [&_td]:!text-text [&_th]:!bg-card-background [&_th]:!text-text'
         scroll={{ x: 240 }}
         dataSource={syncs}
         columns={columns}

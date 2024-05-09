@@ -1,5 +1,6 @@
 import typography from '@tailwindcss/typography';
 import type { Config } from 'tailwindcss';
+import ariaAttributes from 'tailwindcss-aria-attributes';
 
 export default {
   content: ['./src/**/*.{js,ts,jsx,tsx,mdx}'],
@@ -12,34 +13,49 @@ export default {
         syncClock: '9px 9px 18px #bec8e4',
       },
       colors: {
-        primary: {
-          100: '#5a32ff',
-          200: '#764aff',
-          300: '#8c61ff',
-          400: '#a077ff',
-          500: '#b38dff',
-          600: '#c4a4ff',
+        body: 'hsl(var(--body) / <alpha-value>)',
+        text: 'hsl(var(--text) / <alpha-value>)',
 
-          green: {
-            DEFAULT: 'var(--green)',
-            background: 'var(--green-background)',
-          },
-          red: {
-            DEFAULT: 'var(--red)',
-            background: 'var(--red-background)',
+        button: {
+          DEFAULT: 'hsl(var(--button) / <alpha-value>)',
+          disabled: 'hsl(var(--button-disabled) / <alpha-value>)',
+          hover: 'hsl(var(--button-hover) / <alpha-value>)',
+        },
+
+        card: {
+          DEFAULT: 'hsl(var(--card) / <alpha-value>)',
+          background: 'hsl(var(--card-background) / <alpha-value>)',
+          foreground: 'hsl(var(--card-foreground) / <alpha-value>)',
+        },
+
+        graph: {
+          max: 'hsl(var(--graph-max) / <alpha-value>)',
+          peer: 'var(--graph-peer)',
+          peerMax: 'var(--graph-peer-max)',
+          you: 'var(--graph-you)',
+        },
+
+        banner: 'hsl(var(--banner) / <alpha-value>)',
+        content: 'hsl(var(--content) / <alpha-value>)',
+        dropdownBackground: 'hsl(var(--dropdown-background) / <alpha-value>)',
+
+        navbar: {
+          DEFAULT: 'hsl(var(--navbar) / <alpha-value>)',
+          light: 'hsl(var(--navbar-light) / <alpha-value>)',
+          side: {
+            DEFAULT: 'hsl(var(--navbar-side) / <alpha-value>)',
+            active: 'hsl(var(--navbar-side-active) / <alpha-value>)',
+            hover: 'hsl(var(--navbar-side-hover) / <alpha-value>)',
           },
         },
 
-        bodyBackground: 'var(--body-background)',
-        borderColor: 'var(--border-color)',
-        cardBackground: 'var(--card-background)',
-        groupBackground: 'var(--group-background)',
-        dropdownBackground: 'var(--dropdown-background)',
-        navbarBackground: 'var(--navbar-background)',
-        hoverBackground: 'var(--hover-background)',
-        dialogBackground: 'var(--dialog-background)',
-        logo: 'var(--logo)',
-        text: 'var(--text)',
+        primary: {
+          DEFAULT: 'hsl(var(--primary) / <alpha-value>)',
+          light: 'hsl(var(--primary-light) / <alpha-value>)',
+        },
+
+        success: 'hsl(var(--success) / <alpha-value>)',
+        failure: 'hsl(var(--failure) / <alpha-value>)',
       },
       cursor: {
         brand:
@@ -50,5 +66,5 @@ export default {
       },
     },
   },
-  plugins: [typography],
+  plugins: [ariaAttributes, typography],
 } satisfies Config;

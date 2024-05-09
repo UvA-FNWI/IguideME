@@ -1,10 +1,10 @@
-import { cn } from '@/utils/cn';
 import { getStudents } from '@/api/users';
-import { Select } from 'antd';
-import { useNavigate, useParams } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { type Dispatch, type FC, type ReactElement, type SetStateAction, useEffect } from 'react';
 import { type User } from '@/types/user';
+import { cn } from '@/utils/cn';
+import { useQuery } from '@tanstack/react-query';
+import { Select } from 'antd';
+import { type Dispatch, type FC, type ReactElement, type SetStateAction, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 
 interface SelectorProps {
   /** The placeholder text for the select component. */
@@ -63,10 +63,10 @@ const Selector: FC<SelectorProps> = ({
       allowClear={true}
       aria-disabled={isLoading || isError}
       className={cn(
-        'w-full md:w-80 lg:w-[400px] h-[40px] [&>div]:!bg-navbarBackground [&>div]:!border-white [&>div>span]:!text-white [&_span_*]:!text-white',
+        'h-[40px] w-full md:w-80 lg:w-[400px] [&>div>span]:!text-white [&>div]:!border-white [&>div]:!bg-navbar [&_span_*]:!text-white',
         selectClasses,
       )}
-      popupClassName='!bg-dropdownBackground [&>div>div>div>div>div>div>div]:!text-text styles.custom-hover selectBackgroundHover'
+      popupClassName='!bg-dropdownBackground [&>div>div>div>div>div>div>div]:!text-text selectBackgroundHover'
       disabled={isLoading || isError}
       placeholder={
         isLoading ? 'Loading students...'

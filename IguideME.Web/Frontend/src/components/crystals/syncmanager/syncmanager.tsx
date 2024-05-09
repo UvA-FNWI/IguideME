@@ -9,7 +9,7 @@ const SyncManager: FC = (): ReactElement => {
     <Row gutter={[20, 20]}>
       <Col xs={24} md={12} lg={9}>
         <SyncClock />
-        {error && <Alert type="error" className="mt-5" message="Failed to reach datamart. Try again later!" />}
+        {error && <Alert type='error' className='mt-5' message='Failed to reach datamart. Try again later!' />}
       </Col>
 
       <Col xs={24} md={12} lg={15}>

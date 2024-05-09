@@ -1,12 +1,12 @@
 // /------------------------- Module imports -------------------------/
-import MobileHeader from './MobileHeader/MobileHeader';
 import NotificationPanel from '@/components/atoms/notification-panel/notification-panel';
-import Selector from './Selector';
-import { Button } from 'antd';
 import { HomeOutlined, SettingOutlined } from '@ant-design/icons';
-import { ThemeSwitcherDropdown } from '../ThemeSwitcher/ThemeSwitcher';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Button } from 'antd';
 import { useCallback, useState, type FC, type ReactElement } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { ThemeSwitcherDropdown } from '../ThemeSwitcher/ThemeSwitcher';
+import MobileHeader from './MobileHeader/MobileHeader';
+import Selector from './Selector';
 
 // /-------------------------- Own imports ---------------------------/
 import { UserRoles, type User } from '@/types/user';
@@ -16,7 +16,11 @@ interface HeaderProps {
 }
 
 const Header: FC<HeaderProps> = ({ self }): ReactElement => {
-  const inHome: boolean = useLocation().pathname === '/';
+  const location = useLocation();
+  const inHome: boolean =
+    (self.role === UserRoles.instructor && !location.pathname.startsWith('/admin')) ||
+    (self.role === UserRoles.student && location.pathname !== '/student-settings');
+
   const [selectedStudent, setSelectedStudent] = useState<User | undefined>(undefined);
   const navigate = useNavigate();
 
@@ -34,23 +38,25 @@ const Header: FC<HeaderProps> = ({ self }): ReactElement => {
   }, [inHome, selectedStudent, self]);
 
   return (
-    <header className='bg-navbarBackground w-screen min-h-header flex justify-between items-center p-3 relative overflow-x-hidden'>
-      <a className='align-middle text-white font-semibold inline-block text-2xl' href='/'>
+    <header className='relative flex min-h-header w-screen items-center justify-between overflow-x-hidden bg-navbar p-3'>
+      <a className='inline-block align-middle text-2xl font-semibold text-white' href='/'>
         IguideME
       </a>
       <div className='md:hidden'>
         <MobileHeader self={self} selectedStudent={selectedStudent} setSelectedStudent={setSelectedStudent} />
       </div>
-      <div className='hidden absolute w-fit left-0 right-0 top-0 bottom-0 m-auto md:grid place-content-center'>
-        <Selector selectedStudent={selectedStudent} setSelectedStudent={setSelectedStudent} />
-      </div>
-      <div className='hidden md:flex gap-2 border lg:border-none border-white rounded-3xl px-1'>
-        <div className='flex lg:outline lg:outline-1 outline-white outline-offset-[-1px] lg:rounded-md'>
+      {self.role === UserRoles.instructor && (
+        <div className='absolute bottom-0 left-0 right-0 top-0 m-auto hidden w-fit place-content-center md:grid'>
+          <Selector selectedStudent={selectedStudent} setSelectedStudent={setSelectedStudent} />
+        </div>
+      )}
+      <div className='hidden gap-2 rounded-3xl border border-white px-1 md:flex lg:border-none'>
+        <div className='flex outline-offset-[-1px] outline-white lg:rounded-md lg:outline lg:outline-1'>
           <ThemeSwitcherDropdown buttonClasses='border-none' />
           <NotificationPanel buttonClasses='border-none' placement='bottomLeft' user={selectedStudent ?? self} />
         </div>
         <Button
-          className='flex flex-col justify-center items-center h-10 border-none border lg:border-solid border-white align-middle rounded-3xl lg:rounded-md w-10 lg:w-32 p-2 text-white hover:!text-white hover:!bg-dialogBackground'
+          className='flex h-10 w-10 flex-col items-center justify-center rounded-3xl border border-none border-white p-2 align-middle text-white hover:!bg-navbar-light hover:!text-white lg:w-32 lg:rounded-md lg:border-solid'
           onClick={switchPage}
           type='link'
         >
@@ -62,8 +68,8 @@ const Header: FC<HeaderProps> = ({ self }): ReactElement => {
             : 'Settings'}
           </span>
           {!inHome ?
-            <HomeOutlined className='lg:!hidden !m-0 [&>svg]:w-4 [&>svg]:h-4' />
-          : <SettingOutlined className='lg:!hidden !m-0 [&>svg]:w-4 [&>svg]:h-4' />}
+            <HomeOutlined className='!m-0 lg:!hidden [&>svg]:h-4 [&>svg]:w-4' />
+          : <SettingOutlined className='!m-0 lg:!hidden [&>svg]:h-4 [&>svg]:w-4' />}
         </Button>
       </div>
     </header>

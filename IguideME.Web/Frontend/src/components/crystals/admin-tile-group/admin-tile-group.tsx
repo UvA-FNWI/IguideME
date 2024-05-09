@@ -1,13 +1,13 @@
+import { deleteTileGroup, getTiles, patchTileGroup, postTile } from '@/api/tiles';
 import AdminTileView from '@/components/crystals/admin-tile-view/admin-tile-view';
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
-import { Button, Col, Divider, Input, Row } from 'antd';
-import { CSS } from '@dnd-kit/utilities';
-import { DeleteFilled, PlusOutlined } from '@ant-design/icons';
-import { deleteTileGroup, getTiles, patchTileGroup, postTile } from '@/api/tiles';
-import { SortableContext, useSortable } from '@dnd-kit/sortable';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { GradingType, TileType, type TileGroup } from '@/types/tile';
+import { DeleteFilled, PlusOutlined } from '@ant-design/icons';
+import { SortableContext, useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Button, Col, Divider, Input, Row } from 'antd';
 import { useMemo, useState, type FC, type ReactElement } from 'react';
 
 interface Props {
@@ -68,7 +68,7 @@ const AdminTileGroupView: FC<Props> = ({ group }): ReactElement => {
   if (isDragging) {
     return (
       <div
-        className='p-[10px] border border-dashed border-text rounded-lg bg-cardBackground min-h-[235px]'
+        className='bg-cardBackground min-h-[235px] rounded-lg border border-dashed border-text p-[10px]'
         ref={setNodeRef}
         style={style}
       />
@@ -79,13 +79,13 @@ const AdminTileGroupView: FC<Props> = ({ group }): ReactElement => {
     .fill(0)
     .map((_, i) => (
       <QueryLoading key={i} isLoading={isLoading}>
-        <div className='w-60 h-[150px] border border-solid border-text rounded-md m-0 bg-cardBackground' />
+        <div className='m-0 h-[150px] w-60 rounded-md border border-solid border-text bg-card-background' />
       </QueryLoading>
     ));
 
   const errorState = (
     <Col>
-      <div className='w-60 h-[150px] border border-solid border-text rounded-md m-0 bg-cardBackground relative'>
+      <div className='relative m-0 h-[150px] w-60 rounded-md border border-solid border-text bg-card-background'>
         <QueryError className='grid place-content-center' title='Error: Could not load tile' />
       </div>
     </Col>
@@ -93,14 +93,14 @@ const AdminTileGroupView: FC<Props> = ({ group }): ReactElement => {
 
   return (
     <div
-      className='p-[10px] border border-dashed border-text rounded-lg bg-cardBackground min-h-[235px] my-1'
+      className='my-1 min-h-[235px] rounded-lg border border-dashed border-text bg-card-background p-[10px]'
       ref={setNodeRef}
       style={style}
     >
-      <Row className='content-center cursor-grab justify-between' {...attributes} {...listeners}>
+      <Row className='cursor-grab content-center justify-between' {...attributes} {...listeners}>
         <Col className='cursor-text'>
           <h2
-            className='text-lg p-1'
+            className='p-1 text-lg'
             onClick={() => {
               setEditing(true);
             }}
@@ -109,7 +109,7 @@ const AdminTileGroupView: FC<Props> = ({ group }): ReactElement => {
               group.title
             : editing && (
                 <Input
-                  className='!border-primary-500 hover:!border-primary-500 !bg-cardBackground hover:!bg-dropdownBackground text-text'
+                  className='w-full border-primary bg-card-background text-text hover:border-primary hover:bg-card focus:border-primary focus:shadow-sm focus:shadow-primary aria-invalid:!border-failure aria-invalid:shadow-none aria-invalid:focus:!shadow-sm aria-invalid:focus:!shadow-failure'
                   value={title}
                   autoFocus
                   onBlur={() => {
@@ -134,15 +134,15 @@ const AdminTileGroupView: FC<Props> = ({ group }): ReactElement => {
         </Col>
         <Col>
           <DeleteFilled
-            className='p-1 text-primary-red'
+            className='p-1 text-failure'
             onClick={() => {
               deleteGroup(group.id);
             }}
           />
         </Col>
       </Row>
-      <Divider className='mt-1 mb-2' />
-      <Row gutter={[20, 20]} className='p-[10px] justify-start'>
+      <Divider className='mb-2 mt-1' />
+      <Row gutter={[20, 20]} className='justify-start p-[10px]'>
         <SortableContext items={tileIds}>
           {isLoading ?
             <div className='flex gap-2'>{loadingState}</div>
@@ -170,11 +170,12 @@ const AdminTileGroupView: FC<Props> = ({ group }): ReactElement => {
                 notifications: false,
                 gradingType: GradingType.Percentage,
                 entries: [],
+                alt: false,
               });
             }}
             block
             icon={<PlusOutlined />}
-            className='h-full !w-60 m-0 min-h-[150px] border border-text bg-cardBackground text-text hover:!bg-dropdownBackground hover:!border-primary-500 hover:!text-text'
+            className='m-0 h-full min-h-[150px] !w-60 border border-text bg-card text-text hover:!border-primary hover:!bg-dropdownBackground hover:!text-text'
           >
             New Tile
           </Button>

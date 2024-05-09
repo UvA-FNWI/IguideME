@@ -1,14 +1,14 @@
 import { cn } from '@/utils/cn';
 import { MoonOutlined, SunOutlined } from '@ant-design/icons';
-import { useTheme } from 'next-themes';
 import { Button, Dropdown, type MenuProps, Switch } from 'antd';
+import { useTheme } from 'next-themes';
 import { type FC, memo, type ReactElement, useMemo } from 'react';
 
 const ThemeSwitcherSwitch: FC = (): ReactElement => {
   const { theme, setTheme } = useTheme();
 
   return (
-    <div className='w-full min-h-12 rounded-md flex items-center p-3 justify-between'>
+    <div className='flex min-h-12 w-full items-center justify-between rounded-md p-3'>
       <span className='text-sm'>Theme</span>
       <Switch
         checkedChildren={<MoonOutlined />}
@@ -57,14 +57,14 @@ const ThemeSwitcherDropdown: FC<ThemeSwitcherDropdownProps> = memo(({ buttonClas
     >
       <Button
         className={cn(
-          'flex flex-col justify-center items-center h-10 border border-solid border-white align-middle text-white w-10 p-0 hover:!bg-dialogBackground [&>span]:!text-white',
+          'flex h-10 w-10 flex-col items-center justify-center border border-solid border-white p-0 align-middle text-white hover:!bg-navbar-light [&>span]:!text-white',
           buttonClasses,
         )}
         type='link'
       >
         {theme === 'light' ?
-          <SunOutlined className='[&>svg]:w-4 [&>svg]:h-4' />
-        : <MoonOutlined className='[&>svg]:w-4 [&>svg]:h-4' />}
+          <SunOutlined className='[&>svg]:h-4 [&>svg]:w-4' />
+        : <MoonOutlined className='[&>svg]:h-4 [&>svg]:w-4' />}
       </Button>
     </Dropdown>
   );

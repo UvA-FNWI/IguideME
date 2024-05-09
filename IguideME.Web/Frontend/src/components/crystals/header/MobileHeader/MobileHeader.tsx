@@ -1,23 +1,23 @@
-import HamburgerIcon from './HamburgerIcon/HamburgerIcon';
 import NotificationPanel from '@/components/atoms/notification-panel/notification-panel';
-import Selector from '../Selector';
-import { adminPanelMenuItems } from '../../admin-panel/admin-panel';
-import { Collapse, Divider } from 'antd';
-import { Dispatch, FC, memo, ReactElement, SetStateAction, useState } from 'react';
-import { ThemeSwitcherSwitch } from '../../ThemeSwitcher/ThemeSwitcher';
-import { useLocation } from 'react-router-dom';
 import { User, UserRoles } from '@/types/user';
 import { UserOutlined } from '@ant-design/icons';
+import { Collapse, Divider } from 'antd';
+import { Dispatch, FC, memo, ReactElement, SetStateAction, useState } from 'react';
+import { useLocation } from 'react-router-dom';
+import { adminPanelMenuItems } from '../../admin-panel/admin-panel';
+import { ThemeSwitcherSwitch } from '../../ThemeSwitcher/ThemeSwitcher';
+import Selector from '../Selector';
+import HamburgerIcon from './HamburgerIcon/HamburgerIcon';
 
 const MenuItem: FC<{ item: (typeof adminPanelMenuItems)[0] }> = ({ item }): ReactElement => {
   const currentRoute = useLocation().pathname;
 
   return (
     <li
-      className={`w-full min-h-12 text-sm flex gap-2 ${currentRoute === item.route ? 'font-semibold' : 'font-normal'}`}
+      className={`flex min-h-12 w-full gap-2 text-sm ${currentRoute === item.route ? 'font-semibold' : 'font-normal'}`}
     >
       <span className='grid place-content-center'>{item.icon}</span>
-      <a className='w-full h-12 flex items-center' href={item.route}>
+      <a className='flex h-12 w-full items-center' href={item.route}>
         {item.label}
       </a>
     </li>
@@ -40,27 +40,27 @@ const MobileHeader: FC<MobileHeaderProps> = memo(({ self, selectedStudent, setSe
         <HamburgerIcon open={open} setOpen={setOpen} />
       </div>
       {open && (
-        <div className='fixed z-10 left-0 bottom-0 w-screen mt-header h-[calc(100vh-70px)] backdrop-blur-sm bg-black/30' />
+        <div className='fixed bottom-0 left-0 z-10 mt-header h-[calc(100vh-70px)] w-screen bg-text/30 backdrop-blur-sm' />
       )}
       <div
-        className={`bottom-0 right-0 mt-header w-[min(100vw,400px)] h-[calc(100vh-70px)] fixed bg-white text-black ${open ? 'translate-x-0' : 'translate-x-full'} z-50 transition-all duration-200 ease-in`}
+        className={`fixed bottom-0 right-0 mt-header h-[calc(100vh-70px)] w-[min(100vw,400px)] bg-body text-text ${open ? 'translate-x-0' : 'translate-x-full'} z-50 transition-all duration-200 ease-in`}
       >
-        <div className='px-8 py-6 flex flex-col justify-between gap-8 h-full overflow-y-auto'>
+        <div className='flex h-full flex-col justify-between gap-8 overflow-y-auto px-8 py-6'>
           <div>
             <ul className='flex flex-col gap-2'>
-              <li className='w-full min-h-12 text-base'>
+              <li className='min-h-12 w-full text-base'>
                 <a
-                  className={`w-full h-12 flex items-center ${currentRoute === '/' ? 'font-semibold' : 'font-normal'}`}
+                  className={`flex h-12 w-full items-center ${currentRoute === '/' ? 'font-semibold' : 'font-normal'}`}
                   href='/'
                 >
                   Home
                 </a>
               </li>
               <li>
-                <Divider className='m-0 p-0' />
+                <Divider className='m-0 bg-text/50 p-0' />
               </li>
               <li
-                className={`w-full min-h-12 [&_span]:!text-base [&_span]:!text-black ${currentRoute.startsWith('/admin') ? '[&_span]:!font-semibold' : '[&_span]:!font-normal'}`}
+                className={`min-h-12 w-full [&_span]:!text-base [&_span]:!text-text ${currentRoute.startsWith('/admin') ? '[&_span]:!font-semibold' : '[&_span]:!font-normal'}`}
               >
                 <Collapse
                   className='[&>div>div]:!px-0'
@@ -81,38 +81,38 @@ const MobileHeader: FC<MobileHeaderProps> = memo(({ self, selectedStudent, setSe
                 />
               </li>
               <li>
-                <Divider className='m-0 p-0' />
+                <Divider className='m-0 bg-text/50 p-0' />
               </li>
               {self.role === UserRoles.instructor && (
-                <li className='w-full min-h-12'>
+                <li className='min-h-12 w-full'>
                   <Selector
                     placeholder='Open a student profile'
                     onSelect={() => setOpen(false)}
-                    selectClasses={`h-12 [&>div]:!bg-primary-white [&>div>span]:!text-black [&_span_*]:!text-black [&>div]:!border-none [&_span]:!text-base ${/^\/\d+$/.test(currentRoute) ? '[&_span]:!font-semibold' : '[&_span]:!font-normal'}`}
+                    selectClasses={`h-12 [&>div]:!bg-body [&>div>span]:!text-text [&_span_*]:!text-text [&>div]:!border-none [&_span]:!text-base ${/^\/\d+$/.test(currentRoute) ? '[&_span]:!font-semibold' : '[&_span]:!font-normal'}`}
                     selectedStudent={selectedStudent}
                     setSelectedStudent={setSelectedStudent}
                   />
                 </li>
               )}
               <li>
-                <Divider className='m-0 p-0' />
+                <Divider className='m-0 bg-text/50 p-0' />
               </li>
             </ul>
-            <div className='w-full flex justify-between mt-6 gap-2'>
-              <div className='bg-slate-50 rounded-md flex-grow basis-0'>
+            <div className='mt-6 flex w-full justify-between gap-2'>
+              <div className='flex-grow basis-0 rounded-md bg-card'>
                 <ThemeSwitcherSwitch />
               </div>
-              <div className='bg-slate-50 rounded-md h-12 flex-grow basis-0'>
+              <div className='h-12 flex-grow basis-0 rounded-md bg-card'>
                 <NotificationPanel
-                  buttonClasses='text-black w-full h-full border-none m-0 p-0 grid place-content-center'
+                  buttonClasses='text-text w-full h-full border-none m-0 p-0 grid place-content-center'
                   placement='bottomRight'
                   user={selectedStudent ?? self}
                 />
               </div>
             </div>
           </div>
-          <div className='bg-white'>
-            <div className='flex content-center flex-col justify-center bg-white p-4 h-header'>
+          <div className='bg-body'>
+            <div className='flex h-header flex-col content-center justify-center border-t border-text bg-body p-4'>
               <h3 className='text-lg'>{self?.name}</h3>
               <strong>
                 <UserOutlined /> Instructor

@@ -1,3 +1,4 @@
+import { getSelf } from '@/api/users';
 import {
   AppstoreOutlined,
   CloudUploadOutlined,
@@ -12,11 +13,10 @@ import {
   TrophyOutlined,
   UserOutlined,
 } from '@ant-design/icons';
-import { getSelf } from '@/api/users';
-import { Layout, Menu } from 'antd';
-import { Link, Outlet } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import { Layout, Menu } from 'antd';
 import { useMemo, useState, type FC, type ReactElement } from 'react';
+import { Link, Outlet } from 'react-router-dom';
 
 export const adminPanelMenuItems = [
   { label: 'Dashboard', key: '1', icon: <DatabaseOutlined />, route: '/admin' },
@@ -69,9 +69,9 @@ const AdminPanel: FC = (): ReactElement => {
         onCollapse={(value) => {
           setCollapsed(value);
         }}
-        className='max-md:!hidden !bg-dropdownBackground'
+        className='!bg-navbar-side max-md:!hidden'
       >
-        <div className='flex content-center flex-col justify-center bg-dropdownBackground p-4 border-b border-solid border-b-text h-header'>
+        <div className='flex h-header flex-col content-center justify-center border-b border-solid border-b-text bg-navbar-side p-4'>
           {collapsed ?
             <h3 className='text-center'>
               <UserOutlined />
@@ -85,13 +85,13 @@ const AdminPanel: FC = (): ReactElement => {
           }
         </div>
         <Menu
-          className='!bg-dropdownBackground [&>li]:!text-text adminPanelMenuSelect'
+          className='adminPanelMenuSelect !bg-navbar-side [&>li]:!text-text'
           defaultSelectedKeys={[getKeyFromLocation(location.pathname)]}
           mode='inline'
           items={items}
         />
       </Layout.Sider>
-      <Layout.Content className='p-5 relative bg-bodyBackground min-h-[calc(100dvh-70px)]'>
+      <Layout.Content className='relative min-h-[calc(100dvh-70px)] bg-content p-5'>
         <Outlet />
       </Layout.Content>
     </Layout>

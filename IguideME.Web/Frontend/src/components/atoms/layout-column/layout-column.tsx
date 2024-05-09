@@ -1,11 +1,11 @@
+import { getTileGroups } from '@/api/tiles';
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
-import { Col, Divider, InputNumber, Row, Slider, Transfer } from 'antd';
-import { CSS } from '@dnd-kit/utilities';
 import { DeleteFilled } from '@ant-design/icons';
-import { getTileGroups } from '@/api/tiles';
-import { useQuery } from '@tanstack/react-query';
 import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { useQuery } from '@tanstack/react-query';
+import { Col, Divider, InputNumber, Row, Slider, Transfer } from 'antd';
 import { useTheme } from 'next-themes';
 import { type FC, type ReactElement, useState } from 'react';
 
@@ -69,14 +69,14 @@ const ConfigLayoutColumn: FC<Props> = ({ column, remove, parentOnChange }): Reac
     return (
       <QueryLoading isLoading={isLoading}>
         <div
-          className={`rounded-md w-[425px] h-[360px] p-3 bg-cardBackground ${theme === 'light' ? 'shadow-statusCard' : ''}`}
+          className={`h-[360px] w-[425px] rounded-md bg-card-background p-3 ${theme === 'light' ? 'shadow-statusCard' : ''}`}
         />
       </QueryLoading>
     );
   } else if (isError || data === undefined) {
     return (
       <div
-        className={`relative [&>div]:grid [&>div]:place-content-center rounded-md w-[425px] h-[360px] p-3 bg-cardBackground ${theme === 'light' ? 'shadow-statusCard' : ''}`}
+        className={`relative h-[360px] w-[425px] rounded-md bg-card-background p-3 [&>div]:grid [&>div]:place-content-center ${theme === 'light' ? 'shadow-statusCard' : ''}`}
       >
         <QueryError title='Error: Failed to load tile groups' />
       </div>
@@ -86,7 +86,7 @@ const ConfigLayoutColumn: FC<Props> = ({ column, remove, parentOnChange }): Reac
   if (isDragging) {
     return (
       <div
-        className={`rounded-md w-[425px] h-[360px] p-3 bg-cardBackground ${theme === 'light' ? 'shadow-statusCard' : ''}`}
+        className={`h-[360px] w-[425px] rounded-md bg-card-background p-3 ${theme === 'light' ? 'shadow-statusCard' : ''}`}
         ref={setNodeRef}
         style={style}
       />
@@ -94,7 +94,7 @@ const ConfigLayoutColumn: FC<Props> = ({ column, remove, parentOnChange }): Reac
   } else {
     return (
       <div
-        className={`rounded-md w-[425px] h-[360px] p-3 bg-cardBackground ${theme === 'light' ? 'shadow-statusCard' : ''}`}
+        className={`h-[360px] w-[425px] rounded-md bg-card-background p-3 ${theme === 'light' ? 'shadow-statusCard' : ''}`}
         ref={setNodeRef}
         style={style}
       >
@@ -103,7 +103,7 @@ const ConfigLayoutColumn: FC<Props> = ({ column, remove, parentOnChange }): Reac
             <h3 className='text-lg'>Column</h3>
           </Col>
           <Col>
-            <DeleteFilled className='text-primary-red' onClick={() => remove?.(column.id)} />
+            <DeleteFilled className='text-failure' onClick={() => remove?.(column.id)} />
           </Col>
         </Row>
 
@@ -111,7 +111,7 @@ const ConfigLayoutColumn: FC<Props> = ({ column, remove, parentOnChange }): Reac
 
         <Row className='content-center justify-between'>
           <Col className='grid place-content-center' span={3}>
-            <span className='text-text text-sm'>Width:</span>
+            <span className='text-sm text-text'>Width:</span>
           </Col>
           <Col span={15}>
             <Slider
@@ -138,13 +138,13 @@ const ConfigLayoutColumn: FC<Props> = ({ column, remove, parentOnChange }): Reac
                 onChange();
               }}
               formatter={formatter}
-              className='w-[90%] !border-primary-500 hover:!border-primary-500 !bg-cardBackground hover:!bg-dropdownBackground [&_input]:!text-text antNumberInput'
+              className='antNumberInput w-full !border border-solid !border-primary !bg-card-background hover:!border-primary hover:!bg-card [&_input]:!text-text'
             />
           </Col>
         </Row>
 
         <Divider className='my-[10px] mr-[10px]' />
-        <div className='mb-[10px] text-text text-sm'>Tile Groups:</div>
+        <div className='mb-[10px] text-sm text-text'>Tile Groups:</div>
 
         <Row className='justify-center'>
           <Transfer

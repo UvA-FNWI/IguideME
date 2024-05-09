@@ -1,4 +1,3 @@
-
 export type ViewType = 'graph' | 'grid';
 
 export interface LayoutColumn {
@@ -75,10 +74,8 @@ export interface LearningGoal {
   id: number;
   title: string;
   requirements: GoalRequirement[];
-  results?: boolean[]
+  results?: boolean[];
 }
-
-
 
 export enum GradingType {
   PassFail,
@@ -104,6 +101,10 @@ export const printGradingType = (type: GradingType): string => {
 };
 
 export const printGrade = (type: GradingType, grade: number, max: number, ng: boolean = true): string => {
+  grade = Number(grade);
+  // TODO: This is a temporary fix for the grade being something other than a number
+  if (isNaN(grade)) grade = 0;
+
   switch (type) {
     case GradingType.PassFail:
       return grade > 0 ? 'Pass' : 'Fail';
@@ -159,19 +160,19 @@ export enum LogicalExpression {
 export const printLogicalExpression = (expression: LogicalExpression): string => {
   switch (expression) {
     case LogicalExpression.NotEqual:
-      return '≠'
+      return '≠';
     case LogicalExpression.Less:
-      return '<'
+      return '<';
     case LogicalExpression.LessEqual:
-      return '≤'
+      return '≤';
     case LogicalExpression.Equal:
-      return '='
+      return '=';
     case LogicalExpression.GreaterEqual:
-      return '≥'
+      return '≥';
     case LogicalExpression.Greater:
-      return '>'
+      return '>';
   }
-}
+};
 
 export interface GoalRequirement {
   id: number;

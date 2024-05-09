@@ -1,16 +1,9 @@
+import { getAssignments } from '@/api/entries';
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
-import {
-  CheckCircleOutlined,
-  CheckCircleTwoTone,
-  CloseCircleOutlined,
-  CloseCircleTwoTone,
-  DeleteFilled,
-  DeleteOutlined,
-} from '@ant-design/icons';
-import { getAssignments } from '@/api/entries';
-import { InputNumber, Select, Table } from 'antd';
+import { CheckCircleOutlined, CloseCircleOutlined, DeleteFilled } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
+import { InputNumber, Select, Table } from 'antd';
 import { useCallback, useEffect, useMemo, useState, type FC, type ReactElement } from 'react';
 
 import { printGradingType, type Assignment, type TileEntry } from '@/types/tile';
@@ -103,7 +96,7 @@ const SelectAssignments: FC<SelectAssignmentsProps> = ({ value: entries, onChang
     <QueryLoading isLoading={isLoading}>
       <div className='flex flex-col gap-1 overflow-x-auto'>
         <Table
-          className='[&_th]:!bg-cardBackground [&_th]:!text-text [&_td]:!bg-dropdownBackground [&_td]:!text-text [&_div]:!text-text'
+          className='[&_div]:!text-text [&_td]:!bg-card-background [&_td]:!text-text [&_th]:!bg-card [&_th]:!text-text'
           columns={[
             {
               title: 'Name',
@@ -118,8 +111,8 @@ const SelectAssignments: FC<SelectAssignmentsProps> = ({ value: entries, onChang
               render: (_: string, entry: TileEntry) => {
                 const assignment = assignments.get(entry.content_id);
                 return assignment !== undefined && assignment.published ?
-                    <CheckCircleOutlined className='text-primary-green' />
-                  : <CloseCircleOutlined className='text-primary-red' />;
+                    <CheckCircleOutlined className='text-success' />
+                  : <CloseCircleOutlined className='text-failure' />;
               },
             },
             {
@@ -142,13 +135,14 @@ const SelectAssignments: FC<SelectAssignmentsProps> = ({ value: entries, onChang
               render: (_: string, entry: TileEntry) => {
                 return (
                   <InputNumber
-                    className='!border-primary-500 hover:!border-primary-500 !bg-cardBackground hover:!bg-dropdownBackground [&_input]:!text-text antNumberInput'
+                    className='antNumberInput w-full !border border-solid !border-primary !bg-card-background hover:!border-primary hover:!bg-card [&_input]:!text-text'
                     value={entry.weight}
                     onChange={(val) => {
                       changeWeight(entry, val);
                     }}
                     formatter={(value) => `${(value ?? 0) * 100}%`}
                     parser={(value) => +parseFloat(value!.replace('%', '')).toFixed(1) / 100}
+                    variant='borderless'
                   />
                 );
               },
@@ -161,7 +155,7 @@ const SelectAssignments: FC<SelectAssignmentsProps> = ({ value: entries, onChang
               render: (_: string, entry: TileEntry) => {
                 return (
                   <DeleteFilled
-                    className='text-primary-red'
+                    className='text-failure'
                     onClick={() => {
                       removeEntry(entry.content_id);
                     }}
@@ -176,7 +170,7 @@ const SelectAssignments: FC<SelectAssignmentsProps> = ({ value: entries, onChang
         />
 
         <Select
-          className='w-full [&>div]:!bg-cardBackground [&>div]:!border-primary-500 [&>div]:hover:!bg-dropdownBackground [&_span]:!text-text'
+          className='w-full [&>div]:!border-primary [&>div]:!bg-card-background [&>div]:!shadow-none [&>div]:hover:!bg-card [&_span]:!text-text'
           dropdownClassName='bg-dropdownBackground [&_div]:!text-text selectionSelected'
           value={selectedAssignments}
           mode='multiple'
