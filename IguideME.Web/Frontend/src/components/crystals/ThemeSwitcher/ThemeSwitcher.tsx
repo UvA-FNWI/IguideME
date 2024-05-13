@@ -57,7 +57,7 @@ const ThemeSwitcherDropdown: FC<ThemeSwitcherDropdownProps> = memo(({ buttonClas
     >
       <Button
         className={cn(
-          'flex h-10 w-10 flex-col items-center justify-center border border-solid border-white p-0 align-middle text-white hover:!bg-navbar-light [&>span]:!text-white',
+          'flex h-10 w-10 flex-col items-center justify-center rounded-l-full border border-solid border-white p-0 align-middle text-white hover:!bg-navbar-light lg:rounded-md [&>span]:!text-white',
           buttonClasses,
         )}
         type='link'

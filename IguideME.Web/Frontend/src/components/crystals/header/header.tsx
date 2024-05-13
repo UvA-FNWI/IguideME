@@ -50,13 +50,13 @@ const Header: FC<HeaderProps> = ({ self }): ReactElement => {
           <Selector selectedStudent={selectedStudent} setSelectedStudent={setSelectedStudent} />
         </div>
       )}
-      <div className='hidden gap-2 rounded-3xl border border-white px-1 md:flex lg:border-none'>
+      <div className='hidden gap-2 rounded-full border border-white px-1 md:flex lg:border-none'>
         <div className='flex outline-offset-[-1px] outline-white lg:rounded-md lg:outline lg:outline-1'>
           <ThemeSwitcherDropdown buttonClasses='border-none' />
           <NotificationPanel buttonClasses='border-none' placement='bottomLeft' user={selectedStudent ?? self} />
         </div>
         <Button
-          className='flex h-10 w-10 flex-col items-center justify-center rounded-3xl border border-none border-white p-2 align-middle text-white hover:!bg-navbar-light hover:!text-white lg:w-32 lg:rounded-md lg:border-solid'
+          className='flex h-10 w-10 flex-col items-center justify-center rounded-r-full border border-none border-white p-2 align-middle text-white hover:!bg-navbar-light hover:!text-white lg:w-32 lg:rounded-md lg:border-solid'
           onClick={switchPage}
           type='link'
         >
