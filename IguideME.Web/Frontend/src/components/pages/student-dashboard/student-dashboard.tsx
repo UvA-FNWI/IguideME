@@ -80,7 +80,7 @@ const Dashboard: FC<DashboardProps> = ({ self }): ReactElement => {
         <div className='flex min-h-header flex-col justify-center gap-3 py-3 lg:py-0'>
           <div className='relative flex items-center justify-between'>
             <StudentInfo />
-            <div className='absolute bottom-0 left-0 right-0 top-0 m-auto hidden h-full w-[400px] md:block'>
+            <div className='absolute bottom-0 left-0 right-0 top-0 m-auto hidden h-header w-[400px] place-content-center md:grid'>
               <GradeDisplay />
             </div>
             <Radio.Group
