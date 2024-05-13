@@ -117,14 +117,14 @@ const LayoutConfigurator: FC = (): ReactElement => {
   const loadingState = Array.from({ length: 2 }).map((_, i) => (
     <QueryLoading isLoading={isLoading} key={i}>
       <article
-        className={`m-2 h-[360px] w-[425px] rounded-md bg-card p-3 ${theme === 'light' ? 'shadow-statusCard' : ''}`}
+        className={`m-2 h-[360px] w-[425px] rounded-md bg-surface1 p-3 ${theme === 'light' ? 'shadow-statusCard' : ''}`}
       />
     </QueryLoading>
   ));
 
   const errorState = (
     <article
-      className={`m-2 h-[360px] w-[425px] rounded-md bg-card p-3 ${theme === 'light' ? 'shadow-statusCard' : ''} relative`}
+      className={`m-2 h-[360px] w-[425px] rounded-md bg-surface1 p-3 ${theme === 'light' ? 'shadow-statusCard' : ''} relative`}
     >
       <QueryError className='grid place-content-center' title='Error: Could not load layout columns' />
     </article>
@@ -147,18 +147,17 @@ const LayoutConfigurator: FC = (): ReactElement => {
             }
           </div>
           <Button
-            type='dashed'
             onClick={addColumn}
             block
             icon={<PlusOutlined />}
-            className='bg-card hover:!border-primary hover:!bg-dropdownBackground [&_span]:!text-text'
+            className='bg-surface1 border-dashed hover:!border-solid hover:!border-border1 hover:!bg-accent/50 [&_span]:!text-text'
           >
             Add Column
           </Button>
         </div>
       </SortableContext>
       <Button
-        className='mt-2 min-w-20 !border-none bg-button hover:!border-none hover:!bg-button-hover [&_span]:text-text'
+        className='mt-2 min-w-20 !border-none bg-success hover:!border-none hover:!bg-success/80 [&_span]:text-text'
         onClick={save}
       >
         Save

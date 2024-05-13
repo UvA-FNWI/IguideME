@@ -51,7 +51,7 @@ const GradesTable: FC = (): ReactElement => {
         {isError ?
           <QueryError className='static' title='Failed to load students' />
         : <Table
-            className='[&_div]:!text-text [&_td]:!bg-card-background [&_td]:!text-text [&_th]:!bg-card [&_th]:!text-text'
+            className='[&_div]:!text-text [&_td]:!bg-surface1 [&_td]:!text-text [&_th]:!bg-surface1 [&_th]:!text-text'
             size='middle'
             columns={getColumns()}
             dataSource={getData(students ?? [])}

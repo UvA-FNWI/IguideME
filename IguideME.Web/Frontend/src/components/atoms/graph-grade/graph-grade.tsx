@@ -11,7 +11,7 @@ const GraphGrade: FC<Grades> = ({ grade, peerAvg, peerMin, peerMax, max, type })
     if (active && payload && payload.length) {
       const data = payload[1].payload;
       return (
-        <div className='z-50 rounded-lg border border-solid border-text bg-body p-2'>
+        <div className='z-50 rounded-lg border border-solid border-text bg-surface1/85 p-2'>
           <p>
             {data.name === 'You' ? <>Grade: {printGrade(type, data.grade, max)}</>
               :
@@ -41,14 +41,14 @@ const GraphGrade: FC<Grades> = ({ grade, peerAvg, peerMin, peerMax, max, type })
           grade: grade,
           peerMin: 0,
           peerMax: 0,
-          fill: fullConfig.theme.colors.graph.you,
+          fill: fullConfig.theme.colors.primary,
         },
         {
           name: 'Peers',
           grade: peerAvg,
           peerMin: peerMin,
           peerMax: peerMax,
-          fill: fullConfig.theme.colors.graph.peer,
+          fill: fullConfig.theme.colors.secondary,
         },
       ]}
       margin={{
@@ -63,11 +63,11 @@ const GraphGrade: FC<Grades> = ({ grade, peerAvg, peerMin, peerMax, max, type })
       <XAxis dataKey='name' xAxisId={0} stroke={theme === 'light' ? 'black' : 'white'} />
       <XAxis dataKey='name' xAxisId={1} hide />
       <YAxis dataKey='grade' domain={[0, max]} hide />
-      <Tooltip content={<BarTooltip />} />
+      <Tooltip content={<BarTooltip />} cursor={false}/>
       <Bar
         background={{ fill: '#eee' }}
         barSize={70}
-        className='[&>g>path]:!fill-graph-max'
+        className='[&>g>path]:!fill-overlay0'
         dataKey={({ peerMin, peerMax }) => [peerMin, peerMax]}
         opacity={0.5}
         xAxisId={0}

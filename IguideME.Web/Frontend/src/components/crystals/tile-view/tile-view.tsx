@@ -42,7 +42,7 @@ const ViewTile: FC<Props> = memo(({ tile, textStyle }): ReactElement => {
         aria-disabled={isLoading || isError}
         className={`${
           isError ? 'cursor-not-allowed' : 'cursor-pointer'
-        } relative h-[230px] w-[270px] rounded-md border border-solid border-white bg-card-background`}
+        } relative h-[230px] w-[270px] rounded-md border border-solid border-border1 bg-surface1 p-2`}
         onClick={() => {
           if (!(isError || isLoading)) navigate(tile.id + '/');
         }}
@@ -62,7 +62,7 @@ const ViewTile: FC<Props> = memo(({ tile, textStyle }): ReactElement => {
     if (tile.type === TileType.assignments && tile.gradingType === GradingType.NotGraded) {
       return (
         <Row className='h-4/5 content-center justify-center'>
-          <p className='text-base'>Not Graded</p>
+          <p className='text-text'>Not Graded</p>
         </Row>
       );
     }
@@ -101,7 +101,7 @@ const ViewTile: FC<Props> = memo(({ tile, textStyle }): ReactElement => {
             </Row>
             <Row className='h-[30%] w-full content-start justify-center'>
               <Col className='h-full w-full'>
-                <Divider className='m-0 w-full p-0' />
+                <Divider className='m-0 p-0 border-text' />
                 <PeerComparison
                   {...{
                     grade: grades.grade,

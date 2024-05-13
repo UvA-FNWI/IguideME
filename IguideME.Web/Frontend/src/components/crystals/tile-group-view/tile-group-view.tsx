@@ -28,7 +28,7 @@ const ViewTileGroup: FC<Props> = memo(({ group }): ReactElement => {
         {isError ?
           <QueryError className='grid place-content-center' title='Error: Unable to load tiles' />
         : tiles?.map((tile) => (
-            <Col className='h-full bg-card' key={tile.id}>
+            <Col className='h-full' key={tile.id}>
               <TileView tile={tile} />
             </Col>
           ))

@@ -8,7 +8,7 @@ interface Props {
 }
 const EntryView: FC<Props> = ({ entry, type }): ReactElement => {
   return (
-    <div className='h-[230px] w-max min-w-[270px] max-w-xs rounded-md border border-solid border-white bg-card-background'>
+    <div className='h-[230px] w-max min-w-[270px] max-w-xs rounded-md border border-solid border-border1 bg-surface1'>
       {renderViewType()}
     </div>
   );

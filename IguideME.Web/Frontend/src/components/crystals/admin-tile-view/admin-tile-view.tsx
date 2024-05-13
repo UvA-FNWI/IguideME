@@ -13,7 +13,7 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Col, Row, Space, Tooltip } from 'antd';
-import { type FC, type ReactElement } from 'react';
+import { useMemo, type FC, type ReactElement } from 'react';
 import Swal from 'sweetalert2';
 import { useDrawerStore } from '../tile-group-board/useDrawerStore';
 
@@ -49,6 +49,8 @@ const AdminTileView: FC<Props> = ({ tile, move }): ReactElement => {
       tile,
     },
   });
+  
+  const tileStyle = useMemo(() => `font-tnum m-0 h-full w-60 rounded-md border border-solid border-border1 p-3 ${tile.visible ? 'bg-success/10' : 'bg-failure/10'}`, [tile])
 
   const style = {
     transition,
@@ -62,11 +64,12 @@ const AdminTileView: FC<Props> = ({ tile, move }): ReactElement => {
   const toggleNotifications = (): void => {
     updateTile({ ...tile, notifications: !tile.notifications });
   };
+  
 
   if (isDragging) {
     return (
       <div
-        className={`font-tnum m-0 h-full w-60 rounded-md border border-solid border-text p-3 ${tile.visible ? 'bg-success/10' : 'bg-failure/10'}`}
+        className={tileStyle}
         ref={setNodeRef}
         style={style}
       />
@@ -76,7 +79,7 @@ const AdminTileView: FC<Props> = ({ tile, move }): ReactElement => {
   if (move === true) {
     return (
       <div
-        className={`font-tnum m-0 h-full w-60 rounded-md border border-solid border-text p-3 ${tile.visible ? 'bg-success/10' : 'bg-failure/10'}`}
+        className={tileStyle}
         ref={setNodeRef}
         style={style}
       >
@@ -89,7 +92,7 @@ const AdminTileView: FC<Props> = ({ tile, move }): ReactElement => {
 
   return (
     <div
-      className={`font-tnum m-0 h-full w-60 rounded-md border border-solid border-text p-3 ${tile.visible ? 'bg-success/10' : 'bg-failure/10'}`}
+      className={tileStyle}
       ref={setNodeRef}
       style={style}
       {...attributes}

@@ -68,7 +68,7 @@ const AdminTileGroupView: FC<Props> = ({ group }): ReactElement => {
   if (isDragging) {
     return (
       <div
-        className='bg-cardBackground min-h-[235px] rounded-lg border border-dashed border-text p-[10px]'
+        className='bg-accent/50 min-h-[235px] rounded-lg border border-dashed border-text p-[10px]'
         ref={setNodeRef}
         style={style}
       />
@@ -79,13 +79,13 @@ const AdminTileGroupView: FC<Props> = ({ group }): ReactElement => {
     .fill(0)
     .map((_, i) => (
       <QueryLoading key={i} isLoading={isLoading}>
-        <div className='m-0 h-[150px] w-60 rounded-md border border-solid border-text bg-card-background' />
+        <div className='m-0 h-[150px] w-60 rounded-md border border-solid border-text bg-surface1' />
       </QueryLoading>
     ));
 
   const errorState = (
     <Col>
-      <div className='relative m-0 h-[150px] w-60 rounded-md border border-solid border-text bg-card-background'>
+      <div className='relative m-0 h-[150px] w-60 rounded-md border border-solid border-text bg-surface1'>
         <QueryError className='grid place-content-center' title='Error: Could not load tile' />
       </div>
     </Col>
@@ -93,7 +93,7 @@ const AdminTileGroupView: FC<Props> = ({ group }): ReactElement => {
 
   return (
     <div
-      className='my-1 min-h-[235px] rounded-lg border border-dashed border-text bg-card-background p-[10px]'
+      className='my-4 min-h-[235px] rounded-lg border border-solid border-border0 bg-surface1 p-[10px]'
       ref={setNodeRef}
       style={style}
     >
@@ -109,7 +109,7 @@ const AdminTileGroupView: FC<Props> = ({ group }): ReactElement => {
               group.title
             : editing && (
                 <Input
-                  className='w-full border-primary bg-card-background text-text hover:border-primary hover:bg-card focus:border-primary focus:shadow-sm focus:shadow-primary aria-invalid:!border-failure aria-invalid:shadow-none aria-invalid:focus:!shadow-sm aria-invalid:focus:!shadow-failure'
+                  className='w-full border-accent bg-surface1 text-text hover:border-accent/50 hover:bg-surface1 focus:bg-surface1 focus:border-accent focus:shadow-sm focus:shadow-accent aria-invalid:!border-failure aria-invalid:shadow-none aria-invalid:focus:!shadow-sm aria-invalid:focus:!shadow-failure'
                   value={title}
                   autoFocus
                   onBlur={() => {
@@ -175,7 +175,7 @@ const AdminTileGroupView: FC<Props> = ({ group }): ReactElement => {
             }}
             block
             icon={<PlusOutlined />}
-            className='m-0 h-full min-h-[150px] !w-60 border border-text bg-card text-text hover:!border-primary hover:!bg-dropdownBackground hover:!text-text'
+            className='m-0 h-full min-h-[150px] !w-60 border border-accent/70 bg-accent/20 text-text hover:!border-accent hover:!bg-accent hover:!text-text'
           >
             New Tile
           </Button>

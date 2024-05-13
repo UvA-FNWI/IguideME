@@ -37,7 +37,7 @@ const NotificationSettings: FC = (): ReactElement => {
   if (isError || isLoading || data === undefined) {
     return (
       <QueryLoading isLoading={isLoading}>
-        <div className='h-20 bg-card-background'>
+        <div className='h-20 bg-surface1'>
           {(isError || (data === undefined && !isLoading)) && (
             <QueryError className='top-[-30px]' title='Failed to load notification settings' />
           )}
@@ -117,14 +117,12 @@ const NotificationSettingsForm: FC<{
       </p>
       <Radio.Group buttonStyle='solid' defaultValue={range} onChange={rangeChangeHandler}>
         <Radio.Button
-          className={`!border-primary ${!range ? '!bg-primary !text-white' : '!bg-dropdownBackground text-text hover:!bg-primary-light hover:!text-white'}`}
           disabled={!range}
           value={false}
         >
           Select Dates
         </Radio.Button>
         <Radio.Button
-          className={`!border-primary ${range ? '!bg-primary !text-white' : '!bg-dropdownBackground text-text hover:!bg-primary-light hover:!text-white'}`}
           disabled={range}
           value={true}
         >
@@ -134,7 +132,7 @@ const NotificationSettingsForm: FC<{
       <DatePickers isRange={range} checkedList={checkedList} setCheckedList={setCheckedList} />
       <div className='flex justify-end'>
         <Button
-          className='right-0 min-w-20 !border-none bg-button hover:!border-none hover:!bg-button-hover [&_span]:text-text'
+          className='right-0 min-w-20 !border-none bg-overlay1 hover:!border-none hover:!bg-overlay2 [&_span]:text-text'
           htmlType='submit'
         >
           Save

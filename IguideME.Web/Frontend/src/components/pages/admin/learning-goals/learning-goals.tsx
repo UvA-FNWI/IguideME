@@ -56,12 +56,12 @@ const LearningGoals: FC = (): ReactElement => {
   if (isLoading) {
     return (
       <QueryLoading isLoading={isLoading}>
-        <div className='h-[100px] w-full rounded-lg bg-card-background' />
+        <div className='h-[100px] w-full rounded-lg bg-surface1' />
       </QueryLoading>
     );
   } else if (isError) {
     return (
-      <div className='h-[100px] w-full rounded-lg bg-card-background'>
+      <div className='h-[100px] w-full rounded-lg bg-surface1'>
         <QueryError title='Error: Unable to load learning goals' />
       </div>
     );
@@ -76,7 +76,7 @@ const LearningGoals: FC = (): ReactElement => {
             onClick={addGoal}
             block
             icon={<PlusOutlined />}
-            className='bg-card-background hover:!border-primary hover:!bg-dropdownBackground [&_span]:!text-text'
+            className='bg-accent/30 hover:!bg-accent/70 hover:border-solid hover:!border-border1 [&_span]:!text-text'
           >
             Add Goal
           </Button>
@@ -122,7 +122,7 @@ const ViewLearningGoal: FC<GoalProps> = ({ goal }): ReactElement => {
   };
 
   return (
-    <div className='font-tnum rounded-lg border border-dashed border-text bg-card-background p-[10px]'>
+    <div className='font-tnum rounded-lg border border-solid border-border0 bg-surface1 p-[10px]'>
       <div className='flex w-full justify-between'>
         <h2
           onClick={() => {
@@ -134,7 +134,7 @@ const ViewLearningGoal: FC<GoalProps> = ({ goal }): ReactElement => {
             goal.title
           : editing && (
               <Input
-                className='w-full border-primary bg-card-background text-text hover:border-primary hover:bg-card focus:border-primary focus:shadow-sm focus:shadow-primary aria-invalid:!border-failure aria-invalid:shadow-none aria-invalid:focus:!shadow-sm aria-invalid:focus:!shadow-failure'
+                className='w-full !border-accent !bg-surface1 text-text hover:!border-accent hover:bg-surface1 focus:!border-accent focus:shadow-sm focus:shadow-accent aria-invalid:!border-failure aria-invalid:shadow-none aria-invalid:focus:!shadow-sm aria-invalid:focus:!shadow-failure'
                 value={title}
                 autoFocus
                 onBlur={() => {
@@ -167,8 +167,7 @@ const ViewLearningGoal: FC<GoalProps> = ({ goal }): ReactElement => {
       ))}
 
       <Button
-        className='bg-button hover:!border-primary hover:!bg-button-hover [&_span]:!text-text'
-        type='dashed'
+        className='bg-accent/20 border-dashed hover:!border-border1 hover:border-solid hover:!bg-accent/70 [&_span]:!text-text'
         onClick={addRequirement}
         block
         icon={<PlusOutlined />}
@@ -239,7 +238,7 @@ const ViewGoalRequirement: FC<ReqProps> = ({ requirement }): ReactElement => {
   }, [isLoading, isError, requirement, form]);
 
   return (
-    <div className='font-tnum mb-[10px] w-full rounded-lg border border-solid border-text p-[10px]'>
+    <div className='font-tnum mb-[10px] w-full rounded-lg border border-solid border-border1 p-[10px]'>
       <Form<GoalRequirement>
         form={form}
         name={`goal_requirement_form_${requirement.id}`}
@@ -266,8 +265,8 @@ const ViewGoalRequirement: FC<ReqProps> = ({ requirement }): ReactElement => {
             <Item name='assignment_id' noStyle>
               <Select
                 aria-disabled={isLoading || isError}
-                className='w-full [&>div]:!border-primary [&>div]:!bg-card-background [&>div]:!shadow-none [&>div]:hover:!bg-card [&_span]:!text-text'
-                dropdownClassName='bg-dropdownBackground [&_div]:!text-text selectionSelected'
+                className='w-full [&>div]:hover:!border-accent [&>div]:!border-accent/60 [&>div]:!bg-surface1 [&>div]:!shadow-none [&>div]:hover:!bg-surface2 [&_span]:!text-text'
+                dropdownClassName='bg-surface1 [&_div]:!text-text selectionSelected'
                 disabled={isLoading || isError}
                 showSearch
                 optionFilterProp='label'
@@ -291,8 +290,8 @@ const ViewGoalRequirement: FC<ReqProps> = ({ requirement }): ReactElement => {
             <Item name='expression' noStyle>
               <Select
                 aria-disabled={isLoading || isError}
-                className='w-full [&>div]:!border-primary [&>div]:!bg-card-background [&>div]:!shadow-none [&>div]:hover:!bg-card [&_span]:!text-text'
-                dropdownClassName='bg-dropdownBackground [&_div]:!text-text selectionSelected'
+                className='w-full [&>div]:hover:!border-accent [&>div]:!border-accent/60 [&>div]:!bg-surface1 [&>div]:!shadow-none [&>div]:hover:!bg-surface2 [&_span]:!text-text'
+                dropdownClassName='bg-surface1 [&_div]:!text-text selectionSelected'
                 disabled={isLoading || isError}
                 options={[
                   {
@@ -325,7 +324,7 @@ const ViewGoalRequirement: FC<ReqProps> = ({ requirement }): ReactElement => {
 
             <Item name='value' noStyle>
               <InputNumber
-                className='antNumberInput w-12 !border border-solid !border-primary !bg-card-background hover:!border-primary hover:!bg-card [&_input]:!text-text'
+                className='antNumberInput w-12 !border border-solid !border-accent/60 !bg-surface1 hover:!border-accent hover:!bg-surface2 [&_input]:!text-text'
                 aria-disabled={isLoading || isError}
                 disabled={isLoading || isError}
                 variant='borderless'
@@ -335,7 +334,7 @@ const ViewGoalRequirement: FC<ReqProps> = ({ requirement }): ReactElement => {
           <div className='flex gap-2'>
             <Item noStyle>
               <Button
-                className='min-w-20 bg-button hover:!bg-button-hover [&_span]:text-text'
+                className='min-w-20 bg-success hover:!bg-success/80 [&_span]:text-text'
                 type='primary'
                 htmlType='submit'
               >
@@ -343,9 +342,8 @@ const ViewGoalRequirement: FC<ReqProps> = ({ requirement }): ReactElement => {
               </Button>
             </Item>
             <Button
-              className='min-w-20 bg-failure hover:!bg-red-400 [&_span]:text-text'
+              className='min-w-20 bg-failure hover:!bg-failure/80 [&_span]:text-text'
               type='primary'
-              danger
               onClick={() => {
                 removeRequirement(requirement.id);
               }}

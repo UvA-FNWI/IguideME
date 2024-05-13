@@ -16,7 +16,7 @@ const PeerSettings: FC = (): ReactElement => {
   if (isError || isLoading || data === undefined) {
     return (
       <QueryLoading isLoading={isLoading}>
-        <div className='h-20 bg-card-background'>
+        <div className='h-20 bg-surface1'>
           {(isError || (data === undefined && !isLoading)) && (
             <QueryError className='top-[-30px]' title='Failed to load peer settings' />
           )}
@@ -58,7 +58,7 @@ const PeerSettingsForm: FC<Props> = ({ minSize }): ReactElement => {
       <div className='flex justify-between'>
         <Form.Item className='[&_label]:!text-sm [&_label]:!text-text' name='min_size' label='Minimum group size'>
           <InputNumber
-            className='antNumberInput w-full !border border-solid !border-primary !bg-card-background hover:!border-primary hover:!bg-card [&_input]:!text-text'
+            className='antNumberInput w-full !border border-solid !border-accent/50 !bg-surface1 hover:!border-accent hover:!bg-surface2 [&_input]:!text-text'
             min={2}
             variant='borderless'
           />
@@ -75,7 +75,7 @@ const PeerSettingsForm: FC<Props> = ({ minSize }): ReactElement => {
 
       <Form.Item className='m-0 flex justify-end'>
         <Button
-          className='min-w-20 !border-none bg-button hover:!border-none hover:!bg-button-hover [&_span]:text-text'
+          className='min-w-20 !border-none bg-success hover:!border-none hover:!bg-success/80 [&_span]:text-text'
           htmlType='submit'
         >
           Save

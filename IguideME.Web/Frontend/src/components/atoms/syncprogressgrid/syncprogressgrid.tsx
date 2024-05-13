@@ -42,7 +42,7 @@ const SyncProgressGrid: FC = (): ReactElement => {
     );
   } else {
     return (
-      <div className={`h-full w-full rounded-lg bg-card p-[10px] ${theme === 'light' && 'shadow-statusCard'}`}>
+      <div className={`h-full w-full rounded-lg bg-overlay0 p-[10px] ${theme === 'light' && 'shadow-statusCard'}`}>
         <Row gutter={[10, 10]}>
           {Object.values(SyncStateNames).map((name: string) => {
             const stateType = SyncStates.get(name);

@@ -26,7 +26,7 @@ const GraphLearning: FC<Grades> = memo(({ grade, peerAvg, max }): ReactElement =
   const RadialBarTooltip: FC<TooltipProps> = ({ active, payload }) => {
     if (active && payload && payload.length) {
       return (
-        <div className='z-50 rounded-lg border border-solid border-text bg-body p-2'>
+        <div className='z-50 rounded-lg border border-solid border-text bg-surface1/85 p-2'>
           <p>
             Completed: {Math.round(payload[0].value)}/{max}
           </p>
@@ -45,12 +45,12 @@ const GraphLearning: FC<Grades> = memo(({ grade, peerAvg, max }): ReactElement =
         {
           name: 'You',
           grade: grade,
-          fill: fullConfig.theme.colors.graph.you,
+          fill: fullConfig.theme.colors.primary,
         },
         {
           name: 'Peer',
           grade: peerAvg,
-          fill: fullConfig.theme.colors.graph.peer,
+          fill: fullConfig.theme.colors.secondary,
         },
       ]}
       cx='50%'
@@ -63,7 +63,7 @@ const GraphLearning: FC<Grades> = memo(({ grade, peerAvg, max }): ReactElement =
       width={250}
       height={180}
     >
-      <RadialBar background className='[&>g>path]:!fill-graph-max' dataKey='grade' />
+      <RadialBar background className='[&>g>path]:!fill-overlay0' dataKey='grade' />
       <Legend align='right' layout='vertical' verticalAlign='top' />
       <Tooltip content={<RadialBarTooltip />} />
       <PolarAngleAxis type='number' domain={[0, max]} angleAxisId={0} tick={false} />

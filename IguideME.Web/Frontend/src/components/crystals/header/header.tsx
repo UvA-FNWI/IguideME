@@ -38,8 +38,8 @@ const Header: FC<HeaderProps> = ({ self }): ReactElement => {
   }, [inHome, selectedStudent, self]);
 
   return (
-    <header className='relative flex min-h-header w-screen items-center justify-between overflow-x-hidden bg-navbar p-3'>
-      <a className='inline-block align-middle text-2xl font-semibold text-white' href='/'>
+    <header className='relative flex min-h-header w-screen items-center justify-between overflow-x-hidden bg-surface0 p-3'>
+      <a className='inline-block align-middle text-2xl font-semibold text-textAlt' href='/'>
         IguideME
       </a>
       <div className='md:hidden'>
@@ -50,13 +50,13 @@ const Header: FC<HeaderProps> = ({ self }): ReactElement => {
           <Selector selectedStudent={selectedStudent} setSelectedStudent={setSelectedStudent} />
         </div>
       )}
-      <div className='hidden gap-2 rounded-full border border-white px-1 md:flex lg:border-none'>
-        <div className='flex outline-offset-[-1px] outline-white lg:rounded-md lg:outline lg:outline-1'>
+      <div className='hidden gap-2 rounded-full border border-textAlt px-1 md:flex lg:border-none'>
+        <div className='flex outline-offset-[-1px] outline-textAlt lg:rounded-md lg:outline lg:outline-1'>
           <ThemeSwitcherDropdown buttonClasses='border-none' />
           <NotificationPanel buttonClasses='border-none' placement='bottomLeft' user={selectedStudent ?? self} />
         </div>
         <Button
-          className='flex h-10 w-10 flex-col items-center justify-center rounded-r-full border border-none border-white p-2 align-middle text-white hover:!bg-navbar-light hover:!text-white lg:w-32 lg:rounded-md lg:border-solid'
+          className='flex h-10 w-10 flex-col items-center justify-center rounded-r-full border border-none border-textAlt p-2 align-middle text-textAlt hover:!border-subtext0 hover:!text-subtext0 lg:w-32 lg:rounded-md lg:border-solid'
           onClick={switchPage}
           type='link'
         >
@@ -68,8 +68,8 @@ const Header: FC<HeaderProps> = ({ self }): ReactElement => {
             : 'Settings'}
           </span>
           {!inHome ?
-            <HomeOutlined className='!m-0 lg:!hidden [&>svg]:h-4 [&>svg]:w-4' />
-          : <SettingOutlined className='!m-0 lg:!hidden [&>svg]:h-4 [&>svg]:w-4' />}
+            <HomeOutlined className='!m-0 lg:!hidden [&>svg]:h-4 [&>svg]:w-4 hover:!text-subtext1' />
+          : <SettingOutlined className='!m-0 lg:!hidden [&>svg]:h-4 [&>svg]:w-4 hover:!text-subtext1' />}
         </Button>
       </div>
     </header>

@@ -22,7 +22,7 @@ const StatusCard: FC<Props> = ({ title, description, status }): ReactElement => 
 
   return (
     <div
-      className={`w-full h-full p-4 bg-card-foreground rounded-md ${theme === 'light' && 'shadow-statusCard'} font-tnum`}
+      className={`w-full h-full p-4 bg-base rounded-md ${theme === 'light' && 'shadow-statusCard'} font-tnum`}
     >
       <Row className='justify-between'>
         <Col>

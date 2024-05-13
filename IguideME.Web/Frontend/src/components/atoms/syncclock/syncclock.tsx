@@ -71,7 +71,7 @@ const SyncClock: FC = (): ReactElement => {
       <div className='grid w-full place-content-center'>
         <div
           className={cn(
-            `flex h-[180px] w-[180px] items-center justify-center rounded-full bg-card-foreground text-center ${theme === 'light' && 'shadow-syncClock'} ${
+            `flex h-[180px] w-[180px] items-center justify-center rounded-full bg-base text-center ${theme === 'light' && 'shadow-syncClock'} ${
               elapsed !== undefined ? 'before:animate-spin' : ''
             }`,
             styles.syncClock,
@@ -93,7 +93,7 @@ const SyncClock: FC = (): ReactElement => {
       <div className='flex justify-between gap-2'>
         <Button
           block
-          className={`m-0 flex-grow basis-0 bg-button uppercase text-text hover:!bg-button-hover hover:!text-text ${theme === 'light' && 'shadow-syncButton hover:enabled:shadow-statusCard disabled:shadow-statusCard'} rounded-sm border-none disabled:bg-button-disabled disabled:!text-text disabled:hover:!bg-button-disabled disabled:hover:!text-text`}
+          className={`m-0 flex-grow basis-0 bg-overlay1 uppercase text-text hover:!bg-overlay2 hover:!text-text ${theme === 'light' && 'shadow-syncButton hover:enabled:shadow-statusCard disabled:shadow-statusCard'} rounded-sm border-none disabled:bg-surface2 disabled:!text-text disabled:hover:!bg-surface2 disabled:hover:!text-text`}
           disabled={elapsed !== undefined}
           onClick={startSync}
         >
@@ -101,7 +101,7 @@ const SyncClock: FC = (): ReactElement => {
         </Button>
 
         <Button
-          className={`m-0 flex-grow basis-0 bg-button uppercase text-text hover:!bg-button-hover hover:!text-text ${theme === 'light' && 'shadow-syncButton hover:enabled:shadow-statusCard disabled:shadow-statusCard'} rounded-sm border-none disabled:bg-button-disabled disabled:!text-text disabled:hover:!bg-button-disabled disabled:hover:!text-text`}
+          className={`m-0 flex-grow basis-0 bg-overlay1 uppercase text-text hover:!bg-overlay2 hover:!text-text ${theme === 'light' && 'shadow-syncButton hover:enabled:shadow-statusCard disabled:shadow-statusCard'} rounded-sm border-none disabled:bg-surface2 disabled:!text-text disabled:hover:!bg-surface2 disabled:hover:!text-text`}
           disabled={elapsed === undefined}
           block
           onClick={() => {

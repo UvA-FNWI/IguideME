@@ -43,12 +43,12 @@ const MobileHeader: FC<MobileHeaderProps> = memo(({ self, selectedStudent, setSe
         <div className='fixed bottom-0 left-0 z-10 mt-header h-[calc(100vh-70px)] w-screen bg-text/30 backdrop-blur-sm' />
       )}
       <div
-        className={`fixed bottom-0 right-0 mt-header h-[calc(100vh-70px)] w-[min(100vw,400px)] bg-body text-text ${open ? 'translate-x-0' : 'translate-x-full'} z-50 transition-all duration-200 ease-in`}
+        className={`fixed bottom-0 right-0 mt-header h-[calc(100vh-70px)] w-[min(100vw,400px)] bg-crust text-text ${open ? 'translate-x-0' : 'translate-x-full'} z-50 transition-all duration-200 ease-in`}
       >
         <div className='flex h-full flex-col justify-between gap-8 overflow-y-auto px-8 py-6'>
           <div>
             <ul className='flex flex-col gap-2'>
-              <li className='min-h-12 w-full text-base'>
+              <li className='min-h-12 w-full text-text'>
                 <a
                   className={`flex h-12 w-full items-center ${currentRoute === '/' ? 'font-semibold' : 'font-normal'}`}
                   href='/'
@@ -60,7 +60,7 @@ const MobileHeader: FC<MobileHeaderProps> = memo(({ self, selectedStudent, setSe
                 <Divider className='m-0 bg-text/50 p-0' />
               </li>
               <li
-                className={`min-h-12 w-full [&_span]:!text-base [&_span]:!text-text ${currentRoute.startsWith('/admin') ? '[&_span]:!font-semibold' : '[&_span]:!font-normal'}`}
+                className={`min-h-12 w-full [&_span]:!text-text ${currentRoute.startsWith('/admin') ? '[&_span]:!font-semibold' : '[&_span]:!font-normal'}`}
               >
                 <Collapse
                   className='[&>div>div]:!px-0'
@@ -70,7 +70,7 @@ const MobileHeader: FC<MobileHeaderProps> = memo(({ self, selectedStudent, setSe
                       key: '1',
                       label: 'Admin Panel',
                       children: (
-                        <ul>
+                        <ul className='text-text'>
                           {adminPanelMenuItems.map((item) => (
                             <MenuItem key={item.key} item={item} />
                           ))}
@@ -88,7 +88,7 @@ const MobileHeader: FC<MobileHeaderProps> = memo(({ self, selectedStudent, setSe
                   <Selector
                     placeholder='Open a student profile'
                     onSelect={() => setOpen(false)}
-                    selectClasses={`h-12 [&>div]:!bg-body [&>div>span]:!text-text [&_span_*]:!text-text [&>div]:!border-none [&_span]:!text-base ${/^\/\d+$/.test(currentRoute) ? '[&_span]:!font-semibold' : '[&_span]:!font-normal'}`}
+                    selectClasses={`h-12 [&>div]:!bg-crust [&>div>span]:!text-text [&_span_*]:!text-text [&>div]:!border-none [&_span]:!text-text ${/^\/\d+$/.test(currentRoute) ? '[&_span]:!font-semibold' : '[&_span]:!font-normal'}`}
                     selectedStudent={selectedStudent}
                     setSelectedStudent={setSelectedStudent}
                   />
@@ -99,10 +99,10 @@ const MobileHeader: FC<MobileHeaderProps> = memo(({ self, selectedStudent, setSe
               </li>
             </ul>
             <div className='mt-6 flex w-full justify-between gap-2'>
-              <div className='flex-grow basis-0 rounded-md bg-card'>
+              <div className='flex-grow basis-0 rounded-md bg-surface2'>
                 <ThemeSwitcherSwitch />
               </div>
-              <div className='h-12 flex-grow basis-0 rounded-md bg-card'>
+              <div className='h-12 flex-grow basis-0 rounded-md bg-surface2'>
                 <NotificationPanel
                   buttonClasses='text-text w-full h-full border-none m-0 p-0 grid place-content-center'
                   placement='bottomRight'
@@ -111,10 +111,10 @@ const MobileHeader: FC<MobileHeaderProps> = memo(({ self, selectedStudent, setSe
               </div>
             </div>
           </div>
-          <div className='bg-body'>
-            <div className='flex h-header flex-col content-center justify-center border-t border-text bg-body p-4'>
+          <div className='bg-crust'>
+            <div className='flex h-header flex-col content-center justify-center border-t border-text bg-crust p-4'>
               <h3 className='text-lg'>{self?.name}</h3>
-              <strong>
+              <strong className='text-text'>
                 <UserOutlined /> Instructor
               </strong>
             </div>

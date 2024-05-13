@@ -94,7 +94,7 @@ const GoalGrade: FC<GoalProps> = ({ goalGrade }): ReactElement => {
   return (
     <div id={'desiredGrade'}>
       <h1 className='text-left text-2xl'>Goal Grade</h1>
-      <p className='text-justify text-base'>
+      <p className='text-justify text-text'>
         Please indicate the grade you wish to obtain for this course. You can always change your goal at a later stage!
       </p>
       <div className='mt-2 w-full'>
@@ -143,7 +143,7 @@ const Consent: FC<ConsentProps> = ({ consent }): ReactElement => {
             key: 1,
             label: (
               <>
-                <p className='text-justify text-base'>
+                <p className='text-justify text-text'>
                   Please read the informed consent carefully. You will be asked to accept the informed consent, if
                   declined your data will not be processed. You can change your preference at any time.
                   <span className='sr-only'>Click anywhere on this text to open the informed consent.</span>
@@ -164,7 +164,7 @@ const Consent: FC<ConsentProps> = ({ consent }): ReactElement => {
 };
 
 const ConsentText: FC = () => (
-  <div className='bg-primary-gray prose rounded-lg p-2 text-justify prose-h1:text-text prose-h2:text-text prose-h3:text-text'>
+  <div className='bg-subtext1 prose rounded-lg p-2 text-justify prose-h1:text-text prose-h2:text-text prose-h3:text-text'>
     <h1>IguideME</h1>
     <h2>INFORMED CONSENT</h2>
     <p>

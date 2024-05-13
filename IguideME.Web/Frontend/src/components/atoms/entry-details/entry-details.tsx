@@ -44,7 +44,7 @@ export const AssignmentDetail: FC<Props> = ({ entry }): ReactElement => {
     case 'graph':
       return (
         <div className='h-full w-full p-2'>
-          <h3 className='overflow-hidden text-ellipsis text-nowrap text-center text-base font-bold'>{entry.title}</h3>
+          <h3 className='overflow-hidden text-ellipsis text-nowrap text-center text-text font-bold'>{entry.title}</h3>
           <div className='grid h-full w-full place-content-center'>
             <GraphGrade {...submission.grades} />
           </div>
@@ -53,7 +53,7 @@ export const AssignmentDetail: FC<Props> = ({ entry }): ReactElement => {
     case 'grid':
       return (
         <div className='h-full w-full p-2'>
-          <h3 className='h-1/5 max-w-[270px] overflow-hidden text-ellipsis text-nowrap text-center text-base font-bold'>
+          <h3 className='h-1/5 max-w-[270px] overflow-hidden text-ellipsis text-nowrap text-center text-text font-bold'>
             {entry.title}
           </h3>
           <div className='flex h-4/5 w-full flex-col justify-between'>
@@ -61,7 +61,7 @@ export const AssignmentDetail: FC<Props> = ({ entry }): ReactElement => {
               <GradeView {...submission.grades} />
             </div>
             <div>
-              <Divider className='m-0 p-0' />
+              <Divider className='m-0 p-0 border-text' />
               <PeerComparison {...submission.grades} />
             </div>
           </div>
@@ -95,7 +95,7 @@ export const DiscussionDetail: FC<Props> = ({ entry }): ReactElement => {
   } else
     return (
       <div className='h-full w-full p-2'>
-        <h3 className='overflow-hidden text-ellipsis text-nowrap text-center text-base font-bold'>{entry.title}</h3>
+        <h3 className='overflow-hidden text-ellipsis text-nowrap text-center text-text font-bold'>{entry.title}</h3>
         <p>{discussion.message}</p>
       </div>
     );
@@ -112,7 +112,6 @@ export const LearningGoalDetail: FC<Props> = ({ entry }): ReactElement => {
     queryFn: async () => await getLearningGoal(entry.content_id, user.userID),
   });
 
-  console.log('test', learningGoal);
   const {
     data: assignments,
     isError: assIsError,
@@ -135,22 +134,22 @@ export const LearningGoalDetail: FC<Props> = ({ entry }): ReactElement => {
   return (
     <div className='h-full w-full p-2'>
       <div className='flex h-1/5 items-baseline justify-between gap-4'>
-        <h3 className='overflow-hidden text-ellipsis text-nowrap text-base font-bold'>{entry.title}</h3>
+        <h3 className='overflow-hidden text-ellipsis text-nowrap text-text font-bold'>{entry.title}</h3>
         {learningGoal.results?.every((b) => b) ?
-          <span className='flex place-content-center gap-2 text-sm'>
+          <span className='flex place-content-center gap-2 text-sm text-subtext1'>
             Passed
-            <CheckCircleOutlined className='text-base [&_svg]:!fill-success' />
+            <CheckCircleOutlined className='text-text [&_svg]:!fill-success' />
           </span>
         : <span className='flex place-content-center gap-2 text-sm'>
             Failed
-            <CloseCircleOutlined className='text-base [&_svg]:!fill-failure' />
+            <CloseCircleOutlined className='text-text [&_svg]:!fill-failure' />
           </span>
         }
       </div>
 
       <div className='flex h-4/5 w-full flex-col overflow-auto'>
-        <h4 className='mb-2 flex-shrink-0 text-base underline'>Sub-goals</h4>
-        <ul className='h-full flex-grow overflow-auto'>
+        <h4 className='mb-2 flex-shrink-0 text-subtext1 underline'>Sub-goals</h4>
+        <ul className='h-full flex-grow overflow-auto text-subtext1'>
           {learningGoal.requirements.map((req, i) => {
             const result = learningGoal.results?.[i];
             const ass = assignments.get(req.assignment_id);

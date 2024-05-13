@@ -53,7 +53,7 @@ function TileDetailView(): ReactElement {
       <Row>
         <Col>
           <Button
-            className='ml-[20px] !w-[50px] rounded-[20px] border border-solid border-primary bg-body p-0 hover:!bg-text/10 [&>span]:!text-text'
+            className='ml-[20px] !w-[50px] rounded-[20px] border border-solid border-border1 bg-crust p-0 hover:!bg-text/10 [&>span]:!text-text'
             type={'link'}
             icon={<ArrowLeftOutlined />}
             onClick={() => {

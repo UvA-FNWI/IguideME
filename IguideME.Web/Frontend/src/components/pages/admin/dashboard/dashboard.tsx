@@ -67,7 +67,7 @@ const Dashboard: FC = (): ReactElement => {
       <h2 className='mt-5 text-xl'>Historic versions</h2>
       <Divider className='mb-5 mt-1' />
       <Table
-        className='[&_button]:!text-text [&_div]:!text-text [&_td]:!bg-dropdownBackground [&_td]:!text-text [&_th]:!bg-card-background [&_th]:!text-text'
+        className='[&_button]:!text-text [&_div]:!text-text [&_td]:!bg-surface1 [&_td]:!text-text [&_th]:!bg-surface1 [&_th]:!text-text'
         scroll={{ x: 240 }}
         dataSource={syncs}
         columns={columns}

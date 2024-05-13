@@ -45,7 +45,7 @@ export const GradeView: FC<Grades> = ({ grade, max, type }): ReactElement => {
 const Discussions: FC<Grades> = ({ grade }): ReactElement => {
   return (
     <Space>
-      {grade === 0 ? '...' : grade.toFixed(0)}
+      <p>{grade === 0 ? '...' : grade.toFixed(0)}</p>
       <MessageFilled />
     </Space>
   );
@@ -54,13 +54,13 @@ const Discussions: FC<Grades> = ({ grade }): ReactElement => {
 const Learnings: FC<Grades> = ({ grade, max }): ReactElement => {
   return (
     <Space>
-      {grade === 0 ?
+      <p>{grade === 0 ?
         '...'
       : <>
           {grade.toFixed(0)}/{max}
         </>
-      }
-      <TrophyOutlined />
+      }</p>
+      <TrophyOutlined className='text-success'/>
     </Space>
   );
 };

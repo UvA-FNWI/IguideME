@@ -63,10 +63,10 @@ const Selector: FC<SelectorProps> = ({
       allowClear={true}
       aria-disabled={isLoading || isError}
       className={cn(
-        'h-[40px] w-full md:w-80 lg:w-[400px] [&>div>span]:!text-white [&>div]:!border-white [&>div]:!bg-navbar [&_span_*]:!text-white',
+        'h-[40px] w-full md:w-80 lg:w-[400px] [&>div>span]:!text-textAlt [&>div]:!border-textAlt [&>div]:!bg-surface0 [&_span_*]:!text-textAlt',
         selectClasses,
       )}
-      popupClassName='!bg-dropdownBackground [&>div>div>div>div>div>div>div]:!text-text selectBackgroundHover'
+      popupClassName='!bg-surface1 [&>div>div>div>div>div>div>div]:!text-text selectBackgroundHover'
       disabled={isLoading || isError}
       placeholder={
         isLoading ? 'Loading students...'

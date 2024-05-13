@@ -13,49 +13,33 @@ export default {
         syncClock: '9px 9px 18px #bec8e4',
       },
       colors: {
-        body: 'hsl(var(--body) / <alpha-value>)',
-        text: 'hsl(var(--text) / <alpha-value>)',
+        primary:   'var(--primary)',
+        secondary: 'var(--secondary)',
+        tertiary:  'var(--tertiary)',
+        accent:    'hsl(var(--accent) / <alpha-value>)',
 
-        button: {
-          DEFAULT: 'hsl(var(--button) / <alpha-value>)',
-          disabled: 'hsl(var(--button-disabled) / <alpha-value>)',
-          hover: 'hsl(var(--button-hover) / <alpha-value>)',
-        },
+        crust:     'hsl(var(--crust) / <alpha-value>)',
+        mantle:    'hsl(var(--mantle) / <alpha-value>)',
+        base:      'hsl(var(--base) / <alpha-value>)',
 
-        card: {
-          DEFAULT: 'hsl(var(--card) / <alpha-value>)',
-          background: 'hsl(var(--card-background) / <alpha-value>)',
-          foreground: 'hsl(var(--card-foreground) / <alpha-value>)',
-        },
+        surface0:  'hsl(var(--surface0) / <alpha-value>)',
+        surface1:  'hsl(var(--surface1) / <alpha-value>)',
+        surface2:  'hsl(var(--surface2) / <alpha-value>)',
 
-        graph: {
-          max: 'hsl(var(--graph-max) / <alpha-value>)',
-          peer: 'var(--graph-peer)',
-          peerMax: 'var(--graph-peer-max)',
-          you: 'var(--graph-you)',
-        },
+        overlay0:  'hsl(var(--overlay0) / <alpha-value>)',
+        overlay1:  'hsl(var(--overlay1) / <alpha-value>)',
+        overlay2:  'hsl(var(--overlay2) / <alpha-value>)',
 
-        banner: 'hsl(var(--banner) / <alpha-value>)',
-        content: 'hsl(var(--content) / <alpha-value>)',
-        dropdownBackground: 'hsl(var(--dropdown-background) / <alpha-value>)',
+        subtext0:  'hsl(var(--subtext0) / <alpha-value>)',
+        subtext1:  'hsl(var(--subtext1) / <alpha-value>)',
+        text:      'hsl(var(--text) / <alpha-value>)',
+        textAlt:   'hsl(var(--textAlt) / <alpha-value>)',
 
-        navbar: {
-          DEFAULT: 'hsl(var(--navbar) / <alpha-value>)',
-          light: 'hsl(var(--navbar-light) / <alpha-value>)',
-          side: {
-            DEFAULT: 'hsl(var(--navbar-side) / <alpha-value>)',
-            active: 'hsl(var(--navbar-side-active) / <alpha-value>)',
-            hover: 'hsl(var(--navbar-side-hover) / <alpha-value>)',
-          },
-        },
+        border0:   'hsl(var(--border0) / <alpha-value>)',
+        border1:   'hsl(var(--border1) / <alpha-value>)',
 
-        primary: {
-          DEFAULT: 'hsl(var(--primary) / <alpha-value>)',
-          light: 'hsl(var(--primary-light) / <alpha-value>)',
-        },
-
-        success: 'hsl(var(--success) / <alpha-value>)',
-        failure: 'hsl(var(--failure) / <alpha-value>)',
+        success:   'hsl(var(--success) / <alpha-value>)',
+        failure:   'hsl(var(--failure) / <alpha-value>)',
       },
       cursor: {
         brand:
