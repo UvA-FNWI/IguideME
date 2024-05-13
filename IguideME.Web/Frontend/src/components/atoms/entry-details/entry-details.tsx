@@ -57,7 +57,7 @@ export const AssignmentDetail: FC<Props> = ({ entry }): ReactElement => {
             {entry.title}
           </h3>
           <div className='flex h-4/5 w-full flex-col justify-between'>
-            <div className='grid h-2/5 place-content-center'>
+            <div className='grid flex-grow place-content-center'>
               <GradeView {...submission.grades} />
             </div>
             <div>
@@ -134,7 +134,7 @@ export const LearningGoalDetail: FC<Props> = ({ entry }): ReactElement => {
 
   return (
     <div className='h-full w-full p-2'>
-      <div className='flex items-baseline justify-between gap-4 h-1/5'>
+      <div className='flex h-1/5 items-baseline justify-between gap-4'>
         <h3 className='overflow-hidden text-ellipsis text-nowrap text-base font-bold'>{entry.title}</h3>
         {learningGoal.results?.every((b) => b) ?
           <span className='flex place-content-center gap-2 text-sm'>
@@ -148,9 +148,9 @@ export const LearningGoalDetail: FC<Props> = ({ entry }): ReactElement => {
         }
       </div>
 
-      <div className='h-4/5 w-full overflow-auto flex flex-col'>
-        <h4 className='mb-2 text-base underline flex-shrink-0'>Sub-goals</h4>
-        <ul className='overflow-auto h-full flex-grow'>
+      <div className='flex h-4/5 w-full flex-col overflow-auto'>
+        <h4 className='mb-2 flex-shrink-0 text-base underline'>Sub-goals</h4>
+        <ul className='h-full flex-grow overflow-auto'>
           {learningGoal.requirements.map((req, i) => {
             const result = learningGoal.results?.[i];
             const ass = assignments.get(req.assignment_id);
@@ -164,7 +164,7 @@ export const LearningGoalDetail: FC<Props> = ({ entry }): ReactElement => {
                     {ass.title} {printLogicalExpression(req.expression)} {req.value}
                   </>
                 : <>
-                    <CloseOutlined className='text-xs text-failure mr-2' />
+                    <CloseOutlined className='mr-2 text-xs text-failure' />
                     {ass.title} {printLogicalExpression(req.expression)} {req.value}
                   </>
                 }
