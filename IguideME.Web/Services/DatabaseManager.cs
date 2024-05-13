@@ -2837,6 +2837,35 @@ namespace IguideME.Web.Services
             return discussions;
         }
 
+        public AppDiscussion GetTopicGradesForUser(int courseID, int entryID, string userID)
+        {
+            using (
+                SQLiteDataReader r = Query(
+                    DatabaseQueries.QUERY_TOPIC_FOR_USER,
+                    new SQLiteParameter("courseID", courseID),
+                    new SQLiteParameter("entryID", entryID),
+                    new SQLiteParameter("userID", userID)
+                )
+            )
+            {
+                while (r.Read())
+                {
+                    return new(
+                            Discussion_type.Topic,
+                            r.GetInt32(0),
+                            -1,
+                            r.GetInt32(1),
+                            r.GetValue(2).ToString(),
+                            r.GetValue(3).ToString(),
+                            r.GetInt32(4),
+                            r.GetValue(5).ToString()
+                        );
+                }
+            }
+
+            return null;
+        }
+
         public List<AppDiscussion> GetDiscussionsForTile(int tileID)
         {
             List<AppDiscussion> discussions = new();

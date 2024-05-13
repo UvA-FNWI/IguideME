@@ -135,7 +135,7 @@ export const LearningGoalDetail: FC<Props> = ({ entry }): ReactElement => {
 
   return (
     <div className='h-full w-full p-2'>
-      <div className='flex items-center justify-between gap-4'>
+      <div className='flex items-baseline justify-between gap-4 h-1/5'>
         <h3 className='overflow-hidden text-ellipsis text-nowrap text-base font-bold'>{entry.title}</h3>
         {learningGoal.results?.every((b) => b) ?
           <span className='flex place-content-center gap-2 text-sm'>
@@ -144,28 +144,28 @@ export const LearningGoalDetail: FC<Props> = ({ entry }): ReactElement => {
           </span>
         : <span className='flex place-content-center gap-2 text-sm'>
             Failed
-            <CloseCircleOutlined className='text-base [&_svg]:!fill-success' />
+            <CloseCircleOutlined className='text-base [&_svg]:!fill-failure' />
           </span>
         }
       </div>
 
-      <div className='mt-4 h-full w-full overflow-auto'>
-        <h4 className='mb-2 text-base underline underline-offset-2'>Sub-goals</h4>
-        <ul className='overflow-y-auto'>
+      <div className='h-4/5 w-full overflow-auto flex flex-col'>
+        <h4 className='mb-2 text-base underline flex-shrink-0'>Sub-goals</h4>
+        <ul className='overflow-auto h-full flex-grow'>
           {learningGoal.requirements.map((req, i) => {
             const result = learningGoal.results?.[i];
             const ass = assignments.get(req.assignment_id);
             if (!ass) return null;
 
             return (
-              <li className='list-item overflow-x-auto overflow-y-hidden text-nowrap text-xs' key={i}>
+              <li className='list-item text-nowrap text-sm' key={i}>
                 {result ?
                   <>
                     <CheckOutlined className='mr-2 text-xs text-success' />
                     {ass.title} {printLogicalExpression(req.expression)} {req.value}
                   </>
                 : <>
-                    <CloseOutlined className='text-xs text-failure' />
+                    <CloseOutlined className='text-xs text-failure mr-2' />
                     {ass.title} {printLogicalExpression(req.expression)} {req.value}
                   </>
                 }

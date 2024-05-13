@@ -483,6 +483,28 @@ namespace IguideME.Web.Controllers
                 : BadRequest();
         }
 
+        [Authorize]
+        [HttpGet]
+        [Route("/discussions/{entryID}/{userID}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public ActionResult GetTopic(string entryID, string userID)
+        {
+            // Only instructors may view submissions of other students
+            if (this.GetUserID() != userID &&
+                !this.IsAdministrator())
+                return Unauthorized();
+
+            bool success = int.TryParse(entryID, out int id);
+
+            return success
+                ? Json(
+                    _databaseManager.GetTopicGradesForUser(
+                        this.GetCourseID(), id, userID))
+                : BadRequest();
+        }
+
         // [Authorize]
         // [HttpGet]
         // [Route("/tiles/{tileID}/submissions")]

@@ -1081,6 +1081,16 @@ public static class DatabaseQueries
         WHERE       `discussions`.`course_id`=@courseID
         ;";
 
+    public const string QUERY_TOPIC_FOR_USER =
+        @"SELECT    `discussions`.`discussion_id`,
+                    `discussions`.`title`,
+                    `discussions`.`author`,
+                    `discussions`.`date`,
+                    `discussions`.`message`
+        FROM        `discussions`
+        WHERE       `discussions`.`course_id`=@courseID
+        ;";
+
     public const string QUERY_TILE_DISCUSSIONS =
         @"SELECT    `discussions`.`discussion_id`,
                     `discussions`.`course_id`,
