@@ -5,10 +5,9 @@ import PeerComparison from '@/components/particles/peer-comparison/peercompariso
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
 import { printLogicalExpression, type TileEntry } from '@/types/tile';
-import { CheckCircleTwoTone, CheckOutlined, CloseCircleTwoTone, CloseOutlined } from '@ant-design/icons';
+import { CheckCircleOutlined, CheckOutlined, CloseCircleOutlined, CloseOutlined } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
-import { Divider, Row } from 'antd';
-import { Col } from 'antd/lib';
+import { Divider } from 'antd';
 import { type FC, type ReactElement } from 'react';
 import GraphGrade from '../graph-grade/graph-grade';
 
@@ -44,23 +43,29 @@ export const AssignmentDetail: FC<Props> = ({ entry }): ReactElement => {
   switch (viewType) {
     case 'graph':
       return (
-        <Row className='h-4/5 content-center justify-center'>
-          <GraphGrade {...submission.grades} />
-        </Row>
+        <div className='h-full w-full p-2'>
+          <h3 className='overflow-hidden text-ellipsis text-nowrap text-center text-base font-bold'>{entry.title}</h3>
+          <div className='grid h-full w-full place-content-center'>
+            <GraphGrade {...submission.grades} />
+          </div>
+        </div>
       );
     case 'grid':
       return (
-        <>
-          <Row className='h-1/2 content-center justify-center'>
-            <GradeView {...submission.grades} />
-          </Row>
-          <Row className='h-[30%] content-start justify-center'>
-            <Col className='w-full'>
+        <div className='h-full w-full p-2'>
+          <h3 className='h-1/5 max-w-[270px] overflow-hidden text-ellipsis text-nowrap text-center text-base font-bold'>
+            {entry.title}
+          </h3>
+          <div className='flex h-4/5 w-full flex-col justify-between'>
+            <div className='grid h-2/5 place-content-center'>
+              <GradeView {...submission.grades} />
+            </div>
+            <div>
               <Divider className='m-0 p-0' />
               <PeerComparison {...submission.grades} />
-            </Col>{' '}
-          </Row>
-        </>
+            </div>
+          </div>
+        </div>
       );
     default:
       throw new Error('Unknown view type');
@@ -87,7 +92,13 @@ export const DiscussionDetail: FC<Props> = ({ entry }): ReactElement => {
     );
   } else if (isError || !discussion) {
     return <QueryError className='grid place-content-center' title='No submission found' />;
-  } else return <>{discussion.message}</>;
+  } else
+    return (
+      <div className='h-full w-full p-2'>
+        <h3 className='overflow-hidden text-ellipsis text-nowrap text-center text-base font-bold'>{entry.title}</h3>
+        <p>{discussion.message}</p>
+      </div>
+    );
 };
 
 export const LearningGoalDetail: FC<Props> = ({ entry }): ReactElement => {
@@ -123,36 +134,46 @@ export const LearningGoalDetail: FC<Props> = ({ entry }): ReactElement => {
   }
 
   return (
-    <>
-      <Row className='h-2/5 content-center justify-center'>
+    <div className='h-full w-full p-2'>
+      <div className='flex items-center justify-between gap-4'>
+        <h3 className='overflow-hidden text-ellipsis text-nowrap text-base font-bold'>{entry.title}</h3>
         {learningGoal.results?.every((b) => b) ?
-          <>
+          <span className='flex place-content-center gap-2 text-sm'>
             Passed
-            <CheckCircleTwoTone className='text-2xl' />
-          </>
-        : <>
+            <CheckCircleOutlined className='text-base [&_svg]:!fill-success' />
+          </span>
+        : <span className='flex place-content-center gap-2 text-sm'>
             Failed
-            <CloseCircleTwoTone className='text-2xl' />
-          </>
+            <CloseCircleOutlined className='text-base [&_svg]:!fill-success' />
+          </span>
         }
-      </Row>
-      <Row className='h-2/5 content-center justify-center overflow-y-scroll'>
-        {learningGoal.requirements.map((req, i) => {
-          const result = learningGoal.results?.[i];
-          const ass = assignments.get(req.assignment_id);
-          if (!ass) {
-            return <></>;
-          }
-          return (
-            <div key={i}>
-              {ass.title} {printLogicalExpression(req.expression)} {req.value}
-              {result ?
-                <CheckOutlined />
-              : <CloseOutlined />}
-            </div>
-          );
-        })}
-      </Row>
-    </>
+      </div>
+
+      <div className='mt-4 h-full w-full overflow-auto'>
+        <h4 className='mb-2 text-base underline underline-offset-2'>Sub-goals</h4>
+        <ul className='overflow-y-auto'>
+          {learningGoal.requirements.map((req, i) => {
+            const result = learningGoal.results?.[i];
+            const ass = assignments.get(req.assignment_id);
+            if (!ass) return null;
+
+            return (
+              <li className='list-item overflow-x-auto overflow-y-hidden text-nowrap text-xs' key={i}>
+                {result ?
+                  <>
+                    <CheckOutlined className='mr-2 text-xs text-success' />
+                    {ass.title} {printLogicalExpression(req.expression)} {req.value}
+                  </>
+                : <>
+                    <CloseOutlined className='text-xs text-failure' />
+                    {ass.title} {printLogicalExpression(req.expression)} {req.value}
+                  </>
+                }
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    </div>
   );
 };

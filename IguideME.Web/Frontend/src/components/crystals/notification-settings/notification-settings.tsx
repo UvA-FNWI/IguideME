@@ -39,7 +39,7 @@ const NotificationSettings: FC = (): ReactElement => {
       <QueryLoading isLoading={isLoading}>
         <div className='h-20 bg-card-background'>
           {(isError || (data === undefined && !isLoading)) && (
-            <QueryError className='top-[-30px]' title='Failed to load peer settings' />
+            <QueryError className='top-[-30px]' title='Failed to load notification settings' />
           )}
         </div>
       </QueryLoading>

@@ -56,14 +56,14 @@ const LearningGoals: FC = (): ReactElement => {
   if (isLoading) {
     return (
       <QueryLoading isLoading={isLoading}>
-        <article className='h-[100px] w-full rounded-lg' />
+        <div className='h-[100px] w-full rounded-lg bg-card-background' />
       </QueryLoading>
     );
   } else if (isError) {
     return (
-      <article className='h-[100px] w-full rounded-lg'>
+      <div className='h-[100px] w-full rounded-lg bg-card-background'>
         <QueryError title='Error: Unable to load learning goals' />
-      </article>
+      </div>
     );
   } else {
     return (

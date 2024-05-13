@@ -27,10 +27,7 @@ function App(): ReactElement {
   });
 
   useEffect(() => {
-    // TODO: If data is null or undefined print an error message. The backend needs one synchronize before data can be fetched.
-    if (isSuccess && data.role === UserRoles.student) {
-      navigate(data.userID ?? '/');
-    }
+    if (isSuccess && data.role === UserRoles.student) navigate(data.userID ?? '/');
   }, [isSuccess]);
 
   const HeaderLoader = (
@@ -51,7 +48,7 @@ function App(): ReactElement {
   if (isLoading) return GlobalLoadingState;
   else if (isError || data === undefined) {
     return (
-      <Suspense fallback={GlobalLoadingState}>
+      <>
         {HeaderLoader}
         <div className='flex h-[calc(100vh-70px)] flex-col items-center justify-center gap-2 bg-body text-justify'>
           <h1 className='w-full max-w-lg text-2xl tracking-normal'>
@@ -64,7 +61,7 @@ function App(): ReactElement {
             }
           </p>
         </div>
-      </Suspense>
+      </>
     );
   }
 

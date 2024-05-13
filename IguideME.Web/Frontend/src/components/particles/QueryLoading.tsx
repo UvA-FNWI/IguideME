@@ -9,7 +9,11 @@ interface QueryLoadingProps extends SpinProps {
 
 const QueryLoading: FC<QueryLoadingProps> = ({ children, className, isLoading, ...props }) => {
   return (
-    <Spin className={cn(isLoading ? `cursor-wait [&_i]:!bg-primary` : '', className)} spinning={isLoading} {...props}>
+    <Spin
+      className={cn(isLoading ? `cursor-wait !text-text [&_i]:!bg-primary` : '', className)}
+      spinning={isLoading}
+      {...props}
+    >
       {children}
     </Spin>
   );
