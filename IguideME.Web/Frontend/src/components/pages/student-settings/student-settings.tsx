@@ -51,8 +51,6 @@ const Notifications: FC<NotificationProps> = ({ notifications }): ReactElement =
     },
   });
 
-  // TODO: Add success state.
-
   useEffect(() => {
     if (status === 'success') {
       toast.success(`Successfully ${notifications ? 'enabled' : 'disabled'} your notifications.`, {

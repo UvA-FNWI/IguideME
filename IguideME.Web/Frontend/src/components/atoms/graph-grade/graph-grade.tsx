@@ -9,16 +9,21 @@ import resolveConfig from 'tailwindcss/resolveConfig';
 const GraphGrade: FC<Grades> = ({ grade, peerAvg, peerMin, peerMax, max, type }): ReactElement => {
   const BarTooltip: FC<TooltipProps> = ({ active, payload }) => {
     if (active && payload && payload.length) {
+      const data = payload[1].payload;
       return (
         <div className='z-50 rounded-lg border border-solid border-text bg-body p-2'>
           <p>
-            {payload[0].payload.name === 'Peers' ? 'Average ' : ''}Grade: {printGrade(type, payload[0].value, max)}
-            {payload[0].payload.name === 'Peers' ?
+            {data.name === 'You' ? <>Grade: {printGrade(type, data.grade, max)}</>
+              :
               <>
+                High: {printGrade(type, data.peerMax, max)}
                 <br />
-                {`Min - Max: (${Number(payload[0].payload.peerMin).toFixed(1)}-${Number(payload[0].payload.peerMax).toFixed(1)})`}
+                Average: {printGrade(type, data.grade, max)}
+                <br />
+                Low:
+                {printGrade(type, data.peerMin, max)}
               </>
-            : ''}
+              }
           </p>
         </div>
       );
@@ -58,7 +63,6 @@ const GraphGrade: FC<Grades> = ({ grade, peerAvg, peerMin, peerMax, max, type })
       <XAxis dataKey='name' xAxisId={0} stroke={theme === 'light' ? 'black' : 'white'} />
       <XAxis dataKey='name' xAxisId={1} hide />
       <YAxis dataKey='grade' domain={[0, max]} hide />
-      {/* @ts-ignore */}
       <Tooltip content={<BarTooltip />} />
       <Bar
         background={{ fill: '#eee' }}

@@ -34,7 +34,7 @@ export const GradeView: FC<Grades> = ({ grade, max, type }): ReactElement => {
               <LikeTwoTone twoToneColor={'rgb(0, 185, 120)'} className='text-lg' />
             : <WarningTwoTone twoToneColor={'rgb(255, 110, 90)'} className='text-lg' />}
           </div>
-          {printGrade(type, grade, max)}
+          <p className='text-base'>{printGrade(type, grade, max)}</p>
         </>
       }
     </Space>

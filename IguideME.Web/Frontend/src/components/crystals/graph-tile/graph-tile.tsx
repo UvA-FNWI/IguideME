@@ -65,7 +65,6 @@ const GraphLearning: FC<Grades> = memo(({ grade, peerAvg, max }): ReactElement =
     >
       <RadialBar background className='[&>g>path]:!fill-graph-max' dataKey='grade' />
       <Legend align='right' layout='vertical' verticalAlign='top' />
-      {/* @ts-ignore */}
       <Tooltip content={<RadialBarTooltip />} />
       <PolarAngleAxis type='number' domain={[0, max]} angleAxisId={0} tick={false} />
     </RadialBarChart>

@@ -101,10 +101,6 @@ export const printGradingType = (type: GradingType): string => {
 };
 
 export const printGrade = (type: GradingType, grade: number, max: number, ng: boolean = true): string => {
-  grade = Number(grade);
-  // TODO: This is a temporary fix for the grade being something other than a number
-  if (isNaN(grade)) grade = 0;
-
   switch (type) {
     case GradingType.PassFail:
       return grade > 0 ? 'Pass' : 'Fail';

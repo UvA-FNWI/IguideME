@@ -108,7 +108,6 @@ export const LearningGoalDetail: FC<Props> = ({ entry }): ReactElement => {
     isError,
     isLoading,
   } = useQuery({
-    // TODO: I think using entry.content_id might give conflicts
     queryKey: [`${entry.tile_id}/entry/${entry.content_id}/${user.userID}`],
     queryFn: async () => await getLearningGoal(entry.content_id, user.userID),
   });

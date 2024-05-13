@@ -59,6 +59,11 @@ const ViewTile: FC<Props> = memo(({ tile, textStyle }): ReactElement => {
     if (isError) return <QueryError title='Failed to load grades' />;
     else if (!grades) return <></>;
 
+    if (tile.type === TileType.assignments && tile.gradingType === GradingType.NotGraded) {
+      return <Row className='h-4/5 content-center justify-center'>
+      <p className='text-base'>Not Graded</p>
+      </Row>
+    }
     switch (viewType) {
       case 'graph':
         return (

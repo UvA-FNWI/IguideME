@@ -130,7 +130,6 @@ const GraphGrades: FC<Props> = memo(({ goal, total, pred }): ReactElement => {
       >
         <XAxis hide axisLine={false} type='number' domain={[0, 10]} />
         <YAxis axisLine dataKey='name' tick={false} tickSize={0} type='category' width={1} />
-        {/* @ts-ignore */}
         <Tooltip content={<BarTooltip />} />
         <Bar dataKey='grade' className='[&>g>path]:!fill-graph-max' barSize={15} background={{ fill: '#eee' }} />
         <ReferenceLine className='stroke-text [&>line]:!stroke-text' strokeDasharray='3 3' strokeWidth={2} x={goal}>
