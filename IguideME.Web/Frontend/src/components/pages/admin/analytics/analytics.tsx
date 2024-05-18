@@ -67,7 +67,7 @@ const GradeAnalytics: FC = (): ReactElement => {
   return (
     <QueryLoading isLoading={selfIsLoading || analyticsIsLoading || consentInfoIsLoading}>
       <div
-        className='grid h-full w-full gap-4 rounded-md bg-card-background p-4'
+        className='bg-surface1 grid h-full w-full gap-4 rounded-md p-4'
         style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', justifyItems: 'center' }}
       >
         {selfIsError || analyticsIsError || consentInfoIsError ?

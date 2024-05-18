@@ -80,7 +80,7 @@ const SessionDistributionGraph: FC<SessionDistributionGraphProps> = memo(({ sess
 
   return (
     <div
-      className='grid h-[400px] w-[400px] grid-rows-2 rounded-md bg-card-foreground p-4'
+      className='bg-overlay0 grid h-[400px] w-[400px] grid-rows-2 rounded-md p-4'
       style={{ gridTemplateRows: 'auto 1fr' }}
     >
       <div className='mb-4 flex max-h-fit w-full items-center justify-between'>
