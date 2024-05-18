@@ -2,12 +2,12 @@ import { ActionTypes, EventReturnType } from '@/utils/analytics';
 import { http, HttpResponse } from 'msw';
 
 const BIAS = 0.6;
-const STUDENTS = 100;
+const STUDENTS = 1000;
 
 const MIN_PARTICIPANTS = Math.floor(STUDENTS * BIAS);
 const PARTICIPANTS = Math.floor(Math.random() * (STUDENTS - MIN_PARTICIPANTS + 1)) + MIN_PARTICIPANTS;
 
-const COURSE_LENGTH = 8; // weeks
+const COURSE_LENGTH = 16; // weeks
 const WEEKLY_EVENTS = 2;
 
 export const analyticsHandlers = [

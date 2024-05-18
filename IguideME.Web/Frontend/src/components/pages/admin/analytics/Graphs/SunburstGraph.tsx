@@ -24,8 +24,11 @@ const SunburstGraph: FC<SunburstGraphProps> = memo(({ sessions }) => {
 
     Array.from(sessions.values()).forEach((session) => {
       let currentNode = root;
+      let depth: number = 0;
 
       session.slice(1).forEach((event: SessionData) => {
+        if (depth >= 6) return;
+
         const currentAction = event.action_detail;
         // Check if a child node with the current action already exists
         let childNode = currentNode.children.find((child: TreeType) => child.name === currentAction);
@@ -37,6 +40,7 @@ const SunburstGraph: FC<SunburstGraphProps> = memo(({ sessions }) => {
         }
 
         currentNode = childNode;
+        depth++;
       });
     });
 
