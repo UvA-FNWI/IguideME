@@ -3,6 +3,8 @@ import EntryView from '@/components/crystals/entry-view/entry-view';
 import GroupView from '@/components/particles/group-view/group-view';
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
+import { UserRoles } from '@/types/user';
+import { ActionTypes, Analytics } from '@/utils/analytics';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
 import { Button, Col, Row } from 'antd';
@@ -15,6 +17,17 @@ function TileDetailView(): ReactElement {
   const { user } = useTileViewStore((state) => ({
     user: state.user,
   }));
+
+  useEffect(() => {
+    if (user.role === UserRoles.student && tid) {
+      Analytics.trackEvent({
+        userID: user.userID,
+        action: ActionTypes.tile,
+        actionDetail: tid,
+        courseID: user.course_id,
+      });
+    }
+  }, []);
 
   const {
     data: tile,

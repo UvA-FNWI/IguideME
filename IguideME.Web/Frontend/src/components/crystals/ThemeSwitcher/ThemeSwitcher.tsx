@@ -1,10 +1,16 @@
+import { User, UserRoles } from '@/types/user';
+import { ActionTypes, Analytics } from '@/utils/analytics';
 import { cn } from '@/utils/cn';
 import { MoonOutlined, SunOutlined } from '@ant-design/icons';
 import { Button, Dropdown, type MenuProps, Switch } from 'antd';
 import { useTheme } from 'next-themes';
 import { type FC, memo, type ReactElement, useMemo } from 'react';
 
-const ThemeSwitcherSwitch: FC = (): ReactElement => {
+interface ThemeSwitcherSwitchProps {
+  user: User;
+}
+
+const ThemeSwitcherSwitch: FC<ThemeSwitcherSwitchProps> = ({ user }): ReactElement => {
   const { theme, setTheme } = useTheme();
 
   return (
@@ -15,6 +21,14 @@ const ThemeSwitcherSwitch: FC = (): ReactElement => {
         unCheckedChildren={<SunOutlined />}
         checked={theme === 'dark'}
         onChange={() => {
+          if (user.role === UserRoles.student) {
+            Analytics.trackEvent({
+              userID: user.userID,
+              action: ActionTypes.theme,
+              actionDetail: theme === 'light' ? 'dark' : 'light',
+              courseID: user.course_id,
+            });
+          }
           setTheme(theme === 'light' ? 'dark' : 'light');
         }}
       />
@@ -24,9 +38,10 @@ const ThemeSwitcherSwitch: FC = (): ReactElement => {
 
 interface ThemeSwitcherDropdownProps {
   buttonClasses?: string;
+  user: User;
 }
 
-const ThemeSwitcherDropdown: FC<ThemeSwitcherDropdownProps> = memo(({ buttonClasses }): ReactElement => {
+const ThemeSwitcherDropdown: FC<ThemeSwitcherDropdownProps> = memo(({ buttonClasses, user }): ReactElement => {
   const items = useMemo(
     () => [
       {
@@ -46,6 +61,14 @@ const ThemeSwitcherDropdown: FC<ThemeSwitcherDropdownProps> = memo(({ buttonClas
   const { theme, setTheme } = useTheme();
 
   const onClick: MenuProps['onClick'] = ({ key }) => {
+    if (user.role === UserRoles.student) {
+      Analytics.trackEvent({
+        userID: user.userID,
+        action: ActionTypes.theme,
+        actionDetail: key === '1' ? 'light' : 'dark',
+        courseID: user.course_id,
+      });
+    }
     setTheme(key === '1' ? 'light' : 'dark');
   };
 

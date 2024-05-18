@@ -4,6 +4,7 @@ import StudentInfo from '@/components/atoms/student-info/student-info';
 import Loading from '@/components/particles/loading';
 import { type ViewType } from '@/types/tile';
 import { UserRoles, type User } from '@/types/user';
+import { ActionTypes, Analytics } from '@/utils/analytics';
 import { AppstoreOutlined, BarChartOutlined } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
 import { Radio } from 'antd';
@@ -34,6 +35,17 @@ const StudentDashboard: FC = (): ReactElement => {
 
   if (selfIsLoading) return <LoadingState />;
   if (selfIsError || self === undefined || id === undefined) return <ErrorMessage />;
+
+  useEffect(() => {
+    if (self.role === UserRoles.student) {
+      Analytics.trackEvent({
+        userID: self.userID,
+        action: ActionTypes.page,
+        actionDetail: 'Student Dashboard',
+        courseID: self.course_id,
+      });
+    }
+  }, []);
 
   if (self.role === UserRoles.student) return <DashboardView user={self} />;
   if (self.role === UserRoles.instructor && id === self.userID) navigate('/');
@@ -87,7 +99,7 @@ const Dashboard: FC<DashboardProps> = ({ self }): ReactElement => {
               value={viewType}
               buttonStyle='solid'
               onChange={(e) => {
-                setViewType(e.target.value as ViewType);
+                setViewType(self, e.target.value as ViewType);
               }}
             >
               <Radio.Button

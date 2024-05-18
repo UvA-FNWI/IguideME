@@ -1,6 +1,8 @@
 import { postConsentSettings, postGoalGrade, postNotificationSettings } from '@/api/student_settings';
 import { getSelf } from '@/api/users';
 import Loading from '@/components/particles/loading';
+import { User, UserRoles } from '@/types/user';
+import { ActionTypes, Analytics } from '@/utils/analytics';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Checkbox, Collapse, Divider, Radio, Space, Switch } from 'antd';
 import { FC, ReactElement, useEffect } from 'react';
@@ -25,13 +27,24 @@ const StudentSettings: FC = (): ReactElement => {
   if (selfIsLoading) return <LoadingState />;
   if (selfIsError || self === undefined || self.settings === undefined) return <ErrorMessage />;
 
+  useEffect(() => {
+    if (self.role === UserRoles.student) {
+      Analytics.trackEvent({
+        userID: self.userID,
+        action: ActionTypes.page,
+        actionDetail: 'Student Settings',
+        courseID: self.course_id,
+      });
+    }
+  }, []);
+
   return (
     <div className='w-full p-4'>
       <div className='mx-auto w-3/4'>
         <h1 className='mb-4 text-left text-4xl'>Settings</h1>
-        <Notifications notifications={self.settings.notifications} />
+        <Notifications notifications={self.settings.notifications} user={self} />
         <Divider />
-        <GoalGrade goalGrade={self.settings.goal_grade} />
+        <GoalGrade goalGrade={self.settings.goal_grade} user={self} />
         <Divider />
         <Consent consent={self.settings.consent} />
       </div>
@@ -41,13 +54,24 @@ const StudentSettings: FC = (): ReactElement => {
 
 interface NotificationProps {
   notifications: boolean;
+  user: User;
 }
-const Notifications: FC<NotificationProps> = ({ notifications }): ReactElement => {
+
+const Notifications: FC<NotificationProps> = ({ notifications, user }): ReactElement => {
   const queryClient = useQueryClient();
   const { mutate: saveNotifications, status } = useMutation({
     mutationFn: postNotificationSettings,
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['self'] });
+
+      if (user.role === UserRoles.student) {
+        Analytics.trackEvent({
+          userID: user.userID,
+          action: ActionTypes.notifications,
+          actionDetail: notifications ? 'enabled notifications' : 'disabled notifications',
+          courseID: user.course_id,
+        });
+      }
     },
   });
 
@@ -72,14 +96,24 @@ const Notifications: FC<NotificationProps> = ({ notifications }): ReactElement =
 
 interface GoalProps {
   goalGrade: number;
+  user: User;
 }
 
-const GoalGrade: FC<GoalProps> = ({ goalGrade }): ReactElement => {
+const GoalGrade: FC<GoalProps> = ({ goalGrade, user }): ReactElement => {
   const queryClient = useQueryClient();
   const { mutate: saveGoalGrade, status } = useMutation({
     mutationFn: postGoalGrade,
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['self'] });
+
+      if (user.role === UserRoles.student) {
+        Analytics.trackEvent({
+          userID: user.userID,
+          action: ActionTypes.settingChange,
+          actionDetail: `goal grade: ${goalGrade}`,
+          courseID: user.course_id,
+        });
+      }
     },
   });
 

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using IguideME.Web.Models.Impl;
 
 public static class DatabaseQueries
 {
@@ -9,12 +10,12 @@ public static class DatabaseQueries
     public static readonly Dictionary<string, string> MIGRATIONS =
         new()
         {
-            {
-            "000_add_alt_column_to_tile",
-            @"
-            ALTER TABLE `tiles` ADD COLUMN `alt`
-            ;"
-            }
+            // {
+            // "000_add_alt_column_to_tile",
+            // @"
+            // ALTER TABLE `tiles` ADD COLUMN `alt`
+            // ;"
+            // }
         };
 
     // //================================ Tables ================================//
@@ -55,11 +56,23 @@ public static class DatabaseQueries
 
     public const string CREATE_TABLE_USER_TRACKER =
         @"CREATE TABLE IF NOT EXISTS `user_tracker` (
-            `timestamp`           INTEGER PRIMARY KEY,
-            `user_id`             STRING,
-            `action`              STRING,
+            `timestamp`           INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+            `user_id`             STRING NOT NULL,
+            `action`              INTEGER NOT NULL CHECK(`action` >= 0 AND `action` <= 5),
+            `action_detail`       STRING,
+            `session_id`          INTEGER NOT NULL,
+            `course_id`           INTEGER NOT NULL,
             FOREIGN KEY(`user_id`) REFERENCES `users`(`user_id`)
+            FOREIGN KEY(`course_id`) REFERENCES `course_settings`(`course_id`)
+            PRIMARY KEY(`timestamp`, `user_id`, `session_id`)
+            UNIQUE(`timestamp`, `user_id`)
         );";
+
+    public const string CREATE_INDEX_USER_TRACKER_USER_ID =
+        @"CREATE INDEX IF NOT EXISTS `index_user_id` ON `user_tracker` (`user_id`);";
+
+    public const string CREATE_INDEX_USER_TRACKER_COURSE_ID =
+        @"CREATE INDEX IF NOT EXISTS `index_course_id` ON `user_tracker` (`course_id`);";
 
     /**
      * The user interface can be customized by the course's teachers. The "Tile"
@@ -1748,12 +1761,32 @@ public static class DatabaseQueries
           WHERE         `course_id` = @courseID
           AND           `end_timestamp` IS NULL;";
 
+    public const string GET_TRACKER_SESSION_ID =
+        @"SELECT          `session_id`, `timestamp`
+          FROM            `user_tracker`
+          WHERE           `user_id` = @userID
+          AND             `course_id` = @courseID
+          ORDER BY        `timestamp` DESC
+          LIMIT           1;";
     public const string INSERT_USER_ACTION =
-        @"INSERT INTO   `user_tracker` (`user_id`,`action`)
+        @"INSERT INTO   `user_tracker` (`user_id`,`action`,`action_detail`,`session_id`,`course_id`)
           VALUES        (
             @userID,
-            @action
+            @action,
+            @actionDetail,
+            @sessionID,
+            @courseID
           );";
+
+    public const string QUERY_ALL_ACTIONS_PER_COURSE =
+        @"SELECT          `timestamp`,
+                          `user_id`,
+                          `action`,
+                          `action_detail`,
+                          `session_id`
+          FROM            `user_tracker`
+          WHERE           `course_id` = @courseID
+        ;";
 
     // TODO: check if change here was ok
     public const string DELETE_OLD_SYNCS_FOR_COURSE = //half done

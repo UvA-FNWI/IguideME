@@ -59,48 +59,58 @@ const MobileHeader: FC<MobileHeaderProps> = memo(({ self, selectedStudent, setSe
               <li>
                 <Divider className='m-0 bg-text/50 p-0' />
               </li>
-              <li
-                className={`min-h-12 w-full [&_span]:!text-base [&_span]:!text-text ${currentRoute.startsWith('/admin') ? '[&_span]:!font-semibold' : '[&_span]:!font-normal'}`}
-              >
-                <Collapse
-                  className='[&>div>div]:!px-0'
-                  ghost
-                  items={[
-                    {
-                      key: '1',
-                      label: 'Admin Panel',
-                      children: (
-                        <ul>
-                          {adminPanelMenuItems.map((item) => (
-                            <MenuItem key={item.key} item={item} />
-                          ))}
-                        </ul>
-                      ),
-                    },
-                  ]}
-                />
-              </li>
-              <li>
-                <Divider className='m-0 bg-text/50 p-0' />
-              </li>
-              {self.role === UserRoles.instructor && (
-                <li className='min-h-12 w-full'>
-                  <Selector
-                    placeholder='Open a student profile'
-                    onSelect={() => setOpen(false)}
-                    selectClasses={`h-12 [&>div]:!bg-body [&>div>span]:!text-text [&_span_*]:!text-text [&>div]:!border-none [&_span]:!text-base ${/^\/\d+$/.test(currentRoute) ? '[&_span]:!font-semibold' : '[&_span]:!font-normal'}`}
-                    selectedStudent={selectedStudent}
-                    setSelectedStudent={setSelectedStudent}
-                  />
+              {self.role === UserRoles.instructor ?
+                <>
+                  <li
+                    className={`min-h-12 w-full [&_span]:!text-base [&_span]:!text-text ${currentRoute.startsWith('/admin') ? '[&_span]:!font-semibold' : '[&_span]:!font-normal'}`}
+                  >
+                    <Collapse
+                      className='[&>div>div]:!px-0'
+                      ghost
+                      items={[
+                        {
+                          key: '1',
+                          label: 'Admin Panel',
+                          children: (
+                            <ul>
+                              {adminPanelMenuItems.map((item) => (
+                                <MenuItem key={item.key} item={item} />
+                              ))}
+                            </ul>
+                          ),
+                        },
+                      ]}
+                    />
+                  </li>
+                  <li>
+                    <Divider className='m-0 bg-text/50 p-0' />
+                  </li>
+                  <li className='min-h-12 w-full'>
+                    <Selector
+                      placeholder='Open a student profile'
+                      onSelect={() => setOpen(false)}
+                      selectClasses={`h-12 [&>div]:!bg-body [&>div>span]:!text-text [&_span_*]:!text-text [&>div]:!border-none [&_span]:!text-base ${/^\/\d+$/.test(currentRoute) ? '[&_span]:!font-semibold' : '[&_span]:!font-normal'}`}
+                      selectedStudent={selectedStudent}
+                      setSelectedStudent={setSelectedStudent}
+                    />
+                  </li>
+                </>
+              : <li className='min-h-12 w-full text-base'>
+                  <a
+                    className={`flex h-12 w-full items-center ${currentRoute === '/student-settings' ? 'font-semibold' : 'font-normal'}`}
+                    href='/student-settings'
+                  >
+                    Settings
+                  </a>
                 </li>
-              )}
+              }
               <li>
                 <Divider className='m-0 bg-text/50 p-0' />
               </li>
             </ul>
             <div className='mt-6 flex w-full justify-between gap-2'>
               <div className='flex-grow basis-0 rounded-md bg-card'>
-                <ThemeSwitcherSwitch />
+                <ThemeSwitcherSwitch user={self} />
               </div>
               <div className='h-12 flex-grow basis-0 rounded-md bg-card'>
                 <NotificationPanel

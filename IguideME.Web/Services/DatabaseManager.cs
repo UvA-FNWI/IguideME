@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.SqlClient;
 using System.Data.SQLite;
 using IguideME.Web.Models;
 using IguideME.Web.Models.App;
@@ -190,7 +191,6 @@ namespace IguideME.Web.Services
                 DatabaseQueries.CREATE_TABLE_USERS,
                 DatabaseQueries.CREATE_TABLE_COURSE_SETTINGS,
                 DatabaseQueries.CREATE_TABLE_NOTIFICATIONS_COURSE_SETTINGS,
-                DatabaseQueries.CREATE_INDEX_NOTIFICATIONS_COURSE_SETTINGS,
                 DatabaseQueries.CREATE_TABLE_SYNC_HISTORY,
                 DatabaseQueries.CREATE_TABLE_STUDENT_SETTINGS,
                 DatabaseQueries.CREATE_TABLE_USER_TRACKER,
@@ -211,6 +211,11 @@ namespace IguideME.Web.Services
                 DatabaseQueries.CREATE_TABLE_TILE_GRADES,
                 DatabaseQueries.CREATE_TABLE_NOTIFICATIONS,
                 DatabaseQueries.CREATE_TABLE_MIGRATIONS,
+                DatabaseQueries.CREATE_TABLE_USER_TRACKER,
+
+                DatabaseQueries.CREATE_INDEX_NOTIFICATIONS_COURSE_SETTINGS,
+                DatabaseQueries.CREATE_INDEX_USER_TRACKER_USER_ID,
+                DatabaseQueries.CREATE_INDEX_USER_TRACKER_COURSE_ID,
             };
 
             // create tables if they do not exist
@@ -223,6 +228,7 @@ namespace IguideME.Web.Services
             foreach (KeyValuePair<string, string> entry in DatabaseQueries.MIGRATIONS)
             {
                 string migration_id = entry.Key;
+                Console.WriteLine($"Checking migration {migration_id}...");
                 using (
                     SQLiteDataReader r = Query(
                         DatabaseQueries.QUERY_MIGRATIONS,
@@ -1470,28 +1476,25 @@ namespace IguideME.Web.Services
 
         public bool GetGoalRequirementResult(GoalRequirement requirement, string userID)
         {
-            using (
-                SQLiteDataReader r = Query(
+            using SQLiteDataReader r = Query(
                     DatabaseQueries.QUERY_ASSIGNMENT_GRADE,
                     new SQLiteParameter("assignmentID", requirement.AssignmentID),
                     new SQLiteParameter("userID", userID)
+                );
 
-                )
-            )
+            if (r.Read())
             {
-                if (r.Read())
+                double grade = r.GetDouble(0);
+                return requirement.Expression switch
                 {
-                    double grade = r.GetDouble(0);
-                    return requirement.Expression switch
-                    {
-                        LogicalExpressions.NotEqual => grade != requirement.Value,
-                        LogicalExpressions.Less => grade < requirement.Value,
-                        LogicalExpressions.LessEqual => grade <= requirement.Value,
-                        LogicalExpressions.Equal => grade == requirement.Value,
-                        LogicalExpressions.GreaterEqual => grade > requirement.Value,
-                        LogicalExpressions.Greater => grade >= requirement.Value,
-                    };
-                }
+                    LogicalExpressions.NotEqual => grade != requirement.Value,
+                    LogicalExpressions.Less => grade < requirement.Value,
+                    LogicalExpressions.LessEqual => grade <= requirement.Value,
+                    LogicalExpressions.Equal => grade == requirement.Value,
+                    LogicalExpressions.GreaterEqual => grade > requirement.Value,
+                    LogicalExpressions.Greater => grade >= requirement.Value,
+                    _ => throw new InvalidOperationException("Invalid logical expression")
+                };
             }
 
             return false;
@@ -3224,19 +3227,6 @@ namespace IguideME.Web.Services
 
         public ExternalData[] GetExternalData(int courseID, int tileID, string userID)
         {
-            // string query = tileID == -1
-            //     ? String.Format(
-            //             "SELECT `user_id`, `title`, `grade` from `external_data` WHERE `course_id`={0} AND `user_id`='{1}'",
-            //             courseID, userID
-            //         )
-            //     : userID != null ?
-            //         String.Format(
-            //             "SELECT `user_id`, `title`, `grade` from `external_data` WHERE `course_id`={0} AND `tile_id`={1} AND `user_id`='{2}'",
-            //             courseID, tileID, userID
-            //         ) : String.Format(
-            //             "SELECT `user_id`, `title`, `grade` from `external_data` WHERE `course_id`={0} AND `tile_id`={1}",
-            //             courseID, tileID
-            //         );
             List<ExternalData> submissions = new();
 
             using (
@@ -3265,13 +3255,89 @@ namespace IguideME.Web.Services
             return submissions.ToArray();
         }
 
-        public void TrackUserAction(string userID, string action)
+        public void InsertUserAction(string userID, ActionTypes action, string actionDetail, int courseID)
         {
-            NonQuery(
-                DatabaseQueries.INSERT_USER_ACTION,
-                new SQLiteParameter("userID", userID),
-                new SQLiteParameter("action", action)
-            );
+            try
+            {
+                int sessionID = 0;
+                long timestamp = 0;
+
+                using SQLiteConnection connection = new(s_instance._connection_string);
+                connection.Open();
+
+                // Open a transaction to prevent race conditions for the sessionID.
+                using SQLiteTransaction transaction = connection.BeginTransaction();
+                {
+                    using SQLiteCommand commandGet = connection.CreateCommand();
+                    {
+                        commandGet.CommandText = DatabaseQueries.GET_TRACKER_SESSION_ID;
+                        commandGet.Parameters.Add(new SQLiteParameter("userID", userID));
+                        commandGet.Parameters.Add(new SQLiteParameter("courseID", courseID));
+                        commandGet.Transaction = transaction;
+
+                        using SQLiteDataReader r = commandGet.ExecuteReader(CommandBehavior.Default);
+                        {
+                            if (r.Read())
+                            {
+                                sessionID = r.GetInt32(0);
+                                timestamp = r.GetInt64(1);
+                            }
+                        }
+                    }
+
+                    if (DateTimeOffset.UtcNow.ToUnixTimeSeconds() - timestamp > 1800) // 30 minutes
+                    {
+                        sessionID++;
+                    }
+
+                    using SQLiteCommand commandInsert = connection.CreateCommand();
+                    {
+                        commandInsert.CommandText = DatabaseQueries.INSERT_USER_ACTION;
+                        commandInsert.Parameters.Add(new SQLiteParameter("userID", userID));
+                        commandInsert.Parameters.Add(new SQLiteParameter("action", action));
+                        commandInsert.Parameters.Add(new SQLiteParameter("actionDetail", actionDetail));
+                        commandInsert.Parameters.Add(new SQLiteParameter("sessionID", sessionID));
+                        commandInsert.Parameters.Add(new SQLiteParameter("courseID", courseID));
+                        commandInsert.Transaction = transaction;
+
+                        commandInsert.ExecuteNonQuery();
+                    }
+
+                    transaction.Commit();
+                }
+
+                connection.Close();
+            }
+            catch (Exception e)
+            {
+                // silently fail
+                _logger.LogError("Error inserting user action: {message}", e.Message);
+            }
+        }
+
+        public List<UserTracker> RetrieveAllActionsPerCourse(int courseID)
+        {
+            List<UserTracker> actions = [];
+
+            using SQLiteDataReader r = Query(
+                    DatabaseQueries.QUERY_ALL_ACTIONS_PER_COURSE,
+                    new SQLiteParameter("courseID", courseID)
+                );
+            while (r.Read())
+            {
+                actions.Add(
+                    new UserTracker(
+                        r.GetInt64(0),
+                        r.GetValue(1).ToString(),
+                        (ActionTypes)r.GetInt32(2),
+                        r.GetValue(3).ToString(),
+                        r.GetInt32(4),
+                        courseID
+                    )
+                );
+            }
+
+            return actions;
         }
     }
 }

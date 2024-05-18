@@ -1,12 +1,13 @@
 import { getStudentNotifications } from '@/api/users';
 import Notifications from '@/components/particles/notifications/notifications';
-import { type User } from '@/types/user';
+import { UserRoles, type User } from '@/types/user';
+import { ActionTypes, Analytics } from '@/utils/analytics';
 import { cn } from '@/utils/cn';
 import { BellOutlined, ExclamationOutlined, LoadingOutlined } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
 import { Button, Popover, Tooltip } from 'antd';
 import { type TooltipPlacement } from 'antd/lib/tooltip';
-import { type FC, type ReactElement } from 'react';
+import { useState, type FC, type ReactElement } from 'react';
 
 interface Props {
   buttonClasses?: string;
@@ -14,6 +15,7 @@ interface Props {
   user: User;
 }
 const NotificationPanel: FC<Props> = ({ buttonClasses, placement = 'leftTop', user }): ReactElement => {
+  const [open, setOpen] = useState<boolean>(false);
   const {
     data: notifications,
     isError,
@@ -38,6 +40,18 @@ const NotificationPanel: FC<Props> = ({ buttonClasses, placement = 'leftTop', us
             <p>Please select a student</p>
           </div>
       }
+      open={open}
+      onOpenChange={(visible) => {
+        if (user.role === UserRoles.student && visible) {
+          Analytics.trackEvent({
+            userID: user.userID,
+            action: ActionTypes.notifications,
+            actionDetail: 'viewed notifications',
+            courseID: user.course_id,
+          });
+        }
+        setOpen(visible);
+      }}
       title='Notifications'
       trigger='click'
       placement={placement}

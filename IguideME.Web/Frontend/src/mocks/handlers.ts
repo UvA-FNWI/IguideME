@@ -1,3 +1,4 @@
+import { analyticsHandlers } from './analytics';
 import { courseSettingsHandlers } from './course_settings';
 import { entriesHandlers } from './entries';
 import { gradeHandlers } from './grades';
@@ -8,6 +9,7 @@ import { tileHandlers } from './tiles';
 import { userHandlers } from './users';
 
 export const handlers = [
+  ...analyticsHandlers,
   ...setupHandlers,
   ...userHandlers,
   ...syncingHandlers,

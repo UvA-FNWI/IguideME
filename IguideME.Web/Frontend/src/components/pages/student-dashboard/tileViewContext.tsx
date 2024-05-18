@@ -1,5 +1,6 @@
 import { type ViewType } from '@/types/tile';
-import { type User } from '@/types/user';
+import { UserRoles, type User } from '@/types/user';
+import { ActionTypes, Analytics } from '@/utils/analytics';
 import { createContext, useContext, useRef, type PropsWithChildren, type ReactElement } from 'react';
 import { createStore, useStore } from 'zustand';
 import { createJSONStorage, devtools, persist } from 'zustand/middleware';
@@ -10,7 +11,7 @@ interface tileViewProps {
 }
 
 interface tileViewState extends tileViewProps {
-  setViewType: (viewType: ViewType) => void;
+  setViewType: (self: User, viewType: ViewType) => void;
   setUser: (user: User) => void;
 }
 
@@ -28,7 +29,15 @@ export const createTileViewStore = (initProps: { user: User; viewType?: ViewType
             ...DEFAULT_PROPS,
             ...initProps,
 
-            setViewType: (viewType) => {
+            setViewType: (self, viewType) => {
+              if (self.role === UserRoles.student) {
+                Analytics.trackEvent({
+                  userID: self.userID,
+                  action: ActionTypes.tileView,
+                  actionDetail: viewType,
+                  courseID: self.course_id,
+                });
+              }
               set({ viewType });
             },
             setUser: (user) => {
