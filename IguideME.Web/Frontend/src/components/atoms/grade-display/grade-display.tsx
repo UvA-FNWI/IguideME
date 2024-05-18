@@ -90,7 +90,7 @@ GridGrades.displayName = 'GridGrades';
 const BarTooltip: FC<TooltipProps> = memo(({ active, payload, label }) => {
   if (active && payload && payload.length) {
     return (
-      <div className='z-50 rounded-lg border border-solid border-text bg-body p-2'>
+      <div className='z-50 rounded-lg border border-solid border-text bg-crust/80 p-2'>
         <p>
           {label}: {Number(payload[0].value.toFixed(1))}/10
         </p>
@@ -110,12 +110,12 @@ const GraphGrades: FC<Props> = memo(({ goal, total, pred }): ReactElement => {
           {
             name: 'Current Grade',
             grade: total,
-            fill: fullConfig.theme.colors.graph.you,
+            fill: fullConfig.theme.colors.primary,
           },
           {
             name: 'Predicted Grade',
             grade: pred,
-            fill: fullConfig.theme.colors.graph.peer,
+            fill: fullConfig.theme.colors.tertiary,
           },
         ]}
         height={40}
@@ -130,8 +130,8 @@ const GraphGrades: FC<Props> = memo(({ goal, total, pred }): ReactElement => {
       >
         <XAxis hide axisLine={false} type='number' domain={[0, 10]} />
         <YAxis axisLine dataKey='name' tick={false} tickSize={0} type='category' width={1} />
-        <Tooltip content={<BarTooltip />} />
-        <Bar dataKey='grade' className='[&>g>path]:!fill-graph-max' barSize={15} background={{ fill: '#eee' }} />
+        <Tooltip content={<BarTooltip />} cursor={false}/>
+        <Bar dataKey='grade' className='[&>g>path]:!fill-overlay0' barSize={15} background={{ fill: '#eee' }} />
         <ReferenceLine className='stroke-text [&>line]:!stroke-text' strokeDasharray='3 3' strokeWidth={2} x={goal}>
           <Label value='goal' position='insideLeft' />
         </ReferenceLine>

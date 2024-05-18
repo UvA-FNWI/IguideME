@@ -103,7 +103,6 @@ const Dashboard: FC<DashboardProps> = ({ self }): ReactElement => {
               }}
             >
               <Radio.Button
-                className={`!border-primary ${viewType === 'graph' ? '!bg-primary !text-white' : '!bg-dropdownBackground text-text hover:!bg-primary-light hover:!text-white'}`}
                 disabled={viewType === 'graph'}
                 value='graph'
               >
@@ -111,7 +110,6 @@ const Dashboard: FC<DashboardProps> = ({ self }): ReactElement => {
                 <span> Graph</span>
               </Radio.Button>
               <Radio.Button
-                className={`!border-primary ${viewType === 'grid' ? '!bg-primary !text-white' : '!bg-dropdownBackground text-text hover:!bg-primary-light hover:!text-white'}`}
                 disabled={viewType === 'grid'}
                 value='grid'
               >

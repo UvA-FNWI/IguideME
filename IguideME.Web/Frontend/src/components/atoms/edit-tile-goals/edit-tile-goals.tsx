@@ -81,7 +81,7 @@ const TileGoalsSelect: FC<TileGoalsSelectProps> = ({ goals, value: entries, onCh
   return (
     <div className='flex flex-col gap-1'>
       <Table
-        className='[&_div]:!text-text [&_td]:!bg-card-background [&_td]:!text-text [&_th]:!bg-card [&_th]:!text-text'
+        className='[&_div]:!text-text [&_td]:!bg-surface1 [&_td]:!text-text [&_th]:!bg-surface1 [&_th]:!text-text'
         columns={[
           {
             title: 'Name',
@@ -121,8 +121,8 @@ const TileGoalsSelect: FC<TileGoalsSelectProps> = ({ goals, value: entries, onCh
       />
 
       <Select
-        className='w-full [&>div]:!border-primary [&>div]:!bg-card-background [&>div]:!shadow-none [&>div]:hover:!bg-card [&_span]:!text-text'
-        dropdownClassName='bg-dropdownBackground [&_div]:!text-text selectionSelected'
+        className='w-full [&>div]:!border-accent/70 [&>div]:!bg-surface1 [&>div]:!shadow-none [&>div]:hover:!bg-surface2 [&>div]:hover:!border-accent [&_span]:!text-text'
+        dropdownClassName='bg-surface1 [&_div]:!text-text selectionSelected'
         value={selectedGoals}
         mode='multiple'
         options={unselectedGoals?.map((ass) => ({

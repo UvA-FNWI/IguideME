@@ -27,7 +27,7 @@ const NotificationPanel: FC<Props> = ({ buttonClasses, placement = 'leftTop', us
 
   return (
     <Popover
-      overlayClassName='!bg-dropdownBackground [&_div]:!bg-transparent [&>div]:before:!bg-dropdownBackground [&>div>div>div]:!text-text'
+      overlayClassName='!bg-surface1 [&_div]:!bg-transparent [&>div]:before:!bg-surface1 [&>div>div>div]:!text-text'
       content={
         user !== undefined ?
           notifications !== undefined ?
@@ -68,16 +68,16 @@ const NotificationPanel: FC<Props> = ({ buttonClasses, placement = 'leftTop', us
         <Button
           aria-disabled={isLoading || isError}
           className={cn(
-            'flex h-10 w-10 flex-col items-center justify-center border border-solid border-white p-0 align-middle text-white hover:!bg-navbar-light hover:!text-white',
+            'flex h-10 w-10 flex-col items-center justify-center border border-solid border-textAlt p-0 align-middle text-textAlt hover:!text-subtext1',
             buttonClasses,
           )}
           disabled={isLoading || isError}
           type='link'
         >
           {isLoading ?
-            <LoadingOutlined className='text-white [&>svg]:h-4 [&>svg]:w-4' />
+            <LoadingOutlined className='text-textAlt [&>svg]:h-4 [&>svg]:w-4' />
           : isError ?
-            <ExclamationOutlined className='text-white [&>svg]:h-4 [&>svg]:w-4' />
+            <ExclamationOutlined className='text-textAlt [&>svg]:h-4 [&>svg]:w-4' />
           : <BellOutlined className='[&>svg]:h-4 [&>svg]:w-4' />}
         </Button>
       </Tooltip>

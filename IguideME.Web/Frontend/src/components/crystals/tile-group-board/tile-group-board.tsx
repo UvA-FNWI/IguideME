@@ -94,14 +94,14 @@ const TileGroupBoard: FC = (): ReactElement => {
     .fill(0)
     .map((_, i) => (
       <QueryLoading key={i} isLoading={isLoading} tip='Loading tile groups...'>
-        <div className='my-1 min-h-[235px] rounded-lg border border-dashed border-white bg-card p-[10px]'>
+        <div className='my-1 min-h-[235px] rounded-lg border border-dashed border-textAlt bg-surface1 p-[10px]'>
           <Row />
         </div>
       </QueryLoading>
     ));
 
   const errorState = (
-    <div className='relative my-1 min-h-[235px] rounded-lg border border-dashed border-white bg-card p-[10px]'>
+    <div className='relative my-1 min-h-[235px] rounded-lg border border-dashed border-textAlt bg-surface1 p-[10px]'>
       <QueryError className='grid place-content-center' title='Error: Could not load tile group(s)' />
     </div>
   );
@@ -109,7 +109,7 @@ const TileGroupBoard: FC = (): ReactElement => {
   return (
     <>
       <Drawer
-        className='!bg-body [&>div>div>div]:!text-text [&_button]:!text-text'
+        className='!bg-mantle [&>div>div>div]:!text-text [&_button]:!text-text'
         title={editTitle && 'Editing: ' + editTitle.title}
         placement='right'
         closable
@@ -154,7 +154,7 @@ const TileGroupBoard: FC = (): ReactElement => {
               ))}
             </SortableContext>
             <Button
-              className='border-dashed !bg-button hover:!border-primary hover:!bg-button-hover [&_span]:!text-text'
+              className='h-14 border-dashed !bg-accent/40 hover:!border-solid hover:!border-accent hover:!bg-accent/70 [&_span]:!text-text'
               onClick={() => {
                 postGroup({
                   title: 'TileGroup',

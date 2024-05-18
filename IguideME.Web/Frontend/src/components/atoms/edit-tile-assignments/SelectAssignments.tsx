@@ -96,7 +96,7 @@ const SelectAssignments: FC<SelectAssignmentsProps> = ({ value: entries, onChang
     <QueryLoading isLoading={isLoading}>
       <div className='flex flex-col gap-1 overflow-x-auto'>
         <Table
-          className='[&_div]:!text-text [&_td]:!bg-card-background [&_td]:!text-text [&_th]:!bg-card [&_th]:!text-text'
+          className='[&_div]:!text-text [&_td]:!bg-surface1 [&_td]:!text-text [&_th]:!bg-surface1 [&_th]:!text-text'
           columns={[
             {
               title: 'Name',
@@ -135,7 +135,7 @@ const SelectAssignments: FC<SelectAssignmentsProps> = ({ value: entries, onChang
               render: (_: string, entry: TileEntry) => {
                 return (
                   <InputNumber
-                    className='antNumberInput w-full !border border-solid !border-primary !bg-card-background hover:!border-primary hover:!bg-card [&_input]:!text-text'
+                    className='antNumberInput w-full !border border-solid !border-accent/70 !bg-surface1 hover:!border-accent hover:!bg-surface2 [&_input]:!text-text'
                     value={entry.weight}
                     onChange={(val) => {
                       changeWeight(entry, val);
@@ -170,8 +170,8 @@ const SelectAssignments: FC<SelectAssignmentsProps> = ({ value: entries, onChang
         />
 
         <Select
-          className='w-full [&>div]:!border-primary [&>div]:!bg-card-background [&>div]:!shadow-none [&>div]:hover:!bg-card [&_span]:!text-text'
-          dropdownClassName='bg-dropdownBackground [&_div]:!text-text selectionSelected'
+          className='w-full [&>div]:!border-accent/70 [&>div]:!bg-surface1 [&>div]:!shadow-none [&>div]:hover:!bg-surface2 [&>div]:hover:!border-accent[&_span]:!text-text'
+          dropdownClassName='bg-surface1 [&_div]:!text-text selectionSelected'
           value={selectedAssignments}
           mode='multiple'
           options={options}

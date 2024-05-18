@@ -16,7 +16,7 @@ const HamburgerIcon: FC<HamburgerIconProps> = memo(({ open, setOpen }): ReactEle
       className={cn(styles.hamburger_icon, 'min-h-12 min-w-12')}
       onClick={() => setOpen(!open)}
     >
-      <svg className='fill-white' viewBox='0 0 100 100'>
+      <svg className='fill-textAlt' viewBox='0 0 100 100'>
         <rect width={80} height={10} x={10} y={open ? 45 : 25} rx={5} />
         <rect width={80} height={10} x={10} y={45} rx={5} />
         <rect width={80} height={10} x={10} y={open ? 45 : 65} rx={5} />

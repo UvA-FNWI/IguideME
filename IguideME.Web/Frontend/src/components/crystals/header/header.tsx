@@ -38,8 +38,8 @@ const Header: FC<HeaderProps> = ({ self }): ReactElement => {
   }, [inHome, selectedStudent, self]);
 
   return (
-    <header className='relative flex min-h-header w-screen items-center justify-between overflow-x-hidden bg-navbar p-3'>
-      <a className='inline-block align-middle text-2xl font-semibold text-white' href='/'>
+    <header className='bg-surface0 relative flex min-h-header w-screen items-center justify-between overflow-x-hidden p-3'>
+      <a className='text-textAlt inline-block align-middle text-2xl font-semibold' href='/'>
         IguideME
       </a>
       <div className='md:hidden'>
@@ -56,7 +56,7 @@ const Header: FC<HeaderProps> = ({ self }): ReactElement => {
           <NotificationPanel buttonClasses='border-none' placement='bottomLeft' user={selectedStudent ?? self} />
         </div>
         <Button
-          className='flex h-10 w-10 flex-col items-center justify-center rounded-r-full border border-none border-white p-2 align-middle text-white hover:!bg-navbar-light hover:!text-white lg:w-32 lg:rounded-md lg:border-solid'
+          className='border-textAlt text-textAlt hover:!border-subtext0 hover:!text-subtext0 flex h-10 w-10 flex-col items-center justify-center rounded-r-full border border-none p-2 align-middle lg:w-32 lg:rounded-md lg:border-solid'
           onClick={switchPage}
           type='link'
         >
@@ -68,8 +68,8 @@ const Header: FC<HeaderProps> = ({ self }): ReactElement => {
             : 'Settings'}
           </span>
           {!inHome ?
-            <HomeOutlined className='!m-0 lg:!hidden [&>svg]:h-4 [&>svg]:w-4' />
-          : <SettingOutlined className='!m-0 lg:!hidden [&>svg]:h-4 [&>svg]:w-4' />}
+            <HomeOutlined className='hover:!text-subtext1 !m-0 lg:!hidden [&>svg]:h-4 [&>svg]:w-4' />
+          : <SettingOutlined className='hover:!text-subtext1 !m-0 lg:!hidden [&>svg]:h-4 [&>svg]:w-4' />}
         </Button>
       </div>
     </header>

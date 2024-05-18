@@ -22,7 +22,7 @@ const Notifications: FC<Props> = ({ notifications }): ReactElement => {
         <>
           <div className='flex gap-1'>
             <TrophyOutlined />
-            <p className='text-base'>You are outperforming your peers in:</p>
+            <p className='text-text'>You are outperforming your peers in:</p>
           </div>
           <ul className='list-disc pl-9 text-sm'>
             {outperforming.map((notification) => (
@@ -38,7 +38,7 @@ const Notifications: FC<Props> = ({ notifications }): ReactElement => {
         <>
           <div className='flex gap-1'>
             <RiseOutlined />
-            <p className='text-base'>You are closing the gap to your peers in:</p>
+            <p className='text-text'>You are closing the gap to your peers in:</p>
           </div>
           <ul className='list-disc pl-9 text-sm'>
             {closing.map((notification) => (
@@ -54,7 +54,7 @@ const Notifications: FC<Props> = ({ notifications }): ReactElement => {
         <>
           <div className='flex gap-1'>
             <WarningOutlined />
-            <p className='text-base'>You are falling behind in:</p>
+            <p className='text-text'>You are falling behind in:</p>
           </div>
           <ul className='list-disc pl-9 text-sm'>
             {falling.map((notification) => (
@@ -69,7 +69,7 @@ const Notifications: FC<Props> = ({ notifications }): ReactElement => {
         <>
           <div className='flex gap-1'>
             <WarningOutlined />
-            <p className='text-base'>You have to put more effort in:</p>
+            <p className='text-text'>You have to put more effort in:</p>
           </div>
           <ul className='list-disc pl-9 text-sm'>
             {effort.map((notification) => (

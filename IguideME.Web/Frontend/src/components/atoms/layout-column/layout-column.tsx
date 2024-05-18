@@ -69,14 +69,14 @@ const ConfigLayoutColumn: FC<Props> = ({ column, remove, parentOnChange }): Reac
     return (
       <QueryLoading isLoading={isLoading}>
         <div
-          className={`h-[360px] w-[425px] rounded-md bg-card-background p-3 ${theme === 'light' ? 'shadow-statusCard' : ''}`}
+          className={`h-[360px] w-[425px] rounded-md bg-surface1 p-3 ${theme === 'light' ? 'shadow-statusCard' : 'border border-solid border-accent/50'}`}
         />
       </QueryLoading>
     );
   } else if (isError || data === undefined) {
     return (
       <div
-        className={`relative h-[360px] w-[425px] rounded-md bg-card-background p-3 [&>div]:grid [&>div]:place-content-center ${theme === 'light' ? 'shadow-statusCard' : ''}`}
+        className={`relative h-[360px] w-[425px] rounded-md bg-surface1 p-3 [&>div]:grid [&>div]:place-content-center ${theme === 'light' ? 'shadow-statusCard' : 'border border-solid border-accent/50'}`}
       >
         <QueryError title='Error: Failed to load tile groups' />
       </div>
@@ -86,7 +86,7 @@ const ConfigLayoutColumn: FC<Props> = ({ column, remove, parentOnChange }): Reac
   if (isDragging) {
     return (
       <div
-        className={`h-[360px] w-[425px] rounded-md bg-card-background p-3 ${theme === 'light' ? 'shadow-statusCard' : ''}`}
+        className={`h-[360px] w-[425px] rounded-md bg-accent/20 p-3 ${theme === 'light' ? 'shadow-statusCard' : 'border border-solid border-accent/50'}`}
         ref={setNodeRef}
         style={style}
       />
@@ -94,7 +94,7 @@ const ConfigLayoutColumn: FC<Props> = ({ column, remove, parentOnChange }): Reac
   } else {
     return (
       <div
-        className={`h-[360px] w-[425px] rounded-md bg-card-background p-3 ${theme === 'light' ? 'shadow-statusCard' : ''}`}
+        className={`h-[360px] w-[425px] rounded-md bg-surface1 p-3 ${theme === 'light' ? 'shadow-statusCard' : 'border border-solid border-accent/50'}`}
         ref={setNodeRef}
         style={style}
       >
@@ -138,7 +138,7 @@ const ConfigLayoutColumn: FC<Props> = ({ column, remove, parentOnChange }): Reac
                 onChange();
               }}
               formatter={formatter}
-              className='antNumberInput w-full !border border-solid !border-primary !bg-card-background hover:!border-primary hover:!bg-card [&_input]:!text-text'
+              className='antNumberInput w-full !border border-solid !border-accent/50 !bg-surface1 hover:!border-accent hover:!bg-surface1 [&_input]:!text-text'
             />
           </Col>
         </Row>

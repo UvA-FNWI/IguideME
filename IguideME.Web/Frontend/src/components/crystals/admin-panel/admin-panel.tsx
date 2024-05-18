@@ -69,29 +69,29 @@ const AdminPanel: FC = (): ReactElement => {
         onCollapse={(value) => {
           setCollapsed(value);
         }}
-        className='!bg-navbar-side max-md:!hidden'
+        className='!bg-surface1 max-md:!hidden'
       >
-        <div className='flex h-header flex-col content-center justify-center border-b border-solid border-b-text bg-navbar-side p-4'>
+        <div className='flex h-header flex-col content-center justify-center border-b border-solid border-b-text bg-surface1 p-4'>
           {collapsed ?
             <h3 className='text-center'>
               <UserOutlined />
             </h3>
           : <>
               <h3 className='text-lg'>{self?.name}</h3>
-              <strong>
+              <strong className='text-text'>
                 <UserOutlined /> Instructor
               </strong>
             </>
           }
         </div>
         <Menu
-          className='adminPanelMenuSelect !bg-navbar-side [&>li]:!text-text'
+          className='adminPanelMenuSelect !bg-surface1 [&>li]:!text-text'
           defaultSelectedKeys={[getKeyFromLocation(location.pathname)]}
           mode='inline'
           items={items}
         />
       </Layout.Sider>
-      <Layout.Content className='relative min-h-[calc(100dvh-70px)] bg-content p-5'>
+      <Layout.Content className='relative min-h-[calc(100dvh-70px)] bg-mantle p-5'>
         <Outlet />
       </Layout.Content>
     </Layout>

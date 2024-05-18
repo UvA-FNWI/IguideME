@@ -17,8 +17,8 @@ const EditTileAssignments: FC = (): ReactElement => {
                 value: val,
                 label: printGradingType(val),
               }))}
-            className='w-full [&>div]:!border-primary [&>div]:!bg-card-background [&>div]:!shadow-none [&>div]:hover:!bg-card [&_span]:!text-text'
-            dropdownClassName='bg-dropdownBackground [&_div]:!text-text selectionSelected'
+            className='w-full [&>div]:!border-accent/70 [&>div]:!bg-surface1 [&>div]:!shadow-none [&>div]:hover:!bg-surface2 [&>div]:hover:!border-accent [&_span]:!text-text'
+            dropdownClassName='bg-surface1 [&_div]:!text-text selectionSelected'
           />
         </Form.Item>
       </div>
@@ -26,7 +26,7 @@ const EditTileAssignments: FC = (): ReactElement => {
       <div className='col-span-2'>
         <Form.Item name='weight' noStyle>
           <InputNumber<number>
-            className='antNumberInput w-full !border border-solid !border-primary !bg-card-background hover:!border-primary hover:!bg-card [&_input]:!text-text'
+            className='antNumberInput w-full !border border-solid !border-accent/70 !bg-surface1 hover:!border-accent hover:!bg-surface2 [&_input]:!text-text'
             formatter={(value) => `${(value ?? 0) * 100}%`}
             parser={(value) => +parseFloat(value!.replace('%', '')).toFixed(1) / 100}
             variant='borderless'
