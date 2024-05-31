@@ -1,11 +1,11 @@
-import { getStudentNotifications } from '@/api/users';
 import Notifications from '@/components/particles/notifications/notifications';
-import { UserRoles, type User } from '@/types/user';
 import { ActionTypes, Analytics } from '@/utils/analytics';
-import { cn } from '@/utils/cn';
 import { BellOutlined, ExclamationOutlined, LoadingOutlined } from '@ant-design/icons';
-import { useQuery } from '@tanstack/react-query';
 import { Button, Popover, Tooltip } from 'antd';
+import { cn } from '@/utils/cn';
+import { getStudentNotifications } from '@/api/users';
+import { useQuery } from '@tanstack/react-query';
+import { UserRoles, type User } from '@/types/user';
 import { type TooltipPlacement } from 'antd/lib/tooltip';
 import { useState, type FC, type ReactElement } from 'react';
 

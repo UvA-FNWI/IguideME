@@ -1,25 +1,36 @@
-import { QuestionCircleOutlined } from '@ant-design/icons';
-import { Tooltip as AntToolTip } from 'antd';
-import { FC, memo, useEffect, useMemo, useRef } from 'react';
 import Sunburst from 'sunburst-chart';
-import { SessionData } from '../analytics';
+import { type FC, memo, useEffect, useMemo, useRef } from 'react';
+import { type SessionData } from '../analytics';
 
-type SunburstGraphProps = {
+/**
+ * Generates a color based on the name
+ * @param name The name to generate the color for
+ * @returns A color in hex format
+ */
+function nameToColor(name: string): string {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+
+  const c = (hash & 0x00ffffff).toString(16).toUpperCase();
+  return '#' + '00000'.substring(0, 6 - c.length) + c;
+}
+
+interface SunburstGraphProps {
   sessions: Map<string, SessionData[]>;
-};
+}
 
-type TreeType = {
+interface TreeType {
   name: string;
   children: TreeType[];
   value: number;
-};
+}
 
 const SunburstGraph: FC<SunburstGraphProps> = memo(({ sessions }) => {
   const tree: TreeType = useMemo(() => {
     const root: TreeType = {
       name: 'Opened IguideME',
       children: [],
-      value: sessions.size,
+      value: 0,
     };
 
     Array.from(sessions.values()).forEach((session) => {
@@ -47,47 +58,19 @@ const SunburstGraph: FC<SunburstGraphProps> = memo(({ sessions }) => {
     return root;
   }, [sessions]);
 
-  const tooltipInfo =
-    'This graph shows the user navigation path analysis. ' +
-    'The root node is the number of sessions opened. ' +
-    'The children nodes are the actions taken by the user.';
-
-  return (
-    <div
-      className='bg-overlay0 grid h-[400px] w-[400px] grid-rows-2 rounded-md p-4'
-      style={{ gridTemplateRows: 'auto 1fr' }}
-    >
-      <div className='mb-4 flex max-h-fit w-full items-center justify-between'>
-        <h2 className='h-fit text-xl'>User Navigation Path Analysis</h2>
-        <AntToolTip placement='bottom' title={tooltipInfo}>
-          <QuestionCircleOutlined className='text-xl text-success' />
-        </AntToolTip>
-      </div>
-
-      <SunburstChart {...tree} />
-    </div>
-  );
+  return <SunburstChart {...tree} />;
 });
 SunburstGraph.displayName = 'SunburstGraph';
 export default SunburstGraph;
 
 const SunburstChart: FC<TreeType> = memo((tree) => {
-  function nameToColor(name: string): string {
-    // Generate a color based on the name
-    let hash = 0;
-    for (let i = 0; i < name.length; i++) {
-      hash = name.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    const c = (hash & 0x00ffffff).toString(16).toUpperCase();
-    return '#' + '00000'.substring(0, 6 - c.length) + c;
-  }
-
   const chartDrawnRef = useRef<boolean>(false);
   const sunburstChartRef = useRef(null);
   useEffect(() => {
+    // eslint-disable-next-line
     if (tree.children.length === 0 || !sunburstChartRef.current || chartDrawnRef.current) return;
 
-    const treeCopy = JSON.parse(JSON.stringify(tree));
+    const treeCopy: TreeType = JSON.parse(JSON.stringify(tree));
     const myChart = Sunburst();
     myChart
       .width(300)

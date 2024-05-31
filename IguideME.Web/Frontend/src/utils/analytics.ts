@@ -9,21 +9,21 @@ export enum ActionTypes {
   settingChange,
 }
 
-export type EventReturnType = {
+export interface EventReturnType {
   timestamp: number;
   user_id: string;
   action: ActionTypes;
   action_detail: string;
   session_id: number;
   course_id: number;
-};
+}
 
-type TrackEventProps = {
+interface TrackEventProps {
   userID: string;
   action: ActionTypes;
   actionDetail: string;
   courseID: number;
-};
+}
 
 export class Analytics {
   static async getAllEvents({ courseID }: { courseID: number }) {
@@ -39,7 +39,7 @@ export class Analytics {
   static async getConsentInfo({ courseID }: { courseID: number }) {
     try {
       const data = await apiClient.get(`analytics/consent/${courseID}`);
-      return data.data as { consent: number; total: number };
+      return data.data as { current_consent: number; prev_consent: number; total: number };
     } catch (error) {
       console.log('Error fetching consent info', error);
       throw error;
