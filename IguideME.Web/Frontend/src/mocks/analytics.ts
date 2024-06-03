@@ -13,7 +13,8 @@ const COURSE_LENGTH = 16; // weeks
 const WEEKLY_EVENTS = 2;
 
 export const analyticsHandlers = [
-  http.get('/analytics/events/*', () => {
+  // Using results instead of events as some adblockers block it otherwise.
+  http.get('/analytics/results/*', () => {
     return HttpResponse.json<EventReturnType[]>(getMockData(PARTICIPANTS, COURSE_LENGTH * WEEKLY_EVENTS, 20));
   }),
 

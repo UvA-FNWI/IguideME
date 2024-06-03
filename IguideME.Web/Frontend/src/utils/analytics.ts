@@ -28,7 +28,7 @@ interface TrackEventProps {
 export class Analytics {
   static async getAllEvents({ courseID }: { courseID: number }) {
     try {
-      const data = await apiClient.get(`analytics/events/${courseID}`);
+      const data = await apiClient.get(`analytics/results/${courseID}`);
       return data.data as EventReturnType[];
     } catch (error) {
       console.log('Error fetching events', error);

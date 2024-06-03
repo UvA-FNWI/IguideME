@@ -51,7 +51,7 @@ const Header: FC<HeaderProps> = ({ self }): ReactElement => {
         </div>
       )}
       <div className='hidden gap-2 rounded-full border border-white px-1 md:flex lg:border-none'>
-        <div className='flex outline-offset-[-1px] outline-white lg:rounded-md lg:outline lg:outline-1'>
+        <div className='flex outline-offset-[-1px] outline-textAlt lg:rounded-md lg:outline lg:outline-1'>
           <ThemeSwitcherDropdown buttonClasses='border-none' user={self} />
           <NotificationPanel buttonClasses='border-none' placement='bottomLeft' user={selectedStudent ?? self} />
         </div>

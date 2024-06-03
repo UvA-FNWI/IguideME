@@ -1,5 +1,5 @@
-import Decrease from '../assets/decrease.svg';
-import Increase from '../assets/increase.svg';
+import Decrease from '../assets/Decrease.svg';
+import Increase from '../assets/Increase.svg';
 import { cn } from '@/utils/cn';
 import { QuestionCircleOutlined } from '@ant-design/icons';
 import { Tooltip as AntToolTip } from 'antd';
