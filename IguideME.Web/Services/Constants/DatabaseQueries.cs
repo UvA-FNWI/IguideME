@@ -520,6 +520,7 @@ public static class DatabaseQueries
             @type,
             @weight,
             @gradingType,
+            @alt,
             @visible,
             @notifications
         );";

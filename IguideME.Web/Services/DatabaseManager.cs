@@ -3157,7 +3157,7 @@ namespace IguideME.Web.Services
                 new SQLiteParameter("gradingType", tile.GradingType),
                 new SQLiteParameter("alt", tile.Alt),
                 new SQLiteParameter("visible", tile.Visible),
-                new SQLiteParameter("notifications.", tile.Notifications)
+                new SQLiteParameter("notifications", tile.Notifications)
             );
         }
 
