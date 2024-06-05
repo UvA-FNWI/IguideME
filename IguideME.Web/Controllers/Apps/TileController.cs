@@ -489,7 +489,7 @@ namespace IguideME.Web.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public ActionResult GetTopic(string entryID, string userID)
+        public ActionResult GetTopicCount(string entryID, string userID)
         {
             // Only instructors may view submissions of other students
             if (this.GetUserID() != userID &&

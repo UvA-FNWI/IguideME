@@ -68,6 +68,7 @@ export interface Discussion {
   author: string;
   date: number;
   message: string;
+  grades?: Grades;
 }
 
 export interface LearningGoal {
@@ -109,7 +110,10 @@ export const printGrade = (type: GradingType, grade: number, max: number, ng: bo
     case GradingType.Letters:
       return letterGrade(grade);
     case GradingType.Points:
-      return ((grade * max) / 100).toFixed(1) + '/' + max.toFixed(1);
+      if (max > 0) return ((grade * max) / 100).toFixed(1) + '/' + max.toFixed(1);
+
+      return grade.toFixed(0);
+
     case GradingType.NotGraded:
       return ng ? 'N/A' : grade.toFixed(0);
   }
