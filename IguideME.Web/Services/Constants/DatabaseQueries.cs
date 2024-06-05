@@ -1286,6 +1286,13 @@ public static class DatabaseQueries
         ORDER BY    `users`.`name` ASC
         LIMIT       1;";
 
+    public const string QUERY_USER_ID_FROM_NAME =
+        @"SELECT    `users`.`user_id`
+        FROM        `users`
+        WHERE       `users`.`name`=@name
+        ORDER BY    `users`.`name` ASC
+        LIMIT       1;";
+
     public const string QUERY_CONSENTED_USER_ID_FROM_STUDENT_NUMBER =
         @"SELECT    `users`.`user_id`
         FROM        `users`
@@ -1503,6 +1510,29 @@ public static class DatabaseQueries
     //     WHERE           `disc_id` IS NOT NULL
     //     ;";
 
+
+    public const string QUERY_DISCUSSIONS_COUNTER_FOR_USER =
+        @"SELECT (
+                SELECT
+                COUNT(*) from discussions 
+                WHERE courseID = @courseID
+                AND userID = @userID
+            )
+            +
+            (
+                SELECT
+                COUNT(*) from discussion_replies 
+                WHERE courseID = @courseID
+                AND userID = @userID
+            )
+        ;";
+
+    public const string QUERY_DISCUSSIONS_COUNTER_FOR_USER_FOR_ENTRY =
+        @"SELECT
+            COUNT(*) from discussion_replies 
+            WHERE discussion_id = @contentID
+            AND userID = @userID
+        ;";
 
     public const string QUERY_DISCUSSION_COUNTER_FOR_USER = // no consent
         @"SELECT        `tile_entries`.`tile_id`,

@@ -21,7 +21,7 @@ namespace IguideME.Web.Services
         public string[] statuses;
     }
 
-    // Not strictly necessary since we only have 1 class but apparently good practice for DI and testing.
+    // Not strictly necessary since we only have 1 class but apparently good practice.
     public interface ICanvasSyncService
     {
         Task<JobResultModel> DoWorkAsync(string jobId, JobParametersModel work,

@@ -766,6 +766,23 @@ namespace IguideME.Web.Services
             return null;
         }
 
+        public string GetUserIDFromName(int courseID, string name)
+        {
+            using (
+                SQLiteDataReader r = Query(
+                    DatabaseQueries.QUERY_USER_ID_FROM_NAME,
+                    new SQLiteParameter("name", name)
+                )
+            )
+            {
+                if (r.Read())
+                {
+                    return r.GetValue(0).ToString();
+                }
+            }
+            return null;
+        }
+
         public string GetConsentedStudentID(int courseID, int studentNumber)
         {
             using (
@@ -1668,6 +1685,48 @@ namespace IguideME.Web.Services
                 }
             }
             return grades;
+        }
+
+        public int GetDiscussionCountForUser(int courseID, string userID)
+        {
+
+            using (
+                SQLiteDataReader r = Query(
+                    DatabaseQueries.QUERY_DISCUSSIONS_COUNTER_FOR_USER,
+                    new SQLiteParameter("courseID", courseID),
+                    new SQLiteParameter("userID", userID)
+                )
+            )
+            {
+                if (r.Read())
+                {
+                    return r.GetInt32(0);
+                }
+
+            }
+
+            return 0;
+        }
+
+        public int GetDiscussionCountForUserForEntry(int contentID, string userID)
+        {
+
+            using (
+                SQLiteDataReader r = Query(
+                    DatabaseQueries.QUERY_DISCUSSIONS_COUNTER_FOR_USER_FOR_ENTRY,
+                    new SQLiteParameter("contentID", contentID),
+                    new SQLiteParameter("userID", userID)
+                )
+            )
+            {
+                if (r.Read())
+                {
+                    return r.GetInt32(0);
+                }
+
+            }
+
+            return 0;
         }
 
         public Dictionary<int, double> GetUserDiscussionCounters(int courseID, string userID)
