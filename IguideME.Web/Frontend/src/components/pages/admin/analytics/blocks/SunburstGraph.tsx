@@ -1,18 +1,30 @@
 import Sunburst from 'sunburst-chart';
+import { ActionTypes } from '@/utils/analytics';
 import { type FC, memo, useEffect, useMemo, useRef } from 'react';
 import { type SessionData } from '../analytics';
 
 /**
- * Generates a color based on the name
- * @param name The name to generate the color for
- * @returns A color in hex format
+ * typeToColor converts an action type to a color.
+ * @param type The type of action to convert to a color.
+ * @returns The color corresponding to the given action type.
  */
-function nameToColor(name: string): string {
-  let hash = 0;
-  for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
-
-  const c = (hash & 0x00ffffff).toString(16).toUpperCase();
-  return '#' + '00000'.substring(0, 6 - c.length) + c;
+function typeToColor(type: ActionTypes): string {
+  switch (type) {
+    case ActionTypes.page:
+      return '#6f4e7c';
+    case ActionTypes.tile:
+      return '#0b84a5';
+    case ActionTypes.tileView:
+      return '#f6c85f';
+    case ActionTypes.theme:
+      return '#9dd866';
+    case ActionTypes.notifications:
+      return '#ca472f';
+    case ActionTypes.settingChange:
+      return '#ffa056';
+    default:
+      return '#8dddd0';
+  }
 }
 
 interface SunburstGraphProps {
@@ -23,14 +35,21 @@ interface TreeType {
   name: string;
   children: TreeType[];
   value: number;
+  type: ActionTypes;
 }
 
 const SunburstGraph: FC<SunburstGraphProps> = memo(({ sessions }) => {
+  const sortChildren = (node: TreeType): void => {
+    node.children.sort((a, b) => a.type - b.type);
+    node.children.forEach(sortChildren);
+  };
+
   const tree: TreeType = useMemo(() => {
     const root: TreeType = {
       name: 'Opened IguideME',
       children: [],
       value: 0,
+      type: ActionTypes.page,
     };
 
     Array.from(sessions.values()).forEach((session) => {
@@ -46,7 +65,7 @@ const SunburstGraph: FC<SunburstGraphProps> = memo(({ sessions }) => {
         if (childNode) {
           childNode.value++;
         } else {
-          childNode = { name: currentAction, value: 1, children: [] };
+          childNode = { name: currentAction, value: 1, children: [], type: event.action };
           currentNode.children.push(childNode);
         }
 
@@ -54,6 +73,9 @@ const SunburstGraph: FC<SunburstGraphProps> = memo(({ sessions }) => {
         depth++;
       });
     });
+
+    // Sort each layer by action type. The order is defined in the ActionTypes enum.
+    sortChildren(root);
 
     return root;
   }, [sessions]);
@@ -77,8 +99,9 @@ const SunburstChart: FC<TreeType> = memo((tree) => {
       .height(300)
       .data(treeCopy)
       .showLabels(false)
-      .color((node) => nameToColor(node.name ?? ''))
-      .maxLevels(5)(sunburstChartRef.current);
+      .color((node) => typeToColor((node as TreeType).type ?? ActionTypes.page))
+      .maxLevels(5)(sunburstChartRef.current)
+      .tooltipTitle((node) => (node as TreeType).name);
     chartDrawnRef.current = true;
   }, [tree]);
 
