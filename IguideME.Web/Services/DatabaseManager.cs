@@ -578,26 +578,14 @@ namespace IguideME.Web.Services
             );
         }
 
-        public int RegisterDiscussionEntry(DiscussionEntry entry, string userID)
-        {
-            return IDNonQuery(
-                DatabaseQueries.REGISTER_DISCUSSION_REPLY,
-                new SQLiteParameter("entryID", entry.TopicID),
-                new SQLiteParameter("userID", userID),
-                new SQLiteParameter("date", entry.CreatedAt),
-                new SQLiteParameter("message", entry.Message)
-            // new SQLiteParameter("message", entry.Message.Replace("'", "''")),
-
-            );
-        }
-
         public void RegisterDiscussionReply(AppDiscussion reply)
         {
             NonQuery(
                 DatabaseQueries.REGISTER_DISCUSSION_REPLY,
-                new SQLiteParameter("entryID", reply.ParentID),
+                new SQLiteParameter("contentID", reply.ParentID),
                 new SQLiteParameter("userID", reply.Author),
                 new SQLiteParameter("date", reply.Date),
+                new SQLiteParameter("courseID", reply.CourseID),
                 new SQLiteParameter("message", reply.Message)
             );
         }
@@ -755,6 +743,23 @@ namespace IguideME.Web.Services
                 SQLiteDataReader r = Query(
                     DatabaseQueries.QUERY_USER_ID,
                     new SQLiteParameter("studentNumber", studentNumber)
+                )
+            )
+            {
+                if (r.Read())
+                {
+                    return r.GetValue(0).ToString();
+                }
+            }
+            return null;
+        }
+
+        public string GetUserIDFromName(int courseID, string name)
+        {
+            using (
+                SQLiteDataReader r = Query(
+                    DatabaseQueries.QUERY_USER_ID_FROM_NAME,
+                    new SQLiteParameter("name", name)
                 )
             )
             {
@@ -1513,7 +1518,7 @@ namespace IguideME.Web.Services
             using (
                 SQLiteDataReader r = Query(
                     DatabaseQueries.QUERY_USER_SUBMISSION_FOR_ENTRY_FOR_USER,
-                    new SQLiteParameter("entryID", entryID),
+                    new SQLiteParameter("contentID", entryID),
                     new SQLiteParameter("userID", userID)
                 )
             )
@@ -1670,37 +1675,46 @@ namespace IguideME.Web.Services
             return grades;
         }
 
-        public Dictionary<int, double> GetUserDiscussionCounters(int courseID, string userID)
+        public int GetDiscussionCountForUser(int courseID, string userID)
         {
-            Dictionary<int, double> discussionCounters = new();
 
             using (
                 SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_DISCUSSION_COUNTER_FOR_USER,
+                    DatabaseQueries.QUERY_DISCUSSIONS_COUNTER_FOR_USER,
                     new SQLiteParameter("courseID", courseID),
                     new SQLiteParameter("userID", userID)
                 )
             )
             {
-                while (r.Read())
+                if (r.Read())
                 {
-                    try
-                    {
-                        // We save the sum of discussion entries and replies in a dictionary with
-                        // the root discussion_id as key and the total of their entries/replies as value
-                        if (!r.IsDBNull(0))
-                        {
-                            int discID = r.GetInt32(0);
-                            discussionCounters[discID] = r.GetInt32(1);
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        PrintQueryError("GetUserDiscussionCounters", 3, r, e);
-                    }
+                    return r.GetInt32(0);
                 }
+
             }
-            return discussionCounters;
+
+            return 0;
+        }
+
+        public int GetDiscussionCountForUserForEntry(int contentID, string userID)
+        {
+
+            using (
+                SQLiteDataReader r = Query(
+                    DatabaseQueries.QUERY_DISCUSSIONS_COUNTER_FOR_USER_FOR_ENTRY,
+                    new SQLiteParameter("contentID", contentID),
+                    new SQLiteParameter("userID", userID)
+                )
+            )
+            {
+                if (r.Read())
+                {
+                    return r.GetInt32(0);
+                }
+
+            }
+
+            return 0;
         }
 
         public PeerComparisonData GetUserPeerComparison(
@@ -2313,7 +2327,7 @@ namespace IguideME.Web.Services
 
         public void DeleteTileEntry(int entryID)
         {
-            NonQuery(DatabaseQueries.DELETE_TILE_ENTRY, new SQLiteParameter("entryID", entryID));
+            NonQuery(DatabaseQueries.DELETE_TILE_ENTRY, new SQLiteParameter("contentID", entryID));
         }
 
         /////////////////////////////////////////////////////////////////////////////////
@@ -2840,28 +2854,39 @@ namespace IguideME.Web.Services
             return discussions;
         }
 
-        public AppDiscussion GetTopicGradesForUser(int courseID, int entryID, string userID)
+        public AppDiscussion GetTopicGradesForUser(int courseID, int contentID, string userID)
         {
+            int goal = GetUserGoalGrade(courseID, userID, GetCurrentSyncID(courseID));
+            int grade = GetDiscussionCountForUserForEntry(contentID, userID);
+            PeerComparisonData comparison = GetUserPeerComparison(courseID, goal, Comparison_Component_Types.discussion, contentID);
+
             using (
                 SQLiteDataReader r = Query(
                     DatabaseQueries.QUERY_TOPIC_FOR_USER,
                     new SQLiteParameter("courseID", courseID),
-                    new SQLiteParameter("entryID", entryID),
-                    new SQLiteParameter("userID", userID)
+                    new SQLiteParameter("contentID", contentID)
                 )
             )
             {
-                while (r.Read())
+                if (r.Read())
                 {
                     return new(
                             Discussion_type.Topic,
                             r.GetInt32(0),
                             -1,
-                            r.GetInt32(1),
+                            courseID,
+                            r.GetValue(1).ToString(),
                             r.GetValue(2).ToString(),
-                            r.GetValue(3).ToString(),
-                            r.GetInt32(4),
-                            r.GetValue(5).ToString()
+                            r.GetInt32(3),
+                            r.GetValue(4).ToString(),
+                            new(
+                                   grade,
+                                 comparison.Average,
+                                 comparison.Minimum,
+                                 comparison.Maximum,
+                                     -1,
+                                     AppGradingType.Points
+                            )
                         );
                 }
             }
@@ -2898,124 +2923,6 @@ namespace IguideME.Web.Services
             }
 
             return discussions;
-        }
-
-        public List<AppDiscussion> GetDiscussionEntries(int discussionID)
-        {
-            List<AppDiscussion> entries = new();
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_DISCUSSION_ENTRIES,
-                    new SQLiteParameter("discussionID", discussionID)
-                )
-            )
-            {
-                while (r.Read())
-                {
-                    AppDiscussion row =
-                        new(
-                            Discussion_type.Entry,
-                            r.GetInt32(0),
-                            discussionID,
-                            r.GetInt32(5),
-                            r.GetValue(4).ToString(),
-                            r.GetValue(1).ToString(),
-                            r.GetInt32(2),
-                            r.GetValue(3).ToString()
-                        );
-                    entries.Add(row);
-                }
-            }
-            return entries;
-        }
-
-        public List<AppDiscussion> GetDiscussionEntries(int discussion_id, string user_id)
-        {
-            List<AppDiscussion> entries = new();
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_DISCUSSION_ENTRIES_FOR_USER,
-                    new SQLiteParameter("discussionID", discussion_id),
-                    new SQLiteParameter("userID", user_id)
-                )
-            )
-            {
-                while (r.Read())
-                {
-                    AppDiscussion row =
-                        new(
-                            Discussion_type.Entry,
-                            r.GetInt32(0),
-                            discussion_id,
-                            r.GetInt32(5),
-                            r.GetValue(4).ToString(),
-                            r.GetValue(1).ToString(),
-                            r.GetInt32(2),
-                            r.GetValue(3).ToString()
-                        );
-                    entries.Add(row);
-                }
-            }
-            return entries;
-        }
-
-        public List<AppDiscussion> GetDiscussionReplies(int discussion_id)
-        {
-            List<AppDiscussion> entries = new();
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_DISCUSSION_REPLIES,
-                    new SQLiteParameter("discussionID", discussion_id)
-                )
-            )
-            {
-                while (r.Read())
-                {
-                    AppDiscussion row =
-                        new(
-                            Discussion_type.Reply,
-                            r.GetInt32(0),
-                            discussion_id,
-                            r.GetInt32(5),
-                            r.GetValue(4).ToString(),
-                            r.GetValue(1).ToString(),
-                            r.GetInt32(2),
-                            r.GetValue(3).ToString()
-                        );
-                    entries.Add(row);
-                }
-            }
-            return entries;
-        }
-
-        public List<AppDiscussion> GetDiscussionReplies(int discussion_id, string user_id)
-        {
-            List<AppDiscussion> entries = new();
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_DISCUSSION_REPLIES_FOR_USER,
-                    new SQLiteParameter("discussionID", discussion_id),
-                    new SQLiteParameter("userID", user_id)
-                )
-            )
-            {
-                while (r.Read())
-                {
-                    AppDiscussion row =
-                        new(
-                            Discussion_type.Reply,
-                            r.GetInt32(0),
-                            discussion_id,
-                            r.GetInt32(5),
-                            r.GetValue(4).ToString(),
-                            r.GetValue(1).ToString(),
-                            r.GetInt32(2),
-                            r.GetValue(3).ToString()
-                        );
-                    entries.Add(row);
-                }
-            }
-            return entries;
         }
 
         public List<LayoutColumn> GetLayoutColumns(int courseID)
@@ -3157,7 +3064,7 @@ namespace IguideME.Web.Services
                 new SQLiteParameter("gradingType", tile.GradingType),
                 new SQLiteParameter("alt", tile.Alt),
                 new SQLiteParameter("visible", tile.Visible),
-                new SQLiteParameter("notifications.", tile.Notifications)
+                new SQLiteParameter("notifications", tile.Notifications)
             );
         }
 

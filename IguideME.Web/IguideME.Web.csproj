@@ -8,7 +8,7 @@
     <None Update="app.db" CopyToOutputDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Npgsql" Version="8.0.2" />
+    <PackageReference Include="Npgsql" Version="8.0.3" />
     <PackageReference Include="UvA.Connectors.Canvas" Version="0.25.3" />
     <PackageReference Include="StackExchange.Redis" Version="2.2.62" />
     <PackageReference Include="System.Data.SQLite" Version="1.0.114.4" />

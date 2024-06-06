@@ -21,6 +21,7 @@ namespace IguideME.Web.Services
         public CanvasApiConnector Connector;
         public string BaseUrl;
         public string AccessToken;
+        public DatabaseManager _databaseManager;
 
         /// <summary>
         /// This constructor initializes the new CanvasHandler to
@@ -28,11 +29,12 @@ namespace IguideME.Web.Services
         /// </summary>
         /// <param name="config">The configuration for the instance.</param>
         /// <param name="logger">A reference to the logger used for this service.</param>
-        public CanvasHandler(IConfiguration config, ILogger<SyncManager> logger)
+        public CanvasHandler(IConfiguration config, ILogger<SyncManager> logger, DatabaseManager databaseManager)
         {
             _logger = logger;
             this.AccessToken = config["LMS:Canvas:AccessToken"];
             this.BaseUrl = config["LMS:Canvas:Url"];
+            this._databaseManager = databaseManager;
             this.SyncInit();
         }
 
@@ -271,7 +273,7 @@ namespace IguideME.Web.Services
                                 -1,
                                 courseID,
                                 topic.Title,
-                                topic.UserName,
+                                _databaseManager.GetUserIDFromName(courseID, topic.UserName),
                                 ((DateTimeOffset)topic.PostedAt).ToUnixTimeMilliseconds(),
                                 topic.Message
                             )

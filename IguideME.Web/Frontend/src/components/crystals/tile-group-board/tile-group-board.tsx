@@ -6,15 +6,15 @@ import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
 import { PlusOutlined } from '@ant-design/icons';
 import {
-    DndContext,
-    type DragEndEvent,
-    type DragOverEvent,
-    DragOverlay,
-    type DragStartEvent,
-    PointerSensor,
-    type UniqueIdentifier,
-    useSensor,
-    useSensors,
+  DndContext,
+  type DragEndEvent,
+  type DragOverEvent,
+  DragOverlay,
+  type DragStartEvent,
+  PointerSensor,
+  type UniqueIdentifier,
+  useSensor,
+  useSensors,
 } from '@dnd-kit/core';
 import { arrayMove, SortableContext } from '@dnd-kit/sortable';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -135,7 +135,6 @@ const TileGroupBoard: FC = (): ReactElement => {
           }
         }}
         open={editTitle !== null}
-        rootStyle={{ position: 'absolute' }}
         getContainer={() => {
           return document.getElementsByClassName('adminContent')[0];
         }}

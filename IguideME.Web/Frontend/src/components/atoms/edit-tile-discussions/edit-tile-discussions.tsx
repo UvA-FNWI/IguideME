@@ -5,6 +5,7 @@ import { type Discussion, type TileEntry } from '@/types/tile';
 import { CheckOutlined, CloseOutlined, DeleteFilled } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
 import { Form, Select, Switch, Table } from 'antd';
+import { useWatch } from 'antd/es/form/Form';
 import { useCallback, useState, type FC, type ReactElement } from 'react';
 
 const EditTileDiscussions: FC = (): ReactElement => {
@@ -15,21 +16,28 @@ const EditTileDiscussions: FC = (): ReactElement => {
 
   if (isError) return <QueryError className='static [&_span]:!text-2xl' title={'Error: Could not load discussions'} />;
 
+  const alt: boolean = useWatch('alt');
+
   return (
     <>
       <p className='mb-1'>Discussions:</p>
       <div className='col-span-2'>
-        <Form.Item name='alt' noStyle valuePropName='checked'>
-          <Switch className='float-end' checkedChildren={<CheckOutlined />} unCheckedChildren={<CloseOutlined />} />
-        </Form.Item>
-      </div>
-      <div className='col-span-3'>
-        <QueryLoading isLoading={isLoading}>
-          <Form.Item name='entries' className='m-0 w-full'>
-            <DiscussionSelect topics={data ?? []} value={[]} onChange={() => {}} />
+        <p className='float-end'>
+          Count all:{' '}
+          <Form.Item name='alt' noStyle valuePropName='checked'>
+            <Switch checkedChildren={<CheckOutlined />} unCheckedChildren={<CloseOutlined />} />
           </Form.Item>
-        </QueryLoading>
+        </p>
       </div>
+      {!alt && (
+        <div className='col-span-3'>
+          <QueryLoading isLoading={isLoading}>
+            <Form.Item name='entries' className='m-0 w-full'>
+              <DiscussionSelect topics={data ?? []} value={[]} onChange={() => {}} />
+            </Form.Item>
+          </QueryLoading>
+        </div>
+      )}
     </>
   );
 };

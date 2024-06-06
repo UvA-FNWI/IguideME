@@ -140,8 +140,9 @@ const SelectAssignments: FC<SelectAssignmentsProps> = ({ value: entries, onChang
                     onChange={(val) => {
                       changeWeight(entry, val);
                     }}
-                    formatter={(value) => `${(value ?? 0) * 100}%`}
-                    parser={(value) => +parseFloat(value!.replace('%', '')).toFixed(1) / 100}
+                    formatter={(value) => `${((value ?? 0) * 100).toFixed(1)}%`}
+                    parser={(value) => parseFloat(value!.replace('%', '')) / 100}
+                    step={0.01}
                     variant='borderless'
                   />
                 );

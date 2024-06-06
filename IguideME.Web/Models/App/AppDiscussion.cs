@@ -20,9 +20,6 @@ namespace IguideME.Web.Models.App
         [JsonProperty("type")]
         public Discussion_type Type { get; set; }
 
-        // [JsonProperty("discussion_id")]
-        // public int DiscussionID { get; set; }
-
         [JsonProperty("parent_id")]
         public int ParentID { get; set; }
 
@@ -41,8 +38,11 @@ namespace IguideME.Web.Models.App
         [JsonProperty("message")]
         public string Message { get; set; }
 
+        // Only populated when send to frontend
+        [JsonProperty(PropertyName = "grades")]
+        public AssignmentGrades Grades { get; set; }
+
         public AppDiscussion(
-            // int discussionID,
             Discussion_type type,
             int id,
             int parentID,
@@ -54,13 +54,34 @@ namespace IguideME.Web.Models.App
         {
             this.ID = id;
             this.Type = type;
-            // this.DiscussionID = discussionID;
             this.ParentID = parentID;
             this.CourseID = courseID;
             this.Title = title;
             this.Author = author;
             this.Date = date;
             this.Message = message;
+        }
+
+        public AppDiscussion(
+            Discussion_type type,
+            int id,
+            int parentID,
+            int courseID,
+            string title,
+            string author,
+            long date,
+            string message,
+            AssignmentGrades grades)
+        {
+            this.ID = id;
+            this.Type = type;
+            this.ParentID = parentID;
+            this.CourseID = courseID;
+            this.Title = title;
+            this.Author = author;
+            this.Date = date;
+            this.Message = message;
+            this.Grades = grades;
         }
 
     }

@@ -31,7 +31,7 @@ export const GradeView: FC<Grades> = ({ grade, max, type }): ReactElement => {
         '...'
       : <>
           <div>
-            {grade >= 50 ?
+            {grade >= 50 || (max === -1 && grade > 0) ?
               <LikeTwoTone twoToneColor={'rgb(0, 185, 120)'} className='text-lg' />
             : <WarningTwoTone twoToneColor={'rgb(255, 110, 90)'} className='text-lg' />}
           </div>
@@ -54,13 +54,15 @@ const Discussions: FC<Grades> = ({ grade }): ReactElement => {
 const Learnings: FC<Grades> = ({ grade, max }): ReactElement => {
   return (
     <Space>
-      <p>{grade === 0 ?
-        '...'
-      : <>
-          {grade.toFixed(0)}/{max}
-        </>
-      }</p>
-      <TrophyOutlined className='text-success'/>
+      <p>
+        {grade === 0 ?
+          '...'
+        : <>
+            {grade.toFixed(0)}/{max}
+          </>
+        }
+      </p>
+      <TrophyOutlined className='text-success' />
     </Space>
   );
 };

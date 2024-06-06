@@ -1,4 +1,4 @@
-import tailwindConfig from '@/../tailwind.config.js';
+import tailwindConfig from '@/../tailwind.config';
 import { TooltipProps } from '@/types/reactRecharts';
 import { printGrade, type Grades } from '@/types/tile';
 import { useTheme } from 'next-themes';

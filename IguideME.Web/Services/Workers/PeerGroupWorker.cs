@@ -57,10 +57,6 @@ namespace IguideME.Web.Services.Workers
         {
             this._logger.LogInformation("Creating peer groups");
             CreatePeerGroups();
-
-            // TODO: Lets move this to the notification worker as it's not part of the same loop now anyway.
-            // this._logger.LogInformation("Creating performance notifications");
-            // CreateNotifications();
         }
 
         /// <summary>
@@ -133,7 +129,26 @@ namespace IguideME.Web.Services.Workers
         /// <returns>The grade of the tile.</returns>
         double CalculateTileGrade(Tile tile, string userID, Dictionary<int, double> userEntryGradesMap)
         {
+            return tile.Type switch
+            {
+                TileType.assignments => CalculateAssignmentTileGrade(tile, userID, userEntryGradesMap),
+                TileType.discussions => CalculateDiscussionTileGrade(tile, userID),
+                TileType.learning_outcomes => CalculateLearningGoalTileGrade(tile, userID),
+                _ => 0
+            };
+        }
+
+        /// <summary>
+        /// Calculate the total grade of an assignment tile for a user.
+        /// </summary>
+        /// <param name="tile"> The tile to calculate the average for.</param>
+        /// <param name="userID">The id of the user.</param>
+        /// <param name="userEntryGradesMap">A dictionary mapping assignments to lists of grades for the total course grade.</param>
+        /// <returns>The grade of the tile.</returns>
+        double CalculateAssignmentTileGrade(Tile tile, string userID, Dictionary<int, double> userEntryGradesMap)
+        {
             double tileGrade = 0;
+
 
             foreach (TileEntry entry in tile.Entries)
             {
@@ -158,6 +173,61 @@ namespace IguideME.Web.Services.Workers
             );
 
             return tileGrade;
+        }
+
+        /// <summary>
+        /// Calculate the total grade of a discussion tile for a user.
+        /// </summary>
+        /// <param name="tile"> The tile to calculate the average for.</param>
+        /// <param name="userID">The id of the user.</param>
+        /// <param name="userEntryGradesMap">A dictionary mapping assignments to lists of grades for the total course grade.</param>
+        /// <returns>The grade of the tile.</returns>
+        double CalculateDiscussionTileGrade(Tile tile, string userID)
+        {
+            double tileGrade = 0;
+
+            // Alt for a discussion tile means to count all posts by the user instead of only specified.
+            if (tile.Alt)
+            {
+                tileGrade = _databaseManager.GetDiscussionCountForUser(_courseID, userID);
+            }
+            else
+            {
+                foreach (TileEntry entry in tile.Entries)
+                {
+                    double entryGrade = _databaseManager.GetDiscussionCountForUserForEntry(entry.ContentID, userID);
+
+                    tileGrade += entryGrade;
+
+                    // Store the entry grade for the peer statistics.
+                    if (peerEntryGradesMap.ContainsKey(entry.ContentID))
+                        peerEntryGradesMap[entry.ContentID].Add(entryGrade);
+                    else
+                        peerEntryGradesMap[entry.ContentID] = new();
+                }
+            }
+
+            _databaseManager.CreateTileGradeForUser(
+                userID,
+                tile.ID,
+                tileGrade,
+                _syncID
+            );
+
+            return tileGrade;
+        }
+
+        /// <summary>
+        /// Calculate the total grade of a learning goal tile for a user.
+        /// </summary>
+        /// <param name="tile"> The tile to calculate the average for.</param>
+        /// <param name="userID">The id of the user.</param>
+        /// <param name="userEntryGradesMap">A dictionary mapping assignments to lists of grades for the total course grade.</param>
+        /// <returns>The grade of the tile.</returns>
+        double CalculateLearningGoalTileGrade(Tile tile, string userID)
+        {
+            // TODO: Implement.
+            return 0;
         }
 
         /// <summary>

@@ -367,6 +367,7 @@ public static class DatabaseQueries
         @"CREATE TABLE IF NOT EXISTS `discussion_replies` (
             `reply_id`        INTEGER PRIMARY KEY AUTOINCREMENT,
             `discussion_id`   INTEGER,
+            `course_id`       INTEGER,
             `author`          STRING,
             `date`            INTEGER,
             `message`         TEXT DEFAULT NULL,
@@ -520,6 +521,7 @@ public static class DatabaseQueries
             @type,
             @weight,
             @gradingType,
+            @alt,
             @visible,
             @notifications
         );";
@@ -607,11 +609,13 @@ public static class DatabaseQueries
         @"INSERT OR REPLACE
             INTO   `discussion_replies`
                         (   `discussion_id`,
+                            `course_id`,
                             `author`,
                             `date`,
                             `message` )
         VALUES(
-            @entryID,
+            @contentID,
+            @courseID,
             @userID,
             @date,
             @message
@@ -1102,6 +1106,8 @@ public static class DatabaseQueries
                     `discussions`.`message`
         FROM        `discussions`
         WHERE       `discussions`.`course_id`=@courseID
+        AND         `discussions`.`discussion_id`=@contentID
+        LIMIT       1
         ;";
 
     public const string QUERY_TILE_DISCUSSIONS =
@@ -1115,78 +1121,6 @@ public static class DatabaseQueries
         INNER JOIN  `tile_entries`
             ON      `tile_entries`.`content_id` == `discussions`.`discussion_id`
         WHERE       `tile_entries`.`tile_id`=@tileID
-        ;";
-
-    // NOT USED ANYWHERE. DO WE WANT IT?????
-    // public const string QUERY_TILE_DISCUSSIONS_FOR_USER =
-    //     @"SELECT    `id`,
-    //                 `discussion_id`,
-    //                 `course_id`,
-    //                 `title`,
-    //                 `posted_by`,
-    //                 `posted_at`,
-    //                 `message`
-    //     FROM        `discussions`
-    //     WHERE       `tile_id`=@id
-    //     AND         `posted_by`=@userID
-    //     AND         `sync_hash`=@hash;";
-
-    public const string QUERY_DISCUSSION_ENTRIES =
-        @"SELECT    `discussion_replies`.`reply_id`,
-                    `discussion_replies`.`author`,
-                    `discussion_replies`.`date`,
-                    `discussion_replies`.`message`,
-                    `discussions`.`title`,
-                    `discussions`.`course_id`
-        FROM        `discussion_replies`
-        INNER JOIN  `discussions`
-            USING   (`discussion_id`)
-        WHERE       `discussion_replies`.`discussion_id`=@discussionID
-        ;";
-
-    public const string QUERY_DISCUSSION_ENTRIES_FOR_USER =
-        @"SELECT    `discussion_replies`.`reply_id`,
-                    `discussion_replies`.`author`,
-                    `discussion_replies`.`date`,
-                    `discussion_replies`.`message`,
-                    `discussions`.`title`
-                    `discussions`.`course_id`
-        FROM        `discussion_replies`
-        INNER JOIN  `discussions`
-            USING   (`discussion_id`)
-        WHERE       `discussion_replies`.`discussion_id`=@discussionID
-        AND         `discussion_replies`.`author`=@userID
-        ;";
-
-    public const string QUERY_DISCUSSION_REPLIES =
-        @"SELECT    rep.`discussion_replies`.`reply_id`,
-                    rep.`discussion_replies`.`author`,
-                    rep.`discussion_replies`.`date`,
-                    rep.`discussion_replies`.`message`,
-                    `discussions`.`title`,
-                    `discussions`.`course_id`
-        FROM        `discussion_replies` rep
-        INNER JOIN  `discussion_replies` ent
-            ON      rep.`discussion_id` == ent.`reply_id`
-        INNER JOIN  `discussions`
-            ON      `discussions`.`discussion_id` == ent.`discussion_id`
-        WHERE       ent.`discussion_id`=@discussionID
-        ;";
-
-    public const string QUERY_DISCUSSION_REPLIES_FOR_USER =
-        @"SELECT    rep.`discussion_replies`.`reply_id`,
-                    rep.`discussion_replies`.`author`,
-                    rep.`discussion_replies`.`date`,
-                    rep.`discussion_replies`.`message`,
-                    `discussions`.`title`,
-                    `discussions`.`course_id`
-        FROM        `discussion_replies` rep
-        INNER JOIN  `discussion_replies` ent
-            ON      rep.`discussion_id` == ent.`reply_id`
-        INNER JOIN  `discussions`
-            ON      `discussions`.`discussion_id` == ent.`discussion_id`
-        WHERE       ent.`discussion_id`=@discussionID
-        AND         rep.`author`=@userID
         ;";
 
     public const string QUERY_SYNC_HASHES_FOR_COURSE =
@@ -1282,6 +1216,13 @@ public static class DatabaseQueries
         @"SELECT    `users`.`user_id`
         FROM        `users`
         WHERE       `users`.`student_number`=@studentNumber
+        ORDER BY    `users`.`name` ASC
+        LIMIT       1;";
+
+    public const string QUERY_USER_ID_FROM_NAME =
+        @"SELECT    `users`.`user_id`
+        FROM        `users`
+        WHERE       `users`.`name`=@name
         ORDER BY    `users`.`name` ASC
         LIMIT       1;";
 
@@ -1459,95 +1400,27 @@ public static class DatabaseQueries
         AND         `submissions`.`user_id`=@userID
         ;";
 
-    // public const string QUERY_USER_DISCUSSION_COUNTER = // TO BE DELETED
-    //     @"SELECT        `discussions`.`tile_id`,
-    //                     SUM(`counter`)
+    public const string QUERY_DISCUSSIONS_COUNTER_FOR_USER =
+        @"SELECT (
+                SELECT
+                COUNT(*) from discussions 
+                WHERE course_id = @courseID
+                AND author = @userID
+            )
+            +
+            (
+                SELECT
+                COUNT(*) from discussion_replies 
+                WHERE course_id = @courseID
+                AND author = @userID
+            )
+        ;";
 
-    //     FROM(SELECT     `discussion_replies`.`discussion_id`
-    //             AS      `disc_id`,
-    //         COUNT(*)
-    //             AS      `counter`
-    //         FROM        `discussion_replies`
-    //         LEFT JOIN   `discussion_replies`
-    //             ON      `discussion_replies`.`id` = `discussion_replies`.`entry_id`
-    //         WHERE       `discussion_replies`.`course_id` = @courseID
-    //         AND         `discussion_replies`.`posted_by` = @userID
-
-    //         UNION ALL
-
-    //         SELECT      `discussion_replies`.`discussion_id`
-    //             AS      `disc_id`,
-    //         COUNT(*)
-    //             AS      `counter`
-    //         FROM        `discussion_replies`
-    //         WHERE       `course_id` = @courseID
-    //         AND         `posted_by` =@userID
-
-    //         UNION ALL
-
-    //         SELECT      `discussions`.`discussion_id`
-    //             AS      `disc_id`,
-    //         COUNT(*)
-    //             AS      `counter`
-    //         FROM        `discussions`
-    //         INNER JOIN  `users`
-    //             ON      `discussions`.`posted_by` = `users`.`name`
-    //         WHERE       `discussions`.`course_id` = @courseID
-    //         AND         `users`.`user_id` =@userID
-    //         AND         `discussions`.`sync_id` = @syncID
-    //         AND         `users`.`sync_id` = @syncID)
-
-    //     INNER JOIN       `discussions`
-    //         ON          `disc_id` = `discussions`.`discussion_id`
-    //     WHERE           `disc_id` IS NOT NULL
-    //     ;";
-
-
-    public const string QUERY_DISCUSSION_COUNTER_FOR_USER = // no consent
-        @"SELECT        `tile_entries`.`tile_id`,
-                        SUM(`counter`)
-        FROM(
-                SELECT      `discussions`.`discussion_id`
-                    AS      `disc_id`,
-                COUNT(*)
-                    AS      `counter`
-                FROM        `discussions`
-                INNER JOIN  `users`
-                    ON      `discussions`.`author` = `users`.`name`
-                WHERE       `discussions`.`course_id` = @courseID
-                AND         `users`.`user_id` = @userID
-                GROUP BY    `disc_id`
-            UNION ALL
-                SELECT      `discussions`.`discussion_id`
-                    AS      `disc_id`,
-                COUNT(*)
-                    AS      `counter`
-                FROM        `discussion_replies`
-                LEFT JOIN   `discussions`
-                    USING   (`discussion_id`)
-                WHERE       `discussions`.`course_id` = @courseID
-                AND         `discussion_replies`.`author` = @userID
-                GROUP BY    `disc_id`
-            UNION ALL
-                SELECT      `discussions`.`discussion_id`
-                    AS      `disc_id`,
-                COUNT(*)
-                    AS      `counter`
-                FROM        `discussion_replies`
-                LEFT JOIN   `discussion_replies`
-                    AS      `repl2`
-                    ON      `repl2`.`discussion_id` = `discussion_replies`.`reply_id`
-                LEFT JOIN   `discussions`
-                    USING   (`discussion_id`)
-                WHERE       `discussions`.`course_id` = @courseID
-                AND         `repl2`.`author` = @userID
-                GROUP BY    `disc_id`
-        )
-
-        LEFT JOIN   `tile_entries`
-            ON      `disc_id` = `tile_entries`.`content_id`
-        WHERE       `disc_id` IS NOT NULL
-        GROUP BY    `disc_id`
+    public const string QUERY_DISCUSSIONS_COUNTER_FOR_USER_FOR_ENTRY =
+        @"SELECT
+            COUNT(*) from discussion_replies 
+            WHERE discussion_id = @contentID
+            AND author = @userID
         ;";
 
     public const string QUERY_PEER_GROUP_RESULTS =

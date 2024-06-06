@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace IguideME.Web.Controllers
 {
-    public class AnalyticController: DataController
+    public class AnalyticController : DataController
     {
         private readonly ILogger<DataController> _logger;
 
@@ -35,8 +35,9 @@ namespace IguideME.Web.Controllers
             return Ok("User action has been saved.");
         }
 
+        // Using results instead of events as some adblockers block it otherwise.
         [Authorize(Policy = "IsInstructor")]
-        [Route("/analytics/events/{courseID}")]
+        [Route("/analytics/results/{courseID}")]
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult GetAllEvents(int courseID)

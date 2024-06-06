@@ -92,13 +92,24 @@ export const DiscussionDetail: FC<Props> = ({ entry }): ReactElement => {
     );
   } else if (isError || !discussion) {
     return <QueryError className='grid place-content-center' title='No submission found' />;
-  } else
-    return (
-      <div className='h-full w-full p-2'>
-        <h3 className='overflow-hidden text-ellipsis text-nowrap text-center text-text font-bold'>{entry.title}</h3>
-        <p>{discussion.message}</p>
-      </div>
-    );
+  }
+
+  return (
+    <div className='h-full w-full p-2'>
+      <h3 className='overflow-hidden text-ellipsis text-nowrap text-center text-text font-bold'>{entry.title}</h3>
+      {discussion.grades ?
+        <div className='flex h-4/5 w-full flex-col justify-between'>
+          <div className='grid flex-grow place-content-center'>
+            <GradeView {...discussion.grades} />
+          </div>
+          <div>
+            <Divider className='m-0 p-0 border-text' />
+            <PeerComparison {...discussion.grades} />
+          </div>
+        </div>
+      : <QueryError className='grid place-content-center' title='No submission found' />}
+    </div>
+  );
 };
 
 export const LearningGoalDetail: FC<Props> = ({ entry }): ReactElement => {
