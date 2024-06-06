@@ -1,5 +1,4 @@
-import { ActionTypes } from '@/utils/analytics';
-import { isThisWeek } from '../utils';
+import { ActionTypes, isThisWeek } from '@/utils/analytics';
 import { Table } from 'antd';
 import { type ColumnProps } from 'antd/es/table';
 import { type FC, memo, useMemo } from 'react';
