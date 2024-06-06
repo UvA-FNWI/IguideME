@@ -110,7 +110,7 @@ const AnalyticsChips: FC<AnalyticsChipProps> = memo(({ analytics, consentInfo, s
   }, [analytics, sessions]);
 
   return (
-    <div className='flex w-full flex-wrap justify-between gap-4'>
+    <div className='flex w-full max-w-[2000px] flex-wrap justify-center gap-4'>
       <AnalyticsChip
         change={consentInfo ? consentInfo.current_consent - consentInfo.prev_consent : 0}
         display={consentInfo?.current_consent}
@@ -162,6 +162,7 @@ const AnalyticsChips: FC<AnalyticsChipProps> = memo(({ analytics, consentInfo, s
             )
           : 0
         }
+        className='flex-grow'
         display={
           sessionLengthData.length > 0 ?
             `${Math.round(sessionLengthData[sessionLengthData.length - 1]?.value)} min`

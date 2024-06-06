@@ -100,7 +100,7 @@ const GradeAnalytics: FC = (): ReactElement => {
   if (selfIsError || analyticsIsError || consentInfoIsError) {
     return (
       <div className='relative h-96 w-96 rounded-xl bg-surface1'>
-        <QueryError title='Failed to usage analytic data' />
+        <QueryError title='Failed to load usage analytic data' />
       </div>
     );
   }
@@ -109,11 +109,11 @@ const GradeAnalytics: FC = (): ReactElement => {
     <>
       <AdminTitle title='Usage Analytics' description='View the usage analytics for your course.' />
       <QueryLoading isLoading={selfIsLoading || analyticsIsLoading || consentInfoIsLoading}>
-        <div className='flex max-w-[1400px] flex-col gap-4'>
+        <div className='flex w-full flex-col gap-4'>
           <AnalyticsChips analytics={analytics} consentInfo={consentInfo} sessions={sessions} />
-          <div className='flex flex-wrap gap-4'>
+          <div className='flex w-full max-w-[2000px] flex-wrap justify-center gap-4'>
             <AnalyticsGraph
-              className='w-[400px]'
+              className='min-w-[400px] max-w-[900px] flex-1 flex-grow'
               title='User Navigation Path Analysis'
               tooltip={
                 <p className='text-xs text-white'>
@@ -124,10 +124,10 @@ const GradeAnalytics: FC = (): ReactElement => {
             >
               <SunburstGraph sessions={sessions} />
             </AnalyticsGraph>
-            <AnalyticsTextBlock className='w-[560px]' title='Page Visits'>
+            <AnalyticsTextBlock className='min-w-[560px] max-w-[900px] flex-1 flex-grow' title='Page Visits'>
               <PageVisits actionDetailLength={actionDetailLength} analytics={analytics} />
             </AnalyticsTextBlock>
-            <AnalyticsTextBlock className='w-[400px]' title='Exit Page Analysis'>
+            <AnalyticsTextBlock className='min-w-[400px] max-w-[900px] flex-1 flex-grow' title='Exit Page Analysis'>
               <PageExits sessions={sessions} />
             </AnalyticsTextBlock>
           </div>
