@@ -3246,5 +3246,26 @@ namespace IguideME.Web.Services
 
             return actions;
         }
+
+        public ConsentInfo RetrieveAnalyticConsentInfoPerCourse(int courseID)
+        {
+            ConsentInfo consentInfo = new ConsentInfo();
+
+            // TODO: This query is not implemented. I don't know if we already have this functionality.
+            using SQLiteDataReader r = Query(
+                    DatabaseQueries.QUERY_ANALYTIC_CONSENT_PER_COURSE,
+                    new SQLiteParameter("courseID", courseID)
+                );
+            while (r.Read())
+            {
+                ConsentInfo = {
+                    current_consent: r.GetInt32(0),
+                    prev_consent: r.GetInt32(1),
+                    total: r.GetInt32(2)
+                };
+            }
+
+            return ConsentInfo;
+
     }
 }

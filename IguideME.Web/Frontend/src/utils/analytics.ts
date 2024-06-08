@@ -30,13 +30,15 @@ async function getAllEvents({ courseID }: { courseID: number }): Promise<EventRe
   return data.data as EventReturnType[];
 }
 
-async function getConsentInfo({
-  courseID,
-}: {
-  courseID: number;
-}): Promise<{ current_consent: number; prev_consent: number; total: number }> {
+interface ConsentInfoReturnType {
+  current_consent: number;
+  prev_consent: number;
+  total: number;
+}
+
+async function getConsentInfo({ courseID }: { courseID: number }): Promise<ConsentInfoReturnType> {
   const data = await apiClient.get(`analytics/consent/${courseID}`);
-  return data.data as { current_consent: number; prev_consent: number; total: number };
+  return data.data as ConsentInfoReturnType;
 }
 
 async function trackEvent({ userID, action, actionDetail, courseID }: TrackEventProps): Promise<void> {

@@ -44,5 +44,14 @@ namespace IguideME.Web.Controllers
         {
             return Ok(_databaseManager.RetrieveAllActionsPerCourse(courseID));
         }
+
+        [Authorize(Policy = "IsInstructor")]
+        [Route("/analytics/consent/{courseID}")]
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public ActionResult GetConsentInfo(int courseID)
+        {
+            return Ok(_databaseManager.RetrieveAllActionsPerCourse(courseID));
+        }
     }
 }

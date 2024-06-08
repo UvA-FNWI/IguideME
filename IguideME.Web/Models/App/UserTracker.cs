@@ -12,6 +12,13 @@ namespace IguideME.Web.Models.App
         settingChange,
     }
 
+    public class ConsentInfo
+    {
+        public int CurrentConsent { get; set; }
+        public int PrevConsent { get; set; }
+        public int Total { get; set; }
+    }
+
     public class UserTracker
     {
         [JsonProperty("timestamp")]
