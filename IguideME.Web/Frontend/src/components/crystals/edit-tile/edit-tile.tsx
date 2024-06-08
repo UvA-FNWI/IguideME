@@ -1,16 +1,16 @@
-import { deleteTile, patchTile } from '@/api/tiles';
 import EditTileAssignments from '@/components/atoms/edit-tile-assignments/edit-tile-assignments';
 import EditTileDiscussions from '@/components/atoms/edit-tile-discussions/edit-tile-discussions';
 import EditTileGoals from '@/components/atoms/edit-tile-goals/edit-tile-goals';
-import { TileType, type Tile } from '@/types/tile';
+import Swal from 'sweetalert2';
 import { BellOutlined, CheckCircleOutlined, StopOutlined } from '@ant-design/icons';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button, Form, Input, Select } from 'antd';
+import { deleteTile, patchTile } from '@/api/tiles';
+import { useDrawerStore } from '../tile-group-board/useDrawerStore';
 import { useForm, useWatch } from 'antd/es/form/Form';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { TileType, type Tile } from '@/types/tile';
 import { type FormInstance } from 'antd/lib/form/Form';
 import { useState, type FC, type ReactElement } from 'react';
-import Swal from 'sweetalert2';
-import { useDrawerStore } from '../tile-group-board/useDrawerStore';
 
 interface Props {
   tile: Tile;

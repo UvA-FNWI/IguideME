@@ -1,5 +1,5 @@
-import { SmileOutlined } from '@ant-design/icons';
 import { Result } from 'antd';
+import { SmileOutlined } from '@ant-design/icons';
 import { type FC, type ReactElement } from 'react';
 
 const Home: FC = (): ReactElement => {

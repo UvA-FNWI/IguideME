@@ -1,10 +1,10 @@
-import { getStudentsWithSettings } from '@/api/users';
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
-import { type User } from '@/types/user';
 import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
-import { useQuery } from '@tanstack/react-query';
 import { Col, Row, Table, Tooltip } from 'antd';
+import { getStudentsWithSettings } from '@/api/users';
+import { useQuery } from '@tanstack/react-query';
+import { type User } from '@/types/user';
 import { type ColumnsType } from 'antd/lib/table';
 import { type FC, type ReactElement } from 'react';
 

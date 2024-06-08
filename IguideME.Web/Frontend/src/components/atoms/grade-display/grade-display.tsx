@@ -1,11 +1,11 @@
+import resolveConfig from 'tailwindcss/resolveConfig';
 import tailwindConfig from '@/../tailwind.config';
-import { useTileViewStore } from '@/components/pages/student-dashboard/tileViewContext';
-import { TooltipProps } from '@/types/reactRecharts';
+import { Bar, BarChart, Label, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { FrownTwoTone, MehTwoTone, SmileTwoTone } from '@ant-design/icons';
 import { Space, Spin } from 'antd';
+import { type TooltipProps } from '@/types/reactRecharts';
+import { useTileViewStore } from '@/components/pages/student-dashboard/tileViewContext';
 import { memo, type FC, type ReactElement } from 'react';
-import { Bar, BarChart, Label, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
-import resolveConfig from 'tailwindcss/resolveConfig';
 
 const GradeDisplay: FC = (): ReactElement => {
   const { user, viewType } = useTileViewStore((state) => ({
@@ -88,7 +88,7 @@ const GridGrades: FC<Props> = memo(({ goal, total, pred }): ReactElement => {
 GridGrades.displayName = 'GridGrades';
 
 const BarTooltip: FC<TooltipProps> = memo(({ active, payload, label }) => {
-  if (active && payload && payload.length) {
+  if (active && payload?.length) {
     return (
       <div className='z-50 rounded-lg border border-solid border-text bg-crust/80 p-2'>
         <p>
@@ -130,7 +130,7 @@ const GraphGrades: FC<Props> = memo(({ goal, total, pred }): ReactElement => {
       >
         <XAxis hide axisLine={false} type='number' domain={[0, 10]} />
         <YAxis axisLine dataKey='name' tick={false} tickSize={0} type='category' width={1} />
-        <Tooltip content={<BarTooltip />} cursor={false}/>
+        <Tooltip content={<BarTooltip />} cursor={false} />
         <Bar dataKey='grade' className='[&>g>path]:!fill-overlay0' barSize={15} background={{ fill: '#eee' }} />
         <ReferenceLine className='stroke-text [&>line]:!stroke-text' strokeDasharray='3 3' strokeWidth={2} x={goal}>
           <Label value='goal' position='insideLeft' />

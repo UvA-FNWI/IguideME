@@ -1,29 +1,29 @@
-import tailwindConfig from '@/../tailwind.config';
-import { TooltipProps } from '@/types/reactRecharts';
-import { printGrade, type Grades } from '@/types/tile';
-import { useTheme } from 'next-themes';
-import { type FC, type ReactElement } from 'react';
-import { Bar, BarChart, Tooltip, XAxis, YAxis } from 'recharts';
 import resolveConfig from 'tailwindcss/resolveConfig';
+import tailwindConfig from '@/../tailwind.config';
+import { Bar, BarChart, Tooltip, XAxis, YAxis } from 'recharts';
+import { useTheme } from 'next-themes';
+import { type TooltipProps } from '@/types/reactRecharts';
+import { printGrade, type Grades } from '@/types/tile';
+import { type FC, type ReactElement } from 'react';
 
 const GraphGrade: FC<Grades> = ({ grade, peerAvg, peerMin, peerMax, max, type }): ReactElement => {
   const BarTooltip: FC<TooltipProps> = ({ active, payload }) => {
-    if (active && payload && payload.length) {
+    if (active && payload?.length) {
       const data = payload[1].payload;
       return (
         <div className='z-50 rounded-lg border border-solid border-text bg-surface1/85 p-2'>
           <p>
-            {data.name === 'You' ? <>Grade: {printGrade(type, data.grade, max)}</>
-              :
-              <>
-                High: {printGrade(type, data.peerMax, max)}
+            {data.name === 'You' ?
+              <>Grade: {printGrade(type, Number(data.grade), max)}</>
+            : <>
+                High: {printGrade(type, Number(data.peerMax), max)}
                 <br />
-                Average: {printGrade(type, data.grade, max)}
+                Average: {printGrade(type, Number(data.grade), max)}
                 <br />
                 Low:
-                {printGrade(type, data.peerMin, max)}
+                {printGrade(type, Number(data.peerMin), max)}
               </>
-              }
+            }
           </p>
         </div>
       );
@@ -38,16 +38,16 @@ const GraphGrade: FC<Grades> = ({ grade, peerAvg, peerMin, peerMax, max, type })
       data={[
         {
           name: 'You',
-          grade: grade,
+          grade,
           peerMin: 0,
           peerMax: 0,
           fill: fullConfig.theme.colors.primary,
         },
         {
           name: 'Peers',
-          grade: peerAvg,
-          peerMin: peerMin,
-          peerMax: peerMax,
+          peerAvg,
+          peerMin,
+          peerMax,
           fill: fullConfig.theme.colors.secondary,
         },
       ]}
@@ -63,7 +63,7 @@ const GraphGrade: FC<Grades> = ({ grade, peerAvg, peerMin, peerMax, max, type })
       <XAxis dataKey='name' xAxisId={0} stroke={theme === 'light' ? 'black' : 'white'} />
       <XAxis dataKey='name' xAxisId={1} hide />
       <YAxis dataKey='grade' domain={[0, max]} hide />
-      <Tooltip content={<BarTooltip />} cursor={false}/>
+      <Tooltip content={<BarTooltip />} cursor={false} />
       <Bar
         background={{ fill: '#eee' }}
         barSize={70}

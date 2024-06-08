@@ -1,36 +1,10 @@
+import { adminPanelMenuItems } from './adminPanelMenuItems';
 import { getSelf } from '@/api/users';
-import {
-  AppstoreOutlined,
-  CloudUploadOutlined,
-  ClusterOutlined,
-  ControlOutlined,
-  DatabaseOutlined,
-  DotChartOutlined,
-  FundProjectionScreenOutlined,
-  LaptopOutlined,
-  NotificationOutlined,
-  TeamOutlined,
-  TrophyOutlined,
-  UserOutlined,
-} from '@ant-design/icons';
-import { useQuery } from '@tanstack/react-query';
 import { Layout, Menu } from 'antd';
-import { useMemo, useState, type FC, type ReactElement } from 'react';
 import { Link, Outlet } from 'react-router-dom';
-
-export const adminPanelMenuItems = [
-  { label: 'Dashboard', key: '1', icon: <DatabaseOutlined />, route: '/admin' },
-  { label: 'Tiles', key: '2', icon: <AppstoreOutlined />, route: '/admin/tiles' },
-  { label: 'Layout', key: '3', icon: <LaptopOutlined />, route: '/admin/layout' },
-  { label: 'Student Overview', key: '4', icon: <TeamOutlined />, route: '/admin/student-overview' },
-  { label: 'Grade Predictor', key: '5', icon: <FundProjectionScreenOutlined />, route: '/admin/grade-predictor' },
-  { label: 'Grade Analyzer', key: '6', icon: <DotChartOutlined />, route: '/admin/grade-analyzer' },
-  { label: 'Learning Goals', key: '7', icon: <TrophyOutlined />, route: '/admin/learning-goals' },
-  { label: 'Data Wizard', key: '8', icon: <CloudUploadOutlined />, route: '/admin/data-wizard' },
-  { label: 'Usage Analytics', key: '9', icon: <ClusterOutlined />, route: '/admin/analytics' },
-  { label: 'Notification Centre', key: '10', icon: <NotificationOutlined />, route: '/admin/notification-centre' },
-  { label: 'Settings', key: '11', icon: <ControlOutlined />, route: '/admin/settings' },
-];
+import { useQuery } from '@tanstack/react-query';
+import { UserOutlined } from '@ant-design/icons';
+import { useMemo, useState, type FC, type ReactElement } from 'react';
 
 const routeToKeyMap: Record<string, string> = adminPanelMenuItems.reduce(
   (map, item) => ({ ...map, [item.route]: item.key }),

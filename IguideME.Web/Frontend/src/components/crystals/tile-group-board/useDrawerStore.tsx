@@ -1,5 +1,5 @@
-import { type Tile } from '@/types/tile';
 import { create } from 'zustand';
+import { type Tile } from '@/types/tile';
 
 interface DrawerStoreProps {
   isChanged: boolean;
@@ -11,8 +11,12 @@ interface DrawerStoreProps {
 
 export const useDrawerStore = create<DrawerStoreProps>((set) => ({
   isChanged: false,
-  setIsChanged: (changed) => set({ isChanged: changed }),
+  setIsChanged: (changed) => {
+    set({ isChanged: changed });
+  },
 
   editTitle: null,
-  setEditTile: (tile) => set({ editTitle: tile }),
+  setEditTile: (tile) => {
+    set({ editTitle: tile });
+  },
 }));

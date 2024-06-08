@@ -10,7 +10,7 @@ const Notifications: FC<Props> = ({ notifications }): ReactElement => {
   const { outperforming, closing, falling, effort } = notifications;
   if (outperforming.length + closing.length + falling.length + effort.length === 0) {
     return (
-      <div className='h-16 grid items-center'>
+      <div className='grid h-16 items-center'>
         <p>No notifications found</p>
       </div>
     );

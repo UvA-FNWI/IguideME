@@ -1,3 +1,8 @@
+import AdminTitle from '@/components/atoms/admin-titles/admin-titles';
+import QueryError from '@/components/particles/QueryError';
+import QueryLoading from '@/components/particles/QueryLoading';
+import { Button, Divider, Form, Input, InputNumber, Select } from 'antd';
+import { DeleteFilled, PlusOutlined } from '@ant-design/icons';
 import {
   deleteLearningGoal,
   deleteRequirement,
@@ -8,15 +13,10 @@ import {
   postGoalRequirement,
   postLearningGoal,
 } from '@/api/entries';
-import AdminTitle from '@/components/atoms/admin-titles/admin-titles';
-import QueryError from '@/components/particles/QueryError';
-import QueryLoading from '@/components/particles/QueryLoading';
-import { LogicalExpression, type GoalRequirement, type LearningGoal } from '@/types/tile';
-import { DeleteFilled, PlusOutlined } from '@ant-design/icons';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Button, Divider, Form, Input, InputNumber, Select } from 'antd';
-import { useEffect, useState, type FC, type ReactElement } from 'react';
 import { toast } from 'sonner';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { LogicalExpression, type GoalRequirement, type LearningGoal } from '@/types/tile';
+import { useEffect, useState, type FC, type ReactElement } from 'react';
 
 const { Item } = Form;
 
@@ -76,7 +76,7 @@ const LearningGoals: FC = (): ReactElement => {
             onClick={addGoal}
             block
             icon={<PlusOutlined />}
-            className='bg-accent/30 hover:!bg-accent/70 hover:border-solid hover:!border-border1 [&_span]:!text-text'
+            className='bg-accent/30 hover:border-solid hover:!border-border1 hover:!bg-accent/70 [&_span]:!text-text'
           >
             Add Goal
           </Button>
@@ -167,7 +167,7 @@ const ViewLearningGoal: FC<GoalProps> = ({ goal }): ReactElement => {
       ))}
 
       <Button
-        className='bg-accent/20 border-dashed hover:!border-border1 hover:border-solid hover:!bg-accent/70 [&_span]:!text-text'
+        className='border-dashed bg-accent/20 hover:border-solid hover:!border-border1 hover:!bg-accent/70 [&_span]:!text-text'
         onClick={addRequirement}
         block
         icon={<PlusOutlined />}
@@ -265,7 +265,7 @@ const ViewGoalRequirement: FC<ReqProps> = ({ requirement }): ReactElement => {
             <Item name='assignment_id' noStyle>
               <Select
                 aria-disabled={isLoading || isError}
-                className='w-full [&>div]:hover:!border-accent [&>div]:!border-accent/60 [&>div]:!bg-surface1 [&>div]:!shadow-none [&>div]:hover:!bg-surface2 [&_span]:!text-text'
+                className='w-full [&>div]:!border-accent/60 [&>div]:!bg-surface1 [&>div]:!shadow-none [&>div]:hover:!border-accent [&>div]:hover:!bg-surface2 [&_span]:!text-text'
                 dropdownClassName='bg-surface1 [&_div]:!text-text selectionSelected'
                 disabled={isLoading || isError}
                 showSearch
@@ -290,7 +290,7 @@ const ViewGoalRequirement: FC<ReqProps> = ({ requirement }): ReactElement => {
             <Item name='expression' noStyle>
               <Select
                 aria-disabled={isLoading || isError}
-                className='w-full [&>div]:hover:!border-accent [&>div]:!border-accent/60 [&>div]:!bg-surface1 [&>div]:!shadow-none [&>div]:hover:!bg-surface2 [&_span]:!text-text'
+                className='w-full [&>div]:!border-accent/60 [&>div]:!bg-surface1 [&>div]:!shadow-none [&>div]:hover:!border-accent [&>div]:hover:!bg-surface2 [&_span]:!text-text'
                 dropdownClassName='bg-surface1 [&_div]:!text-text selectionSelected'
                 disabled={isLoading || isError}
                 options={[

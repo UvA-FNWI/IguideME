@@ -1,5 +1,5 @@
-import { useTileViewStore } from '@/components/pages/student-dashboard/tileViewContext';
 import { SmileTwoTone } from '@ant-design/icons';
+import { useTileViewStore } from '@/components/pages/student-dashboard/tileViewContext';
 import { type FC, type ReactElement } from 'react';
 
 const StudentInfo: FC = (): ReactElement => {

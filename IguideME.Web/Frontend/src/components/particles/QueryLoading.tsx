@@ -1,6 +1,6 @@
 import { cn } from '@/utils/cn';
-import { Spin, SpinProps } from 'antd';
-import { FC, ReactNode } from 'react';
+import { type FC, type ReactNode } from 'react';
+import { Spin, type SpinProps } from 'antd';
 
 interface QueryLoadingProps extends SpinProps {
   children: ReactNode;

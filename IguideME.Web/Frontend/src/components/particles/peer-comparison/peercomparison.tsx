@@ -5,7 +5,7 @@ import { type Grades, printGrade } from '@/types/tile';
 const PeerComparison: FC<Grades> = ({ peerAvg, peerMax, peerMin, max, type }): ReactElement => {
   return (
     <div className='text-subtext0'>
-      <Row className='pt-1 content-center justify-center'>
+      <Row className='content-center justify-center pt-1'>
         <Col>
           <span className='text-xs font-semibold'>Peer Comparison</span>
         </Col>

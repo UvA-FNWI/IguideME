@@ -1,9 +1,9 @@
-import { getLayoutColumns, getTileGroups } from '@/api/tiles';
 import QueryError from '@/components/particles/QueryError';
-import { useQuery } from '@tanstack/react-query';
-import { Col, Row, Spin } from 'antd';
-import { Fragment, type FC, type ReactElement } from 'react';
 import ViewTileGroup from '../tile-group-view/tile-group-view';
+import { Col, Row, Spin } from 'antd';
+import { getLayoutColumns, getTileGroups } from '@/api/tiles';
+import { useQuery } from '@tanstack/react-query';
+import { Fragment, type FC, type ReactElement } from 'react';
 
 const ViewLayout: FC = (): ReactElement => {
   const {

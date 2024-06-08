@@ -1,10 +1,10 @@
-import { getStudents } from '@/api/users';
-import { type User } from '@/types/user';
 import { cn } from '@/utils/cn';
-import { useQuery } from '@tanstack/react-query';
+import { getStudents } from '@/api/users';
 import { Select } from 'antd';
-import { type Dispatch, type FC, type ReactElement, type SetStateAction, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import { type User } from '@/types/user';
+import { type Dispatch, type FC, type ReactElement, type SetStateAction, useEffect } from 'react';
 
 interface SelectorProps {
   /** The placeholder text for the select component. */

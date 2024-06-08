@@ -1,15 +1,15 @@
-import { getLayoutColumns, postLayoutColumns } from '@/api/tiles';
 import ConfigLayoutColumn from '@/components/atoms/layout-column/layout-column';
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
-import { PlusOutlined } from '@ant-design/icons';
 import { arrayMove, SortableContext } from '@dnd-kit/sortable';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button } from 'antd';
+import { createPortal } from 'react-dom';
+import { getLayoutColumns, postLayoutColumns } from '@/api/tiles';
+import { PlusOutlined } from '@ant-design/icons';
+import { toast } from 'sonner';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTheme } from 'next-themes';
 import { type FC, type ReactElement, useCallback, useEffect, useMemo, useState } from 'react';
-import { createPortal } from 'react-dom';
-import { toast } from 'sonner';
 
 import { type LayoutColumn } from '@/types/tile';
 import {
@@ -150,7 +150,7 @@ const LayoutConfigurator: FC = (): ReactElement => {
             onClick={addColumn}
             block
             icon={<PlusOutlined />}
-            className='bg-surface1 border-dashed hover:!border-solid hover:!border-border1 hover:!bg-accent/50 [&_span]:!text-text'
+            className='border-dashed bg-surface1 hover:!border-solid hover:!border-border1 hover:!bg-accent/50 [&_span]:!text-text'
           >
             Add Column
           </Button>

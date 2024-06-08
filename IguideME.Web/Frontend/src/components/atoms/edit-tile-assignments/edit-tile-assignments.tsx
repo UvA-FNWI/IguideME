@@ -1,8 +1,8 @@
-import { GradingType, printGradingType } from '@/types/tile';
+import SelectAssignments from './SelectAssignments';
 import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
 import { Form, InputNumber, Select, Switch } from 'antd';
+import { GradingType, printGradingType } from '@/types/tile';
 import { type FC, type ReactElement } from 'react';
-import SelectAssignments from './SelectAssignments';
 
 const EditTileAssignments: FC = (): ReactElement => {
   return (
@@ -17,7 +17,7 @@ const EditTileAssignments: FC = (): ReactElement => {
                 value: val,
                 label: printGradingType(val),
               }))}
-            className='w-full [&>div]:!border-accent/70 [&>div]:!bg-surface1 [&>div]:!shadow-none [&>div]:hover:!bg-surface2 [&>div]:hover:!border-accent [&_span]:!text-text'
+            className='w-full [&>div]:!border-accent/70 [&>div]:!bg-surface1 [&>div]:!shadow-none [&>div]:hover:!border-accent [&>div]:hover:!bg-surface2 [&_span]:!text-text'
             dropdownClassName='bg-surface1 [&_div]:!text-text selectionSelected'
           />
         </Form.Item>
@@ -28,7 +28,7 @@ const EditTileAssignments: FC = (): ReactElement => {
           <InputNumber<number>
             className='antNumberInput w-full !border border-solid !border-accent/70 !bg-surface1 hover:!border-accent hover:!bg-surface2 [&_input]:!text-text'
             formatter={(value) => `${((value ?? 0) * 100).toFixed(1)}%`}
-            parser={(value) => parseFloat(value!.replace('%', '')) / 100}
+            parser={(value) => parseFloat((value ?? '0').replace('%', '')) / 100}
             step={0.01}
             variant='borderless'
           />

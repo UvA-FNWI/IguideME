@@ -1,5 +1,4 @@
 import { Divider } from 'antd';
-
 import { type FC, type ReactElement } from 'react';
 
 interface Props {

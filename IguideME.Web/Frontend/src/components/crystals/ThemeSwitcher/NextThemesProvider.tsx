@@ -1,9 +1,10 @@
 import { ThemeProvider } from 'next-themes';
-import { ThemeProviderProps } from 'next-themes/dist/types';
-import { memo } from 'react';
+import { memo, type ReactElement } from 'react';
+import { type ThemeProviderProps } from 'next-themes/dist/types';
 
-function NextThemesProvider({ children, ...props }: ThemeProviderProps) {
+function NextThemesProvider({ children, ...props }: ThemeProviderProps): ReactElement {
   return <ThemeProvider {...props}>{children}</ThemeProvider>;
 }
 
-export default memo(NextThemesProvider);
+const MemoizedNextThemesProvider = memo(NextThemesProvider);
+export default MemoizedNextThemesProvider;

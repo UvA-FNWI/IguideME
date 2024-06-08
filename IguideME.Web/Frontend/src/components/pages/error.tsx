@@ -1,5 +1,5 @@
-import { type FC, type ReactElement } from 'react';
 import { isRouteErrorResponse, useRouteError } from 'react-router-dom';
+import { type FC, type ReactElement } from 'react';
 
 const ErrorPage: FC = (): ReactElement => {
   const error = useRouteError();

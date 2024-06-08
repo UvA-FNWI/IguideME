@@ -1,16 +1,16 @@
-import { getTileGrades } from '@/api/tiles';
 import GraphTile from '@/components/crystals/graph-tile/graph-tile.tsx';
 import GridTile from '@/components/crystals/grid-tile/grid-tile.tsx';
-import { useTileViewStore } from '@/components/pages/student-dashboard/tileViewContext';
 import PeerComparison from '@/components/particles/peer-comparison/peercomparison';
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
-import { GradingType, TileType, type Tile } from '@/types/tile';
 import { cn } from '@/utils/cn';
-import { useQuery } from '@tanstack/react-query';
 import { Col, Divider, Row } from 'antd';
-import { memo, type FC, type ReactElement } from 'react';
+import { getTileGrades } from '@/api/tiles';
 import { useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import { useTileViewStore } from '@/components/pages/student-dashboard/tileViewContext';
+import { GradingType, TileType, type Tile } from '@/types/tile';
+import { memo, type FC, type ReactElement } from 'react';
 
 interface Props {
   tile: Tile;
@@ -101,7 +101,7 @@ const ViewTile: FC<Props> = memo(({ tile, textStyle }): ReactElement => {
             </Row>
             <Row className='h-[30%] w-full content-start justify-center'>
               <Col className='h-full w-full'>
-                <Divider className='m-0 p-0 border-text' />
+                <Divider className='m-0 border-text p-0' />
                 <PeerComparison
                   {...{
                     grade: grades.grade,

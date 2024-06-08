@@ -1,8 +1,8 @@
-import { getConsentSettings, postConsentSettings } from '@/api/course_settings';
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button, Form } from 'antd';
+import { getConsentSettings, postConsentSettings } from '@/api/course_settings';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { type FC, type ReactElement } from 'react';
 
 const ConsentSettings: FC = (): ReactElement => {

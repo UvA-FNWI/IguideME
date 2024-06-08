@@ -1,6 +1,6 @@
-import { printGrade, TileType, type Grades } from '@/types/tile';
 import { LikeTwoTone, MessageFilled, TrophyOutlined, WarningTwoTone } from '@ant-design/icons';
 import { Space } from 'antd';
+import { printGrade, TileType, type Grades } from '@/types/tile';
 import { type FC, type ReactElement } from 'react';
 
 interface GridTileProps {

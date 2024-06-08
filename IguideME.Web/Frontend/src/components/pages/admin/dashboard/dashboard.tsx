@@ -1,10 +1,10 @@
 // /------------------------- Module imports -------------------------/
-import { getSynchronizations } from '@/api/syncing';
 import AdminTitle from '@/components/atoms/admin-titles/admin-titles';
 import SyncManager from '@/components/crystals/syncmanager/syncmanager';
-import { getRelativeTimeString, getRelativeTimeTimer } from '@/helpers/time';
-import { useQuery } from '@tanstack/react-query';
 import { Divider, Table } from 'antd';
+import { getRelativeTimeString, getRelativeTimeTimer } from '@/helpers/time';
+import { getSynchronizations } from '@/api/syncing';
+import { useQuery } from '@tanstack/react-query';
 import { type FC, type ReactElement } from 'react';
 
 // /-------------------------- Own imports ---------------------------/

@@ -1,9 +1,9 @@
-import { getAssignments } from '@/api/entries';
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
 import { CheckCircleOutlined, CloseCircleOutlined, DeleteFilled } from '@ant-design/icons';
-import { useQuery } from '@tanstack/react-query';
+import { getAssignments } from '@/api/entries';
 import { InputNumber, Select, Table } from 'antd';
+import { useQuery } from '@tanstack/react-query';
 import { useCallback, useEffect, useMemo, useState, type FC, type ReactElement } from 'react';
 
 import { printGradingType, type Assignment, type TileEntry } from '@/types/tile';
@@ -141,7 +141,7 @@ const SelectAssignments: FC<SelectAssignmentsProps> = ({ value: entries, onChang
                       changeWeight(entry, val);
                     }}
                     formatter={(value) => `${((value ?? 0) * 100).toFixed(1)}%`}
-                    parser={(value) => parseFloat(value!.replace('%', '')) / 100}
+                    parser={(value) => parseFloat((value ?? '0').replace('%', '')) / 100}
                     step={0.01}
                     variant='borderless'
                   />
@@ -171,13 +171,15 @@ const SelectAssignments: FC<SelectAssignmentsProps> = ({ value: entries, onChang
         />
 
         <Select
-          className='w-full [&>div]:!border-accent/70 [&>div]:!bg-surface1 [&>div]:!shadow-none [&>div]:hover:!bg-surface2 [&>div]:hover:!border-accent[&_span]:!text-text'
+          className='[&>div]:hover:!border-accent[&_span]:!text-text w-full [&>div]:!border-accent/70 [&>div]:!bg-surface1 [&>div]:!shadow-none [&>div]:hover:!bg-surface2'
           dropdownClassName='bg-surface1 [&_div]:!text-text selectionSelected'
           value={selectedAssignments}
           mode='multiple'
           options={options}
           open={open}
-          onDropdownVisibleChange={(visible) => setOpen(visible)}
+          onDropdownVisibleChange={(visible) => {
+            setOpen(visible);
+          }}
           onChange={onSelectChange}
           filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
           tagRender={() => <></>}

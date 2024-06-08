@@ -1,10 +1,10 @@
-import { pollSync } from '@/api/syncing';
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
 import StatusCard from '@/components/particles/status-card/status-card';
-import { JobStatus, SyncStateNames, SyncStates } from '@/types/synchronization';
-import { useQuery } from '@tanstack/react-query';
 import { Col, Row } from 'antd';
+import { JobStatus, SyncStateNames, SyncStates } from '@/types/synchronization';
+import { pollSync } from '@/api/syncing';
+import { useQuery } from '@tanstack/react-query';
 import { useTheme } from 'next-themes';
 import { useEffect, useState, type FC, type ReactElement } from 'react';
 
@@ -49,7 +49,7 @@ const SyncProgressGrid: FC = (): ReactElement => {
             if (stateType === undefined) return '';
 
             let status: JobStatus = JobStatus.Unknown;
-            if (statuses.has(name)) status = statuses.get(name) || JobStatus.Unknown;
+            if (statuses.has(name)) status = statuses.get(name) ?? JobStatus.Unknown;
 
             let description: string = '';
             switch (status) {

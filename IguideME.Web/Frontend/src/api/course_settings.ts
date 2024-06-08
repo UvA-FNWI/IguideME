@@ -1,5 +1,5 @@
-import { NotificationAdminSettings } from '@/components/crystals/notification-settings/notification-settings';
 import apiClient from './axios';
+import { type NotificationAdminSettings } from '@/components/crystals/notification-settings/notification-settings';
 
 export const getPeerSettings: () => Promise<{
   min_size: number;

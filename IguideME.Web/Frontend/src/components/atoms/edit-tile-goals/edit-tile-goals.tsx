@@ -1,11 +1,11 @@
-import { getLearningGoals } from '@/api/entries';
-import { useDrawerStore } from '@/components/crystals/tile-group-board/useDrawerStore';
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
-import type { LearningGoal, TileEntry } from '@/types/tile';
 import { CheckOutlined, CloseOutlined, DeleteFilled } from '@ant-design/icons';
-import { useQuery } from '@tanstack/react-query';
 import { Form, Select, Switch, Table } from 'antd';
+import { getLearningGoals } from '@/api/entries';
+import type { LearningGoal, TileEntry } from '@/types/tile';
+import { useDrawerStore } from '@/components/crystals/tile-group-board/useDrawerStore';
+import { useQuery } from '@tanstack/react-query';
 import { useCallback, useState, type FC, type ReactElement } from 'react';
 
 const EditTileGoals: FC = (): ReactElement => {
@@ -35,11 +35,11 @@ const EditTileGoals: FC = (): ReactElement => {
   );
 };
 
-type TileGoalsSelectProps = {
+interface TileGoalsSelectProps {
   goals: LearningGoal[];
   value: TileEntry[];
   onChange: (value: TileEntry[]) => void;
-};
+}
 
 const TileGoalsSelect: FC<TileGoalsSelectProps> = ({ goals, value: entries, onChange: setEntries }): ReactElement => {
   const [selectedGoals, setSelectedGoals] = useState<number[]>(entries.map((entry) => entry.content_id));
@@ -62,7 +62,7 @@ const TileGoalsSelect: FC<TileGoalsSelectProps> = ({ goals, value: entries, onCh
         selected.map((id) => {
           const goal = goals.find((g) => g.id === id);
           return {
-            title: goal!.title,
+            title: goal ? goal.title : 'No title found',
             tile_id: -1, // Set the correct id on the backend
             weight: 0,
             content_id: id,
@@ -121,7 +121,7 @@ const TileGoalsSelect: FC<TileGoalsSelectProps> = ({ goals, value: entries, onCh
       />
 
       <Select
-        className='w-full [&>div]:!border-accent/70 [&>div]:!bg-surface1 [&>div]:!shadow-none [&>div]:hover:!bg-surface2 [&>div]:hover:!border-accent [&_span]:!text-text'
+        className='w-full [&>div]:!border-accent/70 [&>div]:!bg-surface1 [&>div]:!shadow-none [&>div]:hover:!border-accent [&>div]:hover:!bg-surface2 [&_span]:!text-text'
         dropdownClassName='bg-surface1 [&_div]:!text-text selectionSelected'
         value={selectedGoals}
         mode='multiple'

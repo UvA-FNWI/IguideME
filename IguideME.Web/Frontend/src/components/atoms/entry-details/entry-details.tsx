@@ -1,15 +1,15 @@
-import { getAssignments, getAssignmentSubmission, getDiscussion, getLearningGoal } from '@/api/entries';
-import { GradeView } from '@/components/crystals/grid-tile/grid-tile';
-import { useTileViewStore } from '@/components/pages/student-dashboard/tileViewContext';
+import GraphGrade from '../graph-grade/graph-grade';
 import PeerComparison from '@/components/particles/peer-comparison/peercomparison';
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
-import { printLogicalExpression, type TileEntry } from '@/types/tile';
 import { CheckCircleOutlined, CheckOutlined, CloseCircleOutlined, CloseOutlined } from '@ant-design/icons';
-import { useQuery } from '@tanstack/react-query';
 import { Divider } from 'antd';
+import { getAssignments, getAssignmentSubmission, getDiscussion, getLearningGoal } from '@/api/entries';
+import { GradeView } from '@/components/crystals/grid-tile/grid-tile';
+import { useQuery } from '@tanstack/react-query';
+import { useTileViewStore } from '@/components/pages/student-dashboard/tileViewContext';
+import { printLogicalExpression, type TileEntry } from '@/types/tile';
 import { type FC, type ReactElement } from 'react';
-import GraphGrade from '../graph-grade/graph-grade';
 
 interface Props {
   entry: TileEntry;
@@ -44,7 +44,7 @@ export const AssignmentDetail: FC<Props> = ({ entry }): ReactElement => {
     case 'graph':
       return (
         <div className='h-full w-full p-2'>
-          <h3 className='overflow-hidden text-ellipsis text-nowrap text-center text-text font-bold'>{entry.title}</h3>
+          <h3 className='overflow-hidden text-ellipsis text-nowrap text-center font-bold text-text'>{entry.title}</h3>
           <div className='grid h-full w-full place-content-center'>
             <GraphGrade {...submission.grades} />
           </div>
@@ -53,7 +53,7 @@ export const AssignmentDetail: FC<Props> = ({ entry }): ReactElement => {
     case 'grid':
       return (
         <div className='h-full w-full p-2'>
-          <h3 className='h-1/5 max-w-[270px] overflow-hidden text-ellipsis text-nowrap text-center text-text font-bold'>
+          <h3 className='h-1/5 max-w-[270px] overflow-hidden text-ellipsis text-nowrap text-center font-bold text-text'>
             {entry.title}
           </h3>
           <div className='flex h-4/5 w-full flex-col justify-between'>
@@ -61,7 +61,7 @@ export const AssignmentDetail: FC<Props> = ({ entry }): ReactElement => {
               <GradeView {...submission.grades} />
             </div>
             <div>
-              <Divider className='m-0 p-0 border-text' />
+              <Divider className='m-0 border-text p-0' />
               <PeerComparison {...submission.grades} />
             </div>
           </div>
@@ -96,14 +96,14 @@ export const DiscussionDetail: FC<Props> = ({ entry }): ReactElement => {
 
   return (
     <div className='h-full w-full p-2'>
-      <h3 className='overflow-hidden text-ellipsis text-nowrap text-center text-text font-bold'>{entry.title}</h3>
+      <h3 className='overflow-hidden text-ellipsis text-nowrap text-center font-bold text-text'>{entry.title}</h3>
       {discussion.grades ?
         <div className='flex h-4/5 w-full flex-col justify-between'>
           <div className='grid flex-grow place-content-center'>
             <GradeView {...discussion.grades} />
           </div>
           <div>
-            <Divider className='m-0 p-0 border-text' />
+            <Divider className='m-0 border-text p-0' />
             <PeerComparison {...discussion.grades} />
           </div>
         </div>
@@ -145,7 +145,7 @@ export const LearningGoalDetail: FC<Props> = ({ entry }): ReactElement => {
   return (
     <div className='h-full w-full p-2'>
       <div className='flex h-1/5 items-baseline justify-between gap-4'>
-        <h3 className='overflow-hidden text-ellipsis text-nowrap text-text font-bold'>{entry.title}</h3>
+        <h3 className='overflow-hidden text-ellipsis text-nowrap font-bold text-text'>{entry.title}</h3>
         {learningGoal.results?.every((b) => b) ?
           <span className='flex place-content-center gap-2 text-sm text-subtext1'>
             Passed

@@ -1,15 +1,14 @@
-import { getNotificationSettings, postNotificationSettings } from '@/api/course_settings';
+import dayjs from 'dayjs';
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button, Checkbox, DatePicker, Divider, Form, Radio } from 'antd';
-import { type CheckboxChangeEvent } from 'antd/es/checkbox';
-import { type CheckboxValueType } from 'antd/es/checkbox/Group';
+import { getNotificationSettings, postNotificationSettings } from '@/api/course_settings';
+import { toast } from 'sonner';
 import { useForm } from 'antd/es/form/Form';
-import dayjs from 'dayjs';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { type CheckboxChangeEvent } from 'antd/es/checkbox';
 import { memo, useCallback, useEffect, useMemo, useState, type FC, type ReactElement } from 'react';
 import { type DateObject } from 'react-multi-date-picker';
-import { toast } from 'sonner';
 
 export interface NotificationAdminSettings {
   isRange: boolean;
@@ -64,7 +63,7 @@ const NotificationSettingsForm: FC<{
   const [form] = useForm<Data>();
   const [range, setRange] = useState<boolean>(isRange);
 
-  const [checkedList, setCheckedList] = useState<CheckboxValueType[]>(selectedDays ?? ['Tue', 'Thu']);
+  const [checkedList, setCheckedList] = useState<string[]>(selectedDays ?? ['Tue', 'Thu']);
 
   const rangeChangeHandler = useCallback(() => {
     form.resetFields();
@@ -107,7 +106,7 @@ const NotificationSettingsForm: FC<{
   return (
     <Form<Data>
       className='flex flex-col gap-2'
-      initialValues={{ ['selectedDates']: selectedDates }}
+      initialValues={{ selectedDates }}
       form={form}
       name='notification_settings_form'
       onFinish={submit}
@@ -116,16 +115,10 @@ const NotificationSettingsForm: FC<{
         Select the dates or the range of dates that the students will receive notifications.
       </p>
       <Radio.Group buttonStyle='solid' defaultValue={range} onChange={rangeChangeHandler}>
-        <Radio.Button
-          disabled={!range}
-          value={false}
-        >
+        <Radio.Button disabled={!range} value={false}>
           Select Dates
         </Radio.Button>
-        <Radio.Button
-          disabled={range}
-          value={true}
-        >
+        <Radio.Button disabled={range} value={true}>
           Select Range
         </Radio.Button>
       </Radio.Group>
@@ -146,15 +139,15 @@ export default NotificationSettings;
 
 interface DatePickersProps {
   isRange: boolean;
-  checkedList: CheckboxValueType[];
-  setCheckedList: (list: CheckboxValueType[]) => void;
+  checkedList: string[];
+  setCheckedList: (list: string[]) => void;
 }
 
 const DatePickers: FC<DatePickersProps> = memo(({ isRange, checkedList, setCheckedList }): ReactElement => {
   const checkBoxOptions = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   const [error, setError] = useState<string | null>(null);
 
-  const onGroupChange = useCallback((list: CheckboxValueType[]) => {
+  const onGroupChange = useCallback((list: string[]) => {
     setCheckedList(list);
 
     if (list.length === 0) {
@@ -177,7 +170,7 @@ const DatePickers: FC<DatePickersProps> = memo(({ isRange, checkedList, setCheck
       >
         <DatePicker.RangePicker
           className='!w-72 [&_input]:!text-text'
-          disabledDate={(current) => current && current.toDate() < new Date()}
+          disabledDate={(current) => current.toDate() < new Date()}
           format='YYYY-MM-DD'
           picker='week'
         />

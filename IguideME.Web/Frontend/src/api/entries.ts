@@ -7,9 +7,11 @@ import {
   type Submission,
 } from '@/types/tile';
 
+type GetAssignmentsData = Record<string, Assignment>;
+
 export const getAssignments: () => Promise<Map<number, Assignment>> = async () =>
-  await apiClient.get(`assignments`).then((response) => {
-    return new Map<number, Assignment>(Object.entries(response.data).map(([k, v]) => [+k, v as Assignment]));
+  await apiClient.get(`assignments`).then((response: { data: GetAssignmentsData }) => {
+    return new Map<number, Assignment>(Object.entries(response.data).map(([k, v]) => [+k, v]));
   });
 
 export const getTopics: () => Promise<Discussion[]> = async () =>
@@ -63,4 +65,3 @@ export const getLearningGoal: (cid: number, uid: string) => Promise<LearningGoal
   cid: number,
   studentnr: string,
 ) => await apiClient.get(`learning-goals/${cid}/${studentnr}`).then((response) => response.data);
-

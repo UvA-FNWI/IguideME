@@ -1,5 +1,4 @@
-import { deleteTile, patchTile } from '@/api/tiles';
-import { printGradingType, TileType, type Tile } from '@/types/tile';
+import Swal from 'sweetalert2';
 import {
   BellOutlined,
   CarryOutOutlined,
@@ -9,13 +8,14 @@ import {
   EyeOutlined,
   FormOutlined,
 } from '@ant-design/icons';
-import { useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Col, Row, Space, Tooltip } from 'antd';
-import { useMemo, type FC, type ReactElement } from 'react';
-import Swal from 'sweetalert2';
+import { CSS } from '@dnd-kit/utilities';
+import { deleteTile, patchTile } from '@/api/tiles';
 import { useDrawerStore } from '../tile-group-board/useDrawerStore';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useSortable } from '@dnd-kit/sortable';
+import { printGradingType, TileType, type Tile } from '@/types/tile';
+import { useMemo, type FC, type ReactElement } from 'react';
 
 interface Props {
   tile: Tile;
@@ -49,8 +49,12 @@ const AdminTileView: FC<Props> = ({ tile, move }): ReactElement => {
       tile,
     },
   });
-  
-  const tileStyle = useMemo(() => `font-tnum m-0 h-full w-60 rounded-md border border-solid border-border1 p-3 ${tile.visible ? 'bg-success/10' : 'bg-failure/10'}`, [tile])
+
+  const tileStyle = useMemo(
+    () =>
+      `font-tnum m-0 h-full w-60 rounded-md border border-solid border-border1 p-3 ${tile.visible ? 'bg-success/10' : 'bg-failure/10'}`,
+    [tile],
+  );
 
   const style = {
     transition,
@@ -64,25 +68,14 @@ const AdminTileView: FC<Props> = ({ tile, move }): ReactElement => {
   const toggleNotifications = (): void => {
     updateTile({ ...tile, notifications: !tile.notifications });
   };
-  
 
   if (isDragging) {
-    return (
-      <div
-        className={tileStyle}
-        ref={setNodeRef}
-        style={style}
-      />
-    );
+    return <div className={tileStyle} ref={setNodeRef} style={style} />;
   }
 
   if (move === true) {
     return (
-      <div
-        className={tileStyle}
-        ref={setNodeRef}
-        style={style}
-      >
+      <div className={tileStyle} ref={setNodeRef} style={style}>
         <div className='flex h-full items-center justify-center'>
           <p>Move here</p>
         </div>

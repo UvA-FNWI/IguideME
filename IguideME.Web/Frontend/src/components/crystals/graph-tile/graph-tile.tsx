@@ -1,10 +1,10 @@
-import tailwindConfig from '@/../tailwind.config';
 import GraphGrade from '@/components/atoms/graph-grade/graph-grade';
-import { TooltipProps } from '@/types/reactRecharts';
+import resolveConfig from 'tailwindcss/resolveConfig';
+import tailwindConfig from '@/../tailwind.config';
+import { Legend, PolarAngleAxis, RadialBar, RadialBarChart, Tooltip } from 'recharts';
+import { type TooltipProps } from '@/types/reactRecharts';
 import { TileType, type Grades } from '@/types/tile';
 import { memo, type FC, type ReactElement } from 'react';
-import { Legend, PolarAngleAxis, RadialBar, RadialBarChart, Tooltip } from 'recharts';
-import resolveConfig from 'tailwindcss/resolveConfig';
 
 interface Props {
   type: TileType;
@@ -24,7 +24,7 @@ GraphTile.displayName = 'GraphTile';
 
 const GraphLearning: FC<Grades> = memo(({ grade, peerAvg, max }): ReactElement => {
   const RadialBarTooltip: FC<TooltipProps> = ({ active, payload }) => {
-    if (active && payload && payload.length) {
+    if (active && payload?.length) {
       return (
         <div className='z-50 rounded-lg border border-solid border-text bg-surface1/85 p-2'>
           <p>
@@ -44,7 +44,7 @@ const GraphLearning: FC<Grades> = memo(({ grade, peerAvg, max }): ReactElement =
       data={[
         {
           name: 'You',
-          grade: grade,
+          grade,
           fill: fullConfig.theme.colors.primary,
         },
         {

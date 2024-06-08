@@ -1,13 +1,13 @@
-import { deleteTileGroup, getTiles, patchTileGroup, postTile } from '@/api/tiles';
 import AdminTileView from '@/components/crystals/admin-tile-view/admin-tile-view';
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
-import { GradingType, TileType, type TileGroup } from '@/types/tile';
-import { DeleteFilled, PlusOutlined } from '@ant-design/icons';
-import { SortableContext, useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button, Col, Divider, Input, Row } from 'antd';
+import { CSS } from '@dnd-kit/utilities';
+import { DeleteFilled, PlusOutlined } from '@ant-design/icons';
+import { deleteTileGroup, getTiles, patchTileGroup, postTile } from '@/api/tiles';
+import { SortableContext, useSortable } from '@dnd-kit/sortable';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { GradingType, TileType, type TileGroup } from '@/types/tile';
 import { useMemo, useState, type FC, type ReactElement } from 'react';
 
 interface Props {
@@ -68,7 +68,7 @@ const AdminTileGroupView: FC<Props> = ({ group }): ReactElement => {
   if (isDragging) {
     return (
       <div
-        className='bg-accent/50 min-h-[235px] rounded-lg border border-dashed border-text p-[10px]'
+        className='min-h-[235px] rounded-lg border border-dashed border-text bg-accent/50 p-[10px]'
         ref={setNodeRef}
         style={style}
       />
@@ -109,7 +109,7 @@ const AdminTileGroupView: FC<Props> = ({ group }): ReactElement => {
               group.title
             : editing && (
                 <Input
-                  className='w-full border-accent bg-surface1 text-text hover:border-accent/50 hover:bg-surface1 focus:bg-surface1 focus:border-accent focus:shadow-sm focus:shadow-accent aria-invalid:!border-failure aria-invalid:shadow-none aria-invalid:focus:!shadow-sm aria-invalid:focus:!shadow-failure'
+                  className='w-full border-accent bg-surface1 text-text hover:border-accent/50 hover:bg-surface1 focus:border-accent focus:bg-surface1 focus:shadow-sm focus:shadow-accent aria-invalid:!border-failure aria-invalid:shadow-none aria-invalid:focus:!shadow-sm aria-invalid:focus:!shadow-failure'
                   value={title}
                   autoFocus
                   onBlur={() => {

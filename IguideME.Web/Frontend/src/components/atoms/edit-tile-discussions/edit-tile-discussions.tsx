@@ -1,11 +1,11 @@
-import { getTopics } from '@/api/entries';
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
-import { type Discussion, type TileEntry } from '@/types/tile';
 import { CheckOutlined, CloseOutlined, DeleteFilled } from '@ant-design/icons';
-import { useQuery } from '@tanstack/react-query';
 import { Form, Select, Switch, Table } from 'antd';
+import { getTopics } from '@/api/entries';
+import { useQuery } from '@tanstack/react-query';
 import { useWatch } from 'antd/es/form/Form';
+import { type Discussion, type TileEntry } from '@/types/tile';
 import { useCallback, useState, type FC, type ReactElement } from 'react';
 
 const EditTileDiscussions: FC = (): ReactElement => {
@@ -42,11 +42,11 @@ const EditTileDiscussions: FC = (): ReactElement => {
   );
 };
 
-type DiscussionSelectProps = {
+interface DiscussionSelectProps {
   topics: Discussion[];
   value: TileEntry[];
   onChange: (value: TileEntry[]) => void;
-};
+}
 
 const DiscussionSelect: FC<DiscussionSelectProps> = ({
   topics,
@@ -68,7 +68,7 @@ const DiscussionSelect: FC<DiscussionSelectProps> = ({
         selected.map((id) => {
           const top = topics.find((disc) => disc.id === id);
           return {
-            title: top!.title,
+            title: top ? top.title : 'No title found',
             tile_id: -1, // Set the correct id on the backend
             weight: 0,
             content_id: id,
@@ -139,7 +139,7 @@ const DiscussionSelect: FC<DiscussionSelectProps> = ({
       />
 
       <Select
-        className='w-full [&>div]:!border-accent/70 [&>div]:!bg-surface1 [&>div]:!shadow-none [&>div]:hover:!bg-surface2 [&>div]:hover:!border-accent [&_span]:!text-text'
+        className='w-full [&>div]:!border-accent/70 [&>div]:!bg-surface1 [&>div]:!shadow-none [&>div]:hover:!border-accent [&>div]:hover:!bg-surface2 [&_span]:!text-text'
         dropdownClassName='bg-surface1 [&_div]:!text-text selectionSelected'
         value={selectedTopics}
         mode='multiple'

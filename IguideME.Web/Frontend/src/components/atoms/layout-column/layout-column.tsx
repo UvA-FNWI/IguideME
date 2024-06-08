@@ -1,11 +1,12 @@
-import { getTileGroups } from '@/api/tiles';
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
-import { DeleteFilled } from '@ant-design/icons';
-import { useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-import { useQuery } from '@tanstack/react-query';
 import { Col, Divider, InputNumber, Row, Slider, Transfer } from 'antd';
+import { CSS } from '@dnd-kit/utilities';
+import { DeleteFilled } from '@ant-design/icons';
+import { getTileGroups } from '@/api/tiles';
+import type { Key } from 'antd/lib/table/interface';
+import { useQuery } from '@tanstack/react-query';
+import { useSortable } from '@dnd-kit/sortable';
 import { useTheme } from 'next-themes';
 import { type FC, type ReactElement, useState } from 'react';
 
@@ -53,13 +54,13 @@ const ConfigLayoutColumn: FC<Props> = ({ column, remove, parentOnChange }): Reac
     transform: CSS.Transform.toString(transform),
   };
 
-  const onGroupSelectChange = (source: string[], target: string[]): void => {
-    setSelectedGroups([...source, ...target]);
+  const onGroupSelectChange = (source: Key[], target: Key[]): void => {
+    setSelectedGroups([...source.map(String), ...target.map(String)]);
   };
 
-  const onGroupChange = (targetKeys: string[]): void => {
-    setGroups(targetKeys);
-    column.groups = targetKeys.map((key) => +key);
+  const onGroupChange = (targetKeys: Key[]): void => {
+    setGroups(targetKeys.map(String));
+    column.groups = targetKeys.map((key) => Number(key));
     onChange();
   };
 

@@ -6,11 +6,11 @@ interface Props {
 }
 const GroupView: FC<PropsWithChildren<Props>> = ({ title, children }): ReactElement => {
   return (
-    <div className='w-full pt-[1px] rounded-md border border-solid border-border0 bg-base min-h-[300px] h-full'>
+    <div className='h-full min-h-[300px] w-full rounded-md border border-solid border-border0 bg-base pt-[1px]'>
       <div className='m-3'>
-        <h2 className='text-center overflow-hidden text-ellipsis whitespace-nowrap text-xl'>{title}</h2>
+        <h2 className='overflow-hidden text-ellipsis whitespace-nowrap text-center text-xl'>{title}</h2>
       </div>
-      <Row className='justify-evenly my-[10px' gutter={[10, 78]}>
+      <Row className='my-[10px justify-evenly' gutter={[10, 78]}>
         {children}
       </Row>
     </div>

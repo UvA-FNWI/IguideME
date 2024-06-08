@@ -1,5 +1,5 @@
-import { FC, ReactElement } from 'react';
 import Loading from '../particles/loading';
+import { type FC, type ReactElement } from 'react';
 
 const LoadingPage: FC = (): ReactElement => {
   return (

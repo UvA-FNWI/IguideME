@@ -1,13 +1,13 @@
-import { pollSync, startNewSync, stopCurrentSync } from '@/api/syncing';
+import styles from './syncclock.module.css';
+import Swal from 'sweetalert2';
+import { Button } from 'antd';
+import { cn } from '@/utils/cn';
 import { getRelativeTimeTimer } from '@/helpers/time';
 import { JobStatus } from '@/types/synchronization';
-import { cn } from '@/utils/cn';
+import { pollSync, startNewSync, stopCurrentSync } from '@/api/syncing';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Button } from 'antd';
 import { useTheme } from 'next-themes';
 import { type FC, type ReactElement, useEffect, useState } from 'react';
-import Swal from 'sweetalert2';
-import styles from './syncclock.module.css';
 
 const SyncClock: FC = (): ReactElement => {
   const { theme } = useTheme();
