@@ -1,12 +1,12 @@
-import { postConsentSettings, postGoalGrade, postNotificationSettings } from '@/api/student_settings';
-import { getSelf } from '@/api/users';
 import Loading from '@/components/particles/loading';
-import { User, UserRoles } from '@/types/user';
-import { ActionTypes, Analytics } from '@/utils/analytics';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { ActionTypes, trackEvent } from '@/utils/analytics';
 import { Checkbox, Collapse, Divider, Radio, Space, Switch } from 'antd';
-import { FC, ReactElement, useEffect } from 'react';
+import { getSelf } from '@/api/users';
+import { postConsentSettings, postGoalGrade, postNotificationSettings } from '@/api/student_settings';
 import { toast } from 'sonner';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { type FC, type ReactElement, useEffect } from 'react';
+import { type User, UserRoles } from '@/types/user';
 
 const LoadingState: FC = () => (
   <div className='absolute inset-0 grid h-screen w-screen place-content-center'>
@@ -25,15 +25,17 @@ const StudentSettings: FC = (): ReactElement => {
   });
 
   if (selfIsLoading) return <LoadingState />;
-  if (selfIsError || self === undefined || self.settings === undefined) return <ErrorMessage />;
+  if (selfIsError || self?.settings === undefined) return <ErrorMessage />;
 
   useEffect(() => {
     if (self.role === UserRoles.student) {
-      Analytics.trackEvent({
+      trackEvent({
         userID: self.userID,
         action: ActionTypes.page,
         actionDetail: 'Student Settings',
         courseID: self.course_id,
+      }).catch(() => {
+        // Silently fail, since this is not critical
       });
     }
   }, []);
@@ -65,11 +67,13 @@ const Notifications: FC<NotificationProps> = ({ notifications, user }): ReactEle
       await queryClient.invalidateQueries({ queryKey: ['self'] });
 
       if (user.role === UserRoles.student) {
-        Analytics.trackEvent({
+        trackEvent({
           userID: user.userID,
           action: ActionTypes.notifications,
-          actionDetail: notifications ? 'enabled notifications' : 'disabled notifications',
+          actionDetail: notifications ? 'Enabled Notifications' : 'Disabled Notifications',
           courseID: user.course_id,
+        }).catch(() => {
+          // Silently fail, since this is not critical
         });
       }
     },
@@ -88,7 +92,12 @@ const Notifications: FC<NotificationProps> = ({ notifications, user }): ReactEle
       <h1 className='text-left text-2xl'>Notifications</h1>
       <div className='flex gap-2 text-left'>
         <p>Enable notifications:</p>
-        <Switch checked={notifications ?? false} onChange={(val) => saveNotifications(val)} />
+        <Switch
+          checked={notifications ?? false}
+          onChange={(val) => {
+            saveNotifications(val);
+          }}
+        />
       </div>
     </>
   );
@@ -105,15 +114,6 @@ const GoalGrade: FC<GoalProps> = ({ goalGrade, user }): ReactElement => {
     mutationFn: postGoalGrade,
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['self'] });
-
-      if (user.role === UserRoles.student) {
-        Analytics.trackEvent({
-          userID: user.userID,
-          action: ActionTypes.settingChange,
-          actionDetail: `goal grade: ${goalGrade}`,
-          courseID: user.course_id,
-        });
-      }
     },
   });
 
@@ -135,7 +135,19 @@ const GoalGrade: FC<GoalProps> = ({ goalGrade, user }): ReactElement => {
         <Space className='mx-auto' direction={'vertical'}>
           <Radio.Group
             value={goalGrade}
-            onChange={(val) => saveGoalGrade(val.target.value)}
+            onChange={(val) => {
+              saveGoalGrade(Number(val.target.value));
+              if (user.role === UserRoles.student) {
+                trackEvent({
+                  userID: user.userID,
+                  action: ActionTypes.settingChange,
+                  actionDetail: `Change Goal Grade: ${val.target.value}`,
+                  courseID: user.course_id,
+                }).catch(() => {
+                  // Silently fail, since this is not critical
+                });
+              }
+            }}
             options={Array.from({ length: 10 }, (_, i) => ({ label: `${i + 1}`, value: i + 1 }))}
             optionType='button'
           />
@@ -190,7 +202,13 @@ const Consent: FC<ConsentProps> = ({ consent }): ReactElement => {
         ]}
       />
 
-      <Checkbox className='mt-4' checked={consent} onChange={(e) => saveConsent(e.target.checked)}>
+      <Checkbox
+        className='mt-4'
+        checked={consent}
+        onChange={(e) => {
+          saveConsent(e.target.checked);
+        }}
+      >
         <p>I have read and understood the informed consent</p>
       </Checkbox>
     </>
@@ -198,15 +216,15 @@ const Consent: FC<ConsentProps> = ({ consent }): ReactElement => {
 };
 
 const ConsentText: FC = () => (
-  <div className='bg-subtext1 prose rounded-lg p-2 text-justify prose-h1:text-text prose-h2:text-text prose-h3:text-text'>
+  <div className='prose rounded-lg bg-subtext1 p-2 text-justify prose-h1:text-text prose-h2:text-text prose-h3:text-text'>
     <h1>IguideME</h1>
     <h2>INFORMED CONSENT</h2>
     <p>
       Dear participant,
       <br />
       We ask for your cooperation in an evaluation study into educational improvement. In this document, the so-called
-      "informed consent", we explain this study and you can indicate whether you want to cooperate. Read the text below
-      carefully.
+      &quot;informed consent&quot;, we explain this study and you can indicate whether you want to cooperate. Read the
+      text below carefully.
     </p>
     <h3>Goal of the research</h3>
     <p>
@@ -245,13 +263,13 @@ const ConsentText: FC = () => (
     <p>Here you will be asked to sign the Informed consent.</p>
     <ul>
       <li className='text-text'>
-        By choosing <i>"Yes"</i> in this form, you declare that you have read the document entitled “informed consent
-        IguideME”, understood it, and confirm that you agree with the procedure as described.
+        By choosing <i>&quot;Yes&quot;</i> in this form, you declare that you have read the document entitled “informed
+        consent IguideME”, understood it, and confirm that you agree with the procedure as described.
         <br />
       </li>
       <li className='text-text'>
-        By choosing <i>"No"</i> in the form, you declare that you have read the document entitled “informed consent
-        IguideME”, understood it, and confirm that you do not want to participate in this study.
+        By choosing <i>&quot;No&quot;</i> in the form, you declare that you have read the document entitled “informed
+        consent IguideME”, understood it, and confirm that you do not want to participate in this study.
       </li>
     </ul>
   </div>

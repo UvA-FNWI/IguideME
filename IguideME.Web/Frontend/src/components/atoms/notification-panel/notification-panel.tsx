@@ -1,5 +1,5 @@
 import Notifications from '@/components/particles/notifications/notifications';
-import { ActionTypes, Analytics } from '@/utils/analytics';
+import { ActionTypes, trackEvent } from '@/utils/analytics';
 import { BellOutlined, ExclamationOutlined, LoadingOutlined } from '@ant-design/icons';
 import { Button, Popover, Tooltip } from 'antd';
 import { cn } from '@/utils/cn';
@@ -43,11 +43,13 @@ const NotificationPanel: FC<Props> = ({ buttonClasses, placement = 'leftTop', us
       open={open}
       onOpenChange={(visible) => {
         if (user.role === UserRoles.student && visible) {
-          Analytics.trackEvent({
+          trackEvent({
             userID: user.userID,
             action: ActionTypes.notifications,
-            actionDetail: 'viewed notifications',
+            actionDetail: 'Opened Notifications',
             courseID: user.course_id,
+          }).catch(() => {
+            // Silently fail, since this is not critical
           });
         }
         setOpen(visible);

@@ -1,6 +1,6 @@
 import apiClient from '@/api/axios';
 
-export enum ActionTypes {
+enum ActionTypes {
   page,
   tile,
   tileView,
@@ -9,7 +9,7 @@ export enum ActionTypes {
   settingChange,
 }
 
-export interface EventReturnType {
+interface EventReturnType {
   timestamp: number;
   user_id: string;
   action: ActionTypes;
@@ -25,39 +25,31 @@ interface TrackEventProps {
   courseID: number;
 }
 
-export class Analytics {
-  static async getAllEvents({ courseID }: { courseID: number }) {
-    try {
-      const data = await apiClient.get(`analytics/results/${courseID}`);
-      return data.data as EventReturnType[];
-    } catch (error) {
-      console.log('Error fetching events', error);
-      throw error;
-    }
-  }
+async function getAllEvents({ courseID }: { courseID: number }): Promise<EventReturnType[]> {
+  const data = await apiClient.get(`analytics/results/${courseID}`);
+  return data.data as EventReturnType[];
+}
 
-  static async getConsentInfo({ courseID }: { courseID: number }) {
-    try {
-      const data = await apiClient.get(`analytics/consent/${courseID}`);
-      return data.data as { current_consent: number; prev_consent: number; total: number };
-    } catch (error) {
-      console.log('Error fetching consent info', error);
-      throw error;
-    }
-  }
+async function getConsentInfo({
+  courseID,
+}: {
+  courseID: number;
+}): Promise<{ current_consent: number; prev_consent: number; total: number }> {
+  const data = await apiClient.get(`analytics/consent/${courseID}`);
+  return data.data as { current_consent: number; prev_consent: number; total: number };
+}
 
-  static async trackEvent({ userID, action, actionDetail, courseID }: TrackEventProps) {
-    await apiClient
-      .post('analytics/track', {
-        UserID: userID,
-        Action: action,
-        ActionDetail: actionDetail,
-        CourseID: courseID,
-      })
-      .catch(() => {
-        // silently fail, since this is not critical
-      });
-  }
+async function trackEvent({ userID, action, actionDetail, courseID }: TrackEventProps): Promise<void> {
+  await apiClient
+    .post('analytics/track', {
+      UserID: userID,
+      Action: action,
+      ActionDetail: actionDetail,
+      CourseID: courseID,
+    })
+    .catch(() => {
+      // silently fail, since this is not critical
+    });
 }
 
 /**
@@ -65,7 +57,7 @@ export class Analytics {
  * @param timestamp The timestamp to check.
  * @returns True if the timestamp is in the current week, false otherwise.
  */
-export function isThisWeek(timestamp: number): boolean {
+function isThisWeek(timestamp: number): boolean {
   const eventDate = new Date(timestamp);
   const now = new Date();
 
@@ -75,3 +67,5 @@ export function isThisWeek(timestamp: number): boolean {
 
   return eventDate >= startOfWeek;
 }
+
+export { getAllEvents, getConsentInfo, trackEvent, isThisWeek, ActionTypes, type EventReturnType };

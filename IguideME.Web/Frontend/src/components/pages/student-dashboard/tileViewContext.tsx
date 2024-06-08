@@ -1,9 +1,9 @@
+import { ActionTypes, Analytics, trackEvent } from '@/utils/analytics';
+import { createJSONStorage, devtools, persist } from 'zustand/middleware';
+import { createStore, useStore } from 'zustand';
 import { type ViewType } from '@/types/tile';
 import { UserRoles, type User } from '@/types/user';
-import { ActionTypes, Analytics } from '@/utils/analytics';
 import { createContext, useContext, useRef, type PropsWithChildren, type ReactElement } from 'react';
-import { createStore, useStore } from 'zustand';
-import { createJSONStorage, devtools, persist } from 'zustand/middleware';
 
 interface tileViewProps {
   viewType?: ViewType;
@@ -16,7 +16,7 @@ interface tileViewState extends tileViewProps {
 }
 
 type tileViewStore = ReturnType<typeof createTileViewStore>;
-export const createTileViewStore = (initProps: { user: User; viewType?: ViewType }) => {
+export const createTileViewStore = (initProps: { user: User; viewType?: ViewType }): ReactElement => {
   const DEFAULT_PROPS = {
     viewType: 'graph' as ViewType,
   };
@@ -31,11 +31,13 @@ export const createTileViewStore = (initProps: { user: User; viewType?: ViewType
 
             setViewType: (self, viewType) => {
               if (self.role === UserRoles.student) {
-                Analytics.trackEvent({
+                trackEvent({
                   userID: self.userID,
                   action: ActionTypes.tileView,
                   actionDetail: viewType,
                   courseID: self.course_id,
+                }).catch(() => {
+                  // Silently fail, since this is not critical
                 });
               }
               set({ viewType });

@@ -6,7 +6,7 @@ import { AnalyticsGraph, AnalyticsTextBlock } from './components/AnalyticsBlockV
 import { getSelf } from '@/api/users';
 import { PageExits, PageVisits, SunburstGraph } from './blocks';
 import { useQuery } from '@tanstack/react-query';
-import { ActionTypes, Analytics, type EventReturnType } from '@/utils/analytics';
+import { ActionTypes, getAllEvents, getConsentInfo, type EventReturnType } from '@/utils/analytics';
 import { useMemo, type FC, type ReactElement } from 'react';
 
 export type SessionData = Omit<EventReturnType, 'user_id' | 'session_id' | 'course_id'>;
@@ -27,7 +27,7 @@ const GradeAnalytics: FC = (): ReactElement => {
     isLoading: analyticsIsLoading,
   } = useQuery({
     queryKey: ['analytics', self!.course_id],
-    queryFn: () => Analytics.getAllEvents({ courseID: self!.course_id }),
+    queryFn: async () => await getAllEvents({ courseID: self!.course_id }),
     enabled: self !== undefined,
   });
 
@@ -37,7 +37,7 @@ const GradeAnalytics: FC = (): ReactElement => {
     isLoading: consentInfoIsLoading,
   } = useQuery({
     queryKey: ['analytics', 'consent', self!.course_id],
-    queryFn: () => Analytics.getConsentInfo({ courseID: self!.course_id }),
+    queryFn: async () => await getConsentInfo({ courseID: self!.course_id }),
     enabled: self !== undefined,
   });
 

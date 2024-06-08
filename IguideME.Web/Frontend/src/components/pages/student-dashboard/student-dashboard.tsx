@@ -1,16 +1,16 @@
-import { getSelf, getStudent } from '@/api/users';
 import GradeDisplay from '@/components/atoms/grade-display/grade-display';
-import StudentInfo from '@/components/atoms/student-info/student-info';
 import Loading from '@/components/particles/loading';
+import StudentInfo from '@/components/atoms/student-info/student-info';
+import { ActionTypes, trackEvent } from '@/utils/analytics';
+import { AppstoreOutlined, BarChartOutlined } from '@ant-design/icons';
+import { getSelf, getStudent } from '@/api/users';
+import { Outlet, useNavigate, useParams } from 'react-router-dom';
+import { Radio } from 'antd';
+import { TileViewStoreProvider, useTileViewStore } from './tileViewContext';
+import { useQuery } from '@tanstack/react-query';
 import { type ViewType } from '@/types/tile';
 import { UserRoles, type User } from '@/types/user';
-import { ActionTypes, Analytics } from '@/utils/analytics';
-import { AppstoreOutlined, BarChartOutlined } from '@ant-design/icons';
-import { useQuery } from '@tanstack/react-query';
-import { Radio } from 'antd';
 import { useEffect, type FC, type ReactElement } from 'react';
-import { Outlet, useNavigate, useParams } from 'react-router-dom';
-import { TileViewStoreProvider, useTileViewStore } from './tileViewContext';
 
 const LoadingState: FC = () => (
   <div className='absolute inset-0 grid h-screen w-screen place-content-center'>
@@ -38,11 +38,13 @@ const StudentDashboard: FC = (): ReactElement => {
 
   useEffect(() => {
     if (self.role === UserRoles.student) {
-      Analytics.trackEvent({
+      trackEvent({
         userID: self.userID,
         action: ActionTypes.page,
         actionDetail: 'Student Dashboard',
         courseID: self.course_id,
+      }).catch(() => {
+        // Silently fail, since this is not critical
       });
     }
   }, []);
@@ -102,17 +104,11 @@ const Dashboard: FC<DashboardProps> = ({ self }): ReactElement => {
                 setViewType(self, e.target.value as ViewType);
               }}
             >
-              <Radio.Button
-                disabled={viewType === 'graph'}
-                value='graph'
-              >
+              <Radio.Button disabled={viewType === 'graph'} value='graph'>
                 <BarChartOutlined />
                 <span> Graph</span>
               </Radio.Button>
-              <Radio.Button
-                disabled={viewType === 'grid'}
-                value='grid'
-              >
+              <Radio.Button disabled={viewType === 'grid'} value='grid'>
                 <AppstoreOutlined />
                 <span> Grid</span>
               </Radio.Button>
