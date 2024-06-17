@@ -8,7 +8,7 @@ import { type FC, type ReactElement } from 'react';
 
 const GraphGrade: FC<Grades> = ({ grade, peerAvg, peerMin, peerMax, max, type }): ReactElement => {
   const BarTooltip: FC<TooltipProps> = ({ active, payload }) => {
-    if (active && payload?.length) {
+    if (active && payload && payload.length > 1) {
       const data = payload[1].payload;
       return (
         <div className='z-50 rounded-lg border border-solid border-text bg-surface1/85 p-2'>
@@ -32,6 +32,7 @@ const GraphGrade: FC<Grades> = ({ grade, peerAvg, peerMin, peerMax, max, type })
 
   const fullConfig = resolveConfig(tailwindConfig);
   const { theme } = useTheme();
+  console.log("data", peerAvg, peerMin, peerMax)
   return (
     <BarChart
       barGap={-30}
@@ -45,7 +46,7 @@ const GraphGrade: FC<Grades> = ({ grade, peerAvg, peerMin, peerMax, max, type })
         },
         {
           name: 'Peers',
-          peerAvg,
+          grade: peerAvg,
           peerMin,
           peerMax,
           fill: fullConfig.theme.colors.secondary,

@@ -12,6 +12,7 @@ interface Props {
 }
 
 const GraphTile: FC<Props> = memo(({ type, grades }): ReactElement => {
+  console.log("grades", grades)
   switch (type) {
     case TileType.assignments:
     case TileType.discussions:
