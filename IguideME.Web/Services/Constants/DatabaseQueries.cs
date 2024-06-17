@@ -1139,6 +1139,14 @@ public static class DatabaseQueries
         ORDER BY    `end_timestamp` DESC
         LIMIT       @limit;";
 
+    public const string QUERY_SYNCS_SINCE_MOMENT_FOR_COURSE =
+        @"SELECT    `sync_id`
+        FROM        `sync_history`
+        WHERE       `sync_id` > @moment
+        AND         `course_id`=@courseID
+        ORDER BY    `end_timestamp` DESC
+        LIMIT       @limit;";
+
     public const string QUERY_OLD_HASHES_FOR_COURSE =
         @"SELECT    `sync_id`
         FROM        `sync_history`
@@ -1192,6 +1200,15 @@ public static class DatabaseQueries
             GROUP BY    `users`.`user_id`
             ORDER BY    `users`.`name` ASC
             ;";
+
+    public const string QUERY_COUNT_USERS =
+        @"SELECT    COUNT(*)
+        FROM        `users`
+        LEFT JOIN   `student_settings`
+            USING   (`user_id`)
+        WHERE       `student_settings`.`course_id` = @courseID
+        AND         `users`.`role` = @role
+        ;";
 
     public const string QUERY_CONSENTED_STUDENTS_FOR_COURSE =
         /// ^^^ WITH CONSENT ^^^ //NoTotalAverage
@@ -1649,6 +1666,14 @@ public static class DatabaseQueries
             @actionDetail,
             @sessionID,
             @courseID
+          );";
+
+    public const string QUERY_NUMBER_CONSENT_PER_COURSE =
+        @"
+            SELECT        COUNT(*)
+            FROM          `student_settings`
+            WHERE         `course_id` = @courseID
+            AND           `sync_id` = @syncID
           );";
 
     public const string QUERY_ALL_ACTIONS_PER_COURSE =

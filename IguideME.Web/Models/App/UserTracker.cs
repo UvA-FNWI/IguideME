@@ -17,6 +17,13 @@ namespace IguideME.Web.Models.App
         public int CurrentConsent { get; set; }
         public int PrevConsent { get; set; }
         public int Total { get; set; }
+
+        public ConsentInfo(int currentConsent, int prevConsent, int total)
+        {
+            CurrentConsent = currentConsent;
+            PrevConsent = prevConsent;
+            Total = total;
+        }
     }
 
     public class UserTracker

@@ -51,7 +51,7 @@ namespace IguideME.Web.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult GetConsentInfo(int courseID)
         {
-            return Ok(_databaseManager.RetrieveAllActionsPerCourse(courseID));
+            return Ok(_databaseManager.RetrieveAnalyticConsentInfoPerCourse(courseID));
         }
     }
 }

@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
 using System.Data.SQLite;
 using IguideME.Web.Models;
 using IguideME.Web.Models.App;
 using IguideME.Web.Models.Impl;
 using IguideME.Web.Services.Workers;
 using Microsoft.Extensions.Logging;
-using DiscussionEntry = UvA.DataNose.Connectors.Canvas.DiscussionEntry;
 
 namespace IguideME.Web.Services
 {
@@ -268,6 +266,25 @@ namespace IguideME.Web.Services
                     return long.Parse(r.GetValue(0).ToString());
 
             return 0;
+        }
+
+        private List<long> GetSyncsSince(int courseID, long moment, int limit = 1)
+        {
+            List<long> syncs = new() { };
+            using (
+                SQLiteDataReader r = Query(
+                    DatabaseQueries.QUERY_SYNCS_SINCE_MOMENT_FOR_COURSE,
+                    new SQLiteParameter("courseID", courseID),
+                    new SQLiteParameter("moment", moment),
+                    new SQLiteParameter("limit", limit)
+                )
+            )
+                while (r.Read())
+                {
+                    syncs.Add(long.Parse(r.GetValue(0).ToString()));
+                }
+
+            return syncs;
         }
 
         private List<long> GetRecentSyncs(int courseID, int number_of_syncs)
@@ -630,6 +647,43 @@ namespace IguideME.Web.Services
             }
 
             return users;
+        }
+
+        public int CountUsers(int courseID, UserRoles role = UserRoles.student, long syncID = 0)
+        {
+
+            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
+            if (activeSync == 0)
+            {
+                return 0;
+            }
+
+            using (
+                SQLiteDataReader r = Query(
+                    DatabaseQueries.QUERY_COUNT_USERS,
+                    new SQLiteParameter("courseID", courseID),
+                    new SQLiteParameter("role", role),
+                    new SQLiteParameter("syncID", activeSync)
+                )
+            )
+                if (r.Read())
+                    return r.GetInt32(0);
+
+            return 0;
+        }
+
+        public int CountConsents(int courseID, long syncID)
+        {
+            using SQLiteDataReader r = Query(
+                    DatabaseQueries.QUERY_NUMBER_CONSENT_PER_COURSE,
+                    new SQLiteParameter("courseID", courseID),
+                    new SQLiteParameter("syncID", syncID)
+            );
+            if (r.Read())
+            {
+                return r.GetInt32(0);
+            }
+            return 0;
         }
 
         public List<User> GetUsersWithGrantedConsent(
@@ -3249,23 +3303,22 @@ namespace IguideME.Web.Services
 
         public ConsentInfo RetrieveAnalyticConsentInfoPerCourse(int courseID)
         {
-            ConsentInfo consentInfo = new ConsentInfo();
+            long now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            long lastWeek = now - (7 * 24 * 60 * 60 * 1000);
+            List<long> syncs = GetSyncsSince(courseID, lastWeek);
+            now = GetCurrentSyncID(courseID);
 
-            // TODO: This query is not implemented. I don't know if we already have this functionality.
-            using SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_ANALYTIC_CONSENT_PER_COURSE,
-                    new SQLiteParameter("courseID", courseID)
-                );
-            while (r.Read())
+            if (syncs.Count > 0)
             {
-                ConsentInfo = {
-                    current_consent: r.GetInt32(0),
-                    prev_consent: r.GetInt32(1),
-                    total: r.GetInt32(2)
-                };
+                lastWeek = syncs[0];
             }
 
-            return ConsentInfo;
 
+            return new(
+            CountConsents(courseID, now),
+            CountConsents(courseID, lastWeek),
+            CountUsers(courseID)
+            );
+        }
     }
 }
