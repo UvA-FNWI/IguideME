@@ -14,8 +14,11 @@ namespace IguideME.Web.Models.App
 
     public class ConsentInfo
     {
+        [JsonProperty("current_consent")]
         public int CurrentConsent { get; set; }
+        [JsonProperty("prev_consent")]
         public int PrevConsent { get; set; }
+        [JsonProperty("total")]
         public int Total { get; set; }
 
         public ConsentInfo(int currentConsent, int prevConsent, int total)

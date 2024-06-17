@@ -1669,12 +1669,11 @@ public static class DatabaseQueries
           );";
 
     public const string QUERY_NUMBER_CONSENT_PER_COURSE =
-        @"
-            SELECT        COUNT(*)
-            FROM          `student_settings`
-            WHERE         `course_id` = @courseID
-            AND           `sync_id` = @syncID
-          );";
+        @"SELECT        COUNT(*)
+          FROM          `student_settings`
+          WHERE         `course_id` = @courseID
+          AND           `sync_id` = @syncID
+          ;";
 
     public const string QUERY_ALL_ACTIONS_PER_COURSE =
         @"SELECT          `timestamp`,

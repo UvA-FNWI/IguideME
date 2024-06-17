@@ -3313,7 +3313,6 @@ namespace IguideME.Web.Services
                 lastWeek = syncs[0];
             }
 
-
             return new(
             CountConsents(courseID, now),
             CountConsents(courseID, lastWeek),
