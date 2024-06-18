@@ -15,7 +15,7 @@ export const getAssignments: () => Promise<Map<number, Assignment>> = async () =
   });
 
 export const getTopics: () => Promise<Discussion[]> = async () =>
-  await apiClient.get(`topics`).then((response) => response.data);
+  await apiClient.get('topics').then((response) => response.data);
 
 export const getDiscussion: (cid: number, uid: string) => Promise<Discussion> = async (
   cid: number,
@@ -23,7 +23,7 @@ export const getDiscussion: (cid: number, uid: string) => Promise<Discussion> = 
 ) => await apiClient.get(`discussions/${cid}/${studentnr}`).then((response) => response.data);
 
 export const getLearningGoals: () => Promise<LearningGoal[]> = async () =>
-  await apiClient.get(`learning-goals`).then((response) => response.data);
+  await apiClient.get('learning-goals').then((response) => response.data);
 
 export const postLearningGoal: (goal: LearningGoal) => Promise<void> = async (goal: LearningGoal) => {
   await apiClient.post(`learning-goals/${goal.id}`, goal);

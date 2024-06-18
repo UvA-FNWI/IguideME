@@ -233,51 +233,44 @@ namespace IguideME.Web.Services
         }
 
         /// <inheritdoc />
-        public IEnumerable<AppDiscussion> GetDiscussions(int courseID)
+        public IEnumerable<AppDiscussionTopic> GetDiscussions(int courseID)
         {
             return Connector
                 .FindCourseById(courseID)
-                .Discussions.SelectMany(topic =>
-                    topic
-                        .Entries.SelectMany(entry =>
-                            entry
-                                .Replies.Select(reply => new AppDiscussion(
-                                    Discussion_type.Reply,
-                                    reply.ID ?? -1,
-                                    entry.ID ?? -1,
-                                    courseID,
-                                    topic.Title,
-                                    reply.UserID.ToString(),
-                                    (
-                                        (DateTimeOffset)reply.CreatedAt.Value
-                                    ).ToUnixTimeMilliseconds(),
-                                    reply.Message
-                                ))
-                                .Append(
-                                    new AppDiscussion(
-                                        Discussion_type.Entry,
-                                        entry.ID ?? -1,
-                                        topic.ID ?? -1,
-                                        courseID,
-                                        topic.Title,
-                                        entry.UserID.ToString(),
-                                        ((DateTimeOffset)entry.CreatedAt).ToUnixTimeMilliseconds(),
-                                        entry.Message
-                                    )
-                                )
-                        )
-                        .Append(
-                            new AppDiscussion(
-                                Discussion_type.Topic,
+                .Discussions.Select(topic =>
+                            new AppDiscussionTopic(
                                 topic.ID ?? -1,
-                                -1,
                                 courseID,
                                 topic.Title,
                                 _databaseManager.GetUserIDFromName(courseID, topic.UserName),
                                 ((DateTimeOffset)topic.PostedAt).ToUnixTimeMilliseconds(),
-                                topic.Message
+                                topic.Message,
+                                topic.Entries.SelectMany(entry =>
+                                        entry
+                                            .Replies.Select(reply => new AppDiscussionEntry(
+                                                reply.ID ?? -1,
+                                                topic.ID ?? -1,
+                                                entry.ID ?? -1,
+                                                courseID,
+                                                reply.UserID.ToString(),
+                                                (
+                                                    (DateTimeOffset)reply.CreatedAt.Value
+                                                ).ToUnixTimeMilliseconds(),
+                                                reply.Message
+                                            ))
+                                            .Append(
+                                                new AppDiscussionEntry(
+                                                    entry.ID ?? -1,
+                                                    topic.ID ?? -1,
+                                                    topic.ID ?? -1,
+                                                    courseID,
+                                                    entry.UserID.ToString(),
+                                                    ((DateTimeOffset)entry.CreatedAt).ToUnixTimeMilliseconds(),
+                                                    entry.Message
+                                                )
+                                            )
+                                    )
                             )
-                        )
                 );
         }
     }

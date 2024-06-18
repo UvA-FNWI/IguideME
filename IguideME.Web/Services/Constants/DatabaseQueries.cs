@@ -363,17 +363,18 @@ public static class DatabaseQueries
             FOREIGN KEY(`author`) REFERENCES `users`(`name`)
         );";
 
-    public const string CREATE_TABLE_DISCUSSION_REPLIES =
-        @"CREATE TABLE IF NOT EXISTS `discussion_replies` (
-            `reply_id`        INTEGER PRIMARY KEY AUTOINCREMENT,
+    public const string CREATE_TABLE_DISCUSSION_ENTRIES =
+        @"CREATE TABLE IF NOT EXISTS `discussion_entries` (
+            `entry_id`        INTEGER,
             `discussion_id`   INTEGER,
+            `parent_id`       INTEGER,
             `course_id`       INTEGER,
             `author`          STRING,
             `date`            INTEGER,
             `message`         TEXT DEFAULT NULL,
-            UNIQUE (`discussion_id`,`author`,`date`),
-            FOREIGN KEY(`discussion_id`) REFERENCES `discussions`(`discussion_id`),
+            UNIQUE (`parent_id`, `entry_id`),
             FOREIGN KEY(`author`) REFERENCES `users`(`name`)
+            FOREIGN KEY(`discussion_id`) REFERENCES `discussions`(`discussion_id`)
         );";
 
     public const string CREATE_TABLE_SYNC_HISTORY =
@@ -605,22 +606,26 @@ public static class DatabaseQueries
             @message
         );";
 
-    public const string REGISTER_DISCUSSION_REPLY =
+    public const string REGISTER_DISCUSSION_ENTRY =
         @"INSERT OR REPLACE
-            INTO   `discussion_replies`
-                        (   `discussion_id`,
+            INTO   `discussion_entries`
+                        (   `entry_id`,
+                            `discussion_id`,
+                            `parent_id`,
                             `course_id`,
                             `author`,
                             `date`,
                             `message` )
         VALUES(
-            @contentID,
+            @entryID,
+            @discussionID,
+            @parentID,
             @courseID,
             @userID,
             @date,
             @message
         )
-        ON CONFLICT ( `discussion_id`, `author`, `date` )
+        ON CONFLICT ( `parent_id`, `entry_id` )
         DO UPDATE SET `message` = @message
         ;";
 
@@ -1088,7 +1093,7 @@ public static class DatabaseQueries
         AND         `assignment_id`=@internalID
         ;";
 
-    public const string QUERY_COURSE_DISCUSSIONS =
+    public const string QUERY_COURSE_TOPICS =
         @"SELECT    `discussions`.`discussion_id`,
                     `discussions`.`title`,
                     `discussions`.`author`,
@@ -1427,7 +1432,7 @@ public static class DatabaseQueries
             +
             (
                 SELECT
-                COUNT(*) from discussion_replies 
+                COUNT(*) from discussion_entries 
                 WHERE course_id = @courseID
                 AND author = @userID
             )
@@ -1435,8 +1440,8 @@ public static class DatabaseQueries
 
     public const string QUERY_DISCUSSIONS_COUNTER_FOR_USER_FOR_ENTRY =
         @"SELECT
-            COUNT(*) from discussion_replies 
-            WHERE discussion_id = @contentID
+            COUNT(*) from discussion_entries 
+            WHERE discussion_id = @discussionID
             AND author = @userID
         ;";
 

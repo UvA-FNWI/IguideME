@@ -532,7 +532,7 @@ namespace IguideME.Web.Controllers
         // [ProducesResponseType(StatusCodes.Status204NoContent)]
         // [ProducesResponseType(StatusCodes.Status400BadRequest)]
         // [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        // public ActionResult GetDiscussions(string tileID, string userID)
+        // public ActionResult GetDiscussionTopics(string tileID, string userID)
         // {
         //     int course_id = this.GetCourseID();
         //     // Only instructors may view submissions of other students
@@ -550,9 +550,9 @@ namespace IguideME.Web.Controllers
 
         //     User user = _databaseManager.GetUser(course_id, userID);
 
-        //     List<AppDiscussion> discussions = _databaseManager.GetDiscussionsForTile(id);
+        //     List<AppDiscussionTopic> discussions = _databaseManager.GetDiscussionsForTile(id);
 
-        //     foreach (AppDiscussion discussion in new List<AppDiscussion>(discussions))
+        //     foreach (AppDiscussionTopic discussion in new List<AppDiscussionTopic>(discussions))
         //     {
         //         discussions.AddRange(_databaseManager.GetDiscussionEntries(
         //             discussion.ID, user_id: user.UserID.ToString()));

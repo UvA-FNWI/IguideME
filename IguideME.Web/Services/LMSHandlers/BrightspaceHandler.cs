@@ -521,10 +521,10 @@ namespace IguideME.Web.Services
         }
 
         /// <inheritdoc />
-        public IEnumerable<AppDiscussion> GetDiscussions(int courseID)
+        public IEnumerable<AppDiscussionTopic> GetDiscussions(int courseID)
         {
             // Return an empty collection as brightspace doesn't have discussions
-            return new List<AppDiscussion>();
+            return new List<AppDiscussionTopic>();
         }
     }
 }

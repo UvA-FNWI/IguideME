@@ -330,13 +330,13 @@ namespace IguideME.Web.Controllers
         // [Authorize(Policy = "IsInstructor")]
         // [HttpGet]
         // [Route("/datamart/discussions")]
-        // public ActionResult GetDiscussions()
+        // public ActionResult GetDiscussionTopics()
         // {
         //     int course_id = this.GetCourseID();
 
-        //     List<AppDiscussion> discussions = _databaseManager.GetDiscussions(course_id);
+        //     List<AppDiscussionTopic> discussions = _databaseManager.GetDiscussionTopics(course_id);
 
-        //     foreach (AppDiscussion discussion in new List<AppDiscussion>(discussions))
+        //     foreach (AppDiscussionTopic discussion in new List<AppDiscussionTopic>(discussions))
         //     {
         //         discussions.AddRange(_databaseManager.GetDiscussionEntries(
         //             discussion.ID));

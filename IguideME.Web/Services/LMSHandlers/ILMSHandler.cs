@@ -78,6 +78,6 @@ namespace IguideME.Web.Services.LMSHandlers
         /// </summary>
         /// <param name="courseID">The id of the course the quizzes are from.</param>
         /// <returns>A list of discussions.</returns>
-		IEnumerable<AppDiscussion> GetDiscussions(int courseID);
+		IEnumerable<AppDiscussionTopic> GetDiscussions(int courseID);
     }
 }
