@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SQLite;
+using System.Diagnostics;
 using IguideME.Web.Models;
 using IguideME.Web.Models.App;
 using IguideME.Web.Models.Impl;
@@ -2891,6 +2892,36 @@ namespace IguideME.Web.Services
                             r.GetInt32(3),
                             r.GetValue(4).ToString(),
                             new List<AppDiscussionEntry>() { }
+                        );
+                    discussions.Add(row);
+                }
+            }
+
+            return discussions;
+        }
+        public List<AppDiscussionEntry> GetUserDiscussionEntries(int courseID, string userID)
+        {
+            List<AppDiscussionEntry> discussions = new();
+
+            using (
+                SQLiteDataReader r = Query(
+                    DatabaseQueries.QUERY_COURSE_DISCUSSION_ENTRIES_FOR_USER,
+                    new SQLiteParameter("courseID", courseID),
+                    new SQLiteParameter("userID", userID)
+                )
+            )
+            {
+                while (r.Read())
+                {
+                    AppDiscussionEntry row =
+                        new(
+                            r.GetInt32(0),
+                            r.GetInt32(1),
+                            r.GetInt32(2),
+                            courseID,
+                            r.GetValue(3).ToString(),
+                            r.GetInt32(4),
+                            r.GetValue(5).ToString()
                         );
                     discussions.Add(row);
                 }

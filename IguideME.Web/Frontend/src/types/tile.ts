@@ -59,9 +59,8 @@ export interface Assignment {
   grading_type: GradingType;
 }
 
-export interface Discussion {
+export interface DiscussionTopic {
   id: number;
-  type: DiscussionType;
   parent_id: number;
   course_id: number;
   title: string;
@@ -69,6 +68,16 @@ export interface Discussion {
   date: number;
   message: string;
   grades?: Grades;
+}
+
+export interface DiscussionEntry {
+  id: number;
+  discussion_id: number;
+  parent_id: number;
+  course_id: number;
+  author: string;
+  date: number;
+  message: string;
 }
 
 export interface LearningGoal {
@@ -140,12 +149,6 @@ export interface Grades {
   peerMax: number;
   max: number;
   type: GradingType;
-}
-
-export enum DiscussionType {
-  Topic,
-  Entry,
-  Reply,
 }
 
 export enum LogicalExpression {

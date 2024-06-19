@@ -1,5 +1,5 @@
 import { http, HttpResponse } from 'msw';
-import { GradingType, type Assignment, type Discussion, type LearningGoal, LogicalExpression } from '@/types/tile';
+import { GradingType, type Assignment, type DiscussionTopic, type LearningGoal, LogicalExpression } from '@/types/tile';
 
 export const entriesHandlers = [
   http.get('/assignments', () => {
@@ -10,10 +10,10 @@ export const entriesHandlers = [
     return HttpResponse.json(resp);
   }),
   http.get('/topics', () => {
-    return HttpResponse.json<Discussion[]>(MOCK_TOPICS);
+    return HttpResponse.json<DiscussionTopic[]>(MOCK_TOPICS);
   }),
   http.get('/discussions/*/*', ({ params }) => {
-    return HttpResponse.json<Discussion>(
+    return HttpResponse.json<DiscussionTopic>(
       MOCK_DISCUSSIONS.find((disc) => disc.id.toString() === params[0] && disc.author === params[1]),
     );
   }),
@@ -233,7 +233,7 @@ export const MOCK_ASSIGNMENTS: Assignment[] = [
   },
 ];
 
-export const MOCK_TOPICS: Discussion[] = [
+export const MOCK_TOPICS: DiscussionTopic[] = [
   {
     id: 1,
     type: 0,
@@ -267,7 +267,7 @@ export const MOCK_TOPICS: Discussion[] = [
 ];
 
 // TODO: Add replies etc
-export const MOCK_DISCUSSIONS: Discussion[] = [...MOCK_TOPICS];
+export const MOCK_DISCUSSIONS: DiscussionTopic[] = [...MOCK_TOPICS];
 
 export const MOCK_GOALS: LearningGoal[] = [
   {

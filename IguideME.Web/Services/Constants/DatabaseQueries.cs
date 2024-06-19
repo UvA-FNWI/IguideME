@@ -1115,6 +1115,18 @@ public static class DatabaseQueries
         LIMIT       1
         ;";
 
+    public const string QUERY_COURSE_DISCUSSION_ENTRIES_FOR_USER =
+        @"SELECT    `entry_id`,
+                    `discussion_id`,
+                    `parent_id`,
+                    `author`,
+                    `date`,
+                    `message`
+        FROM        `discussion_entries` 
+        WHERE       `course_id` = @courseID
+        AND         `author` = @userID
+        ;";
+
     public const string QUERY_TILE_DISCUSSIONS =
         @"SELECT    `discussions`.`discussion_id`,
                     `discussions`.`course_id`,
@@ -1424,25 +1436,25 @@ public static class DatabaseQueries
 
     public const string QUERY_DISCUSSIONS_COUNTER_FOR_USER =
         @"SELECT (
-                SELECT
-                COUNT(*) from discussions 
-                WHERE course_id = @courseID
-                AND author = @userID
+                SELECT     COUNT(*) 
+                FROM       `discussions` 
+                WHERE      `course_id` = @courseID
+                AND        `author` = @userID
             )
             +
             (
-                SELECT
-                COUNT(*) from discussion_entries 
-                WHERE course_id = @courseID
-                AND author = @userID
+                SELECT     COUNT(*) 
+                FROM       `discussion_entries` 
+                WHERE      `course_id` = @courseID
+                AND        `author` = @userID
             )
         ;";
 
     public const string QUERY_DISCUSSIONS_COUNTER_FOR_USER_FOR_ENTRY =
-        @"SELECT
-            COUNT(*) from discussion_entries 
-            WHERE discussion_id = @discussionID
-            AND author = @userID
+        @"SELECT     COUNT(*) 
+        FROM         `discussion_entries` 
+        WHERE        `discussion_id` = @discussionID
+        AND          `author` = @userID
         ;";
 
     public const string QUERY_PEER_GROUP_RESULTS =

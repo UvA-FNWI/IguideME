@@ -1,10 +1,11 @@
 import apiClient from './axios';
 import {
-  type Discussion,
+  type DiscussionTopic,
   type Assignment,
   type LearningGoal,
   type GoalRequirement,
   type Submission,
+  DiscussionEntry,
 } from '@/types/tile';
 
 type GetAssignmentsData = Record<string, Assignment>;
@@ -14,10 +15,10 @@ export const getAssignments: () => Promise<Map<number, Assignment>> = async () =
     return new Map<number, Assignment>(Object.entries(response.data).map(([k, v]) => [+k, v]));
   });
 
-export const getTopics: () => Promise<Discussion[]> = async () =>
+export const getTopics: () => Promise<DiscussionTopic[]> = async () =>
   await apiClient.get('topics').then((response) => response.data);
 
-export const getDiscussion: (cid: number, uid: string) => Promise<Discussion> = async (
+export const getDiscussionEntries: (cid: number, uid: string) => Promise<DiscussionTopic> = async (
   cid: number,
   studentnr: string,
 ) => await apiClient.get(`discussions/${cid}/${studentnr}`).then((response) => response.data);
@@ -65,3 +66,6 @@ export const getLearningGoal: (cid: number, uid: string) => Promise<LearningGoal
   cid: number,
   studentnr: string,
 ) => await apiClient.get(`learning-goals/${cid}/${studentnr}`).then((response) => response.data);
+
+export const getUserDiscussionEntries: (uid: string) => Promise<DiscussionEntry[]> = async (uid: string) =>
+  await apiClient.get(`discussions/${uid}`).then((response) => response.data);

@@ -4,7 +4,7 @@ import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
 import { CheckCircleOutlined, CheckOutlined, CloseCircleOutlined, CloseOutlined } from '@ant-design/icons';
 import { Divider } from 'antd';
-import { getAssignments, getAssignmentSubmission, getDiscussion, getLearningGoal } from '@/api/entries';
+import { getAssignments, getAssignmentSubmission, getDiscussionEntries, getLearningGoal } from '@/api/entries';
 import { GradeView } from '@/components/crystals/grid-tile/grid-tile';
 import { useQuery } from '@tanstack/react-query';
 import { useTileViewStore } from '@/components/pages/student-dashboard/tileViewContext';
@@ -81,7 +81,7 @@ export const DiscussionDetail: FC<Props> = ({ entry }): ReactElement => {
     isLoading,
   } = useQuery({
     queryKey: [`${entry.tile_id}/entry/${entry.content_id}/${user.userID}`],
-    queryFn: async () => await getDiscussion(entry.content_id, user.userID),
+    queryFn: async () => await getDiscussionEntries(entry.content_id, user.userID),
   });
 
   if (isLoading) {

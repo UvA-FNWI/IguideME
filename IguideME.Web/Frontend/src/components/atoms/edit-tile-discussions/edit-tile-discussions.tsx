@@ -5,7 +5,7 @@ import { Form, Select, Switch, Table } from 'antd';
 import { getTopics } from '@/api/entries';
 import { useQuery } from '@tanstack/react-query';
 import { useWatch } from 'antd/es/form/Form';
-import { type Discussion, type TileEntry } from '@/types/tile';
+import { type DiscussionTopic, type TileEntry } from '@/types/tile';
 import { useCallback, useState, type FC, type ReactElement } from 'react';
 
 const EditTileDiscussions: FC = (): ReactElement => {
@@ -43,7 +43,7 @@ const EditTileDiscussions: FC = (): ReactElement => {
 };
 
 interface DiscussionSelectProps {
-  topics: Discussion[];
+  topics: DiscussionTopic[];
   value: TileEntry[];
   onChange: (value: TileEntry[]) => void;
 }
@@ -56,7 +56,7 @@ const DiscussionSelect: FC<DiscussionSelectProps> = ({
   const [open, setOpen] = useState<boolean>(false);
   const [selectedTopics, setSelectedTopics] = useState<number[]>(entries.map((entry) => entry.content_id));
 
-  const unselectedTopics: Discussion[] = [...topics.values()].filter((top) => {
+  const unselectedTopics: DiscussionTopic[] = [...topics.values()].filter((top) => {
     return !selectedTopics.some((sel) => sel === top.id);
   });
 
