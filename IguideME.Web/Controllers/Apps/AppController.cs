@@ -34,7 +34,8 @@ namespace IguideME.Web.Controllers
         [Authorize(Policy = "IsInstructor")]
         [Route("/app/setup")]
         [HttpPost]
-        public void SetupCourse() {
+        public void SetupCourse()
+        {
             if (!DatabaseManager.Instance.IsCourseRegistered(GetCourseID()))
                 DatabaseManager.Instance.RegisterCourse(GetCourseID(), GetCourseTitle());
         }
@@ -96,7 +97,7 @@ namespace IguideME.Web.Controllers
             DatabaseManager.Instance.UpdateNotificationEnable(
                     this.GetCourseID(),
                     this.GetUserID(),
-                    (bool) JObject.Parse(body)["enable"]
+                    (bool)JObject.Parse(body)["enable"]
                     );
 
             return Json(
@@ -195,7 +196,7 @@ namespace IguideME.Web.Controllers
             if (this.IsAdministrator()) return Json("");
 
             var body = new StreamReader(Request.Body).ReadToEnd();
-            string action = (string) JObject.Parse(body)["action"];
+            string action = (string)JObject.Parse(body)["action"];
 
             DatabaseManager.Instance.TrackUserAction(
                     this.GetUserID(),
@@ -217,7 +218,7 @@ namespace IguideME.Web.Controllers
             int courseID = this.GetCourseID();
 
             var body = new StreamReader(Request.Body).ReadToEnd();
-            string dates = (string) JObject.Parse(body)["dates"];
+            string dates = (string)JObject.Parse(body)["dates"];
 
             DatabaseManager.Instance.UpdateNotificationDates(
                 courseID,
@@ -242,5 +243,17 @@ namespace IguideME.Web.Controllers
 
             return allDates != null ? Json(allDates) : NotFound();
         }
+
+        [Authorize(Policy = "IsInstructor")]
+        [Route("/app/usage")]
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public ActionResult GetUsage()
+        {
+            return Json(DatabaseManager.Instance.GetUsage(GetCourseID()));
+        }
+
     }
 }

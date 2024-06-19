@@ -124,8 +124,6 @@ namespace IguideME.Web.Services
                 .UpdateJobProgressInformationAsync(jobId, $"tasks.students", 0)
                 .ConfigureAwait(false);
 
-            DatabaseManager.Instance.GetUsage(courseID, timestamp);
-
             new QuizWorker(courseID, timestamp, _lmsHandler, _logger).Start();
             await _computationJobStatus
                 .UpdateJobProgressInformationAsync(jobId, $"tasks.quizzes", 0)

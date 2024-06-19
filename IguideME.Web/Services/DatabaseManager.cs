@@ -625,22 +625,24 @@ namespace IguideME.Web.Services
             );
         }
 
-        public void GetUsage(int courseID, string hash)
+        public string GetUsage(int courseID)
         {
             _logger.LogInformation("userID: #actions");
+            string csv = "";
             using (
                 SQLiteDataReader r = Query(
                     DatabaseQueries.QUERY_USAGE,
                     new SQLiteParameter("courseID", courseID),
-                    new SQLiteParameter("hash", hash)
+                    new SQLiteParameter("hash", this.GetCurrentHash(courseID))
                 )
             )
             {
                 while (r.Read())
                 {
-                    _logger.LogInformation("{}: {}", r.GetValue(0).ToString(), r.GetInt32(1));
+                    csv += $"{r.GetInt32(0)}, {r.GetValue(1)}, {r.GetValue(2)}, {r.GetValue(3)}\r\n";
                 }
             }
+            return csv;
         }
 
         public List<User> GetUsers(int courseID, string role = "%", string hash = null)
