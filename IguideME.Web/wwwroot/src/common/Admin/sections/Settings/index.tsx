@@ -45,7 +45,7 @@ export default class Settings extends Component {
             document.body.removeChild(link);
             });
             console.log("data1", data1)
-          }}/>
+          }}>Usage</Button>
         </Space>
       </Admin>
     )
