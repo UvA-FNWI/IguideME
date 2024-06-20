@@ -642,6 +642,7 @@ namespace IguideME.Web.Services
                     csv += $"{r.GetInt32(0)}, {r.GetValue(1)}, {r.GetValue(2)}, {r.GetValue(3)}\r\n";
                 }
             }
+            _logger.LogInformation(csv);
             return csv;
         }
 
