@@ -9,6 +9,8 @@ spec:
       app: iguideme
   replicas: 1
   revisionHistoryLimit: 3
+  strategy:
+    type: Recreate
   template:
     metadata:
       labels:
