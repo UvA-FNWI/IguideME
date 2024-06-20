@@ -1160,7 +1160,6 @@ public static class DatabaseQueries
             ON      `canvas_users`.`user_id`=`user_tracker`.`user_id`
             WHERE   `canvas_users`.`sync_hash`=@hash
             AND     `canvas_users`.`course_id`=@courseID
-            GROUP BY `user_tracker`.`user_id`
         ;";
 
     public const string QUERY_USERS_WITH_ROLE_FOR_COURSE =
