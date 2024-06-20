@@ -1155,7 +1155,7 @@ public static class DatabaseQueries
                     `user_tracker`.`time`,
                     `user_tracker`.`user_id`,
                     `user_tracker`.`action`
-            FROM    `user_tracker`
+        FROM    `user_tracker`
         INNER JOIN  `canvas_users`
             ON      `canvas_users`.`user_id`=`user_tracker`.`user_id`
             WHERE   `canvas_users`.`sync_hash`=@hash

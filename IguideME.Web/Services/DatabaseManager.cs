@@ -627,7 +627,7 @@ namespace IguideME.Web.Services
 
         public string GetUsage(int courseID)
         {
-            _logger.LogInformation("userID: #actions");
+            _logger.LogInformation("userID: actions");
             string csv = "";
             using (
                 SQLiteDataReader r = Query(
