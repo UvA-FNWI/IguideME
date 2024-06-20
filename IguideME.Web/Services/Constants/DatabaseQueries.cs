@@ -1154,7 +1154,7 @@ public static class DatabaseQueries
         @"SELECT    `user_tracker`.`id`,
                     `user_tracker`.`time`,
                     `user_tracker`.`user_id`,
-                    `user_tracker`.`action`,
+                    `user_tracker`.`action`
             FROM    `user_tracker`
         INNER JOIN  `canvas_users`
             ON      `canvas_users`.`user_id`=`user_tracker`.`user_id`
