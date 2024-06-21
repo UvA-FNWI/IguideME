@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 namespace IguideME.Web.Services.Workers
 {
     /// <summary>
-    /// Class <a>GradePredictorWorker</a> models a worker that handle making grade predictions for users.
+    /// Class <a>GradePredictorWorker</a> models a worker that handle making Grade predictions for users.
     /// </summary>
 	public class GradePredictorWorker : IWorker
     {
@@ -36,14 +36,14 @@ namespace IguideME.Web.Services.Workers
         }
 
         /// <summary>
-        /// Starts the grade prediction worker.
+        /// Starts the Grade prediction worker.
         /// </summary>
         public void Start()
         {
-            _logger.LogInformation("Making grade predictions");
+            _logger.LogInformation("Making Grade predictions");
             if (this._model == null)
             {
-                _logger.LogWarning("No suitible grade prediction model found for courseID {ID}", this._courseID);
+                _logger.LogWarning("No suitible Grade prediction model found for courseID {ID}", this._courseID);
                 return;
             }
 
@@ -80,7 +80,7 @@ namespace IguideME.Web.Services.Workers
             //         continue;
             //     }
 
-            //     _logger.LogInformation("grade += {grade} * {Weight}", submission.Grade, modelParameter.Weight);
+            //     _logger.LogInformation("Grade += {Grade} * {Weight}", submission.Grade, modelParameter.Weight);
 
             //     wGrade += submission.Grade * modelParameter.Weight;
             // } TODO: fix

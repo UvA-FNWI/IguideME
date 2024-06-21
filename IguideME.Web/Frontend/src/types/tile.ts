@@ -33,6 +33,7 @@ export interface TileGrades {
   peerMin: number;
   peerAvg: number;
   peerMax: number;
+  max: number;
 }
 
 export enum TileType {
@@ -142,6 +143,8 @@ const letterGrade = (grade: number): string => {
   if (grade > 60) return 'D-';
   return 'F';
 };
+
+// TODO collapse together with tileGrades
 export interface Grades {
   grade: number;
   peerAvg: number;

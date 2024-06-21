@@ -18,7 +18,7 @@ const GradeDisplay: FC = (): ReactElement => {
   }
 
   const goal = user.settings.goal_grade;
-  const total = user.settings.total_grade / 10;
+  const total = user.settings.total_grade;
   const pred = user.settings.predicted_grade;
 
   switch (viewType) {
@@ -52,7 +52,7 @@ const GridGrades: FC<Props> = memo(({ goal, total, pred }): ReactElement => {
             : goal >= 5.5 ?
               meh
             : unhappy}
-            {goal}
+            {goal.toFixed(1)}
           </Space>
         </h2>
       </div>
@@ -65,23 +65,25 @@ const GridGrades: FC<Props> = memo(({ goal, total, pred }): ReactElement => {
             : total >= 5.5 ?
               meh
             : unhappy}
-            {total}
+            {total.toFixed(1)}
           </Space>
         </h2>
       </div>
-      <div className='text-center'>
-        <p>Predicted</p>
-        <h2 className='text-lg font-semibold'>
-          <Space>
-            {pred > goal ?
-              happy
-            : pred >= 5.5 ?
-              meh
-            : unhappy}
-            {pred}
-          </Space>
-        </h2>
-      </div>
+      {pred > 0 && (
+        <div className='text-center'>
+          <p>Predicted</p>
+          <h2 className='text-lg font-semibold'>
+            <Space>
+              {pred > goal ?
+                happy
+              : pred >= 5.5 ?
+                meh
+              : unhappy}
+              {pred.toFixed(1)}
+            </Space>
+          </h2>
+        </div>
+      )}{' '}
     </Space>
   );
 });
@@ -103,21 +105,26 @@ BarTooltip.displayName = 'BarTooltip';
 const GraphGrades: FC<Props> = memo(({ goal, total, pred }): ReactElement => {
   const fullConfig = resolveConfig(tailwindConfig);
 
+  const data = [
+    {
+      name: 'Current Grade',
+      grade: total,
+      fill: fullConfig.theme.colors.primary,
+    },
+  ];
+
+  if (pred > 0) {
+    data.push({
+      name: 'Predicted Grade',
+      grade: pred,
+      fill: fullConfig.theme.colors.tertiary,
+    });
+  }
+
   return (
     <ResponsiveContainer width='100%' minWidth={330} height={40}>
       <BarChart
-        data={[
-          {
-            name: 'Current Grade',
-            grade: total,
-            fill: fullConfig.theme.colors.primary,
-          },
-          {
-            name: 'Predicted Grade',
-            grade: pred,
-            fill: fullConfig.theme.colors.tertiary,
-          },
-        ]}
+        data={data}
         height={40}
         layout='vertical'
         margin={{

@@ -32,7 +32,6 @@ const GraphGrade: FC<Grades> = ({ grade, peerAvg, peerMin, peerMax, max, type })
 
   const fullConfig = resolveConfig(tailwindConfig);
   const { theme } = useTheme();
-  console.log("data", peerAvg, peerMin, peerMax)
   return (
     <BarChart
       barGap={-30}

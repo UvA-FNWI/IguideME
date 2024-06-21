@@ -258,7 +258,7 @@ namespace IguideME.Web.Controllers
 
         // [Authorize]
         // [HttpGet]
-        // [Route("/goal-grade/{userID}")]
+        // [Route("/goal-Grade/{userID}")]
         // [ProducesResponseType(StatusCodes.Status200OK)]
         // [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         // public ActionResult GetGoalGrade(string userID)
@@ -267,7 +267,7 @@ namespace IguideME.Web.Controllers
         //         !this.IsAdministrator())
         //         return Unauthorized();
 
-        //     // returns the goal grade for the logged in user
+        //     // returns the goal Grade for the logged in user
         //     return Json(
         //         _databaseManager.GetUserGoalGrade(
         //             this.GetCourseID(),
@@ -277,12 +277,12 @@ namespace IguideME.Web.Controllers
 
         // [Authorize]
         // [HttpGet]
-        // [Route("/goal-grade")]
+        // [Route("/goal-Grade")]
         // [ProducesResponseType(StatusCodes.Status200OK)]
         // [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         // public ActionResult GetGoalGrade()
         // {
-        //     // returns the goal grade for the logged in user
+        //     // returns the goal Grade for the logged in user
         //     return Json(
         //         _databaseManager.GetUserGoalGrade(
         //             this.GetCourseID(),
@@ -292,7 +292,7 @@ namespace IguideME.Web.Controllers
 
         // [Authorize]
         // [HttpPost]
-        // [Route("/goal-grade")]
+        // [Route("/goal-Grade")]
         // [ProducesResponseType(StatusCodes.Status200OK)]
         // [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         // public ActionResult UpdateGoalGrade()

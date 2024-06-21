@@ -481,7 +481,7 @@ namespace IguideME.Web.Services
                             if (r.IsDBNull(3))
                             {
                                 _logger.LogWarning(
-                                    "Both grade and denominator are null, inserting 0 for grade..."
+                                    "Both Grade and denominator are null, inserting 0 for Grade..."
                                 );
                                 rawGrade = "0";
                             }

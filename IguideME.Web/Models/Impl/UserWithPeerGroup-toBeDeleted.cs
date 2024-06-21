@@ -66,13 +66,13 @@
 //             }
 
 //             // If personalized peers are enabled then assert the student
-//             // provided a goal grade.
+//             // provided a goal Grade.
 //             var _grade = _databaseManager.GetUserGoalGrade(
 //                 this.CourseID, this.LoginID);
 
 //             if (_grade < 0)
 //             {
-//                 Console.WriteLine("Student with loginID " + this.LoginID + " has no goal grade set, thus no peers will be considered.");
+//                 Console.WriteLine("Student with loginID " + this.LoginID + " has no goal Grade set, thus no peers will be considered.");
 //                 return;
 //             }
 
@@ -80,34 +80,34 @@
 //              * When identifying peers we adhere to the simple principle that
 //              * a peer group must have a minimal size and the group is
 //              * populated with students whom have the most similar goal
-//              * grade. If there are too few students with the same grade goal
-//              * as the student, students with a higher peer grade will be sought
-//              * first, then students with a lower grade goal until the group size
+//              * Grade. If there are too few students with the same Grade goal
+//              * as the student, students with a higher peer Grade will be sought
+//              * first, then students with a lower Grade goal until the group size
 //              * exceeds the minimum.
 //              */
 //             List<int> _grades = new List<int>();
-//             var grade = (int)_grade;
+//             var Grade = (int)_grade;
 //             var offset = 1;
-//             this.GoalGrade = grade;
+//             this.GoalGrade = Grade;
 
 //             List<User> peers = new List<User>();
-//             _grades.Add(grade);
+//             _grades.Add(Grade);
 
 //             _databaseManager
-//                 .GetUsersWithGoalGrade(this.CourseID, (int)grade, this.Hash)
+//                 .GetUsersWithGoalGrade(this.CourseID, (int)Grade, this.Hash)
 //                 .FindAll(u => u.LoginID != this.LoginID)
 //                 .ForEach(x => peers.Add(x));
 
 //             while (peers.Count < minPeerGroupSize)
 //             {
-//                 if (offset > 9 || (int) grade + offset > 10 || (int) grade - offset < 1) break;
+//                 if (offset > 9 || (int) Grade + offset > 10 || (int) Grade - offset < 1) break;
 
 //                 // Keep filling the peer group with more distant peers
 //                 var requiredPeers = minPeerGroupSize - peers.Count;
 
 //                 // Check upwards peers
 //                 var usersWithGoalGrade = _databaseManager
-//                     .GetUsersWithGoalGrade(this.CourseID, (int)grade + offset, this.Hash);
+//                     .GetUsersWithGoalGrade(this.CourseID, (int)Grade + offset, this.Hash);
 //                 if (usersWithGoalGrade.Count > 0)
 //                     usersWithGoalGrade
 //                         .GetRange(0, requiredPeers)
@@ -119,7 +119,7 @@
 
 //                 // Check downward peers
 //                 usersWithGoalGrade = _databaseManager
-//                     .GetUsersWithGoalGrade(this.CourseID, (int)grade - offset, this.Hash);
+//                     .GetUsersWithGoalGrade(this.CourseID, (int)Grade - offset, this.Hash);
 //                 if (usersWithGoalGrade.Count > 0)
 //                     usersWithGoalGrade
 //                     .GetRange(0, requiredPeers)

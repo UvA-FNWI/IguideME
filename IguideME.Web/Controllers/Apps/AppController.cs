@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using IguideME.Web.Models.App;
 using IguideME.Web.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -7,8 +6,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
-using System;
-using Newtonsoft.Json;
 
 namespace IguideME.Web.Controllers
 {
@@ -83,7 +80,7 @@ namespace IguideME.Web.Controllers
 
         [Authorize]
         [HttpPost]
-        [Route("/student/settings/goal-grade")]
+        [Route("/student/settings/goal-Grade")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public void UpdateGoalGrade()
@@ -93,7 +90,7 @@ namespace IguideME.Web.Controllers
                     this.GetCourseID(),
                     this.GetUserID(),
                     null,
-                    (int)JObject.Parse(body)["grade"],
+                    (int)JObject.Parse(body)["Grade"],
                     null,
                     null,
                     null,

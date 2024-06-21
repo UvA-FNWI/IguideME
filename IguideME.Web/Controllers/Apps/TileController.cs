@@ -721,12 +721,12 @@ namespace IguideME.Web.Controllers
 
         //         string[] values = row.ToObject<string[]>();
 
-        //         _ = float.TryParse(values[grade_column], out float grade);
+        //         _ = float.TryParse(values[grade_column], out float Grade);
 
         //         int submissionID = _databaseManager.CreateUserSubmission(
         //             assignmentID,
         //             values[id_column],
-        //             grade,
+        //             Grade,
         //             DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
         //         );
 
@@ -765,7 +765,7 @@ namespace IguideME.Web.Controllers
 
         // [Authorize]
         // [HttpGet]
-        // [Route("/tiles/grade-summary/{userID}")]
+        // [Route("/tiles/Grade-summary/{userID}")]
         // [ProducesResponseType(StatusCodes.Status200OK)]
         // [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         // public ActionResult GetGradeSummary(string userID)
@@ -780,7 +780,7 @@ namespace IguideME.Web.Controllers
 
         // [Authorize]
         // [HttpGet]
-        // [Route("/tiles/grade-history/{userID}")]
+        // [Route("/tiles/Grade-history/{userID}")]
         // [ProducesResponseType(StatusCodes.Status200OK)]
         // [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         // public ActionResult GetTileHistory(string userID)

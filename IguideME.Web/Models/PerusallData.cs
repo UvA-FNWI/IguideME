@@ -10,7 +10,7 @@ namespace IguideME.Web.Models
         [JsonProperty(PropertyName = "userID")]
         public string UserID { get; set; }
 
-        [JsonProperty(PropertyName = "grade")]
+        [JsonProperty(PropertyName = "Grade")]
         public float Grade { get; set; }
 
         [JsonProperty(PropertyName = "entry")]

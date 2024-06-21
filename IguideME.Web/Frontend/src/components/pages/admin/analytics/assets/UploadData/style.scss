@@ -1,0 +1,42 @@
+@import "../../../../../../../scss/base";
+
+#uploadButton {
+  background-color: $primary-green;
+  border: 1px solid $primary-border-color;
+  display: inline-block;
+  color: white;
+}
+
+#filePickerInputContainer {
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+#uploadedFilesUl {
+  margin-top: 20px;
+
+  > li {
+    list-style: none;
+    margin: 5px 0;
+
+    .liDeleteBtn {
+      margin-right: 8px;
+    }
+  }
+}
+
+.finalGradesDSSelect {
+  margin-top: 20px;
+  width: 100%;
+
+  &.error {
+    .ant-select-selector {
+      border-color: red;
+    }
+
+    * {
+      color: red;
+    }
+  }
+}
