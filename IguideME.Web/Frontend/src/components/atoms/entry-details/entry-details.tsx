@@ -29,6 +29,7 @@ export const AssignmentDetail: FC<Props> = ({ entry }): ReactElement => {
     queryKey: [`${entry.tile_id}/entry/${entry.content_id}/${user.userID}`],
     queryFn: async () => await getAssignmentSubmission(entry.content_id, user.userID),
   });
+  console.log('sub', submission);
 
   if (isLoading) {
     return (

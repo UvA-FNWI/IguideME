@@ -1581,7 +1581,7 @@ namespace IguideME.Web.Services
             using (
                 SQLiteDataReader r = Query(
                     DatabaseQueries.QUERY_USER_SUBMISSION_FOR_ENTRY_FOR_USER,
-                    new SQLiteParameter("contentID", entryID),
+                    new SQLiteParameter("entryID", entryID),
                     new SQLiteParameter("userID", userID)
                 )
             )
