@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using IguideME.Web.Models;
 using IguideME.Web.Models.App;
 using IguideME.Web.Services.LMSHandlers;
 using Microsoft.Extensions.Logging;
@@ -44,31 +43,6 @@ namespace IguideME.Web.Services.Workers
         }
 
         /// <summary>
-        /// Convert letter grading systems to our internal system of grades between 0 and 100.
-        /// </summary>
-        /// <param name="grade">the Grade as a letter that should be converted.</param>
-        /// <returns>The Grade as a percentage.</returns>
-        static private double LetterToGrade(string grade)
-        {
-            return grade switch
-            {
-                "A" => 100,
-                "A-" => 93,
-                "B+" => 89,
-                "B" => 86,
-                "B-" => 83,
-                "C+" => 79,
-                "C" => 76,
-                "C-" => 73,
-                "D+" => 69,
-                "D" => 66,
-                "D-" => 63,
-                "F" => 60,
-                _ => 0.00,
-            };
-        }
-
-        /// <summary>
         /// Register submissions associated to an assignment in the database.
         /// </summary>
         /// <param name="assignment">the assignment the submissions are associated to.</param>
@@ -88,43 +62,7 @@ namespace IguideME.Web.Services.Workers
                 if (gradingTypes.TryGetValue(submission.AssignmentID, out elem))
                 {
                     (max, type) = elem;
-                    switch (type)
-                    {
-                        case AppGradingType.Points:
-                            submission.Grade =
-                                (
-                                    submission.RawGrade != null
-                                        ? double.Parse(submission.RawGrade)
-                                        : submission.Grade
-                                )
-                                * 100
-                                / max;
-                            break;
-                        case AppGradingType.Percentage:
-                            submission.Grade =
-                                submission.RawGrade != null
-                                    ? double.Parse(submission.RawGrade)
-                                    : submission.Grade;
-                            break;
-                        case AppGradingType.Letters:
-                            submission.Grade = LetterToGrade(submission.RawGrade ?? "0");
-                            break;
-                        case AppGradingType.PassFail:
-                            _logger.LogInformation("passfail text: {Grade}", submission.RawGrade);
-                            submission.Grade = submission.RawGrade == "PASS" ? 100 : 0;
-                            break;
-                        case AppGradingType.NotGraded:
-                            submission.Grade = -1;
-                            break;
-                        default:
-                            submission.Grade = -1;
-                            _logger.LogWarning(
-                                "Grade format {Type} is not supported, submissions.Grade = {Grade}, treating as not graded...",
-                                gradingTypes[submission.AssignmentID],
-                                submission.RawGrade
-                            );
-                            break;
-                    }
+                    submission.RawToGrade(type, max);
 
                     _databaseManager.CreateUserSubmission(submission);
                 }
@@ -156,8 +94,6 @@ namespace IguideME.Web.Services.Workers
 
             Dictionary<int, (double, AppGradingType)> gradingTypes = new();
             List<AssignmentSubmission> assignmentSubmissionsWithTiles = new();
-
-            _logger.LogInformation("test {}", submissions.Select(sub => sub.UserID));
 
             foreach (AppAssignment assignment in assignments)
             {
