@@ -92,7 +92,7 @@ const ViewTile: FC<Props> = memo(({ tile, textStyle }): ReactElement => {
                   peerAvg: grades.peerAvg,
                   peerMin: grades.peerMin,
                   peerMax: grades.peerMax,
-                  max,
+                  max: grades.max,
                   type: tile.gradingType,
                 }}
               />
@@ -106,7 +106,7 @@ const ViewTile: FC<Props> = memo(({ tile, textStyle }): ReactElement => {
                     peerAvg: grades.peerAvg,
                     peerMin: grades.peerMin,
                     peerMax: grades.peerMax,
-                    max,
+                    max: grades.max,
                     type: tile.type === TileType.assignments ? tile.gradingType : GradingType.NotGraded,
                   }}
                 />
