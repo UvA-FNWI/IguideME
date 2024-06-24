@@ -2,7 +2,6 @@
 using System.Linq;
 using IguideME.Web.Models;
 using IguideME.Web.Models.App;
-using IguideME.Web.Models.Impl;
 using Microsoft.Extensions.Logging;
 
 namespace IguideME.Web.Services.Workers
@@ -210,7 +209,10 @@ namespace IguideME.Web.Services.Workers
                 }
             }
 
-            return tileGrade;
+            double max = _databaseManager.GetTileMax(tile.ID, _courseID);
+            // _logger.LogWarning("tileGrade {tileGrade} max {max} tile {tile}", tileGrade, max, )
+
+            return 100 * tileGrade / max;
         }
 
         /// <summary>
@@ -222,7 +224,7 @@ namespace IguideME.Web.Services.Workers
         /// <returns>The Grade of the tile.</returns>
         double CalculateLearningGoalTileGrade(Tile tile, string userID)
         {
-            double grade = 0;
+            double tileGrade = 0;
             List<LearningGoal> goals = _databaseManager.GetLearningGoalsForTile(tile.ID);
             foreach (LearningGoal goal in goals)
             {
@@ -232,11 +234,12 @@ namespace IguideME.Web.Services.Workers
                     // goal.Results.Add(_databaseManager.GetGoalRequirementResult(requirement, userID));
                     if (_databaseManager.GetGoalRequirementResult(requirement, userID))
                     {
-                        grade++;
+                        tileGrade++;
                     }
                 }
             }
-            return grade;
+            double max = _databaseManager.GetTileMax(tile.ID, _courseID);
+            return 100 * tileGrade / max;
         }
 
         /// <summary>

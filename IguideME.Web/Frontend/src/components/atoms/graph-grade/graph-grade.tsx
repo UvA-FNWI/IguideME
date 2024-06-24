@@ -62,7 +62,7 @@ const GraphGrade: FC<Grades> = ({ grade, peerAvg, peerMin, peerMax, max, type })
     >
       <XAxis dataKey='name' xAxisId={0} stroke={theme === 'light' ? 'black' : 'white'} />
       <XAxis dataKey='name' xAxisId={1} hide />
-      <YAxis dataKey='grade' domain={[0, max]} hide />
+      <YAxis type='number' dataKey='grade' domain={[0, 100]} hide />
       <Tooltip content={<BarTooltip />} cursor={false} />
       <Bar
         background={{ fill: '#eee' }}

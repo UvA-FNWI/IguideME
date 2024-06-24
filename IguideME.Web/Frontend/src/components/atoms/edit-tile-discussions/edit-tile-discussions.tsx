@@ -1,7 +1,7 @@
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
 import { CheckOutlined, CloseOutlined, DeleteFilled } from '@ant-design/icons';
-import { Form, Select, Switch, Table } from 'antd';
+import { Form, Input, Select, Switch, Table } from 'antd';
 import { getTopics } from '@/api/entries';
 import { useQuery } from '@tanstack/react-query';
 import { useWatch } from 'antd/es/form/Form';
@@ -20,6 +20,9 @@ const EditTileDiscussions: FC = (): ReactElement => {
 
   return (
     <>
+      <Form.Item name='gradingType' hidden>
+        <Input type='hidden' />
+      </Form.Item>
       <p className='mb-1'>Discussions:</p>
       <div className='col-span-2'>
         <p className='float-end'>

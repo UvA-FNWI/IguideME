@@ -2991,6 +2991,8 @@ namespace IguideME.Web.Services
             {
                 if (r.Read())
                 {
+                    int max = r.GetInt32(5);
+                    max = max == 0 ? 1 : max;
                     return new(
                             r.GetInt32(0),
                             courseID,
@@ -2999,11 +3001,11 @@ namespace IguideME.Web.Services
                             r.GetInt32(3),
                             r.GetValue(4).ToString(),
                             new AssignmentGrades(
-                                   grade,
-                                 comparison.Average,
-                                 comparison.Minimum,
-                                 comparison.Maximum,
-                                     -1,
+                                   100 * grade / max,
+                                 100 * comparison.Average / max,
+                                 100 * comparison.Minimum / max,
+                                 100 * comparison.Maximum / max,
+                                     max,
                                      AppGradingType.Points
                             )
                         );

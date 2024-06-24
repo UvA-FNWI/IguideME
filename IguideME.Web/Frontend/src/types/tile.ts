@@ -116,17 +116,26 @@ export const printGrade = (type: GradingType, grade: number, max: number, ng: bo
     case GradingType.PassFail:
       return grade > 0 ? 'Pass' : 'Fail';
     case GradingType.Percentage:
-      return grade.toFixed(1) + '%';
+      return varFixed(grade) + '%';
     case GradingType.Letters:
       return letterGrade(grade);
     case GradingType.Points:
-      if (max > 0) return ((grade * max) / 100).toFixed(1) + '/' + max.toFixed(1);
+      if (max > 0) {
+        const result = (grade * max) / 100;
+
+        return varFixed(result) + '/' + varFixed(max);
+      }
 
       return grade.toFixed(0);
 
     case GradingType.NotGraded:
-      return ng ? 'N/A' : grade.toFixed(0);
+      return ng ? 'N/A' : (max > 0 ? (grade * max) / 100 : grade).toFixed(0);
   }
+};
+
+export const varFixed = (nr: number): string => {
+  const result = nr.toFixed(1);
+  return result[result.length - 1] === '0' ? result.slice(0, -2) : result;
 };
 
 const letterGrade = (grade: number): string => {

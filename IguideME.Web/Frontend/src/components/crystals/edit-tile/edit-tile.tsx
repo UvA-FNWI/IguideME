@@ -8,7 +8,7 @@ import { deleteTile, patchTile } from '@/api/tiles';
 import { useDrawerStore } from '../tile-group-board/useDrawerStore';
 import { useForm, useWatch } from 'antd/es/form/Form';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { TileType, type Tile } from '@/types/tile';
+import { GradingType, TileType, type Tile } from '@/types/tile';
 import { type FormInstance } from 'antd/lib/form/Form';
 import { useState, type FC, type ReactElement } from 'react';
 
@@ -47,6 +47,15 @@ const EditTile: FC<Props> = ({ tile }): ReactElement => {
       initialValues={tile}
       onFinish={(data: Tile) => {
         setEditTile(null);
+        switch (data.type) {
+          case TileType.assignments:
+            break;
+          case TileType.discussions:
+            data.gradingType = GradingType.NotGraded;
+            break;
+          case TileType.learning_outcomes:
+            data.gradingType = GradingType.Points;
+        }
         saveTile(data);
         setIsChanged(false);
       }}
@@ -130,7 +139,6 @@ const EditTile: FC<Props> = ({ tile }): ReactElement => {
   );
 
   function renderTypeSettings(): ReactElement {
-    // TODO: delete entries when changing types.
     const type = useWatch('type', form);
     switch (type) {
       case TileType.assignments:

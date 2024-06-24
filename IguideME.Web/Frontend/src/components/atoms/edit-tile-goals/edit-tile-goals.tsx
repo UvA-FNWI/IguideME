@@ -1,7 +1,7 @@
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
 import { CheckOutlined, CloseOutlined, DeleteFilled } from '@ant-design/icons';
-import { Form, Select, Switch, Table } from 'antd';
+import { Form, Input, Select, Switch, Table } from 'antd';
 import { getLearningGoals } from '@/api/entries';
 import type { LearningGoal, TileEntry } from '@/types/tile';
 import { useDrawerStore } from '@/components/crystals/tile-group-board/useDrawerStore';
@@ -18,6 +18,9 @@ const EditTileGoals: FC = (): ReactElement => {
 
   return (
     <>
+      <Form.Item name='gradingType' hidden>
+        <Input type='hidden' />
+      </Form.Item>
       <p className='mb-1'>Goals:</p>
       <div className='col-span-2'>
         <Form.Item name='alt' noStyle valuePropName='checked'>

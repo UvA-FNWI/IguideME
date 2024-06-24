@@ -6,6 +6,7 @@ import { Space, Spin } from 'antd';
 import { type TooltipProps } from '@/types/reactRecharts';
 import { useTileViewStore } from '@/components/pages/student-dashboard/tileViewContext';
 import { memo, type FC, type ReactElement } from 'react';
+import { varFixed } from '@/types/tile';
 
 const GradeDisplay: FC = (): ReactElement => {
   const { user, viewType } = useTileViewStore((state) => ({
@@ -52,7 +53,7 @@ const GridGrades: FC<Props> = memo(({ goal, total, pred }): ReactElement => {
             : goal >= 5.5 ?
               meh
             : unhappy}
-            {goal.toFixed(1)}
+            {varFixed(goal)}
           </Space>
         </h2>
       </div>
@@ -65,7 +66,7 @@ const GridGrades: FC<Props> = memo(({ goal, total, pred }): ReactElement => {
             : total >= 5.5 ?
               meh
             : unhappy}
-            {total.toFixed(1)}
+            {varFixed(total)}
           </Space>
         </h2>
       </div>
@@ -79,7 +80,7 @@ const GridGrades: FC<Props> = memo(({ goal, total, pred }): ReactElement => {
               : pred >= 5.5 ?
                 meh
               : unhappy}
-              {pred.toFixed(1)}
+              {varFixed(pred)}
             </Space>
           </h2>
         </div>

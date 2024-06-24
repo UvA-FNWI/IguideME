@@ -42,26 +42,19 @@ export const GradeView: FC<Grades> = ({ grade, max, type }): ReactElement => {
   );
 };
 
-const Discussions: FC<Grades> = ({ grade }): ReactElement => {
+const Discussions: FC<Grades> = ({ grade, max }): ReactElement => {
   return (
     <Space>
-      <p>{grade === 0 ? '...' : grade.toFixed(0)}</p>
+      <p>{grade === 0 ? '...' : ((grade * max) / 100).toFixed(0)}</p>
       <MessageFilled />
     </Space>
   );
 };
 
-const Learnings: FC<Grades> = ({ grade, max }): ReactElement => {
+const Learnings: FC<Grades> = ({ grade, max, type }): ReactElement => {
   return (
     <Space>
-      <p>
-        {grade === 0 ?
-          '...'
-        : <>
-            {grade.toFixed(0)}/{max}
-          </>
-        }
-      </p>
+      <p>{grade === 0 ? '...' : <>{printGrade(type, grade, max)}</>}</p>
       <TrophyOutlined className='text-success' />
     </Space>
   );

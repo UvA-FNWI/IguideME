@@ -107,7 +107,7 @@ const ViewTile: FC<Props> = memo(({ tile, textStyle }): ReactElement => {
                     peerMin: grades.peerMin,
                     peerMax: grades.peerMax,
                     max: grades.max,
-                    type: tile.type === TileType.assignments ? tile.gradingType : GradingType.NotGraded,
+                    type: tile.gradingType,
                   }}
                 />
               </Col>{' '}
