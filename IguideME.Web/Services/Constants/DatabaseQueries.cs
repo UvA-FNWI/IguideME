@@ -1691,6 +1691,7 @@ public static class DatabaseQueries
           AND             `course_id` = @courseID
           ORDER BY        `timestamp` DESC
           LIMIT           1;";
+
     public const string INSERT_USER_ACTION =
         @"INSERT INTO   `user_tracker` (`user_id`,`action`,`action_detail`,`session_id`,`course_id`)
           VALUES        (
@@ -1698,6 +1699,30 @@ public static class DatabaseQueries
             @action,
             @actionDetail,
             @sessionID,
+            @courseID
+          );";
+
+    public const string INSERT_USER_ACTION_TEST =
+        @"INSERT INTO   `user_tracker` (`user_id`,`action`,`action_detail`,`session_id`,`course_id`)
+          VALUES        (
+            @userID,
+            @action,
+            @actionDetail,
+            (
+            SELECT
+                CASE WHEN strftime('%s', 'now') - `timestamp` > 1800 THEN 
+                    `session_id` + 1 
+                WHEN COUNT(*) = 0 THEN
+                    1
+                ELSE
+                    `session_id`
+                END
+            FROM `user_tracker`
+            WHERE `user_id`=@userID
+            AND   `course_id`=@courseID
+            ORDER BY `timestamp` DESC
+            LIMIT 1
+            ),
             @courseID
           );";
 

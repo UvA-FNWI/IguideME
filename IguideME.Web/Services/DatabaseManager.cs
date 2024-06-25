@@ -3252,64 +3252,75 @@ namespace IguideME.Web.Services
             return submissions.ToArray();
         }
 
+        // public void InsertUserAction(string userID, ActionTypes action, string actionDetail, int courseID)
+        // {
+        //     int sessionID = 0;
+        //     long timestamp = 0;
+
+        //     using SQLiteConnection connection = new(s_instance._connection_string);
+        //     try
+        //     {
+        //         connection.Open();
+
+        //         // Open a transaction to prevent race conditions for the sessionID.
+        //         using SQLiteTransaction transaction = connection.BeginTransaction();
+        //         {
+        //             using SQLiteCommand commandGet = connection.CreateCommand();
+        //             {
+        //                 commandGet.CommandText = DatabaseQueries.GET_TRACKER_SESSION_ID;
+        //                 commandGet.Parameters.Add(new SQLiteParameter("userID", userID));
+        //                 commandGet.Parameters.Add(new SQLiteParameter("courseID", courseID));
+        //                 commandGet.Transaction = transaction;
+
+        //                 using SQLiteDataReader r = commandGet.ExecuteReader(CommandBehavior.Default);
+        //                 {
+        //                     if (r.Read())
+        //                     {
+        //                         sessionID = r.GetInt32(0);
+        //                         timestamp = r.GetInt64(1);
+        //                     }
+        //                 }
+        //             }
+
+        //             if (DateTimeOffset.UtcNow.ToUnixTimeSeconds() - timestamp > 1800) // 30 minutes
+        //             {
+        //                 sessionID++;
+        //             }
+
+        //             using SQLiteCommand commandInsert = connection.CreateCommand();
+        //             {
+        //                 commandInsert.CommandText = DatabaseQueries.INSERT_USER_ACTION;
+        //                 commandInsert.Parameters.Add(new SQLiteParameter("userID", userID));
+        //                 commandInsert.Parameters.Add(new SQLiteParameter("action", action));
+        //                 commandInsert.Parameters.Add(new SQLiteParameter("actionDetail", actionDetail));
+        //                 commandInsert.Parameters.Add(new SQLiteParameter("sessionID", sessionID));
+        //                 commandInsert.Parameters.Add(new SQLiteParameter("courseID", courseID));
+        //                 commandInsert.Transaction = transaction;
+
+        //                 commandInsert.ExecuteNonQuery();
+        //             }
+
+        //             transaction.Commit();
+        //         }
+
+        //         connection.Close();
+        //     }
+        //     catch (Exception e)
+        //     {
+        //         // silently fail
+        //         _logger.LogError("Error inserting user action: {message}", e.Message);
+        //         connection.Close();
+        //     }
+        // }
+
         public void InsertUserAction(string userID, ActionTypes action, string actionDetail, int courseID)
         {
-            try
-            {
-                int sessionID = 0;
-                long timestamp = 0;
-
-                using SQLiteConnection connection = new(s_instance._connection_string);
-                connection.Open();
-
-                // Open a transaction to prevent race conditions for the sessionID.
-                using SQLiteTransaction transaction = connection.BeginTransaction();
-                {
-                    using SQLiteCommand commandGet = connection.CreateCommand();
-                    {
-                        commandGet.CommandText = DatabaseQueries.GET_TRACKER_SESSION_ID;
-                        commandGet.Parameters.Add(new SQLiteParameter("userID", userID));
-                        commandGet.Parameters.Add(new SQLiteParameter("courseID", courseID));
-                        commandGet.Transaction = transaction;
-
-                        using SQLiteDataReader r = commandGet.ExecuteReader(CommandBehavior.Default);
-                        {
-                            if (r.Read())
-                            {
-                                sessionID = r.GetInt32(0);
-                                timestamp = r.GetInt64(1);
-                            }
-                        }
-                    }
-
-                    if (DateTimeOffset.UtcNow.ToUnixTimeSeconds() - timestamp > 1800) // 30 minutes
-                    {
-                        sessionID++;
-                    }
-
-                    using SQLiteCommand commandInsert = connection.CreateCommand();
-                    {
-                        commandInsert.CommandText = DatabaseQueries.INSERT_USER_ACTION;
-                        commandInsert.Parameters.Add(new SQLiteParameter("userID", userID));
-                        commandInsert.Parameters.Add(new SQLiteParameter("action", action));
-                        commandInsert.Parameters.Add(new SQLiteParameter("actionDetail", actionDetail));
-                        commandInsert.Parameters.Add(new SQLiteParameter("sessionID", sessionID));
-                        commandInsert.Parameters.Add(new SQLiteParameter("courseID", courseID));
-                        commandInsert.Transaction = transaction;
-
-                        commandInsert.ExecuteNonQuery();
-                    }
-
-                    transaction.Commit();
-                }
-
-                connection.Close();
-            }
-            catch (Exception e)
-            {
-                // silently fail
-                _logger.LogError("Error inserting user action: {message}", e.Message);
-            }
+            NonQuery(DatabaseQueries.INSERT_USER_ACTION_TEST,
+    new SQLiteParameter("userID", userID),
+                new SQLiteParameter("action", action),
+                new SQLiteParameter("actionDetail", actionDetail),
+                new SQLiteParameter("courseID", courseID)
+            );
         }
 
         public List<UserTracker> RetrieveAllActionsPerCourse(int courseID)
