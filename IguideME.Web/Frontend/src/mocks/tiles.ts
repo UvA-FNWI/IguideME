@@ -93,6 +93,7 @@ export const MOCK_TILES: Tile[] = [
     visible: true,
     notifications: true,
     gradingType: GradingType.Percentage,
+    alt: false,
     entries: [
       {
         tile_id: 1,
@@ -130,6 +131,7 @@ export const MOCK_TILES: Tile[] = [
     visible: true,
     notifications: true,
     gradingType: GradingType.PassFail,
+    alt: false,
     entries: [
       {
         tile_id: 1,
@@ -162,6 +164,7 @@ export const MOCK_TILES: Tile[] = [
     notifications: true,
     gradingType: GradingType.PassFail,
     entries: [],
+    alt: false,
   },
   {
     id: 4,
@@ -173,6 +176,7 @@ export const MOCK_TILES: Tile[] = [
     visible: true,
     notifications: true,
     gradingType: GradingType.NotGraded,
+    alt: false,
     entries: [
       {
         tile_id: 1,
@@ -234,6 +238,7 @@ export const MOCK_TILES: Tile[] = [
     visible: true,
     notifications: true,
     gradingType: GradingType.Points,
+    alt: false,
     entries: [
       {
         tile_id: 1,
@@ -272,6 +277,7 @@ export const MOCK_TILES: Tile[] = [
     notifications: true,
     gradingType: GradingType.NotGraded,
     entries: [],
+    alt: false,
   },
   {
     id: 7,
@@ -283,6 +289,7 @@ export const MOCK_TILES: Tile[] = [
     visible: true,
     notifications: false,
     gradingType: GradingType.NotGraded,
+    alt: true,
     entries: [
       {
         tile_id: 7,
@@ -313,7 +320,8 @@ export const MOCK_TILES: Tile[] = [
     type: TileType.learning_outcomes,
     visible: true,
     notifications: true,
-    gradingType: GradingType.NotGraded,
+    gradingType: GradingType.Points,
+    alt: false,
     entries: [
       {
         tile_id: 7,
@@ -333,6 +341,7 @@ export const MOCK_TILES: Tile[] = [
     visible: false,
     notifications: true,
     gradingType: GradingType.Points,
+    alt: false,
     entries: [],
   },
 ];
