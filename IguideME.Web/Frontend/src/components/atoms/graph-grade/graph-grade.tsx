@@ -12,19 +12,28 @@ const GraphGrade: FC<Grades> = ({ grade, peerAvg, peerMin, peerMax, max, type })
       const data = payload[1].payload;
       return (
         <div className='z-50 rounded-lg border border-solid border-text bg-surface1/85 p-2'>
-          <p>
+          <div>
             {data.name === 'You' ?
-              <>Grade: {printGrade(type, Number(data.grade), max)}</>
+              <p>
+                <div className='inline-block bg-primary w-3 h-3' /> Grade: {printGrade(type, Number(data.grade), max)}
+              </p>
             : <>
+                <div className='inline-block w-3 h-3' style={{ backgroundColor: '#eee' }}>
+                  <div className='h-1/2' />
+                  <div className='h-1/2 w-full bg-secondary opacity-20'></div>
+                </div>{' '}
                 High: {printGrade(type, Number(data.peerMax), max)}
                 <br />
-                Average: {printGrade(type, Number(data.grade), max)}
+                <div className='inline-block bg-secondary w-3 h-3' /> Average:{' '}
+                {printGrade(type, Number(data.grade), max)}
                 <br />
-                Low:
-                {printGrade(type, Number(data.peerMin), max)}
+                <div className='inline-block w-3 h-3' style={{ backgroundColor: '#eee' }}>
+                  <div className='h-1/2 w-full bg-secondary opacity-20'></div>
+                </div>{' '}
+                Low: {printGrade(type, Number(data.peerMin), max)}
               </>
             }
-          </p>
+          </div>
         </div>
       );
     }
@@ -69,7 +78,7 @@ const GraphGrade: FC<Grades> = ({ grade, peerAvg, peerMin, peerMax, max, type })
         barSize={70}
         className='[&>g>path]:!fill-overlay0'
         dataKey={({ peerMin, peerMax }) => [peerMin, peerMax]}
-        opacity={0.5}
+        opacity={0.2}
         xAxisId={0}
       />
       <Bar barSize={50} dataKey='grade' xAxisId={1} />

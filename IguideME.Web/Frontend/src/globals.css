@@ -6,63 +6,71 @@
 
 @layer base {
   :root {
-    --primary:     #5c33ff;
-    --secondary:   #fc5f5f;
-    --tertiary:    #82ca9d;
-    --accent:      233deg 13%  80%;
-    
-    --crust:       0deg   0%   100%;    
-    --mantle:      210deg 29%  97%;    
-    --base:        210deg 30%  95%;    
-    
-    --surface0:    252deg 100% 60%;
-    --surface1:    0deg   0%   100%;    
-    --surface2:    0deg   0%   90%;    
-    
-    --overlay0:    210deg 20%  93%;    
-    --overlay1:    210deg 29%  97%;    
-    --overlay2:    210deg 29%  93%;    
-    
-    --subtext0:    233deg 10%  47%;    
-    --subtext1:    233deg 13%  41%;    
-    --text:        0deg   0%   20%;
-    --textAlt:     0deg   0%   100%;
-    
-    --border0:     233deg 13%  90%;    
-    --border1:     233deg 13%  80%;    
+    /* Note, these first three do not support alpha */
+    --primary:        252deg 100% 60%;
+    --secondary:      0deg   96%  68%;
+    --tertiary:       143deg 40%  65%;
 
-    --success:     123deg 65% 52%;
-    --failure:     16deg 98% 50%;
+    --secondaryAlpha: 0deg   96%  68%;
+    --accent:         233deg 13%  80%;
+    
+    --crust:          0deg   0%   100%;    
+    --mantle:         210deg 29%  97%;    
+    --base:           210deg 30%  95%;    
+    
+    --surface0:       252deg 100% 60%;
+    --surface1:       0deg   0%   100%;    
+    --surface2:       0deg   0%   90%;    
+    
+    --overlay0:       210deg 20%  93%;    
+    --overlay1:       210deg 29%  97%;    
+    --overlay2:       210deg 29%  93%;    
+    
+    --subtext0:       233deg 10%  47%;    
+    --subtext1:       233deg 13%  41%;    
+    --text:           0deg   0%   20%;
+    --textAlt:        0deg   0%   100%;
+    
+    --border0:        233deg 13%  90%;    
+    --border1:        233deg 13%  80%;    
+
+    --success:        123deg 65%  60%;
+    --failure:        16deg  98%  50%;
+    --meh:            54deg  95%  45%;
   }
 
   .dark {
-    --primary:     #8839ef;
-    --secondary:   #ed8796;
-    --tertiary:    #8bd5ca;
-    --accent:      266deg 85% 58%;
+    /* Note, these first three do not support alpha */
+    --primary:        266deg 85% 58%;
+    --secondary:      351deg 74% 73%;
+    --tertiary:       171deg 47% 69%;
+
+    --secondaryAlpha: 266deg 85% 58%;
+    --accent:         266deg 85% 58%;
     
-    --crust:       236deg 23% 12%;    
-    --mantle:      233deg 23% 15%;    
-    --base:        232deg 23% 18%;    
+    --crust:          236deg 23% 12%;    
+    --mantle:         233deg 23% 15%;    
+    --base:           232deg 23% 18%;    
     
-    --surface0:    230deg 19% 26%;    
-    --surface1:    231deg 16% 34%;    
-    --surface2:    230deg 14% 41%;    
+    --surface0:       230deg 19% 26%;    
+    --surface1:       231deg 16% 34%;    
+    --surface2:       230deg 14% 41%;    
     
-    --overlay0:    230deg 12% 49%;    
-    --overlay1:    228deg 15% 57%;    
-    --overlay2:    228deg 20% 65%;    
+    --overlay0:       230deg 12% 49%;    
+    --overlay1:       228deg 15% 57%;    
+    --overlay2:       228deg 20% 65%;    
     
-    --subtext0:    227deg 27% 72%;    
-    --subtext1:    228deg 39% 85%;    
-    --text:        227deg 68% 88%;    
-    --textAlt:     266deg 60% 85%;    
+    --subtext0:       227deg 27% 72%;    
+    --subtext1:       228deg 39% 85%;    
+    --text:           227deg 68% 88%;    
+    --textAlt:        266deg 60% 85%;    
     
-    --border0:     266deg 45% 38%;    
-    --border1:     266deg 55% 58%;    
+    --border0:        266deg 45% 38%;    
+    --border1:        266deg 55% 58%;    
     
-    --success:     109deg 58% 40%;
-    --failure:     347deg 87% 44%;
+    --success:        109deg 88% 45%;
+    --failure:        347deg 88% 49%;
+    --meh:            54deg 88% 45%;
 /* 
 MIT License 
 Copyright (c) 2021 Catppuccin 

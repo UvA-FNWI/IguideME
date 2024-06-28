@@ -1,7 +1,7 @@
 import resolveConfig from 'tailwindcss/resolveConfig';
 import tailwindConfig from '@/../tailwind.config';
 import { Bar, BarChart, Label, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
-import { FrownTwoTone, MehTwoTone, SmileTwoTone } from '@ant-design/icons';
+import { FrownOutlined, MehOutlined, SmileOutlined } from '@ant-design/icons';
 import { Space, Spin } from 'antd';
 import { type TooltipProps } from '@/types/reactRecharts';
 import { useTileViewStore } from '@/components/pages/student-dashboard/tileViewContext';
@@ -39,9 +39,9 @@ interface Props {
 }
 
 const GridGrades: FC<Props> = memo(({ goal, total, pred }): ReactElement => {
-  const happy = <SmileTwoTone size={10} twoToneColor='rgb(0, 185, 120)' />;
-  const meh = <MehTwoTone size={10} twoToneColor='rgb(245, 226, 54)' />;
-  const unhappy = <FrownTwoTone size={10} twoToneColor={'rgb(255, 110, 90)'} />;
+  const happy = <SmileOutlined size={10} className='text-success' />;
+  const meh = <MehOutlined size={10} className='text-meh' />;
+  const unhappy = <FrownOutlined size={10} className='text-failure' />;
   return (
     <Space className='h-full w-full justify-center' size='large'>
       <div className='text-center'>
@@ -61,7 +61,7 @@ const GridGrades: FC<Props> = memo(({ goal, total, pred }): ReactElement => {
         <p>Current</p>
         <h2 className='text-lg font-semibold'>
           <Space>
-            {total > goal ?
+            {total >= goal ?
               happy
             : total >= 5.5 ?
               meh
@@ -75,7 +75,7 @@ const GridGrades: FC<Props> = memo(({ goal, total, pred }): ReactElement => {
           <p>Predicted</p>
           <h2 className='text-lg font-semibold'>
             <Space>
-              {pred > goal ?
+              {pred >= goal ?
                 happy
               : pred >= 5.5 ?
                 meh
