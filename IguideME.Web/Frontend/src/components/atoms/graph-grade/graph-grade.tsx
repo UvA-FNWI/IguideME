@@ -11,24 +11,24 @@ const GraphGrade: FC<Grades> = ({ grade, peerAvg, peerMin, peerMax, max, type })
     if (active && payload && payload.length > 1) {
       const data = payload[1].payload;
       return (
-        <div className='z-50 rounded-lg border border-solid border-text bg-surface1/85 p-2'>
+        <div className='border-text bg-surface1/85 z-50 rounded-lg border border-solid p-2'>
           <div>
             {data.name === 'You' ?
-              <p>
-                <div className='inline-block bg-primary w-3 h-3' /> Grade: {printGrade(type, Number(data.grade), max)}
-              </p>
+              <div>
+                <div className='bg-primary inline-block h-3 w-3' /> Grade: {printGrade(type, Number(data.grade), max)}
+              </div>
             : <>
-                <div className='inline-block w-3 h-3' style={{ backgroundColor: '#eee' }}>
+                <div className='inline-block h-3 w-3' style={{ backgroundColor: '#eee' }}>
                   <div className='h-1/2' />
-                  <div className='h-1/2 w-full bg-secondary opacity-20'></div>
+                  <div className='bg-secondary h-1/2 w-full opacity-20'></div>
                 </div>{' '}
                 High: {printGrade(type, Number(data.peerMax), max)}
                 <br />
-                <div className='inline-block bg-secondary w-3 h-3' /> Average:{' '}
+                <div className='bg-secondary inline-block h-3 w-3' /> Average:{' '}
                 {printGrade(type, Number(data.grade), max)}
                 <br />
-                <div className='inline-block w-3 h-3' style={{ backgroundColor: '#eee' }}>
-                  <div className='h-1/2 w-full bg-secondary opacity-20'></div>
+                <div className='inline-block h-3 w-3' style={{ backgroundColor: '#eee' }}>
+                  <div className='bg-secondary h-1/2 w-full opacity-20'></div>
                 </div>{' '}
                 Low: {printGrade(type, Number(data.peerMin), max)}
               </>
