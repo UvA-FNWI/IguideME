@@ -7,6 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 import { type User } from '@/types/user';
 import { type ColumnsType } from 'antd/lib/table';
 import { type FC, type ReactElement } from 'react';
+import { varFixed } from '@/types/tile';
 
 const SettingsTable: FC = (): ReactElement => {
   const {
@@ -101,8 +102,8 @@ function getColumns(): any {
       render: (text: string, record: DataType) => {
         if (Number(text) !== -1) {
           return (
-            <p>
-              {((record.total ?? 0) / 10).toFixed(1)}
+            <p className={record.total && record.total < 5.5 ? 'text-failure' : ''}>
+              {varFixed(record.total ?? 0)}
               <br />
             </p>
           );
@@ -114,11 +115,11 @@ function getColumns(): any {
       dataIndex: 'predicted',
       width: 50,
       sorter: (a, b) => (a.predicted ?? -1) - (b.predicted ?? -1),
-      render: (text: string, _: any) => {
+      render: (text: string, record: DataType) => {
         if (Number(text) !== -1) {
           return (
-            <p>
-              {text}
+            <p className={record.total && record.total < 5.5 ? 'text-failure' : ''}>
+              {varFixed(record.predicted ?? 0)}
               <br />
             </p>
           );
@@ -130,11 +131,11 @@ function getColumns(): any {
       dataIndex: 'goal',
       width: 50,
       sorter: (a, b) => (a.goal ?? -1) - (b.goal ?? -1),
-      render: (text: string, _: any) => {
+      render: (text: string, record: DataType) => {
         if (Number(text) !== -1) {
           return (
-            <p>
-              {text}
+            <p className={record.total && record.total < 5.5 ? 'text-failure' : ''}>
+              {varFixed(record.goal ?? 0)}
               <br />
             </p>
           );

@@ -16,6 +16,9 @@ export const userHandlers = [
   http.get('/students', () => {
     return HttpResponse.json<User[]>(MOCK_STUDENTS);
   }),
+  http.get('/students/settings', () => {
+    return HttpResponse.json<User[]>(MOCK_STUDENTS);
+  }),
   http.get('/student/*', ({ params }) => {
     return HttpResponse.json<User | undefined>(MOCK_STUDENTS.find((student) => student.userID === params[0]));
   }),
@@ -47,8 +50,8 @@ export const MOCK_STUDENTS: User[] = [
     settings: {
       consent: true,
       goal_grade: 10,
-      predicted_grade: 9,
-      total_grade: 9,
+      predicted_grade: 9.123234,
+      total_grade: 9.5,
       notifications: true,
     },
   },
@@ -77,7 +80,7 @@ export const MOCK_STUDENTS: User[] = [
     settings: {
       consent: false,
       goal_grade: 8,
-      predicted_grade: 7,
+      predicted_grade: 7.54,
       total_grade: 7,
       notifications: true,
     },
@@ -93,7 +96,7 @@ export const MOCK_STUDENTS: User[] = [
       consent: true,
       goal_grade: 9,
       predicted_grade: 8,
-      total_grade: 8,
+      total_grade: 8.3,
       notifications: true,
     },
   },
@@ -122,8 +125,8 @@ export const MOCK_STUDENTS: User[] = [
     settings: {
       consent: true,
       goal_grade: 5,
-      predicted_grade: 4,
-      total_grade: 4,
+      predicted_grade: 4.0,
+      total_grade: 4.1,
       notifications: true,
     },
   },
@@ -197,8 +200,8 @@ export const MOCK_STUDENTS: User[] = [
     settings: {
       consent: true,
       goal_grade: 8,
-      predicted_grade: 7,
-      total_grade: 7,
+      predicted_grade: 7.89,
+      total_grade: 7.89,
       notifications: true,
     },
   },
@@ -228,7 +231,7 @@ export const MOCK_STUDENTS: User[] = [
       consent: true,
       goal_grade: 7,
       predicted_grade: 6,
-      total_grade: 6,
+      total_grade: 6.21,
       notifications: true,
     },
   },
@@ -258,7 +261,7 @@ export const MOCK_STUDENTS: User[] = [
       consent: true,
       goal_grade: 6,
       predicted_grade: 5,
-      total_grade: 5,
+      total_grade: 5.34,
       notifications: true,
     },
   },
@@ -287,7 +290,7 @@ export const MOCK_STUDENTS: User[] = [
     settings: {
       consent: true,
       goal_grade: 6,
-      predicted_grade: 5,
+      predicted_grade: 5.85,
       total_grade: 5,
       notifications: true,
     },
@@ -302,8 +305,8 @@ export const MOCK_STUDENTS: User[] = [
     settings: {
       consent: true,
       goal_grade: 5,
-      predicted_grade: 4,
-      total_grade: 4,
+      predicted_grade: 4.9999991,
+      total_grade: 4.0000000012,
       notifications: true,
     },
   },
@@ -317,8 +320,8 @@ export const MOCK_STUDENTS: User[] = [
     settings: {
       consent: true,
       goal_grade: 9,
-      predicted_grade: 8,
-      total_grade: 8,
+      predicted_grade: 8.5,
+      total_grade: 8.100001,
       notifications: true,
     },
   },
@@ -827,8 +830,8 @@ export const MOCK_STUDENTS: User[] = [
     settings: {
       consent: true,
       goal_grade: 0,
-      predicted_grade: -1,
-      total_grade: -1,
+      predicted_grade: 7,
+      total_grade: 7,
       notifications: true,
     },
   },
