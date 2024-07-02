@@ -7,6 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Col, Row, Table, Tooltip } from 'antd';
 import { type ColumnsType } from 'antd/lib/table';
 import { type FC, type ReactElement } from 'react';
+import { Tile } from '@/types/tile';
 
 const GradesTable: FC = (): ReactElement => {
   // In principe zijn deze 2 routes voor nu genoeg denk ik
@@ -35,17 +36,7 @@ const GradesTable: FC = (): ReactElement => {
     <div className='relative overflow-visible' id={'settingsTable'}>
       <QueryLoading isLoading={isLoading}>
         <Row className='content-end justify-between pb-[10px]'>
-          <Col>
-            <h2 className='text-xl'>General Overview</h2>
-          </Col>
-          <Col>
-            Consent Given:{' '}
-            {!isError && students ?
-              <>
-                {students.filter((student: User) => student.settings?.consent).length}/{students.length}
-              </>
-            : <>0/0</>}
-          </Col>
+          <h2 className='text-xl'>General Overview</h2>
         </Row>
 
         {isError ?
@@ -88,7 +79,7 @@ function getData(students: User[]): DataType[] {
   }));
 }
 
-function getColumns(): any {
+function getColumns(tiles: Tile[]): any {
   const columns: ColumnsType<DataType> = [
     {
       title: 'Student',
@@ -107,128 +98,26 @@ function getColumns(): any {
         );
       },
     },
-    {
-      title: 'Total',
-      dataIndex: 'total',
+  ];
+
+  return columns.concat(
+    tiles.map((tile) => ({
+      title: tile.title,
+      dataIndex: tile.id,
       width: 50,
-      sorter: (a, b) => (a.total ?? -1) - (b.total ?? -1),
+      sorter: (a, b) => (a.grade ?? -1) - (b.grade ?? -1),
       render: (text: string, record: DataType) => {
         if (Number(text) !== -1) {
           return (
             <p>
-              {((record.total ?? 0) / 10).toFixed(1)}
+              {((record.grade ?? 0) / 10).toFixed(1)}
               <br />
             </p>
           );
         }
       },
-    },
-    {
-      title: 'Predicted',
-      dataIndex: 'predicted',
-      width: 50,
-      sorter: (a, b) => (a.predicted ?? -1) - (b.predicted ?? -1),
-      render: (text: string, _: any) => {
-        if (Number(text) !== -1) {
-          return (
-            <p>
-              {text}
-              <br />
-            </p>
-          );
-        }
-      },
-    },
-    {
-      title: 'Goal',
-      dataIndex: 'goal',
-      width: 50,
-      sorter: (a, b) => (a.goal ?? -1) - (b.goal ?? -1),
-      render: (text: string, _: any) => {
-        if (Number(text) !== -1) {
-          return (
-            <p>
-              {text}
-              <br />
-            </p>
-          );
-        }
-      },
-    },
-    {
-      title: 'Consent',
-      dataIndex: 'consent',
-      width: 50,
-      sorter: (a, b) => {
-        const consentA = a.consent === undefined ? 0 : +a.consent;
-        const consentB = b.consent === undefined ? 0 : +b.consent;
-        return consentB - consentA;
-      },
-      filters: [
-        {
-          text: 'Consent given',
-          value: true,
-        },
-        {
-          text: 'Consent not given',
-          value: false,
-        },
-      ],
-      onFilter: (value, record) => record.consent === value,
-      render: (value: boolean) => {
-        if (value) {
-          return (
-            <Tooltip title='Consent given'>
-              <CheckCircleOutlined className='text-success' />
-            </Tooltip>
-          );
-        } else {
-          return (
-            <Tooltip title='No consent given'>
-              <CloseCircleOutlined className='text-failure' />
-            </Tooltip>
-          );
-        }
-      },
-    },
-    {
-      title: 'Notifications',
-      dataIndex: 'notifications',
-      width: 50,
-      sorter: (a, b) => {
-        const notificationsA = a.notifications === undefined ? 0 : +a.notifications;
-        const notificationsB = b.notifications === undefined ? 0 : +b.notifications;
-        return notificationsB - notificationsA;
-      },
-      filters: [
-        {
-          text: 'On',
-          value: true,
-        },
-        {
-          text: 'Off',
-          value: false,
-        },
-      ],
-      onFilter: (value, record) => record.notifications === value,
-      render: (value: boolean) => {
-        if (value) {
-          return (
-            <Tooltip title='Consent given'>
-              <CheckCircleOutlined className='text-success' />
-            </Tooltip>
-          );
-        } else {
-          return (
-            <Tooltip title='No consent given'>
-              <CloseCircleOutlined className='text-failure' />
-            </Tooltip>
-          );
-        }
-      },
-    },
-  ];
-  return columns;
+    })),
+  );
 }
 
 export default GradesTable;
