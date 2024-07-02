@@ -1,7 +1,7 @@
 import tailwindConfig from '@/../tailwind.config';
 import GraphGrade from '@/components/atoms/graph-grade/graph-grade';
 import { type TooltipProps } from '@/types/reactRecharts';
-import { TileType, type Grades } from '@/types/tile';
+import { TileType, printGrade, type Grades } from '@/types/tile';
 import { memo, type FC, type ReactElement } from 'react';
 import { Legend, PolarAngleAxis, RadialBar, RadialBarChart, Tooltip } from 'recharts';
 import resolveConfig from 'tailwindcss/resolveConfig';
@@ -22,14 +22,14 @@ const GraphTile: FC<Props> = memo(({ type, grades }): ReactElement => {
 });
 GraphTile.displayName = 'GraphTile';
 
-const GraphLearning: FC<Grades> = memo(({ grade, peerAvg, max }): ReactElement => {
+const GraphLearning: FC<Grades> = memo(({ type, grade, peerAvg, max }): ReactElement => {
   const RadialBarTooltip: FC<TooltipProps> = ({ active, payload }) => {
-    if (active && payload?.length) {
+    console.log('payload', payload);
+    if (active && payload && payload.length > 0) {
+      const data = payload[0].payload;
       return (
         <div className='z-50 rounded-lg border border-solid border-text bg-surface1/85 p-2'>
-          <p>
-            Completed: {Math.round(payload[0].value)}/{max}
-          </p>
+          <p>Completed: {printGrade(type, data.grade, max)}</p>
         </div>
       );
     }
@@ -66,7 +66,7 @@ const GraphLearning: FC<Grades> = memo(({ grade, peerAvg, max }): ReactElement =
       <RadialBar background className='[&>g>path]:!fill-overlay0' dataKey='grade' />
       <Legend align='right' layout='vertical' verticalAlign='top' />
       <Tooltip content={<RadialBarTooltip />} />
-      <PolarAngleAxis type='number' domain={[0, max]} angleAxisId={0} tick={false} />
+      <PolarAngleAxis type='number' domain={[0, 100]} angleAxisId={0} tick={false} />
     </RadialBarChart>
   );
 });

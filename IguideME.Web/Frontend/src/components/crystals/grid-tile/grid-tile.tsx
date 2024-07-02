@@ -1,4 +1,13 @@
-import { LikeTwoTone, MessageFilled, TrophyOutlined, WarningTwoTone } from '@ant-design/icons';
+import {
+  FrownOutlined,
+  FrownTwoTone,
+  MehOutlined,
+  MehTwoTone,
+  MessageFilled,
+  SmileOutlined,
+  SmileTwoTone,
+  TrophyOutlined,
+} from '@ant-design/icons';
 import { Space } from 'antd';
 import { printGrade, TileType, type Grades } from '@/types/tile';
 import { type FC, type ReactElement } from 'react';
@@ -24,16 +33,18 @@ const GridTile: FC<GridTileProps> = ({ type, grades }): ReactElement => {
   return <div className='text-lg'>{inner}</div>;
 };
 
-export const GradeView: FC<Grades> = ({ grade, max, type }): ReactElement => {
+export const GradeView: FC<Grades> = ({ grade, max, peerAvg, type }): ReactElement => {
   return (
     <Space className='content-end'>
       {grade === 0 ?
         '...'
       : <>
           <div>
-            {grade >= 50 || (max === -1 && grade > 0) ?
-              <LikeTwoTone twoToneColor={'rgb(0, 185, 120)'} className='text-lg' />
-            : <WarningTwoTone twoToneColor={'rgb(255, 110, 90)'} className='text-lg' />}
+            {grade < 50 ?
+              <FrownOutlined className='text-failure text-lg' />
+            : grade >= peerAvg || (max === -1 && grade > 0) ?
+              <SmileOutlined className='text-success text-lg' />
+            : <MehOutlined className='text-meh text-lg' />}
           </div>
           <p className='text-lg'>{printGrade(type, grade, max)}</p>
         </>
@@ -42,26 +53,19 @@ export const GradeView: FC<Grades> = ({ grade, max, type }): ReactElement => {
   );
 };
 
-const Discussions: FC<Grades> = ({ grade }): ReactElement => {
+const Discussions: FC<Grades> = ({ grade, max }): ReactElement => {
   return (
     <Space>
-      <p>{grade === 0 ? '...' : grade.toFixed(0)}</p>
+      <p>{grade === 0 ? '...' : ((grade * max) / 100).toFixed(0)}</p>
       <MessageFilled />
     </Space>
   );
 };
 
-const Learnings: FC<Grades> = ({ grade, max }): ReactElement => {
+const Learnings: FC<Grades> = ({ grade, max, type }): ReactElement => {
   return (
     <Space>
-      <p>
-        {grade === 0 ?
-          '...'
-        : <>
-            {grade.toFixed(0)}/{max}
-          </>
-        }
-      </p>
+      <p>{grade === 0 ? '...' : <>{printGrade(type, grade, max)}</>}</p>
       <TrophyOutlined className='text-success' />
     </Space>
   );

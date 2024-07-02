@@ -47,12 +47,16 @@ namespace IguideME.Web.Services.Workers
 		/// </summary>
 		/// <param name="quiz">the quiz the submissions are associated to.</param>
 		/// <param name="entry">the tile entry the submissions are associated to.</param>
-		public void RegisterSubmissions(IEnumerable<AssignmentSubmission> submissions, TileEntry entry)
+		public void RegisterSubmissions(IEnumerable<AssignmentSubmission> submissions, AppAssignment assignment)
 		{
+			_logger.LogInformation("Registering submissions...");
+			_logger.LogInformation("Registering id {} with {}", assignment.ID, submissions);
 			foreach (AssignmentSubmission sub in submissions)
 			{
 				// TODO: WE NEED TO CHANGE THE SUBMISSION IDs FROM EXTERNAL QUIZ ID TO INTERNAL ASSIGNMENT ID
-				sub.AssignmentID = _databaseManager.GetInternalAssignmentID(_courseID, sub.AssignmentID);
+				_logger.LogWarning("score {} {}", sub.UserID, sub.RawGrade);
+				sub.AssignmentID = assignment.ID;
+				sub.RawToGrade(assignment.GradingType, assignment.MaxGrade);
 				_databaseManager.CreateUserSubmission(sub);
 			}
 		}
@@ -70,20 +74,19 @@ namespace IguideME.Web.Services.Workers
 
 			// Get the consented users and only ask for their submissions
 			List<Models.Impl.User> users = _databaseManager.GetUsersWithGrantedConsent(this._courseID);
-            // IEnumerable<SubmissionGroup> submissions = this._canvasHandler.GetQuizzes(this._courseID, users.Select(user => user.UserID).ToArray());
+			// IEnumerable<SubmissionGroup> submissions = this._canvasHandler.GetQuizzes(this._courseID, users.Select(user => user.UserID).ToArray());
 
 			// Register the quizzes in the database.
 			foreach ((AppAssignment quiz, IEnumerable<AssignmentSubmission> submissions) in quizzes)
 			{
 
 				_logger.LogInformation("Processing quiz: {Name}", quiz.Title);
-				_databaseManager.RegisterAssignment(quiz);
+				quiz.ID = _databaseManager.RegisterAssignment(quiz);
 
-				// Don't register submissions that aren't assigned to tiles (as entries).
-				TileEntry entry = entries.Find(e => e.ContentID == quiz.ID);
-				if (entry == null) continue;
+				if (!_databaseManager.AssignmentHasEntry(this._courseID, quiz.ID))
+					continue;
 
-				this.RegisterSubmissions(submissions, entry);
+				this.RegisterSubmissions(submissions, quiz);
 			}
 		}
 	}

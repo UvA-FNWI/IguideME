@@ -152,7 +152,7 @@ public static class DatabaseQueries
             `submission_id`   INTEGER PRIMARY KEY AUTOINCREMENT,
             `assignment_id`   INTEGER,
             `user_id`         STRING,
-            `grade`           FLOAT NULL,
+            `Grade`           FLOAT NULL,
             `date`            INTEGER NULL,
             FOREIGN KEY(`assignment_id`) REFERENCES `assignments`(`assignment_id`),
             FOREIGN KEY(`user_id`) REFERENCES `users`(`user_id`),
@@ -193,7 +193,7 @@ public static class DatabaseQueries
      * preferences. These preferences include:
      *
      *
-     *  - goal_grade: target grade of the user for the course. Also used to
+     *  - goal_grade: target Grade of the user for the course. Also used to
                       create the peer groups.
      *      -   0: Grade not set yet
      *      -   1-10
@@ -231,7 +231,7 @@ public static class DatabaseQueries
 
     /**
      * The peer_group table stores the groups of peers students in each goal
-     * grade belong to as well as the grade statistics of that group.
+     * Grade belong to as well as the Grade statistics of that group.
      *
      * user_ids should go away, right?????
      * `component_type` is an enum and it is the type of comparison and it might be:
@@ -256,7 +256,7 @@ public static class DatabaseQueries
         );";
 
     /**
-     * The tile_grades table stores the tile grade of each student
+     * The tile_grades table stores the tile Grade of each student
      * at any given point in time
      *
      */
@@ -264,7 +264,7 @@ public static class DatabaseQueries
         @"CREATE TABLE IF NOT EXISTS `tile_grades` (
             `user_id`           STRING,
             `tile_id`           INTEGER,
-            `grade`             FLOAT,
+            `Grade`             FLOAT,
             `sync_id`           INTEGER,
             PRIMARY KEY (`user_id`,`tile_id`,`sync_id`),
             FOREIGN KEY(`user_id`) REFERENCES `users`(`user_id`),
@@ -312,7 +312,7 @@ public static class DatabaseQueries
     //         `id`                  INTEGER PRIMARY KEY AUTOINCREMENT,
     //         `course_id`           INTEGER,
     //         `user_id`             STRING,
-    //         `grade`               FLOAT,
+    //         `Grade`               FLOAT,
     //         `date`                TEXT,
     //         UNIQUE(course_id, user_id, date)
     //     );";
@@ -402,15 +402,15 @@ public static class DatabaseQueries
     // public const string REGISTER_PREDICTED_GRADE =  // DONE , integrated into student_settings
     //     @"INSERT INTO   `predicted_grade` ( `course_id`,
     //                                         `user_id`,
-    //                                         `grade`,
+    //                                         `Grade`,
     //                                         `date` )
     //       VALUES        (
     //         @courseID,
     //         @userID,
-    //         @grade,
+    //         @Grade,
     //         CURRENT_DATE
     //       )
-    //       ON CONFLICT (`course_id`, `user_id`, `date`) DO UPDATE SET `grade`=`excluded`.`grade`;";
+    //       ON CONFLICT (`course_id`, `user_id`, `date`) DO UPDATE SET `Grade`=`excluded`.`Grade`;";
 
     public const string REGISTER_USER_PEER =
         @"INSERT INTO   `peer_groups` ( `goal_grade`,
@@ -435,18 +435,18 @@ public static class DatabaseQueries
     public const string REGISTER_TILE_GRADE =
         @"INSERT INTO   `tile_grades` ( `user_id`,
                                         `tile_id`,
-                                        `grade`,
+                                        `Grade`,
                                         `sync_id`)
             VALUES        (
                 @userID,
                 @tileID,
-                @grade,
+                @Grade,
                 @syncID
             )
             ON CONFLICT DO NOTHING;";
 
     public const string QUERY_TILE_GRADE_FOR_USER =
-        @"SELECT    `grade`
+        @"SELECT    `Grade`
           FROM      `tile_grades`
           WHERE     `user_id` = @userID
           AND       `tile_id` = @tileID
@@ -650,12 +650,12 @@ public static class DatabaseQueries
             INTO   `submissions`
                         (   `assignment_id`,
                             `user_id`,
-                            `grade`,
+                            `Grade`,
                             `date`)
         VALUES(
             @assignmentID,
             @userID,
-            @grade,
+            @Grade,
             @date
         )
         ;";
@@ -706,13 +706,13 @@ public static class DatabaseQueries
                         (   `course_id`,
                             `tile_id`,
                             `title`,
-                            `grade`,
+                            `Grade`,
                             `user_id`   )
         VALUES(
             @courseID,
             @tileID,
             @title,
-            @grade,
+            @Grade,
             @userID
         )
         ;";
@@ -871,11 +871,26 @@ public static class DatabaseQueries
     ";
 
     public const string QUERY_TILE_GRADE =
-        @"SELECT    `grade`
+        @"SELECT    `Grade`
         FROM        `tile_grades`
         WHERE       `tile_id`=@tileID
         AND         `sync_id`=@syncID
         AND         `user_id`=@userID;";
+
+    public const string QUERY_TILE_MAX_GRADE =
+        @"SELECT     
+            CASE type 
+                WHEN 0 THEN 100 
+                WHEN 1 THEN (
+                    (SELECT COUNT(*) FROM `discussions` WHERE `course_id`=@courseID) 
+                    + 
+                    (SELECT COUNT(*) FROM `discussion_entries` WHERE `course_id`=@courseID)) 
+                WHEN 2 THEN (
+                    SELECT COUNT(*) FROM `learning_goals` WHERE `course_id`=@courseID) 
+            END 
+        FROM `tiles`
+        WHERE `tile_id`=@tileID
+        ;";
 
     public const string QUERY_TILE_PEER_GRADES =
         @"SELECT    `peer_groups`.`min_grade`,
@@ -1108,11 +1123,24 @@ public static class DatabaseQueries
                     `discussions`.`title`,
                     `discussions`.`author`,
                     `discussions`.`date`,
-                    `discussions`.`message`
+                    `discussions`.`message`,
+                    (SELECT COUNT(*) FROM `discussion_entries` WHERE `discussion_entries`.`discussion_id`=@contentID)
         FROM        `discussions`
         WHERE       `discussions`.`course_id`=@courseID
         AND         `discussions`.`discussion_id`=@contentID
         LIMIT       1
+        ;";
+
+    public const string QUERY_COURSE_DISCUSSION_ENTRIES_FOR_USER =
+        @"SELECT    `entry_id`,
+                    `discussion_id`,
+                    `parent_id`,
+                    `author`,
+                    `date`,
+                    `message`
+        FROM        `discussion_entries` 
+        WHERE       `course_id` = @courseID
+        AND         `author` = @userID
         ;";
 
     public const string QUERY_TILE_DISCUSSIONS =
@@ -1223,7 +1251,7 @@ public static class DatabaseQueries
                     `users`.`sortable_name`,
                     `users`.`role`,
                     `student_settings`.`goal_grade`,
-                    max(`student_settings`.`sync_id`)
+                    Max(`student_settings`.`sync_id`)
             FROM    `users`
                 LEFT JOIN   `student_settings`
                     USING   (`user_id`)
@@ -1290,7 +1318,7 @@ public static class DatabaseQueries
                     `users`.`name`,
                     `users`.`sortable_name`,
                     `users`.`role`,
-                    max(`student_settings`.`sync_id`)
+                    Max(`student_settings`.`sync_id`)
             FROM    `users`
                 LEFT JOIN   `student_settings`
                     USING   (`user_id`)
@@ -1303,7 +1331,7 @@ public static class DatabaseQueries
 
     public const string QUERY_STUDENT_IDS_WITH_GOAL_GRADE = //NoTotalAverage
         @"SELECT    `users`.`user_id`,
-                    max(`student_settings`.`sync_id`)
+                    Max(`student_settings`.`sync_id`)
             FROM    `users`
                 LEFT JOIN   `student_settings`
                     USING   (`user_id`)
@@ -1316,7 +1344,7 @@ public static class DatabaseQueries
 
     public const string QUERY_NOTIFICATIONS_ENABLE =
         @"SELECT    `notifications`,
-                    max(`student_settings`.`sync_id`)
+                    Max(`student_settings`.`sync_id`)
         FROM        `student_settings`
         WHERE       `course_id`=@courseID
         AND         `user_id`=@userID
@@ -1325,7 +1353,7 @@ public static class DatabaseQueries
 
     public const string QUERY_GOAL_GRADE_FOR_USER =
         @"SELECT    `goal_grade`,
-                    max(`student_settings`.`sync_id`)
+                    Max(`student_settings`.`sync_id`)
         FROM        `student_settings`
         WHERE       `course_id`=@courseID
         AND         `user_id`=@userID
@@ -1335,7 +1363,7 @@ public static class DatabaseQueries
     public const string QUERY_CONSENT_FOR_USER =
         @"SELECT    `consent`
         FROM        `student_settings`
-                    max(`student_settings`.`sync_id`)
+                    Max(`student_settings`.`sync_id`)
         WHERE       `course_id`=@courseID
         AND         `user_id`=@userID
         AND         `consent` = true
@@ -1367,7 +1395,7 @@ public static class DatabaseQueries
         @"SELECT    `submissions`.`submission_id`,
                     `submissions`.`assignment_id`,
                     `submissions`.`user_id`,
-                    `submissions`.`grade`,
+                    `submissions`.`Grade`,
                     `submissions`.`date`
         FROM        `submissions`
         INNER JOIN  `assignments`
@@ -1379,13 +1407,13 @@ public static class DatabaseQueries
         INNER JOIN  `tile_groups`
             USING   (`group_id`)
         WHERE       `tile_groups`.`course_id`=@courseID
-        AND         `submissions`.`grade` NOT NULL;";
+        AND         `submissions`.`Grade` NOT NULL;";
 
     public const string QUERY_COURSE_SUBMISSIONS_FOR_STUDENT =
         @"SELECT    `submissions`.`submission_id`,
                     `submissions`.`assignment_id`,
                     `submissions`.`user_id`,
-                    `submissions`.`grade`,
+                    `submissions`.`Grade`,
                     `submissions`.`date`
         FROM        `submissions`
         INNER JOIN  `assignments`
@@ -1398,7 +1426,7 @@ public static class DatabaseQueries
         @"SELECT    `submissions`.`submission_id`,
                     `submissions`.`assignment_id`,
                     `submissions`.`user_id`,
-                    `submissions`.`grade`,
+                    `submissions`.`Grade`,
                     `submissions`.`date`
         FROM        `submissions`
         INNER JOIN  `assignments`
@@ -1411,7 +1439,7 @@ public static class DatabaseQueries
         @"SELECT    `submissions`.`submission_id`,
                     `submissions`.`assignment_id`,
                     `submissions`.`user_id`,
-                    `submissions`.`grade`,
+                    `submissions`.`Grade`,
                     `submissions`.`date`
         FROM        `submissions`
         INNER JOIN  `assignments`
@@ -1424,25 +1452,25 @@ public static class DatabaseQueries
 
     public const string QUERY_DISCUSSIONS_COUNTER_FOR_USER =
         @"SELECT (
-                SELECT
-                COUNT(*) from discussions 
-                WHERE course_id = @courseID
-                AND author = @userID
+                SELECT     COUNT(*) 
+                FROM       `discussions` 
+                WHERE      `course_id` = @courseID
+                AND        `author` = @userID
             )
             +
             (
-                SELECT
-                COUNT(*) from discussion_entries 
-                WHERE course_id = @courseID
-                AND author = @userID
+                SELECT     COUNT(*) 
+                FROM       `discussion_entries` 
+                WHERE      `course_id` = @courseID
+                AND        `author` = @userID
             )
         ;";
 
     public const string QUERY_DISCUSSIONS_COUNTER_FOR_USER_FOR_ENTRY =
-        @"SELECT
-            COUNT(*) from discussion_entries 
-            WHERE discussion_id = @discussionID
-            AND author = @userID
+        @"SELECT     COUNT(*) 
+        FROM         `discussion_entries` 
+        WHERE        `discussion_id` = @discussionID
+        AND          `author` = @userID
         ;";
 
     public const string QUERY_PEER_GROUP_RESULTS =
@@ -1457,7 +1485,7 @@ public static class DatabaseQueries
 
     public const string QUERY_GRADE_COMPARISSON_HISTORY = // half done ?????
         @"SELECT    `peer_groups`.`component_id`,
-                    avg(`submissions`.`grade`),
+                    avg(`submissions`.`Grade`),
                     `peer_groups`.`avg_grade`,
                     `peer_groups`.`max_grade`,
                     `peer_groups`.`min_grade`,
@@ -1470,7 +1498,7 @@ public static class DatabaseQueries
         INNER JOIN  `tile_entries`
             ON      `tile_entries`.`content_id` == `submissions`.`assignment_id`
         WHERE       `peer_groups`.`course_id`=@courseID
-        AND         `peer_groups`.`goal_grade`=@grade
+        AND         `peer_groups`.`goal_grade`=@Grade
         AND         `peer_groups`.`componentType`= @componentType
         AND         `submissions`.`user_id` = @userID
         GROUP BY    `peer_groups`.`component_id`, `peer_groups`.`sync_id`
@@ -1480,7 +1508,7 @@ public static class DatabaseQueries
         @"SELECT    `submission_id`,
                     `assignment_id`,
                     `user_id`,
-                    `grade`,
+                    `Grade`,
                     `date`
         FROM        `submissions`
         WHERE       `assignment_id`=@entryID
@@ -1488,7 +1516,7 @@ public static class DatabaseQueries
         ;";
 
     public const string QUERY_ASSIGNMENT_GRADE =
-        @"SELECT    `grade`
+        @"SELECT    `Grade`
         FROM        `submissions`
         WHERE       `assignment_id`=@assignmentID
         AND         `user_id`=@userID
@@ -1498,7 +1526,7 @@ public static class DatabaseQueries
         @"SELECT    `id`,
                     `entry_id`,
                     `user_id`,
-                    `grade`,
+                    `Grade`,
                     `submitted`
         FROM        `submissions`
         WHERE       `entry_id`=@entryID
@@ -1506,7 +1534,7 @@ public static class DatabaseQueries
     public const string QUERY_EXTERNALDATA =
         @"SELECT    `user_id`,
                     `title`,
-                    `grade`
+                    `Grade`
         FROM        `external_data`
         WHERE       `course_id`=@courseID
         AND         `user_id`=@userID
@@ -1663,6 +1691,7 @@ public static class DatabaseQueries
           AND             `course_id` = @courseID
           ORDER BY        `timestamp` DESC
           LIMIT           1;";
+
     public const string INSERT_USER_ACTION =
         @"INSERT INTO   `user_tracker` (`user_id`,`action`,`action_detail`,`session_id`,`course_id`)
           VALUES        (
@@ -1670,6 +1699,30 @@ public static class DatabaseQueries
             @action,
             @actionDetail,
             @sessionID,
+            @courseID
+          );";
+
+    public const string INSERT_USER_ACTION_TEST =
+        @"INSERT INTO   `user_tracker` (`user_id`,`action`,`action_detail`,`session_id`,`course_id`)
+          VALUES        (
+            @userID,
+            @action,
+            @actionDetail,
+            (
+            SELECT
+                CASE WHEN strftime('%s', 'now') - `timestamp` > 1800 THEN 
+                    `session_id` + 1 
+                WHEN COUNT(*) = 0 THEN
+                    1
+                ELSE
+                    `session_id`
+                END
+            FROM `user_tracker`
+            WHERE `user_id`=@userID
+            AND   `course_id`=@courseID
+            ORDER BY `timestamp` DESC
+            LIMIT 1
+            ),
             @courseID
           );";
 

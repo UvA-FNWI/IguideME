@@ -74,7 +74,7 @@ namespace IguideME.Web.Services
             workerStatus = new()
             {
                 counter = 0,
-                tasks = new string[] { "boot-up", "students", "quizzes", "discussions", "assignments", "grade-predictor", "peer-groups", "notifications", "done" }
+                tasks = new string[] { "boot-up", "students", "quizzes", "discussions", "assignments", "Grade-predictor", "peer-groups", "notifications", "done" }
             };
             workerStatus.statuses = workerStatus.tasks.Select((_) => "Pending").ToArray();
             UpdateStatus(jobId);

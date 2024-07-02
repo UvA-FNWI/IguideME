@@ -11,20 +11,29 @@ const GraphGrade: FC<Grades> = ({ grade, peerAvg, peerMin, peerMax, max, type })
     if (active && payload && payload.length > 1) {
       const data = payload[1].payload;
       return (
-        <div className='z-50 rounded-lg border border-solid border-text bg-surface1/85 p-2'>
-          <p>
+        <div className='border-text bg-surface1/85 z-50 rounded-lg border border-solid p-2'>
+          <div>
             {data.name === 'You' ?
-              <>Grade: {printGrade(type, Number(data.grade), max)}</>
+              <div>
+                <div className='bg-primary inline-block h-3 w-3' /> Grade: {printGrade(type, Number(data.grade), max)}
+              </div>
             : <>
+                <div className='inline-block h-3 w-3' style={{ backgroundColor: '#eee' }}>
+                  <div className='h-1/2' />
+                  <div className='bg-secondary h-1/2 w-full opacity-20'></div>
+                </div>{' '}
                 High: {printGrade(type, Number(data.peerMax), max)}
                 <br />
-                Average: {printGrade(type, Number(data.grade), max)}
+                <div className='bg-secondary inline-block h-3 w-3' /> Average:{' '}
+                {printGrade(type, Number(data.grade), max)}
                 <br />
-                Low:
-                {printGrade(type, Number(data.peerMin), max)}
+                <div className='inline-block h-3 w-3' style={{ backgroundColor: '#eee' }}>
+                  <div className='bg-secondary h-1/2 w-full opacity-20'></div>
+                </div>{' '}
+                Low: {printGrade(type, Number(data.peerMin), max)}
               </>
             }
-          </p>
+          </div>
         </div>
       );
     }
@@ -62,14 +71,14 @@ const GraphGrade: FC<Grades> = ({ grade, peerAvg, peerMin, peerMax, max, type })
     >
       <XAxis dataKey='name' xAxisId={0} stroke={theme === 'light' ? 'black' : 'white'} />
       <XAxis dataKey='name' xAxisId={1} hide />
-      <YAxis dataKey='grade' domain={[0, max]} hide />
+      <YAxis type='number' dataKey='grade' domain={[0, 100]} hide />
       <Tooltip content={<BarTooltip />} cursor={false} />
       <Bar
         background={{ fill: '#eee' }}
         barSize={70}
         className='[&>g>path]:!fill-overlay0'
         dataKey={({ peerMin, peerMax }) => [peerMin, peerMax]}
-        opacity={0.5}
+        opacity={0.2}
         xAxisId={0}
       />
       <Bar barSize={50} dataKey='grade' xAxisId={1} />

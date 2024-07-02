@@ -33,6 +33,7 @@ export interface TileGrades {
   peerMin: number;
   peerAvg: number;
   peerMax: number;
+  max: number;
 }
 
 export enum TileType {
@@ -59,9 +60,8 @@ export interface Assignment {
   grading_type: GradingType;
 }
 
-export interface Discussion {
+export interface DiscussionTopic {
   id: number;
-  type: DiscussionType;
   parent_id: number;
   course_id: number;
   title: string;
@@ -69,6 +69,16 @@ export interface Discussion {
   date: number;
   message: string;
   grades?: Grades;
+}
+
+export interface DiscussionEntry {
+  id: number;
+  discussion_id: number;
+  parent_id: number;
+  course_id: number;
+  author: string;
+  date: number;
+  message: string;
 }
 
 export interface LearningGoal {
@@ -106,17 +116,26 @@ export const printGrade = (type: GradingType, grade: number, max: number, ng: bo
     case GradingType.PassFail:
       return grade > 0 ? 'Pass' : 'Fail';
     case GradingType.Percentage:
-      return grade.toFixed(1) + '%';
+      return varFixed(grade) + '%';
     case GradingType.Letters:
       return letterGrade(grade);
     case GradingType.Points:
-      if (max > 0) return ((grade * max) / 100).toFixed(1) + '/' + max.toFixed(1);
+      if (max > 0) {
+        const result = (grade * max) / 100;
+
+        return varFixed(result) + '/' + varFixed(max);
+      }
 
       return grade.toFixed(0);
 
     case GradingType.NotGraded:
-      return ng ? 'N/A' : grade.toFixed(0);
+      return ng ? 'N/A' : (max > 0 ? (grade * max) / 100 : grade).toFixed(0);
   }
+};
+
+export const varFixed = (nr: number): string => {
+  const result = nr.toFixed(1);
+  return result[result.length - 1] === '0' ? result.slice(0, -2) : result;
 };
 
 const letterGrade = (grade: number): string => {
@@ -133,6 +152,8 @@ const letterGrade = (grade: number): string => {
   if (grade > 60) return 'D-';
   return 'F';
 };
+
+// TODO collapse together with tileGrades
 export interface Grades {
   grade: number;
   peerAvg: number;
@@ -140,12 +161,6 @@ export interface Grades {
   peerMax: number;
   max: number;
   type: GradingType;
-}
-
-export enum DiscussionType {
-  Topic,
-  Entry,
-  Reply,
 }
 
 export enum LogicalExpression {

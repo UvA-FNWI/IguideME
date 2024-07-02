@@ -2,7 +2,6 @@
 using System.Linq;
 using IguideME.Web.Models;
 using IguideME.Web.Models.App;
-using IguideME.Web.Models.Impl;
 using Microsoft.Extensions.Logging;
 
 namespace IguideME.Web.Services.Workers
@@ -60,7 +59,7 @@ namespace IguideME.Web.Services.Workers
         }
 
         /// <summary>
-        /// Groups users into an array indexed by their goal grade.
+        /// Groups users into an array indexed by their goal Grade.
         /// </summary>
         /// <returns>An array of lists of userIDs.</returns>
         List<string>[] groupUsers()
@@ -80,10 +79,10 @@ namespace IguideME.Web.Services.Workers
         }
 
         /// <summary>
-        /// Create the peer groups for a given goal grade.
+        /// Create the peer groups for a given goal Grade.
         /// </summary>
         /// <param name="groupedUsers">An array of lists of users indexed by their goal grades.</param>
-        /// <param name="goalGrade">The goal grade to create a peer group for.</param>
+        /// <param name="goalGrade">The goal Grade to create a peer group for.</param>
         /// <param name="minPeerGroupSize">The minimum group size a peer group needs to have.</param>
         /// <returns>A list of userIDs in the group</returns>
         static List<string> CreatePeerGroup(
@@ -94,7 +93,7 @@ namespace IguideME.Web.Services.Workers
         {
             List<string> peerGroup = new(groupedUsers[goalGrade]);
 
-            // Skip if grade hasn't been selected at all.
+            // Skip if Grade hasn't been selected at all.
             if (peerGroup.Count() == 0)
                 return new List<string>();
 
@@ -121,30 +120,40 @@ namespace IguideME.Web.Services.Workers
         }
 
         /// <summary>
-        /// Calculate the total grade of a tile for a user.
+        /// Calculate the total Grade of a tile for a user.
         /// </summary>
         /// <param name="tile"> The tile to calculate the average for.</param>
         /// <param name="userID">The id of the user.</param>
-        /// <param name="userEntryGradesMap">A dictionary mapping assignments to lists of grades for the total course grade.</param>
-        /// <returns>The grade of the tile.</returns>
+        /// <param name="userEntryGradesMap">A dictionary mapping assignments to lists of grades for the total course Grade.</param>
+        /// <returns>The Grade of the tile.</returns>
         double CalculateTileGrade(Tile tile, string userID, Dictionary<int, double> userEntryGradesMap)
         {
-            return tile.Type switch
+            double grade = tile.Type switch
             {
                 TileType.assignments => CalculateAssignmentTileGrade(tile, userID, userEntryGradesMap),
                 TileType.discussions => CalculateDiscussionTileGrade(tile, userID),
                 TileType.learning_outcomes => CalculateLearningGoalTileGrade(tile, userID),
                 _ => 0
             };
+
+            _databaseManager.CreateTileGradeForUser(
+                userID,
+                tile.ID,
+                grade,
+                _syncID
+            );
+
+            return grade;
+
         }
 
         /// <summary>
-        /// Calculate the total grade of an assignment tile for a user.
+        /// Calculate the total Grade of an assignment tile for a user.
         /// </summary>
         /// <param name="tile"> The tile to calculate the average for.</param>
         /// <param name="userID">The id of the user.</param>
-        /// <param name="userEntryGradesMap">A dictionary mapping assignments to lists of grades for the total course grade.</param>
-        /// <returns>The grade of the tile.</returns>
+        /// <param name="userEntryGradesMap">A dictionary mapping assignments to lists of grades for the total course Grade.</param>
+        /// <returns>The Grade of the tile.</returns>
         double CalculateAssignmentTileGrade(Tile tile, string userID, Dictionary<int, double> userEntryGradesMap)
         {
             double tileGrade = 0;
@@ -157,7 +166,7 @@ namespace IguideME.Web.Services.Workers
                 {
                     tileGrade += entryGrade * entry.Weight;
 
-                    // Store the entry grade for the peer statistics.
+                    // Store the entry Grade for the peer statistics.
                     if (peerEntryGradesMap.ContainsKey(entry.ContentID))
                         peerEntryGradesMap[entry.ContentID].Add(entryGrade);
                     else
@@ -165,23 +174,16 @@ namespace IguideME.Web.Services.Workers
                 }
             }
 
-            _databaseManager.CreateTileGradeForUser(
-                userID,
-                tile.ID,
-                tileGrade,
-                _syncID
-            );
-
             return tileGrade;
         }
 
         /// <summary>
-        /// Calculate the total grade of a discussion tile for a user.
+        /// Calculate the total Grade of a discussion tile for a user.
         /// </summary>
         /// <param name="tile"> The tile to calculate the average for.</param>
         /// <param name="userID">The id of the user.</param>
-        /// <param name="userEntryGradesMap">A dictionary mapping assignments to lists of grades for the total course grade.</param>
-        /// <returns>The grade of the tile.</returns>
+        /// <param name="userEntryGradesMap">A dictionary mapping assignments to lists of grades for the total course Grade.</param>
+        /// <returns>The Grade of the tile.</returns>
         double CalculateDiscussionTileGrade(Tile tile, string userID)
         {
             double tileGrade = 0;
@@ -199,7 +201,7 @@ namespace IguideME.Web.Services.Workers
 
                     tileGrade += entryGrade;
 
-                    // Store the entry grade for the peer statistics.
+                    // Store the entry Grade for the peer statistics.
                     if (peerEntryGradesMap.ContainsKey(entry.ContentID))
                         peerEntryGradesMap[entry.ContentID].Add(entryGrade);
                     else
@@ -207,35 +209,45 @@ namespace IguideME.Web.Services.Workers
                 }
             }
 
-            _databaseManager.CreateTileGradeForUser(
-                userID,
-                tile.ID,
-                tileGrade,
-                _syncID
-            );
+            double max = _databaseManager.GetTileMax(tile.ID, _courseID);
+            // _logger.LogWarning("tileGrade {tileGrade} max {max} tile {tile}", tileGrade, max, )
 
-            return tileGrade;
+            return 100 * tileGrade / max;
         }
 
         /// <summary>
-        /// Calculate the total grade of a learning goal tile for a user.
+        /// Calculate the total Grade of a learning goal tile for a user.
         /// </summary>
         /// <param name="tile"> The tile to calculate the average for.</param>
         /// <param name="userID">The id of the user.</param>
-        /// <param name="userEntryGradesMap">A dictionary mapping assignments to lists of grades for the total course grade.</param>
-        /// <returns>The grade of the tile.</returns>
+        /// <param name="userEntryGradesMap">A dictionary mapping assignments to lists of grades for the total course Grade.</param>
+        /// <returns>The Grade of the tile.</returns>
         double CalculateLearningGoalTileGrade(Tile tile, string userID)
         {
-            // TODO: Implement.
-            return 0;
+            double tileGrade = 0;
+            List<LearningGoal> goals = _databaseManager.GetLearningGoalsForTile(tile.ID);
+            foreach (LearningGoal goal in goals)
+            {
+                goal.Requirements = _databaseManager.GetGoalRequirements(goal.ID);
+                foreach (GoalRequirement requirement in goal.Requirements)
+                {
+                    // goal.Results.Add(_databaseManager.GetGoalRequirementResult(requirement, userID));
+                    if (_databaseManager.GetGoalRequirementResult(requirement, userID))
+                    {
+                        tileGrade++;
+                    }
+                }
+            }
+            double max = _databaseManager.GetTileMax(tile.ID, _courseID);
+            return 100 * tileGrade / max;
         }
 
         /// <summary>
-        /// Calculate the current overal grade for the course for a user.
+        /// Calculate the current overal Grade for the course for a user.
         /// </summary>
         /// <param name="tiles">A list of the tiles in the course.</param>
         /// <param name="userID">The id of the user.</param>
-        /// <returns>The total grade of the user.</returns>
+        /// <returns>The total Grade of the user.</returns>
         double CalculateUserTotalGrade(List<Tile> tiles, string userID)
         {
             double userTotal = 0;
@@ -247,7 +259,7 @@ namespace IguideME.Web.Services.Workers
                 double userTileGrade = CalculateTileGrade(tile, userID, userEntryGradesMap);
                 userTotal += userTileGrade * tile.Weight;
 
-                // Store the tile grade for the peer statistics.
+                // Store the tile Grade for the peer statistics.
                 if (peerTileGradesMap.ContainsKey(tile.ID))
                     peerTileGradesMap[tile.ID].Add(userTileGrade);
                 else
@@ -275,7 +287,7 @@ namespace IguideME.Web.Services.Workers
         /// <summary>
         /// Stores the calculated peer statistics in the database
         /// </summary>
-        /// <param name="goalGrade">the goal grade of the current peergroup.</param>
+        /// <param name="goalGrade">the goal Grade of the current peergroup.</param>
         /// <param name="peerGroup">the users in the current peergroup.</param>
         void StorePeerStatistics(int goalGrade, List<string> peerGroup)
         {

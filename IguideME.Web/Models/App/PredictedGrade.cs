@@ -10,7 +10,7 @@ namespace IguideME.Web.Models.App
         [JsonProperty("date")]
         public long Date { get; set; }
 
-        [JsonProperty("grade")]
+        [JsonProperty("Grade")]
         public double Grade { get; set; }
 
         public PredictedGrade(

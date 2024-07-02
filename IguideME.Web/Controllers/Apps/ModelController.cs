@@ -72,7 +72,7 @@ namespace IguideME.Web.Controllers
         }
 
         [Authorize(Policy = "IsInstructor")]
-        [Route("/app/grade-predictor")]
+        [Route("/app/Grade-predictor")]
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

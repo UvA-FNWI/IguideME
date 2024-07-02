@@ -34,8 +34,6 @@ const ViewTile: FC<Props> = memo(({ tile, textStyle }): ReactElement => {
 
   const navigate = useNavigate();
 
-  const max = 100;
-
   return (
     <QueryLoading isLoading={isLoading}>
       <div
@@ -77,7 +75,7 @@ const ViewTile: FC<Props> = memo(({ tile, textStyle }): ReactElement => {
                 peerAvg: grades.peerAvg,
                 peerMin: grades.peerMin,
                 peerMax: grades.peerMax,
-                max,
+                max: grades.max,
                 type: tile.gradingType,
               }}
             />
@@ -94,7 +92,7 @@ const ViewTile: FC<Props> = memo(({ tile, textStyle }): ReactElement => {
                   peerAvg: grades.peerAvg,
                   peerMin: grades.peerMin,
                   peerMax: grades.peerMax,
-                  max,
+                  max: grades.max,
                   type: tile.gradingType,
                 }}
               />
@@ -108,8 +106,8 @@ const ViewTile: FC<Props> = memo(({ tile, textStyle }): ReactElement => {
                     peerAvg: grades.peerAvg,
                     peerMin: grades.peerMin,
                     peerMax: grades.peerMax,
-                    max,
-                    type: tile.type === TileType.assignments ? tile.gradingType : GradingType.NotGraded,
+                    max: grades.max,
+                    type: tile.gradingType,
                   }}
                 />
               </Col>{' '}

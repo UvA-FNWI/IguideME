@@ -1,5 +1,12 @@
 import { http, HttpResponse } from 'msw';
-import { GradingType, type Assignment, type Discussion, type LearningGoal, LogicalExpression } from '@/types/tile';
+import {
+  GradingType,
+  type Assignment,
+  type DiscussionTopic,
+  type LearningGoal,
+  LogicalExpression,
+  DiscussionEntry,
+} from '@/types/tile';
 
 export const entriesHandlers = [
   http.get('/assignments', () => {
@@ -10,12 +17,15 @@ export const entriesHandlers = [
     return HttpResponse.json(resp);
   }),
   http.get('/topics', () => {
-    return HttpResponse.json<Discussion[]>(MOCK_TOPICS);
+    return HttpResponse.json<DiscussionTopic[]>(MOCK_TOPICS);
   }),
   http.get('/discussions/*/*', ({ params }) => {
-    return HttpResponse.json<Discussion>(
-      MOCK_DISCUSSIONS.find((disc) => disc.id.toString() === params[0] && disc.author === params[1]),
+    return HttpResponse.json<DiscussionTopic>(
+      MOCK_TOPICS.find((disc) => disc.id.toString() === params[0] && disc.author === params[1]),
     );
+  }),
+  http.get('/discussions/*', ({ params }) => {
+    return HttpResponse.json<DiscussionEntry>(MOCK_DISCUSSION_ENTRIES.find((disc) => disc.author === params[0]));
   }),
   http.get('/learning-goals', () => {
     return HttpResponse.json<LearningGoal[]>(MOCK_GOALS);
@@ -233,10 +243,9 @@ export const MOCK_ASSIGNMENTS: Assignment[] = [
   },
 ];
 
-export const MOCK_TOPICS: Discussion[] = [
+export const MOCK_TOPICS: DiscussionTopic[] = [
   {
     id: 1,
-    type: 0,
     parent_id: 0,
     course_id: 994,
     title: 'Third discussion',
@@ -246,7 +255,6 @@ export const MOCK_TOPICS: Discussion[] = [
   },
   {
     id: 2,
-    type: 0,
     parent_id: 0,
     course_id: 994,
     title: 'Second discussion',
@@ -256,7 +264,6 @@ export const MOCK_TOPICS: Discussion[] = [
   },
   {
     id: 3,
-    type: 0,
     parent_id: 0,
     course_id: 994,
     title: 'First discussion',
@@ -266,8 +273,7 @@ export const MOCK_TOPICS: Discussion[] = [
   },
 ];
 
-// TODO: Add replies etc
-export const MOCK_DISCUSSIONS: Discussion[] = [...MOCK_TOPICS];
+export const MOCK_DISCUSSION_ENTRIES: DiscussionEntry[] = [];
 
 export const MOCK_GOALS: LearningGoal[] = [
   {

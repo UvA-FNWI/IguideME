@@ -11,7 +11,7 @@
     <PackageReference Include="Npgsql" Version="8.0.3" />
     <PackageReference Include="UvA.Connectors.Canvas" Version="0.25.3" />
     <PackageReference Include="StackExchange.Redis" Version="2.2.62" />
-    <PackageReference Include="System.Data.SQLite" Version="1.0.114.4" />
+    <PackageReference Include="System.Data.SQLite" Version="1.0.118" />
     <PackageReference Include="UvA.LTI" Version="0.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.3" />

@@ -224,7 +224,7 @@ namespace IguideME.Web.Services
                             .Select(sub => new AssignmentSubmission(
                                 -1,
                                 quiz.ID ?? -1,
-                                sub.UserID.ToString(),
+                                _databaseManager.GetUserID(sub.UserID),
                                 sub.Score.ToString(),
                                 ((DateTimeOffset)sub.FinishedDate.Value).ToUnixTimeMilliseconds()
                             ))

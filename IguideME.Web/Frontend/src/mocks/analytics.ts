@@ -21,6 +21,9 @@ export const analyticsHandlers = [
   http.get('/analytics/consent/*', () => {
     return HttpResponse.json({ current_consent: PARTICIPANTS, prev_consent: PREV_PARTICIPANTS, total: STUDENTS });
   }),
+  http.post('/analytics/track', () => {
+    return new HttpResponse(null, { status: 200 });
+  }),
 ];
 
 const actionDetails: { [key in ActionTypes]: string[] } = {

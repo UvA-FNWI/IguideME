@@ -4,7 +4,7 @@ import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
 import { CheckCircleOutlined, CheckOutlined, CloseCircleOutlined, CloseOutlined } from '@ant-design/icons';
 import { Divider } from 'antd';
-import { getAssignments, getAssignmentSubmission, getDiscussion, getLearningGoal } from '@/api/entries';
+import { getAssignments, getAssignmentSubmission, getDiscussionEntries, getLearningGoal } from '@/api/entries';
 import { GradeView } from '@/components/crystals/grid-tile/grid-tile';
 import { useQuery } from '@tanstack/react-query';
 import { useTileViewStore } from '@/components/pages/student-dashboard/tileViewContext';
@@ -73,7 +73,7 @@ export const AssignmentDetail: FC<Props> = ({ entry }): ReactElement => {
 };
 
 export const DiscussionDetail: FC<Props> = ({ entry }): ReactElement => {
-  const user = useTileViewStore((state) => state.user);
+  const { user, viewType } = useTileViewStore((state) => ({ user: state.user, viewType: state.viewType }));
 
   const {
     data: discussion,
@@ -81,7 +81,7 @@ export const DiscussionDetail: FC<Props> = ({ entry }): ReactElement => {
     isLoading,
   } = useQuery({
     queryKey: [`${entry.tile_id}/entry/${entry.content_id}/${user.userID}`],
-    queryFn: async () => await getDiscussion(entry.content_id, user.userID),
+    queryFn: async () => await getDiscussionEntries(entry.content_id, user.userID),
   });
 
   if (isLoading) {
@@ -90,26 +90,38 @@ export const DiscussionDetail: FC<Props> = ({ entry }): ReactElement => {
         <div className='h-[180px] w-[270px]' />
       </QueryLoading>
     );
-  } else if (isError || !discussion) {
+  } else if (isError || !discussion || !discussion.grades) {
     return <QueryError className='grid place-content-center' title='No submission found' />;
   }
 
-  return (
-    <div className='h-full w-full p-2'>
-      <h3 className='overflow-hidden text-ellipsis text-nowrap text-center font-bold text-text'>{entry.title}</h3>
-      {discussion.grades ?
-        <div className='flex h-4/5 w-full flex-col justify-between'>
-          <div className='grid flex-grow place-content-center'>
-            <GradeView {...discussion.grades} />
-          </div>
-          <div>
-            <Divider className='m-0 border-text p-0' />
-            <PeerComparison {...discussion.grades} />
+  switch (viewType) {
+    case 'graph':
+      return (
+        <div className='h-full w-full p-2'>
+          <h3 className='overflow-hidden text-ellipsis text-nowrap text-center font-bold text-text'>{entry.title}</h3>
+          <div className='grid h-full w-full place-content-center'>
+            <GraphGrade {...discussion.grades} />
           </div>
         </div>
-      : <QueryError className='grid place-content-center' title='No submission found' />}
-    </div>
-  );
+      );
+    case 'grid':
+      return (
+        <div className='h-full w-full p-2'>
+          <h3 className='overflow-hidden text-ellipsis text-nowrap text-center font-bold text-text'>{entry.title}</h3>
+          <div className='flex h-4/5 w-full flex-col justify-between'>
+            <div className='grid flex-grow place-content-center'>
+              <GradeView {...discussion.grades} />
+            </div>
+            <div>
+              <Divider className='m-0 border-text p-0' />
+              <PeerComparison {...discussion.grades} />
+            </div>
+          </div>
+        </div>
+      );
+    default:
+      throw new Error('Unknown view type');
+  }
 };
 
 export const LearningGoalDetail: FC<Props> = ({ entry }): ReactElement => {

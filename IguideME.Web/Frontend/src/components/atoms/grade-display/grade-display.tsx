@@ -1,11 +1,12 @@
 import resolveConfig from 'tailwindcss/resolveConfig';
 import tailwindConfig from '@/../tailwind.config';
 import { Bar, BarChart, Label, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
-import { FrownTwoTone, MehTwoTone, SmileTwoTone } from '@ant-design/icons';
+import { FrownOutlined, MehOutlined, SmileOutlined } from '@ant-design/icons';
 import { Space, Spin } from 'antd';
 import { type TooltipProps } from '@/types/reactRecharts';
 import { useTileViewStore } from '@/components/pages/student-dashboard/tileViewContext';
 import { memo, type FC, type ReactElement } from 'react';
+import { varFixed } from '@/types/tile';
 
 const GradeDisplay: FC = (): ReactElement => {
   const { user, viewType } = useTileViewStore((state) => ({
@@ -18,7 +19,7 @@ const GradeDisplay: FC = (): ReactElement => {
   }
 
   const goal = user.settings.goal_grade;
-  const total = user.settings.total_grade / 10;
+  const total = user.settings.total_grade;
   const pred = user.settings.predicted_grade;
 
   switch (viewType) {
@@ -38,9 +39,9 @@ interface Props {
 }
 
 const GridGrades: FC<Props> = memo(({ goal, total, pred }): ReactElement => {
-  const happy = <SmileTwoTone size={10} twoToneColor='rgb(0, 185, 120)' />;
-  const meh = <MehTwoTone size={10} twoToneColor='rgb(245, 226, 54)' />;
-  const unhappy = <FrownTwoTone size={10} twoToneColor={'rgb(255, 110, 90)'} />;
+  const happy = <SmileOutlined size={10} className='text-success' />;
+  const meh = <MehOutlined size={10} className='text-meh' />;
+  const unhappy = <FrownOutlined size={10} className='text-failure' />;
   return (
     <Space className='h-full w-full justify-center' size='large'>
       <div className='text-center'>
@@ -52,7 +53,7 @@ const GridGrades: FC<Props> = memo(({ goal, total, pred }): ReactElement => {
             : goal >= 5.5 ?
               meh
             : unhappy}
-            {goal}
+            {varFixed(goal)}
           </Space>
         </h2>
       </div>
@@ -60,28 +61,30 @@ const GridGrades: FC<Props> = memo(({ goal, total, pred }): ReactElement => {
         <p>Current</p>
         <h2 className='text-lg font-semibold'>
           <Space>
-            {total > goal ?
+            {total >= goal ?
               happy
             : total >= 5.5 ?
               meh
             : unhappy}
-            {total}
+            {varFixed(total)}
           </Space>
         </h2>
       </div>
-      <div className='text-center'>
-        <p>Predicted</p>
-        <h2 className='text-lg font-semibold'>
-          <Space>
-            {pred > goal ?
-              happy
-            : pred >= 5.5 ?
-              meh
-            : unhappy}
-            {pred}
-          </Space>
-        </h2>
-      </div>
+      {pred > 0 && (
+        <div className='text-center'>
+          <p>Predicted</p>
+          <h2 className='text-lg font-semibold'>
+            <Space>
+              {pred >= goal ?
+                happy
+              : pred >= 5.5 ?
+                meh
+              : unhappy}
+              {varFixed(pred)}
+            </Space>
+          </h2>
+        </div>
+      )}{' '}
     </Space>
   );
 });
@@ -103,21 +106,26 @@ BarTooltip.displayName = 'BarTooltip';
 const GraphGrades: FC<Props> = memo(({ goal, total, pred }): ReactElement => {
   const fullConfig = resolveConfig(tailwindConfig);
 
+  const data = [
+    {
+      name: 'Current Grade',
+      grade: total,
+      fill: fullConfig.theme.colors.primary,
+    },
+  ];
+
+  if (pred > 0) {
+    data.push({
+      name: 'Predicted Grade',
+      grade: pred,
+      fill: fullConfig.theme.colors.tertiary,
+    });
+  }
+
   return (
     <ResponsiveContainer width='100%' minWidth={330} height={40}>
       <BarChart
-        data={[
-          {
-            name: 'Current Grade',
-            grade: total,
-            fill: fullConfig.theme.colors.primary,
-          },
-          {
-            name: 'Predicted Grade',
-            grade: pred,
-            fill: fullConfig.theme.colors.tertiary,
-          },
-        ]}
+        data={data}
         height={40}
         layout='vertical'
         margin={{

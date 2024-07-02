@@ -11,6 +11,7 @@ import { useQuery } from '@tanstack/react-query';
 import { UserRoles } from '@/types/user';
 import { useTileViewStore } from '../student-dashboard/tileViewContext';
 import { type ReactElement, useCallback, useEffect } from 'react';
+import AltEntries from '@/components/atoms/alt-entries/alt-entries';
 
 function TileDetailView(): ReactElement {
   const { tid } = useParams();
@@ -83,6 +84,8 @@ function TileDetailView(): ReactElement {
             <GroupView title={tile ? tile.title : ''}>
               {isError ?
                 <QueryError className='grid place-content-center' title='Failed to load tile' />
+              : tile?.alt ?
+                <AltEntries tile={tile} />
               : tile?.entries.map((entry) => (
                   <Col key={entry.content_id}>
                     <EntryView entry={entry} type={tile.type} />

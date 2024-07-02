@@ -1,4 +1,4 @@
-import { SmileTwoTone } from '@ant-design/icons';
+import { StarOutlined } from '@ant-design/icons';
 import { useTileViewStore } from '@/components/pages/student-dashboard/tileViewContext';
 import { type FC, type ReactElement } from 'react';
 
@@ -9,7 +9,7 @@ const StudentInfo: FC = (): ReactElement => {
 
   return (
     <div className='flex gap-2'>
-      <SmileTwoTone className='text-4xl' twoToneColor='#00cc66' />
+      <StarOutlined className='text-primary text-4xl' />
       <div className='grid h-9 place-content-center text-xs'>
         <p>
           {user.name}

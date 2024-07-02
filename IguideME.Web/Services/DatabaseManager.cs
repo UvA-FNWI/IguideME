@@ -1330,7 +1330,7 @@ namespace IguideME.Web.Services
                 DatabaseQueries.REGISTER_TILE_GRADE,
                 new SQLiteParameter("userID", userID),
                 new SQLiteParameter("tileID", tileID),
-                new SQLiteParameter("grade", grade),
+                new SQLiteParameter("Grade", grade),
                 new SQLiteParameter("syncID", syncID)
             );
         }
@@ -1411,7 +1411,7 @@ namespace IguideME.Web.Services
                 DatabaseQueries.REGISTER_USER_SUBMISSION,
                 new SQLiteParameter("assignmentID", submission.AssignmentID),
                 new SQLiteParameter("userID", submission.UserID),
-                new SQLiteParameter("grade", submission.Grade),
+                new SQLiteParameter("Grade", submission.Grade),
                 new SQLiteParameter("date", submission.Date)
             );
         }
@@ -1426,7 +1426,7 @@ namespace IguideME.Web.Services
             );
         }
 
-        // TODO: probably switch to using grades version of submissions instead of grade.
+        // TODO: probably switch to using grades version of submissions instead of Grade.
         public List<AssignmentSubmission> GetCourseSubmissions(int courseID, long syncID = 0)
         {
             long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
@@ -1525,6 +1525,23 @@ namespace IguideME.Web.Services
             return goal;
         }
 
+        public List<LearningGoal> GetLearningGoalsForTile(int tileID)
+        {
+            List<LearningGoal> goals = new();
+
+            using SQLiteDataReader r = Query(
+                    DatabaseQueries.QUERY_TILE_LEARNING_GOALS,
+                    new SQLiteParameter("tileID", tileID)
+                );
+            while (r.Read())
+            {
+                goals.Add(new(r.GetInt32(0), r.GetValue(1).ToString()));
+            }
+
+            return goals;
+        }
+
+
         public bool GetGoalRequirementResult(GoalRequirement requirement, string userID)
         {
             using SQLiteDataReader r = Query(
@@ -1564,7 +1581,7 @@ namespace IguideME.Web.Services
             using (
                 SQLiteDataReader r = Query(
                     DatabaseQueries.QUERY_USER_SUBMISSION_FOR_ENTRY_FOR_USER,
-                    new SQLiteParameter("contentID", entryID),
+                    new SQLiteParameter("entryID", entryID),
                     new SQLiteParameter("userID", userID)
                 )
             )
@@ -1823,7 +1840,7 @@ namespace IguideME.Web.Services
             return predictions;
         }
 
-        // TODO: probably switch to using grades version of submissions instead of grade.
+        // TODO: probably switch to using grades version of submissions instead of Grade.
         public List<AssignmentSubmission> GetTileSubmissionsForUser(
             int courseID,
             string userID,
@@ -1878,7 +1895,7 @@ namespace IguideME.Web.Services
                 SQLiteDataReader r1 = Query(
                     DatabaseQueries.QUERY_GRADE_COMPARISSON_HISTORY,
                     new SQLiteParameter("courseID", courseID),
-                    new SQLiteParameter("grade", GetUserGoalGrade(courseID, userID, syncID)),
+                    new SQLiteParameter("Grade", GetUserGoalGrade(courseID, userID, syncID)),
                     new SQLiteParameter("userID", userID)
                 )
             )
@@ -1888,7 +1905,7 @@ namespace IguideME.Web.Services
                     // Initialize last elements
                     double last_user_avg = -1; //user
                     double last_peer_avg = -1; //avg
-                    double last_peer_max = -1; //max
+                    double last_peer_max = -1; //Max
                     double last_peer_min = -1; //min
 
                     while (r1.Read())
@@ -1897,7 +1914,7 @@ namespace IguideME.Web.Services
                         int tile_id = r1.GetInt32(0); //tile
                         double user_avg = r1.GetDouble(1); //user
                         double peer_avg = r1.GetDouble(2); //avg
-                        double peer_max = r1.GetDouble(3); //max
+                        double peer_max = r1.GetDouble(3); //Max
                         double peer_min = r1.GetDouble(4); //min
 
                         DateTime labelDate = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
@@ -2737,10 +2754,9 @@ namespace IguideME.Web.Services
             return tileGroups;
         }
 
-        public TileGrades GetTileGrade(int tileID, string userID, int courseID)
+        public double GetTileAVG(int tileID, string userID, int courseID)
         {
             long syncID = this.GetCurrentSyncID(courseID);
-            double tileGrade = -1;
             using (
                 SQLiteDataReader r = Query(
                     DatabaseQueries.QUERY_TILE_GRADE,
@@ -2754,7 +2770,7 @@ namespace IguideME.Web.Services
                 {
                     try
                     {
-                        tileGrade = r.GetDouble(0);
+                        return r.GetDouble(0);
                     }
                     catch (Exception e)
                     {
@@ -2762,6 +2778,35 @@ namespace IguideME.Web.Services
                     }
                 }
             }
+            return -1;
+
+        }
+
+        public int GetTileMax(int tileID, int courseID)
+        {
+            using (
+                SQLiteDataReader r = Query(
+                    DatabaseQueries.QUERY_TILE_MAX_GRADE,
+                    new SQLiteParameter("tileID", tileID),
+                    new SQLiteParameter("courseID", courseID)
+                )
+            )
+            {
+                if (r.Read())
+                {
+                    return Convert.ToInt32(r.GetDouble(0));
+                }
+            }
+            return -1;
+
+        }
+
+        public TileGrades GetTileGrade(int tileID, string userID, int courseID)
+        {
+            double tileGrade = GetTileAVG(tileID, userID, courseID);
+            int max = GetTileMax(tileID, courseID);
+
+            long syncID = this.GetCurrentSyncID(courseID);
             using (
                 SQLiteDataReader r = Query(
                     DatabaseQueries.QUERY_TILE_PEER_GRADES,
@@ -2781,7 +2826,8 @@ namespace IguideME.Web.Services
                             tileGrade,
                             r.GetDouble(0),
                             r.GetDouble(1),
-                            r.GetDouble(2)
+                            r.GetDouble(2),
+                            max
                         );
                     }
                     catch (Exception e)
@@ -2898,6 +2944,36 @@ namespace IguideME.Web.Services
 
             return discussions;
         }
+        public List<AppDiscussionEntry> GetUserDiscussionEntries(int courseID, string userID)
+        {
+            List<AppDiscussionEntry> discussions = new();
+
+            using (
+                SQLiteDataReader r = Query(
+                    DatabaseQueries.QUERY_COURSE_DISCUSSION_ENTRIES_FOR_USER,
+                    new SQLiteParameter("courseID", courseID),
+                    new SQLiteParameter("userID", userID)
+                )
+            )
+            {
+                while (r.Read())
+                {
+                    AppDiscussionEntry row =
+                        new(
+                            r.GetInt32(0),
+                            r.GetInt32(1),
+                            r.GetInt32(2),
+                            courseID,
+                            r.GetValue(3).ToString(),
+                            r.GetInt32(4),
+                            r.GetValue(5).ToString()
+                        );
+                    discussions.Add(row);
+                }
+            }
+
+            return discussions;
+        }
 
         public AppDiscussionTopic GetTopicGradesForUser(int courseID, int contentID, string userID)
         {
@@ -2915,6 +2991,8 @@ namespace IguideME.Web.Services
             {
                 if (r.Read())
                 {
+                    int max = r.GetInt32(5);
+                    max = max == 0 ? 1 : max;
                     return new(
                             r.GetInt32(0),
                             courseID,
@@ -2923,11 +3001,11 @@ namespace IguideME.Web.Services
                             r.GetInt32(3),
                             r.GetValue(4).ToString(),
                             new AssignmentGrades(
-                                   grade,
-                                 comparison.Average,
-                                 comparison.Minimum,
-                                 comparison.Maximum,
-                                     -1,
+                                   100 * grade / max,
+                                 100 * comparison.Average / max,
+                                 100 * comparison.Minimum / max,
+                                 100 * comparison.Maximum / max,
+                                     max,
                                      AppGradingType.Points
                             )
                         );
@@ -3138,7 +3216,7 @@ namespace IguideME.Web.Services
                     new SQLiteParameter("courseID", courseID),
                     new SQLiteParameter("tileID", entry.TileID),
                     new SQLiteParameter("title", entry.Title),
-                    new SQLiteParameter("grade", entry.Grade),
+                    new SQLiteParameter("Grade", entry.Grade),
                     new SQLiteParameter("userID", entry.UserID)
                 );
             }
@@ -3174,64 +3252,75 @@ namespace IguideME.Web.Services
             return submissions.ToArray();
         }
 
+        // public void InsertUserAction(string userID, ActionTypes action, string actionDetail, int courseID)
+        // {
+        //     int sessionID = 0;
+        //     long timestamp = 0;
+
+        //     using SQLiteConnection connection = new(s_instance._connection_string);
+        //     try
+        //     {
+        //         connection.Open();
+
+        //         // Open a transaction to prevent race conditions for the sessionID.
+        //         using SQLiteTransaction transaction = connection.BeginTransaction();
+        //         {
+        //             using SQLiteCommand commandGet = connection.CreateCommand();
+        //             {
+        //                 commandGet.CommandText = DatabaseQueries.GET_TRACKER_SESSION_ID;
+        //                 commandGet.Parameters.Add(new SQLiteParameter("userID", userID));
+        //                 commandGet.Parameters.Add(new SQLiteParameter("courseID", courseID));
+        //                 commandGet.Transaction = transaction;
+
+        //                 using SQLiteDataReader r = commandGet.ExecuteReader(CommandBehavior.Default);
+        //                 {
+        //                     if (r.Read())
+        //                     {
+        //                         sessionID = r.GetInt32(0);
+        //                         timestamp = r.GetInt64(1);
+        //                     }
+        //                 }
+        //             }
+
+        //             if (DateTimeOffset.UtcNow.ToUnixTimeSeconds() - timestamp > 1800) // 30 minutes
+        //             {
+        //                 sessionID++;
+        //             }
+
+        //             using SQLiteCommand commandInsert = connection.CreateCommand();
+        //             {
+        //                 commandInsert.CommandText = DatabaseQueries.INSERT_USER_ACTION;
+        //                 commandInsert.Parameters.Add(new SQLiteParameter("userID", userID));
+        //                 commandInsert.Parameters.Add(new SQLiteParameter("action", action));
+        //                 commandInsert.Parameters.Add(new SQLiteParameter("actionDetail", actionDetail));
+        //                 commandInsert.Parameters.Add(new SQLiteParameter("sessionID", sessionID));
+        //                 commandInsert.Parameters.Add(new SQLiteParameter("courseID", courseID));
+        //                 commandInsert.Transaction = transaction;
+
+        //                 commandInsert.ExecuteNonQuery();
+        //             }
+
+        //             transaction.Commit();
+        //         }
+
+        //         connection.Close();
+        //     }
+        //     catch (Exception e)
+        //     {
+        //         // silently fail
+        //         _logger.LogError("Error inserting user action: {message}", e.Message);
+        //         connection.Close();
+        //     }
+        // }
+
         public void InsertUserAction(string userID, ActionTypes action, string actionDetail, int courseID)
         {
-            try
-            {
-                int sessionID = 0;
-                long timestamp = 0;
-
-                using SQLiteConnection connection = new(s_instance._connection_string);
-                connection.Open();
-
-                // Open a transaction to prevent race conditions for the sessionID.
-                using SQLiteTransaction transaction = connection.BeginTransaction();
-                {
-                    using SQLiteCommand commandGet = connection.CreateCommand();
-                    {
-                        commandGet.CommandText = DatabaseQueries.GET_TRACKER_SESSION_ID;
-                        commandGet.Parameters.Add(new SQLiteParameter("userID", userID));
-                        commandGet.Parameters.Add(new SQLiteParameter("courseID", courseID));
-                        commandGet.Transaction = transaction;
-
-                        using SQLiteDataReader r = commandGet.ExecuteReader(CommandBehavior.Default);
-                        {
-                            if (r.Read())
-                            {
-                                sessionID = r.GetInt32(0);
-                                timestamp = r.GetInt64(1);
-                            }
-                        }
-                    }
-
-                    if (DateTimeOffset.UtcNow.ToUnixTimeSeconds() - timestamp > 1800) // 30 minutes
-                    {
-                        sessionID++;
-                    }
-
-                    using SQLiteCommand commandInsert = connection.CreateCommand();
-                    {
-                        commandInsert.CommandText = DatabaseQueries.INSERT_USER_ACTION;
-                        commandInsert.Parameters.Add(new SQLiteParameter("userID", userID));
-                        commandInsert.Parameters.Add(new SQLiteParameter("action", action));
-                        commandInsert.Parameters.Add(new SQLiteParameter("actionDetail", actionDetail));
-                        commandInsert.Parameters.Add(new SQLiteParameter("sessionID", sessionID));
-                        commandInsert.Parameters.Add(new SQLiteParameter("courseID", courseID));
-                        commandInsert.Transaction = transaction;
-
-                        commandInsert.ExecuteNonQuery();
-                    }
-
-                    transaction.Commit();
-                }
-
-                connection.Close();
-            }
-            catch (Exception e)
-            {
-                // silently fail
-                _logger.LogError("Error inserting user action: {message}", e.Message);
-            }
+            NonQuery(DatabaseQueries.INSERT_USER_ACTION_TEST,
+    new SQLiteParameter("userID", userID),
+                new SQLiteParameter("action", action),
+                new SQLiteParameter("actionDetail", actionDetail),
+                new SQLiteParameter("courseID", courseID)
+            );
         }
 
         public List<UserTracker> RetrieveAllActionsPerCourse(int courseID)

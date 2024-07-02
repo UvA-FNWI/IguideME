@@ -6,9 +6,12 @@
 
 @layer base {
   :root {
-    --primary: #5c33ff;
-    --secondary: #fc5f5f;
-    --tertiary: #82ca9d;
+    /* Note, these first three do not support alpha */
+    --primary: 252deg 100% 60%;
+    --secondary: 0deg 96% 68%;
+    --tertiary: 143deg 40% 65%;
+
+    --secondaryAlpha: 0deg 96% 68%;
     --accent: 233deg 13% 80%;
 
     --crust: 0deg 0% 100%;
@@ -31,14 +34,18 @@
     --border0: 233deg 13% 90%;
     --border1: 233deg 13% 80%;
 
-    --success: 123deg 65% 52%;
+    --success: 123deg 65% 60%;
     --failure: 16deg 98% 50%;
+    --meh: 54deg 95% 45%;
   }
 
   .dark {
-    --primary: #8839ef;
-    --secondary: #ed8796;
-    --tertiary: #8bd5ca;
+    /* Note, these first three do not support alpha */
+    --primary: 266deg 85% 58%;
+    --secondary: 351deg 74% 73%;
+    --tertiary: 171deg 47% 69%;
+
+    --secondaryAlpha: 266deg 85% 58%;
     --accent: 266deg 85% 58%;
 
     --crust: 236deg 23% 12%;
@@ -61,8 +68,9 @@
     --border0: 266deg 45% 38%;
     --border1: 266deg 55% 58%;
 
-    --success: 109deg 58% 40%;
-    --failure: 347deg 87% 44%;
+    --success: 109deg 88% 45%;
+    --failure: 347deg 88% 49%;
+    --meh: 54deg 88% 45%;
     /*
 MIT License
 Copyright (c) 2021 Catppuccin
