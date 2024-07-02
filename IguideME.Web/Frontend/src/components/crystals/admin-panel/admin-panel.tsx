@@ -1,16 +1,11 @@
-import { adminPanelMenuItems } from './adminPanelMenuItems';
+import { getAdminPanelMenuItems } from './adminPanelMenuItems';
 import { getSelf } from '@/api/users';
 import { Layout, Menu } from 'antd';
 import { Link, Outlet } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { UserOutlined } from '@ant-design/icons';
 import { useMemo, useState, type FC, type ReactElement } from 'react';
-
-const routeToKeyMap: Record<string, string> = adminPanelMenuItems.reduce(
-  (map, item) => ({ ...map, [item.route]: item.key }),
-  {},
-);
-const getKeyFromLocation = (location: string): string => routeToKeyMap[location] || '1';
+import { useRequiredParams } from '@/utils/params';
 
 const AdminPanel: FC = (): ReactElement => {
   // This data is already fetched in the App component.
@@ -21,6 +16,15 @@ const AdminPanel: FC = (): ReactElement => {
   });
 
   const [collapsed, setCollapsed] = useState<boolean>(false);
+
+  const { courseId } = useRequiredParams(['courseId']);
+  const adminPanelMenuItems = getAdminPanelMenuItems(courseId);
+
+  const routeToKeyMap: Record<string, string> = adminPanelMenuItems.reduce(
+    (map, item) => ({ ...map, [item.route]: item.key }),
+    {},
+  );
+  const getKeyFromLocation = (location: string): string => routeToKeyMap[location] || '1';
 
   const items = useMemo(
     () =>

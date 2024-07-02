@@ -21,9 +21,10 @@ const Home: FC = (): ReactElement => {
 
   return (
     <Result
+      className='flex h-full w-full flex-col items-center justify-center'
       icon={<SmileOutlined className='!text-primary' />}
       title={
-        <div className=''>
+        <div>
           <h1 className='mb-8 inline-block p-0 text-[5vmax] font-bold tracking-tight text-text opacity-40 transition-all duration-300 ease-in-out hover:scale-110 hover:cursor-brand hover:text-primary hover:opacity-80'>
             IguideME
           </h1>

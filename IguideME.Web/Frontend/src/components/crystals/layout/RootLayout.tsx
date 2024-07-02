@@ -7,6 +7,7 @@ import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   SearchOutlined,
+  SmileOutlined,
   UserOutlined,
 } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
@@ -53,10 +54,6 @@ const Layout: FC = (): ReactElement => {
   return (
     <GlobalStoreProvider self={self}>
       <AntLayout className='h-screen'>
-        <AntLayout.Header className='relative flex items-center bg-surface0 pl-4 pr-6'>
-          <p className='inline-block w-full align-middle text-2xl font-semibold text-textAlt'>IguideME</p>
-        </AntLayout.Header>
-
         <AntLayout>
           <AntLayout.Sider
             breakpoint='lg'
@@ -67,6 +64,11 @@ const Layout: FC = (): ReactElement => {
             onCollapse={() => toggleSidebar()}
             trigger={null}
           >
+            <div className='grid place-content-center p-4'>
+              {isSidebarClosed ?
+                <SmileOutlined className='text-2xl !text-primary' />
+              : <p className='text-2xl font-bold'>IguideME</p>}
+            </div>
             <SideNavigation />
           </AntLayout.Sider>
 
@@ -135,7 +137,7 @@ const SideNavigation: FC = (): ReactElement => {
               />
               {self.role === UserRoles.instructor && (
                 <SideNavigationLink
-                  to={`/${courseId}/admin`}
+                  to={`/${courseId}/admin/admin-panel`}
                   Icon={DashboardOutlined}
                   label='Admin Dashboard'
                   isSidebarClosed={isSidebarClosed}

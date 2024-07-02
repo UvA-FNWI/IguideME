@@ -86,7 +86,7 @@ const Dashboard: FC<DashboardProps> = ({ self }): ReactElement => {
 
   return (
     <>
-      <div className='w-screen px-3'>
+      <div className='w-full px-3'>
         <div className='flex min-h-header flex-col justify-center gap-3 py-3 lg:py-0'>
           <div className='relative flex items-center justify-between'>
             <StudentInfo />

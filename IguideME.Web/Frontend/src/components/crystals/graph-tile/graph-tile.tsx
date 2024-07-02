@@ -24,7 +24,6 @@ GraphTile.displayName = 'GraphTile';
 
 const GraphLearning: FC<Grades> = memo(({ type, grade, peerAvg, max }): ReactElement => {
   const RadialBarTooltip: FC<TooltipProps> = ({ active, payload }) => {
-    console.log('payload', payload);
     if (active && payload && payload.length > 0) {
       const data = payload[0].payload;
       return (

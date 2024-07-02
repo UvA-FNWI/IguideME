@@ -63,10 +63,10 @@ const ViewLayout: FC = (): ReactElement => {
   }
 
   return (
-    <Row className='mx-auto mb-3 flex flex-col flex-nowrap gap-3 lg:flex-row'>
+    <Row className='mx-auto mb-3 flex flex-col flex-nowrap gap-3 xl:flex-row'>
       {columns.map((column, index) => (
         <Fragment key={index}>
-          <div className='flex flex-col gap-3 lg:hidden'>
+          <div className='flex flex-col gap-3 xl:hidden'>
             {column.groups.map((id) => {
               const group = tilegroups.find((group) => group.id === id);
               return (
@@ -78,7 +78,7 @@ const ViewLayout: FC = (): ReactElement => {
               );
             })}
           </div>
-          <Col key={column.id} span={Math.round((24 * column.width) / 100)} className='hidden flex-shrink lg:block'>
+          <Col key={column.id} span={Math.round((24 * column.width) / 100)} className='hidden flex-shrink xl:block'>
             <div className='grid h-full gap-3'>
               {column.groups.map((id) => {
                 const group = tilegroups.find((group) => group.id === id);

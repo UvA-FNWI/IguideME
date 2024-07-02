@@ -40,7 +40,7 @@ export const createRouter = () =>
             ],
           },
           {
-            path: ':courseId',
+            path: '/:courseId',
             lazy: async () => {
               const Home = await import('@/components/pages/home/home.tsx');
               return { Component: Home.default };
@@ -111,7 +111,7 @@ export const createRouter = () =>
             },
           },
           {
-            path: ':courseId/:studentId/settings',
+            path: '/:courseId/:studentId/settings',
             lazy: async () => {
               const StudentSettings = await import('@/components/pages/student-settings/student-settings.tsx');
               return { Component: StudentSettings.default };
@@ -146,7 +146,7 @@ export const createRouter = () =>
             },
           },
           {
-            path: ':courseId/admin',
+            path: '/:courseId/admin/admin-panel',
             lazy: async () => {
               const AdminPanel = await import('@/components/crystals/admin-panel/admin-panel.tsx');
               return { Component: AdminPanel.default };
@@ -160,16 +160,18 @@ export const createRouter = () =>
                 else throw error;
               }
             },
-            handle: (data: Course, params: { [key: string]: string }) => [
-              {
-                href: `/${params['courseId']}`,
-                label: data ? data.name : 'Course',
-              },
-              {
-                href: `/${params['courseId']}/admin`,
-                label: 'Admin Panel',
-              },
-            ],
+            handle: {
+              crumb: (data: Course, params: { [key: string]: string }) => [
+                {
+                  href: `/${params['courseId']}`,
+                  label: data ? data.name : 'Course',
+                },
+                {
+                  href: `/${params['courseId']}/admin/admin-panel`,
+                  label: 'Admin Panel',
+                },
+              ],
+            },
             children: [
               {
                 index: true,
