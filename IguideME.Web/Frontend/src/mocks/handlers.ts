@@ -1,5 +1,6 @@
 import { analyticsHandlers } from './analytics';
 import { courseSettingsHandlers } from './course_settings';
+import { courseHandlers } from './courses';
 import { entriesHandlers } from './entries';
 import { gradeHandlers } from './grades';
 import { notificationsHandlers } from './notifications';
@@ -10,12 +11,13 @@ import { userHandlers } from './users';
 
 export const handlers = [
   ...analyticsHandlers,
-  ...setupHandlers,
-  ...userHandlers,
-  ...syncingHandlers,
+  ...courseHandlers,
   ...courseSettingsHandlers,
-  ...tileHandlers,
   ...entriesHandlers,
   ...gradeHandlers,
   ...notificationsHandlers,
+  ...setupHandlers,
+  ...syncingHandlers,
+  ...tileHandlers,
+  ...userHandlers,
 ];

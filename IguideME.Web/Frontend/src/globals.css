@@ -6,85 +6,84 @@
 
 @layer base {
   :root {
-    --primary:     #5c33ff;
-    --secondary:   #fc5f5f;
-    --tertiary:    #82ca9d;
-    --accent:      233deg 13%  80%;
-    
-    --crust:       0deg   0%   100%;    
-    --mantle:      210deg 29%  97%;    
-    --base:        210deg 30%  95%;    
-    
-    --surface0:    252deg 100% 60%;
-    --surface1:    0deg   0%   100%;    
-    --surface2:    0deg   0%   90%;    
-    
-    --overlay0:    210deg 20%  93%;    
-    --overlay1:    210deg 29%  97%;    
-    --overlay2:    210deg 29%  93%;    
-    
-    --subtext0:    233deg 10%  47%;    
-    --subtext1:    233deg 13%  41%;    
-    --text:        0deg   0%   20%;
-    --textAlt:     0deg   0%   100%;
-    
-    --border0:     233deg 13%  90%;    
-    --border1:     233deg 13%  80%;    
+    --primary: #5c33ff;
+    --secondary: #fc5f5f;
+    --tertiary: #82ca9d;
+    --accent: 233deg 13% 80%;
 
-    --success:     123deg 65% 52%;
-    --failure:     16deg 98% 50%;
+    --crust: 0deg 0% 100%;
+    --mantle: 210deg 29% 97%;
+    --base: 210deg 30% 95%;
+
+    --surface0: 252deg 100% 60%;
+    --surface1: 0deg 0% 100%;
+    --surface2: 0deg 0% 90%;
+
+    --overlay0: 210deg 20% 93%;
+    --overlay1: 210deg 29% 97%;
+    --overlay2: 210deg 29% 93%;
+
+    --subtext0: 233deg 10% 47%;
+    --subtext1: 233deg 13% 41%;
+    --text: 0deg 0% 20%;
+    --textAlt: 0deg 0% 100%;
+
+    --border0: 233deg 13% 90%;
+    --border1: 233deg 13% 80%;
+
+    --success: 123deg 65% 52%;
+    --failure: 16deg 98% 50%;
   }
 
   .dark {
-    --primary:     #8839ef;
-    --secondary:   #ed8796;
-    --tertiary:    #8bd5ca;
-    --accent:      266deg 85% 58%;
-    
-    --crust:       236deg 23% 12%;    
-    --mantle:      233deg 23% 15%;    
-    --base:        232deg 23% 18%;    
-    
-    --surface0:    230deg 19% 26%;    
-    --surface1:    231deg 16% 34%;    
-    --surface2:    230deg 14% 41%;    
-    
-    --overlay0:    230deg 12% 49%;    
-    --overlay1:    228deg 15% 57%;    
-    --overlay2:    228deg 20% 65%;    
-    
-    --subtext0:    227deg 27% 72%;    
-    --subtext1:    228deg 39% 85%;    
-    --text:        227deg 68% 88%;    
-    --textAlt:     266deg 60% 85%;    
-    
-    --border0:     266deg 45% 38%;    
-    --border1:     266deg 55% 58%;    
-    
-    --success:     109deg 58% 40%;
-    --failure:     347deg 87% 44%;
-/* 
-MIT License 
-Copyright (c) 2021 Catppuccin 
+    --primary: #8839ef;
+    --secondary: #ed8796;
+    --tertiary: #8bd5ca;
+    --accent: 266deg 85% 58%;
 
-Permission is hereby granted, free of charge, to any person obtaining a copy 
-of this software and associated documentation files (the "Software"), to deal 
-in the Software without restriction, including without limitation the rights 
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
-copies of the Software, and to permit persons to whom the Software is 
-furnished to do so, subject to the following conditions: 
+    --crust: 236deg 23% 12%;
+    --mantle: 233deg 23% 15%;
+    --base: 232deg 23% 18%;
 
- The above copyright notice and this permission notice shall be included in all 
- copies or substantial portions of the Software. 
+    --surface0: 230deg 19% 26%;
+    --surface1: 231deg 16% 34%;
+    --surface2: 230deg 14% 41%;
 
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE 
+    --overlay0: 230deg 12% 49%;
+    --overlay1: 228deg 15% 57%;
+    --overlay2: 228deg 20% 65%;
+
+    --subtext0: 227deg 27% 72%;
+    --subtext1: 228deg 39% 85%;
+    --text: 227deg 68% 88%;
+    --textAlt: 266deg 60% 85%;
+
+    --border0: 266deg 45% 38%;
+    --border1: 266deg 55% 58%;
+
+    --success: 109deg 58% 40%;
+    --failure: 347deg 87% 44%;
+    /*
+MIT License
+Copyright (c) 2021 Catppuccin
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+ The above copyright notice and this permission notice shall be included in all
+ copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE. */
- 
   }
 }
 
@@ -215,7 +214,7 @@ textarea:not([rows]) {
 
 .adminPanelMenuSelect .ant-menu-item-selected:hover {
   background-color: hsl(var(--surface0)) !important;
-  color: hsl(var(--textAtl))!important;
+  color: hsl(var(--textAtl)) !important;
 }
 
 .adminPanelMenuSelect .ant-menu-item-active {
@@ -244,7 +243,7 @@ textarea:not([rows]) {
 }
 
 .customSlider .ant-slider-rail {
-  background-color: hsl(var(--accent) / .4) !important;
+  background-color: hsl(var(--accent) / 0.4) !important;
 }
 
 .customSlider .ant-slider-handle::after {
@@ -300,7 +299,7 @@ textarea:not([rows]) {
 }
 
 .ant-switch[aria-checked='false'] {
-  background: hsl(var(--surface1)) !important;
+  background: hsl(var(--surface2)) !important;
 }
 
 .ant-picker-outlined {
@@ -355,13 +354,13 @@ textarea:not([rows]) {
 
 .ant-radio-button-wrapper-checked {
   background-color: hsl(var(--surface0)) !important;
-  border-color: hsl(var(--border0))!important;
+  border-color: hsl(var(--border0)) !important;
   color: hsl(var(--textAlt)) !important;
 }
 
 .ant-radio-button-wrapper-checked:hover {
   background-color: hsl(var(--surface0)) !important;
-  border-color: hsl(var(--border0))!important;
+  border-color: hsl(var(--border0)) !important;
   color: hsl(var(--textAlt)) !important;
 }
 
@@ -369,3 +368,16 @@ textarea:not([rows]) {
   background-color: hsl(var(--surface1)) !important;
 }
 
+.course-selection-tabs {
+  .ant-tabs-tab-btn {
+    color: hsl(var(--text)) !important;
+
+    &:hover {
+      color: hsl(var(--textAlt)) !important;
+    }
+  }
+
+  .ant-tabs-ink-bar {
+    background-color: hsl(var(--surface0)) !important;
+  }
+}

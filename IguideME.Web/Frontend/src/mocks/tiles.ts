@@ -1,6 +1,6 @@
+import { GradingType, type LayoutColumn, type Tile, type TileGroup, TileType } from '@/types/tile';
 import { http, HttpResponse } from 'msw';
 import { MOCK_ASSIGNMENTS, MOCK_GOALS, MOCK_TOPICS } from './entries';
-import { type TileGroup, type LayoutColumn, type Tile, TileType, GradingType } from '@/types/tile';
 
 export const tileHandlers = [
   http.get('/layout/columns', () => {
@@ -24,10 +24,9 @@ export const tileHandlers = [
   http.patch('/tiles/groups/order', () => {
     return new HttpResponse(null, { status: 200 });
   }),
-  http.get('tilegroup/*/tiles', ({ params }) => {
-    return HttpResponse.json<Tile[]>(
-      MOCK_TILES.filter((tile) => tile.visible && tile.group_id.toString() === params[0]),
-    );
+  http.get('/tilegroup/:groupID/tiles', ({ params }) => {
+    const groupID = parseInt(params.groupID as string, 10);
+    return HttpResponse.json<Tile[]>(MOCK_TILES.filter((tile) => tile.visible && tile.group_id === groupID));
   }),
   http.get('/tiles', () => {
     return HttpResponse.json<Tile[]>(MOCK_TILES);
@@ -93,6 +92,7 @@ export const MOCK_TILES: Tile[] = [
     visible: true,
     notifications: true,
     gradingType: GradingType.Percentage,
+    alt: false,
     entries: [
       {
         tile_id: 1,
@@ -130,6 +130,7 @@ export const MOCK_TILES: Tile[] = [
     visible: true,
     notifications: true,
     gradingType: GradingType.PassFail,
+    alt: false,
     entries: [
       {
         tile_id: 1,
@@ -161,6 +162,7 @@ export const MOCK_TILES: Tile[] = [
     visible: true,
     notifications: true,
     gradingType: GradingType.PassFail,
+    alt: false,
     entries: [],
   },
   {
@@ -173,6 +175,7 @@ export const MOCK_TILES: Tile[] = [
     visible: true,
     notifications: true,
     gradingType: GradingType.NotGraded,
+    alt: false,
     entries: [
       {
         tile_id: 1,
@@ -234,6 +237,7 @@ export const MOCK_TILES: Tile[] = [
     visible: true,
     notifications: true,
     gradingType: GradingType.Points,
+    alt: false,
     entries: [
       {
         tile_id: 1,
@@ -271,6 +275,7 @@ export const MOCK_TILES: Tile[] = [
     visible: true,
     notifications: true,
     gradingType: GradingType.NotGraded,
+    alt: false,
     entries: [],
   },
   {
@@ -283,6 +288,7 @@ export const MOCK_TILES: Tile[] = [
     visible: true,
     notifications: false,
     gradingType: GradingType.NotGraded,
+    alt: false,
     entries: [
       {
         tile_id: 7,
@@ -314,6 +320,7 @@ export const MOCK_TILES: Tile[] = [
     visible: true,
     notifications: true,
     gradingType: GradingType.NotGraded,
+    alt: false,
     entries: [
       {
         tile_id: 7,
@@ -333,6 +340,7 @@ export const MOCK_TILES: Tile[] = [
     visible: false,
     notifications: true,
     gradingType: GradingType.Points,
+    alt: false,
     entries: [],
   },
 ];

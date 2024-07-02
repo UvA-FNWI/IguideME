@@ -1,10 +1,10 @@
-import GraphGrade from '@/components/atoms/graph-grade/graph-grade';
-import resolveConfig from 'tailwindcss/resolveConfig';
 import tailwindConfig from '@/../tailwind.config';
-import { Legend, PolarAngleAxis, RadialBar, RadialBarChart, Tooltip } from 'recharts';
+import GraphGrade from '@/components/atoms/graph-grade/graph-grade';
 import { type TooltipProps } from '@/types/reactRecharts';
 import { TileType, type Grades } from '@/types/tile';
 import { memo, type FC, type ReactElement } from 'react';
+import { Legend, PolarAngleAxis, RadialBar, RadialBarChart, Tooltip } from 'recharts';
+import resolveConfig from 'tailwindcss/resolveConfig';
 
 interface Props {
   type: TileType;
@@ -12,7 +12,6 @@ interface Props {
 }
 
 const GraphTile: FC<Props> = memo(({ type, grades }): ReactElement => {
-  console.log("grades", grades)
   switch (type) {
     case TileType.assignments:
     case TileType.discussions:

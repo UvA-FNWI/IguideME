@@ -1,9 +1,9 @@
-import { ActionTypes, Analytics, trackEvent } from '@/utils/analytics';
-import { createJSONStorage, devtools, persist } from 'zustand/middleware';
-import { createStore, useStore } from 'zustand';
 import { type ViewType } from '@/types/tile';
 import { UserRoles, type User } from '@/types/user';
+import { ActionTypes, trackEvent } from '@/utils/analytics';
 import { createContext, useContext, useRef, type PropsWithChildren, type ReactElement } from 'react';
+import { createStore, useStore } from 'zustand';
+import { createJSONStorage, devtools, persist } from 'zustand/middleware';
 
 interface tileViewProps {
   viewType?: ViewType;
@@ -21,6 +21,7 @@ export const createTileViewStore = (initProps: { user: User; viewType?: ViewType
     viewType: 'graph' as ViewType,
   };
 
+  // @ts-expect-error - The Zustand store works correctly, but TypeScript doesn't understand the type
   return createStore<tileViewState>()(
     devtools(
       persist(
@@ -48,7 +49,7 @@ export const createTileViewStore = (initProps: { user: User; viewType?: ViewType
           }) satisfies tileViewState,
         {
           name: 'tileViewStore',
-          storage: createJSONStorage(() => sessionStorage),
+          storage: createJSONStorage(() => localStorage),
           // only persist viewType. Never save user data in localStorage
           partialize: (state) => ({ viewType: state.viewType }),
         },
@@ -72,5 +73,6 @@ export function TileViewStoreProvider({ children, ...props }: tileViewStoreProvi
 export function useTileViewStore<T>(selector: (state: tileViewState) => T): T {
   const store = useContext(tileViewContext);
   if (!store) throw new Error('Missing tileViewContext.Provider in the tree');
+  // @ts-expect-error - The Zustand store works correctly, but TypeScript doesn't understand the type
   return useStore(store, selector);
 }

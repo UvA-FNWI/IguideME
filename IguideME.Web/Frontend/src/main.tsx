@@ -1,35 +1,12 @@
-// /----------------------------- React ------------------------------/
 import setup from '@/api/setup.ts';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import React, { lazy } from 'react';
+import { StrictMode } from 'react';
 import ReactDOM from 'react-dom/client';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import App from './App.tsx';
+import { RouterProvider } from 'react-router-dom';
 import NextThemesProvider from './components/crystals/ThemeSwitcher/NextThemesProvider.tsx';
 import './globals.css';
-
-// /--------------------------- Pages ---------------------------/
-const ErrorPage = lazy(async () => await import('@/components/pages/error.tsx'));
-const Home = lazy(async () => await import('@/components/pages/home/home.tsx'));
-const Tiles = lazy(async () => await import('@/components/pages/admin/tiles/tiles.tsx'));
-const EditLayout = lazy(async () => await import('@/components/pages/admin/layout/layout.tsx'));
-const AdminSettings = lazy(async () => await import('@/components/pages/admin/settings/settings.tsx'));
-const StudentSettings = lazy(async () => await import('@/components/pages/student-settings/student-settings.tsx'));
-const Dashboard = lazy(async () => await import('@/components/pages/admin/dashboard/dashboard.tsx'));
-const Analytics = lazy(async () => await import('@/components/pages/admin/analytics/analytics.tsx'));
-const GradeAnalyzer = lazy(async () => await import('@/components/pages/admin/analyzer/analyzer.tsx'));
-const AdminPanel = lazy(async () => await import('@/components/crystals/admin-panel/admin-panel.tsx'));
-const DataWizard = lazy(async () => await import('@/components/pages/admin/datawizard/datawizard.tsx'));
-const LearningGoals = lazy(async () => await import('@/components/pages/admin/learning-goals/learning-goals.tsx'));
-const GradePredictor = lazy(async () => await import('@/components/pages/admin/predictor/predictor.tsx'));
-const StudentDashboard = lazy(async () => await import('@/components/pages/student-dashboard/student-dashboard.tsx'));
-const StudentOverview = lazy(async () => await import('@/components/pages/admin/studentoverview/studentoverview.tsx'));
-const NotificationCentre = lazy(
-  async () => await import('@/components/pages/admin/notificationcentre/notificationcentre.tsx'),
-);
-const ViewLayout = lazy(async () => await import('@/components/crystals/layout-view/layout-view.tsx'));
-const TileDetailView = lazy(async () => await import('@/components/pages/tile-detail-view/tile-detail-view.tsx'));
+import { createRouter } from './router.tsx';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -68,7 +45,7 @@ enableMocking()
       // Routes that end with /> are endpoints but routes that have other routes listed before </Route>
       // will have those routes render within an Outlet component.
       ReactDOM.createRoot(document.getElementById('root')!).render(
-        <React.StrictMode>
+        <StrictMode>
           <QueryClientProvider client={queryClient}>
             <NextThemesProvider
               attribute='class'
@@ -77,35 +54,11 @@ enableMocking()
               enableSystem
               themes={['light', 'dark']}
             >
-              <BrowserRouter>
-                <Routes>
-                  <Route path='/' element={<App />} errorElement={<ErrorPage />}>
-                    <Route path='' element={<Home />} />
-                    <Route path='student-settings' element={<StudentSettings />} />
-                    <Route path=':id' element={<StudentDashboard />}>
-                      <Route path='' element={<ViewLayout />} />
-                      <Route path=':tid' element={<TileDetailView />} />
-                    </Route>
-                    <Route path='admin' element={<AdminPanel />}>
-                      <Route path='' element={<Dashboard />} />
-                      <Route path='tiles' element={<Tiles />} />
-                      <Route path='layout' element={<EditLayout />} />
-                      <Route path='student-overview' element={<StudentOverview />} />
-                      <Route path='grade-predictor' element={<GradePredictor />} />
-                      <Route path='grade-analyzer' element={<GradeAnalyzer />} />
-                      <Route path='data-wizard' element={<DataWizard />} />
-                      <Route path='learning-goals' element={<LearningGoals />} />
-                      <Route path='analytics' element={<Analytics />} />
-                      <Route path='notification-centre' element={<NotificationCentre />} />
-                      <Route path='settings' element={<AdminSettings />} />
-                    </Route>
-                  </Route>
-                </Routes>
-              </BrowserRouter>
+              <RouterProvider router={createRouter()} />
             </NextThemesProvider>
             {import.meta.env.MODE === 'mock' && <ReactQueryDevtools initialIsOpen={false} />}
           </QueryClientProvider>
-        </React.StrictMode>,
+        </StrictMode>,
       );
     },
     () => {

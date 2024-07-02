@@ -1,25 +1,25 @@
+import { getStudentsWithSettings } from '@/api/users';
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
-import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
-import { Col, Row, Table, Tooltip } from 'antd';
-import { getAllTileGrades, getTiles } from '@/api/tiles';
-import { getStudentsWithSettings } from '@/api/users';
-import { useQuery } from '@tanstack/react-query';
 import { type User } from '@/types/user';
+import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
+import { useQuery } from '@tanstack/react-query';
+import { Col, Row, Table, Tooltip } from 'antd';
 import { type ColumnsType } from 'antd/lib/table';
 import { type FC, type ReactElement } from 'react';
 
 const GradesTable: FC = (): ReactElement => {
   // In principe zijn deze 2 routes voor nu genoeg denk ik
-  const { data: tiles } = useQuery({
-    queryKey: ['tiles'],
-    queryFn: getTiles,
-  });
+  // TODO: Check of deze routes nog nodig zijn
+  //   const { data: tiles } = useQuery({
+  //     queryKey: ['tiles'],
+  //     queryFn: getTiles,
+  //   });
 
-  const { data: tileGrades } = useQuery({
-    queryKey: ['tilegrades'],
-    queryFn: getAllTileGrades,
-  });
+  //   const { data: tileGrades } = useQuery({
+  //     queryKey: ['tilegrades'],
+  //     queryFn: getAllTileGrades,
+  //   });
 
   // Deze hieronder laat ik staan zodat de voorbeeld tabel werkt, maar zal uiteindelijk niet nodig zijn vgm
   const {

@@ -1,16 +1,19 @@
+import { getStudent } from '@/api/users';
 import GradeDisplay from '@/components/atoms/grade-display/grade-display';
-import Loading from '@/components/particles/loading';
 import StudentInfo from '@/components/atoms/student-info/student-info';
-import { ActionTypes, trackEvent } from '@/utils/analytics';
-import { AppstoreOutlined, BarChartOutlined } from '@ant-design/icons';
-import { getSelf, getStudent } from '@/api/users';
-import { Outlet, useNavigate, useParams } from 'react-router-dom';
-import { Radio } from 'antd';
-import { TileViewStoreProvider, useTileViewStore } from './tileViewContext';
-import { useQuery } from '@tanstack/react-query';
+import { useGlobalContext } from '@/components/crystals/layout/GlobalStore/useGlobalStore';
+import Loading from '@/components/particles/loading';
 import { type ViewType } from '@/types/tile';
 import { UserRoles, type User } from '@/types/user';
+import { ActionTypes, trackEvent } from '@/utils/analytics';
+import { useRequiredParams } from '@/utils/params';
+import { AppstoreOutlined, BarChartOutlined } from '@ant-design/icons';
+import { useQuery } from '@tanstack/react-query';
+import { Radio } from 'antd';
 import { useEffect, type FC, type ReactElement } from 'react';
+import { Outlet, useNavigate } from 'react-router-dom';
+import { useShallow } from 'zustand/react/shallow';
+import { TileViewStoreProvider, useTileViewStore } from './tileViewContext';
 
 const LoadingState: FC = () => (
   <div className='absolute inset-0 grid h-screen w-screen place-content-center'>
@@ -21,20 +24,12 @@ const LoadingState: FC = () => (
 const ErrorMessage: FC = () => <p>Something went wrong, could not load user</p>;
 
 const StudentDashboard: FC = (): ReactElement => {
-  const { id } = useParams();
-  const navigate = useNavigate();
-
-  const {
-    data: self,
-    isError: selfIsError,
-    isLoading: selfIsLoading,
-  } = useQuery({
-    queryKey: ['self'],
-    queryFn: getSelf,
-  });
-
-  if (selfIsLoading) return <LoadingState />;
-  if (selfIsError || self === undefined || id === undefined) return <ErrorMessage />;
+  const { studentId } = useRequiredParams(['studentId']);
+  const { self } = useGlobalContext(
+    useShallow((state) => ({
+      self: state.self,
+    })),
+  );
 
   useEffect(() => {
     if (self.role === UserRoles.student) {
@@ -49,16 +44,17 @@ const StudentDashboard: FC = (): ReactElement => {
     }
   }, []);
 
+  const navigate = useNavigate();
   if (self.role === UserRoles.student) return <DashboardView user={self} />;
-  if (self.role === UserRoles.instructor && id === self.userID) navigate('/');
+  if (self.role === UserRoles.instructor && studentId === self.userID) navigate('/');
 
   const {
     data: student,
     isError: studentIsError,
     isLoading: studentIsLoading,
   } = useQuery({
-    queryKey: ['student', id],
-    queryFn: async () => await getStudent(id),
+    queryKey: ['student', studentId],
+    queryFn: async () => await getStudent(studentId),
   });
 
   if (studentIsLoading) return <LoadingState />;

@@ -1,10 +1,10 @@
-import resolveConfig from 'tailwindcss/resolveConfig';
 import tailwindConfig from '@/../tailwind.config';
-import { Bar, BarChart, Tooltip, XAxis, YAxis } from 'recharts';
-import { useTheme } from 'next-themes';
 import { type TooltipProps } from '@/types/reactRecharts';
 import { printGrade, type Grades } from '@/types/tile';
+import { useTheme } from 'next-themes';
 import { type FC, type ReactElement } from 'react';
+import { Bar, BarChart, Tooltip, XAxis, YAxis } from 'recharts';
+import resolveConfig from 'tailwindcss/resolveConfig';
 
 const GraphGrade: FC<Grades> = ({ grade, peerAvg, peerMin, peerMax, max, type }): ReactElement => {
   const BarTooltip: FC<TooltipProps> = ({ active, payload }) => {
@@ -32,7 +32,6 @@ const GraphGrade: FC<Grades> = ({ grade, peerAvg, peerMin, peerMax, max, type })
 
   const fullConfig = resolveConfig(tailwindConfig);
   const { theme } = useTheme();
-  console.log("data", peerAvg, peerMin, peerMax)
   return (
     <BarChart
       barGap={-30}
