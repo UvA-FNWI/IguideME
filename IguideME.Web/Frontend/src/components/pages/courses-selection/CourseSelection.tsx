@@ -1,11 +1,11 @@
-import { Course, getCoursesByUser, WorkflowStates } from '@/api/courses';
+import { type Course, getCoursesByUser, WorkflowStates } from '@/api/courses';
 import { useGlobalContext } from '@/components/crystals/layout/GlobalStore/useGlobalStore';
 import QueryError from '@/components/particles/QueryError';
 import { UserRoles } from '@/types/user';
 import { AppstoreOutlined, CheckOutlined, EyeInvisibleOutlined, EyeOutlined } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
 import { Card, Skeleton, Tabs } from 'antd';
-import { FC, memo, ReactElement } from 'react';
+import { type FC, memo, type ReactElement } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useShallow } from 'zustand/react/shallow';
 
@@ -18,7 +18,7 @@ const CourseSelection: FC = (): ReactElement => {
 
   const { data, isLoading, isError } = useQuery({
     queryKey: [self.userID, 'courses'],
-    queryFn: async () => getCoursesByUser(self.userID),
+    queryFn: async () => await getCoursesByUser(self.userID),
   });
 
   const loadingCard = (
@@ -118,7 +118,9 @@ const CourseCard: FC<{ course: Course }> = memo(({ course }): ReactElement => {
       className='w-[240px]'
       hoverable
       cover={<img alt={`${course.name}'s cover image`} src={course.courseImage} />}
-      onDoubleClick={() => navigate(`/${course.id}`)}
+      onClick={() => {
+        navigate(`/${course.id}`);
+      }}
     >
       <Card.Meta title={course.name} description={course.courseCode} />
     </Card>

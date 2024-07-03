@@ -3,31 +3,25 @@ import AnalyticsChips from './components/AnalyticsChips';
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
 import { AnalyticsGraph, AnalyticsTextBlock } from './components/AnalyticsBlockVariants';
-import { getSelf } from '@/api/users';
 import { PageExits, PageVisits, SunburstGraph } from './blocks';
 import { useQuery } from '@tanstack/react-query';
 import { ActionTypes, getAllEvents, getConsentInfo, type EventReturnType } from '@/utils/analytics';
 import { useMemo, type FC, type ReactElement } from 'react';
+import { useGlobalContext } from '@/components/crystals/layout/GlobalStore/useGlobalStore';
+import { useShallow } from 'zustand/react/shallow';
 
 export type SessionData = Omit<EventReturnType, 'user_id' | 'session_id' | 'course_id'>;
 
 const GradeAnalytics: FC = (): ReactElement => {
-  const {
-    data: self,
-    isError: selfIsError,
-    isLoading: selfIsLoading,
-  } = useQuery({
-    queryKey: ['self'],
-    queryFn: getSelf,
-  });
+  const { self } = useGlobalContext(useShallow((state) => ({ self: state.self })));
 
   const {
     data: analytics,
     isError: analyticsIsError,
     isLoading: analyticsIsLoading,
   } = useQuery({
-    queryKey: ['analytics', self!.course_id],
-    queryFn: async () => await getAllEvents({ courseID: self!.course_id }),
+    queryKey: ['analytics', self.course_id],
+    queryFn: async () => await getAllEvents({ courseID: self.course_id }),
     enabled: self !== undefined,
   });
 
@@ -36,8 +30,8 @@ const GradeAnalytics: FC = (): ReactElement => {
     isError: consentInfoIsError,
     isLoading: consentInfoIsLoading,
   } = useQuery({
-    queryKey: ['analytics', 'consent', self!.course_id],
-    queryFn: async () => await getConsentInfo({ courseID: self!.course_id }),
+    queryKey: ['analytics', 'consent', self.course_id],
+    queryFn: async () => await getConsentInfo({ courseID: self.course_id }),
     enabled: self !== undefined,
   });
 
@@ -46,6 +40,7 @@ const GradeAnalytics: FC = (): ReactElement => {
     if (!analytics) return sessionData;
 
     analytics.forEach((event) => {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
       const { user_id, session_id, course_id, ...rest } = event;
       const sessionID = `${user_id}-${session_id}`;
 
@@ -97,7 +92,7 @@ const GradeAnalytics: FC = (): ReactElement => {
     return actionDetailLength;
   }, [sessions]);
 
-  if (selfIsError || analyticsIsError || consentInfoIsError) {
+  if (analyticsIsError || consentInfoIsError) {
     return (
       <div className='relative h-96 w-96 rounded-xl bg-surface1'>
         <QueryError title='Failed to load usage analytic data' />
@@ -108,7 +103,7 @@ const GradeAnalytics: FC = (): ReactElement => {
   return (
     <>
       <AdminTitle title='Usage Analytics' description='View the usage analytics for your course.' />
-      <QueryLoading isLoading={selfIsLoading || analyticsIsLoading || consentInfoIsLoading}>
+      <QueryLoading isLoading={analyticsIsLoading || consentInfoIsLoading}>
         <div className='flex w-full flex-col gap-4'>
           <AnalyticsChips analytics={analytics} consentInfo={consentInfo} sessions={sessions} />
           <div className='flex w-full max-w-[2000px] flex-wrap justify-center gap-4'>

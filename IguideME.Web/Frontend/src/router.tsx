@@ -1,14 +1,14 @@
 import Layout from '@/components/crystals/layout/RootLayout';
 import ErrorPage from '@/components/pages/error';
-import { AxiosError } from 'axios';
+import { type AxiosError } from 'axios';
 import { createBrowserRouter, redirect } from 'react-router-dom';
-import { Course, getCourseById } from './api/courses';
+import { type Course, getCourseById } from './api/courses';
 import { getStudent } from './api/users';
 import CourseSelection from './components/pages/courses-selection/CourseSelection';
 import NotFound from './components/pages/NotFound';
-import { User } from './types/user';
+import { type User } from './types/user';
 
-export const createRouter = () =>
+export const createRouter = (): ReturnType<typeof createBrowserRouter> =>
   createBrowserRouter(
     [
       {
@@ -47,18 +47,19 @@ export const createRouter = () =>
             },
             loader: async ({ params }) => {
               try {
-                if (!params['courseId']) return null;
-                return await getCourseById(params['courseId']);
+                if (!params.courseId) return null;
+                return await getCourseById(params.courseId);
               } catch (error) {
+                // eslint-disable-next-line @typescript-eslint/no-throw-literal
                 if ((error as AxiosError).response?.status === 404) throw redirect('/404-not-found');
                 else throw error;
               }
             },
             handle: {
-              crumb: (data: Course, params: { [key: string]: string }) => [
+              crumb: (data: Course, params: Record<string, string>) => [
                 {
-                  href: `/${params['courseId']}`,
-                  label: data ? data.name : 'Course',
+                  href: `/${params.courseId}`,
+                  label: data.name,
                 },
               ],
             },
@@ -86,26 +87,28 @@ export const createRouter = () =>
               },
             ],
             loader: async ({ params }) => {
-              if (!params['courseId'] || !params['studentId']) throw redirect('/');
+              // eslint-disable-next-line @typescript-eslint/no-throw-literal
+              if (!params.courseId || !params.studentId) throw redirect('/');
 
               try {
-                const course = await getCourseById(params['courseId']);
-                const user = await getStudent(params['studentId']);
+                const course = await getCourseById(params.courseId);
+                const user = await getStudent(params.studentId);
                 return { course, user };
               } catch (error) {
+                // eslint-disable-next-line @typescript-eslint/no-throw-literal
                 if ((error as AxiosError).response?.status === 404) throw redirect('/404-not-found');
                 else throw error;
               }
             },
             handle: {
-              crumb: (data: { course: Course; user: User }, params: { [key: string]: string }) => [
+              crumb: (data: { course: Course; user: User }, params: Record<string, string>) => [
                 {
-                  href: `/${params['courseId']}`,
-                  label: data ? data.course.name : 'Course',
+                  href: `/${params.courseId}`,
+                  label: data.course.name,
                 },
                 {
-                  href: `/${params['courseId']}/${params['studentId']}`,
-                  label: data ? `${data.user.name.split(' ')[0]}'s Dashboard` : `Student's Dashboard`,
+                  href: `/${params.courseId}/${params.studentId}`,
+                  label: `${data.user.name.split(' ')[0]}'s Dashboard`,
                 },
               ],
             },
@@ -117,29 +120,31 @@ export const createRouter = () =>
               return { Component: StudentSettings.default };
             },
             loader: async ({ params }) => {
-              if (!params['courseId'] || !params['studentId']) throw redirect('/');
+              // eslint-disable-next-line @typescript-eslint/no-throw-literal
+              if (!params.courseId || !params.studentId) throw redirect('/');
 
               try {
-                const course = await getCourseById(params['courseId']);
-                const user = await getStudent(params['studentId']);
+                const course = await getCourseById(params.courseId);
+                const user = await getStudent(params.studentId);
                 return { course, user };
               } catch (error) {
+                // eslint-disable-next-line @typescript-eslint/no-throw-literal
                 if ((error as AxiosError).response?.status === 404) throw redirect('/404-not-found');
                 else throw error;
               }
             },
             handle: {
-              crumb: (data: { course: Course; user: User }, params: { [key: string]: string }) => [
+              crumb: (data: { course: Course; user: User }, params: Record<string, string>) => [
                 {
-                  href: `/${params['courseId']}`,
-                  label: data ? data.course.name : 'Course',
+                  href: `/${params.courseId}`,
+                  label: data.course.name,
                 },
                 {
-                  href: `/${params['courseId']}/${params['studentId']}`,
-                  label: data ? `${data.user.name.split(' ')[0]}'s Dashboard` : `Student's Dashboard`,
+                  href: `/${params.courseId}/${params.studentId}`,
+                  label: `${data.user.name.split(' ')[0]}'s Dashboard`,
                 },
                 {
-                  href: `/${params['courseId']}/${params['studentId']}/settings`,
+                  href: `/${params.courseId}/${params.studentId}/settings`,
                   label: 'Settings',
                 },
               ],
@@ -148,26 +153,27 @@ export const createRouter = () =>
           {
             path: '/:courseId/admin/admin-panel',
             lazy: async () => {
-              const AdminPanel = await import('@/components/crystals/admin-panel/admin-panel.tsx');
-              return { Component: AdminPanel.default };
+              const AdminPanelLayout = await import('@/components/crystals/AdminPanelLayout/AdminPanelLayout.tsx');
+              return { Component: AdminPanelLayout.default };
             },
             loader: async ({ params }) => {
               try {
-                if (!params['courseId']) return null;
-                return await getCourseById(params['courseId']);
+                if (!params.courseId) return null;
+                return await getCourseById(params.courseId);
               } catch (error) {
+                // eslint-disable-next-line @typescript-eslint/no-throw-literal
                 if ((error as AxiosError).response?.status === 404) throw redirect('/404-not-found');
                 else throw error;
               }
             },
             handle: {
-              crumb: (data: Course, params: { [key: string]: string }) => [
+              crumb: (data: Course, params: Record<string, string>) => [
                 {
-                  href: `/${params['courseId']}`,
-                  label: data ? data.name : 'Course',
+                  href: `/${params.courseId}`,
+                  label: data.name,
                 },
                 {
-                  href: `/${params['courseId']}/admin/admin-panel`,
+                  href: `/${params.courseId}/admin/admin-panel`,
                   label: 'Admin Panel',
                 },
               ],

@@ -1,31 +1,15 @@
-import Loading from '@/components/particles/loading';
 import { ActionTypes, trackEvent } from '@/utils/analytics';
 import { Checkbox, Collapse, Divider, Radio, Space, Switch } from 'antd';
-import { getSelf } from '@/api/users';
 import { postConsentSettings, postGoalGrade, postNotificationSettings } from '@/api/student_settings';
 import { toast } from 'sonner';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { type FC, type ReactElement, useEffect } from 'react';
 import { type User, UserRoles } from '@/types/user';
+import { useGlobalContext } from '@/components/crystals/layout/GlobalStore/useGlobalStore';
+import { useShallow } from 'zustand/react/shallow';
 
-const LoadingState: FC = () => (
-  <div className='absolute inset-0 grid h-screen w-screen place-content-center'>
-    <Loading />
-  </div>
-);
-const ErrorMessage: FC = () => <p>Something went wrong, could not load user</p>;
 const StudentSettings: FC = (): ReactElement => {
-  const {
-    data: self,
-    isError: selfIsError,
-    isLoading: selfIsLoading,
-  } = useQuery({
-    queryKey: ['self'],
-    queryFn: getSelf,
-  });
-
-  if (selfIsLoading) return <LoadingState />;
-  if (selfIsError || self?.settings === undefined) return <ErrorMessage />;
+  const { self } = useGlobalContext(useShallow((state) => ({ self: state.self })));
 
   useEffect(() => {
     if (self.role === UserRoles.student) {
@@ -40,15 +24,16 @@ const StudentSettings: FC = (): ReactElement => {
     }
   }, []);
 
+  // TODO: Implement better defaults
   return (
     <div className='w-full p-4'>
       <div className='mx-auto w-3/4'>
         <h1 className='mb-4 text-left text-4xl'>Settings</h1>
-        <Notifications notifications={self.settings.notifications} user={self} />
+        <Notifications notifications={self.settings ? self.settings.notifications : false} user={self} />
         <Divider />
-        <GoalGrade goalGrade={self.settings.goal_grade} user={self} />
+        <GoalGrade goalGrade={self.settings ? self.settings.goal_grade : 0} user={self} />
         <Divider />
-        <Consent consent={self.settings.consent} />
+        <Consent consent={self.settings ? self.settings.consent : false} />
       </div>
     </div>
   );

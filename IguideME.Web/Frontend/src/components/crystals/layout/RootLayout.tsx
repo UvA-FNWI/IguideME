@@ -4,31 +4,34 @@ import { UserRoles } from '@/types/user';
 import {
   CompassOutlined,
   DashboardOutlined,
+  DownOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   SearchOutlined,
   SmileOutlined,
+  UpOutlined,
   UserOutlined,
 } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
 import { Layout as AntLayout, Breadcrumb, Button } from 'antd';
-import { ElementType, memo, Suspense, type FC, type ReactElement } from 'react';
-import { Link, NavLink, Outlet, useMatches, useParams } from 'react-router-dom';
+import { type ElementType, memo, Suspense, type FC, type ReactElement, useState } from 'react';
+import { Link, NavLink, Outlet, useLocation, useMatches, useParams } from 'react-router-dom';
 import { useShallow } from 'zustand/react/shallow';
 import ThemeSwitcher from '../ThemeSwitcher/ThemeSwitcher';
 import GlobalStoreProvider from './GlobalStore/globalStore';
 import { useGlobalContext } from './GlobalStore/useGlobalStore';
 import { useLayoutStore } from './LayoutStore';
+import { getAdminPanelMenuItems } from './adminPanelMenuItems';
 
-type Match = {
+interface Match {
   id: string;
   pathname: string;
-  params: { [key: string]: string };
+  params: Record<string, string>;
   data?: unknown;
   handle: {
-    crumb: (data: unknown, params: { [key: string]: string }) => { href: string; label: string }[];
+    crumb: (data: unknown, params: Record<string, string>) => Array<{ href: string; label: string }>;
   };
-};
+}
 
 const Layout: FC = (): ReactElement => {
   const { data: self } = useQuery({
@@ -57,11 +60,13 @@ const Layout: FC = (): ReactElement => {
         <AntLayout>
           <AntLayout.Sider
             breakpoint='lg'
-            className='border-r-0 !bg-surface1 [&>div]:flex [&>div]:flex-grow [&>div]:flex-col'
+            className='max-h-screen overflow-y-auto border-r-0 !bg-surface1 [&>div]:flex [&>div]:flex-grow [&>div]:flex-col'
             collapsed={isSidebarClosed}
             collapsedWidth={60}
             collapsible
-            onCollapse={() => toggleSidebar()}
+            onCollapse={() => {
+              toggleSidebar();
+            }}
             trigger={null}
           >
             <div className='grid place-content-center p-4'>
@@ -108,17 +113,17 @@ const SideNavigation: FC = (): ReactElement => {
     })),
   );
 
+  const path = useLocation().pathname;
+
   return (
     <>
       <div className='mb-1 flex flex-col items-center border-b border-solid border-b-text px-4 py-2'>
         {isSidebarClosed ?
           <UserOutlined className='text-text' />
         : <>
-            <h3 className='self-start overflow-hidden text-ellipsis whitespace-nowrap text-lg'>
-              {self ? self.name : ''}
-            </h3>
+            <h3 className='self-start overflow-hidden text-ellipsis whitespace-nowrap text-lg'>{self.name}</h3>
             <strong className='self-start text-text'>
-              <UserOutlined className='text-text' /> {self ? ['Student', 'Instructor'][self.role] : ''}
+              <UserOutlined className='text-text' /> {['Student', 'Instructor'][self.role]}
             </strong>
           </>
         }
@@ -126,22 +131,30 @@ const SideNavigation: FC = (): ReactElement => {
 
       <div className='flex flex-grow flex-col justify-between px-2 pb-6 [&_li]:h-11 [&_li]:w-full'>
         <ul className='flex flex-col gap-2'>
-          <SideNavigationLink to='/' Icon={CompassOutlined} label='Select Course' isSidebarClosed={isSidebarClosed} />
+          <SideNavigationLink to='/' Icon={CompassOutlined} label='Select Course' />
           {courseId && (
             <>
               <SideNavigationLink
+                activeOverride={path === `/${courseId}`}
                 to={`/${courseId}${self.role === UserRoles.student ? `/${self.userID}` : ''}`}
                 Icon={self.role === UserRoles.student ? DashboardOutlined : SearchOutlined}
                 label={self.role === UserRoles.student ? 'Dashboard' : 'Select Student'}
-                isSidebarClosed={isSidebarClosed}
               />
               {self.role === UserRoles.instructor && (
-                <SideNavigationLink
-                  to={`/${courseId}/admin/admin-panel`}
-                  Icon={DashboardOutlined}
-                  label='Admin Dashboard'
-                  isSidebarClosed={isSidebarClosed}
-                />
+                <>
+                  {(() => {
+                    const adminPanelMenuItems = getAdminPanelMenuItems(courseId, path);
+                    return (
+                      <SideNavigationDropdown
+                        activeOverride={path.startsWith(`/${courseId}/admin`)}
+                        Icon={DashboardOutlined}
+                        label='Admin Panel'
+                        to={`/${courseId}/admin/admin-panel`}
+                        items={adminPanelMenuItems}
+                      />
+                    );
+                  })()}
+                </>
               )}
             </>
           )}
@@ -164,7 +177,9 @@ const SideNavigation: FC = (): ReactElement => {
           <li>
             <Button
               className='grid h-full w-full grid-cols-4 items-center p-0'
-              onClick={() => toggleSidebar()}
+              onClick={() => {
+                toggleSidebar();
+              }}
               type='text'
             >
               {isSidebarClosed ?
@@ -183,19 +198,27 @@ const SideNavigation: FC = (): ReactElement => {
 };
 SideNavigation.displayName = 'SideNavigation';
 
-type SideNavigationLinkProps = {
+export interface SideNavigationLinkProps {
+  activeOverride?: boolean;
   to: string;
   Icon: ElementType;
   label: string;
-  isSidebarClosed: boolean;
-};
+}
 
-const SideNavigationLink: FC<SideNavigationLinkProps> = memo(({ to, Icon, label, isSidebarClosed }): ReactElement => {
+const SideNavigationLink: FC<SideNavigationLinkProps> = memo(({ activeOverride, to, Icon, label }): ReactElement => {
+  const { isSidebarClosed } = useLayoutStore(useShallow((state) => ({ isSidebarClosed: state.isSidebarClosed })));
+
   return (
     <li>
       <NavLink
         className={({ isActive }) =>
-          `grid h-full w-full grid-cols-4 items-center rounded-md transition-colors hover:bg-surface2/50 active:bg-surface2/50 ${isActive ? 'bg-surface2' : ''}`
+          `grid h-full w-full grid-cols-4 items-center rounded-md transition-colors hover:bg-surface2/50 active:bg-surface2/50 ${
+            typeof activeOverride !== 'undefined' ?
+              activeOverride ? 'bg-surface2'
+              : ''
+            : isActive ? 'bg-surface2'
+            : ''
+          }`
         }
         to={to}
       >
@@ -208,3 +231,48 @@ const SideNavigationLink: FC<SideNavigationLinkProps> = memo(({ to, Icon, label,
   );
 });
 SideNavigationLink.displayName = 'SideNavigationLink';
+
+interface SideNavigationDropdownProps extends SideNavigationLinkProps {
+  items?: SideNavigationDropdownProps[];
+}
+
+const SideNavigationDropdown: FC<SideNavigationDropdownProps> = memo(({ items, ...props }): ReactElement => {
+  const [open, setOpen] = useState<boolean>(false);
+
+  const { isSidebarClosed } = useLayoutStore(useShallow((state) => ({ isSidebarClosed: state.isSidebarClosed })));
+  const height =
+    open ?
+      items ? 44 * items.length + 44 + 8 * items.length
+      : 44
+    : 44;
+
+  return (
+    <li style={{ height }}>
+      {items ?
+        <>
+          <button
+            className={`${isSidebarClosed ? 'flex' : 'grid grid-cols-4'} mb-2 h-11 w-full items-center rounded-md transition-colors hover:bg-surface2/50 ${props.activeOverride ? 'bg-surface2' : ''}`}
+            onClick={() => {
+              setOpen((prev) => !prev);
+            }}
+          >
+            <props.Icon className='col-span-1 grid h-full w-full place-content-center text-text' />
+            {!isSidebarClosed && <p className='col-span-2 text-left'>{props.label}</p>}
+            {open ?
+              <DownOutlined className='col-span-1 grid h-full w-full place-content-center text-text' />
+            : <UpOutlined className='col-span-1 grid h-full w-full place-content-center text-text' />}
+          </button>
+
+          {open && (
+            <ul className={`flex flex-col gap-2 ${!isSidebarClosed && 'pl-4'}`}>
+              {items.map((child) => (
+                <SideNavigationDropdown key={child.label} {...child} />
+              ))}
+            </ul>
+          )}
+        </>
+      : <SideNavigationLink {...props} />}
+    </li>
+  );
+});
+SideNavigationDropdown.displayName = 'SideNavigationDropdown';
