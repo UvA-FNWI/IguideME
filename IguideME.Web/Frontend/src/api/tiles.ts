@@ -43,7 +43,7 @@ export const getTileGrades: (userID: string, tileID: number) => Promise<TileGrad
 
 export const getAllTileGrades: () => Promise<
   Array<{
-    id: string;
+    userID: string;
     goal: number;
     tile_grades: TileGrades[];
   }>
