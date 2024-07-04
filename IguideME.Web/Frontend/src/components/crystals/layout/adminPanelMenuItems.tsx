@@ -10,7 +10,7 @@ import {
   NotificationOutlined,
   TeamOutlined,
   TrophyOutlined,
-} from '@ant-design/Icons';
+} from '@ant-design/icons';
 import type { SideNavigationLinkProps } from './RootLayout';
 
 export const getAdminPanelMenuItems = (courseId: string, path: string): SideNavigationLinkProps[] => [
