@@ -49,7 +49,7 @@ enableMocking()
           <QueryClientProvider client={queryClient}>
             <NextThemesProvider
               attribute='class'
-              defaultTheme='system'
+              defaultTheme='light'
               disableTransitionOnChange
               enableSystem
               themes={['light', 'dark']}
