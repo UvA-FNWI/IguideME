@@ -8,13 +8,12 @@ import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   SearchOutlined,
-  SmileOutlined,
   UpOutlined,
   UserOutlined,
 } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
 import { Layout as AntLayout, Breadcrumb, Button } from 'antd';
-import { type ElementType, memo, Suspense, type FC, type ReactElement, useState } from 'react';
+import { type ElementType, type FC, memo, type ReactElement, Suspense, useState } from 'react';
 import { Link, NavLink, Outlet, useLocation, useMatches, useParams } from 'react-router-dom';
 import { useShallow } from 'zustand/react/shallow';
 import ThemeSwitcher from '../ThemeSwitcher/ThemeSwitcher';
@@ -22,6 +21,8 @@ import GlobalStoreProvider from './GlobalStore/globalStore';
 import { useGlobalContext } from './GlobalStore/useGlobalStore';
 import { useLayoutStore } from './LayoutStore';
 import { getAdminPanelMenuItems } from './adminPanelMenuItems';
+import IguideME_Hat from '/IguideME-hat.svg';
+import IguideME_Logo from '/IguideME-logo.svg';
 
 interface Match {
   id: string;
@@ -71,8 +72,8 @@ const Layout: FC = (): ReactElement => {
           >
             <div className='grid place-content-center p-4'>
               {isSidebarClosed ?
-                <SmileOutlined className='text-2xl !text-primary' />
-              : <p className='text-2xl font-bold'>IguideME</p>}
+                <img className='w-full' src={IguideME_Hat} alt='IguideME Logo' />
+              : <img className='w-full' src={IguideME_Logo} alt='IguideME Logo' />}
             </div>
             <SideNavigation />
           </AntLayout.Sider>
@@ -259,8 +260,8 @@ const SideNavigationDropdown: FC<SideNavigationDropdownProps> = memo(({ items, .
             <props.Icon className='col-span-1 grid h-full w-full place-content-center text-text' />
             {!isSidebarClosed && <p className='col-span-2 text-left'>{props.label}</p>}
             {open ?
-              <DownOutlined className='col-span-1 grid h-full w-full place-content-center text-text' />
-            : <UpOutlined className='col-span-1 grid h-full w-full place-content-center text-text' />}
+              <UpOutlined className='col-span-1 grid h-full w-full place-content-center text-text' />
+            : <DownOutlined className='col-span-1 grid h-full w-full place-content-center text-text' />}
           </button>
 
           {open && (
