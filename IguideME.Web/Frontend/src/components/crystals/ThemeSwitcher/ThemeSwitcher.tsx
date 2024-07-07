@@ -1,25 +1,32 @@
 import { type User, UserRoles } from '@/types/user';
 import { ActionTypes, trackEvent } from '@/utils/analytics';
+import { cn } from '@/utils/cn';
 import { MoonOutlined, SunOutlined } from '@ant-design/icons';
 import { Switch, Tooltip } from 'antd';
 import { useTheme } from 'next-themes';
-import { type FC, memo, type ReactElement } from 'react';
+import { type FC, type HTMLAttributes, memo, type ReactElement } from 'react';
 
-interface ThemeSwitcherProps {
+interface ThemeSwitcherProps extends HTMLAttributes<HTMLDivElement> {
+  rotate?: boolean;
   user: User;
-  variant: 'full' | 'compact';
 }
 
-const ThemeSwitcher: FC<ThemeSwitcherProps> = ({ user, variant }): ReactElement => {
+const ThemeSwitcher: FC<ThemeSwitcherProps> = memo(({ className, rotate, user, ...props }): ReactElement => {
   const { theme, setTheme } = useTheme();
 
   return (
-    <div className={`flex min-h-11 ${variant === 'full' && 'w-full p-3'} items-center justify-between rounded-md`}>
-      {variant === 'full' && <span className='text-sm'>Theme</span>}
+    <div
+      className={cn(
+        `flex min-h-11 items-center justify-between rounded-md ${rotate && 'rotate-90 lg:rotate-0'}`,
+        className,
+      )}
+      {...props}
+    >
       <Tooltip title='Toggle Theme'>
         <Switch
-          checkedChildren={<MoonOutlined className='text-text' />}
-          unCheckedChildren={<SunOutlined className='text-text' />}
+          className='[&_span]:!bg-surface2'
+          checkedChildren={<MoonOutlined className={`text-text ${rotate && '-rotate-45 lg:rotate-0'}`} />}
+          unCheckedChildren={<SunOutlined className={`text-text ${rotate && '-rotate-45 lg:rotate-0'}`} />}
           checked={theme === 'dark'}
           onChange={() => {
             if (user.role === UserRoles.student) {
@@ -38,6 +45,6 @@ const ThemeSwitcher: FC<ThemeSwitcherProps> = ({ user, variant }): ReactElement 
       </Tooltip>
     </div>
   );
-};
+});
 ThemeSwitcher.displayName = 'ThemeSwitcher';
-export default memo(ThemeSwitcher);
+export default ThemeSwitcher;

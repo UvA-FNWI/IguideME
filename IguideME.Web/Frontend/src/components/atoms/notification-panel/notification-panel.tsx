@@ -37,7 +37,8 @@ const NotificationPanel: FC<Props> = memo(({ buttonClasses, placement = 'leftTop
       placement='right'
     >
       <Popover
-        overlayClassName='!bg-surface1 [&_div]:!bg-transparent [&>div]:before:!bg-surface1 [&>div>div>div]:!text-text'
+        arrow={false}
+        overlayClassName='custom-popover'
         content={
           user !== null ?
             notifications !== undefined ?

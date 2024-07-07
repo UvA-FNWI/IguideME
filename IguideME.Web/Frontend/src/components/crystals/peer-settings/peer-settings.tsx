@@ -74,10 +74,7 @@ const PeerSettingsForm: FC<Props> = ({ minSize }): ReactElement => {
       </div>
 
       <Form.Item className='m-0 flex justify-end'>
-        <Button
-          className='min-w-20 !border-none bg-success hover:!border-none hover:!bg-success/80 [&_span]:text-text'
-          htmlType='submit'
-        >
+        <Button className='custom-default-button min-w-20' htmlType='submit'>
           Save
         </Button>
       </Form.Item>

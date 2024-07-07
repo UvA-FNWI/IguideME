@@ -89,7 +89,7 @@ const Layout: FC = (): ReactElement => {
                 ),
               }))}
             />
-            <AntLayout.Content className='relative mx-6 mb-6 overflow-auto rounded-lg bg-surface1'>
+            <AntLayout.Content className='relative ml-1 overflow-auto rounded-lg bg-surface1 md:mx-6 md:mb-6'>
               <Suspense fallback={<div>Loading...</div>}>
                 <Outlet />
               </Suspense>
@@ -165,7 +165,7 @@ const SideNavigation: FC = (): ReactElement => {
             <div
               className={`grid h-11 flex-1 place-content-center rounded-md ${!isSidebarClosed && 'border border-border1'}`}
             >
-              <ThemeSwitcher user={self} variant='compact' />
+              <ThemeSwitcher rotate user={self} />
             </div>
             <div className={`h-11 flex-1 rounded-md ${!isSidebarClosed && 'border border-border1'} p-0 text-text`}>
               <NotificationPanel

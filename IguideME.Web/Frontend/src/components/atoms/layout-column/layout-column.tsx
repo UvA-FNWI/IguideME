@@ -116,7 +116,7 @@ const ConfigLayoutColumn: FC<Props> = ({ column, remove, parentOnChange }): Reac
           </Col>
           <Col span={15}>
             <Slider
-              className='customSlider'
+              className='custom-slider'
               min={MIN_WIDTH}
               max={MAX_WIDTH}
               value={width}
@@ -139,7 +139,7 @@ const ConfigLayoutColumn: FC<Props> = ({ column, remove, parentOnChange }): Reac
                 onChange();
               }}
               formatter={formatter}
-              className='antNumberInput w-full !border border-solid !border-accent/50 !bg-surface1 hover:!border-accent hover:!bg-surface1 [&_input]:!text-text'
+              className='w-full !border border-solid !border-accent/70 !bg-surface1 hover:!border-accent hover:!bg-surface2 [&_input]:!text-text'
             />
           </Col>
         </Row>
@@ -157,7 +157,7 @@ const ConfigLayoutColumn: FC<Props> = ({ column, remove, parentOnChange }): Reac
             render={(item) => item.title}
             oneWay
             showSearch
-            className='customTransfer [&_span]:!text-text'
+            className='custom-transfer'
           />
         </Row>
       </div>

@@ -1,13 +1,4 @@
-import {
-  FrownOutlined,
-  FrownTwoTone,
-  MehOutlined,
-  MehTwoTone,
-  MessageFilled,
-  SmileOutlined,
-  SmileTwoTone,
-  TrophyOutlined,
-} from '@ant-design/icons';
+import { FrownOutlined, MehOutlined, MessageOutlined, SmileOutlined, TrophyOutlined } from '@ant-design/icons';
 import { Space } from 'antd';
 import { printGrade, TileType, type Grades } from '@/types/tile';
 import { type FC, type ReactElement } from 'react';
@@ -41,10 +32,10 @@ export const GradeView: FC<Grades> = ({ grade, max, peerAvg, type }): ReactEleme
       : <>
           <div>
             {grade < 50 ?
-              <FrownOutlined className='text-failure text-lg' />
+              <FrownOutlined className='text-lg text-failure' />
             : grade >= peerAvg || (max === -1 && grade > 0) ?
-              <SmileOutlined className='text-success text-lg' />
-            : <MehOutlined className='text-meh text-lg' />}
+              <SmileOutlined className='text-lg text-success' />
+            : <MehOutlined className='text-lg text-meh' />}
           </div>
           <p className='text-lg'>{printGrade(type, grade, max)}</p>
         </>
@@ -57,7 +48,7 @@ const Discussions: FC<Grades> = ({ grade, max }): ReactElement => {
   return (
     <Space>
       <p>{grade === 0 ? '...' : ((grade * max) / 100).toFixed(0)}</p>
-      <MessageFilled />
+      <MessageOutlined className='text-text' />
     </Space>
   );
 };

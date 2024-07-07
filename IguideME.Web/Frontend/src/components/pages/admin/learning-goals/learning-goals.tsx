@@ -257,7 +257,7 @@ const ViewGoalRequirement: FC<ReqProps> = ({ requirement }): ReactElement => {
           <Input type='hidden' />
         </Item>
 
-        <div className='flex justify-between gap-2'>
+        <div className='flex flex-col justify-between gap-2 md:flex-row'>
           <div
             className='grid grid-cols-3 gap-1 overflow-x-auto'
             style={{ gridTemplateColumns: '300px min-content min-content' }}

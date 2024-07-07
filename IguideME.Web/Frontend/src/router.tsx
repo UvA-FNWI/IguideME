@@ -79,7 +79,7 @@ export const createRouter = (): ReturnType<typeof createBrowserRouter> =>
                 },
               },
               {
-                path: ':tid',
+                path: ':tileId',
                 lazy: async () => {
                   const TileDetailView = await import('@/components/pages/tile-detail-view/tile-detail-view.tsx');
                   return { Component: TileDetailView.default };
@@ -259,6 +259,10 @@ export const createRouter = (): ReturnType<typeof createBrowserRouter> =>
                 },
               },
             ],
+          },
+          {
+            path: '*', // 404
+            element: <NotFound />,
           },
         ],
       },

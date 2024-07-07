@@ -28,7 +28,7 @@ const GraphLearning: FC<Grades> = memo(({ type, grade, peerAvg, max }): ReactEle
       const data = payload[0].payload;
       return (
         <div className='z-50 rounded-lg border border-solid border-text bg-surface1/85 p-2'>
-          <p>Completed: {printGrade(type, data.grade, max)}</p>
+          <p>Completed: {printGrade(type, Number(data.grade), max)}</p>
         </div>
       );
     }

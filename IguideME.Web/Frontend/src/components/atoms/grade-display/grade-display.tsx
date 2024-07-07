@@ -7,6 +7,7 @@ import { type TooltipProps } from '@/types/reactRecharts';
 import { useTileViewStore } from '@/components/pages/student-dashboard/tileViewContext';
 import { memo, type FC, type ReactElement } from 'react';
 import { varFixed } from '@/types/tile';
+import { UseMediaQuery } from '@/hooks/UseMediaQuery';
 
 const GradeDisplay: FC = (): ReactElement => {
   const { user, viewType } = useTileViewStore((state) => ({
@@ -42,8 +43,9 @@ const GridGrades: FC<Props> = memo(({ goal, total, pred }): ReactElement => {
   const happy = <SmileOutlined size={10} className='text-success' />;
   const meh = <MehOutlined size={10} className='text-meh' />;
   const unhappy = <FrownOutlined size={10} className='text-failure' />;
+
   return (
-    <Space className='h-full w-full justify-center' size='large'>
+    <div className='flex w-full items-center justify-center gap-6'>
       <div className='text-center'>
         <p>Goal</p>
         <h2 className='text-lg font-semibold'>
@@ -84,8 +86,8 @@ const GridGrades: FC<Props> = memo(({ goal, total, pred }): ReactElement => {
             </Space>
           </h2>
         </div>
-      )}{' '}
-    </Space>
+      )}
+    </div>
   );
 });
 GridGrades.displayName = 'GridGrades';
@@ -105,6 +107,8 @@ BarTooltip.displayName = 'BarTooltip';
 
 const GraphGrades: FC<Props> = memo(({ goal, total, pred }): ReactElement => {
   const fullConfig = resolveConfig(tailwindConfig);
+  const isMobile = UseMediaQuery('(max-width: 767px)');
+  const isTablet = UseMediaQuery('(max-width: 1023px)');
 
   const data = [
     {
@@ -123,10 +127,18 @@ const GraphGrades: FC<Props> = memo(({ goal, total, pred }): ReactElement => {
   }
 
   return (
-    <ResponsiveContainer width='100%' minWidth={330} height={40}>
+    <ResponsiveContainer
+      width='100%'
+      minWidth={
+        isMobile ? 'auto'
+        : isTablet ?
+          '330px'
+        : '400px'
+      }
+      height={40}
+    >
       <BarChart
         data={data}
-        height={40}
         layout='vertical'
         margin={{
           top: 0,
@@ -134,7 +146,6 @@ const GraphGrades: FC<Props> = memo(({ goal, total, pred }): ReactElement => {
           left: 0,
           bottom: 0,
         }}
-        width={400}
       >
         <XAxis hide axisLine={false} type='number' domain={[0, 10]} />
         <YAxis axisLine dataKey='name' tick={false} tickSize={0} type='category' width={1} />

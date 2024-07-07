@@ -48,7 +48,7 @@ export const createTileViewStore = (initProps: { user: User; viewType?: ViewType
             },
           }) satisfies tileViewState,
         {
-          name: 'tileViewStore',
+          name: 'tileView',
           storage: createJSONStorage(() => localStorage),
           // only persist viewType. Never save user data in localStorage
           partialize: (state) => ({ viewType: state.viewType }),

@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
-import { Button, Checkbox, DatePicker, Divider, Form, Radio } from 'antd';
+import { Button, Checkbox, DatePicker, Divider, Form, Segmented } from 'antd';
 import { getNotificationSettings, postNotificationSettings } from '@/api/course_settings';
 import { toast } from 'sonner';
 import { useForm } from 'antd/es/form/Form';
@@ -114,20 +114,20 @@ const NotificationSettingsForm: FC<{
       <p className='mb-2 text-sm'>
         Select the dates or the range of dates that the students will receive notifications.
       </p>
-      <Radio.Group buttonStyle='solid' defaultValue={range} onChange={rangeChangeHandler}>
-        <Radio.Button disabled={!range} value={false}>
-          Select Dates
-        </Radio.Button>
-        <Radio.Button disabled={range} value={true}>
-          Select Range
-        </Radio.Button>
-      </Radio.Group>
-      <DatePickers isRange={range} checkedList={checkedList} setCheckedList={setCheckedList} />
+      <Segmented
+        className='custom-segmented w-fit !bg-surface2'
+        options={[
+          { label: 'Select Dates', value: false },
+          { label: 'Select Range', value: true },
+        ]}
+        value={range}
+        onChange={rangeChangeHandler}
+      />
+      <div className='custom-datepicker'>
+        <DatePickers isRange={range} checkedList={checkedList} setCheckedList={setCheckedList} />
+      </div>
       <div className='flex justify-end'>
-        <Button
-          className='right-0 min-w-20 !border-none bg-overlay1 hover:!border-none hover:!bg-overlay2 [&_span]:text-text'
-          htmlType='submit'
-        >
+        <Button className='custom-default-button right-0 min-w-20' htmlType='submit'>
           Save
         </Button>
       </div>
@@ -169,14 +169,13 @@ const DatePickers: FC<DatePickersProps> = memo(({ isRange, checkedList, setCheck
         rules={[{ required: true, message: 'Please select a date range' }]}
       >
         <DatePicker.RangePicker
-          className='!w-72 [&_input]:!text-text'
+          className='w-full !max-w-72 [&_input]:!text-text'
           disabledDate={(current) => current.toDate() < new Date()}
           format='YYYY-MM-DD'
           picker='week'
         />
       </Form.Item>
-      <Divider />
-      <p className='text-sm'>On which days of the week do you want to send notifications?</p>
+      <p className='mt-4 text-sm'>On which days of the week do you want to send notifications?</p>
       <div className='flex h-14 align-top'>
         <Checkbox
           className='h-fit text-text'
@@ -202,11 +201,12 @@ const DatePickers: FC<DatePickersProps> = memo(({ isRange, checkedList, setCheck
   const Single = (
     <Form.Item className='m-0' name='selectedDates' rules={[{ required: true, message: 'Please select a date' }]}>
       <DatePicker
-        className='!w-72'
+        className='!w-full !max-w-72'
         disabledDate={(current) => current.toDate() < new Date()}
         format='YYYY-MM-DD'
         multiple
         maxTagCount='responsive'
+        placeholder='Select (multiple) dates'
       />
     </Form.Item>
   );

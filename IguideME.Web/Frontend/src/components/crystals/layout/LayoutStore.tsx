@@ -1,21 +1,23 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
-type LayoutStore = {
+interface LayoutStore {
   isSidebarClosed: boolean;
   toggleSidebar: () => void;
-};
+}
 
 export const useLayoutStore = create<LayoutStore>()(
   persist(
     (set) => ({
-      isSidebarClosed: false,
-      toggleSidebar: () => set((state) => ({ isSidebarClosed: !state.isSidebarClosed })),
+      isSidebarClosed: window.innerWidth < 768,
+      toggleSidebar: () => {
+        set((state) => ({ isSidebarClosed: !state.isSidebarClosed }));
+      },
     }),
     {
-      partialize: (state) => ({ sidebarOpen: state.isSidebarClosed }),
+      partialize: (state) => ({ isSidebarClosed: state.isSidebarClosed }),
       name: 'viewMode',
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => sessionStorage),
     },
   ),
 );

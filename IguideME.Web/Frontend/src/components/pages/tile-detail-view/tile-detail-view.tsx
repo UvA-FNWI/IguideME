@@ -4,27 +4,26 @@ import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
 import { ActionTypes, trackEvent } from '@/utils/analytics';
 import { ArrowLeftOutlined } from '@ant-design/icons';
-import { Button, Col, Row } from 'antd';
+import { Button } from 'antd';
 import { getTile } from '@/api/tiles';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { UserRoles } from '@/types/user';
 import { useTileViewStore } from '../student-dashboard/tileViewContext';
 import { type ReactElement, useCallback, useEffect } from 'react';
 import AltEntries from '@/components/atoms/alt-entries/alt-entries';
+import { useRequiredParams } from '@/utils/params';
 
 function TileDetailView(): ReactElement {
-  const { tid } = useParams();
-  const { user } = useTileViewStore((state) => ({
-    user: state.user,
-  }));
+  const { tileId } = useRequiredParams(['tileId']);
+  const { user } = useTileViewStore((state) => ({ user: state.user }));
 
   useEffect(() => {
-    if (user.role === UserRoles.student && tid) {
+    if (user.role === UserRoles.student) {
       trackEvent({
         userID: user.userID,
         action: ActionTypes.tile,
-        actionDetail: tid,
+        actionDetail: tileId,
         courseID: user.course_id,
       }).catch(() => {
         // Silently fail, since this is not critical
@@ -37,8 +36,8 @@ function TileDetailView(): ReactElement {
     isError,
     isLoading,
   } = useQuery({
-    queryKey: [`tile/${tid}/${user.userID}`],
-    queryFn: async () => await getTile(tid ?? -1),
+    queryKey: [`tile/${tileId}/${user.userID}`],
+    queryFn: async () => await getTile(tileId),
   });
 
   const navigate = useNavigate();
@@ -65,38 +64,29 @@ function TileDetailView(): ReactElement {
   });
 
   return (
-    <>
-      <Row>
-        <Col>
-          <Button
-            className='ml-[20px] !w-[50px] rounded-[20px] border border-solid border-border1 bg-crust p-0 hover:!bg-text/10 [&>span]:!text-text'
-            type={'link'}
-            icon={<ArrowLeftOutlined />}
-            onClick={() => {
-              back();
-            }}
-          />
-        </Col>
-      </Row>
-      <Row className='min-h-[60vh] p-1 [&>div]:w-full'>
-        <QueryLoading isLoading={isLoading}>
-          <div className='flex w-full justify-normal p-1'>
-            <GroupView title={tile ? tile.title : ''}>
-              {isError ?
-                <QueryError className='grid place-content-center' title='Failed to load tile' />
-              : tile?.alt ?
-                <AltEntries tile={tile} />
-              : tile?.entries.map((entry) => (
-                  <Col key={entry.content_id}>
-                    <EntryView entry={entry} type={tile.type} />
-                  </Col>
-                ))
-              }
-            </GroupView>
-          </div>
-        </QueryLoading>
-      </Row>
-    </>
+    <div>
+      <Button
+        className='custom-default-button ml-1'
+        icon={<ArrowLeftOutlined />}
+        onClick={() => {
+          back();
+        }}
+      >
+        Back
+      </Button>
+
+      <QueryLoading isLoading={isLoading}>
+        <div className='flex w-full justify-normal p-1'>
+          <GroupView title={tile ? tile.title : ''}>
+            {isError ?
+              <QueryError className='grid place-content-center' title='Failed to load tile' />
+            : tile?.alt ?
+              <AltEntries tile={tile} />
+            : tile?.entries.map((entry) => <EntryView entry={entry} key={entry.content_id} type={tile.type} />)}
+          </GroupView>
+        </div>
+      </QueryLoading>
+    </div>
   );
 }
 

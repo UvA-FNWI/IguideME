@@ -26,7 +26,7 @@ const EditTileAssignments: FC = (): ReactElement => {
       <div className='col-span-2'>
         <Form.Item name='weight' noStyle>
           <InputNumber<number>
-            className='antNumberInput w-full !border border-solid !border-accent/70 !bg-surface1 hover:!border-accent hover:!bg-surface2 [&_input]:!text-text'
+            className='w-full !border border-solid !border-accent/70 !bg-surface1 hover:!border-accent hover:!bg-surface2 [&_input]:!text-text'
             formatter={(value) => `${((value ?? 0) * 100).toFixed(1)}%`}
             parser={(value) => parseFloat((value ?? '0').replace('%', '')) / 100}
             step={0.01}

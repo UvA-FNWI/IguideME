@@ -1,7 +1,7 @@
 import { cn } from '@/utils/cn';
 import { Select } from 'antd';
-import { SelectProps as AntSelectProps } from 'antd/lib';
-import { FC, ReactElement } from 'react';
+import { type SelectProps as AntSelectProps } from 'antd/lib';
+import { type FC, type ReactElement } from 'react';
 
 type SelectProps = {
   className?: string;

@@ -47,7 +47,15 @@ const PageExits: FC<PageExitsProps> = memo(({ sessions }) => {
     }));
   }, [exitPageData]);
 
-  return <Table columns={PageExitsColumns} dataSource={PageExitsRows} pagination={{ pageSize: 5 }} size='small' />;
+  return (
+    <Table
+      className='custom-table'
+      columns={PageExitsColumns}
+      dataSource={PageExitsRows}
+      pagination={{ pageSize: 5 }}
+      size='small'
+    />
+  );
 });
 PageExits.displayName = 'PageExits';
 export default PageExits;

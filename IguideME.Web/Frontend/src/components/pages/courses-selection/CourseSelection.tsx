@@ -115,7 +115,7 @@ const CourseCard: FC<{ course: Course }> = memo(({ course }): ReactElement => {
   return (
     <Card
       key={course.id}
-      className='w-[240px]'
+      className='custom-card w-[240px] !bg-surface2'
       hoverable
       cover={<img alt={`${course.name}'s cover image`} src={course.courseImage} />}
       onClick={() => {

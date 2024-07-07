@@ -47,7 +47,13 @@ const PageVisits: FC<PageVisitsProps> = memo(({ actionDetailLength, analytics })
   }, [pageVisitData]);
 
   return (
-    <Table columns={pageVisitDataColumns} dataSource={pageVisitDataRows} pagination={{ pageSize: 5 }} size='small' />
+    <Table
+      className='custom-table'
+      columns={pageVisitDataColumns}
+      dataSource={pageVisitDataRows}
+      pagination={{ pageSize: 5 }}
+      size='small'
+    />
   );
 });
 PageVisits.displayName = 'PageVisits';

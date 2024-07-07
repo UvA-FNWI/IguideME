@@ -1,5 +1,5 @@
 import { ActionTypes, trackEvent } from '@/utils/analytics';
-import { Checkbox, Collapse, Divider, Radio, Space, Switch } from 'antd';
+import { Checkbox, Collapse, Radio, Switch, Tooltip } from 'antd';
 import { postConsentSettings, postGoalGrade, postNotificationSettings } from '@/api/student_settings';
 import { toast } from 'sonner';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -7,8 +7,12 @@ import { type FC, type ReactElement, useEffect } from 'react';
 import { type User, UserRoles } from '@/types/user';
 import { useGlobalContext } from '@/components/crystals/layout/GlobalStore/useGlobalStore';
 import { useShallow } from 'zustand/react/shallow';
+import { Navigate } from 'react-router-dom';
+import { useRequiredParams } from '@/utils/params';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
 
 const StudentSettings: FC = (): ReactElement => {
+  const { courseId, studentId } = useRequiredParams(['courseId', 'studentId']);
   const { self } = useGlobalContext(useShallow((state) => ({ self: state.self })));
 
   useEffect(() => {
@@ -24,17 +28,14 @@ const StudentSettings: FC = (): ReactElement => {
     }
   }, []);
 
-  // TODO: Implement better defaults
+  if (self.role !== UserRoles.student) return <Navigate to={`/${courseId}/${studentId}`} replace />;
+
   return (
-    <div className='w-full p-4'>
-      <div className='mx-auto w-3/4'>
-        <h1 className='mb-4 text-left text-4xl'>Settings</h1>
-        <Notifications notifications={self.settings ? self.settings.notifications : false} user={self} />
-        <Divider />
-        <GoalGrade goalGrade={self.settings ? self.settings.goal_grade : 0} user={self} />
-        <Divider />
-        <Consent consent={self.settings ? self.settings.consent : false} />
-      </div>
+    <div className='flex w-full flex-col gap-4 p-4'>
+      <h1 className='text-4xl'>Settings</h1>
+      <Notifications notifications={self.settings ? self.settings.notifications : false} user={self} />
+      <GoalGrade goalGrade={self.settings ? self.settings.goal_grade : 0} user={self} />
+      <Consent consent={self.settings ? self.settings.consent : false} />
     </div>
   );
 };
@@ -51,16 +52,14 @@ const Notifications: FC<NotificationProps> = ({ notifications, user }): ReactEle
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['self'] });
 
-      if (user.role === UserRoles.student) {
-        trackEvent({
-          userID: user.userID,
-          action: ActionTypes.notifications,
-          actionDetail: notifications ? 'Enabled Notifications' : 'Disabled Notifications',
-          courseID: user.course_id,
-        }).catch(() => {
-          // Silently fail, since this is not critical
-        });
-      }
+      trackEvent({
+        userID: user.userID,
+        action: ActionTypes.notifications,
+        actionDetail: notifications ? 'Enabled Notifications' : 'Disabled Notifications',
+        courseID: user.course_id,
+      }).catch(() => {
+        // Silently fail, since this is not critical
+      });
     },
   });
 
@@ -73,18 +72,19 @@ const Notifications: FC<NotificationProps> = ({ notifications, user }): ReactEle
   }, [status]);
 
   return (
-    <>
-      <h1 className='text-left text-2xl'>Notifications</h1>
-      <div className='flex gap-2 text-left'>
+    <div>
+      <h1 className='mb-2 text-2xl'>Notifications</h1>
+      <div className='flex gap-2'>
         <p>Enable notifications:</p>
         <Switch
-          checked={notifications ?? false}
+          className='custom-switch bg-surface2 hover:!bg-surface2/25'
+          checked={notifications}
           onChange={(val) => {
             saveNotifications(val);
           }}
         />
       </div>
-    </>
+    </div>
   );
 };
 
@@ -111,32 +111,37 @@ const GoalGrade: FC<GoalProps> = ({ goalGrade, user }): ReactElement => {
   }, [status]);
 
   return (
-    <div id={'desiredGrade'}>
-      <h1 className='text-left text-2xl'>Goal Grade</h1>
-      <p className='text-justify text-text'>
+    <div id='desiredGrade'>
+      <div className='mb-2 flex items-center gap-2'>
+        <h1 className='text-2xl'>Goal Grade</h1>
+        {goalGrade === 0 && (
+          <Tooltip title='You have not set a goal grade yet.'>
+            <ExclamationCircleOutlined className='text-lg text-failure' />
+          </Tooltip>
+        )}
+      </div>
+      <p className='text-justify'>
         Please indicate the grade you wish to obtain for this course. You can always change your goal at a later stage!
       </p>
       <div className='mt-2 w-full'>
-        <Space className='mx-auto' direction={'vertical'}>
-          <Radio.Group
-            value={goalGrade}
-            onChange={(val) => {
-              saveGoalGrade(Number(val.target.value));
-              if (user.role === UserRoles.student) {
-                trackEvent({
-                  userID: user.userID,
-                  action: ActionTypes.settingChange,
-                  actionDetail: `Change Goal Grade: ${val.target.value}`,
-                  courseID: user.course_id,
-                }).catch(() => {
-                  // Silently fail, since this is not critical
-                });
-              }
-            }}
-            options={Array.from({ length: 10 }, (_, i) => ({ label: `${i + 1}`, value: i + 1 }))}
-            optionType='button'
-          />
-        </Space>
+        <Radio.Group
+          className='custom-radio-group flex w-full flex-nowrap overflow-x-auto overflow-y-hidden'
+          value={goalGrade}
+          onChange={(val) => {
+            saveGoalGrade(Number(val.target.value));
+
+            trackEvent({
+              userID: user.userID,
+              action: ActionTypes.settingChange,
+              actionDetail: `Change Goal Grade: ${val.target.value}`,
+              courseID: user.course_id,
+            }).catch(() => {
+              // Silently fail, since this is not critical
+            });
+          }}
+          options={Array.from({ length: 10 }, (_, i) => ({ label: `${i + 1}`, value: i + 1 }))}
+          optionType='button'
+        />
       </div>
     </div>
   );
@@ -163,11 +168,11 @@ const Consent: FC<ConsentProps> = ({ consent }): ReactElement => {
   }, [status]);
 
   return (
-    <>
-      <h2 className='text-left text-2xl'>Informed Consent</h2>
+    <div>
+      <h2 className='mb-2 text-2xl'>Informed Consent</h2>
       <Collapse
         bordered={false}
-        className='[&>div>div]:!p-0'
+        className='[&>div>div]:!p-0 [&_svg]:!text-text'
         ghost
         items={[
           {
@@ -188,7 +193,7 @@ const Consent: FC<ConsentProps> = ({ consent }): ReactElement => {
       />
 
       <Checkbox
-        className='mt-4'
+        className='custom-checkbox mt-4'
         checked={consent}
         onChange={(e) => {
           saveConsent(e.target.checked);
@@ -196,12 +201,12 @@ const Consent: FC<ConsentProps> = ({ consent }): ReactElement => {
       >
         <p>I have read and understood the informed consent</p>
       </Checkbox>
-    </>
+    </div>
   );
 };
 
 const ConsentText: FC = () => (
-  <div className='prose rounded-lg bg-subtext1 p-2 text-justify prose-h1:text-text prose-h2:text-text prose-h3:text-text'>
+  <div className='prose w-full rounded-lg bg-surface2 p-2 text-justify prose-h1:text-text prose-h2:text-text prose-h3:text-text'>
     <h1>IguideME</h1>
     <h2>INFORMED CONSENT</h2>
     <p>

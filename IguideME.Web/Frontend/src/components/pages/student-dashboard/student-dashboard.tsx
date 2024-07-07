@@ -9,19 +9,12 @@ import { ActionTypes, trackEvent } from '@/utils/analytics';
 import { useRequiredParams } from '@/utils/params';
 import { AppstoreOutlined, BarChartOutlined } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
-import { Radio } from 'antd';
+import { Segmented } from 'antd';
 import { useEffect, type FC, type ReactElement } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { useShallow } from 'zustand/react/shallow';
 import { TileViewStoreProvider, useTileViewStore } from './tileViewContext';
-
-const LoadingState: FC = () => (
-  <div className='absolute inset-0 grid h-screen w-screen place-content-center'>
-    <Loading />
-  </div>
-);
-
-const ErrorMessage: FC = () => <p>Something went wrong, could not load user</p>;
+import { UseMediaQuery } from '@/hooks/UseMediaQuery';
 
 const StudentDashboard: FC = (): ReactElement => {
   const { studentId } = useRequiredParams(['studentId']);
@@ -57,8 +50,15 @@ const StudentDashboard: FC = (): ReactElement => {
     queryFn: async () => await getStudent(studentId),
   });
 
-  if (studentIsLoading) return <LoadingState />;
-  if (studentIsError || student === undefined) return <ErrorMessage />;
+  if (studentIsLoading) {
+    return (
+      <div className='absolute inset-0 grid h-screen w-screen place-content-center'>
+        <Loading />
+      </div>
+    );
+  }
+
+  if (studentIsError || student === undefined) return <p>Something went wrong, could not load user</p>;
 
   return <DashboardView user={student} />;
 };
@@ -84,34 +84,32 @@ const Dashboard: FC<DashboardProps> = ({ self }): ReactElement => {
     setUser(self);
   }, [self]);
 
+  const isMobile = UseMediaQuery('(max-width: 768px)');
+
   return (
     <>
-      <div className='w-full px-3'>
+      <div className='w-full px-1 md:px-3'>
         <div className='flex min-h-header flex-col justify-center gap-3 py-3 lg:py-0'>
           <div className='relative flex items-center justify-between'>
             <StudentInfo />
             <div className='absolute bottom-0 left-0 right-0 top-0 m-auto hidden h-header w-[400px] place-content-center md:grid'>
               <GradeDisplay />
             </div>
-            <Radio.Group
+            <Segmented
+              className='custom-segmented w-fit !bg-surface2'
+              size={isMobile ? 'large' : 'middle'}
+              options={[
+                { label: isMobile ? '' : 'Graph', value: 'graph', icon: <BarChartOutlined /> },
+                { label: isMobile ? '' : 'Grid', value: 'grid', icon: <AppstoreOutlined /> },
+              ]}
               value={viewType}
-              buttonStyle='solid'
-              onChange={(e) => {
-                setViewType(self, e.target.value as ViewType);
+              onChange={(value) => {
+                setViewType(self, value as ViewType);
               }}
-            >
-              <Radio.Button disabled={viewType === 'graph'} value='graph'>
-                <BarChartOutlined />
-                <span> Graph</span>
-              </Radio.Button>
-              <Radio.Button disabled={viewType === 'grid'} value='grid'>
-                <AppstoreOutlined />
-                <span> Grid</span>
-              </Radio.Button>
-            </Radio.Group>
+            />
           </div>
         </div>
-        <div className='mb-3 grid h-[40px] w-[330px] place-content-center md:hidden'>
+        <div className='mb-3 w-full md:hidden'>
           <GradeDisplay />
         </div>
         <Outlet />

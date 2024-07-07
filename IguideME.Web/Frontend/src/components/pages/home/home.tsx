@@ -40,9 +40,9 @@ const Home: FC = (): ReactElement => {
 Home.displayName = 'Home';
 export default Home;
 
-type StudentSelectorProps = {
+interface StudentSelectorProps {
   courseId: string;
-};
+}
 
 const StudentSelector: FC<StudentSelectorProps> = memo(({ courseId }): ReactElement => {
   const navigate = useNavigate();
@@ -61,7 +61,9 @@ const StudentSelector: FC<StudentSelectorProps> = memo(({ courseId }): ReactElem
         error: 'Failed to load students',
         message: 'Select a student',
       }}
-      onSelect={(value) => navigate(`/${courseId}/${value}`)}
+      onSelect={(value) => {
+        navigate(`/${courseId}/${value}`);
+      }}
       options={data?.map((student) => {
         return { label: student.name, value: student.userID };
       })}
