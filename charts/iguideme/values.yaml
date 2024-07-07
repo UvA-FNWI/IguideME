@@ -29,6 +29,6 @@ azure:
     - name: iguideme-canvas-token
       key: LMS__Canvas__AccessToken
     - name: iguideme-brightspace-user
-      key: LMS__Brightspace__UserID
+      key: LMS__Brightspace__Connection__UserID
     - name: iguideme-brightspace-pass
-      key: LMS__Brightspace__Password
+      key: LMS__Brightspace__Connection__Password
