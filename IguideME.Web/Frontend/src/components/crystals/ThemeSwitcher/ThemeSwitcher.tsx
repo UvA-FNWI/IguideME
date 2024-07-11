@@ -16,17 +16,14 @@ const ThemeSwitcher: FC<ThemeSwitcherProps> = memo(({ className, rotate, user, .
 
   return (
     <div
-      className={cn(
-        `flex min-h-11 items-center justify-between rounded-md ${rotate && 'rotate-90 lg:rotate-0'}`,
-        className,
-      )}
+      className={cn(`flex min-h-11 items-center justify-between rounded-md ${rotate && 'rotate-90'}`, className)}
       {...props}
     >
       <Tooltip title='Toggle Theme'>
         <Switch
           className='[&_span]:!bg-surface2'
-          checkedChildren={<MoonOutlined className={`text-text ${rotate && '-rotate-45 lg:rotate-0'}`} />}
-          unCheckedChildren={<SunOutlined className={`text-text ${rotate && '-rotate-45 lg:rotate-0'}`} />}
+          checkedChildren={<MoonOutlined className={`text-text ${rotate && '-rotate-45'}`} />}
+          unCheckedChildren={<SunOutlined className={`text-text ${rotate && '-rotate-45'}`} />}
           checked={theme === 'dark'}
           onChange={() => {
             if (user.role === UserRoles.student) {

@@ -1,4 +1,6 @@
 import { getSelf } from '@/api/users';
+import Hat from '@/components/atoms/logo/Hat';
+import Logo from '@/components/atoms/logo/Logo';
 import NotificationPanel from '@/components/atoms/notification-panel/notification-panel';
 import { UserRoles } from '@/types/user';
 import {
@@ -21,8 +23,6 @@ import GlobalStoreProvider from './GlobalStore/globalStore';
 import { useGlobalContext } from './GlobalStore/useGlobalStore';
 import { useLayoutStore } from './LayoutStore';
 import { getAdminPanelMenuItems } from './adminPanelMenuItems';
-import Hat from '@/components/atoms/logo/Hat';
-import Logo from '@/components/atoms/logo/Logo';
 
 interface Match {
   id: string;
@@ -165,7 +165,7 @@ const SideNavigation: FC = (): ReactElement => {
             <div
               className={`grid h-11 flex-1 place-content-center rounded-md ${!isSidebarClosed && 'border border-border1'}`}
             >
-              <ThemeSwitcher rotate user={self} />
+              <ThemeSwitcher rotate={isSidebarClosed} user={self} />
             </div>
             <div className={`h-11 flex-1 rounded-md ${!isSidebarClosed && 'border border-border1'} p-0 text-text`}>
               <NotificationPanel
