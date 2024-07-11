@@ -8,8 +8,8 @@
   :root {
     /* Note, these first three do not support alpha */
     --primary: 252deg 100% 60%;
-    --secondary: 0deg 96% 68%;
-    --tertiary: 143deg 40% 65%;
+    --secondary: 46deg 65% 52%;
+    --tertiary: 88deg 37% 40%;
 
     --secondaryAlpha: 0deg 96% 68%;
     --accent: 233deg 13% 80%;
@@ -43,7 +43,7 @@
     /* Note, these first three do not support alpha */
     --primary: 266deg 85% 58%;
     --secondary: 351deg 74% 73%;
-    --tertiary: 171deg 47% 69%;
+    --tertiary: 88deg 34% 60%;
 
     --secondaryAlpha: 266deg 85% 58%;
     --accent: 266deg 85% 58%;

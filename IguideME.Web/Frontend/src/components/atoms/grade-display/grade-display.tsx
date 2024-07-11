@@ -1,13 +1,13 @@
-import resolveConfig from 'tailwindcss/resolveConfig';
 import tailwindConfig from '@/../tailwind.config';
-import { Bar, BarChart, Label, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { useTileViewStore } from '@/components/pages/student-dashboard/tileViewContext';
+import { UseMediaQuery } from '@/hooks/UseMediaQuery';
+import { type TooltipProps } from '@/types/reactRecharts';
+import { varFixed } from '@/types/tile';
 import { FrownOutlined, MehOutlined, SmileOutlined } from '@ant-design/icons';
 import { Space, Spin } from 'antd';
-import { type TooltipProps } from '@/types/reactRecharts';
-import { useTileViewStore } from '@/components/pages/student-dashboard/tileViewContext';
 import { memo, type FC, type ReactElement } from 'react';
-import { varFixed } from '@/types/tile';
-import { UseMediaQuery } from '@/hooks/UseMediaQuery';
+import { Bar, BarChart, Label, LabelList, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import resolveConfig from 'tailwindcss/resolveConfig';
 
 const GradeDisplay: FC = (): ReactElement => {
   const { user, viewType } = useTileViewStore((state) => ({
@@ -150,7 +150,9 @@ const GraphGrades: FC<Props> = memo(({ goal, total, pred }): ReactElement => {
         <XAxis hide axisLine={false} type='number' domain={[0, 10]} />
         <YAxis axisLine dataKey='name' tick={false} tickSize={0} type='category' width={1} />
         <Tooltip content={<BarTooltip />} cursor={false} />
-        <Bar dataKey='grade' className='[&>g>path]:!fill-overlay0' barSize={15} background={{ fill: '#eee' }} />
+        <Bar dataKey='grade' className='[&>g>path]:!fill-overlay0' barSize={15} background={{ fill: '#eee' }}>
+          <LabelList dataKey='name' position='insideLeft' fill='#ffffff' />
+        </Bar>
         <ReferenceLine className='stroke-text [&>line]:!stroke-text' strokeDasharray='3 3' strokeWidth={2} x={goal}>
           <Label value='goal' position='insideLeft' />
         </ReferenceLine>
