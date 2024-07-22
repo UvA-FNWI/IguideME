@@ -33,7 +33,7 @@ namespace IguideME.Web.Models.App
 
         // Only populated when send to frontend
         [JsonProperty(PropertyName = "grades")]
-        public AssignmentGrades Grades { get; set; }
+        public AppGrades Grades { get; set; }
 
         public AppDiscussionTopic(
             int id,
@@ -60,7 +60,7 @@ namespace IguideME.Web.Models.App
             string author,
             long date,
             string message,
-            AssignmentGrades grades)
+            AppGrades grades)
         {
             this.ID = id;
             this.CourseID = courseID;
@@ -98,7 +98,7 @@ namespace IguideME.Web.Models.App
 
         // Only populated when send to frontend
         [JsonProperty(PropertyName = "grades")]
-        public AssignmentGrades Grades { get; set; }
+        public AppGrades Grades { get; set; }
 
         public AppDiscussionEntry(
             int id,
@@ -126,7 +126,7 @@ namespace IguideME.Web.Models.App
             string author,
             long date,
             string message,
-            AssignmentGrades grades)
+            AppGrades grades)
         {
             this.ID = id;
             this.DiscussionID = discussionID;

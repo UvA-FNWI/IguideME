@@ -1592,7 +1592,7 @@ namespace IguideME.Web.Services
                         r.GetInt32(0),
                         r.GetInt32(1),
                         r.GetValue(2).ToString(),
-                        new AssignmentGrades(
+                        new AppGrades(
                             r.GetDouble(3),
                             comparison.Average,
                             comparison.Minimum,
@@ -2782,11 +2782,11 @@ namespace IguideME.Web.Services
 
         }
 
-        public int GetTileMax(int tileID, int courseID)
+        public (int, AppGradingType) GetTileMax(int tileID, int courseID)
         {
             using (
                 SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_TILE_MAX_GRADE,
+                    DatabaseQueries.QUERY_TILE_GRADE_MAX_AND_TYPE,
                     new SQLiteParameter("tileID", tileID),
                     new SQLiteParameter("courseID", courseID)
                 )
@@ -2794,17 +2794,16 @@ namespace IguideME.Web.Services
             {
                 if (r.Read())
                 {
-                    return Convert.ToInt32(r.GetDouble(0));
+                    return (Convert.ToInt32(r.GetDouble(0)), (AppGradingType)r.GetInt32(1));
                 }
             }
-            return -1;
-
+            return (-1, AppGradingType.Points);
         }
 
-        public TileGrades GetTileGrade(int tileID, string userID, int courseID)
+        public AppGrades GetTileGrade(int tileID, string userID, int courseID)
         {
             double tileGrade = GetTileAVG(tileID, userID, courseID);
-            int max = GetTileMax(tileID, courseID);
+            (int max, AppGradingType type) = GetTileMax(tileID, courseID);
 
             long syncID = this.GetCurrentSyncID(courseID);
             using (
@@ -2822,12 +2821,12 @@ namespace IguideME.Web.Services
                     try
                     {
                         return new(
-                            tileID,
                             tileGrade,
                             r.GetDouble(0),
                             r.GetDouble(1),
                             r.GetDouble(2),
-                            max
+                            max,
+                            type
                         );
                     }
                     catch (Exception e)
@@ -2994,21 +2993,21 @@ namespace IguideME.Web.Services
                     int max = r.GetInt32(5);
                     max = max == 0 ? 1 : max;
                     return new(
-                            r.GetInt32(0),
-                            courseID,
-                            r.GetValue(1).ToString(),
-                            r.GetValue(2).ToString(),
-                            r.GetInt32(3),
-                            r.GetValue(4).ToString(),
-                            new AssignmentGrades(
-                                   100 * grade / max,
-                                 100 * comparison.Average / max,
-                                 100 * comparison.Minimum / max,
-                                 100 * comparison.Maximum / max,
-                                     max,
-                                     AppGradingType.Points
-                            )
-                        );
+                        r.GetInt32(0),
+                        courseID,
+                        r.GetValue(1).ToString(),
+                        r.GetValue(2).ToString(),
+                        r.GetInt32(3),
+                        r.GetValue(4).ToString(),
+                        new AppGrades(
+                               100 * grade / max,
+                             100 * comparison.Minimum / max,
+                             100 * comparison.Average / max,
+                             100 * comparison.Maximum / max,
+                                 max,
+                                 AppGradingType.Points
+                        )
+                    );
                 }
             }
 

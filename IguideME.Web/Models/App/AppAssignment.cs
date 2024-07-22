@@ -2,15 +2,6 @@
 
 namespace IguideME.Web.Models.App
 {
-
-    public enum AppGradingType
-    {
-        PassFail,
-        Percentage,
-        Letters,
-        Points,
-        NotGraded
-    }
     public class AppAssignment
     {
         [JsonProperty("id")]

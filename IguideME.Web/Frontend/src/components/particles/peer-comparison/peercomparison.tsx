@@ -2,7 +2,7 @@ import { Col, Row } from 'antd';
 import { type FC, type ReactElement } from 'react';
 import { type Grades, printGrade } from '@/types/tile';
 
-const PeerComparison: FC<Grades> = ({ peerAvg, peerMax, peerMin, max, type }): ReactElement => {
+const PeerComparison: FC<{ grades: Grades }> = ({ grades: { peerAvg, peerMax, peerMin, max, type } }): ReactElement => {
   return (
     <div className='text-subtext0'>
       <Row className='content-center justify-center pt-1'>

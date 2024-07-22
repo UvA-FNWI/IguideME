@@ -5,7 +5,7 @@ import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
 import { cn } from '@/utils/cn';
 import { Col, Divider, Row } from 'antd';
-import { getTileGrades } from '@/api/tiles';
+import { getUserTileGrades } from '@/api/grades';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useTileViewStore } from '@/components/pages/student-dashboard/tileViewContext';
@@ -29,7 +29,7 @@ const ViewTile: FC<Props> = memo(({ tile, textStyle }): ReactElement => {
     isLoading,
   } = useQuery({
     queryKey: [user.userID, tile.id],
-    queryFn: async () => await getTileGrades(user.userID, tile.id),
+    queryFn: async () => await getUserTileGrades(user.userID, tile.id),
   });
 
   const navigate = useNavigate();
@@ -40,7 +40,7 @@ const ViewTile: FC<Props> = memo(({ tile, textStyle }): ReactElement => {
         aria-disabled={isLoading || isError}
         className={`${
           isError ? 'cursor-not-allowed' : 'cursor-pointer'
-        } relative h-[230px] w-[270px] rounded-md border border-solid border-border1 bg-surface1 p-2`}
+        } border-border1 bg-surface1 relative h-[230px] w-[270px] rounded-md border border-solid p-2`}
         onClick={() => {
           if (!(isError || isLoading)) navigate(tile.id + '/');
         }}
@@ -68,48 +68,19 @@ const ViewTile: FC<Props> = memo(({ tile, textStyle }): ReactElement => {
       case 'graph':
         return (
           <Row className='h-4/5 content-center justify-center'>
-            <GraphTile
-              type={tile.type}
-              grades={{
-                grade: grades.grade,
-                peerAvg: grades.peerAvg,
-                peerMin: grades.peerMin,
-                peerMax: grades.peerMax,
-                max: grades.max,
-                type: tile.gradingType,
-              }}
-            />
+            <GraphTile type={tile.type} grades={grades} />
           </Row>
         );
       case 'grid':
         return (
           <>
             <Row className='h-1/2 content-center justify-center'>
-              <GridTile
-                type={tile.type}
-                grades={{
-                  grade: grades.grade,
-                  peerAvg: grades.peerAvg,
-                  peerMin: grades.peerMin,
-                  peerMax: grades.peerMax,
-                  max: grades.max,
-                  type: tile.gradingType,
-                }}
-              />
+              <GridTile type={tile.type} grades={grades} />
             </Row>
             <Row className='h-[30%] w-full content-start justify-center'>
               <Col className='h-full w-full'>
-                <Divider className='m-0 border-text p-0' />
-                <PeerComparison
-                  {...{
-                    grade: grades.grade,
-                    peerAvg: grades.peerAvg,
-                    peerMin: grades.peerMin,
-                    peerMax: grades.peerMax,
-                    max: grades.max,
-                    type: tile.gradingType,
-                  }}
-                />
+                <Divider className='border-text m-0 p-0' />
+                <PeerComparison grades={grades} />
               </Col>{' '}
             </Row>
           </>

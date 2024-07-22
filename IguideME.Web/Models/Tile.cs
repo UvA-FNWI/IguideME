@@ -101,29 +101,14 @@ namespace IguideME.Web.Models
         [JsonProperty(PropertyName = "tile_id")]
         public int TileID { get; set; }
 
-        [JsonProperty(PropertyName = "grade")]
-        public double Grade { get; set; }
+        [JsonProperty(PropertyName = "grades")]
+        public AppGrades Grades { get; set; }
 
-        [JsonProperty(PropertyName = "peerMin")]
-        public double PeerMin { get; set; }
 
-        [JsonProperty(PropertyName = "peerAvg")]
-        public double PeerAvg { get; set; }
-
-        [JsonProperty(PropertyName = "peerMax")]
-        public double PeerMax { get; set; }
-
-        [JsonProperty(PropertyName = "max")]
-        public int Max { get; set; }
-
-        public TileGrades(int tileID, double grade, double peerMin, double peerAvg, double peerMax, int max)
+        public TileGrades(int tileID, AppGrades grades)
         {
             this.TileID = tileID;
-            this.Grade = grade;
-            this.PeerMin = peerMin;
-            this.PeerAvg = peerAvg;
-            this.PeerMax = peerMax;
-            this.Max = max;
+            this.Grades = grades;
         }
     }
 }

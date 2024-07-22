@@ -19,7 +19,7 @@ namespace IguideME.Web.Models.App
         public string RawGrade { get; set; }
 
         [JsonProperty(PropertyName = "grades")]
-        public AssignmentGrades Grades { get; set; }
+        public AppGrades Grades { get; set; }
 
         [JsonProperty(PropertyName = "date")]
         public long Date { get; set; }
@@ -61,7 +61,7 @@ namespace IguideME.Web.Models.App
             int id,
             int assignmentID,
             string userID,
-            AssignmentGrades grades,
+            AppGrades grades,
             long date
         )
         {
@@ -140,44 +140,5 @@ namespace IguideME.Web.Models.App
                 _ => 0.00,
             };
         }
-    }
-
-    public class AssignmentGrades
-    {
-        [JsonProperty(PropertyName = "grade")]
-        public double Grade { get; set; }
-
-        [JsonProperty(PropertyName = "peerAvg")]
-        public double PeerAvg { get; set; }
-
-        [JsonProperty(PropertyName = "peerMin")]
-        public double PeerMin { get; set; }
-
-        [JsonProperty(PropertyName = "peerMax")]
-        public double PeerMax { get; set; }
-
-        [JsonProperty(PropertyName = "max")]
-        public double Max { get; set; }
-
-        [JsonProperty(PropertyName = "type")]
-        public AppGradingType Type { get; set; }
-
-        public AssignmentGrades(
-            double grade,
-            double peerAvg,
-            double peerMin,
-            double peerMax,
-            double max,
-            AppGradingType type
-        )
-        {
-            Grade = grade;
-            PeerAvg = peerAvg;
-            PeerMin = peerMin;
-            PeerMax = peerMax;
-            Max = max;
-            Type = type;
-        }
-
     }
 }

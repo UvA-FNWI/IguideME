@@ -1,4 +1,5 @@
-import { getTopics, getUserDiscussionEntries } from '@/api/entries';
+import { getTopics } from '@/api/entries';
+import { getUserDiscussionEntries } from '@/api/grades';
 import { useTileViewStore } from '@/components/pages/student-dashboard/tileViewContext';
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
@@ -93,9 +94,9 @@ interface DiscProps {
 }
 const DiscussionDisplay: FC<DiscProps> = ({ title, message }): ReactElement => {
   return (
-    <div className='h-[230px] w-max min-w-[270px] max-w-xs rounded-md border border-solid border-border1 bg-surface1'>
+    <div className='border-border1 bg-surface1 h-[230px] w-max min-w-[270px] max-w-xs rounded-md border border-solid'>
       <div className='h-full w-full p-2'>
-        <h3 className='overflow-hidden text-ellipsis text-nowrap text-center font-bold text-text'>{title}</h3>
+        <h3 className='text-text overflow-hidden text-ellipsis text-nowrap text-center font-bold'>{title}</h3>
         <div className='grid h-full w-full place-content-center'>
           <div dangerouslySetInnerHTML={{ __html: message }}></div>
         </div>

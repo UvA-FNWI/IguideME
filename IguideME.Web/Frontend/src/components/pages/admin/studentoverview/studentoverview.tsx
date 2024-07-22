@@ -4,11 +4,13 @@ import { useMemo, type FC, type ReactElement } from 'react';
 import type { TableColumnsType } from 'antd/lib';
 import { getStudentsWithSettings } from '@/api/users';
 import { useQuery } from '@tanstack/react-query';
-import { getAllTileGrades, getTiles } from '@/api/tiles';
+import { getTiles } from '@/api/tiles';
 import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import NestedTable from './NestedTable';
 import QueryError from '@/components/particles/QueryError';
 import { useAntFilterDropdown } from './AntFilterDropdown';
+import { User } from '@/types/user';
+import { getAllUserTileGrades } from '@/api/grades';
 
 export interface TableData {
   student: User;
@@ -46,7 +48,7 @@ const StudentOverview: FC = (): ReactElement => {
     isLoading: isGradesLoading,
   } = useQuery({
     queryKey: ['tilegrades'],
-    queryFn: getAllTileGrades,
+    queryFn: getAllUserTileGrades,
   });
 
   const data: TableData[] = useMemo(() => {

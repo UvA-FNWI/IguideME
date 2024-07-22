@@ -264,7 +264,7 @@ public static class DatabaseQueries
         @"CREATE TABLE IF NOT EXISTS `tile_grades` (
             `user_id`           STRING,
             `tile_id`           INTEGER,
-            `Grade`             FLOAT,
+            `grade`             FLOAT,
             `sync_id`           INTEGER,
             PRIMARY KEY (`user_id`,`tile_id`,`sync_id`),
             FOREIGN KEY(`user_id`) REFERENCES `users`(`user_id`),
@@ -435,7 +435,7 @@ public static class DatabaseQueries
     public const string REGISTER_TILE_GRADE =
         @"INSERT INTO   `tile_grades` ( `user_id`,
                                         `tile_id`,
-                                        `Grade`,
+                                        `grade`,
                                         `sync_id`)
             VALUES        (
                 @userID,
@@ -446,7 +446,7 @@ public static class DatabaseQueries
             ON CONFLICT DO NOTHING;";
 
     public const string QUERY_TILE_GRADE_FOR_USER =
-        @"SELECT    `Grade`
+        @"SELECT    `grade`
           FROM      `tile_grades`
           WHERE     `user_id` = @userID
           AND       `tile_id` = @tileID
@@ -871,13 +871,13 @@ public static class DatabaseQueries
     ";
 
     public const string QUERY_TILE_GRADE =
-        @"SELECT    `Grade`
+        @"SELECT    `grade`
         FROM        `tile_grades`
         WHERE       `tile_id`=@tileID
         AND         `sync_id`=@syncID
         AND         `user_id`=@userID;";
 
-    public const string QUERY_TILE_MAX_GRADE =
+    public const string QUERY_TILE_GRADE_MAX_AND_TYPE =
         @"SELECT     
             CASE type 
                 WHEN 0 THEN 100 
@@ -887,7 +887,8 @@ public static class DatabaseQueries
                     (SELECT COUNT(*) FROM `discussion_entries` WHERE `course_id`=@courseID)) 
                 WHEN 2 THEN (
                     SELECT COUNT(*) FROM `learning_goals` WHERE `course_id`=@courseID) 
-            END 
+            END,
+            `grading_type`
         FROM `tiles`
         WHERE `tile_id`=@tileID
         ;";

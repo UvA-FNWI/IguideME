@@ -1,4 +1,4 @@
-import { printGrade, type Tile, type TileGrades } from '@/types/tile';
+import { printGrade, TileGrade, type Tile } from '@/types/tile';
 import type { User } from '@/types/user';
 import { Table } from 'antd';
 import type { TableColumnsType } from 'antd/lib';
@@ -11,7 +11,7 @@ interface NestedTableProps {
   tileGrades: Array<{
     userID: string;
     goal: number;
-    tile_grades: TileGrades[];
+    tile_grades: TileGrade[];
   }>;
 }
 
@@ -26,8 +26,8 @@ const NestedTable: FC<NestedTableProps> = memo(({ student, tiles, tileGrades }):
 
     tileGrades
       .find((grades) => grades.userID === student.userID)
-      ?.tile_grades.forEach((grades) => {
-        data['tile ' + grades.tile_id] = { grade: grades.grade, max: grades.max };
+      ?.tile_grades.forEach(({ tile_id, grade, max }) => {
+        data['tile ' + tile_id] = { grade: grade, max: max };
       });
 
     return [data];

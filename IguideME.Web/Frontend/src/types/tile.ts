@@ -27,12 +27,9 @@ export interface Tile {
   entries: TileEntry[];
 }
 
-export interface TileGrades {
+export interface TileGrade {
   tile_id: number;
   grade: number;
-  peerMin: number;
-  peerAvg: number;
-  peerMax: number;
   max: number;
 }
 
@@ -153,7 +150,6 @@ const letterGrade = (grade: number): string => {
   return 'F';
 };
 
-// TODO collapse together with tileGrades
 export interface Grades {
   grade: number;
   peerAvg: number;

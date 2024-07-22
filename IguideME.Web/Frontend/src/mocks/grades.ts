@@ -5,10 +5,25 @@ import { MOCK_GOALS } from './entries';
 import { MOCK_PERUSALL_SUBMISSIONS } from './submissions/perusal';
 import { MOCK_PRACTICE_SESSIONS } from './submissions/practice-sessions';
 import { MOCK_QUIZ_SUBMISSIONS } from './submissions/quizzes';
-import { type LearningGoal, LogicalExpression, type Submission, type TileGrades } from '@/types/tile';
+import { Grades, type LearningGoal, LogicalExpression, type Submission, type TileGrade } from '@/types/tile';
 import { MOCK_STUDENTS } from './users';
+import { MOCK_TILES } from './tiles';
 
 export const gradeHandlers = [
+  http.get('/grades/*', ({ request, params }) => {
+    const url = new URL(request.url);
+
+    const id = params[0];
+    const type = url.searchParams.get('type');
+    console.log('params', { id, type });
+    // return HttpResponse.json<
+    //   Array<{
+    //     userID: string;
+    //     tile_grades: Array<TileGrade>;
+    //   }>
+    // >(MOCK_TILE_GRADES);
+  }),
+
   http.get('/tiles/*/grades/*', ({ params }) => {
     const tid = params[0];
     const uid = params[1];
@@ -23,21 +38,42 @@ export const gradeHandlers = [
       console.warn('No grades found for tile', tid);
       return new HttpResponse(null, { status: 404 });
     }
-    return HttpResponse.json<TileGrades>({
+    return HttpResponse.json<Grades>({
       ...result,
       ...MOCK_PEER_TILE_GRADES[MOCK_STUDENTS.find((a) => a.userID === uid)!.settings!.goal_grade].find(
         (pg) => pg.tileID.toString() === tid,
       )!,
+      type: MOCK_TILES.find((tile) => tile.id.toString() === tid)!.gradingType,
     });
   }),
-
   http.get('/tiles/grades', () => {
     return HttpResponse.json<
       Array<{
         userID: string;
-        tile_grades: Array<{ grade: number; max: number }>;
+        tile_grades: Array<TileGrade>;
       }>
     >(MOCK_TILE_GRADES);
+  }),
+  http.get('/assignments/*/submissions/*', ({ params }) => {
+    return HttpResponse.json<Submission | undefined>(
+      MOCK_SUBMISSIONS.find((sub) => sub.assignmentID.toString() === params[0] && sub.userID === params[1]),
+    );
+  }),
+  http.get('/tiles/*/grades', ({ params }) => {
+    const tid = params[0];
+    return HttpResponse.json<
+      Array<{
+        userID: string;
+        grade: number;
+        max: number;
+      }>
+    >(
+      MOCK_TILE_GRADES.map(({ userID, tile_grades }) => {
+        const grades = tile_grades.find((tgrade) => tgrade.tile_id.toString() === tid);
+
+        return { userID, grade: grades?.grade ?? -1, max: grades?.max ?? -1 };
+      }),
+    );
   }),
   http.get('/assignments/*/submissions/*', ({ params }) => {
     return HttpResponse.json<Submission | undefined>(
@@ -459,7 +495,7 @@ const MOCK_PEER_TILE_GRADES: Array<
 
 const MOCK_TILE_GRADES: Array<{
   userID: string;
-  tile_grades: Array<{ grade: number; tile_id: number; max: number }>;
+  tile_grades: Array<TileGrade>;
 }> = [
   {
     userID: '28332183',
