@@ -1,8 +1,9 @@
 import apiClient from './axios';
 import { type JobModel, type Synchronization } from '@/types/synchronization';
 
-export const getSynchronizations: () => Promise<Synchronization[]> = async () =>
-  await apiClient.get('datamart/synchronizations').then((response) => response.data);
+export async function getSynchronizations(): Promise<Synchronization[]> {
+  return await apiClient.get('datamart/synchronizations').then((response) => response.data);
+}
 
 interface Job {
   startTime: string;
@@ -12,8 +13,9 @@ interface Job {
 }
 
 type PollSyncData = Record<string, Job>;
-export const pollSync: () => Promise<JobModel[]> = async () =>
-  await apiClient.get('datamart/status').then((response) => {
+
+export async function pollSync(): Promise<JobModel[]> {
+  return await apiClient.get('datamart/status').then((response) => {
     if (response.data === null || response.data === undefined) {
       return response.data;
     }
@@ -27,8 +29,12 @@ export const pollSync: () => Promise<JobModel[]> = async () =>
       };
     });
   });
-
+}
 // TODO: figure out the typing here to be cleaner
-export const startNewSync: () => Promise<any> = async () => await apiClient.post('datamart/start-sync', {});
+export async function startNewSync(): Promise<any> {
+  return await apiClient.post('datamart/start-sync', {});
+}
 
-export const stopCurrentSync: () => Promise<any> = async () => await apiClient.post('datamart/stop-sync', {});
+export async function stopCurrentSync(): Promise<any> {
+  return await apiClient.post('datamart/stop-sync', {});
+}

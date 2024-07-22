@@ -1,5 +1,6 @@
 import apiClient from './axios';
 import { type AxiosResponse } from 'axios';
 
-const setup = async (): Promise<AxiosResponse<any, any>> => await apiClient.post('app/setup');
-export default setup;
+export default async function setup(): Promise<AxiosResponse<any, any>> {
+  return await apiClient.post('app/setup');
+}
