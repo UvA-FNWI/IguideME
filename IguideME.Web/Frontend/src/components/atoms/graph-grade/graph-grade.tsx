@@ -1,6 +1,6 @@
 import tailwindConfig from '@/../tailwind.config';
 import { type TooltipProps } from '@/types/reactRecharts';
-import { printGrade, type Grades } from '@/types/tile';
+import { printGrade, type Grades } from '@/types/grades';
 import { useTheme } from 'next-themes';
 import { type FC, type ReactElement } from 'react';
 import { Bar, BarChart, Tooltip, XAxis, YAxis } from 'recharts';

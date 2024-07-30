@@ -5,7 +5,8 @@ import { MOCK_GOALS } from './entries';
 import { MOCK_PERUSALL_SUBMISSIONS } from './submissions/perusal';
 import { MOCK_PRACTICE_SESSIONS } from './submissions/practice-sessions';
 import { MOCK_QUIZ_SUBMISSIONS } from './submissions/quizzes';
-import { Grades, type LearningGoal, LogicalExpression, type Submission, type TileGrade } from '@/types/tile';
+import { type LearningGoal, LogicalExpression } from '@/types/tile';
+import { type Submission, Grades, TileGrade, UserGrade } from '@/types/grades';
 import { MOCK_STUDENTS } from './users';
 import { MOCK_TILES } from './tiles';
 
@@ -15,13 +16,10 @@ export const gradeHandlers = [
 
     const id = params[0];
     const type = url.searchParams.get('type');
-    console.log('params', { id, type });
-    // return HttpResponse.json<
-    //   Array<{
-    //     userID: string;
-    //     tile_grades: Array<TileGrade>;
-    //   }>
-    // >(MOCK_TILE_GRADES);
+
+    if (!type) return HttpResponse.json();
+
+    return HttpResponse.json<Array<UserGrade>>(getContentGrades(id, type));
   }),
 
   http.get('/tiles/*/grades/*', ({ params }) => {
@@ -110,6 +108,30 @@ export const gradeHandlers = [
     return HttpResponse.json<LearningGoal | undefined>(goal);
   }),
 ];
+
+function getContentGrades(id: string | readonly string[], type: string): UserGrade[] {
+  switch (type) {
+    case 'tile':
+      return MOCK_TILE_GRADES.map((set) => {
+        const res = set.tile_grades.find((grades) => grades.tile_id.toString() === id);
+        if (!res) return undefined;
+
+        return { userID: set.userID, grade: res.grade, max: res.max };
+      }).filter((val) => val !== undefined); //remove undefined here
+    case 'ass':
+      return MOCK_SUBMISSIONS.filter((sub) => sub.assignmentID.toString() === id).map((sub) => ({
+        userID: sub.userID,
+        grade: sub.grades.grade,
+        max: sub.grades.max,
+      }));
+    case 'disc':
+    // TODO
+    case 'goal':
+    // TODO
+    default:
+  }
+  return [];
+}
 
 const MOCK_SUBMISSIONS: Submission[] = [
   ...MOCK_QUIZ_SUBMISSIONS,

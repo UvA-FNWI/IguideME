@@ -1,4 +1,4 @@
-import { GradingType, type Submission } from '@/types/tile';
+import { GradingType, type Submission } from '@/types/grades';
 
 export const MOCK_PERUSALL_SUBMISSIONS: Submission[] = [
   {

@@ -1,10 +1,8 @@
-import { DiscussionEntry, DiscussionTopic, Grades, LearningGoal, Submission, TileGrade } from '@/types/tile';
+import { DiscussionEntry, DiscussionTopic, LearningGoal } from '@/types/tile';
+import { Submission, Grades, TileGrade, UserGrade } from '@/types/grades';
 import apiClient from './axios';
 
-export async function getCompareGrades(
-  id: number,
-  type: string,
-): Promise<Array<{ userID: string; grade: number; max: number }>> {
+export async function getCompareGrades(id: number, type: string): Promise<Array<UserGrade>> {
   return await apiClient.get(`grades/${id}`, { params: { type } }).then((response) => response.data);
 }
 

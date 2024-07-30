@@ -2,7 +2,7 @@ import tailwindConfig from '@/../tailwind.config';
 import { useTileViewStore } from '@/components/pages/student-dashboard/tileViewContext';
 import { UseMediaQuery } from '@/hooks/UseMediaQuery';
 import { type TooltipProps } from '@/types/reactRecharts';
-import { varFixed } from '@/types/tile';
+import { varFixed } from '@/types/grades';
 import { FrownOutlined, MehOutlined, SmileOutlined } from '@ant-design/icons';
 import { Space, Spin } from 'antd';
 import { memo, type FC, type ReactElement } from 'react';
@@ -95,7 +95,7 @@ GridGrades.displayName = 'GridGrades';
 const BarTooltip: FC<TooltipProps> = memo(({ active, payload, label }) => {
   if (active && payload?.length) {
     return (
-      <div className='z-50 rounded-lg border border-solid border-text bg-crust/80 p-2'>
+      <div className='border-text bg-crust/80 z-50 rounded-lg border border-solid p-2'>
         <p>
           {label}: {Number(payload[0].value.toFixed(1))}/10
         </p>

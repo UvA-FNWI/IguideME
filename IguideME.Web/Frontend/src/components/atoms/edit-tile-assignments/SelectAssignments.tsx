@@ -6,7 +6,8 @@ import { InputNumber, Select, Table } from 'antd';
 import { useQuery } from '@tanstack/react-query';
 import { useCallback, useEffect, useMemo, useState, type FC, type ReactElement } from 'react';
 
-import { printGradingType, type Assignment, type TileEntry } from '@/types/tile';
+import { type Assignment, type TileEntry } from '@/types/tile';
+import { printGradingType } from '@/types/grades';
 
 interface SelectAssignmentsProps {
   value: TileEntry[];
@@ -135,7 +136,7 @@ const SelectAssignments: FC<SelectAssignmentsProps> = ({ value: entries, onChang
               render: (_: string, entry: TileEntry) => {
                 return (
                   <InputNumber
-                    className='antNumberInput w-full !border border-solid !border-accent/70 !bg-surface1 hover:!border-accent hover:!bg-surface2 [&_input]:!text-text'
+                    className='antNumberInput !border-accent/70 !bg-surface1 hover:!border-accent hover:!bg-surface2 [&_input]:!text-text w-full !border border-solid'
                     value={entry.weight}
                     onChange={(val) => {
                       changeWeight(entry, val);
@@ -171,7 +172,7 @@ const SelectAssignments: FC<SelectAssignmentsProps> = ({ value: entries, onChang
         />
 
         <Select
-          className='[&>div]:hover:!border-accent[&_span]:!text-text w-full [&>div]:!border-accent/70 [&>div]:!bg-surface1 [&>div]:!shadow-none [&>div]:hover:!bg-surface2'
+          className='[&>div]:hover:!border-accent[&_span]:!text-text [&>div]:!border-accent/70 [&>div]:!bg-surface1 [&>div]:hover:!bg-surface2 w-full [&>div]:!shadow-none'
           dropdownClassName='bg-surface1 [&_div]:!text-text selectionSelected'
           value={selectedAssignments}
           mode='multiple'

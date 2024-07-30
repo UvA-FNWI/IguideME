@@ -1,6 +1,7 @@
-import { GradingType, type LayoutColumn, type Tile, type TileGroup, TileType } from '@/types/tile';
+import { type LayoutColumn, type Tile, type TileGroup, TileType } from '@/types/tile';
 import { http, HttpResponse } from 'msw';
 import { MOCK_ASSIGNMENTS, MOCK_GOALS, MOCK_TOPICS } from './entries';
+import { GradingType } from '@/types/grades';
 
 export const tileHandlers = [
   http.get('/layout/columns', () => {

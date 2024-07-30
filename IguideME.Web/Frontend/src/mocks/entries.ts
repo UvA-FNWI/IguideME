@@ -1,12 +1,12 @@
 import { http, HttpResponse } from 'msw';
 import {
-  GradingType,
   type Assignment,
   type DiscussionTopic,
   type LearningGoal,
   LogicalExpression,
   DiscussionEntry,
 } from '@/types/tile';
+import { GradingType } from '@/types/grades';
 
 export const entriesHandlers = [
   http.get('/assignments', () => {
@@ -64,7 +64,7 @@ export const MOCK_ASSIGNMENTS: Assignment[] = [
   {
     id: 2,
     course_id: 17320,
-    title: 'Quiz 3: Neurotransmitter systemen',
+    title: 'Quiz 2: Neurotransmitter systemen',
     published: true,
     muted: false,
     due_date: 1707688872519,
@@ -74,7 +74,7 @@ export const MOCK_ASSIGNMENTS: Assignment[] = [
   {
     id: 3,
     course_id: 17320,
-    title: 'Quiz 2: Macro Anatomie',
+    title: 'Quiz 3: Macro Anatomie',
     published: true,
     muted: false,
     due_date: 1707688872519,

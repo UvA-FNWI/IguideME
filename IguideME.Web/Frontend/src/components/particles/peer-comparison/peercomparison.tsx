@@ -1,6 +1,6 @@
 import { Col, Row } from 'antd';
 import { type FC, type ReactElement } from 'react';
-import { type Grades, printGrade } from '@/types/tile';
+import { printGrade, type Grades } from '@/types/grades';
 
 const PeerComparison: FC<{ grades: Grades }> = ({ grades: { peerAvg, peerMax, peerMin, max, type } }): ReactElement => {
   return (

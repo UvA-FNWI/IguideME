@@ -7,8 +7,9 @@ import { DeleteFilled, PlusOutlined } from '@ant-design/icons';
 import { deleteTileGroup, getTiles, patchTileGroup, postTile } from '@/api/tiles';
 import { SortableContext, useSortable } from '@dnd-kit/sortable';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { GradingType, TileType, type TileGroup } from '@/types/tile';
+import { TileType, type TileGroup } from '@/types/tile';
 import { useMemo, useState, type FC, type ReactElement } from 'react';
+import { GradingType } from '@/types/grades';
 
 interface Props {
   group: TileGroup;
@@ -68,7 +69,7 @@ const AdminTileGroupView: FC<Props> = ({ group }): ReactElement => {
   if (isDragging) {
     return (
       <div
-        className='min-h-[235px] rounded-lg border border-dashed border-text bg-accent/50 p-[10px]'
+        className='border-text bg-accent/50 min-h-[235px] rounded-lg border border-dashed p-[10px]'
         ref={setNodeRef}
         style={style}
       />
@@ -79,13 +80,13 @@ const AdminTileGroupView: FC<Props> = ({ group }): ReactElement => {
     .fill(0)
     .map((_, i) => (
       <QueryLoading key={i} isLoading={isLoading}>
-        <div className='m-0 h-[150px] w-60 rounded-md border border-solid border-text bg-surface1' />
+        <div className='border-text bg-surface1 m-0 h-[150px] w-60 rounded-md border border-solid' />
       </QueryLoading>
     ));
 
   const errorState = (
     <Col>
-      <div className='relative m-0 h-[150px] w-60 rounded-md border border-solid border-text bg-surface1'>
+      <div className='border-text bg-surface1 relative m-0 h-[150px] w-60 rounded-md border border-solid'>
         <QueryError className='grid place-content-center' title='Error: Could not load tile' />
       </div>
     </Col>
@@ -93,7 +94,7 @@ const AdminTileGroupView: FC<Props> = ({ group }): ReactElement => {
 
   return (
     <div
-      className='my-4 min-h-[235px] rounded-lg border border-solid border-border0 bg-surface1 p-[10px]'
+      className='border-border0 bg-surface1 my-4 min-h-[235px] rounded-lg border border-solid p-[10px]'
       ref={setNodeRef}
       style={style}
     >
@@ -109,7 +110,7 @@ const AdminTileGroupView: FC<Props> = ({ group }): ReactElement => {
               group.title
             : editing && (
                 <Input
-                  className='w-full border-accent bg-surface1 text-text hover:border-accent/50 hover:bg-surface1 focus:border-accent focus:bg-surface1 focus:shadow-sm focus:shadow-accent aria-invalid:!border-failure aria-invalid:shadow-none aria-invalid:focus:!shadow-sm aria-invalid:focus:!shadow-failure'
+                  className='border-accent bg-surface1 text-text hover:border-accent/50 hover:bg-surface1 focus:border-accent focus:bg-surface1 focus:shadow-accent aria-invalid:!border-failure aria-invalid:shadow-none aria-invalid:focus:!shadow-sm aria-invalid:focus:!shadow-failure w-full focus:shadow-sm'
                   value={title}
                   autoFocus
                   onBlur={() => {
@@ -134,7 +135,7 @@ const AdminTileGroupView: FC<Props> = ({ group }): ReactElement => {
         </Col>
         <Col>
           <DeleteFilled
-            className='p-1 text-failure'
+            className='text-failure p-1'
             onClick={() => {
               deleteGroup(group.id);
             }}
@@ -175,7 +176,7 @@ const AdminTileGroupView: FC<Props> = ({ group }): ReactElement => {
             }}
             block
             icon={<PlusOutlined />}
-            className='m-0 h-full min-h-[150px] !w-60 border border-accent/70 bg-accent/20 text-text hover:!border-accent hover:!bg-accent hover:!text-text'
+            className='border-accent/70 bg-accent/20 text-text hover:!border-accent hover:!bg-accent hover:!text-text m-0 h-full min-h-[150px] !w-60 border'
           >
             New Tile
           </Button>

@@ -1,4 +1,5 @@
-import { printGrade, TileGrade, type Tile } from '@/types/tile';
+import { printGrade, TileGrade } from '@/types/grades';
+import { type Tile } from '@/types/tile';
 import type { User } from '@/types/user';
 import { Table } from 'antd';
 import type { TableColumnsType } from 'antd/lib';

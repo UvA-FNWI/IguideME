@@ -1,7 +1,8 @@
 import tailwindConfig from '@/../tailwind.config';
 import GraphGrade from '@/components/atoms/graph-grade/graph-grade';
 import { type TooltipProps } from '@/types/reactRecharts';
-import { TileType, printGrade, type Grades } from '@/types/tile';
+import { TileType } from '@/types/tile';
+import { type Grades, printGrade } from '@/types/grades';
 import { memo, type FC, type ReactElement } from 'react';
 import { Legend, PolarAngleAxis, RadialBar, RadialBarChart, Tooltip } from 'recharts';
 import resolveConfig from 'tailwindcss/resolveConfig';
@@ -27,7 +28,7 @@ const GraphLearning: FC<Grades> = memo(({ type, grade, peerAvg, max }): ReactEle
     if (active && payload && payload.length > 0) {
       const data = payload[0].payload;
       return (
-        <div className='z-50 rounded-lg border border-solid border-text bg-surface1/85 p-2'>
+        <div className='border-text bg-surface1/85 z-50 rounded-lg border border-solid p-2'>
           <p>Completed: {printGrade(type, Number(data.grade), max)}</p>
         </div>
       );

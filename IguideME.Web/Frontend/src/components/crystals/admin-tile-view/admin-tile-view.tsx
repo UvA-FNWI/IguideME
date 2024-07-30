@@ -14,8 +14,9 @@ import { deleteTile, patchTile } from '@/api/tiles';
 import { useDrawerStore } from '../tile-group-board/useDrawerStore';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSortable } from '@dnd-kit/sortable';
-import { printGradingType, TileType, type Tile } from '@/types/tile';
+import { TileType, type Tile } from '@/types/tile';
 import { useMemo, type FC, type ReactElement } from 'react';
+import { printGradingType } from '@/types/grades';
 
 interface Props {
   tile: Tile;
@@ -100,13 +101,13 @@ const AdminTileView: FC<Props> = ({ tile, move }): ReactElement => {
             <Tooltip title={<>This tile is {!tile.visible && <b>not </b>}visible for students</>}>
               {tile.visible ?
                 <EyeOutlined
-                  className='text-xs text-success'
+                  className='text-success text-xs'
                   onClick={(event) => {
                     clickThrough(event, toggleVisible);
                   }}
                 />
               : <EyeInvisibleOutlined
-                  className='text-xs text-failure'
+                  className='text-failure text-xs'
                   onClick={(event) => {
                     clickThrough(event, toggleVisible);
                   }}
@@ -149,7 +150,7 @@ const AdminTileView: FC<Props> = ({ tile, move }): ReactElement => {
                 }
               });
             }}
-            className='pr-1 text-failure'
+            className='text-failure pr-1'
           />
         </Col>
       </Row>

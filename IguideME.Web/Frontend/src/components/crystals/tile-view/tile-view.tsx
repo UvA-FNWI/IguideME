@@ -9,8 +9,9 @@ import { getUserTileGrades } from '@/api/grades';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useTileViewStore } from '@/components/pages/student-dashboard/tileViewContext';
-import { GradingType, TileType, type Tile } from '@/types/tile';
+import { TileType, type Tile } from '@/types/tile';
 import { memo, type FC, type ReactElement } from 'react';
+import { GradingType } from '@/types/grades';
 
 interface Props {
   tile: Tile;

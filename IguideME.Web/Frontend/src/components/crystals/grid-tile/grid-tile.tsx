@@ -1,6 +1,7 @@
 import { FrownOutlined, MehOutlined, MessageOutlined, SmileOutlined, TrophyOutlined } from '@ant-design/icons';
 import { Space } from 'antd';
-import { printGrade, TileType, type Grades } from '@/types/tile';
+import { TileType } from '@/types/tile';
+import { type Grades, printGrade } from '@/types/grades';
 import { type FC, type ReactElement } from 'react';
 
 interface GridTileProps {
@@ -32,10 +33,10 @@ export const GradeView: FC<Grades> = ({ grade, max, peerAvg, type }): ReactEleme
       : <>
           <div>
             {grade < 50 ?
-              <FrownOutlined className='text-lg text-failure' />
+              <FrownOutlined className='text-failure text-lg' />
             : grade >= peerAvg || (max === -1 && grade > 0) ?
-              <SmileOutlined className='text-lg text-success' />
-            : <MehOutlined className='text-lg text-meh' />}
+              <SmileOutlined className='text-success text-lg' />
+            : <MehOutlined className='text-meh text-lg' />}
           </div>
           <p className='text-lg'>{printGrade(type, grade, max)}</p>
         </>
