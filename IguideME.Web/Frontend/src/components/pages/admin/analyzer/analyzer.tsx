@@ -84,7 +84,7 @@ function Comparison({ selectedA, selectedB }: CompareProps) {
   const data = gradesA
     .map((a) => {
       const b = gradesB.find((b) => b.userID === a.userID);
-      return b ? { x: (100 * a.grade) / a.max, y: (100 * b.grade) / b.max } : undefined;
+      return b ? { x: a.grade, y: b.grade } : undefined;
     })
     .filter((x) => x !== undefined);
 
