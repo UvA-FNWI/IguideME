@@ -202,6 +202,22 @@ namespace IguideME.Web.Controllers
                     .ToArray()
             );
         }
+        [Authorize(Policy = "IsInstructor")]
+        [HttpGet]
+        [Route("/api/courses/{courseID}/students")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public ActionResult GetStudents(string courseID)
+        {
+
+            if (int.TryParse(courseID, out int id))
+                return Json(
+                    _databaseManager
+                        .GetUsersWithGrantedConsent(id, UserRoles.student)
+                        .ToArray()
+                );
+            return NoContent();
+        }
 
         [Authorize(Policy = "IsInstructor")]
         [HttpGet]

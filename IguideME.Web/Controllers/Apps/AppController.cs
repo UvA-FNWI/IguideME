@@ -52,6 +52,18 @@ namespace IguideME.Web.Controllers
 		}
 
 		[Authorize]
+		[Route("/api/courses/{courseID}")]
+		[HttpGet]
+		[ProducesResponseType(StatusCodes.Status200OK)]
+		[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+		public ActionResult GetCourse(string courseID)
+		{
+			//TODO: actually implement.
+			return Json(new Course(994, "Testcursus IguideME", "IguideME", WorkflowStates.AVAILABLE, true, ""));
+		}
+
+
+		[Authorize]
 		[HttpPost]
 		[Route("/student/settings/notifications")]
 		[ProducesResponseType(StatusCodes.Status200OK)]
