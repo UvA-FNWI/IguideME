@@ -2782,7 +2782,7 @@ namespace IguideME.Web.Services
 
         }
 
-        public (int, AppGradingType) GetTileMax(int tileID, int courseID)
+        public (int max, AppGradingType type) GetTileMax(int tileID, int courseID)
         {
             using (
                 SQLiteDataReader r = Query(

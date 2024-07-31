@@ -209,7 +209,7 @@ namespace IguideME.Web.Services.Workers
                 }
             }
 
-            double max = _databaseManager.GetTileMax(tile.ID, _courseID);
+            double max = _databaseManager.GetTileMax(tile.ID, _courseID).max;
             // _logger.LogWarning("tileGrade {tileGrade} max {max} tile {tile}", tileGrade, max, )
 
             return 100 * tileGrade / max;
@@ -238,7 +238,7 @@ namespace IguideME.Web.Services.Workers
                     }
                 }
             }
-            double max = _databaseManager.GetTileMax(tile.ID, _courseID);
+            double max = _databaseManager.GetTileMax(tile.ID, _courseID).max;
             return 100 * tileGrade / max;
         }
 
