@@ -132,32 +132,32 @@ namespace IguideME.Web.Services
         // -------------------------- QUERIES ------------------------------------ //
 
         // TODO: when we start doing multiple courses we need to put this in the lms interface.
-        public List<Course> GetAllCourses()
-        {
-            List<Course> courses = new List<Course>();
-            using (
-                NpgsqlDataReader r = Query(
-                    @"SELECT  org_unit_id,
-                                name,
-                                start_date,
-                                end_date
-                        FROM    organizational_units
-                        WHERE   type='Course Offering'"
-                )
-            )
-            {
-                while (r.Read())
-                    courses.Add(
-                        new Course(
-                            r.GetInt32(0),
-                            r.GetValue(1).ToString()
-                        // r.GetValue(2).ToString(), //start and end dates need to be converted from text to float timestamps
-                        // r.GetValue(3).ToString()
-                        )
-                    );
-            }
-            return null;
-        }
+        // public List<Course> GetAllCourses()
+        // {
+        //     List<Course> courses = new List<Course>();
+        //     using (
+        //         NpgsqlDataReader r = Query(
+        //             @"SELECT  org_unit_id,
+        //                         name,
+        //                         start_date,
+        //                         end_date
+        //                 FROM    organizational_units
+        //                 WHERE   type='Course Offering'"
+        //         )
+        //     )
+        //     {
+        //         while (r.Read())
+        //             courses.Add(
+        //                 new Course(
+        //                     r.GetInt32(0),
+        //                     r.GetValue(1).ToString()
+        //                 // r.GetValue(2).ToString(), //start and end dates need to be converted from text to float timestamps
+        //                 // r.GetValue(3).ToString()
+        //                 )
+        //             );
+        //     }
+        //     return null;
+        // }
 
         public List<string> GetAllUsernames()
         {
