@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using IguideME.Web.Models;
 using IguideME.Web.Models.App;
 using IguideME.Web.Models.Impl;
 using IguideME.Web.Services.LMSHandlers;

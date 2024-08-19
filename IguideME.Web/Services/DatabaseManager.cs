@@ -2506,7 +2506,7 @@ namespace IguideME.Web.Services
                 new SQLiteParameter("type", (int)tile.Type),
                 new SQLiteParameter("weight", tile.Weight),
                 new SQLiteParameter("gradingType", (int)tile.GradingType),
-                new SQLiteParameter("Alt", tile.Alt),
+                new SQLiteParameter("alt", tile.Alt),
                 new SQLiteParameter("visible", tile.Visible),
                 new SQLiteParameter("notifications", tile.Notifications)
             );
