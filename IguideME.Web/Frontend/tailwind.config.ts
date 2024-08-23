@@ -1,57 +1,108 @@
-import typography from '@tailwindcss/typography';
 import type { Config } from 'tailwindcss';
-import ariaAttributes from 'tailwindcss-aria-attributes';
 
-export default {
-  content: ['./src/**/*.{js,ts,jsx,tsx,mdx}'],
+const config: Config = {
   darkMode: ['class'],
+  content: [
+    './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/components/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/app/**/*.{js,ts,jsx,tsx,mdx}',
+  ],
+  prefix: '',
   theme: {
+    container: {
+      center: true,
+      padding: '2rem',
+      screens: {
+        '2xl': '1400px',
+      },
+    },
     extend: {
-      boxShadow: {
-        statusCard: '2px 2px 6px #bec8e4',
-        syncButton: '4px 4px 9px #bec8e4',
-        syncClock: '9px 9px 18px #bec8e4',
+      animation: {
+        'accordion-down': 'accordion-down 0.2s ease-out',
+        'accordion-up': 'accordion-up 0.2s ease-out',
+        spotlight: 'spotlight 2s ease .75s 1 forwards',
+      },
+      borderRadius: {
+        lg: 'var(--radius)',
+        md: 'calc(var(--radius) - 2px)',
+        sm: 'calc(var(--radius) - 4px)',
       },
       colors: {
-        primary: 'hsl(var(--primary))',
-        secondary: 'hsl(var(--secondary))',
-        tertiary: 'hsl(var(--tertiary))',
+        chart1: 'hsl(var(--chart-1))',
+        chart2: 'hsl(var(--chart-2))',
+        chart3: 'hsl(var(--chart-3))',
 
-        accent: 'hsl(var(--accent) / <alpha-value>)',
-        secondayAlpha: 'hsl(var(--secondayAlpha)) / <alpha-value>',
-
-        crust: 'hsl(var(--crust) / <alpha-value>)',
-        mantle: 'hsl(var(--mantle) / <alpha-value>)',
-        base: 'hsl(var(--base) / <alpha-value>)',
-
-        surface0: 'hsl(var(--surface0) / <alpha-value>)',
-        surface1: 'hsl(var(--surface1) / <alpha-value>)',
-        surface2: 'hsl(var(--surface2) / <alpha-value>)',
-
-        overlay0: 'hsl(var(--overlay0) / <alpha-value>)',
-        overlay1: 'hsl(var(--overlay1) / <alpha-value>)',
-        overlay2: 'hsl(var(--overlay2) / <alpha-value>)',
-
-        subtext0: 'hsl(var(--subtext0) / <alpha-value>)',
-        subtext1: 'hsl(var(--subtext1) / <alpha-value>)',
-        text: 'hsl(var(--text) / <alpha-value>)',
-        textAlt: 'hsl(var(--textAlt) / <alpha-value>)',
-
-        border0: 'hsl(var(--border0) / <alpha-value>)',
-        border1: 'hsl(var(--border1) / <alpha-value>)',
-
-        success: 'hsl(var(--success) / <alpha-value>)',
-        failure: 'hsl(var(--failure) / <alpha-value>)',
-        meh: 'hsl(var(--meh) / <alpha-value>)',
+        border: 'hsl(var(--border))',
+        input: 'hsl(var(--input))',
+        ring: 'hsl(var(--ring))',
+        background: 'hsl(var(--background))',
+        foreground: 'hsl(var(--foreground))',
+        primary: {
+          DEFAULT: 'hsl(var(--primary))',
+          foreground: 'hsl(var(--primary-foreground))',
+        },
+        secondary: {
+          DEFAULT: 'hsl(var(--secondary))',
+          foreground: 'hsl(var(--secondary-foreground))',
+        },
+        destructive: {
+          DEFAULT: 'hsl(var(--destructive))',
+          foreground: 'hsl(var(--destructive-foreground))',
+        },
+        success: {
+          DEFAULT: 'hsl(var(--success))',
+          foreground: 'hsl(var(--success-foreground))',
+        },
+        warning: {
+          DEFAULT: 'hsl(var(--warning))',
+          foreground: 'hsl(var(--warning-foreground))',
+        },
+        muted: {
+          DEFAULT: 'hsl(var(--muted))',
+          foreground: 'hsl(var(--muted-foreground))',
+        },
+        accent: {
+          DEFAULT: 'hsl(var(--accent))',
+          foreground: 'hsl(var(--accent-foreground))',
+        },
+        popover: {
+          DEFAULT: 'hsl(var(--popover))',
+          foreground: 'hsl(var(--popover-foreground))',
+        },
+        card: {
+          DEFAULT: 'hsl(var(--card))',
+          foreground: 'hsl(var(--card-foreground))',
+        },
       },
-      cursor: {
-        brand:
-          "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'  width='40' height='48' viewport='0 0 100 100' style='fill:black;font-size:24px;'><text y='50%'>❤️</text></svg>\") 8 0,auto;",
+      keyframes: {
+        'accordion-down': {
+          from: { height: '0' },
+          to: { height: 'var(--radix-accordion-content-height)' },
+        },
+        'accordion-up': {
+          from: { height: 'var(--radix-accordion-content-height)' },
+          to: { height: '0' },
+        },
+        spotlight: {
+          '0%': {
+            opacity: '0',
+            transform: 'translate(-72%, -62%) scale(0.5)',
+          },
+          '100%': {
+            opacity: '1',
+            transform: 'translate(-50%,-40%) scale(1)',
+          },
+        },
       },
-      spacing: {
-        header: '70px',
+      screens: {
+        '1k': '1920px',
+        '2k': '2560px',
+        '4k': '3840px',
+        '8k': '7680px',
       },
     },
   },
-  plugins: [ariaAttributes, typography],
-} satisfies Config;
+  plugins: [require('tailwindcss-animate'), require('@tailwindcss/typography')],
+};
+
+export default config;

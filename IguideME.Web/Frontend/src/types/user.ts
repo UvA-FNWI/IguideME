@@ -1,9 +1,9 @@
-export enum UserRoles {
-  student,
-  instructor,
+enum UserRoles {
+  Student,
+  Instructor,
 }
 
-export interface User {
+interface User {
   course_id: number;
   studentnumber: number;
   userID: string;
@@ -13,10 +13,13 @@ export interface User {
   settings: UserSettings | undefined;
 }
 
-export interface UserSettings {
+interface UserSettings {
   goal_grade: number;
   predicted_grade: number;
   total_grade: number;
   consent: boolean;
   notifications: boolean;
 }
+
+export { UserRoles };
+export type { User, UserSettings };

@@ -1,0 +1,802 @@
+[
+  {
+    "id": 5958088955789312,
+    "name": "volubilis",
+    "courseCode": "EiBPFY",
+    "workflowState": "AVAILABLE",
+    "isPublic": true,
+    "courseImage": "https://loremflickr.com/640/480?lock=2772290290843648"
+  },
+  {
+    "id": 4783906612051968,
+    "name": "sursum",
+    "courseCode": "z3ZMjy",
+    "workflowState": "UNPUBLISHED",
+    "isPublic": false,
+    "courseImage": "https://loremflickr.com/640/480?lock=4209666764570624"
+  },
+  {
+    "id": 4482692099866624,
+    "name": "spiritus",
+    "courseCode": "I8Odhk",
+    "workflowState": "AVAILABLE",
+    "isPublic": false,
+    "courseImage": "https://picsum.photos/seed/bBibpcpz1/640/480"
+  },
+  {
+    "id": 2101066923507712,
+    "name": "calculus",
+    "courseCode": "mb9HZQ",
+    "workflowState": "UNPUBLISHED",
+    "isPublic": false,
+    "courseImage": "https://loremflickr.com/640/480?lock=2527681333690368"
+  },
+  {
+    "id": 5475645177987072,
+    "name": "defaeco",
+    "courseCode": "gwlskV",
+    "workflowState": "UNPUBLISHED",
+    "isPublic": true,
+    "courseImage": "https://picsum.photos/seed/j7yAl/640/480"
+  },
+  {
+    "id": 3255338438492160,
+    "name": "avaritia",
+    "courseCode": "Y9boPO",
+    "workflowState": "UNPUBLISHED",
+    "isPublic": false,
+    "courseImage": "https://loremflickr.com/640/480?lock=4643211890917376"
+  },
+  {
+    "id": 1107706249216000,
+    "name": "arto",
+    "courseCode": "wn05i5",
+    "workflowState": "COMPLETED",
+    "isPublic": true,
+    "courseImage": "https://picsum.photos/seed/DOT0le/640/480"
+  },
+  {
+    "id": 5424114827264000,
+    "name": "verumtamen",
+    "courseCode": "TDYYRn",
+    "workflowState": "AVAILABLE",
+    "isPublic": false,
+    "courseImage": "https://loremflickr.com/640/480?lock=83894248407040"
+  },
+  {
+    "id": 6558526197465088,
+    "name": "strues",
+    "courseCode": "F3t6g1",
+    "workflowState": "COMPLETED",
+    "isPublic": true,
+    "courseImage": "https://picsum.photos/seed/cXReDL/640/480"
+  },
+  {
+    "id": 1428988228534272,
+    "name": "administratio",
+    "courseCode": "giqurE",
+    "workflowState": "COMPLETED",
+    "isPublic": false,
+    "courseImage": "https://loremflickr.com/640/480?lock=4955149164347392"
+  },
+  {
+    "id": 7862224116776960,
+    "name": "adnuo",
+    "courseCode": "66kKIj",
+    "workflowState": "AVAILABLE",
+    "isPublic": false,
+    "courseImage": "https://loremflickr.com/640/480?lock=7305234439208960"
+  },
+  {
+    "id": 5744247756029952,
+    "name": "substantia",
+    "courseCode": "JBnm9C",
+    "workflowState": "COMPLETED",
+    "isPublic": true,
+    "courseImage": "https://picsum.photos/seed/55LfQw2/640/480"
+  },
+  {
+    "id": 4800713314009088,
+    "name": "usitas",
+    "courseCode": "kKMgnj",
+    "workflowState": "AVAILABLE",
+    "isPublic": false,
+    "courseImage": "https://picsum.photos/seed/HudfJa7nI/640/480"
+  },
+  {
+    "id": 4554379963138048,
+    "name": "officiis",
+    "courseCode": "6XtjYC",
+    "workflowState": "UNPUBLISHED",
+    "isPublic": true,
+    "courseImage": "https://picsum.photos/seed/PDrPnV/640/480"
+  },
+  {
+    "id": 5968582135513088,
+    "name": "adduco",
+    "courseCode": "a6oVi8",
+    "workflowState": "AVAILABLE",
+    "isPublic": true,
+    "courseImage": "https://picsum.photos/seed/nBlsfUO/640/480"
+  },
+  {
+    "id": 4512208031580160,
+    "name": "condico",
+    "courseCode": "3sU2KN",
+    "workflowState": "AVAILABLE",
+    "isPublic": false,
+    "courseImage": "https://picsum.photos/seed/Blk2HJyHPB/640/480"
+  },
+  {
+    "id": 34142343397376,
+    "name": "verecundia",
+    "courseCode": "CBn5RH",
+    "workflowState": "UNPUBLISHED",
+    "isPublic": false,
+    "courseImage": "https://picsum.photos/seed/KGYGmqHR/640/480"
+  },
+  {
+    "id": 976965347573760,
+    "name": "amoveo",
+    "courseCode": "1DWvyG",
+    "workflowState": "COMPLETED",
+    "isPublic": false,
+    "courseImage": "https://picsum.photos/seed/t8KgHd/640/480"
+  },
+  {
+    "id": 186150199230464,
+    "name": "tamen",
+    "courseCode": "oOQqAB",
+    "workflowState": "AVAILABLE",
+    "isPublic": false,
+    "courseImage": "https://loremflickr.com/640/480?lock=1046590764613632"
+  },
+  {
+    "id": 2031477323726848,
+    "name": "ademptio",
+    "courseCode": "oC6MdR",
+    "workflowState": "AVAILABLE",
+    "isPublic": false,
+    "courseImage": "https://picsum.photos/seed/zsWJMLMX/640/480"
+  },
+  {
+    "id": 2090366266245120,
+    "name": "omnis",
+    "courseCode": "zWXY8o",
+    "workflowState": "COMPLETED",
+    "isPublic": false,
+    "courseImage": "https://picsum.photos/seed/dr5ha/640/480"
+  },
+  {
+    "id": 583972975280128,
+    "name": "deficio",
+    "courseCode": "AQhgkD",
+    "workflowState": "UNPUBLISHED",
+    "isPublic": true,
+    "courseImage": "https://picsum.photos/seed/jbELx5/640/480"
+  },
+  {
+    "id": 1918180704387072,
+    "name": "vestigium",
+    "courseCode": "lgR20k",
+    "workflowState": "UNPUBLISHED",
+    "isPublic": false,
+    "courseImage": "https://picsum.photos/seed/B2YaPrvvO/640/480"
+  },
+  {
+    "id": 7732213183414272,
+    "name": "cubitum",
+    "courseCode": "qnPJOH",
+    "workflowState": "AVAILABLE",
+    "isPublic": false,
+    "courseImage": "https://picsum.photos/seed/VJ1CdbxlK/640/480"
+  },
+  {
+    "id": 3001717962571776,
+    "name": "sumptus",
+    "courseCode": "CgxLxl",
+    "workflowState": "COMPLETED",
+    "isPublic": false,
+    "courseImage": "https://loremflickr.com/640/480?lock=2361921607041024"
+  },
+  {
+    "id": 441141109456896,
+    "name": "quisquam",
+    "courseCode": "6Sll6t",
+    "workflowState": "UNPUBLISHED",
+    "isPublic": false,
+    "courseImage": "https://picsum.photos/seed/NW6NdQPtGd/640/480"
+  },
+  {
+    "id": 1184045620789248,
+    "name": "unus",
+    "courseCode": "DWtjVA",
+    "workflowState": "COMPLETED",
+    "isPublic": true,
+    "courseImage": "https://picsum.photos/seed/SVYt2O6p/640/480"
+  },
+  {
+    "id": 1452399627599872,
+    "name": "damno",
+    "courseCode": "nsO4qK",
+    "workflowState": "UNPUBLISHED",
+    "isPublic": true,
+    "courseImage": "https://loremflickr.com/640/480?lock=2133761137311744"
+  },
+  {
+    "id": 336375540875264,
+    "name": "desparatus",
+    "courseCode": "G40IJz",
+    "workflowState": "COMPLETED",
+    "isPublic": true,
+    "courseImage": "https://loremflickr.com/640/480?lock=8641243091304448"
+  },
+  {
+    "id": 336738815836160,
+    "name": "uterque",
+    "courseCode": "P11YSk",
+    "workflowState": "COMPLETED",
+    "isPublic": true,
+    "courseImage": "https://picsum.photos/seed/pDlB57/640/480"
+  },
+  {
+    "id": 7350916896260096,
+    "name": "spiritus",
+    "courseCode": "TCeTjC",
+    "workflowState": "AVAILABLE",
+    "isPublic": false,
+    "courseImage": "https://loremflickr.com/640/480?lock=3592141318127616"
+  },
+  {
+    "id": 6500850281218048,
+    "name": "provident",
+    "courseCode": "zKEKvk",
+    "workflowState": "UNPUBLISHED",
+    "isPublic": true,
+    "courseImage": "https://picsum.photos/seed/23rYs11drR/640/480"
+  },
+  {
+    "id": 3490029844299776,
+    "name": "victus",
+    "courseCode": "fWZHFJ",
+    "workflowState": "UNPUBLISHED",
+    "isPublic": true,
+    "courseImage": "https://loremflickr.com/640/480?lock=2956024851988480"
+  },
+  {
+    "id": 3060173310525440,
+    "name": "taedium",
+    "courseCode": "nXEPhB",
+    "workflowState": "UNPUBLISHED",
+    "isPublic": false,
+    "courseImage": "https://loremflickr.com/640/480?lock=7392570223099904"
+  },
+  {
+    "id": 2909900459999232,
+    "name": "delibero",
+    "courseCode": "aXCIe3",
+    "workflowState": "COMPLETED",
+    "isPublic": true,
+    "courseImage": "https://picsum.photos/seed/5AxXv4q/640/480"
+  },
+  {
+    "id": 7782432201768960,
+    "name": "beatus",
+    "courseCode": "66pDig",
+    "workflowState": "UNPUBLISHED",
+    "isPublic": true,
+    "courseImage": "https://picsum.photos/seed/9KpNWsq2/640/480"
+  },
+  {
+    "id": 6441392645603328,
+    "name": "tabula",
+    "courseCode": "snMlSw",
+    "workflowState": "COMPLETED",
+    "isPublic": false,
+    "courseImage": "https://loremflickr.com/640/480?lock=2776842647896064"
+  },
+  {
+    "id": 8871916674744320,
+    "name": "a",
+    "courseCode": "Ooic0P",
+    "workflowState": "COMPLETED",
+    "isPublic": true,
+    "courseImage": "https://loremflickr.com/640/480?lock=3975937796341760"
+  },
+  {
+    "id": 4782186123231232,
+    "name": "commodo",
+    "courseCode": "wlg9VI",
+    "workflowState": "AVAILABLE",
+    "isPublic": false,
+    "courseImage": "https://loremflickr.com/640/480?lock=805286820446208"
+  },
+  {
+    "id": 6717215850102784,
+    "name": "cui",
+    "courseCode": "RbyUMG",
+    "workflowState": "COMPLETED",
+    "isPublic": false,
+    "courseImage": "https://picsum.photos/seed/EndyAkg/640/480"
+  },
+  {
+    "id": 5431023758213120,
+    "name": "quaerat",
+    "courseCode": "d9oBwO",
+    "workflowState": "COMPLETED",
+    "isPublic": false,
+    "courseImage": "https://loremflickr.com/640/480?lock=5736545833189376"
+  },
+  {
+    "id": 2182367760351232,
+    "name": "caveo",
+    "courseCode": "8oJgxR",
+    "workflowState": "AVAILABLE",
+    "isPublic": true,
+    "courseImage": "https://picsum.photos/seed/9YAxEVTWEv/640/480"
+  },
+  {
+    "id": 2992319942885376,
+    "name": "venia",
+    "courseCode": "AYWQen",
+    "workflowState": "COMPLETED",
+    "isPublic": true,
+    "courseImage": "https://picsum.photos/seed/QTGsix59sM/640/480"
+  },
+  {
+    "id": 1324312619384832,
+    "name": "amitto",
+    "courseCode": "MhuPwI",
+    "workflowState": "COMPLETED",
+    "isPublic": false,
+    "courseImage": "https://loremflickr.com/640/480?lock=8564123023441920"
+  },
+  {
+    "id": 8778792092827648,
+    "name": "ater",
+    "courseCode": "nsh6nQ",
+    "workflowState": "AVAILABLE",
+    "isPublic": false,
+    "courseImage": "https://picsum.photos/seed/zaQu16Ccpb/640/480"
+  },
+  {
+    "id": 1579699828424704,
+    "name": "aggredior",
+    "courseCode": "8Pae8n",
+    "workflowState": "AVAILABLE",
+    "isPublic": false,
+    "courseImage": "https://picsum.photos/seed/OzJw2Wkh/640/480"
+  },
+  {
+    "id": 1118886065864704,
+    "name": "assentator",
+    "courseCode": "tDNWGn",
+    "workflowState": "COMPLETED",
+    "isPublic": false,
+    "courseImage": "https://picsum.photos/seed/WbzKGhm7n/640/480"
+  },
+  {
+    "id": 934645940092928,
+    "name": "corroboro",
+    "courseCode": "cyV0po",
+    "workflowState": "UNPUBLISHED",
+    "isPublic": false,
+    "courseImage": "https://picsum.photos/seed/16NRwP/640/480"
+  },
+  {
+    "id": 6376175834234880,
+    "name": "cenaculum",
+    "courseCode": "xzJOZ3",
+    "workflowState": "AVAILABLE",
+    "isPublic": true,
+    "courseImage": "https://picsum.photos/seed/81KEPyp/640/480"
+  },
+  {
+    "id": 3801983276285952,
+    "name": "clarus",
+    "courseCode": "GKvXaM",
+    "workflowState": "COMPLETED",
+    "isPublic": false,
+    "courseImage": "https://picsum.photos/seed/X1ysGdtp/640/480"
+  },
+  {
+    "id": 1914223103836160,
+    "name": "suppellex",
+    "courseCode": "3GweUQ",
+    "workflowState": "AVAILABLE",
+    "isPublic": true,
+    "courseImage": "https://loremflickr.com/640/480?lock=1340705496629248"
+  },
+  {
+    "id": 4040154104725504,
+    "name": "tantillus",
+    "courseCode": "Q0WVNX",
+    "workflowState": "COMPLETED",
+    "isPublic": false,
+    "courseImage": "https://picsum.photos/seed/Z3XLB/640/480"
+  },
+  {
+    "id": 7208699724562432,
+    "name": "terra",
+    "courseCode": "gvtHmf",
+    "workflowState": "AVAILABLE",
+    "isPublic": true,
+    "courseImage": "https://picsum.photos/seed/lCefWIq/640/480"
+  },
+  {
+    "id": 5279327702745088,
+    "name": "vero",
+    "courseCode": "kn71m1",
+    "workflowState": "AVAILABLE",
+    "isPublic": true,
+    "courseImage": "https://picsum.photos/seed/qQvkcz/640/480"
+  },
+  {
+    "id": 7994944811696128,
+    "name": "amiculum",
+    "courseCode": "DkuuhA",
+    "workflowState": "COMPLETED",
+    "isPublic": true,
+    "courseImage": "https://picsum.photos/seed/tTJ23/640/480"
+  },
+  {
+    "id": 8334201914916864,
+    "name": "vere",
+    "courseCode": "GVtuGF",
+    "workflowState": "COMPLETED",
+    "isPublic": false,
+    "courseImage": "https://loremflickr.com/640/480?lock=5025567048990720"
+  },
+  {
+    "id": 7488630213836800,
+    "name": "caveo",
+    "courseCode": "PDFsI2",
+    "workflowState": "AVAILABLE",
+    "isPublic": false,
+    "courseImage": "https://picsum.photos/seed/1Lrlof/640/480"
+  },
+  {
+    "id": 8711648344801280,
+    "name": "accommodo",
+    "courseCode": "zOIhhX",
+    "workflowState": "UNPUBLISHED",
+    "isPublic": false,
+    "courseImage": "https://loremflickr.com/640/480?lock=3200239609577472"
+  },
+  {
+    "id": 7872432106897408,
+    "name": "tersus",
+    "courseCode": "bh7f7R",
+    "workflowState": "UNPUBLISHED",
+    "isPublic": false,
+    "courseImage": "https://loremflickr.com/640/480?lock=8022166654156800"
+  },
+  {
+    "id": 2095864782782464,
+    "name": "ager",
+    "courseCode": "u7nkSv",
+    "workflowState": "AVAILABLE",
+    "isPublic": true,
+    "courseImage": "https://picsum.photos/seed/HWbz9w/640/480"
+  },
+  {
+    "id": 1912302974533632,
+    "name": "quas",
+    "courseCode": "H31oz4",
+    "workflowState": "UNPUBLISHED",
+    "isPublic": true,
+    "courseImage": "https://loremflickr.com/640/480?lock=1200067264380928"
+  },
+  {
+    "id": 3348403327074304,
+    "name": "verto",
+    "courseCode": "kO4XuP",
+    "workflowState": "AVAILABLE",
+    "isPublic": true,
+    "courseImage": "https://picsum.photos/seed/KOm4KdK5hh/640/480"
+  },
+  {
+    "id": 3002187592499200,
+    "name": "adfero",
+    "courseCode": "l8lbv3",
+    "workflowState": "UNPUBLISHED",
+    "isPublic": false,
+    "courseImage": "https://loremflickr.com/640/480?lock=356854989324288"
+  },
+  {
+    "id": 5235509240528896,
+    "name": "bardus",
+    "courseCode": "W5Yszn",
+    "workflowState": "COMPLETED",
+    "isPublic": true,
+    "courseImage": "https://picsum.photos/seed/JJJAhXS/640/480"
+  },
+  {
+    "id": 1495825939169280,
+    "name": "laudantium",
+    "courseCode": "LeTOIr",
+    "workflowState": "AVAILABLE",
+    "isPublic": true,
+    "courseImage": "https://loremflickr.com/640/480?lock=1964517974081536"
+  },
+  {
+    "id": 450734921351168,
+    "name": "nobis",
+    "courseCode": "0l4osJ",
+    "workflowState": "COMPLETED",
+    "isPublic": true,
+    "courseImage": "https://picsum.photos/seed/xVEKa02/640/480"
+  },
+  {
+    "id": 7260778895769600,
+    "name": "tenus",
+    "courseCode": "aYSOrC",
+    "workflowState": "COMPLETED",
+    "isPublic": true,
+    "courseImage": "https://loremflickr.com/640/480?lock=1629669403131904"
+  },
+  {
+    "id": 3513806812610560,
+    "name": "velut",
+    "courseCode": "Np459G",
+    "workflowState": "COMPLETED",
+    "isPublic": true,
+    "courseImage": "https://loremflickr.com/640/480?lock=6202824526397440"
+  },
+  {
+    "id": 7900745133195264,
+    "name": "curriculum",
+    "courseCode": "Sdlswd",
+    "workflowState": "UNPUBLISHED",
+    "isPublic": false,
+    "courseImage": "https://loremflickr.com/640/480?lock=6064730170982400"
+  },
+  {
+    "id": 6379778259025920,
+    "name": "tantum",
+    "courseCode": "GQ06Nn",
+    "workflowState": "COMPLETED",
+    "isPublic": true,
+    "courseImage": "https://picsum.photos/seed/3gTBb7br/640/480"
+  },
+  {
+    "id": 1520320211058688,
+    "name": "fugit",
+    "courseCode": "xSWgSq",
+    "workflowState": "AVAILABLE",
+    "isPublic": false,
+    "courseImage": "https://loremflickr.com/640/480?lock=4192254914723840"
+  },
+  {
+    "id": 3318264704794624,
+    "name": "carpo",
+    "courseCode": "ZW4bTK",
+    "workflowState": "AVAILABLE",
+    "isPublic": true,
+    "courseImage": "https://picsum.photos/seed/QhvoeTQ9f/640/480"
+  },
+  {
+    "id": 1106799484731392,
+    "name": "comis",
+    "courseCode": "6SILWU",
+    "workflowState": "UNPUBLISHED",
+    "isPublic": false,
+    "courseImage": "https://loremflickr.com/640/480?lock=3188010216587264"
+  },
+  {
+    "id": 5714303994822656,
+    "name": "arbor",
+    "courseCode": "AsDwim",
+    "workflowState": "UNPUBLISHED",
+    "isPublic": false,
+    "courseImage": "https://picsum.photos/seed/h6ODx/640/480"
+  },
+  {
+    "id": 8391104812548096,
+    "name": "crebro",
+    "courseCode": "XChQpv",
+    "workflowState": "AVAILABLE",
+    "isPublic": false,
+    "courseImage": "https://picsum.photos/seed/x4TnI/640/480"
+  },
+  {
+    "id": 3012387288383488,
+    "name": "aperte",
+    "courseCode": "Ro22Yj",
+    "workflowState": "AVAILABLE",
+    "isPublic": true,
+    "courseImage": "https://picsum.photos/seed/KX05qd/640/480"
+  },
+  {
+    "id": 3634011970732032,
+    "name": "degenero",
+    "courseCode": "Mn5rL9",
+    "workflowState": "COMPLETED",
+    "isPublic": false,
+    "courseImage": "https://loremflickr.com/640/480?lock=8420061347840000"
+  },
+  {
+    "id": 7809249591689216,
+    "name": "tredecim",
+    "courseCode": "SbI04A",
+    "workflowState": "AVAILABLE",
+    "isPublic": false,
+    "courseImage": "https://loremflickr.com/640/480?lock=1263075921494016"
+  },
+  {
+    "id": 3524335205613568,
+    "name": "vorax",
+    "courseCode": "babryM",
+    "workflowState": "AVAILABLE",
+    "isPublic": false,
+    "courseImage": "https://loremflickr.com/640/480?lock=5825800945270784"
+  },
+  {
+    "id": 8366260320468992,
+    "name": "succurro",
+    "courseCode": "NpDXCu",
+    "workflowState": "AVAILABLE",
+    "isPublic": true,
+    "courseImage": "https://loremflickr.com/640/480?lock=306854236258304"
+  },
+  {
+    "id": 7721533306830848,
+    "name": "repellendus",
+    "courseCode": "OBPFUc",
+    "workflowState": "AVAILABLE",
+    "isPublic": false,
+    "courseImage": "https://loremflickr.com/640/480?lock=8215570193317888"
+  },
+  {
+    "id": 789579953078272,
+    "name": "ut",
+    "courseCode": "Gxxv4y",
+    "workflowState": "UNPUBLISHED",
+    "isPublic": true,
+    "courseImage": "https://picsum.photos/seed/YN7LVEvA1g/640/480"
+  },
+  {
+    "id": 994,
+    "name": "nihil",
+    "courseCode": "d9hoKL",
+    "workflowState": "UNPUBLISHED",
+    "isPublic": false,
+    "courseImage": "https://picsum.photos/seed/lCwXkejpHZ/640/480"
+  },
+  {
+    "id": 5570792792260608,
+    "name": "brevis",
+    "courseCode": "KoZUM7",
+    "workflowState": "COMPLETED",
+    "isPublic": true,
+    "courseImage": "https://loremflickr.com/640/480?lock=5295601728094208"
+  },
+  {
+    "id": 7975651818602496,
+    "name": "sui",
+    "courseCode": "XUpdtA",
+    "workflowState": "AVAILABLE",
+    "isPublic": true,
+    "courseImage": "https://picsum.photos/seed/aBaaxl/640/480"
+  },
+  {
+    "id": 2547382879256576,
+    "name": "attonbitus",
+    "courseCode": "jqNXHe",
+    "workflowState": "AVAILABLE",
+    "isPublic": true,
+    "courseImage": "https://picsum.photos/seed/bOTPmxXw1/640/480"
+  },
+  {
+    "id": 5669018623016960,
+    "name": "natus",
+    "courseCode": "TUGofx",
+    "workflowState": "AVAILABLE",
+    "isPublic": true,
+    "courseImage": "https://loremflickr.com/640/480?lock=1457832792686592"
+  },
+  {
+    "id": 7193438464245760,
+    "name": "vinco",
+    "courseCode": "BThca4",
+    "workflowState": "UNPUBLISHED",
+    "isPublic": true,
+    "courseImage": "https://loremflickr.com/640/480?lock=2764272159424512"
+  },
+  {
+    "id": 425157755666432,
+    "name": "deficio",
+    "courseCode": "m26j1Z",
+    "workflowState": "COMPLETED",
+    "isPublic": false,
+    "courseImage": "https://picsum.photos/seed/ymTYF/640/480"
+  },
+  {
+    "id": 3877006357823488,
+    "name": "absorbeo",
+    "courseCode": "JSEknb",
+    "workflowState": "AVAILABLE",
+    "isPublic": false,
+    "courseImage": "https://loremflickr.com/640/480?lock=3664439104503808"
+  },
+  {
+    "id": 4937259199496192,
+    "name": "commemoro",
+    "courseCode": "Mogqdd",
+    "workflowState": "AVAILABLE",
+    "isPublic": false,
+    "courseImage": "https://picsum.photos/seed/t25tYp6Mi/640/480"
+  },
+  {
+    "id": 6551603385466880,
+    "name": "sui",
+    "courseCode": "QxO9If",
+    "workflowState": "AVAILABLE",
+    "isPublic": false,
+    "courseImage": "https://loremflickr.com/640/480?lock=8030225289969664"
+  },
+  {
+    "id": 1894283309219840,
+    "name": "quam",
+    "courseCode": "CUCAGR",
+    "workflowState": "AVAILABLE",
+    "isPublic": false,
+    "courseImage": "https://loremflickr.com/640/480?lock=3735573451767808"
+  },
+  {
+    "id": 606157301350400,
+    "name": "similique",
+    "courseCode": "5C8oJS",
+    "workflowState": "UNPUBLISHED",
+    "isPublic": true,
+    "courseImage": "https://loremflickr.com/640/480?lock=6103346683314176"
+  },
+  {
+    "id": 7209965469040640,
+    "name": "labore",
+    "courseCode": "Qzr7MS",
+    "workflowState": "AVAILABLE",
+    "isPublic": true,
+    "courseImage": "https://loremflickr.com/640/480?lock=625380427825152"
+  },
+  {
+    "id": 1039691870633984,
+    "name": "vito",
+    "courseCode": "BUjLxg",
+    "workflowState": "UNPUBLISHED",
+    "isPublic": false,
+    "courseImage": "https://picsum.photos/seed/0oRlTNkL7f/640/480"
+  },
+  {
+    "id": 603243684036608,
+    "name": "caecus",
+    "courseCode": "2LBFjX",
+    "workflowState": "AVAILABLE",
+    "isPublic": true,
+    "courseImage": "https://loremflickr.com/640/480?lock=2265859963748352"
+  },
+  {
+    "id": 2247477178662912,
+    "name": "verbera",
+    "courseCode": "3gICVH",
+    "workflowState": "AVAILABLE",
+    "isPublic": true,
+    "courseImage": "https://picsum.photos/seed/6dSgd/640/480"
+  },
+  {
+    "id": 7673356524453888,
+    "name": "arcesso",
+    "courseCode": "unZchm",
+    "workflowState": "UNPUBLISHED",
+    "isPublic": false,
+    "courseImage": "https://loremflickr.com/640/480?lock=3277328492789760"
+  },
+  {
+    "id": 8542683911946240,
+    "name": "copia",
+    "courseCode": "GvozvN",
+    "workflowState": "UNPUBLISHED",
+    "isPublic": true,
+    "courseImage": "https://loremflickr.com/640/480?lock=7423431070973952"
+  }
+]

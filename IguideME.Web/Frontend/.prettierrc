@@ -9,5 +9,5 @@
   "jsxSingleQuote": true,
   "trailingComma": "all",
   "bracketSpacing": true,
-  "plugins": ["./node_modules/prettier-plugin-tailwindcss/dist/index.mjs"]
+  "plugins": ["prettier-plugin-tailwindcss"]
 }

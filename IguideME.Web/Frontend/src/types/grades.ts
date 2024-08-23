@@ -35,19 +35,19 @@ export enum GradingType {
   NotGraded,
 }
 
-export const printGrade = (type: GradingType, grade: number, max: number, ng: boolean = true): string => {
+export const printGrade = (type: GradingType, grade: number, max: number, ng = true): string => {
   switch (type) {
     case GradingType.PassFail:
       return grade > 0 ? 'Pass' : 'Fail';
     case GradingType.Percentage:
-      return varFixed(grade) + '%';
+      return `${varFixed(grade)}%`;
     case GradingType.Letters:
       return letterGrade(grade);
     case GradingType.Points:
       if (max > 0) {
         const result = (grade * max) / 100;
 
-        return varFixed(result) + '/' + varFixed(max);
+        return `${varFixed(result)}/${varFixed(max)}`;
       }
 
       return grade.toFixed(0);
@@ -74,7 +74,7 @@ const letterGrade = (grade: number): string => {
 
 export const varFixed = (nr: number): string => {
   const result = nr.toFixed(1);
-  return result[result.length - 1] === '0' ? result.slice(0, -2) : result;
+  return result.endsWith('0') ? result.slice(0, -2) : result;
 };
 
 export const printGradingType = (type: GradingType): string => {
