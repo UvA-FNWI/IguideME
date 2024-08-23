@@ -13,7 +13,7 @@ namespace IguideME.Web.Services.Workers
 	public class QuizWorker : IWorker
 	{
 		readonly private ILogger<SyncManager> _logger;
-		readonly private ILMSHandler _canvasHandler;
+		readonly private ILMSHandler _lmsHandler;
 		private readonly DatabaseManager _databaseManager;
 
 		readonly private int _courseID;
@@ -21,16 +21,16 @@ namespace IguideME.Web.Services.Workers
 
 		/// <summary>
 		/// This constructor initializes the new Quizworker to
-		/// (<paramref name="courseID"/>, <paramref name="syncID"/>, <paramref name="canvasHandler"/>, <paramref name="logger"/>).
+		/// (<paramref name="courseID"/>, <paramref name="syncID"/>, <paramref name="lmsHandler"/>, <paramref name="logger"/>).
 		/// </summary>
 		/// <param name="courseID">the id of the course.</param>
 		/// <param name="syncID">the hash code associated to the current sync.</param>
-		/// <param name="canvasHandler">a reference to the class managing the connection with canvas.</param>
+		/// <param name="lmsHandler">a reference to the class managing the connection with the lms.</param>
 		/// <param name="logger">a reference to the logger used for the sync.</param>
 		public QuizWorker(
 			int courseID,
 			long syncID,
-			ILMSHandler canvasHandler,
+			ILMSHandler lmsHandler,
 			DatabaseManager databaseManager,
 			ILogger<SyncManager> logger)
 
@@ -38,7 +38,7 @@ namespace IguideME.Web.Services.Workers
 			_logger = logger;
 			_courseID = courseID;
 			_syncID = syncID;
-			_canvasHandler = canvasHandler;
+			_lmsHandler = lmsHandler;
 			_databaseManager = databaseManager;
 		}
 
@@ -68,13 +68,13 @@ namespace IguideME.Web.Services.Workers
 		{
 			_logger.LogInformation("Starting quiz registry...");
 
-			// Get the quizzes from canvas.
-			IEnumerable<(AppAssignment, IEnumerable<AssignmentSubmission>)> quizzes = this._canvasHandler.GetQuizzes(_courseID);
+			// Get the quizzes from the lms.
+			IEnumerable<(AppAssignment, IEnumerable<AssignmentSubmission>)> quizzes = this._lmsHandler.GetQuizzes(_courseID);
 			List<TileEntry> entries = _databaseManager.GetAllTileEntries(this._courseID);
 
 			// Get the consented users and only ask for their submissions
 			List<Models.Impl.User> users = _databaseManager.GetUsersWithGrantedConsent(this._courseID);
-			// IEnumerable<SubmissionGroup> submissions = this._canvasHandler.GetQuizzes(this._courseID, users.Select(user => user.UserID).ToArray());
+			// IEnumerable<SubmissionGroup> submissions = this._lmsHandler.GetQuizzes(this._courseID, users.Select(user => user.UserID).ToArray());
 
 			// Register the quizzes in the database.
 			foreach ((AppAssignment quiz, IEnumerable<AssignmentSubmission> submissions) in quizzes)

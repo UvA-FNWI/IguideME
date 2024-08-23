@@ -15,7 +15,7 @@ namespace IguideME.Web.Services.Workers
     public class DiscussionWorker : IWorker
     {
         private readonly ILogger<SyncManager> _logger;
-        private readonly ILMSHandler _canvasHandler;
+        private readonly ILMSHandler _lmsHandler;
         private readonly DatabaseManager _databaseManager;
 
         private readonly int _courseID;
@@ -23,16 +23,16 @@ namespace IguideME.Web.Services.Workers
 
         /// <summary>
         /// This constructor initializes the new DiscussionWorker to
-        /// (<paramref name="courseID"/>, <paramref name="syncID"/>, <paramref name="canvasHandler"/>, <paramref name="logger"/>).
+        /// (<paramref name="courseID"/>, <paramref name="syncID"/>, <paramref name="lmsHandler"/>, <paramref name="logger"/>).
         /// </summary>
         /// <param name="courseID">the id of the course.</param>
         /// <param name="syncID">the hash code associated to the current sync.</param>
-        /// <param name="canvasHandler">a reference to the class managing the connection with canvas.</param>
+        /// <param name="lmsHandler">a reference to the class managing the connection with the lms.</param>
         /// <param name="logger">a reference to the logger used for the sync.</param>
         public DiscussionWorker(
             int courseID,
             long syncID,
-            ILMSHandler canvasHandler,
+            ILMSHandler lmsHandler,
             DatabaseManager databaseManager,
             ILogger<SyncManager> logger
         )
@@ -40,7 +40,7 @@ namespace IguideME.Web.Services.Workers
             _logger = logger;
             _courseID = courseID;
             _syncID = syncID;
-            _canvasHandler = canvasHandler;
+            _lmsHandler = lmsHandler;
             _databaseManager = databaseManager;
         }
 
@@ -49,7 +49,7 @@ namespace IguideME.Web.Services.Workers
         /// There are two types of discussiosn:
         /// <list type="bullet">
         ///     <item>
-        ///     	Topics: the main discussion on canvas.
+        ///     	Topics: the main discussion on the lms.
         ///     </item>
         ///     <item>
         /// 		Entries: replies to a topic or a reply.
@@ -85,7 +85,7 @@ namespace IguideME.Web.Services.Workers
                 (int)UserRoles.student,
                 this._syncID
             );
-            IEnumerable<AppDiscussionTopic> discussions = this._canvasHandler.GetDiscussions(
+            IEnumerable<AppDiscussionTopic> discussions = this._lmsHandler.GetDiscussions(
                 this._courseID
             );
 

@@ -19,6 +19,17 @@ public static class DatabaseQueries
 
     // //================================ Tables ================================//
 
+
+    public const string CREATE_TABLE_COURSES =
+        @"CREATE TABLE IF NOT EXISTS `courses` (
+            `course_id`       STRING PRIMARY KEY,
+            `name`            STRING,
+            `code`            STRING,
+            `image`           STRING,
+            `workflow_state`  INTEGER DEFAULT 0,
+            `public`          BOOLEAN
+        );";
+
     // /------------------------ Course Settings -------------------------/
 
     /**

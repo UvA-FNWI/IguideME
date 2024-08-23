@@ -34,7 +34,7 @@ namespace IguideME.Web.Models
         [JsonProperty(PropertyName = "courseCode")]
         public string Code { get; set; }
         [JsonProperty(PropertyName = "workflowState")]
-        public WorkflowStates WorkFlowState { get; set; }
+        public WorkflowStates WorkflowState { get; set; }
         [JsonProperty(PropertyName = "isPublic")]
         public bool IsPublic { get; set; }
         [JsonProperty(PropertyName = "courseImage")]
@@ -45,7 +45,7 @@ namespace IguideME.Web.Models
             this.ID = courseID;
             this.Name = name;
             this.Code = code;
-            this.WorkFlowState = state;
+            this.WorkflowState = state;
             this.IsPublic = isPublic;
             this.Image = image;
 

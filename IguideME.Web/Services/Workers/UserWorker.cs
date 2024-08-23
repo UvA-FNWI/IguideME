@@ -12,30 +12,30 @@ namespace IguideME.Web.Services.Workers
     public class UserWorker : IWorker
     {
         readonly private ILogger<SyncManager> _logger;
-        readonly private ILMSHandler _canvasHandler;
+        readonly private ILMSHandler _lmsHandler;
         readonly private DatabaseManager _databaseManager;
         readonly private int _courseID;
         readonly private long _syncID;
 
         /// <summary>
         /// This constructor initializes the new UserWorker to:
-        /// (<paramref name="courseID"/>, <paramref name="syncID"/>, <paramref name="canvasHandler"/>, <paramref name="logger"/>).
+        /// (<paramref name="courseID"/>, <paramref name="syncID"/>, <paramref name="lmsHandler"/>, <paramref name="logger"/>).
         /// </summary>
         /// <param name="courseID">the id of the course.</param>
         /// <param name="syncID">the hash code associated to the current sync.</param>
-        /// <param name="canvasHandler">a reference to the class managing the connection with canvas.</param>
+        /// <param name="lmsHandler">a reference to the class managing the connection with the lms.</param>
         /// <param name="logger">a reference to the logger used for the sync.</param>
         public UserWorker(
             int courseID,
             long syncID,
-            ILMSHandler canvasHandler,
+            ILMSHandler lmsHandler,
             DatabaseManager databaseManager,
             ILogger<SyncManager> logger)
         {
             _logger = logger;
             this._courseID = courseID;
             this._syncID = syncID;
-            this._canvasHandler = canvasHandler;
+            this._lmsHandler = lmsHandler;
             this._databaseManager = databaseManager;
         }
 
@@ -84,13 +84,13 @@ namespace IguideME.Web.Services.Workers
         {
             _logger.LogInformation("Starting user registry...");
 
-            IEnumerable<User> students = this._canvasHandler.GetStudents(this._courseID);
+            IEnumerable<User> students = this._lmsHandler.GetStudents(this._courseID);
 
             _logger.LogInformation("Starting student registry, about to process students...");
 
             this.InitializeStudents(students);
 
-            var instructors = this._canvasHandler.GetAdministrators(_courseID);
+            var instructors = this._lmsHandler.GetAdministrators(_courseID);
 
             _logger.LogInformation("Starting instructor registry, about to process instructurs...");
 

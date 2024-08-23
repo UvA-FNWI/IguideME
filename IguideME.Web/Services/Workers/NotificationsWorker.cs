@@ -15,7 +15,7 @@ namespace IguideME.Web.Services.Workers
     public class NotificationsWorker : IWorker
     {
         readonly private ILogger<SyncManager> _logger;
-        readonly private ILMSHandler _canvasHandler;
+        readonly private ILMSHandler _lmsHandler;
         readonly private DatabaseManager _databaseManager;
 
         readonly private bool _sendNotifications;
@@ -25,17 +25,17 @@ namespace IguideME.Web.Services.Workers
 
         /// <summary>
         /// This constructor initializes the new NotificationsWorker to
-        /// (<paramref name="courseID"/>, <paramref name="syncID"/>, <paramref name="canvasHandler"/>, <paramref name="send_notifications"/>, <paramref name="logger"/>).
+        /// (<paramref name="courseID"/>, <paramref name="syncID"/>, <paramref name="lmsHandler"/>, <paramref name="send_notifications"/>, <paramref name="logger"/>).
         /// </summary>
         /// <param name="courseID">the id of the course.</param>
         /// <param name="syncID">the hash code associated to the current sync.</param>
-        /// <param name="canvasHandler">a reference to the class managing the connection with canvas.</param>
+        /// <param name="lmsHandler">a reference to the class managing the connection with the lms.</param>
         /// <param name="send_notifications">wether or not to send notifications this sync.</param>
         /// <param name="logger">a reference to the logger used for the sync.</param>
         public NotificationsWorker(
             int courseID,
             long syncID,
-            ILMSHandler canvasHandler,
+            ILMSHandler lmsHandler,
             DatabaseManager databaseManager,
             bool sendNotifications,
             ILogger<SyncManager> logger)
@@ -43,13 +43,13 @@ namespace IguideME.Web.Services.Workers
             _logger = logger;
             this._courseID = courseID;
             this._syncID = syncID;
-            this._canvasHandler = canvasHandler;
+            this._lmsHandler = lmsHandler;
             this._databaseManager = databaseManager;
             this._sendNotifications = sendNotifications;
         }
 
         /// <summary>
-        /// Creates and sends a canvas message to a user with a performance notification.
+        /// Creates and sends a message to a user with a performance notification.
         /// </summary>
         /// <param name="student">the student to send the notification to.</param>
         private void SendNotificationsToStudent(User student)
@@ -98,7 +98,7 @@ namespace IguideME.Web.Services.Workers
             {
                 body = "You are using IguideME, please find your personal feedback below. Visit IguideME in your course for more detailed information.\n\n" + body;
                 _logger.LogInformation("Sending notification to {ID}: {Body}", student.UserID, body);
-                _canvasHandler.SendMessage(student.UserID,
+                _lmsHandler.SendMessage(student.UserID,
                 "IguideME",
                 body
                 );

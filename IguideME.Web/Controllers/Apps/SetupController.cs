@@ -26,7 +26,7 @@ namespace IguideME.Web.Controllers
 
 		[Route("/api/setup")]
 		[HttpPost]
-		public async ActionResult SetupCourse()
+		public async Task<IActionResult> SetupCourse()
 		{
 			if (!_databaseManager.IsCourseRegistered(GetCourseID()))
 			{

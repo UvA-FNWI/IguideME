@@ -36,13 +36,12 @@ namespace IguideME.Web.Controllers
 				!this.IsAdministrator())
 				return Unauthorized();
 
-			bool success = int.TryParse(entryID, out int id);
-
-			return success
-				? Ok(
+			if (int.TryParse(entryID, out int id))
+				return Ok(
 					_databaseManager.GetAssignmentSubmissionForUser(
-						this.GetCourseID(), id, userID))
-				: NotFound();
+						this.GetCourseID(), id, userID));
+
+			return NotFound();
 		}
 
 		[Authorize(Policy = "IsInstructor")]
@@ -62,13 +61,12 @@ namespace IguideME.Web.Controllers
 				!this.IsAdministrator())
 				return Unauthorized();
 
-			bool success = int.TryParse(entryID, out int id);
-
-			return success
-				? Ok(
+			if (int.TryParse(entryID, out int id))
+				return Ok(
 					_databaseManager.GetTopicGradesForUser(
-						this.GetCourseID(), id, userID))
-				: NotFound();
+						this.GetCourseID(), id, userID));
+
+			return NotFound();
 		}
 
 		[Authorize]
@@ -104,13 +102,10 @@ namespace IguideME.Web.Controllers
 				!this.IsAdministrator())
 				return Unauthorized();
 
-			bool success = int.TryParse(entryID, out int id);
+			if (int.TryParse(entryID, out int id))
+				return Ok(_databaseManager.GetLearningGoalForUser(this.GetCourseID(), id, userID));
 
-			return success
-				? Ok(
-					_databaseManager.GetLearningGoalForUser(
-						this.GetCourseID(), id, userID))
-				: NotFound();
+			return NotFound();
 		}
 
 		[Authorize(Policy = "IsInstructor")]
@@ -157,7 +152,7 @@ namespace IguideME.Web.Controllers
 
 		[Authorize(Policy = "IsInstructor")]
 		[HttpPost]
-		[Route("api//learning-goal/requirements/{reqID}")]
+		[Route("api/learning-goal/requirements/{reqID}")]
 		public ActionResult PostGoalRequirement(string reqID, [FromBody] GoalRequirement obj)
 		{
 			if (int.TryParse(reqID, out int id))

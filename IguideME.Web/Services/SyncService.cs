@@ -22,16 +22,16 @@ namespace IguideME.Web.Services
     }
 
     // Not strictly necessary since we only have 1 class but apparently good practice.
-    public interface ICanvasSyncService
+    public interface ISyncService
     {
         Task<JobResultModel> DoWorkAsync(string jobId, JobParametersModel work,
             CancellationToken cancellationToken);
     }
 
     /// <summary>
-    /// Class <a>CanvasSyncService</a> implements ICanvasSyncService and is a service that manages syncs. .
+    /// Class <a>SyncService</a> implements ISyncService and is a service that manages syncs. .
     /// </summary>
-    public sealed class CanvasSyncService : ICanvasSyncService
+    public sealed class SyncService : ISyncService
     {
         private readonly ILogger<SyncManager> _logger;
         private readonly IComputationJobStatusService _computationJobStatus;
@@ -40,13 +40,13 @@ namespace IguideME.Web.Services
         private WorkerStatus workerStatus;
 
         /// <summary>
-        /// This constructor initializes the new CanvasSyncService to
+        /// This constructor initializes the new LmsSyncService to
         /// (<paramref name="computationJobStatus"/>, <paramref name="lmsHandler"/>, <paramref name="logger"/>).
         /// </summary>
         /// <param name="computationJobStatus"></param>
         /// <param name="lmsHandler"></param>
         /// <param name="logger"></param>
-        public CanvasSyncService(
+        public SyncService(
             IComputationJobStatusService computationJobStatus,
             ILMSHandler lmsHandler,
             DatabaseManager databaseManager,
@@ -74,7 +74,8 @@ namespace IguideME.Web.Services
             workerStatus = new()
             {
                 counter = 0,
-                tasks = new string[] { "boot-up", "students", "quizzes", "discussions", "assignments", "Grade-predictor", "peer-groups", "notifications", "done" }
+                tasks = new string[] { "boot-up", "students", "quizzes", "discussions", "assignments", "peer-groups", "notifications", "done" }
+                // tasks = new string[] { "boot-up", "students", "quizzes", "discussions", "assignments", "Grade-predictor", "peer-groups", "notifications", "done" }
             };
             workerStatus.statuses = workerStatus.tasks.Select((_) => "Pending").ToArray();
             UpdateStatus(jobId);
@@ -82,7 +83,7 @@ namespace IguideME.Web.Services
             _logger.LogInformation("{Time}: Starting sync for course {CourseID}", DateTime.Now, courseID);
             long timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
-            // Renew the connection with canvas.
+            // Renew the connection with the lms.
             _lmsHandler.SyncInit();
 
             // Don't keep ancient syncs in the database.
@@ -104,7 +105,7 @@ namespace IguideME.Web.Services
             RunWorker(jobId, new QuizWorker(courseID, timestamp, _lmsHandler, _databaseManager, _logger));
             RunWorker(jobId, new DiscussionWorker(courseID, timestamp, _lmsHandler, _databaseManager, _logger));
             RunWorker(jobId, new AssignmentWorker(courseID, timestamp, _lmsHandler, _databaseManager, _logger));
-            RunWorker(jobId, new GradePredictorWorker(courseID, timestamp, _databaseManager, _logger));
+            // RunWorker(jobId, new GradePredictorWorker(courseID, timestamp, _databaseManager, _logger));
             RunWorker(jobId, new PeerGroupWorker(courseID, timestamp, _databaseManager, _logger));
             RunWorker(jobId, new NotificationsWorker(courseID, timestamp, _lmsHandler, _databaseManager, work.SendNotifications, _logger));
 

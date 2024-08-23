@@ -25,7 +25,7 @@ namespace IguideME.Web.Services.Workers
         /// </summary>
         /// <param name="courseID">the id of the course.</param>
         /// <param name="syncID">the hash code associated to the current sync.</param>
-        /// <param name="ILMSHandler">a reference to the class managing the connection with canvas.</param>
+        /// <param name="ILMSHandler">a reference to the class managing the connection with the lms.</param>
         /// <param name="logger">a reference to the logger used for the sync.</param>
         public AssignmentWorker(
             int courseID,

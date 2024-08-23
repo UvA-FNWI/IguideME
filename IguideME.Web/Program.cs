@@ -62,7 +62,7 @@ SymmetricSecurityKey signingKey = new(Encoding.ASCII.GetBytes(key));
 builder.Services.AddRazorPages();
 
 // work object, where the computations are done.
-builder.Services.AddTransient<ICanvasSyncService, CanvasSyncService>();
+builder.Services.AddTransient<ISyncService, SyncService>();
 
 // QueuedBackgroundService is a dual-purpose service
 builder.Services.AddHostedService<QueuedBackgroundService>();
@@ -166,7 +166,7 @@ string GetUserID(string userid, string course)
             return userID;
         }
     }
-    // Try's to find the user in canvas.
+    // Try's to find the user in the lms.
 
     string[] ids = app.Services.GetService<ILMSHandler>().GetUserIDs(courseid, userid);
 

@@ -187,6 +187,7 @@ namespace IguideME.Web.Services
             string[] queries =
             {
                 DatabaseQueries.CREATE_TABLE_USERS,
+                DatabaseQueries.CREATE_TABLE_COURSES,
                 DatabaseQueries.CREATE_TABLE_COURSE_SETTINGS,
                 DatabaseQueries.CREATE_TABLE_NOTIFICATIONS_COURSE_SETTINGS,
                 DatabaseQueries.CREATE_TABLE_SYNC_HISTORY,
@@ -203,8 +204,8 @@ namespace IguideME.Web.Services
                 DatabaseQueries.CREATE_TABLE_TILE_ENTRIES,
                 DatabaseQueries.CREATE_TABLE_SUBMISSIONS,
                 DatabaseQueries.CREATE_TABLE_SUBMISSIONS_META,
-                DatabaseQueries.CREATE_TABLE_GRADE_PREDICTION_MODEL,
-                DatabaseQueries.CREATE_TABLE_GRADE_PREDICTION_MODEL_PARAMETER,
+                // DatabaseQueries.CREATE_TABLE_GRADE_PREDICTION_MODEL,
+                // DatabaseQueries.CREATE_TABLE_GRADE_PREDICTION_MODEL_PARAMETER,
                 DatabaseQueries.CREATE_TABLE_PEER_GROUPS,
                 DatabaseQueries.CREATE_TABLE_TILE_GRADES,
                 DatabaseQueries.CREATE_TABLE_NOTIFICATIONS,

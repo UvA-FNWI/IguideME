@@ -33,7 +33,7 @@ namespace IguideME.Web.Services
             public JobParametersModel JobParameters { get; set; }
         }
 
-        private readonly ICanvasSyncService _workService;
+        private readonly ISyncService _workService;
 
         private readonly ILogger<QueuedBackgroundService> _logger;
 
@@ -57,7 +57,7 @@ namespace IguideME.Web.Services
         /// <param name="jobStatusService">The service used to manage the status of computation jobs.</param>
         /// <param name="logger">The logger used to log events for this service.</param>
 		public QueuedBackgroundService(
-            ICanvasSyncService workService,
+            ISyncService workService,
             IComputationJobStatusService jobStatusService,
             ILogger<QueuedBackgroundService> logger)
         {

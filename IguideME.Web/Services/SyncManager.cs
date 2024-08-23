@@ -12,7 +12,7 @@ namespace IguideME.Web.Services
     public class SyncManager : IHostedService, IDisposable
     {
         private int _executionCount = 0;
-        private readonly ILMSHandler _canvasHandler;
+        private readonly ILMSHandler _lmsHandler;
         private readonly DatabaseManager _databaseManager;
 
         private readonly ILogger<SyncManager> _logger;
@@ -25,10 +25,10 @@ namespace IguideME.Web.Services
             IComputationJobStatusService computationJobStatus,
             IQueuedBackgroundService queuedBackgroundService,
             DatabaseManager databaseManager,
-            ILMSHandler canvasHandler)
+            ILMSHandler lmsHandler)
         {
             _logger = logger;
-            _canvasHandler = canvasHandler;
+            _lmsHandler = lmsHandler;
             _computationJobStatus = computationJobStatus;
             _queuedBackgroundService = queuedBackgroundService;
             _databaseManager = databaseManager;
@@ -53,9 +53,9 @@ namespace IguideME.Web.Services
 
             if (_databaseManager != null && now.Hour == 3 && now.Minute <= 30)
             {
-                new CanvasSyncService(
+                new SyncService(
                     _computationJobStatus,
-                    _canvasHandler,
+                    _lmsHandler,
                     _databaseManager,
                     _logger
                 );
