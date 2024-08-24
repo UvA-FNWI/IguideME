@@ -89,7 +89,7 @@ export function useAntFilterDropdown({ dataIndex }: { dataIndex: DataType }): Ta
     ),
     filterIcon: (filtered: boolean) => <SearchOutlined className='text-text' />,
     onFilter: (value, record) =>
-      record[dataIndex]
+      record[dataIndex as any]! //TODO: figure out typing
         .toString()
         .toLowerCase()
         .includes((value as string).toLowerCase()),

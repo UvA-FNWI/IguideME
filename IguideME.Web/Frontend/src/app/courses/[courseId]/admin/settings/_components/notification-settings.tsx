@@ -28,11 +28,11 @@ function NotificationSettings(): ReactElement {
 
   const { range, selectedDays, selectedDates } = useMemo(() => {
     if (data) {
-      const r = data.isRange;
-      const sDays = data.selectedDays ? data.selectedDays.split(', ') : null;
-      const sDates = data.selectedDates ? data.selectedDates.split(', ').map((date) => dayjs(date)) : [];
+      const range = data.isRange;
+      const selectedDays = data.selectedDays ? data.selectedDays.split(', ') : null;
+      const selectedDates = data.selectedDates ? data.selectedDates.split(', ').map((date) => dayjs(date)) : [];
 
-      return { r, sDays, sDates };
+      return { range, selectedDays, selectedDates };
     }
     return { range: false, selectedDays: null, selectedDates: [] };
   }, [data]);

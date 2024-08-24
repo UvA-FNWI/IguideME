@@ -100,7 +100,7 @@ const SunburstChart: FC<TreeType> = memo((tree) => {
       .height(300)
       .data(treeCopy)
       .showLabels(false)
-      .color((node) => typeToColor((node as TreeType).type ?? ActionTypes.page))
+      .color((node) => typeToColor((node as TreeType).type ?? ActionTypes.Page))
       .maxLevels(5)(sunburstChartRef.current)
       .tooltipTitle((node) => (node as TreeType).name);
     chartDrawnRef.current = true;

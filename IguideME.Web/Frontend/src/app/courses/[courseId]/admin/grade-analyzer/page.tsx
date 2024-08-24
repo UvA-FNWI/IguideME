@@ -11,7 +11,7 @@ import tailwindConfig from '@/../tailwind.config';
 import { getCompareGrades } from '@/api/grades';
 import { getTiles } from '@/api/tiles';
 import { AdminHeader } from '@/app/courses/[courseId]/admin/_components/admin-header';
-import { TileType } from '@/types/tile';
+import { TileType, varFixed } from '@/types/tile';
 
 type ContentType = 'tile' | 'ass' | 'disc' | 'goal';
 interface SelectionData {
@@ -81,7 +81,7 @@ function Comparison({ selectedA, selectedB }: CompareProps): ReactElement {
     refetchOnWindowFocus: false,
   });
 
-  if (isErrorA || isErrorB) return 'TODO:';
+  if (isErrorA || isErrorB) return <>'TODO:'</>;
   if (isLoadingA || isLoadingB || !gradesA || !gradesB) return <></>;
 
   const data = gradesA
@@ -141,6 +141,9 @@ function ComparisonStatistics({ data, titleA, titleB }: GradesProps): ReactEleme
 function ComparisonScatter({ data, titleA, titleB }: GradesProps): ReactElement {
   const fullConfig = resolveConfig(tailwindConfig);
 
+  // @ts-expect-error
+  const fill = fullConfig.theme.colors.primary
+
   return (
     <div className='flex items-center justify-center'>
       <ResponsiveContainer width='40%' aspect={1}>
@@ -159,13 +162,13 @@ function ComparisonScatter({ data, titleA, titleB }: GradesProps): ReactElement 
           <YAxis type='number' dataKey='y' name={titleB}>
             <Label value={titleB} angle={270} position='left' offset={0} />
           </YAxis>
-          <Tooltip cursor={{ strokeDasharray: '3 3' }} />
-          <Scatter name='Comparison' data={data} fill={fullConfig.theme.colors.primary} />
+          <Scatter name='Comparison' data={data} fill={fill} />
         </ScatterChart>
       </ResponsiveContainer>
     </div>
   );
 }
+          // <Tooltip cursor={{ strokeDasharray: '3 3' }} />
 
 function SelectSource({ selected, setSelected }: SelectProps): ReactElement {
   const {
@@ -210,15 +213,15 @@ function SelectSource({ selected, setSelected }: SelectProps): ReactElement {
           let data;
           let key;
           switch (tile.type) {
-            case TileType.assignments:
+            case TileType.Assignments:
               data = { type: 'ass', id: entry.content_id, title: entry.title };
               key = `ass${entry.content_id}`;
               break;
-            case TileType.discussions:
+            case TileType.Discussions:
               data = { type: 'disc', id: entry.content_id, title: entry.title };
               key = `disc${entry.content_id}`;
               break;
-            case TileType.learning_outcomes:
+            case TileType.LearningOutcomes:
               data = { type: 'goal', id: entry.content_id, title: entry.title };
               key = `goal${entry.content_id}`;
               break;
@@ -236,12 +239,13 @@ function SelectSource({ selected, setSelected }: SelectProps): ReactElement {
     },
   ];
 
+  // TODO: the as any shouldn't be necessary, but fsr it thinks value should be an int, which disagrees with docs
   return (
     <Select
       className='[&>div]:!bg-surface1 [&>div]:hover:!bg-surface2 [&_span]:!text-text w-4/5 [&>div]:!border-accent/70 [&>div]:!shadow-none [&>div]:hover:!border-accent'
       onChange={onChange}
-      options={tiles ? options : null}
-      value={selected ? selected.type + selected.id : ''}
+      options={tiles ? options : undefined}
+      value={(selected ? selected.type + selected.id : '') as any}
       placeholder='Select a source of grades'
       notFoundContent={
         isTilesLoading ?

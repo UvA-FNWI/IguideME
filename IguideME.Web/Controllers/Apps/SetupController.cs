@@ -24,18 +24,25 @@ namespace IguideME.Web.Controllers
 			this._computationJobStatusService = computationJobStatusService;
 		}
 
-		[Route("/api/setup")]
+		[Route("/api/setup/{courseID}")]
 		[HttpPost]
-		public async Task<IActionResult> SetupCourse()
+		public async Task<IActionResult> SetupCourse(string courseID)
 		{
-			if (!_databaseManager.IsCourseRegistered(GetCourseID()))
+			if (int.TryParse(courseID, out int id))
 			{
-				_databaseManager.RegisterCourse(GetCourseID(), GetCourseTitle());
-				JobParametersModel obj =
-					new() { CourseID = GetCourseID(), SendNotifications = false };
-				await _queuedBackgroundService.PostWorkItemAsync(obj).ConfigureAwait(false);
+				if (!_databaseManager.IsCourseRegistered(id))
+				{
+					_databaseManager.RegisterCourse(id, GetCourseTitle());
+
+					// Start the first sync in order to get data from the lms
+					JobParametersModel obj =
+						new() { CourseID = id, SendNotifications = false };
+					await _queuedBackgroundService.PostWorkItemAsync(obj).ConfigureAwait(false);
+				}
+				return Accepted();
 			}
-			return Accepted();
+
+			return BadRequest();
 		}
 
 	}

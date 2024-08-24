@@ -20,6 +20,7 @@ public static class DatabaseQueries
     // //================================ Tables ================================//
 
 
+    // TODO: should there be 1 table that is both course and course settings?
     public const string CREATE_TABLE_COURSES =
         @"CREATE TABLE IF NOT EXISTS `courses` (
             `course_id`       STRING PRIMARY KEY,

@@ -22,7 +22,7 @@ const PageExits: FC<PageExitsProps> = memo(({ sessions }) => {
 
       // Find the last action that is either of type page or tile
       const exitPage = sessionDataArray
-        .filter((data) => data.action === ActionTypes.page || data.action === ActionTypes.Tile)
+        .filter((data) => data.action === ActionTypes.Page || data.action === ActionTypes.Tile)
         .pop();
 
       if (exitPage) {

@@ -68,8 +68,8 @@ const AnalyticsChips: FC<AnalyticsChipProps> = memo(({ analytics, consentInfo, s
       const sortedSessionEvents = sessionEvents.sort(
         (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime(),
       );
-      const firstEvent = sortedSessionEvents[0];
-      const lastEvent = sortedSessionEvents[sessionEvents.length - 1];
+      const firstEvent = sortedSessionEvents[0]!;
+      const lastEvent = sortedSessionEvents[sessionEvents.length - 1]!;
       const sessionLength = new Date(lastEvent.timestamp).getTime() - new Date(firstEvent.timestamp).getTime();
       currentData.totalSessionLength += sessionLength;
 
@@ -125,10 +125,10 @@ const AnalyticsChips: FC<AnalyticsChipProps> = memo(({ analytics, consentInfo, s
       <AnalyticsChip
         change={
           sessionData.length > 1 ?
-            sessionData[sessionData.length - 1].value - sessionData[sessionData.length - 2].value
+            sessionData[sessionData.length - 1]!.value - sessionData[sessionData.length - 2]!.value
           : 0
         }
-        display={sessionData.length > 0 ? sessionData[sessionData.length - 1].value : undefined}
+        display={sessionData.length > 0 ? sessionData[sessionData.length - 1]!.value : undefined}
         title='Total Visits'
         unit='number'
       >
@@ -139,14 +139,14 @@ const AnalyticsChips: FC<AnalyticsChipProps> = memo(({ analytics, consentInfo, s
         change={
           conversionRateData.length > 1 ?
             Math.round(
-              conversionRateData[conversionRateData.length - 1]?.value -
-                conversionRateData[conversionRateData.length - 2]?.value,
+              conversionRateData[conversionRateData.length - 1]!.value -
+                conversionRateData[conversionRateData.length - 2]!.value,
             )
           : 0
         }
         display={
           conversionRateData.length > 0 ?
-            `${(conversionRateData[conversionRateData.length - 1]?.value * 100).toFixed(2)}%`
+            `${(conversionRateData[conversionRateData.length - 1]!.value * 100).toFixed(2)}%`
           : undefined
         }
         title='Conversion Rate'
@@ -159,15 +159,15 @@ const AnalyticsChips: FC<AnalyticsChipProps> = memo(({ analytics, consentInfo, s
         change={
           sessionLengthData.length > 1 ?
             Math.round(
-              sessionLengthData[sessionLengthData.length - 1]?.value -
-                sessionLengthData[sessionLengthData.length - 2]?.value,
+              sessionLengthData[sessionLengthData.length - 1]!.value -
+                sessionLengthData[sessionLengthData.length - 2]!.value,
             )
           : 0
         }
         className='flex-grow'
         display={
           sessionLengthData.length > 0 ?
-            `${Math.round(sessionLengthData[sessionLengthData.length - 1]?.value)} min`
+            `${Math.round(sessionLengthData[sessionLengthData.length - 1]!.value)} min`
           : undefined
         }
         title='Session Length'

@@ -16,7 +16,7 @@ const PageVisits: FC<PageVisitsProps> = memo(({ actionDetailLength, analytics })
     if (!analytics) return pageVisitData;
 
     analytics.forEach((event) => {
-      if (event.action !== ActionTypes.page && event.action !== ActionTypes.Tile) return;
+      if (event.action !== ActionTypes.Page && event.action !== ActionTypes.Tile) return;
 
       const page = event.action_detail;
       const currentCount = pageVisitData.get(page) ?? { allTime: 0, thisWeek: 0 };

@@ -60,11 +60,12 @@ function GradeAnalytics(): ReactElement {
   }, [analytics]);
 
   const actionDetailLength: Map<string, number> = useMemo(() => {
-    const adl = new Map<string, number>();
-    if (!analytics) return adl;
+    const adl = new Map<string, {totalTime: number, count: number}>();
+    const todo = new Map<string, number>();
+    if (!analytics) return todo;
 
     analytics.forEach((startingEvent) => {
-      if (startingEvent.action !== ActionTypes.page && startingEvent.action !== ActionTypes.tile) return;
+      if (startingEvent.action !== ActionTypes.Page && startingEvent.action !== ActionTypes.Tile) return;
 
       const actionDetail = startingEvent.action_detail;
       const currentData = adl.get(actionDetail) ?? { totalTime: 0, count: 0 };
@@ -80,7 +81,7 @@ function GradeAnalytics(): ReactElement {
       const startingEventIndex = sortedSessionEvents.findIndex((event) => event.timestamp === startingEvent.timestamp);
       if (startingEventIndex === -1) return;
       if (typeof sortedSessionEvents[startingEventIndex + 1] === 'undefined') return;
-      const endingEvent = sortedSessionEvents[startingEventIndex + 1];
+      const endingEvent = sortedSessionEvents[startingEventIndex + 1]!;
 
       currentData.totalTime += new Date(endingEvent.timestamp).getTime() - new Date(startingEvent.timestamp).getTime();
       currentData.count += 1;
@@ -90,10 +91,10 @@ function GradeAnalytics(): ReactElement {
 
     // For every key in the map, calculate the average time spent on that page in minutes
     adl.forEach((value, key) => {
-      adl.set(key, value.totalTime / 60000 / value.count);
+      todo.set(key, value.totalTime / 60000 / value.count);
     });
 
-    return adl;
+    return todo;
   }, [sessions]);
 
   if (analyticsIsError || consentInfoIsError) {
