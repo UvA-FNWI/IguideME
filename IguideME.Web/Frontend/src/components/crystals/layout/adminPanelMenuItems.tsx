@@ -1,13 +1,13 @@
 import {
   AppstoreOutlined,
-  CloudUploadOutlined,
+  // CloudUploadOutlined,
   ClusterOutlined,
   ControlOutlined,
   DatabaseOutlined,
   DotChartOutlined,
-  FundProjectionScreenOutlined,
+  // FundProjectionScreenOutlined,
   LaptopOutlined,
-  NotificationOutlined,
+  // NotificationOutlined,
   TeamOutlined,
   TrophyOutlined,
 } from '@ant-design/icons';

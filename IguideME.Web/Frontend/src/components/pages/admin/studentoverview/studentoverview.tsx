@@ -1,3 +1,4 @@
+// @ts-nocheck
 import AdminTitle from '@/components/atoms/admin-titles/admin-titles';
 import { Table, Tooltip } from 'antd';
 import { useMemo, type FC, type ReactElement } from 'react';

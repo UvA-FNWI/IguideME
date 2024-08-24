@@ -14,9 +14,7 @@ export default defineConfig((env) => ({
   build: {
     outDir: path.resolve('..', 'wwwroot', 'dist'),
     emptyOutDir: true,
-    rollupOptions: {
-      input: path.join(__dirname, 'src', 'main.tsx'),
-    },
+    rollupOptions: {},
   },
   resolve: {
     alias: [{ find: '@', replacement: path.resolve(__dirname, 'src') }],

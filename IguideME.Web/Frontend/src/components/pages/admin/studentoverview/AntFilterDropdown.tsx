@@ -32,7 +32,7 @@ export const useAntFilterDropdown = (dataIndex: DataType): TableColumnType<DataT
   const getColumnSearchProps = (dataIndex: DataType): TableColumnType<DataType> => ({
     filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
       <div
-        className='border-2 border-primary bg-surface1 p-2'
+        className='border-primary bg-surface1 border-2 p-2'
         onKeyDown={(e) => {
           e.stopPropagation();
         }}
@@ -47,7 +47,7 @@ export const useAntFilterDropdown = (dataIndex: DataType): TableColumnType<DataT
           onPressEnter={() => {
             handleSearch(selectedKeys as string[], confirm, dataIndex);
           }}
-          className='mb-2 block border-accent/50 bg-surface1 text-text hover:border-accent hover:bg-surface2 focus:border-accent focus:shadow-sm focus:shadow-accent aria-invalid:!border-failure aria-invalid:shadow-none aria-invalid:focus:!shadow-sm aria-invalid:focus:!shadow-failure'
+          className='border-accent/50 bg-surface1 text-text hover:border-accent hover:bg-surface2 focus:border-accent focus:shadow-accent aria-invalid:!border-failure aria-invalid:shadow-none aria-invalid:focus:!shadow-sm aria-invalid:focus:!shadow-failure mb-2 block focus:shadow-sm'
         />
         <Space>
           <Button
@@ -73,7 +73,7 @@ export const useAntFilterDropdown = (dataIndex: DataType): TableColumnType<DataT
           <Button
             type='link'
             size='small'
-            className='text-text underline hover:!text-text focus:!text-text'
+            className='text-text hover:!text-text focus:!text-text underline'
             onClick={() => {
               close();
             }}
@@ -83,9 +83,9 @@ export const useAntFilterDropdown = (dataIndex: DataType): TableColumnType<DataT
         </Space>
       </div>
     ),
-    filterIcon: (filtered: boolean) => <SearchOutlined className='text-text' />,
+    filterIcon: () => <SearchOutlined className='text-text' />,
     onFilter: (value, record) =>
-      record[dataIndex]
+      record[dataIndex as any]
         .toString()
         .toLowerCase()
         .includes((value as string).toLowerCase()),

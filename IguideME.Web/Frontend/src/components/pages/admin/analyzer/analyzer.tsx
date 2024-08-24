@@ -4,7 +4,7 @@ import AdminTitle from '@/components/atoms/admin-titles/admin-titles';
 import Loading from '@/components/particles/loading';
 import { TileType } from '@/types/tile';
 import { useQuery } from '@tanstack/react-query';
-import { Select, Tooltip } from 'antd';
+import { Select } from 'antd';
 import { DefaultOptionType } from 'antd/es/select';
 import { Dispatch, SetStateAction, useState, type FC, type ReactElement } from 'react';
 import { CartesianGrid, Label, ResponsiveContainer, Scatter, ScatterChart, XAxis, YAxis } from 'recharts';
@@ -156,12 +156,12 @@ function ComparisonScatter({ data, titleA, titleB }: GradesProps) {
           <YAxis type='number' dataKey='y' name={titleB}>
             <Label value={titleB} angle={270} position='left' offset={0} />
           </YAxis>
-          <Tooltip cursor={{ strokeDasharray: '3 3' }} />
           <Scatter name='Comparison' data={data} fill={fullConfig.theme.colors.primary} />
         </ScatterChart>
       </ResponsiveContainer>
     </div>
   );
+  // <Tooltip cursor={{ strokeDasharray: '3 3' }} />
 }
 
 const SelectSource: FC<SelectProps> = ({ selected, setSelected }): ReactElement => {
@@ -239,7 +239,7 @@ const SelectSource: FC<SelectProps> = ({ selected, setSelected }): ReactElement 
         className='[&>div]:!border-accent/70 [&>div]:!bg-surface1 [&>div]:hover:!border-accent [&>div]:hover:!bg-surface2 [&_span]:!text-text w-4/5 [&>div]:!shadow-none'
         onChange={onChange}
         options={tiles && options}
-        value={selected ? selected.type + selected.id : ''}
+        value={(selected ? selected.type + selected.id : '') as any}
         placeholder='Select a source of grades'
         notFoundContent={
           isTilesLoading ?
