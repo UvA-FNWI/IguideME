@@ -21,7 +21,7 @@ namespace IguideME.Web.Services
             DatabaseManager.s_instance = this;
             _connection_string = isDev
                 ? "Data Source=db.sqlite;Version=3;New=False;Compress=True;"
-                : "Data Source=/data/IguideME.db;Version=3;New=False;Compress=True;";
+                : "Data Source=data/IguideME.db;Version=3;New=False;Compress=True;";
 
             DatabaseManager.s_instance.RunMigrations();
             DatabaseManager.s_instance.CreateTables();

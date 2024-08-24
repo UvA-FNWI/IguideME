@@ -8,11 +8,14 @@ using IguideME.Web.Services.Data;
 using IguideME.Web.Services.LMSHandlers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Headers;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Net.Http.Headers;
 using StackExchange.Redis;
 using UvA.LTI;
 using UserRoles = IguideME.Web.Models.Impl.UserRoles;
@@ -22,15 +25,21 @@ using UserRoles = IguideME.Web.Models.Impl.UserRoles;
 
 //    /------------------------- Create builder --------------------------/
 
+const string FRONTEND_PREFIX = "/front";
+
 // Create a new WebApplicationBuilder for setting up the application.
 WebApplicationBuilder builder = WebApplication.CreateBuilder(
-    new WebApplicationOptions
-    {
-        Args = args, // command-line arguments passed to the app
-        WebRootPath = "wwwroot/dist" // specifies the path to the web root directory
-    }
+// new WebApplicationOptions
+// {
+//     Args = args, // command-line arguments passed to the app
+//     WebRootPath = "wwwroot/dist" // specifies the path to the web root directory
+// }
 );
-
+builder.Services.AddSpaStaticFiles(configuration =>
+{
+    configuration.RootPath = "wwwroot/dist";
+});
+builder.Services.AddHttpLogging(o => { });
 //    /------------------------ Read appsettings.json -------------------------/
 
 // "UnsecureApplicationSettings:UseRedisCache" - indicates whether to use Redis cache or not.
@@ -59,7 +68,7 @@ SymmetricSecurityKey signingKey = new(Encoding.ASCII.GetBytes(key));
 //    /----------------------- Configure services ------------------------/
 
 // Add Razor pages (just index.cshtml)
-builder.Services.AddRazorPages();
+// builder.Serices.AddRazorPages();
 
 // work object, where the computations are done.
 builder.Services.AddTransient<ICanvasSyncService, CanvasSyncService>();
@@ -189,6 +198,7 @@ app.UseLti(
             ltiConfig["AuthenticateUrl"] ?? throw new Exception("Authenticate url not set"),
         JwksUrl = ltiConfig["JwksUrl"] ?? throw new Exception("Jwks url not set"),
         SigningKey = key,
+        RedirectUrl = FRONTEND_PREFIX,
         ClaimsMapping = p =>
         {
             string courseID = p.CustomClaims?.GetProperty("courseid").ToString();
@@ -215,6 +225,7 @@ app.UseLti(
         }
     }
 );
+app.UseHttpLogging();
 
 app.UseHttpsRedirection();
 app.UseDefaultFiles();
@@ -225,7 +236,7 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseEndpoints(endpoints => endpoints.MapRazorPages());
+// app.UseEndpoints(endpoints => endpoints.MapRazorPages());
 
 app.MapControllerRoute(name: "default", pattern: "{controller}/{action=Index}/{id?}");
 
@@ -233,14 +244,42 @@ if (app.Environment.IsDevelopment())
 {
     Console.WriteLine("In Development.");
     app.UseDeveloperExceptionPage();
-    app.UseSpa(spa =>
+
+    app.MapWhen(y => y.Request.Path.StartsWithSegments(FRONTEND_PREFIX), client =>
     {
-        spa.UseProxyToSpaDevelopmentServer("https://localhost:3000/");
+        client.UseSpa(spa =>
+        {
+            spa.UseProxyToSpaDevelopmentServer("https://localhost:3000/");
+        });
     });
 }
 else
 {
     Console.WriteLine("In Production.");
+    app.Map(new PathString(FRONTEND_PREFIX), client =>
+       {
+           client.UseSpaStaticFiles();
+           client.UseSpa(spa =>
+        {
+            spa.Options.SourcePath = "wwwroot";
+
+            // adds no-store header to index page to prevent deployment issues (prevent linking to old .js files)
+            // .js and other static resources are still cached by the browser
+            spa.Options.DefaultPageStaticFileOptions = new StaticFileOptions
+            {
+                OnPrepareResponse = ctx =>
+                {
+                    ResponseHeaders headers = ctx.Context.Response.GetTypedHeaders();
+                    headers.CacheControl = new CacheControlHeaderValue
+                    {
+                        NoCache = true,
+                        NoStore = true,
+                        MustRevalidate = true
+                    };
+                }
+            };
+        });
+       });
     app.UseExceptionHandler("/Error");
 }
 
