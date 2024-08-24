@@ -203,8 +203,8 @@ namespace IguideME.Web.Services
                 DatabaseQueries.CREATE_TABLE_TILE_ENTRIES,
                 DatabaseQueries.CREATE_TABLE_SUBMISSIONS,
                 DatabaseQueries.CREATE_TABLE_SUBMISSIONS_META,
-                DatabaseQueries.CREATE_TABLE_GRADE_PREDICTION_MODEL,
-                DatabaseQueries.CREATE_TABLE_GRADE_PREDICTION_MODEL_PARAMETER,
+                // DatabaseQueries.CREATE_TABLE_GRADE_PREDICTION_MODEL,
+                // DatabaseQueries.CREATE_TABLE_GRADE_PREDICTION_MODEL_PARAMETER,
                 DatabaseQueries.CREATE_TABLE_PEER_GROUPS,
                 DatabaseQueries.CREATE_TABLE_TILE_GRADES,
                 DatabaseQueries.CREATE_TABLE_NOTIFICATIONS,
@@ -1210,8 +1210,8 @@ namespace IguideME.Web.Services
 
             NonQuery(
                 DatabaseQueries.REGISTER_STUDENT_SETTINGS,
-                new SQLiteParameter("courseID", courseID),
-                new SQLiteParameter("userID", userID),
+                new SQLiteParameter("CourseID", courseID),
+                new SQLiteParameter("UserID", userID),
                 new SQLiteParameter("PredictedGrade", tempUser.Settings.PredictedGrade),
                 new SQLiteParameter("TotalGrade", tempUser.Settings.TotalGrade),
                 new SQLiteParameter("GoalGrade", tempUser.Settings.GoalGrade),

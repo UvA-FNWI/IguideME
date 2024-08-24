@@ -27,11 +27,11 @@ export const getAdminPanelMenuItems = (courseId: string, path: string): SideNavi
     Icon: TeamOutlined,
     to: `/${courseId}/admin/admin-panel/student-overview`,
   },
-  {
-    label: 'Grade Predictor',
-    Icon: FundProjectionScreenOutlined,
-    to: `/${courseId}/admin/admin-panel/grade-predictor`,
-  },
+  // {
+  //   label: 'Grade Predictor',
+  //   Icon: FundProjectionScreenOutlined,
+  //   to: `/${courseId}/admin/admin-panel/grade-predictor`,
+  // },
   {
     label: 'Grade Analyzer',
     Icon: DotChartOutlined,
@@ -42,16 +42,16 @@ export const getAdminPanelMenuItems = (courseId: string, path: string): SideNavi
     Icon: TrophyOutlined,
     to: `/${courseId}/admin/admin-panel/learning-goals`,
   },
-  {
-    label: 'Data Wizard',
-    Icon: CloudUploadOutlined,
-    to: `/${courseId}/admin/admin-panel/data-wizard`,
-  },
+  // {
+  //   label: 'Data Wizard',
+  //   Icon: CloudUploadOutlined,
+  //   to: `/${courseId}/admin/admin-panel/data-wizard`,
+  // },
   { label: 'Usage Analytics', Icon: ClusterOutlined, to: `/${courseId}/admin/admin-panel/analytics` },
-  {
-    label: 'Notification Centre',
-    Icon: NotificationOutlined,
-    to: `/${courseId}/admin/admin-panel/notification-centre`,
-  },
+  // {
+  //   label: 'Notification Centre',
+  //   Icon: NotificationOutlined,
+  //   to: `/${courseId}/admin/admin-panel/notification-centre`,
+  // },
   { label: 'Settings', Icon: ControlOutlined, to: `/${courseId}/admin/admin-panel/settings` },
 ];

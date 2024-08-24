@@ -207,13 +207,13 @@ export const createRouter = (): ReturnType<typeof createBrowserRouter> =>
                   return { Component: StudentOverview.default };
                 },
               },
-              {
-                path: 'grade-predictor',
-                lazy: async () => {
-                  const GradePredictor = await import('@/components/pages/admin/predictor/predictor.tsx');
-                  return { Component: GradePredictor.default };
-                },
-              },
+              // {
+              //   path: 'grade-predictor',
+              //   lazy: async () => {
+              //     const GradePredictor = await import('@/components/pages/admin/predictor/predictor.tsx');
+              //     return { Component: GradePredictor.default };
+              //   },
+              // },
               {
                 path: 'grade-analyzer',
                 lazy: async () => {
@@ -221,13 +221,13 @@ export const createRouter = (): ReturnType<typeof createBrowserRouter> =>
                   return { Component: GradeAnalyzer.default };
                 },
               },
-              {
-                path: 'data-wizard',
-                lazy: async () => {
-                  const DataWizard = await import('@/components/pages/admin/datawizard/datawizard.tsx');
-                  return { Component: DataWizard.default };
-                },
-              },
+              // {
+              //   path: 'data-wizard',
+              //   lazy: async () => {
+              //     const DataWizard = await import('@/components/pages/admin/datawizard/datawizard.tsx');
+              //     return { Component: DataWizard.default };
+              //   },
+              // },
               {
                 path: 'learning-goals',
                 lazy: async () => {
@@ -242,15 +242,15 @@ export const createRouter = (): ReturnType<typeof createBrowserRouter> =>
                   return { Component: Analytics.default };
                 },
               },
-              {
-                path: 'notification-centre',
-                lazy: async () => {
-                  const NotificationCentre = await import(
-                    '@/components/pages/admin/notificationcentre/notificationcentre.tsx'
-                  );
-                  return { Component: NotificationCentre.default };
-                },
-              },
+              // {
+              //   path: 'notification-centre',
+              //   lazy: async () => {
+              //     const NotificationCentre = await import(
+              //       '@/components/pages/admin/notificationcentre/notificationcentre.tsx'
+              //     );
+              //     return { Component: NotificationCentre.default };
+              //   },
+              // },
               {
                 path: 'settings',
                 lazy: async () => {

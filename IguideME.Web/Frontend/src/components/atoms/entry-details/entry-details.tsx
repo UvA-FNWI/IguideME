@@ -63,7 +63,7 @@ export const AssignmentDetail: FC<Props> = ({ entry }): ReactElement => {
             </div>
             <div>
               <Divider className='border-text m-0 p-0' />
-              <PeerComparison {...submission.grades} />
+              <PeerComparison grades={submission.grades} />
             </div>
           </div>
         </div>
@@ -115,7 +115,7 @@ export const DiscussionDetail: FC<Props> = ({ entry }): ReactElement => {
             </div>
             <div>
               <Divider className='border-text m-0 p-0' />
-              <PeerComparison {...discussion.grades} />
+              <PeerComparison grades={discussion.grades} />
             </div>
           </div>
         </div>

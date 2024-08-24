@@ -15,7 +15,7 @@ namespace IguideME.Web.Models.App
         [JsonProperty(PropertyName = "assignment_id")]
         public int AssignmentID { get; set; }
 
-        public double? Grade { get; set; }
+        public double Grade { get; set; }
         public string RawGrade { get; set; }
 
         [JsonProperty(PropertyName = "grades")]
@@ -86,7 +86,7 @@ namespace IguideME.Web.Models.App
                                 : this.Grade
                         )
                         * 100
-                        / max;
+                        / max > 0 ? max : 1;
                     break;
                 case AppGradingType.Percentage:
                     this.Grade =

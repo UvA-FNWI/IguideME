@@ -74,7 +74,8 @@ namespace IguideME.Web.Services
             workerStatus = new()
             {
                 counter = 0,
-                tasks = new string[] { "boot-up", "students", "quizzes", "discussions", "assignments", "Grade-predictor", "peer-groups", "notifications", "done" }
+                tasks = new string[] { "boot-up", "students", "quizzes", "discussions", "assignments", "peer-groups", "notifications", "done" }
+                // tasks = new string[] { "boot-up", "students", "quizzes", "discussions", "assignments", "Grade-predictor", "peer-groups", "notifications", "done" }
             };
             workerStatus.statuses = workerStatus.tasks.Select((_) => "Pending").ToArray();
             UpdateStatus(jobId);
@@ -104,7 +105,7 @@ namespace IguideME.Web.Services
             RunWorker(jobId, new QuizWorker(courseID, timestamp, _lmsHandler, _databaseManager, _logger));
             RunWorker(jobId, new DiscussionWorker(courseID, timestamp, _lmsHandler, _databaseManager, _logger));
             RunWorker(jobId, new AssignmentWorker(courseID, timestamp, _lmsHandler, _databaseManager, _logger));
-            RunWorker(jobId, new GradePredictorWorker(courseID, timestamp, _databaseManager, _logger));
+            // RunWorker(jobId, new GradePredictorWorker(courseID, timestamp, _databaseManager, _logger));
             RunWorker(jobId, new PeerGroupWorker(courseID, timestamp, _databaseManager, _logger));
             RunWorker(jobId, new NotificationsWorker(courseID, timestamp, _lmsHandler, _databaseManager, work.SendNotifications, _logger));
 

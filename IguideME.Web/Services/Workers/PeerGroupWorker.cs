@@ -407,9 +407,9 @@ namespace IguideME.Web.Services.Workers
                         List<double> lastSubmissionGrades = new();
                         foreach (AssignmentSubmission submission in userTileSubmissions)
                         {
-                            currentSubmissionGrades.Add(submission.Grade.Value);
+                            currentSubmissionGrades.Add(submission.Grade);
                             if (submission.ID != lastSubmissionID)
-                                lastSubmissionGrades.Add(submission.Grade.Value);
+                                lastSubmissionGrades.Add(submission.Grade);
                         }
 
                         double currentAverage = -1;
