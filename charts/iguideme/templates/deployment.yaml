@@ -9,8 +9,6 @@ spec:
       app: iguideme
   replicas: 1
   revisionHistoryLimit: 3
-  strategy:
-    type: Recreate
   template:
     metadata:
       labels:
@@ -32,15 +30,15 @@ spec:
               value: "{{ .Values.lmsBackend }}"
             - name: LMS__Canvas__Url
               value: "{{ .Values.canvasUrl }}"
-            - name: LMS__Brightspace__Host
+            - name: LMS__Brightspace__Connection__Host
               value: "{{ .Values.brightspaceHost}}"
-            - name: LMS__Brigtspace__Port
+            - name: LMS__Brightspace__Connection__Port
               value: "{{ .Values.brightspacePort }}"
-            - name: LMS__Brightspace__Database
+            - name: LMS__Brightspace__Connection__Database
               value: "{{ .Values.brightspaceDatabase}}"
-            - name: LMS__Brightspace__SearchPath
+            - name: LMS__Brightspace__Connection__SearchPath
               value: "{{ .Values.brightspaceSearchPath}}"
-            - name: LMS__Canvas__Brightspace__Rest
+            - name: LMS__Brightspace__Connection__Rest
               value: "{{ .Values.brightspaceRest}}"
             - name: LTI__ClientId
               value: "{{ .Values.clientId }}"
