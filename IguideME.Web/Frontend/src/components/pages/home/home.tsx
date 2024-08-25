@@ -25,11 +25,11 @@ const Home: FC = (): ReactElement => {
       icon={<SmileOutlined className='!text-primary' />}
       title={
         <div>
-          <h1 className='mb-8 inline-block p-0 text-[5vmax] font-bold tracking-tight text-text opacity-40 transition-all duration-300 ease-in-out hover:scale-110 hover:cursor-brand hover:text-primary hover:opacity-80'>
+          <h1 className='text-text hover:cursor-brand hover:text-primary mb-8 inline-block p-0 text-[5vmax] font-bold tracking-tight opacity-40 transition-all duration-300 ease-in-out hover:scale-110 hover:opacity-80'>
             IguideME
           </h1>
 
-          <h2 className='mb-4 text-text'>Pick a student to start!</h2>
+          <h2 className='text-text mb-4'>Pick a student to start!</h2>
 
           <StudentSelector courseId={courseId} />
         </div>

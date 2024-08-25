@@ -12,6 +12,7 @@ export const createRouter = (): ReturnType<typeof createBrowserRouter> =>
   createBrowserRouter(
     [
       {
+        path: '/',
         element: <Layout />,
         handle: {
           crumb: () => [
@@ -23,12 +24,12 @@ export const createRouter = (): ReturnType<typeof createBrowserRouter> =>
         },
         children: [
           {
-            path: '/',
+            path: '',
             element: <CourseSelection />,
             errorElement: <ErrorPage />,
           },
           {
-            path: '/404-not-found',
+            path: '404-not-found',
             element: <NotFound />,
             handle: [
               {
@@ -40,7 +41,7 @@ export const createRouter = (): ReturnType<typeof createBrowserRouter> =>
             ],
           },
           {
-            path: '/:courseId',
+            path: ':courseId',
             lazy: async () => {
               const Home = await import('@/components/pages/home/home.tsx');
               return { Component: Home.default };
@@ -65,7 +66,7 @@ export const createRouter = (): ReturnType<typeof createBrowserRouter> =>
             },
           },
           {
-            path: '/:courseId/:studentId',
+            path: ':courseId/:studentId',
             lazy: async () => {
               const StudentDashboard = await import('@/components/pages/student-dashboard/student-dashboard.tsx');
               return { Component: StudentDashboard.default };
@@ -114,7 +115,7 @@ export const createRouter = (): ReturnType<typeof createBrowserRouter> =>
             },
           },
           {
-            path: '/:courseId/:studentId/settings',
+            path: ':courseId/:studentId/settings',
             lazy: async () => {
               const StudentSettings = await import('@/components/pages/student-settings/student-settings.tsx');
               return { Component: StudentSettings.default };
@@ -151,7 +152,7 @@ export const createRouter = (): ReturnType<typeof createBrowserRouter> =>
             },
           },
           {
-            path: '/:courseId/admin/admin-panel',
+            path: ':courseId/admin/admin-panel',
             lazy: async () => {
               const AdminPanelLayout = await import('@/components/crystals/AdminPanelLayout/AdminPanelLayout.tsx');
               return { Component: AdminPanelLayout.default };
@@ -268,6 +269,7 @@ export const createRouter = (): ReturnType<typeof createBrowserRouter> =>
       },
     ],
     {
+      basename: '/front',
       future: {
         v7_fetcherPersist: true,
         v7_normalizeFormMethod: true,

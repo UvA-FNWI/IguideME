@@ -18,15 +18,21 @@ namespace IguideME.Web.Services
 
         private DatabaseManager(bool isDev = false)
         {
+            ILoggerFactory factory = LoggerFactory.Create(builder => builder.AddConsole());
+            _logger = factory.CreateLogger("DatabaseManager");
             DatabaseManager.s_instance = this;
-            _connection_string = isDev
-                ? "Data Source=db.sqlite;Version=3;New=False;Compress=True;"
-                : "Data Source=data/IguideME.db;Version=3;New=False;Compress=True;";
+            if (isDev)
+            {
+                _connection_string = "Data Source=db.sqlite;Version=3;New=False;Compress=True;";
+            }
+            else
+            {
+                System.IO.Directory.CreateDirectory("data");
+                _connection_string = "Data Source=data/IguideME.db;Version=3;New=False;Compress=True;";
+            }
 
             DatabaseManager.s_instance.RunMigrations();
             DatabaseManager.s_instance.CreateTables();
-            ILoggerFactory factory = LoggerFactory.Create(builder => builder.AddConsole());
-            _logger = factory.CreateLogger("DatabaseManager");
         }
 
         public static DatabaseManager GetInstance(bool isDev = false)
