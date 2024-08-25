@@ -201,8 +201,13 @@ app.UseLti(
         RedirectUrl = FRONTEND_PREFIX,
         ClaimsMapping = p =>
         {
-            string courseID = p.CustomClaims?.GetProperty("courseid").ToString();
-            if (courseID.IsNullOrEmpty())
+            string courseID;
+            System.Text.Json.JsonElement r_courseID;
+            if ((p.CustomClaims?.TryGetProperty("courseid", out r_courseID) ?? false))
+            {
+                courseID = r_courseID.ToString();
+            }
+            else
             {
                 courseID = p.Context.Id;
             }
