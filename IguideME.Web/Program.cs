@@ -232,7 +232,7 @@ app.UseLti(
 );
 app.UseHttpLogging();
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 app.UseDefaultFiles();
 app.UseStaticFiles();
 
