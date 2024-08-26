@@ -7,6 +7,7 @@ RUN bash nodesource_setup.sh
 RUN apt-get install -y nodejs
 RUN corepack enable pnpm
 
+
 # Copy csproj and restore as distinct layers
 COPY *.csproj ./
 RUN dotnet restore
@@ -19,5 +20,7 @@ RUN dotnet publish -c Release -o out
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
 COPY --from=build-env /app/out .
+
+ENV ASPNETCORE_HTTP_PORTS=80
 
 ENTRYPOINT [ "dotnet", "IguideME.Web.dll" ]
