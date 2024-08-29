@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using IguideME.Web.Models.Service;
@@ -8,6 +9,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using UserRoles = IguideME.Web.Models.Impl.UserRoles;
+using IguideME.Web.Models.App;
+using Newtonsoft.Json.Linq;
+
 
 namespace IguideME.Web.Controllers
 {
@@ -373,90 +377,59 @@ namespace IguideME.Web.Controllers
             return Json(_databaseManager.GetDiscussions(this.GetCourseID()));
         }
 
-        // -------------------- User notifications --------------------
-        // [Authorize(Policy = "IsInstructor")]
-        // [HttpGet]
-        // [Route("/datamart/notifications")]
-        // public ActionResult GetCourseNotifications()
-        // {
-        //     return Json(_databaseManager.GetAllNotifications(GetCourseID()));
-        // }
-
-        // [Authorize]
-        // [HttpGet]
-        // [Route("/datamart/notifications/{userID}")]
-        // public ActionResult GetNotifications(string userID)
-        // {
-        //     return !this.IsAdministrator() && userID != GetUserID()
-        //         ? Unauthorized()
-        //         : Json(
-        //         _databaseManager.GetPendingNotifications(
-        //             GetCourseID(), userID, GetHashCode())
-        //     );
-        // }
-
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // -------------------- Accept List --------------------
 
-        // [Authorize(Policy = "IsInstructor")]
-        // [HttpPost]
-        // [Route("/datamart/accept-list")]
-        // public ActionResult CreateAcceptList([FromBody] AcceptList[] acceptList)
-        // {
-        //     _databaseManager.ResetAcceptList(GetCourseID());
+        [Authorize(Policy = "IsInstructor")]
+        [HttpPost]
+        [Route("/datamart/accept-list")]
+        public ActionResult CreateAcceptList([FromBody] AcceptList[] acceptList)
+        {
+            _logger.LogWarning("list {}", acceptList);
+            foreach (AcceptList accept in acceptList) {
+            _logger.LogWarning("accept {}", accept);
+            }
 
-        //     foreach (AcceptList list in acceptList)
-        //     {
-        //         _databaseManager.RegisterAcceptedStudent(
-        //             GetCourseID(),
-        //             list.UserID,
-        //             list.Accepted);
-        //     }
+            _databaseManager.ResetAcceptList(GetCourseID());
 
-        //     return Json(
-        //         _databaseManager.GetAcceptList(GetCourseID())
-        //     );
-        // }
+            foreach (AcceptList list in acceptList)
+            {
+                _databaseManager.RegisterAcceptedStudent(
+                    GetCourseID(),
+                    list.UserID,
+                    list.Accepted);
+            }
 
-        // [Authorize(Policy = "IsInstructor")]
-        // [HttpPatch]
-        // [Route("/datamart/accept-list")]
-        // public ActionResult UpdateAcceptList()
-        // {
-        //     var body = new StreamReader(Request.Body).ReadToEnd();
-        //     _databaseManager.SetAcceptListRequired(
-        //         GetCourseID(),
-        //         (bool)JObject.Parse(body)["enabled"]);
-        //     return Json((bool)JObject.Parse(body)["enabled"]);
-        // }
+            return Ok();
+        }
 
-        // [Authorize(Policy = "IsInstructor")]
-        // [HttpGet]
-        // [Route("/datamart/accept-list")]
-        // public ActionResult GetAcceptList()
-        // {
-        //     return Json(
-        //         _databaseManager.GetAcceptList(GetCourseID())
-        //     );
-        // }
+        [Authorize(Policy = "IsInstructor")]
+        [HttpGet]
+        [Route("/datamart/accept-list")]
+        public ActionResult GetAcceptList()
+        {
+            return Json(
+                _databaseManager.GetAcceptList(GetCourseID())
+            );
+        }
 
-        // [Authorize]
-        // [HttpGet]
-        // [Route("/datamart/accept-list/{userID}")]
-        // public ActionResult GetAcceptListByStudent(string userID)
-        // {
-        //     var course = _databaseManager.GetPublicInformedConsent(GetCourseID());
+        [Authorize]
+        [HttpGet]
+        [Route("/datamart/accept-list/{userID}")]
+        public ActionResult GetAcceptListByStudent(string userID)
+        {
+            // var course = _databaseManager.GetPublicInformedConsent(GetCourseID());
 
-        //     // if (!course.AcceptList || IsAdministrator()) return Json(true);
-        //     if (IsAdministrator()) return Json(true);
+            // if (!course.AcceptList || IsAdministrator()) return Json(true);
+            if (IsAdministrator()) return Ok(true);
 
-        //     AcceptList student = _databaseManager
-        //         .GetAcceptList(GetCourseID())
-        //         .Find(x => x.UserID == (userID == "self" ? GetUserID() : userID));
+            AcceptList student = _databaseManager
+                .GetAcceptList(GetCourseID())
+                .Find(x => x.UserID == (userID == "self" ? GetUserID() : userID));
 
-        //     return Json(
-        //         student != null && student.Accepted
-        //     );
-        // }
+            return Ok(
+                student != null && student.Accepted
+            );
+        }
     }
 }

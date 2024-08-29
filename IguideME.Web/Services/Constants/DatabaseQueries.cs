@@ -18,6 +18,17 @@ public static class DatabaseQueries
         };
 
     // //================================ Tables ================================//
+    /**
+     * The accept list table lists all the accepted students if the course is
+     * set to have an accept list in the settings.
+     */
+    public const string CREATE_TABLE_ACCEPT_LIST =
+        @"CREATE TABLE IF NOT EXISTS `accept_list` (
+            `id`                  INTEGER PRIMARY KEY AUTOINCREMENT,
+            `course_id`           INTEGER,
+            `user_id`             STRING,
+            `accepted`            BOOLEAN
+        );";
 
     // /------------------------ Course Settings -------------------------/
 
@@ -877,15 +888,15 @@ public static class DatabaseQueries
         AND         `user_id`=@userID;";
 
     public const string QUERY_TILE_GRADE_MAX_AND_TYPE =
-        @"SELECT     
-            CASE type 
-                WHEN 0 THEN 100 
+        @"SELECT
+            CASE type
+                WHEN 0 THEN 100
                 WHEN 1 THEN (
-                    (SELECT COUNT(*) FROM `discussions` WHERE `course_id`=@courseID) 
-                    + 
-                    (SELECT COUNT(*) FROM `discussion_entries` WHERE `course_id`=@courseID)) 
+                    (SELECT COUNT(*) FROM `discussions` WHERE `course_id`=@courseID)
+                    +
+                    (SELECT COUNT(*) FROM `discussion_entries` WHERE `course_id`=@courseID))
                 WHEN 2 THEN (
-                    SELECT COUNT(*) FROM `learning_goals` WHERE `course_id`=@courseID) 
+                    SELECT COUNT(*) FROM `learning_goals` WHERE `course_id`=@courseID)
             END,
             `grading_type`
         FROM `tiles`
@@ -1138,7 +1149,7 @@ public static class DatabaseQueries
                     `author`,
                     `date`,
                     `message`
-        FROM        `discussion_entries` 
+        FROM        `discussion_entries`
         WHERE       `course_id` = @courseID
         AND         `author` = @userID
         ;";
@@ -1452,23 +1463,23 @@ public static class DatabaseQueries
 
     public const string QUERY_DISCUSSIONS_COUNTER_FOR_USER =
         @"SELECT (
-                SELECT     COUNT(*) 
-                FROM       `discussions` 
+                SELECT     COUNT(*)
+                FROM       `discussions`
                 WHERE      `course_id` = @courseID
                 AND        `author` = @userID
             )
             +
             (
-                SELECT     COUNT(*) 
-                FROM       `discussion_entries` 
+                SELECT     COUNT(*)
+                FROM       `discussion_entries`
                 WHERE      `course_id` = @courseID
                 AND        `author` = @userID
             )
         ;";
 
     public const string QUERY_DISCUSSIONS_COUNTER_FOR_USER_FOR_ENTRY =
-        @"SELECT     COUNT(*) 
-        FROM         `discussion_entries` 
+        @"SELECT     COUNT(*)
+        FROM         `discussion_entries`
         WHERE        `discussion_id` = @discussionID
         AND          `author` = @userID
         ;";
@@ -1710,8 +1721,8 @@ public static class DatabaseQueries
             @actionDetail,
             (
             SELECT
-                CASE WHEN strftime('%s', 'now') - `timestamp` > 1800 THEN 
-                    `session_id` + 1 
+                CASE WHEN strftime('%s', 'now') - `timestamp` > 1800 THEN
+                    `session_id` + 1
                 WHEN COUNT(*) = 0 THEN
                     1
                 ELSE
@@ -1762,33 +1773,33 @@ public static class DatabaseQueries
 
     // //============================ Accept List Queries =============================//
 
-    // public const string REGISTER_ACCEPTED_STUDENT =
-    //     @"INSERT INTO       `accept_list`
-    //                         (   `course_id`,
-    //                             `user_id`,
-    //                             `accepted`  )
-    //     VALUES(
-    //         @courseID,
-    //         @studentID,
-    //         @accepted
-    //     );";
+    public const string REGISTER_ACCEPTED_STUDENT =
+        @"INSERT INTO       `accept_list`
+                            (   `course_id`,
+                                `user_id`,
+                                `accepted`  )
+        VALUES(
+            @courseID,
+            @studentID,
+            @accepted
+        );";
 
-    // public const string QUERY_ACCEPT_LIST =
-    //     @"SELECT    `user_id`, `accepted`
-    //     FROM        `accept_list`
-    //     WHERE       `course_id`=@courseID;";
+    public const string QUERY_ACCEPT_LIST =
+        @"SELECT    `user_id`, `accepted`
+        FROM        `accept_list`
+        WHERE       `course_id`=@courseID;";
 
-    // public const string UPDATE_ACCEPT_LIST =
-    //     @"UPDATE    `accept_list`
-    //     SET         `accepted`={2}
-    //     WHERE       `course_id`={0} AND `user_id`='{1}';";
+    public const string UPDATE_ACCEPT_LIST =
+        @"UPDATE    `accept_list`
+        SET         `accepted`={2}
+        WHERE       `course_id`={0} AND `user_id`='{1}';";
 
-    // public const string REQUIRE_ACCEPT_LIST =
-    //     @"UPDATE    `course_settings`
-    //     SET         `accept_list`=@enabled
-    //     WHERE       `course_id`=@courseID;";
+    public const string REQUIRE_ACCEPT_LIST =
+        @"UPDATE    `course_settings`
+        SET         `accept_list`=@enabled
+        WHERE       `course_id`=@courseID;";
 
-    // public const string RESET_ACCEPT_LIST =
-    //     @"DELETE FROM   `accept_list`
-    //     WHERE           `course_id`=@courseID;";
+    public const string RESET_ACCEPT_LIST =
+        @"DELETE FROM   `accept_list`
+        WHERE           `course_id`=@courseID;";
 }

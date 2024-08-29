@@ -115,9 +115,9 @@ const CourseCard: FC<{ course: Course }> = memo(({ course }): ReactElement => {
   return (
     <Card
       key={course.id}
-      className='custom-card !bg-surface2 w-[240px]'
+      className='custom-card w-[240px] !bg-surface2'
       hoverable
-      cover={<img alt={`${course.name}'s cover image`} src={course.courseImage} />}
+      cover={course.courseImage ? <img alt={`${course.name}'s cover image`} src={course.courseImage} /> : undefined}
       onClick={() => {
         navigate(`/${course.id}`);
       }}

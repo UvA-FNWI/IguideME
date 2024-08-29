@@ -208,61 +208,72 @@ const Consent: FC<ConsentProps> = ({ consent }): ReactElement => {
 const ConsentText: FC = () => (
   <div className='prose w-full rounded-lg bg-surface2 p-2 text-justify prose-h1:text-text prose-h2:text-text prose-h3:text-text'>
     <h1>IguideME</h1>
-    <h2>INFORMED CONSENT</h2>
+    <h2>INFORMED CONSENT SLIMMER COLLEGEJAAR</h2>
     <p>
-      Dear participant,
+      Beste deelnemer,
       <br />
-      We ask for your cooperation in an evaluation study into educational improvement. In this document, the so-called
-      &quot;informed consent&quot;, we explain this study and you can indicate whether you want to cooperate. Read the
-      text below carefully.
+      Wij vragen je medewerking aan onderzoek naar onderwijsverbetering. In dit document, de zogenaamde &apos;informed
+      consent&apos;, wordt het onderzoek uitgelegd en kun je aangeven of je mee wilt werken. Lees onderstaande tekst
+      goed door.
     </p>
-    <h3>Goal of the research</h3>
+    <h3>DOEL VAN HET ONDERZOEK</h3>
     <p>
-      The goal of this educational research is to study the effects of the feedback tool “IguideME” and activating
-      learning tools (e.g. Perusall) on the learning process.
+      Het doel van dit onderwijsonderzoek is om de effecten van de feedbacktools &quot;IguideME&quot;,
+      &quot;LearnLoop&quot; en &quot;EtAlia&quot; op het leerproces en de effecten daarvan op de ervaren &quot;rust en
+      ruimte&quot; te bestuderen.
       <br />
-      The results of this research can be used to facilitate your learning process, to improve the design of this and
-      other courses, and for scientific publications.
+      De resultaten van dit onderzoek kunnen worden gebruikt om de didactische opzet van dit vak of andere vakken te
+      verbeteren, en voor wetenschappelijke publicaties.
     </p>
-    <h3>Research description</h3>
+    <h3>ONDERZOEKSBESCHRIJVING</h3>
     <p>
-      To investigate the effects of using IguideME, personal data (name and student ID) and learning activity data will
-      be collected. Based on these data, you will receive personal feedback via the IguideME dashboard in Canvas. You
-      will also receive a predicted course grade that will be automatically calculated from the learning activity data
-      using an algorithm. To investigate the effects of activating learning tools, the quality of assignments will be
-      assessed and the results of a short questionnaire that scores motivation and learning behavior will be compared
-      between the beginning and at the end of the course. For presentations purposes, all data will be anonymized.
+      De onderzoeksgroep bestaat uit een controle groep en een interventiegroep die random zal worden ingedeeld. Alleen
+      de interventiegroep krijgt toegang tot de drie bovengenoemde feedbacktools. Alle studenten (zowel de controle als
+      de interventiegroep) hebben toegang tot alle studiematerialen en krijgen hetzelfde onderwijs.
+      <br />
+      Voor het onderzoek worden persoonsgegevens (naam en student-ID) en leeractiviteitgegevens verzameld (cijfers voor
+      opdrachten die wel en niet meetellen voor het eindcijfer of afgeleiden daarvan (bijv. kwaliteit van inleverde
+      opdrachten of aantal ingeleverde opdrachten)).
+      <br />
+      Op basis van deze gegevens kun je gepersonaliseerde persoonlijke feedback ontvangen over je leerproces middels
+      notaties via Canvas en/of via de feedbacktools.
+      <br />
+      Ook zal het effect van de feedbacktools worden onderzocht middels een korte vragenlijst die aan het begin en aan
+      het eind van het vak wordt uitgezet. Voor presentatiedoeleinden worden alle gegevens geanonimiseerd.
     </p>
-    <h3>Voluntariness</h3>
+    <h3>VRIJWILLIGHEID</h3>
     <p>
-      The participation in this research is voluntary. In the case that you decline to participate or stop your
-      participation the data that you have generated will not be used in the research. You are free to stop your
-      participation in this research without specifying a reason by informing dr. Erwin van Vliet.
+      Deelname aan dit onderzoek is vrijwillig. In het geval dat je niet wilt deelnemen of je deelname stopzet, worden
+      de door jouw gegenereerde gegevens niet gebruikt in het onderzoek. Je bent vrij om deelname aan dit onderzoek
+      zonder opgave van reden stop te zetten. Je kunt dit doen door de vakcoördinator dr. Erwin van Vliet hiervan op de
+      hoogte te stellen.
     </p>
-    <h3>Insurance</h3>
+    <h3>GEEN RISICO&apos;S</h3>
     <p>
-      This research brings no risks for your health and safety and in this case the regular liability insurance of the
-      University of Amsterdam is valid.
+      Dit onderzoek brengt geen risico’s voor je gezondheid en veiligheid met zich mee en de reguliere
+      aansprakelijkheidsverzekering van de Universiteit van Amsterdam is van toepassing.
     </p>
-    <h3>Additional Information</h3>
+    <h3>AANVULLENDE INFORMATIE</h3>
     <p>
-      In case of any questions about this research please contact: <b>TEACHER NAME</b> (<b>ROLE</b>), phone{' '}
-      <b>PHONE-NUMBER</b>, e-mail <b>EMAIL@DOMAIN.XYZ</b>
+      Voor vragen over dit onderzoek kun je contact opnemen met dr. Erwin van Vliet (vakcoördinator en projectleider
+      Slimmer Collegejaar), e-mail e.a.vanvliet@uva.nl
     </p>
-    <h2>CONSENT FORM</h2>
-    <p>Here you will be asked to sign the Informed consent.</p>
+    <h2>TOESTEMMINGSFORMULIER</h2>
+    <p>Hier wordt je gevraagd het toestemmingsformulier te ondertekenen.</p>
     <ul>
       <li className='text-text'>
-        By choosing <i>&quot;Yes&quot;</i> in this form, you declare that you have read the document entitled “informed
-        consent IguideME”, understood it, and confirm that you agree with the procedure as described.
-        <br />
+        Door in dit formulier <i>&quot;Ja&quot;</i> te kiezen, verklaar je dat je het document getiteld &quot;informed
+        consent Slimmer Collegejaar&quot; hebt gelezen en begrepen en dat je akkoord gaat met de procedure zoals
+        beschreven.
       </li>
       <li className='text-text'>
-        By choosing <i>&quot;No&quot;</i> in the form, you declare that you have read the document entitled “informed
-        consent IguideME”, understood it, and confirm that you do not want to participate in this study.
+        Door in dit formulier <i>&quot;Nee&quot;</i> te kiezen, verklaart je dat je het document met de titel
+        &quot;informed consent Slimmer Collegejaar&quot; hebt gelezen en begrepen en bevestigt dat je niet aan dit
+        onderzoek wilt deelnemen.
       </li>
     </ul>
   </div>
 );
 
+export { ConsentText };
 export default StudentSettings;

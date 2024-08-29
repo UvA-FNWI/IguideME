@@ -27,7 +27,7 @@ namespace IguideME.Web.Services
             }
             else
             {
-                _connection_string = "Data Source=/data/IguideME2.db;Version=3;New=False;Compress=True;";
+                _connection_string = "Data Source=data/IguideME2.db;Version=3;New=False;Compress=True;";
             }
 
             DatabaseManager.s_instance.RunMigrations();
@@ -215,6 +215,7 @@ namespace IguideME.Web.Services
                 DatabaseQueries.CREATE_TABLE_NOTIFICATIONS,
                 DatabaseQueries.CREATE_TABLE_MIGRATIONS,
                 DatabaseQueries.CREATE_TABLE_USER_TRACKER,
+                DatabaseQueries.CREATE_TABLE_ACCEPT_LIST,
 
                 DatabaseQueries.CREATE_INDEX_NOTIFICATIONS_COURSE_SETTINGS,
                 DatabaseQueries.CREATE_INDEX_USER_TRACKER_USER_ID,
@@ -2403,52 +2404,52 @@ namespace IguideME.Web.Services
         /////////////////////////////////////////////////////////////////////////////////
 
 
-        // public void RegisterAcceptedStudent(
-        //     int courseID,
-        //     string studentID,
-        //     bool accepted)
-        // {
-        //     NonQuery(DatabaseQueries.REGISTER_ACCEPTED_STUDENT,
-        //         new SQLiteParameter("courseID", courseID),
-        //         new SQLiteParameter("studentID", studentID),
-        //         new SQLiteParameter("accepted", accepted)
-        //     );
-        // }
+        public void RegisterAcceptedStudent(
+            int courseID,
+            string studentID,
+            bool accepted)
+        {
+            NonQuery(DatabaseQueries.REGISTER_ACCEPTED_STUDENT,
+                new SQLiteParameter("courseID", courseID),
+                new SQLiteParameter("studentID", studentID),
+                new SQLiteParameter("accepted", accepted)
+            );
+        }
 
-        // public void ResetAcceptList(int courseID)
-        // {
-        //     NonQuery(DatabaseQueries.RESET_ACCEPT_LIST,
-        //         new SQLiteParameter("courseID", courseID)
-        //     );
-        // }
+        public void ResetAcceptList(int courseID)
+        {
+            NonQuery(DatabaseQueries.RESET_ACCEPT_LIST,
+                new SQLiteParameter("courseID", courseID)
+            );
+        }
 
-        // public void SetAcceptListRequired(int courseID, bool enabled)
-        // {
-        //     NonQuery(DatabaseQueries.REQUIRE_ACCEPT_LIST,
-        //         new SQLiteParameter("courseID", courseID),
-        //         new SQLiteParameter("enabled", enabled)
-        //     );
-        // }
+        public void SetAcceptListRequired(int courseID, bool enabled)
+        {
+            NonQuery(DatabaseQueries.REQUIRE_ACCEPT_LIST,
+                new SQLiteParameter("courseID", courseID),
+                new SQLiteParameter("enabled", enabled)
+            );
+        }
 
-        // public List<AcceptList> GetAcceptList(int courseID)
-        // {
-        //     List<AcceptList> keys = new();
+        public List<AcceptList> GetAcceptList(int courseID)
+        {
+            List<AcceptList> keys = new();
 
-        //     using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_ACCEPT_LIST,
-        //             new SQLiteParameter("courseID", courseID)
-        //         )) {
-        //         while (r.Read())
-        //         {
-        //             keys.Add(
-        //                 new AcceptList(
-        //                     r.GetValue(0).ToString(),
-        //                     r.GetBoolean(1)
-        //                 ));
-        //         }
-        //     }
+            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_ACCEPT_LIST,
+                    new SQLiteParameter("courseID", courseID)
+                )) {
+                while (r.Read())
+                {
+                    keys.Add(
+                        new AcceptList(
+                            r.GetValue(0).ToString(),
+                            r.GetBoolean(1)
+                        ));
+                }
+            }
 
-        //     return keys;
-        // }
+            return keys;
+        }
 
         /////////////////////////////////////////////////////////////////////////////////
         //////////////////////////         END OF LIST         //////////////////////////

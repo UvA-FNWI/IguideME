@@ -29,6 +29,7 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-highlight-words": "^0.20.0",
+    "react-loading-dot": "^1.0.6",
     "react-multi-date-picker": "^4.5.2",
     "react-router-dom": "^6.24.0",
     "recharts": "^2.12.7",
