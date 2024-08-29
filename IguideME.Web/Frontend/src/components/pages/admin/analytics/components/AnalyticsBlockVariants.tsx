@@ -15,7 +15,18 @@ interface AnalyticsChipProps extends HTMLAttributes<HTMLDivElement> {
 
 const AnalyticsChip: FC<AnalyticsChipProps> = memo(
   ({ change, children, className, display, title, unit, ...props }): ReactElement => {
-    const positive = change >= 0;
+    const status =
+      change > 0 ? 'positive'
+      : change < 0 ? 'negative'
+      : 'equal';
+
+    const statusIcon =
+      status === 'positive' ? Increase
+      : status === 'negative' ? Decrease
+      : null;
+
+    const statusText = status === 'positive' ? '+' : '';
+
     return (
       <div
         className={cn(
@@ -25,15 +36,13 @@ const AnalyticsChip: FC<AnalyticsChipProps> = memo(
         {...props}
       >
         <div className='flex h-full flex-col justify-between pr-8'>
-          <h4 className='text-lg text-text/75'>{title ?? '...'}</h4>
-          <p className='text-2xl font-black'>{display ?? '?'}</p>
-          <span className={`flex gap-2 text-xs ${positive ? 'text-success' : 'text-failure'}`}>
-            {positive ?
-              <img src={Increase} alt='Increase' className='h-4 w-4' />
-            : <img src={Decrease} alt='Decrease' className='h-4 w-4' />}
-            {positive ? '+' : ''}
-            {change}
-            {unit === 'percentage' ? '%' : ''}
+          <h4 className='text-lg text-text/75'>{title ?? 'Unknown title'}</h4>
+          <p className='text-2xl font-black'>{display ?? 'No data found'}</p>
+          <span className={`flex gap-2 text-xs ${status === 'positive' ? 'text-success' : 'text-failure'}`}>
+            {statusIcon && <img src={statusIcon} alt={status} className='h-4 w-4' />}
+            {statusText}
+            {status !== 'equal' && change}
+            {status !== 'equal' && unit === 'percentage' ? '%' : ''}
           </span>
         </div>
         <div className='h-[90px] min-w-[90px] flex-grow'>{children}</div>

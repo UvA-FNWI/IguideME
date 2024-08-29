@@ -39,6 +39,10 @@ interface TreeType {
 }
 
 const SunburstGraph: FC<SunburstGraphProps> = memo(({ sessions }) => {
+  if (sessions.size === 0) {
+    return <p>There haven&apos;t been any sessions yet.</p>;
+  }
+
   const sortChildren = (node: TreeType): void => {
     node.children.sort((a, b) => a.type - b.type);
     node.children.forEach(sortChildren);
