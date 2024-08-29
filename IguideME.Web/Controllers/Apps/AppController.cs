@@ -123,17 +123,17 @@ namespace IguideME.Web.Controllers
 					);
 		}
 
-		[Authorize(Policy = "IsInstructor")]
-		[Route("/student/{id}")]
+		[Route("/student/{userID}")]
 		[HttpGet]
 		[ProducesResponseType(StatusCodes.Status200OK)]
 		[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-		public ActionResult GetStudent(string id)
+		public ActionResult GetStudent(string userID)
 		{
-			/**
-             * Returns information of the user with the given id.
-             */
-			return Json(_databaseManager.GetUser(GetCourseID(), id));
+			if (!IsAdministrator() && userID != GetUserID())
+			{
+				return Unauthorized();
+			}
+			return Ok(_databaseManager.GetUser(GetCourseID(), userID));
 		}
 
 		[HttpGet]
