@@ -60,9 +60,6 @@ const AcceptListSettings: FC = (): ReactElement => {
     return <div>Failed to load students.</div>;
   }
 
-  console.log('students', students);
-  console.log('accepted', acceptedStudents);
-
   const acceptanceRatio = acceptedStudents.length / students.length;
   const acceptedPercentage = isNaN(Math.round(acceptanceRatio * 100)) ? 0 : Math.round(acceptanceRatio * 100);
 
@@ -138,7 +135,7 @@ const AcceptListSettings: FC = (): ReactElement => {
           Random assign
         </Button>
         <Button
-          className='min-w-20 !border-none bg-success hover:!border-none hover:!bg-success/80 [&_span]:text-text'
+          className='bg-success hover:!bg-success/80 [&_span]:text-text min-w-20 !border-none hover:!border-none'
           disabled={isPending}
           onClick={() => {
             setAcceptedStudentsRoute(acceptedStudents.map((s) => ({ userID: s.userID, accepted: true })));
@@ -157,7 +154,7 @@ const AcceptListSettings: FC = (): ReactElement => {
             .map((student: User) => (
               <Col xs={12} md={8} lg={6} xl={4} key={student.userID}>
                 <div
-                  className={`py-[5px] ${isObjectInArray(student, acceptedStudents) ? 'font-bold text-primary' : ''}`}
+                  className={`py-[5px] ${isObjectInArray(student, acceptedStudents) ? 'text-primary font-bold' : ''}`}
                   onClick={() => {
                     if (isObjectInArray(student, acceptedStudents)) {
                       setAcceptedStudents(acceptedStudents.filter((s) => s.userID !== student.userID));
