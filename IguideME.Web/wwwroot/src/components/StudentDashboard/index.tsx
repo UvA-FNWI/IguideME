@@ -13,12 +13,12 @@ import TileBars from "./TileBars";
 import {connect, ConnectedProps} from "react-redux";
 import {RootState} from "../../store";
 import "./style.scss";
-import {DataMartActions} from "../../store/actions/datamart";
+// import {DataMartActions} from "../../store/actions/datamart";
 import {PredictedGrade} from "../../models/app/PredictiveModel";
 import UserProfile from "./UserProfile";
 import {CanvasDiscussion} from "../../models/canvas/Discussion";
 import {LearningOutcome} from "../../models/app/LearningGoal";
-import DataMartController from "../../api/controllers/datamart";
+// import DataMartController from "../../api/controllers/datamart";
 import AppController from "../../api/controllers/app";
 import UserSettings from "../../common/UserSettings";
 import { HistoricTileGrades } from "./TileHistoricGraph/types";
@@ -32,7 +32,7 @@ const mapState = (state: RootState) => ({
 });
 
 const mapDispatch = {
-  loadPredictions: (user: string = 'self') => DataMartActions.loadPredictions(user)
+  // loadPredictions: (user: string = 'self') => DataMartActions.loadPredictions(user)
 }
 
 const connector = connect(mapState, mapDispatch)
@@ -97,7 +97,8 @@ class StudentDashboard extends Component<Props, IState> {
 
     // if (propPredictions.length >= 0) predictions = propPredictions;
 
-    let predictions = await DataMartController.getPredictions(student.userID);
+    let predictions: PredictedGrade[] = [];
+    // let predictions = await DataMartController.getPredictions(student.userID);
 
     this.setState({ loaded: false });
 

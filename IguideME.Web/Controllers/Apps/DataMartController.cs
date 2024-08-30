@@ -114,13 +114,7 @@ namespace IguideME.Web.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public ActionResult GetUserPredictions(string userID)
         {
-            return !this.IsAdministrator() && "self" != userID && userID != GetUserID()
-                ? Unauthorized()
-                : Json(
-                DatabaseManager.Instance
-                    .GetPredictedGrades(
-                        GetCourseID(),
-                        userID == "self" ? GetUserID() : userID));
+            return Ok(new List<PredictedGrade>());
         }
 
         [Authorize]
@@ -177,7 +171,7 @@ namespace IguideME.Web.Controllers
                 .ToArray());
         }
 
-                [Authorize(Policy = "IsInstructor")]
+        [Authorize(Policy = "IsInstructor")]
         [HttpGet]
         [Route("/consent/students")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -297,7 +291,8 @@ namespace IguideME.Web.Controllers
 
             List<AppDiscussion> discussions = DatabaseManager.Instance.GetDiscussions(course_id);
 
-            foreach (AppDiscussion discussion in new List<AppDiscussion>(discussions)) {
+            foreach (AppDiscussion discussion in new List<AppDiscussion>(discussions))
+            {
                 discussions.AddRange(DatabaseManager.Instance.GetDiscussionEntries(course_id,
                     discussion.DiscussionID));
                 discussions.AddRange(DatabaseManager.Instance.GetDiscussionReplies(course_id,

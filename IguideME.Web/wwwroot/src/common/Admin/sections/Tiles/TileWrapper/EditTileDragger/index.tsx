@@ -264,7 +264,6 @@ class EditTileDragger extends Component<Props, IState> {
                     options={[
                       { label: 'Binary', value: 'BINARY'},
                       { label: 'Entries', value: 'ENTRIES' },
-                      { label: 'Prediction', value: 'PREDICTION' },
                       { label: 'Learning Outcome', value: 'LEARNING_OUTCOMES' }
                     ]}
                     isClearable={true}

@@ -38,12 +38,12 @@ export class DataMartActions {
     }
   }
 
-  static loadPredictions = async (user: string = 'self') => {
-    const predictions = await DataMartController.getPredictions(user);
+  // static loadPredictions = async (user: string = 'self') => {
+  //   const predictions = await DataMartController.getPredictions(user);
 
-    return {
-      type: DataMartActions.SET_PREDICTIONS_SUCCESS,
-      payload: predictions
-    }
-  }
+  //   return {
+  //     type: DataMartActions.SET_PREDICTIONS_SUCCESS,
+  //     payload: predictions
+  //   }
+  // }
 }

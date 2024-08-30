@@ -7,7 +7,7 @@ import { connect, ConnectedProps } from "react-redux";
 import { ThunkDispatch } from "redux-thunk";
 import { UserActions } from "./store/actions/user";
 import { CourseActions } from "./store/actions/course";
-import { DataMartActions } from "./store/actions/datamart";
+// import { DataMartActions } from "./store/actions/datamart";
 import { AppActions } from "./store/actions/app";
 import { withAdminRole } from "./hoc/withAdminRole";
 import { withConsent } from "./hoc/withConsent";
@@ -21,7 +21,7 @@ const AdminStudentOverview = React.lazy(() => import('./common/Admin/sections/St
 const AdminNotificationCentre = React.lazy(() => import('./common/Admin/sections/NotificationCentre'));
 const AdminDataWizard = React.lazy(() => import('./common/Admin/sections/DataWizard'));
 const AdminGradeAnalyzer = React.lazy(() => import('./common/Admin/sections/grades/GradeAnalyzer'));
-const AdminGradePredictor = React.lazy(() => import('./common/Admin/sections/grades/GradePredictor'));
+// const AdminGradePredictor = React.lazy(() => import('./common/Admin/sections/grades/GradePredictor'));
 const AdminSettings = React.lazy(() => import('./common/Admin/sections/Settings'));
 
 const mapStateToProps = (state: RootState) => ({
@@ -42,7 +42,7 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<RootState, any, any>): any =
         loadTileGroups: async () => dispatch(await TileActions.loadGroups()),
         loadCourse: async () => dispatch(await CourseActions.loadCourse()),
         getUser: async () => dispatch(await UserActions.getUser()),
-        loadPredictions: async () => dispatch(await DataMartActions.loadPredictions()),
+        // loadPredictions: async () => dispatch(await DataMartActions.loadPredictions()),
     };
 };
 
@@ -60,7 +60,7 @@ class IguideME extends React.Component<Props> {
         if (tileGroups.length === 0) props.loadTileGroups();
         if (tileEntries.length === 0) props.loadTileEntries();
         if (dashboardColumns.length === 0) props.loadColumns();
-        if (predictions.length === 0) props.loadPredictions();
+        // if (predictions.length === 0) props.loadPredictions();
         if (!user) props.getUser();
         if (!course) props.loadCourse();
     }
@@ -81,7 +81,6 @@ class IguideME extends React.Component<Props> {
                             <Route path="/admin/student-overview" component={AdminStudentOverview} />
                             <Route path="/admin/data-wizard" component={AdminDataWizard} />
                             <Route path="/admin/grade-analyzer" component={AdminGradeAnalyzer} />
-                            <Route path="/admin/grade-predictor" component={AdminGradePredictor} />
                             <Route path="/admin/settings" component={AdminSettings} />
                             <Route path="/admin/tiles" component={AdminTiles} />
                             <Route path="/admin" component={AdminDataMart} />

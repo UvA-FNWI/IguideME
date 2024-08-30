@@ -64,34 +64,16 @@ class AdminMenu extends Component<Props> {
                             Student Overview
                         </Link>
                     </Menu.Item>
-                    <Menu.SubMenu key={"submenu"} icon={<TrophyOutlined />} title={"Grades"}>
-                        {/* TODO: completely remove oldpredictor from code */}
-                        {/* <Menu.Item key={"gradePredictorOld"} icon={<FundProjectionScreenOutlined />}>
-                            <Link to={'/admin/grade-predictor-old'}>
-                                Old Predictor
-                            </Link>
-                        </Menu.Item> */}
-                        <Menu.Item key={"gradePredictor"} icon={<FundProjectionScreenOutlined />}>
-                            <Link to={'/admin/grade-predictor'}>
-                                Predictor
-                            </Link>
-                        </Menu.Item>
-                        <Menu.Item key={"gradeAnalyzer"} icon={<DotChartOutlined />}>
-                            <Link to={'/admin/grade-analyzer'}>
-                                Analyzer
-                            </Link>
-                        </Menu.Item>
-                    </Menu.SubMenu>
+                    <Menu.Item key={"gradeAnalyzer"} icon={<DotChartOutlined />}>
+                        <Link to={'/admin/grade-analyzer'}>
+                            Grades Analyzer
+                        </Link>
+                    </Menu.Item>
                     <Menu.Item key={"dataWizard"} icon={<CloudUploadOutlined />}>
                         <Link to={'/admin/data-wizard'}>
                             Data Wizard
                         </Link>
                     </Menu.Item>
-                    {/* <Menu.Item key={"analytics"} icon={<ClusterOutlined />}>
-                        <Link to={'/admin/analytics'}>
-                            Analytics
-                        </Link>
-                    </Menu.Item> */}
                     <Menu.Item key={"notificationCentre"} icon={<NotificationOutlined />}>
                         <Link to={'/admin/notification-centre'}>
                             Notification Centre
