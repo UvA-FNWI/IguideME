@@ -47,8 +47,8 @@ namespace IguideME.Web.Controllers
 		public ActionResult GetUsersCourses([FromQuery(Name = "userId")] string userID)
 		{
 			//TODO: actually implement.
-			Course[] courses = [new Course(994, "Testcursus IguideME", "IguideME", WorkflowStates.AVAILABLE, true, "")];
-			return Json(courses);
+			Course[] courses = [new Course(GetCourseID(), GetCourseTitle(), "IguideME", WorkflowStates.AVAILABLE, true, "")];
+			return Ok(courses);
 		}
 
 		[Authorize]
@@ -59,7 +59,7 @@ namespace IguideME.Web.Controllers
 		public ActionResult GetCourse(string courseID)
 		{
 			//TODO: actually implement.
-			return Json(new Course(994, "Testcursus IguideME", "IguideME", WorkflowStates.AVAILABLE, true, ""));
+			return Ok(new Course(GetCourseID(), GetCourseTitle(), "IguideME", WorkflowStates.AVAILABLE, true, ""));
 		}
 
 
