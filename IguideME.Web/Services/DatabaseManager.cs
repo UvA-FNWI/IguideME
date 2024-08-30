@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SQLite;
+using System.Linq;
 using IguideME.Web.Models;
 using IguideME.Web.Models.App;
 using IguideME.Web.Models.Impl;
@@ -2437,7 +2438,8 @@ namespace IguideME.Web.Services
 
             using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_ACCEPT_LIST,
                     new SQLiteParameter("courseID", courseID)
-                )) {
+                ))
+            {
                 while (r.Read())
                 {
                     keys.Add(
@@ -2804,6 +2806,51 @@ namespace IguideME.Web.Services
                 }
             }
             return (-1, AppGradingType.Points);
+        }
+
+        public UserTileGrades[] GetAllTileGrades(int courseID)
+        {
+            List<User> students = GetUsersWithSettings(courseID);
+            return students.Select((student) => new UserTileGrades(
+                student.UserID,
+                student.Settings.GoalGrade,
+                GetUserTileAVGs(student.UserID, courseID).ToArray()
+            )
+
+             ).ToArray();
+
+        }
+
+        public List<TilesGrades> GetUserTileAVGs(string userID, int courseID)
+        {
+            long syncID = this.GetCurrentSyncID(courseID);
+            List<TilesGrades> avgs = new();
+            using (
+                SQLiteDataReader r = Query(
+                    DatabaseQueries.QUERY_TILE_GRADES,
+                    new SQLiteParameter("userID", userID),
+                    new SQLiteParameter("syncID", syncID)
+                )
+            )
+            {
+                while (r.Read())
+                {
+                    try
+                    {
+                        avgs.Append(new(r.GetInt32(1), r.GetDouble(0), -1));
+                    }
+                    catch (Exception e)
+                    {
+                        PrintQueryError("GetLayoutTileGroups", 3, r, e);
+                    }
+                }
+            }
+            foreach (TilesGrades grades in avgs)
+            {
+                grades.max = GetTileMax(grades.tile_id, courseID).max;
+            }
+            return avgs;
+
         }
 
         public AppGrades GetTileGrade(int tileID, string userID, int courseID)

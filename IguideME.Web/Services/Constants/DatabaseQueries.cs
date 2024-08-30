@@ -880,6 +880,12 @@ public static class DatabaseQueries
         LIMIT       1;
     ";
 
+    public const string QUERY_TILE_GRADES =
+        @"SELECT    `grade`, `tile_id`
+        FROM        `tile_grades`
+        WHERE       `sync_id`=@syncID
+        AND         `user_id`=@userID;";
+
     public const string QUERY_TILE_GRADE =
         @"SELECT    `grade`
         FROM        `tile_grades`
