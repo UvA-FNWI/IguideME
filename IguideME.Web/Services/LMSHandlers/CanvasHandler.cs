@@ -107,7 +107,7 @@ namespace IguideME.Web.Services
             return students.Select(student => new User(
                 student.SISUserID,
                 courseID,
-                student.ID.Value,
+                student.ID ?? -1,
                 student.Name,
                 student.SortableName,
                 (int)UserRoles.student
@@ -124,7 +124,7 @@ namespace IguideME.Web.Services
             return admins.Select(admin => new User(
                 admin.SISUserID,
                 courseID,
-                admin.ID.Value,
+                admin.ID ?? -1,
                 admin.Name,
                 admin.SortableName,
                 (int)UserRoles.instructor
@@ -142,7 +142,7 @@ namespace IguideME.Web.Services
                     -1,
                     courseID,
                     ass.Name,
-                    ass.ID.Value,
+                    ass.ID ?? -1,
                     ass.IsPublished,
                     ass.IsMuted,
                     ass.DueDate.HasValue
@@ -226,7 +226,7 @@ namespace IguideME.Web.Services
                                 quiz.ID ?? -1,
                                 _databaseManager.GetUserID(sub.UserID),
                                 sub.Score.ToString(),
-                                ((DateTimeOffset)sub.FinishedDate.Value).ToUnixTimeMilliseconds()
+                                sub.FinishedDate.HasValue ? ((DateTimeOffset)sub.FinishedDate.Value).ToUnixTimeMilliseconds() : 0
                             ))
                     )
                 );
@@ -253,9 +253,9 @@ namespace IguideME.Web.Services
                                                 entry.ID ?? -1,
                                                 courseID,
                                                 reply.UserID.ToString(),
-                                                (
+                                                reply.CreatedAt.HasValue ? (
                                                     (DateTimeOffset)reply.CreatedAt.Value
-                                                ).ToUnixTimeMilliseconds(),
+                                                ).ToUnixTimeMilliseconds() : 0,
                                                 reply.Message
                                             ))
                                             .Append(
