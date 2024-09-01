@@ -243,7 +243,7 @@ namespace IguideME.Web.Services
                                 courseID,
                                 topic.Title,
                                 _databaseManager.GetUserIDFromName(courseID, topic.UserName),
-                                ((DateTimeOffset)topic.PostedAt).ToUnixTimeMilliseconds(),
+                                topic.PostedAt.HasValue ? ((DateTimeOffset)topic.PostedAt).ToUnixTimeMilliseconds() : 0,
                                 topic.Message,
                                 topic.Entries.SelectMany(entry =>
                                         entry
@@ -265,7 +265,7 @@ namespace IguideME.Web.Services
                                                     topic.ID ?? -1,
                                                     courseID,
                                                     entry.UserID.ToString(),
-                                                    ((DateTimeOffset)entry.CreatedAt).ToUnixTimeMilliseconds(),
+                                                    entry.CreatedAt.HasValue ? ((DateTimeOffset)entry.CreatedAt).ToUnixTimeMilliseconds() : 0,
                                                     entry.Message
                                                 )
                                             )
