@@ -81,7 +81,7 @@ namespace IguideME.Web.Models.Impl
         public double PredictedGrade { get; set; }
 
         [JsonProperty("consent")]
-        public bool Consent { get; set; }
+        public int Consent { get; set; }
 
         [JsonProperty("notifications")]
         public bool Notifications { get; set; }
@@ -90,7 +90,7 @@ namespace IguideME.Web.Models.Impl
             int goalGrade,
             double totalGrade,
             double predictedGrade,
-            bool consent,
+            int consent,
             bool notifications
         )
         {

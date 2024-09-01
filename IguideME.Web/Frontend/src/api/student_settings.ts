@@ -4,7 +4,7 @@ export async function postNotificationSettings(enabled: boolean): Promise<void> 
   await apiClient.post('/student/settings/notifications', { enabled });
 }
 
-export async function postConsentSettings(enabled: boolean): Promise<void> {
+export async function postConsentSettings(enabled: number): Promise<void> {
   await apiClient.post('/student/settings/consent', { enabled });
 }
 

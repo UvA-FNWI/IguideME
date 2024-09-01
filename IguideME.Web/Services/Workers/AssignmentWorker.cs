@@ -77,9 +77,10 @@ namespace IguideME.Web.Services.Workers
             _logger.LogInformation("Starting assignment registry...");
 
             // Get the assignments from the ILMS.
-            IEnumerable<AppAssignment> assignments = this._ILMSHandler.GetAssignments(
+            List<AppAssignment> assignments = this._ILMSHandler.GetAssignments(
                 this._courseID
-            );
+            ).ToList();
+            _logger.LogInformation("test assignmentworker: {}; {}", assignments.Count, assignments);
 
             // Get the consented users and only ask for their submissions
             List<Models.Impl.User> users = _databaseManager.GetUsersWithGrantedConsent(

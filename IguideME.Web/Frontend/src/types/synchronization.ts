@@ -52,10 +52,6 @@ export const SyncStates = new Map<string, State>([
   // 	{ title: 'Submissions', busy_text: 'Retrieving students submissions...', finished_text: 'Submissions retrieved.' },
   // ],
   [
-    SyncStateNames.GRADE_PREDICTOR,
-    { title: 'Grade Prediction', busy_text: 'Predicting potential grades...', finished_text: 'Grades predicted.' },
-  ],
-  [
     SyncStateNames.PEER_GROUPS,
     { title: 'Peer Groups', busy_text: 'Assigning peer groups...', finished_text: 'Peer groups assigned.' },
   ],

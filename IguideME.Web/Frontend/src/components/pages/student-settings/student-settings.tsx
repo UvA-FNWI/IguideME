@@ -180,8 +180,10 @@ const Consent: FC<ConsentProps> = ({ consent }): ReactElement => {
             label: (
               <>
                 <p className='text-justify text-text'>
-                  Please read the informed consent carefully. You will be asked to accept the informed consent, if
-                  declined your data will not be processed. You can change your preference at any time.
+                  &quot;Ik verklaar dat ik de informatie heb gelezen en begrepen. Ik geef toestemming voor deelname aan
+                  dit onderwijsonderzoek en het gebruik van mijn gegevens daarin. Ik behoud mijn recht om deze
+                  toestemming stop te zetten zonder een expliciete reden op te geven en om mijn deelname aan dit
+                  experiment op elk moment stop te zetten.&quot;
                   <span className='sr-only'>Click anywhere on this text to open the informed consent.</span>
                 </p>
               </>
@@ -196,7 +198,7 @@ const Consent: FC<ConsentProps> = ({ consent }): ReactElement => {
         className='custom-checkbox mt-4'
         checked={consent}
         onChange={(e) => {
-          saveConsent(e.target.checked);
+          saveConsent(e.target.checked ? 1 : 2);
         }}
       >
         <p>I have read and understood the informed consent</p>

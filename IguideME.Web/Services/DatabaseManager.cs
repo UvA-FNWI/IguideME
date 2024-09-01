@@ -781,7 +781,7 @@ namespace IguideME.Web.Services
                             r2.GetInt32(0),
                             r2.GetDouble(1),
                             r2.GetDouble(2),
-                            r2.GetBoolean(3),
+                            r2.GetInt32(3),
                             r2.GetBoolean(4)
                         );
                     }
@@ -885,7 +885,7 @@ namespace IguideME.Web.Services
                             r2.GetInt32(0),
                             r2.GetDouble(1),
                             r2.GetDouble(2),
-                            r2.GetBoolean(3),
+                            r2.GetInt32(3),
                             r2.GetBoolean(4)
                         );
                     }
@@ -1176,7 +1176,7 @@ namespace IguideME.Web.Services
         public void UpdateUserSettings(
             int courseID,
             string userID,
-            bool? consent,
+            int? consent,
             int? goalGrade,
             double? totalGrade,
             double? predictedGrade,
@@ -1204,7 +1204,7 @@ namespace IguideME.Web.Services
                             goalGrade ?? r.GetInt32(0),
                             totalGrade ?? r.GetDouble(1),
                             predictedGrade ?? r.GetDouble(2),
-                            consent ?? r.GetBoolean(3),
+                            consent ?? r.GetInt32(3),
                             notifications ?? r.GetBoolean(4)
                         );
                     }

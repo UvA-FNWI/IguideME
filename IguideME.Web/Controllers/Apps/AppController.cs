@@ -94,7 +94,7 @@ namespace IguideME.Web.Controllers
 			_databaseManager.UpdateUserSettings(
 					this.GetCourseID(),
 					this.GetUserID(),
-					(bool)JObject.Parse(body)["enabled"],
+					(int)JObject.Parse(body)["enabled"],
 					null,
 					null,
 					null,
