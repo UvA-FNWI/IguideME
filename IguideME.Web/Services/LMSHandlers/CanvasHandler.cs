@@ -148,7 +148,7 @@ namespace IguideME.Web.Services
                     ass.DueDate.HasValue
                         ? ((DateTimeOffset)ass.DueDate.Value).ToUnixTimeMilliseconds()
                         : 0,
-                    ass.PointsPossible ??= 0,
+                    ass.PointsPossible ?? 0,
                     mapGradingType(ass.GradingType)
                 ));
         }
@@ -211,7 +211,7 @@ namespace IguideME.Web.Services
                             -1,
                             courseID,
                             quiz.Name,
-                            quiz.ID,
+                            quiz.ID ?? -1,
                             quiz.IsPublished,
                             false,
                             quiz.DueDate.HasValue
@@ -252,7 +252,7 @@ namespace IguideME.Web.Services
                                                 topic.ID ?? -1,
                                                 entry.ID ?? -1,
                                                 courseID,
-                                                reply.UserID.ToString(),
+                                                reply.UserID.HasValue ? reply.UserID.ToString() : "Admin",
                                                 reply.CreatedAt.HasValue ? (
                                                     (DateTimeOffset)reply.CreatedAt.Value
                                                 ).ToUnixTimeMilliseconds() : 0,
@@ -264,7 +264,7 @@ namespace IguideME.Web.Services
                                                     topic.ID ?? -1,
                                                     topic.ID ?? -1,
                                                     courseID,
-                                                    entry.UserID.ToString(),
+                                                    entry.UserID.HasValue ? entry.UserID.ToString() : "Admin",
                                                     entry.CreatedAt.HasValue ? ((DateTimeOffset)entry.CreatedAt).ToUnixTimeMilliseconds() : 0,
                                                     entry.Message
                                                 )
