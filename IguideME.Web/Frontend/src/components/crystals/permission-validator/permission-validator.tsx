@@ -1,6 +1,6 @@
 import { getStudentAcceptStatus, postConsentSettings } from '@/api/student_settings';
 import { getSelf } from '@/api/users';
-import { ConsentText } from '@/components/pages/student-settings/student-settings';
+import { ConsentText, GoalGrade } from '@/components/pages/student-settings/student-settings';
 import { UserRoles } from '@/types/user';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button, Row } from 'antd';
@@ -106,6 +106,14 @@ const PermissionValidator: FC = (): ReactElement => {
       <div className='mx-auto max-w-3xl p-5'>
         <h1 className='text-xl font-bold tracking-tight'>No access</h1>
         <p>You do not have access to this application. If you think this is an error, please contact the teacher.</p>
+      </div>
+    );
+  }
+
+  if (self.settings.goal_grade <= 0) {
+    return (
+      <div className='flex justify-center flex-col items-center'>
+        <GoalGrade goalGrade={self.settings.goal_grade} user={self} />
       </div>
     );
   }

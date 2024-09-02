@@ -277,5 +277,5 @@ const ConsentText: FC = () => (
   </div>
 );
 
-export { ConsentText };
+export { ConsentText, GoalGrade };
 export default StudentSettings;

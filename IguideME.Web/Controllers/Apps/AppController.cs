@@ -115,7 +115,7 @@ namespace IguideME.Web.Controllers
 					this.GetCourseID(),
 					this.GetUserID(),
 					null,
-					(int)JObject.Parse(body)["Grade"],
+					(int)JObject.Parse(body)["grade"],
 					null,
 					null,
 					null,
