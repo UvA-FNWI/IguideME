@@ -1,17 +1,17 @@
 // @ts-nocheck
-import AdminTitle from '@/components/atoms/admin-titles/admin-titles';
-import { Table, Tooltip } from 'antd';
-import { useMemo, type FC, type ReactElement } from 'react';
-import type { TableColumnsType } from 'antd/lib';
-import { getStudentsWithSettings } from '@/api/users';
-import { useQuery } from '@tanstack/react-query';
-import { getTiles } from '@/api/tiles';
-import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
-import NestedTable from './NestedTable';
-import QueryError from '@/components/particles/QueryError';
-import { useAntFilterDropdown } from './AntFilterDropdown';
-import { User } from '@/types/user';
 import { getAllUserTileGrades } from '@/api/grades';
+import { getTiles } from '@/api/tiles';
+import { getStudentsWithSettings } from '@/api/users';
+import AdminTitle from '@/components/atoms/admin-titles/admin-titles';
+import QueryError from '@/components/particles/QueryError';
+import { User } from '@/types/user';
+import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
+import { useQuery } from '@tanstack/react-query';
+import { Table, Tooltip } from 'antd';
+import type { TableColumnsType } from 'antd/lib';
+import { useMemo, type FC, type ReactElement } from 'react';
+import { useAntFilterDropdown } from './AntFilterDropdown';
+import NestedTable from './NestedTable';
 
 export interface TableData {
   student: User;
@@ -127,35 +127,38 @@ const StudentOverview: FC = (): ReactElement => {
         {
           title: 'Consent',
           dataIndex: 'consent',
-          sorter: (a, b) => {
-            const consentA = a.consent === undefined ? 0 : +a.consent;
-            const consentB = b.consent === undefined ? 0 : +b.consent;
-            return consentB - consentA;
-          },
           filters: [
             {
+              text: 'No data',
+              value: 0,
+            },
+            {
               text: 'Consent given',
-              value: true,
+              value: 1,
             },
             {
               text: 'Consent not given',
-              value: false,
+              value: 2,
             },
           ],
           onFilter: (value, record) => record.consent === value,
           render: (value: boolean) => {
-            if (value) {
+            if (value === 1) {
               return (
                 <Tooltip title='Consent given'>
                   <CheckCircleOutlined className='text-success' />
                 </Tooltip>
               );
-            } else {
+            } else if (value === 2) {
               return (
                 <Tooltip title='No consent given'>
                   <CloseCircleOutlined className='text-failure' />
                 </Tooltip>
               );
+            } else {
+              <Tooltip title='No data'>
+                <CloseCircleOutlined className='text-gray-500' />
+              </Tooltip>;
             }
           },
         },
