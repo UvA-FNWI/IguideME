@@ -26,8 +26,12 @@ namespace IguideME.Web.Controllers
 
         protected string GetUserID()
         {
-            // tmp for brightspace until we have an environment
-            // return "p371565";
+
+            if (IsAdministrator())
+            {
+                return (User.Identity as ClaimsIdentity).FindFirst("userid").Value;
+            }
+
             if (
                 int.TryParse(
                     (User.Identity as ClaimsIdentity).FindFirst("userid").Value,
