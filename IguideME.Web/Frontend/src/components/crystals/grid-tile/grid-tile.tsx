@@ -26,6 +26,7 @@ const GridTile: FC<GridTileProps> = ({ type, grades }): ReactElement => {
 };
 
 export const GradeView: FC<Grades> = ({ grade, max, peerAvg, type }): ReactElement => {
+  console.log('grades', { grade, max, peerAvg, type });
   return (
     <Space className='content-end'>
       {grade === 0 ?

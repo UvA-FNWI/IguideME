@@ -801,7 +801,7 @@ public static class DatabaseQueries
         @"SELECT        `tile_id`,
                         `status`
         FROM            `notifications`
-        INNER JOIN      `user_settings`
+        INNER JOIN      `student_settings`
         WHERE           `user_id`=@userID
         AND             `sync_id`=@syncID
         AND             `sent`=false;";
