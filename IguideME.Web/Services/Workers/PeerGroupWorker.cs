@@ -292,40 +292,44 @@ namespace IguideME.Web.Services.Workers
         void StorePeerStatistics(int goalGrade, List<string> peerGroup)
         {
             foreach ((int key, List<double> value) in peerEntryGradesMap)
-                _databaseManager.CreateUserPeer(
-                    goalGrade,
-                    peerGroup,
-                    key,
-                    value.Average(),
-                    value.Min(),
-                    value.Max(),
-                    (int)Comparison_Component_Types.assignment,
-                    _syncID
-                );
+                if (value.Count > 0)
+                    _databaseManager.CreateUserPeer(
+                        goalGrade,
+                        peerGroup,
+                        key,
+                        value.Average(),
+                        value.Min(),
+                        value.Max(),
+                        (int)Comparison_Component_Types.assignment,
+                        _syncID
+                    );
 
             foreach ((int key, List<double> value) in peerTileGradesMap)
+                if (value.Count > 0)
+                    _databaseManager.CreateUserPeer(
+                        goalGrade,
+                        peerGroup,
+                        key,
+                        value.Average(),
+                        value.Min(),
+                        value.Max(),
+                        (int)Comparison_Component_Types.tile,
+                        _syncID
+                    );
+
+            if (peerTotalGrades.Count > 0)
+            {
                 _databaseManager.CreateUserPeer(
-                    goalGrade,
-                    peerGroup,
-                    key,
-                    value.Average(),
-                    value.Min(),
-                    value.Max(),
-                    (int)Comparison_Component_Types.tile,
-                    _syncID
-                );
-
-            _databaseManager.CreateUserPeer(
-                goalGrade,
-                peerGroup,
-                0,
-                peerTotalGrades.Average(),
-                peerTotalGrades.Min(),
-                peerTotalGrades.Max(),
-                (int)Comparison_Component_Types.total,
-                _syncID
-            );
-
+                            goalGrade,
+                            peerGroup,
+                            0,
+                            peerTotalGrades.Average(),
+                            peerTotalGrades.Min(),
+                            peerTotalGrades.Max(),
+                            (int)Comparison_Component_Types.total,
+                            _syncID
+                        );
+            }
         }
 
         /// <summary>

@@ -896,7 +896,7 @@ public static class DatabaseQueries
     public const string QUERY_TILE_GRADE_MAX_AND_TYPE =
         @"SELECT
             CASE type
-                WHEN 0 THEN 100
+                WHEN 0 THEN 10
                 WHEN 1 THEN (
                     (SELECT COUNT(*) FROM `discussions` WHERE `course_id`=@courseID)
                     +

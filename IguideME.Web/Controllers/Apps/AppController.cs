@@ -33,6 +33,7 @@ namespace IguideME.Web.Controllers
 		[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 		public ActionResult GetSelf()
 		{
+			_logger.LogInformation("Getting user {} for {}", GetUserID(), GetCourseID());
 			/**
              * Returns information of the logged in user.
              */
