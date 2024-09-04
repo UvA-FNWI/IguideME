@@ -297,7 +297,7 @@ namespace IguideME.Web.Services
                                 grade_object_type_id
                         FROM    grade_objects
                         WHERE   org_unit_id = @courseID
-                        AND     is_deleted = FALSE,
+                        AND     is_deleted = FALSE
                         AND    (grade_object_type_id = 1
                             OR      grade_object_type_id = 2
                             OR      grade_object_type_id = 4)",
