@@ -484,12 +484,10 @@ namespace IguideME.Web.Controllers
                 !this.IsAdministrator())
                 return Unauthorized();
 
-            bool success = int.TryParse(tileID, out int id);
-
-            if (success)
+            if (int.TryParse(tileID, out int tid))
             {
                 List<LearningGoal> goals = DatabaseManager.Instance.GetGoals(GetCourseID())
-                    .Where(g => g.TileID == id)
+                    .Where(g => g.TileID == tid)
                     .ToList();
 
                 List<AssignmentSubmission> submissions =
@@ -499,10 +497,42 @@ namespace IguideME.Web.Controllers
 
                 var response = goals.Select(g =>
                 {
-                    bool success = true;
+                    bool success = false;
                     g.FetchRequirements();
                     foreach (GoalRequirement req in g.Requirements)
                     {
+                        if (req.EntryID == -1)
+                        {
+                            continue;
+                        }
+
+                        if (req.EntryID == -2)
+                        {
+                            int grade = 0;
+                            foreach (TileEntry entry in DatabaseManager.Instance.GetTileEntries(tid))
+                            {
+                                if (DatabaseManager.Instance.GetTileEntrySubmissionsForUser(GetCourseID(), entry.ID, userID).Count > 0)
+                                {
+                                    grade++;
+                                }
+                            }
+                            switch (req.Expression)
+                            {
+                                case "lte":
+                                    if (grade <= req.Value)
+                                        success = true;
+                                    break;
+                                case "gte":
+                                    if (grade >= req.Value)
+                                        success = true;
+                                    break;
+                                default:
+                                    if (grade == req.Value)
+                                        success = true;
+                                    break;
+                            }
+
+                        }
                         AssignmentSubmission submission = submissions.Find(
                             s => s.EntryID == req.EntryID);
 
@@ -516,16 +546,16 @@ namespace IguideME.Web.Controllers
                             switch (req.Expression)
                             {
                                 case "lte":
-                                    if (submission.Grade > req.Value)
-                                        success = false;
+                                    if (submission.Grade <= req.Value)
+                                        success = true;
                                     break;
                                 case "gte":
-                                    if (submission.Grade < req.Value)
-                                        success = false;
+                                    if (submission.Grade >= req.Value)
+                                        success = true;
                                     break;
                                 default:
-                                    if (submission.Grade != req.Value)
-                                        success = false;
+                                    if (submission.Grade == req.Value)
+                                        success = true;
                                     break;
                             }
                         }

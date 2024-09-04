@@ -82,7 +82,7 @@ class GoalRequirement extends Component<Props> {
     const targetTile = tiles.find(t => t.id === requirement.tile_id);
     if (targetTile && targetTile.content === "BINARY") {
       entryOptions = [
-        { value: 'count', label: 'COUNT (success)' },
+        { value: -2, label: 'COUNT (success)' },
         ...entryOptions
       ];
     }
@@ -136,7 +136,7 @@ class GoalRequirement extends Component<Props> {
             Entry
             <Select value={{
                       value: requirement.entry_id,
-                      label: requirement.entry_id === "count" ?
+                      label: requirement.entry_id === -2 ?
                         "COUNT (success)" :
                         (tileEntries.find(e => e.id === requirement.entry_id)?.title || "Choose entry")
                     }}
@@ -160,7 +160,7 @@ class GoalRequirement extends Component<Props> {
                       this.props.updateRequirement(requirement);
                       this.setState({requirement});
                     }}
-                    isDisabled={requirement.entry_id === -1 || requirement.entry_id === "count"}
+                    isDisabled={requirement.entry_id === -1 || requirement.entry_id === -2}
                     options={[
                       { value: 'grade', label: 'Grade (default)' },
                       ...this.state.metaKeys.map(k => ({
