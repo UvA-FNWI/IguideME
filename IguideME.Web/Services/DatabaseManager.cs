@@ -28,7 +28,7 @@ namespace IguideME.Web.Services
             }
             else
             {
-                _connection_string = "Data Source=data/IguideME2.db;Version=3;New=False;Compress=True;";
+                _connection_string = "Data Source=/data/IguideME2.db;Version=3;New=False;Compress=True;";
             }
 
             DatabaseManager.s_instance.RunMigrations();
