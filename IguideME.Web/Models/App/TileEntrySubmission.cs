@@ -86,12 +86,12 @@ namespace IguideME.Web.Models.App
                                 : this.Grade
                         )
                         * 100
-                        / max > 0 ? max : 1;
+                        / (max > 0 ? max : 1);
                     break;
                 case AppGradingType.Percentage:
                     this.Grade =
                         this.RawGrade != null
-                            ? double.Parse(this.RawGrade)
+                            ? double.Parse(this.RawGrade.TrimEnd(new char[] { '%', ' ' }))
                             : this.Grade;
                     break;
                 case AppGradingType.Letters:

@@ -62,7 +62,10 @@ namespace IguideME.Web.Services.Workers
                 if (gradingTypes.TryGetValue(submission.AssignmentID, out elem))
                 {
                     (max, type) = elem;
+                    _logger.LogInformation("submission, aid {}, uid {}, grade {}, raw {}", submission.AssignmentID, submission.UserID, submission.Grade, submission.RawGrade);
+                    _logger.LogInformation("max {} type {}", max, type);
                     submission.RawToGrade(type, max);
+                    _logger.LogInformation("{}, raw {} ", submission.Grade, submission.RawGrade);
 
                     _databaseManager.CreateUserSubmission(submission);
                 }
@@ -80,7 +83,6 @@ namespace IguideME.Web.Services.Workers
             List<AppAssignment> assignments = this._ILMSHandler.GetAssignments(
                 this._courseID
             ).ToList();
-            _logger.LogInformation("test assignmentworker: {}; {}", assignments.Count, assignments);
 
             // Get the consented users and only ask for their submissions
             List<Models.Impl.User> users = _databaseManager.GetUsersWithGrantedConsent(

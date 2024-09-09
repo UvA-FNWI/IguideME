@@ -134,12 +134,6 @@ namespace IguideME.Web.Services
         /// <inheritdoc />
         public IEnumerable<AppAssignment> GetAssignments(int courseID)
         {
-            List<Assignment> canvasass = Connector.FindCourseById
-            (courseID).Assignments;
-            _logger.LogInformation("test assignments: {}, {}", canvasass.Count, canvasass);
-            foreach (var ass in canvasass) {
-                _logger.LogInformation("found ass {}, {}", ass.Name, ass.ID);
-            }
             return Connector
                 .FindCourseById(courseID)
                 .Assignments.Where(assignment => assignment != null)

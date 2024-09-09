@@ -2,5 +2,5 @@ apiVersion: v2
 name: iguideme
 description: IguideME
 type: application
-version: 0.3.208
-appVersion: "0.3.208"
+version: 0.3.212
+appVersion: "0.3.212"

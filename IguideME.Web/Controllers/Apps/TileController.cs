@@ -463,7 +463,7 @@ namespace IguideME.Web.Controllers
 			bool success = int.TryParse(entryID, out int id);
 
 			return success
-				? Json(
+				? Ok(
 					_databaseManager.GetAssignmentSubmissionForUser(
 						this.GetCourseID(), id, userID))
 				: BadRequest();

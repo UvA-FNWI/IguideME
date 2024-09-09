@@ -1601,8 +1601,8 @@ namespace IguideME.Web.Services
                         r.GetValue(2).ToString(),
                         new AppGrades(
                             r.GetDouble(3),
-                            comparison.Average,
                             comparison.Minimum,
+                            comparison.Average,
                             comparison.Maximum,
                             ass.MaxGrade,
                             ass.GradingType

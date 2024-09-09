@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using IguideME.Web.Models;
 using IguideME.Web.Models.App;
+using IguideME.Web.Models.Impl;
 using IguideME.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -33,9 +34,15 @@ namespace IguideME.Web.Controllers
 		[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 		public ActionResult GetSelf()
 		{
+			_logger.LogInformation("Getting user {} for {}", GetUserID(), GetCourseID());
 			/**
              * Returns information of the logged in user.
              */
+			// TODO: Tmp fix for admins
+			if (IsAdministrator())
+			{
+				return Ok(new User(GetUserID(), GetCourseID(), -1, GetUserName(), GetUserName(), 1));
+			}
 			return Json(_databaseManager.GetUser(GetCourseID(), GetUserID()));
 		}
 
