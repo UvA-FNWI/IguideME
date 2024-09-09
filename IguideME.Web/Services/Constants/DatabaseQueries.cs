@@ -789,6 +789,7 @@ public static class DatabaseQueries
         FROM            `notifications`
         WHERE           `sync_id` IN ({0});";
 
+
     public const string QUERY_ALL_USER_NOTIFICATIONS =
         @"SELECT        `tile_id`,
                         `status`,
@@ -801,7 +802,6 @@ public static class DatabaseQueries
         @"SELECT        `tile_id`,
                         `status`
         FROM            `notifications`
-        INNER JOIN      `student_settings`
         WHERE           `user_id`=@userID
         AND             `sync_id`=@syncID
         AND             `sent`=false;";
