@@ -2325,7 +2325,6 @@ namespace IguideME.Web.Services
 
             NonQuery(
                 DatabaseQueries.QUERY_MARK_NOTIFICATIONS_SENT,
-                new SQLiteParameter("courseID", courseID),
                 new SQLiteParameter("userID", userID),
                 new SQLiteParameter("syncID", activeSync)
             );
