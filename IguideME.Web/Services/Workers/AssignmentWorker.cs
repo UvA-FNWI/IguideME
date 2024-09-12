@@ -119,7 +119,13 @@ namespace IguideME.Web.Services.Workers
                             break;
                         case AppGradingType.PassFail:
                             _logger.LogInformation("passfail text: {Grade}", submission.Grade);
-                            grade = submission.rawGrade == "PASS" ? 100 : 0;
+                            grade = submission.rawGrade switch
+                            {
+                                "" => submission.Grade > 0 ? 100 : 0,
+                                null => submission.Grade > 0 ? 100 : 0,
+                                "PASS" => 100,
+                                _ => 0
+                            };
                             break;
                         case AppGradingType.NotGraded:
                             grade = -1;
