@@ -26,7 +26,8 @@ public static class DatabaseQueries
         @"CREATE TABLE IF NOT EXISTS `accept_list` (
             `course_id`           INTEGER,
             `user_id`             STRING,
-            `accepted`            BOOLEAN
+            `accepted`            BOOLEAN,
+            PRIMARY KEY(`course_id`, `user_id`)
         );";
 
     // /------------------------ Course Settings -------------------------/
