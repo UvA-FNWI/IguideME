@@ -24,7 +24,6 @@ public static class DatabaseQueries
      */
     public const string CREATE_TABLE_ACCEPT_LIST =
         @"CREATE TABLE IF NOT EXISTS `accept_list` (
-            `id`                  INTEGER PRIMARY KEY AUTOINCREMENT,
             `course_id`           INTEGER,
             `user_id`             STRING,
             `accepted`            BOOLEAN
@@ -809,8 +808,7 @@ public static class DatabaseQueries
     public const string QUERY_MARK_NOTIFICATIONS_SENT =
         @"UPDATE        `notifications`
         SET             `sent`= true
-        WHERE           `course_id`=@courseID
-        AND             `user_id`=@userID
+        WHERE           `user_id`=@userID
         AND             `sync_id`=@syncID;";
 
     public const string QUERY_GRADE_PREDICTION_MODELS_FOR_COURSE =
