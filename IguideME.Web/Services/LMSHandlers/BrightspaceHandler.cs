@@ -383,7 +383,7 @@ namespace IguideME.Web.Services
                                     -1, ///// ????
                                     r.GetInt32(0),
                                     r.GetValue(1).ToString(),
-                                    (r.IsDBNull(2) || r.IsDBNull(3))
+                                    (r.IsDBNull(2) || r.GetDouble(2) == 0 || r.IsDBNull(3))
                                         ? "0"
                                         : (r.GetDouble(2) / r.GetDouble(3)).ToString(),
                                     r.GetValue(5).ToString()
