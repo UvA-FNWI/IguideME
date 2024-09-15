@@ -67,7 +67,7 @@ const UploadManager: FC<UploadManagerProps> = ({ tile, closeUploadMenu, students
   const { mutate: upload, isPending } = useMutation({
     mutationFn: uploadData,
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['tile-groups'] });
+      await queryClient.invalidateQueries({ queryKey: ['tiles'] });
     },
   });
 
@@ -127,7 +127,7 @@ const UploadManager: FC<UploadManagerProps> = ({ tile, closeUploadMenu, students
             </Tooltip>
           </div>
           <Input
-            className='w-full border-accent/50 bg-surface1 text-text hover:border-accent hover:bg-surface2 focus:border-accent focus:shadow-sm focus:shadow-accent aria-invalid:!border-failure aria-invalid:shadow-none aria-invalid:focus:!shadow-sm aria-invalid:focus:!shadow-failure'
+            className='border-accent/50 bg-surface1 text-text hover:border-accent hover:bg-surface2 focus:border-accent focus:shadow-accent aria-invalid:!border-failure aria-invalid:shadow-none aria-invalid:focus:!shadow-sm aria-invalid:focus:!shadow-failure w-full focus:shadow-sm'
             placeholder='Title'
             value={title}
             onChange={changeTitle}
@@ -149,7 +149,7 @@ const UploadManager: FC<UploadManagerProps> = ({ tile, closeUploadMenu, students
             </Tooltip>
           </div>
           <InputNumber
-            className='w-[120px] !border border-solid !border-accent/70 !bg-surface1 hover:!border-accent hover:!bg-surface2 [&_input]:!text-text'
+            className='!border-accent/70 !bg-surface1 hover:!border-accent hover:!bg-surface2 [&_input]:!text-text w-[120px] !border border-solid'
             min={0}
             value={idColumn}
             onChange={changeIDColumn}
@@ -171,7 +171,7 @@ const UploadManager: FC<UploadManagerProps> = ({ tile, closeUploadMenu, students
             </Tooltip>
           </div>
           <InputNumber
-            className='w-[120px] !border border-solid !border-accent/70 !bg-surface1 hover:!border-accent hover:!bg-surface2 [&_input]:!text-text'
+            className='!border-accent/70 !bg-surface1 hover:!border-accent hover:!bg-surface2 [&_input]:!text-text w-[120px] !border border-solid'
             min={0}
             value={gradeColumn}
             onChange={changeGradeColumn}
@@ -251,7 +251,7 @@ const UploadManager: FC<UploadManagerProps> = ({ tile, closeUploadMenu, students
           <Button
             className='custom-default-button'
             onClick={() => {
-              upload({ entryID: tile.id, idColumn, gradeColumn, data });
+              upload({ tileID: tile.id, idColumn, gradeColumn, title, data });
             }}
             loading={isPending}
             disabled={!validate(data)}

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using IguideME.Web.Models;
 using IguideME.Web.Models.App;
@@ -7,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Linq;
 
 namespace IguideME.Web.Controllers
 {
@@ -705,51 +707,57 @@ namespace IguideME.Web.Controllers
 		//     return BadRequest();
 		// }
 
-		// [Authorize(Policy = "IsInstructor")]
-		// [HttpPost]
-		// // DBrefTODO: The entry Id should be changed into assignmentID
-		// // [Route("/entries/{entryID}/upload")]
-		// [Route("/entries/{assignmentID}/upload")]
-		// [ProducesResponseType(StatusCodes.Status204NoContent)]
-		// [ProducesResponseType(StatusCodes.Status400BadRequest)]
-		// [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-		// public ActionResult UploadTileData(int assignmentID, JObject data)
-		// {
-		//     int courseID = this.GetCourseID();
+		[Authorize(Policy = "IsInstructor")]
+		[HttpPost]
+		[Route("/entries/{tileID}/upload")]
+		[ProducesResponseType(StatusCodes.Status204NoContent)]
+		[ProducesResponseType(StatusCodes.Status400BadRequest)]
+		[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+		public ActionResult UploadTileData(int tileID, JObject data)
+		{
+			int courseID = this.GetCourseID();
 
-		//     int id_column = data["id_column"].ToObject<int>();
-		//     int grade_column = data["grade_column"].ToObject<int>();
-		//     JArray table = (JArray)data["data"];
+			int id_column = data["idColumn"].ToObject<int>();
+			int grade_column = data["gradeColumn"].ToObject<int>();
+			string title = data["title"].ToObject<string>();
+			JArray table = (JArray)data["data"];
 
-		//     string[] names = table[0].ToObject<string[]>();
+			string[] names = table[0].ToObject<string[]>();
 
-		//     IEnumerable<int> range = Enumerable.Range(0, names.Length).Where(i => i != id_column && i != grade_column);
-		//     foreach (JArray row in table.Cast<JArray>().Skip(1))
-		//     {
+			int assignmentID = _databaseManager.RegisterExternalAssignment(new(courseID, title, 10, AppGradingType.Points));
 
-		//         string[] values = row.ToObject<string[]>();
+			// TODO: this is a bit of a hack, the ui probably needs to be redesigned a little instead.
+			_databaseManager.CreateTileEntry(new(tileID, assignmentID, title, 0));
 
-		//         _ = float.TryParse(values[grade_column], out float Grade);
+			// IEnumerable<int> range = Enumerable.Range(0, names.Length).Where(i => i != id_column && i != grade_column);
+			foreach (JArray row in table.Cast<JArray>().Skip(1))
+			{
 
-		//         int submissionID = _databaseManager.CreateUserSubmission(
-		//             assignmentID,
-		//             values[id_column],
-		//             Grade,
-		//             DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
-		//         );
+				string[] values = row.ToObject<string[]>();
 
-		//         foreach (int i in range)
-		//         {
-		//             _databaseManager.CreateSubmissionMeta(
-		//                 submissionID,
-		//                 names[i],
-		//                 values[i]
-		//             );
-		//         }
-		//     }
+				_ = float.TryParse(values[grade_column], out float Grade);
 
-		//     return NoContent();
-		// }
+				int submissionID = _databaseManager.CreateUserSubmission(
+				new(
+				-1,
+					assignmentID,
+					values[id_column],
+					Grade * 10,
+					DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
+				));
+
+				// foreach (int i in range)
+				// {
+				//     _databaseManager.CreateSubmissionMeta(
+				//         submissionID,
+				//         names[i],
+				//         values[i]
+				//     );
+				// }
+			}
+
+			return NoContent();
+		}
 
 		// [Authorize(Policy = "IsInstructor")]
 		// [HttpGet]

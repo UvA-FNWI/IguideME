@@ -414,7 +414,6 @@ namespace IguideME.Web.Services
                     {
                         assignments.Add(
                             new AppAssignment(
-                                -1,
                                 r.GetInt32(1),
                                 r.GetValue(2).ToString(),
                                 r.GetInt32(0),

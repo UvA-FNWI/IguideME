@@ -139,7 +139,6 @@ namespace IguideME.Web.Services
                 .Assignments.Where(assignment => assignment != null)
                 .OrderBy(a => a.Position)
                 .Select(ass => new AppAssignment(
-                    -1,
                     courseID,
                     ass.Name,
                     ass.ID ?? -1,
@@ -208,7 +207,6 @@ namespace IguideME.Web.Services
                 .Select(quiz =>
                     (
                         new AppAssignment(
-                            -1,
                             courseID,
                             quiz.Name,
                             quiz.ID ?? -1,

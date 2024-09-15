@@ -203,7 +203,6 @@ namespace IguideME.Web.Services
                 DatabaseQueries.CREATE_TABLE_TILES,
                 DatabaseQueries.CREATE_TABLE_ASSIGNMENTS,
                 DatabaseQueries.CREATE_TABLE_LEARNING_GOALS,
-                DatabaseQueries.CREATE_TABLE_EXTERNAL_DATA,
                 DatabaseQueries.CREATE_TABLE_GOAL_REQUREMENTS,
                 DatabaseQueries.CREATE_TABLE_DISCUSSIONS,
                 DatabaseQueries.CREATE_TABLE_DISCUSSION_ENTRIES,
@@ -555,6 +554,28 @@ namespace IguideME.Web.Services
             int assignment_id = IDNonQuery(
                 DatabaseQueries.REGISTER_ASSIGNMENT,
                 new SQLiteParameter("externalID", assignment.ExternalID),
+                new SQLiteParameter("courseID", assignment.CourseID),
+                new SQLiteParameter("title", assignment.Title),
+                new SQLiteParameter("published", assignment.Published),
+                new SQLiteParameter("muted", assignment.Muted),
+                new SQLiteParameter("dueDate", assignment.DueDate),
+                new SQLiteParameter("maxGrade", assignment.MaxGrade),
+                new SQLiteParameter("gradingType", assignment.GradingType)
+            );
+
+            if (assignment_id == 0)
+                assignment_id = GetInternalAssignmentID(
+                    (int)assignment.ExternalID,
+                    assignment.CourseID
+                );
+
+            return assignment_id;
+        }
+
+        public int RegisterExternalAssignment(AppAssignment assignment)
+        {
+            int assignment_id = IDNonQuery(
+                DatabaseQueries.REGISTER_EXTERNAL_ASSIGNMENT,
                 new SQLiteParameter("courseID", assignment.CourseID),
                 new SQLiteParameter("title", assignment.Title),
                 new SQLiteParameter("published", assignment.Published),
@@ -1217,6 +1238,8 @@ namespace IguideME.Web.Services
                     }
                 }
             }
+
+            _logger.LogInformation("Updating user Notifications to {}", tempUser.Settings.Notifications);
 
             NonQuery(
                 DatabaseQueries.REGISTER_STUDENT_SETTINGS,
@@ -2373,7 +2396,7 @@ namespace IguideME.Web.Services
             NonQuery(
                 DatabaseQueries.REGISTER_TILE_ENTRY,
                 new SQLiteParameter("tileID", entry.TileID),
-                new SQLiteParameter("content_id", entry.ContentID),
+                new SQLiteParameter("contentID", entry.ContentID),
                 new SQLiteParameter("weight", entry.Weight)
             );
         }
@@ -3260,112 +3283,6 @@ namespace IguideME.Web.Services
             }
             return false;
         }
-
-        public void AddExternalData(int courseID, ExternalData data)
-        {
-            NonQuery(
-                DatabaseQueries.REGISTER_EXTERNAL_DATA,
-                new SQLiteParameter("courseID", courseID),
-                new SQLiteParameter("title", data.Title),
-                new SQLiteParameter("max", data.MaxGrade),
-                new SQLiteParameter("gradingType", data.GradingType)
-            );
-        }
-
-        public void AddExternalSubmissions(int courseID, int externalDataID, ExternalGrades grades) {
-
-        }
-
-        public ExternalData[] GetExternalData(int courseID, int tileID, string userID)
-        {
-            List<ExternalData> submissions = new();
-
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_EXTERNALDATA,
-                    new SQLiteParameter("courseID", courseID),
-                    new SQLiteParameter("tileID", tileID == -1 ? '*' : tileID),
-                    new SQLiteParameter("userID", userID == null ? '*' : userID)
-                )
-            )
-            {
-                while (r.Read())
-                {
-                    ExternalData submission =
-                        new(
-                            courseID,
-                            r.GetValue(0).ToString(),
-                            tileID,
-                            r.GetValue(1).ToString(),
-                            r.GetValue(2).ToString()
-                        );
-                    submissions.Add(submission);
-                }
-            }
-
-            return submissions.ToArray();
-        }
-
-        // public void InsertUserAction(string userID, ActionTypes action, string actionDetail, int courseID)
-        // {
-        //     int sessionID = 0;
-        //     long timestamp = 0;
-
-        //     using SQLiteConnection connection = new(s_instance._connection_string);
-        //     try
-        //     {
-        //         connection.Open();
-
-        //         // Open a transaction to prevent race conditions for the sessionID.
-        //         using SQLiteTransaction transaction = connection.BeginTransaction();
-        //         {
-        //             using SQLiteCommand commandGet = connection.CreateCommand();
-        //             {
-        //                 commandGet.CommandText = DatabaseQueries.GET_TRACKER_SESSION_ID;
-        //                 commandGet.Parameters.Add(new SQLiteParameter("userID", userID));
-        //                 commandGet.Parameters.Add(new SQLiteParameter("courseID", courseID));
-        //                 commandGet.Transaction = transaction;
-
-        //                 using SQLiteDataReader r = commandGet.ExecuteReader(CommandBehavior.Default);
-        //                 {
-        //                     if (r.Read())
-        //                     {
-        //                         sessionID = r.GetInt32(0);
-        //                         timestamp = r.GetInt64(1);
-        //                     }
-        //                 }
-        //             }
-
-        //             if (DateTimeOffset.UtcNow.ToUnixTimeSeconds() - timestamp > 1800) // 30 minutes
-        //             {
-        //                 sessionID++;
-        //             }
-
-        //             using SQLiteCommand commandInsert = connection.CreateCommand();
-        //             {
-        //                 commandInsert.CommandText = DatabaseQueries.INSERT_USER_ACTION;
-        //                 commandInsert.Parameters.Add(new SQLiteParameter("userID", userID));
-        //                 commandInsert.Parameters.Add(new SQLiteParameter("action", action));
-        //                 commandInsert.Parameters.Add(new SQLiteParameter("actionDetail", actionDetail));
-        //                 commandInsert.Parameters.Add(new SQLiteParameter("sessionID", sessionID));
-        //                 commandInsert.Parameters.Add(new SQLiteParameter("courseID", courseID));
-        //                 commandInsert.Transaction = transaction;
-
-        //                 commandInsert.ExecuteNonQuery();
-        //             }
-
-        //             transaction.Commit();
-        //         }
-
-        //         connection.Close();
-        //     }
-        //     catch (Exception e)
-        //     {
-        //         // silently fail
-        //         _logger.LogError("Error inserting user action: {message}", e.Message);
-        //         connection.Close();
-        //     }
-        // }
 
         public void InsertUserAction(string userID, ActionTypes action, string actionDetail, int courseID)
         {

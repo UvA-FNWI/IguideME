@@ -169,17 +169,6 @@ public static class DatabaseQueries
             UNIQUE (`assignment_id`,`user_id`)
         );";
 
-    public const string CREATE_TABLE_EXTERNAL_SUBMISSIONS =
-        @"CREATE TABLE IF NOT EXISTS `external_submissions` (
-            `submission_id`   INTEGER PRIMARY KEY AUTOINCREMENT,
-            `data_id`         INTEGER,
-            `user_id`         STRING,
-            `grade`           FLOAT NULL,
-            FOREIGN KEY(`data_id`) REFERENCES `external_data`(`external_data_id`),
-            FOREIGN KEY(`user_id`) REFERENCES `users`(`user_id`),
-            UNIQUE (`data_id`,`user_id`)
-        );";
-
     public const string CREATE_TABLE_SUBMISSIONS_META =
         @"CREATE TABLE IF NOT EXISTS `submissions_meta` (
             `submission_id`   INTEGER,
@@ -357,16 +346,7 @@ public static class DatabaseQueries
             `role`            INTEGER DEFAULT 0
         );";
 
-    public const string CREATE_TABLE_EXTERNAL_DATA =
-        @"CREATE TABLE IF NOT EXISTS `external_data` (
-            `external_data_id`     INTEGER PRIMARY KEY AUTOINCREMENT,
-            `course_id`       INTEGER,
-            `title`           STRING,
-            `max_grade`       INTEGER,
-            `grading_type`    INTEGER,
-             FOREIGN KEY(`course_id`) REFERENCES `course_settings`(`course_id`)
-       );";
-
+    //TODO: I believe that external_id shouldn't be UNIQUE, but not sure
     public const string CREATE_TABLE_ASSIGNMENTS =
         @"CREATE TABLE IF NOT EXISTS `assignments` (
             `assignment_id`   INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -618,6 +598,28 @@ public static class DatabaseQueries
         )
         ON CONFLICT (`external_id`) WHERE NOT NULL DO NOTHING";
 
+    public const string REGISTER_EXTERNAL_ASSIGNMENT =
+        @"INSERT OR REPLACE
+            INTO   `assignments`
+                        (   `external_id`,
+                            `course_id`,
+                            `title`,
+                            `published`,
+                            `muted`,
+                            `due_date`,
+                            `max_grade`,
+                            `grading_type`)
+        VALUES (
+            (SELECT `assignment_id` FROM `assignments` ORDER BY `assignment_id` DESC LIMIT 1) + 1,
+            @courseID,
+            @title,
+            @published,
+            @muted,
+            @dueDate,
+            @maxGrade,
+            @gradingType
+        )";
+
     public const string REGISTER_DISCUSSION =
         @"INSERT OR REPLACE
             INTO   `discussions`
@@ -729,20 +731,6 @@ public static class DatabaseQueries
                             `goal_grade` = excluded.`goal_grade` ,
                             `consent`= excluded.`consent` ,
                             `notifications`= excluded.`notifications`
-        ;";
-    public const string REGISTER_EXTERNAL_DATA =
-        @"INSERT INTO   `external_data`
-                        (   `course_id`,
-                            `title`,
-                            `max_grade`,
-                            `grading_type`
-                        )
-        VALUES(
-            @courseID,
-            @title,
-            @max,
-            @gradingType
-        )
         ;";
 
     public const string REGISTER_SUBMISSION_META =
@@ -1564,15 +1552,6 @@ public static class DatabaseQueries
                     `submitted`
         FROM        `submissions`
         WHERE       `entry_id`=@entryID
-        ;";
-    public const string QUERY_EXTERNALDATA =
-        @"SELECT    `user_id`,
-                    `title`,
-                    `Grade`
-        FROM        `external_data`
-        WHERE       `course_id`=@courseID
-        AND         `user_id`=@userID
-        AND         `tile_id`=@tileID
         ;";
 
     public const string QUERY_MIGRATIONS =

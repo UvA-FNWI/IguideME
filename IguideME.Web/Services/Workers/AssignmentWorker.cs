@@ -108,7 +108,7 @@ namespace IguideME.Web.Services.Workers
                 if (!_databaseManager.AssignmentHasEntry(this._courseID, assignment.ID))
                     continue;
 
-                // We register the internal assignmentID in the submission entity
+                // We register the internal assignmentID in the submission entity, this is to support external data
                 foreach (AssignmentSubmission sub in submissions)
                 {
                     if (sub.AssignmentID == assignment.ExternalID)

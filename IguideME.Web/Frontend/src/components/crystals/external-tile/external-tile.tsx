@@ -35,7 +35,7 @@ const ExternalTile: FC<ExternalTileProps> = ({ tile, tileGroup }) => {
   }
 
   return (
-    <div className='rounded-md border border-solid border-border0 bg-surface2 px-8 pb-1 pt-4'>
+    <div className='border-border0 bg-surface2 rounded-md border border-solid px-8 pb-1 pt-4'>
       <div className='mb-5 flex items-center justify-between'>
         <h3 className='flex items-center gap-2 text-lg'>
           <b>{tile.title}</b> <Tag>{tileGroup.title}</Tag>

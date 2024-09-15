@@ -59,15 +59,22 @@ export async function deleteTileEntry(id: number): Promise<void> {
 }
 
 interface UploadDataProps {
-  entryID: number;
+  tileID: number;
   idColumn: number;
   gradeColumn: number;
+  title: string;
   data: any[];
 }
 
-export async function uploadData({ entryID, idColumn, gradeColumn, data }: UploadDataProps): Promise<any[]> {
+export async function uploadData({
+  tileID: tileID,
+  idColumn,
+  gradeColumn,
+  title,
+  data,
+}: UploadDataProps): Promise<any[]> {
   return await apiClient
-    .post(`/entries/${entryID}/upload`, { idColumn, gradeColumn, data })
+    .post(`/entries/${tileID}/upload`, { idColumn, gradeColumn, title, data })
     .then((response) => response.data);
 }
 

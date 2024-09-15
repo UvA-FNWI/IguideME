@@ -53,5 +53,44 @@ namespace IguideME.Web.Models.App
             this.GradingType = gradingType;
         }
 
+        public AppAssignment(
+            int courseID,
+            string title,
+            int? externalID,
+            bool published,
+            bool muted,
+            long dueDate,
+            double maxGrade,
+            AppGradingType gradingType)
+        {
+            this.ID = -1;
+            this.CourseID = courseID;
+            this.Title = title;
+            this.ExternalID = externalID;
+            this.Published = published;
+            this.Muted = muted;
+            this.DueDate = dueDate;
+            this.MaxGrade = maxGrade;
+            this.GradingType = gradingType;
+        }
+
+        public AppAssignment(
+            int courseID,
+            string title,
+            double maxGrade,
+            AppGradingType gradingType)
+        {
+            this.ID = -1;
+            this.CourseID = courseID;
+            this.Title = title;
+            this.ExternalID = -1;
+            this.Published = true;
+            this.Muted = false;
+            this.DueDate = 0;
+            this.MaxGrade = maxGrade;
+            this.GradingType = gradingType;
+        }
+
+
     }
 }
