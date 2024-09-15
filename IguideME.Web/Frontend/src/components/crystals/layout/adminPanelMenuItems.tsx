@@ -1,5 +1,6 @@
 import {
   AppstoreOutlined,
+  CloudUploadOutlined,
   // CloudUploadOutlined,
   ClusterOutlined,
   ControlOutlined,
@@ -42,11 +43,11 @@ export const getAdminPanelMenuItems = (courseId: string, path: string): SideNavi
     Icon: TrophyOutlined,
     to: `/${courseId}/admin/admin-panel/learning-goals`,
   },
-  // {
-  //   label: 'Data Wizard',
-  //   Icon: CloudUploadOutlined,
-  //   to: `/${courseId}/admin/admin-panel/data-wizard`,
-  // },
+  {
+    label: 'Data Wizard',
+    Icon: CloudUploadOutlined,
+    to: `/${courseId}/admin/admin-panel/data-wizard`,
+  },
   { label: 'Usage Analytics', Icon: ClusterOutlined, to: `/${courseId}/admin/admin-panel/analytics` },
   // {
   //   label: 'Notification Centre',

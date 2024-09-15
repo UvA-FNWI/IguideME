@@ -1,4 +1,4 @@
-import { Grades, GradingType } from './grades';
+import { type Grades, type GradingType } from './grades';
 
 export type ViewType = 'graph' | 'grid';
 
@@ -33,6 +33,7 @@ export enum TileType {
   assignments,
   discussions,
   learning_outcomes,
+  external,
 }
 
 export interface TileEntry {

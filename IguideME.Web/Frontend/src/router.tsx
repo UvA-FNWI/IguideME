@@ -229,13 +229,13 @@ export const createRouter = (): ReturnType<typeof createBrowserRouter> =>
                       return { Component: GradeAnalyzer.default };
                     },
                   },
-                  // {
-                  //   path: 'data-wizard',
-                  //   lazy: async () => {
-                  //     const DataWizard = await import('@/components/pages/admin/datawizard/datawizard.tsx');
-                  //     return { Component: DataWizard.default };
-                  //   },
-                  // },
+                  {
+                    path: 'data-wizard',
+                    lazy: async () => {
+                      const DataWizard = await import('@/components/pages/admin/datawizard/datawizard.tsx');
+                      return { Component: DataWizard.default };
+                    },
+                  },
                   {
                     path: 'learning-goals',
                     lazy: async () => {
@@ -278,7 +278,7 @@ export const createRouter = (): ReturnType<typeof createBrowserRouter> =>
       },
     ],
     {
-      basename: '/front',
+      basename: import.meta.env.MODE === 'mock' ? '/' : '/front',
       future: {
         v7_fetcherPersist: true,
         v7_normalizeFormMethod: true,

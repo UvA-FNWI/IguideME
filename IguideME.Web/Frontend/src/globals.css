@@ -274,6 +274,12 @@ textarea:not([rows]) {
   }
 }
 
+.custom-danger-button {
+  background-color: hsl(var(--failure)) !important;
+  border-color: hsl(var(--failure)) !important;
+  color: hsl(var(--textAlt)) !important;
+}
+
 .custom-radio-group {
   .ant-radio-button-wrapper {
     background-color: hsl(var(--surface1)) !important;

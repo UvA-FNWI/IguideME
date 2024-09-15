@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using IguideME.Web.Models.App;
+using Newtonsoft.Json;
 
 namespace IguideME.Web.Models
 {
@@ -7,25 +8,30 @@ namespace IguideME.Web.Models
         [JsonProperty(PropertyName = "course_id")]
         public int CourseID { get; set; }
 
-        [JsonProperty(PropertyName = "tile_id")]
-        public int TileID { get; set; }
-
-        [JsonProperty(PropertyName = "userID")]
-        public string UserID { get; set; }
-
-        [JsonProperty(PropertyName = "Grade")]
-        public string Grade { get; set; }
-
         [JsonProperty(PropertyName = "title")]
         public string Title { get; set; }
 
-        public ExternalData(int courseID, string userID, int tileID, string title, string grade)
+        [JsonProperty("max_grade")]
+        public double MaxGrade { get; set; }
+
+        [JsonProperty("grading_type")]
+        public AppGradingType GradingType { get; set; }
+
+        [JsonProperty(PropertyName = "grade")]
+        public string Grade { get; set; }
+
+
+        public ExternalData(int courseID, string title, double max, AppGradingType type, string grade)
         {
             this.CourseID = courseID;
-            this.UserID = userID;
-            this.Grade = grade;
             this.Title = title;
-            this.TileID = tileID;
+            this.MaxGrade = max;
+            this.GradingType = type;
+            this.Grade = grade;
         }
+    }
+
+    public class ExternalGrades {
+
     }
 }

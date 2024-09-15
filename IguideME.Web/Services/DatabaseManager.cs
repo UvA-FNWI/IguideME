@@ -203,6 +203,7 @@ namespace IguideME.Web.Services
                 DatabaseQueries.CREATE_TABLE_TILES,
                 DatabaseQueries.CREATE_TABLE_ASSIGNMENTS,
                 DatabaseQueries.CREATE_TABLE_LEARNING_GOALS,
+                DatabaseQueries.CREATE_TABLE_EXTERNAL_DATA,
                 DatabaseQueries.CREATE_TABLE_GOAL_REQUREMENTS,
                 DatabaseQueries.CREATE_TABLE_DISCUSSIONS,
                 DatabaseQueries.CREATE_TABLE_DISCUSSION_ENTRIES,
@@ -1154,7 +1155,8 @@ namespace IguideME.Web.Services
                 SQLiteDataReader r = Query(
                     DatabaseQueries.QUERY_NOTIFICATIONS_ENABLE,
                     new SQLiteParameter("courseID", courseID),
-                    new SQLiteParameter("userID", userID)
+                    new SQLiteParameter("userID", userID),
+                    new SQLiteParameter("syncID", syncID)
                 )
             )
             {
@@ -1162,7 +1164,8 @@ namespace IguideME.Web.Services
                 {
                     try
                     {
-                        result = r.GetBoolean(0);
+                        if (r.IsDBNull(0)) result = false;
+                        else result = r.GetBoolean(0);
                     }
                     catch (Exception e)
                     {
@@ -3258,19 +3261,19 @@ namespace IguideME.Web.Services
             return false;
         }
 
-        public void AddExternalData(int courseID, ExternalData[] entries)
+        public void AddExternalData(int courseID, ExternalData data)
         {
-            foreach (ExternalData entry in entries)
-            {
-                NonQuery(
-                    DatabaseQueries.REGISTER_EXTERNALDATA,
-                    new SQLiteParameter("courseID", courseID),
-                    new SQLiteParameter("tileID", entry.TileID),
-                    new SQLiteParameter("title", entry.Title),
-                    new SQLiteParameter("Grade", entry.Grade),
-                    new SQLiteParameter("userID", entry.UserID)
-                );
-            }
+            NonQuery(
+                DatabaseQueries.REGISTER_EXTERNAL_DATA,
+                new SQLiteParameter("courseID", courseID),
+                new SQLiteParameter("title", data.Title),
+                new SQLiteParameter("max", data.MaxGrade),
+                new SQLiteParameter("gradingType", data.GradingType)
+            );
+        }
+
+        public void AddExternalSubmissions(int courseID, int externalDataID, ExternalGrades grades) {
+
         }
 
         public ExternalData[] GetExternalData(int courseID, int tileID, string userID)

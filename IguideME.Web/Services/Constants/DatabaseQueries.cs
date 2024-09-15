@@ -169,6 +169,17 @@ public static class DatabaseQueries
             UNIQUE (`assignment_id`,`user_id`)
         );";
 
+    public const string CREATE_TABLE_EXTERNAL_SUBMISSIONS =
+        @"CREATE TABLE IF NOT EXISTS `external_submissions` (
+            `submission_id`   INTEGER PRIMARY KEY AUTOINCREMENT,
+            `data_id`         INTEGER,
+            `user_id`         STRING,
+            `grade`           FLOAT NULL,
+            FOREIGN KEY(`data_id`) REFERENCES `external_data`(`external_data_id`),
+            FOREIGN KEY(`user_id`) REFERENCES `users`(`user_id`),
+            UNIQUE (`data_id`,`user_id`)
+        );";
+
     public const string CREATE_TABLE_SUBMISSIONS_META =
         @"CREATE TABLE IF NOT EXISTS `submissions_meta` (
             `submission_id`   INTEGER,
@@ -337,7 +348,6 @@ public static class DatabaseQueries
 
     // /------------------------- Data registry --------------------------/
 
-
     public const string CREATE_TABLE_USERS =
         @"CREATE TABLE IF NOT EXISTS `users` (
             `user_id`         STRING PRIMARY KEY,
@@ -346,6 +356,16 @@ public static class DatabaseQueries
             `sortable_name`   STRING,
             `role`            INTEGER DEFAULT 0
         );";
+
+    public const string CREATE_TABLE_EXTERNAL_DATA =
+        @"CREATE TABLE IF NOT EXISTS `external_data` (
+            `external_data_id`     INTEGER PRIMARY KEY AUTOINCREMENT,
+            `course_id`       INTEGER,
+            `title`           STRING,
+            `max_grade`       INTEGER,
+            `grading_type`    INTEGER,
+             FOREIGN KEY(`course_id`) REFERENCES `course_settings`(`course_id`)
+       );";
 
     public const string CREATE_TABLE_ASSIGNMENTS =
         @"CREATE TABLE IF NOT EXISTS `assignments` (
@@ -710,20 +730,18 @@ public static class DatabaseQueries
                             `consent`= excluded.`consent` ,
                             `notifications`= excluded.`notifications`
         ;";
-
-    public const string REGISTER_EXTERNALDATA =
+    public const string REGISTER_EXTERNAL_DATA =
         @"INSERT INTO   `external_data`
                         (   `course_id`,
-                            `tile_id`,
                             `title`,
-                            `Grade`,
-                            `user_id`   )
+                            `max_grade`,
+                            `grading_type`
+                        )
         VALUES(
             @courseID,
-            @tileID,
             @title,
-            @Grade,
-            @userID
+            @max,
+            @gradingType
         )
         ;";
 
@@ -1359,11 +1377,11 @@ public static class DatabaseQueries
             ;";
 
     public const string QUERY_NOTIFICATIONS_ENABLE =
-        @"SELECT    `notifications`,
-                    Max(`student_settings`.`sync_id`)
+        @"SELECT    `notifications`
         FROM        `student_settings`
         WHERE       `course_id`=@courseID
         AND         `user_id`=@userID
+        AND         `sync_id`=@syncID
         AND         `consent` = true
         ;";
 
