@@ -5,6 +5,7 @@ import NotificationPanel from '@/components/atoms/notification-panel/notificatio
 import { UserRoles } from '@/types/user';
 import {
   CompassOutlined,
+  ControlOutlined,
   DashboardOutlined,
   DownOutlined,
   MenuFoldOutlined,
@@ -156,6 +157,14 @@ const SideNavigation: FC = (): ReactElement => {
                     );
                   })()}
                 </>
+              )}
+              {self.role === UserRoles.student && (
+                <SideNavigationLink
+                  activeOverride={path.startsWith(`/${courseId}/student`)}
+                  to={`/${courseId}/${self.userID}/settings`}
+                  Icon={ControlOutlined}
+                  label='Settings'
+                />
               )}
             </>
           )}

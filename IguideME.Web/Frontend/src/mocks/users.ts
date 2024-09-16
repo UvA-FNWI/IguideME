@@ -1,23 +1,36 @@
-import { http, HttpResponse } from 'msw';
 import { type User, UserRoles } from '@/types/user';
+import { http, HttpResponse } from 'msw';
+
+const TEST_USER: User = {
+  course_id: 994,
+  studentnumber: 42,
+  userID: '42',
+  name: 'Course Admin',
+  sortable_name: 'Admin, Course',
+  role: UserRoles.instructor,
+  settings: {
+    consent: true,
+    goal_grade: 10,
+    predicted_grade: 9,
+    total_grade: 9.5,
+    notifications: true,
+  },
+};
 
 export const userHandlers = [
   http.get('/app/self', () => {
-    return HttpResponse.json<User>({
-      course_id: 994,
-      studentnumber: 42,
-      userID: '42',
-      name: 'Course Admin',
-      sortable_name: 'Admin, Course',
-      role: UserRoles.instructor,
-      settings: undefined,
-    });
+    return HttpResponse.json<User>(TEST_USER);
   }),
   http.get('/students', () => {
     return HttpResponse.json<User[]>(MOCK_STUDENTS);
   }),
   http.get('/students/settings', () => {
     return HttpResponse.json<User[]>(MOCK_STUDENTS);
+  }),
+  http.post('/student/settings/goal-grade', async ({ request }) => {
+    const grade = (await request.json()) as number;
+    TEST_USER.settings!.goal_grade = grade;
+    return HttpResponse.json<User>(TEST_USER);
   }),
   http.get('/student/*', ({ params }) => {
     return HttpResponse.json<User | undefined>(MOCK_STUDENTS.find((student) => student.userID === params[0]));

@@ -3,11 +3,11 @@ import { getSelf } from '@/api/users';
 import { ConsentText, GoalGrade } from '@/components/pages/student-settings/student-settings';
 import { UserRoles } from '@/types/user';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Button, Row } from 'antd';
+import { Button } from 'antd';
 import { useEffect, type FC, type ReactElement } from 'react';
+import { Loading as LoadingDots } from 'react-loading-dot';
 import { Outlet } from 'react-router-dom';
 import { toast } from 'sonner';
-import { Loading as LoadingDots } from 'react-loading-dot';
 
 const IguideMELoading: FC = () => {
   return (
@@ -63,7 +63,7 @@ const PermissionValidator: FC = (): ReactElement => {
 
   if (!self.settings?.consent) {
     return (
-      <div className='mx-auto max-w-3xl p-5 space-y-5'>
+      <div className='mx-auto max-w-3xl space-y-5 p-5'>
         <h1 className='text-xl font-bold tracking-tight'>Informed Consent</h1>
         <ConsentText />
         <p className='text-justify text-text'>
@@ -73,7 +73,7 @@ const PermissionValidator: FC = (): ReactElement => {
           zetten.&quot;
         </p>
 
-        <Row justify={'center'}>
+        <div className='flex w-full items-center justify-center gap-4'>
           <Button
             className='custom-default-button'
             onClick={() => {
@@ -90,7 +90,7 @@ const PermissionValidator: FC = (): ReactElement => {
           >
             Accept
           </Button>
-        </Row>
+        </div>
       </div>
     );
   }
@@ -112,7 +112,7 @@ const PermissionValidator: FC = (): ReactElement => {
 
   if (self.settings.goal_grade <= 0) {
     return (
-      <div className='flex justify-center flex-col items-center'>
+      <div className='flex flex-col items-center justify-center'>
         <GoalGrade goalGrade={self.settings.goal_grade} user={self} />
       </div>
     );

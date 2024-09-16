@@ -75,7 +75,6 @@ public static class DatabaseQueries
             FOREIGN KEY(`user_id`) REFERENCES `users`(`user_id`)
             FOREIGN KEY(`course_id`) REFERENCES `course_settings`(`course_id`)
             PRIMARY KEY(`timestamp`, `user_id`, `session_id`)
-            UNIQUE(`timestamp`, `user_id`)
         );";
 
     public const string CREATE_INDEX_USER_TRACKER_USER_ID =
@@ -1706,16 +1705,6 @@ public static class DatabaseQueries
           LIMIT           1;";
 
     public const string INSERT_USER_ACTION =
-        @"INSERT INTO   `user_tracker` (`user_id`,`action`,`action_detail`,`session_id`,`course_id`)
-          VALUES        (
-            @userID,
-            @action,
-            @actionDetail,
-            @sessionID,
-            @courseID
-          );";
-
-    public const string INSERT_USER_ACTION_TEST =
         @"INSERT INTO   `user_tracker` (`user_id`,`action`,`action_detail`,`session_id`,`course_id`)
           VALUES        (
             @userID,

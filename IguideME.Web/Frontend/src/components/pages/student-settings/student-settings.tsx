@@ -1,22 +1,30 @@
-import { ActionTypes, trackEvent } from '@/utils/analytics';
-import { Checkbox, Collapse, Radio, Switch, Tooltip } from 'antd';
 import { postConsentSettings, postGoalGrade, postNotificationSettings } from '@/api/student_settings';
-import { toast } from 'sonner';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { type FC, type ReactElement, useEffect } from 'react';
+import { getSelf } from '@/api/users';
+import QueryError from '@/components/particles/QueryError';
+import QueryLoading from '@/components/particles/QueryLoading';
 import { type User, UserRoles } from '@/types/user';
-import { useGlobalContext } from '@/components/crystals/layout/GlobalStore/useGlobalStore';
-import { useShallow } from 'zustand/react/shallow';
-import { Navigate } from 'react-router-dom';
+import { ActionTypes, trackEvent } from '@/utils/analytics';
 import { useRequiredParams } from '@/utils/params';
-import { ExclamationCircleOutlined } from '@ant-design/icons';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Checkbox, Collapse, Radio, Switch } from 'antd';
+import { type FC, type ReactElement, useEffect, useState } from 'react';
+import { Navigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 const StudentSettings: FC = (): ReactElement => {
   const { courseId, studentId } = useRequiredParams(['courseId', 'studentId']);
-  const { self } = useGlobalContext(useShallow((state) => ({ self: state.self })));
+
+  const {
+    data: self,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ['self'],
+    queryFn: getSelf,
+  });
 
   useEffect(() => {
-    if (self.role === UserRoles.student) {
+    if (self?.role === UserRoles.student) {
       trackEvent({
         userID: self.userID,
         action: ActionTypes.page,
@@ -28,15 +36,22 @@ const StudentSettings: FC = (): ReactElement => {
     }
   }, []);
 
-  if (self.role !== UserRoles.student) return <Navigate to={`/${courseId}/${studentId}`} replace />;
+  if (self?.role !== UserRoles.student) return <Navigate to={`/${courseId}/${studentId}`} replace />;
 
   return (
-    <div className='flex w-full flex-col gap-4 p-4'>
-      <h1 className='text-4xl'>Settings</h1>
-      <Notifications notifications={self.settings ? self.settings.notifications : false} user={self} />
-      <GoalGrade goalGrade={self.settings ? self.settings.goal_grade : 0} user={self} />
-      <Consent consent={self.settings ? self.settings.consent : false} />
-    </div>
+    <QueryLoading isLoading={isLoading}>
+      <div className='flex w-full flex-col gap-4 p-4'>
+        <h1 className='text-4xl'>Settings</h1>
+        {isError ?
+          <QueryError className='relative' title='Failed to load students.' />
+        : <>
+            <Notifications notifications={self.settings ? self.settings.notifications : false} user={self} />
+            <GoalGrade goalGrade={self.settings ? self.settings.goal_grade : 0} user={self} />
+            <Consent consent={self.settings ? self.settings.consent : false} />
+          </>
+        }
+      </div>
+    </QueryLoading>
   );
 };
 
@@ -94,6 +109,8 @@ interface GoalProps {
 }
 
 const GoalGrade: FC<GoalProps> = ({ goalGrade, user }): ReactElement => {
+  const [currentGoalGrade, setCurrentGoalGrade] = useState<number>(goalGrade);
+
   const queryClient = useQueryClient();
   const { mutate: saveGoalGrade, status } = useMutation({
     mutationFn: postGoalGrade,
@@ -112,23 +129,18 @@ const GoalGrade: FC<GoalProps> = ({ goalGrade, user }): ReactElement => {
 
   return (
     <div id='desiredGrade'>
-      <div className='mb-2 flex items-center gap-2'>
-        <h1 className='text-2xl'>Goal Grade</h1>
-        {goalGrade === 0 && (
-          <Tooltip title='You have not set a goal grade yet.'>
-            <ExclamationCircleOutlined className='text-lg text-failure' />
-          </Tooltip>
-        )}
-      </div>
+      <h1 className='mb-2 text-2xl'>Goal Grade</h1>
       <p className='text-justify'>
         Please indicate the grade you wish to obtain for this course. You can always change your goal at a later stage!
       </p>
       <div className='mt-2 w-full'>
         <Radio.Group
           className='custom-radio-group flex w-full flex-nowrap overflow-x-auto overflow-y-hidden'
-          value={goalGrade}
+          value={currentGoalGrade}
           onChange={(val) => {
-            saveGoalGrade(Number(val.target.value));
+            const newGoalGrade = Number(val.target.value);
+            setCurrentGoalGrade(newGoalGrade);
+            saveGoalGrade(newGoalGrade);
 
             trackEvent({
               userID: user.userID,

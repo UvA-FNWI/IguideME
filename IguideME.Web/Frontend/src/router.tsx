@@ -4,10 +4,10 @@ import { type AxiosError } from 'axios';
 import { createBrowserRouter, redirect } from 'react-router-dom';
 import { type Course, getCourseById } from './api/courses';
 import { getStudent } from './api/users';
+import PermissionValidator from './components/crystals/permission-validator/permission-validator';
 import CourseSelection from './components/pages/courses-selection/CourseSelection';
 import NotFound from './components/pages/NotFound';
 import { type User } from './types/user';
-import PermissionValidator from './components/crystals/permission-validator/permission-validator';
 
 export const createRouter = (): ReturnType<typeof createBrowserRouter> =>
   createBrowserRouter(
@@ -114,7 +114,7 @@ export const createRouter = (): ReturnType<typeof createBrowserRouter> =>
                     },
                     {
                       href: `/${params.courseId}/${params.studentId}`,
-                      label: `${data.user.name.split(' ')[0]}'s Dashboard`,
+                      label: `${data.user.name?.split(' ')[0] || 'User'}'s Dashboard`,
                     },
                   ],
                 },
@@ -147,7 +147,7 @@ export const createRouter = (): ReturnType<typeof createBrowserRouter> =>
                     },
                     {
                       href: `/${params.courseId}/${params.studentId}`,
-                      label: `${data.user.name.split(' ')[0]}'s Dashboard`,
+                      label: `${data.user.name?.split(' ')[0] || 'User'}'s Dashboard`,
                     },
                     {
                       href: `/${params.courseId}/${params.studentId}/settings`,

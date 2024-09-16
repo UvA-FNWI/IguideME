@@ -28,7 +28,7 @@ namespace IguideME.Web.Services
             }
             else
             {
-                _connection_string = "Data Source=/data/IguideME2.db;Version=3;New=False;Compress=True;";
+                _connection_string = "Data Source=IguideME2.db;Version=3;New=False;Compress=True;";
             }
 
             DatabaseManager.s_instance.RunMigrations();
@@ -3284,10 +3284,18 @@ namespace IguideME.Web.Services
             return false;
         }
 
+        /// <summary>
+        /// Inserts a user action into the database.
+        /// </summary>
+        /// <param name="userID">The ID of the user performing the action.</param>
+        /// <param name="action">The type of action performed by the user.</param>
+        /// <param name="actionDetail">Additional details about the action.</param>
+        /// <param name="courseID">The ID of the course associated with the action.</param>
+        /// <param name="timeStamp">The timestamp of when the action occurred, represented as the number of seconds since the Unix epoch.</param>
         public void InsertUserAction(string userID, ActionTypes action, string actionDetail, int courseID)
         {
-            NonQuery(DatabaseQueries.INSERT_USER_ACTION_TEST,
-    new SQLiteParameter("userID", userID),
+            NonQuery(DatabaseQueries.INSERT_USER_ACTION,
+                new SQLiteParameter("userID", userID),
                 new SQLiteParameter("action", action),
                 new SQLiteParameter("actionDetail", actionDetail),
                 new SQLiteParameter("courseID", courseID)
