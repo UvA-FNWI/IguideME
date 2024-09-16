@@ -1,4 +1,6 @@
-import Swal from 'sweetalert2';
+import { deleteTile, patchTile } from '@/api/tiles';
+import { printGradingType } from '@/types/grades';
+import { TileType, type Tile } from '@/types/tile';
 import {
   BellOutlined,
   CarryOutOutlined,
@@ -8,15 +10,13 @@ import {
   EyeOutlined,
   FormOutlined,
 } from '@ant-design/icons';
-import { Col, Row, Space, Tooltip } from 'antd';
-import { CSS } from '@dnd-kit/utilities';
-import { deleteTile, patchTile } from '@/api/tiles';
-import { useDrawerStore } from '../tile-group-board/useDrawerStore';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSortable } from '@dnd-kit/sortable';
-import { TileType, type Tile } from '@/types/tile';
+import { CSS } from '@dnd-kit/utilities';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { Col, Row, Space, Tooltip } from 'antd';
 import { useMemo, type FC, type ReactElement } from 'react';
-import { printGradingType } from '@/types/grades';
+import Swal from 'sweetalert2';
+import { useDrawerStore } from '../tile-group-board/useDrawerStore';
 
 interface Props {
   tile: Tile;
@@ -101,13 +101,13 @@ const AdminTileView: FC<Props> = ({ tile, move }): ReactElement => {
             <Tooltip title={<>This tile is {!tile.visible && <b>not </b>}visible for students</>}>
               {tile.visible ?
                 <EyeOutlined
-                  className='text-success text-xs'
+                  className='text-xs text-success'
                   onClick={(event) => {
                     clickThrough(event, toggleVisible);
                   }}
                 />
               : <EyeInvisibleOutlined
-                  className='text-failure text-xs'
+                  className='text-xs text-failure'
                   onClick={(event) => {
                     clickThrough(event, toggleVisible);
                   }}
@@ -150,7 +150,7 @@ const AdminTileView: FC<Props> = ({ tile, move }): ReactElement => {
                 }
               });
             }}
-            className='text-failure pr-1'
+            className='pr-1 text-failure'
           />
         </Col>
       </Row>
@@ -216,6 +216,8 @@ const TileTypeView: FC<{ tileType: TileType }> = ({ tileType }): ReactElement =>
           </Space>
         </Tooltip>
       );
+    default:
+      throw new Error(`Unknown tile type: ${tileType}`);
   }
 };
 

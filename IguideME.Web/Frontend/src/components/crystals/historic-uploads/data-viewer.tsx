@@ -1,7 +1,7 @@
 import type { Submission } from '@/types/grades';
 import type { TileEntry } from '@/types/tile';
 import type { User } from '@/types/user';
-import { Col, Input, Row, Table } from 'antd';
+import { Col, Row, Select, Table } from 'antd';
 import { useState, type FC } from 'react';
 
 interface DataViewerProps {
@@ -24,13 +24,23 @@ const DataViewer: FC<DataViewerProps> = ({ tileEntry, submissions, students }) =
           <h2 className='mb-2 text-xl'>Student Grades</h2>
 
           <label>Find student by name</label>
-          <Input
+          <Select
             className='mb-4 w-full border-accent/50 bg-surface1 text-text hover:border-accent hover:bg-surface2 focus:border-accent focus:shadow-sm focus:shadow-accent aria-invalid:!border-failure aria-invalid:shadow-none aria-invalid:focus:!shadow-sm aria-invalid:focus:!shadow-failure'
             size={'large'}
             value={query}
+            showSearch
             placeholder={'Student name or id'}
-            onChange={(e) => {
-              setQuery(e.target.value);
+            options={students.map((student) => ({
+              label: `${student.name} (${student.userID})`,
+              value: student.userID,
+            }))}
+            filterOption={(input, option) => {
+              const label = option?.label?.toLowerCase() || '';
+              const value = option?.value?.toLowerCase() || '';
+              return label.includes(input.toLowerCase()) || value.includes(input.toLowerCase());
+            }}
+            onChange={(value) => {
+              setQuery(value);
             }}
           />
 

@@ -1,13 +1,15 @@
+import { deleteTileEntry, getTileSubmissions } from '@/api/tiles';
+import QueryError from '@/components/particles/QueryError';
+import QueryLoading from '@/components/particles/QueryLoading';
 import { GradingType, type Submission } from '@/types/grades';
 import type { Tile, TileEntry } from '@/types/tile';
-import { Button, Drawer, Space, Table } from 'antd';
-import { useState, type FC } from 'react';
-import DataViewer from './data-viewer';
-import type { ColumnsType } from 'antd/lib/table';
-import Swal from 'sweetalert2';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { deleteTileEntry, getTileSubmissions } from '@/api/tiles';
 import type { User } from '@/types/user';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Button, Drawer, Space, Table } from 'antd';
+import type { ColumnsType } from 'antd/lib/table';
+import { useState, type FC } from 'react';
+import Swal from 'sweetalert2';
+import DataViewer from './data-viewer';
 // @ts-expect-error -- Has no declaration file
 import compute from 'compute.io';
 
@@ -38,8 +40,16 @@ const HistoricUploads: FC<HistoricUploadsProps> = ({ tile, entries, students }) 
     },
   });
 
+  if (isError) {
+    return (
+      <div className='relative h-20 w-full'>
+        <QueryError className='!p-0' title='Failed to load submissions' />
+      </div>
+    );
+  }
+
   return (
-    <div>
+    <QueryLoading isLoading={isLoading}>
       <Drawer
         width='100%'
         open={open && openEntry !== undefined}
@@ -65,7 +75,7 @@ const HistoricUploads: FC<HistoricUploadsProps> = ({ tile, entries, students }) 
         scroll={{ x: 1000 }}
         dataSource={formatData(tile, entries, submissions ?? [])}
       />
-    </div>
+    </QueryLoading>
   );
 };
 export default HistoricUploads;

@@ -1,8 +1,8 @@
 import tailwindConfig from '@/../tailwind.config';
 import GraphGrade from '@/components/atoms/graph-grade/graph-grade';
+import { printGrade, type Grades } from '@/types/grades';
 import { type TooltipProps } from '@/types/reactRecharts';
 import { TileType } from '@/types/tile';
-import { type Grades, printGrade } from '@/types/grades';
 import { memo, type FC, type ReactElement } from 'react';
 import { Legend, PolarAngleAxis, RadialBar, RadialBarChart, Tooltip } from 'recharts';
 import resolveConfig from 'tailwindcss/resolveConfig';
@@ -15,10 +15,13 @@ interface Props {
 const GraphTile: FC<Props> = memo(({ type, grades }): ReactElement => {
   switch (type) {
     case TileType.assignments:
+      return <GraphGrade {...grades} />;
     case TileType.discussions:
       return <GraphGrade {...grades} />;
     case TileType.learning_outcomes:
       return <GraphLearning {...grades} />;
+    default:
+      throw new Error(`Unknown tile type: ${type}`);
   }
 });
 GraphTile.displayName = 'GraphTile';
@@ -28,7 +31,7 @@ const GraphLearning: FC<Grades> = memo(({ type, grade, peerAvg, max }): ReactEle
     if (active && payload && payload.length > 0) {
       const data = payload[0].payload;
       return (
-        <div className='border-text bg-surface1/85 z-50 rounded-lg border border-solid p-2'>
+        <div className='z-50 rounded-lg border border-solid border-text bg-surface1/85 p-2'>
           <p>Completed: {printGrade(type, Number(data.grade), max)}</p>
         </div>
       );
