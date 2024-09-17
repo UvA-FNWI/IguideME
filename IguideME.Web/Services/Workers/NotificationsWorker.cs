@@ -151,6 +151,7 @@ namespace IguideME.Web.Services.Workers
 
             foreach (User student in students)
             {
+                _logger.LogInformation("Handling notifications for {} for course {}", student.UserID, _courseID);
                 if (!_databaseManager.GetNotificationEnable(this._courseID, student.UserID, this._syncID))
                 {
                     _logger.LogInformation("Not sending to {ID}, they have notifications disabled", student.UserID);

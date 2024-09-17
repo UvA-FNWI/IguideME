@@ -388,11 +388,15 @@ namespace IguideME.Web.Services.Workers
 
             foreach (string user in users)
             {
+                _logger.LogInformation("Creating notification for user {}", user);
+
                 foreach (KeyValuePair<int, List<double>> entry in grades)
                 {
                     // Get only tiles with notifications
                     if (_databaseManager.GetTileNotificationState(entry.Key))
                     {
+                        _logger.LogInformation("Handling tile {}", entry.Key);
+
                         List<AssignmentSubmission> userTileSubmissions =
                             _databaseManager.GetTileSubmissionsForUser(
                                 entry.Key,

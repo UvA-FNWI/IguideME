@@ -28,7 +28,7 @@ namespace IguideME.Web.Services
             }
             else
             {
-                _connection_string = "Data Source=IguideME2.db;Version=3;New=False;Compress=True;";
+                _connection_string = "Data Source=/data/IguideME2.db;Version=3;New=False;Compress=True;";
             }
 
             DatabaseManager.s_instance.RunMigrations();
@@ -806,6 +806,7 @@ namespace IguideME.Web.Services
                             r2.GetInt32(3),
                             r2.GetBoolean(4)
                         );
+                        _logger.LogInformation("User {} notifications {}", user.UserID, user.Settings.Notifications);
                     }
                 }
             }
@@ -1185,6 +1186,7 @@ namespace IguideME.Web.Services
                 {
                     try
                     {
+                        _logger.LogInformation("notif: {} {}", r.IsDBNull(0), r.GetBoolean(0));
                         if (r.IsDBNull(0)) result = false;
                         else result = r.GetBoolean(0);
                     }
@@ -1211,6 +1213,7 @@ namespace IguideME.Web.Services
             // When it is done by the user, we get the last available syncID, to replace the settings instead of register them
             long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
             User tempUser = new User(userID, courseID, -1, "", "-1", (int)UserRoles.student);
+            _logger.LogInformation("Updating settings for user {} for course {}: consent {} notifications () goal {} total {}", userID, courseID, consent, notifications, goalGrade, totalGrade);
 
             using (
                 SQLiteDataReader r = Query(
@@ -1239,7 +1242,7 @@ namespace IguideME.Web.Services
                 }
             }
 
-            _logger.LogInformation("Updating user Notifications to {}", tempUser.Settings.Notifications);
+            _logger.LogInformation("Actually updating user Notifications to {}", tempUser.Settings.Notifications);
 
             NonQuery(
                 DatabaseQueries.REGISTER_STUDENT_SETTINGS,
@@ -2205,6 +2208,7 @@ namespace IguideME.Web.Services
             long syncID = 0
         )
         {
+            _logger.LogInformation("Registering notification: {} for tile {} for user {}", status, tileID, userID);
             long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
 
             NonQuery(
