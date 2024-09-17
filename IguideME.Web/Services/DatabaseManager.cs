@@ -1225,11 +1225,11 @@ namespace IguideME.Web.Services
                     try
                     {
                         tempUser.Settings = new UserSettings(
-                            goalGrade ?? r.GetInt32(0),
-                            totalGrade ?? r.GetDouble(1),
-                            predictedGrade ?? r.GetDouble(2),
-                            consent ?? r.GetInt32(3),
-                            notifications ?? r.GetBoolean(4)
+                            goalGrade ?? (r.IsDBNull(0) ? -1 : r.GetInt32(0)),
+                            totalGrade ?? (r.IsDBNull(1) ? 0.0 : r.GetDouble(1)),
+                            predictedGrade ?? (r.IsDBNull(2) ? 0.0 : r.GetDouble(2)),
+                            consent ?? (r.IsDBNull(3) ? 0 : r.GetInt32(3)),
+                            notifications ?? (!r.IsDBNull(4) && r.GetBoolean(4))
                         );
                     }
                     catch (Exception e)
