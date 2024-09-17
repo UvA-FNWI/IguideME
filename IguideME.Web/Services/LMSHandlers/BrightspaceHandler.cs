@@ -363,7 +363,7 @@ namespace IguideME.Web.Services
                         INNER JOIN  users
                             ON      users.user_id = grade_results.user_id
                         WHERE       grade_results.org_unit_id = @courseID
-                        AND         is_released = TRUE
+                        AND         is_released != FALSE
                         AND         grade_results.user_id
                             IN      ({string.Join(",", users.Select((_, index) => $"@userID{index}"))})",
                     parameters
