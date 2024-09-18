@@ -37,8 +37,7 @@ namespace IguideME.Web.Models
 	{
 		assignments,
 		discussions,
-		learning_outcomes,
-		external
+		learning_outcomes
 	}
 
 	public class Tile

@@ -1,4 +1,3 @@
-import EditTileExternal from '@/components/atoms/edit-tile-external/edit-tile-external';
 import EditTileAssignments from '@/components/atoms/edit-tile-assignments/edit-tile-assignments';
 import EditTileDiscussions from '@/components/atoms/edit-tile-discussions/edit-tile-discussions';
 import EditTileGoals from '@/components/atoms/edit-tile-goals/edit-tile-goals';
@@ -82,7 +81,7 @@ const EditTile: FC<Props> = ({ tile }): ReactElement => {
       >
         <p>Title:</p>
         <Item name='title' rules={[{ required: true, message: 'Please insert a title for the tile' }]} noStyle>
-          <Input className='w-full border-accent/50 bg-surface1 text-text hover:border-accent hover:bg-surface2 focus:border-accent focus:shadow-sm focus:shadow-accent aria-invalid:!border-failure aria-invalid:shadow-none aria-invalid:focus:!shadow-sm aria-invalid:focus:!shadow-failure' />
+          <Input className='border-accent/50 bg-surface1 text-text hover:border-accent hover:bg-surface2 focus:border-accent focus:shadow-accent aria-invalid:!border-failure aria-invalid:shadow-none aria-invalid:focus:!shadow-sm aria-invalid:focus:!shadow-failure w-full focus:shadow-sm' />
         </Item>
         <div className='flex gap-2'>
           <Item name='notifications' noStyle>
@@ -104,7 +103,7 @@ const EditTile: FC<Props> = ({ tile }): ReactElement => {
       <div className='flex gap-2'>
         <Item>
           <Button
-            className='min-w-20 bg-success shadow-none hover:!bg-success/80 [&_span]:text-text'
+            className='bg-success hover:!bg-success/80 [&_span]:text-text min-w-20 shadow-none'
             type='primary'
             htmlType='submit'
           >
@@ -114,7 +113,7 @@ const EditTile: FC<Props> = ({ tile }): ReactElement => {
 
         <Item>
           <Button
-            className='min-w-20 bg-failure hover:!bg-failure/80 [&_span]:text-text'
+            className='bg-failure hover:!bg-failure/80 [&_span]:text-text min-w-20'
             type='primary'
             onClick={() => {
               void Swal.fire({
@@ -149,8 +148,6 @@ const EditTile: FC<Props> = ({ tile }): ReactElement => {
         return <EditTileDiscussions />;
       case TileType.learning_outcomes:
         return <EditTileGoals />;
-      case TileType.external:
-        return <EditTileExternal />;
       default:
         return <></>;
     }
@@ -171,7 +168,7 @@ const TypeSelector: FC<TypeSelectorProps> = ({ value, onChange, form }): ReactEl
 
   return (
     <Select
-      className='w-full [&>div]:!border-border1 [&>div]:!bg-surface1 [&>div]:!shadow-none [&>div]:hover:!bg-surface2 [&_span]:!text-text'
+      className='[&>div]:!border-border1 [&>div]:!bg-surface1 [&>div]:hover:!bg-surface2 [&_span]:!text-text w-full [&>div]:!shadow-none'
       dropdownClassName='bg-surface1 [&_div]:!text-text selectionSelected'
       options={[
         { value: TileType.assignments, label: 'Assignments' },
@@ -179,10 +176,6 @@ const TypeSelector: FC<TypeSelectorProps> = ({ value, onChange, form }): ReactEl
         {
           value: TileType.learning_outcomes,
           label: 'Learning Outcomes',
-        },
-        {
-          value: TileType.external,
-          label: 'External Data',
         },
       ]}
       value={value}
@@ -199,7 +192,7 @@ const Notification: FC<{
 
   return (
     <Button
-      className='grid place-content-center border-border1 bg-surface1 text-text hover:!border-border1 hover:!bg-surface2'
+      className='border-border1 bg-surface1 text-text hover:!border-border1 hover:!bg-surface2 grid place-content-center'
       shape='circle'
       icon={<BellOutlined className={`${notifications ? 'text-success' : 'text-failure'}`} />}
       onClick={() => {
@@ -216,12 +209,12 @@ const Visible: FC<{ value?: boolean; onChange?: (value: boolean) => void }> = ({
 
   return (
     <Button
-      className='grid place-content-center border-border1 bg-surface1 text-text hover:!border-border1 hover:!bg-surface2'
+      className='border-border1 bg-surface1 text-text hover:!border-border1 hover:!bg-surface2 grid place-content-center'
       shape='circle'
       icon={
         visible === true ?
-          <CheckCircleOutlined className='text-xs text-success' />
-        : <StopOutlined className='text-xs text-failure' />
+          <CheckCircleOutlined className='text-success text-xs' />
+        : <StopOutlined className='text-failure text-xs' />
       }
       onClick={() => {
         if (visible === undefined) return;

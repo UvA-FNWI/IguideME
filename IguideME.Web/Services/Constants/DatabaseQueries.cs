@@ -9,12 +9,12 @@ public static class DatabaseQueries
     public static readonly Dictionary<string, string> MIGRATIONS =
         new()
         {
-            // {
-            // "000_add_alt_column_to_tile",
-            // @"
-            // ALTER TABLE `tiles` ADD COLUMN `alt`
-            // ;"
-            // }
+            {
+            "000_remove_external_data_tiles",
+            @"
+            DELETE FROM `tiles` WHERE `type` = 3
+            ;"
+            }
         };
 
     // //================================ Tables ================================//
