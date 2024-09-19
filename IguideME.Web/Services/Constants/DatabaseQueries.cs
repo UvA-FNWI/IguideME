@@ -1453,7 +1453,6 @@ public static class DatabaseQueries
         INNER JOIN  `tile_entries`
             ON      `submissions`.`assignment_id` = `tile_entries`.`content_id`
         WHERE       `tile_entries`.`tile_id`=@tileID
-        AND         `submissions`.`user_id`=@userID
         ;";
 
     public const string QUERY_ALL_USER_SUBMISSIONS_FOR_TILE =

@@ -1909,6 +1909,37 @@ namespace IguideME.Web.Services
             return submissions;
         }
 
+        public List<AssignmentSubmission> GetTileSubmissions(
+            int tileID,
+            long syncID = 0
+        )
+        {
+            List<AssignmentSubmission> submissions = new();
+
+            using (
+                SQLiteDataReader r1 = Query(
+                    DatabaseQueries.QUERY_TILE_SUBMISSIONS_FOR_STUDENT,
+                    new SQLiteParameter("tileID", tileID)
+                )
+            )
+            {
+                while (r1.Read())
+                {
+                    AssignmentSubmission submission =
+                        new(
+                            r1.GetInt32(0),
+                            r1.GetInt32(1),
+                            r1.GetValue(2).ToString(),
+                            r1.GetDouble(3),
+                            r1.GetInt32(4)
+                        );
+                    submissions.Add(submission);
+                }
+            }
+
+            return submissions;
+        }
+
         public Dictionary<int, List<List<object>>> GetHistoricComparison(
             int courseID,
             string userID,

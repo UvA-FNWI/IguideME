@@ -534,26 +534,26 @@ namespace IguideME.Web.Controllers
 		}
 
 
-		// [Authorize]
-		// [HttpGet]
-		// [Route("/tiles/{tileID}/submissions")]
-		// [ProducesResponseType(StatusCodes.Status204NoContent)]
-		// [ProducesResponseType(StatusCodes.Status400BadRequest)]
-		// [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-		// public ActionResult GetTileSubmissions(string tileID)
-		// {
-		//     // Only instructors may view submissions of other students
-		//     if (!this.IsAdministrator())
-		//         return Unauthorized();
+		[Authorize]
+		[HttpGet]
+		[Route("/tiles/{tileID}/submissions")]
+		[ProducesResponseType(StatusCodes.Status204NoContent)]
+		[ProducesResponseType(StatusCodes.Status400BadRequest)]
+		[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+		public ActionResult GetTileSubmissions(string tileID)
+		{
+			// Only instructors may view submissions of other students
+			if (!this.IsAdministrator())
+				return Unauthorized();
 
-		//     bool success = int.TryParse(tileID, out int id);
+			if (int.TryParse(tileID, out int id))
+			{
+				return Ok(_databaseManager.GetTileSubmissions(this.GetCourseID(), id));
+			}
 
-		//     return success
-		//         ? Json(
-		//             _databaseManager.GetTileSubmissions(
-		//                 this.GetCourseID(), id))
-		//         : BadRequest();
-		// }
+			return BadRequest();
+
+		}
 
 		// [Authorize]
 		// [HttpGet]
@@ -758,26 +758,6 @@ namespace IguideME.Web.Controllers
 
 			return NoContent();
 		}
-
-		// [Authorize(Policy = "IsInstructor")]
-		// [HttpGet]
-		// // DBrefTODO: The entry Id should be changed into assignmentID
-		// // [Route("/entries/{entryID}/submissions")]
-		// [Route("/entries/{assignmentID}/submissions")]
-		// [ProducesResponseType(StatusCodes.Status204NoContent)]
-		// [ProducesResponseType(StatusCodes.Status400BadRequest)]
-		// [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-		// public ActionResult GetEntrySubmissions(string assignmentID)
-		// {
-		//     // TODO: check userID?
-		//     bool success = int.TryParse(assignmentID, out int entry_id);
-
-		//     return success
-		//         ? Json(
-		//             _databaseManager.GetAssignmentSubmissions(
-		//                 this.GetCourseID(), entry_id))
-		//         : BadRequest();
-		// }
 
 		// [Authorize]
 		// [HttpGet]

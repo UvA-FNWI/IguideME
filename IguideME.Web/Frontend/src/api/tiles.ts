@@ -78,16 +78,8 @@ export async function uploadData({
     .then((response) => response.data);
 }
 
-export async function getTileSubmissions({
-  tileId,
-  userID,
-}: {
-  tileId: number;
-  userID?: string;
-}): Promise<Submission[]> {
-  return await apiClient
-    .get(userID ? `tiles/${tileId}/submissions/${userID}` : `tiles/${tileId}/submissions`)
-    .then((response) => response.data);
+export async function getTileSubmissions({ tileId }: { tileId: number }): Promise<Submission[]> {
+  return await apiClient.get(`tiles/${tileId}/submissions`).then((response) => response.data);
 }
 
 export async function AddDataWizardTile({ tileId, groupId }: { tileId: number; groupId: number }): Promise<void> {
