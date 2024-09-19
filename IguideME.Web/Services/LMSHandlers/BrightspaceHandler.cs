@@ -379,32 +379,26 @@ namespace IguideME.Web.Services
                         _logger.LogInformation("user {}, text {}, num {}, den {}", r.GetValue(1), r.GetValue(4), r.GetValue(2), r.GetValue(3));
                         if (rawGrade.IsNullOrEmpty())
                         {
-                            submissions.Add(
-                                new AssignmentSubmission(
-                                    -1,
-                                    -1, ///// ????
-                                    r.GetInt32(0),
-                                    r.GetValue(1).ToString(),
-                                    (r.IsDBNull(2) || r.GetDouble(2) == 0 || r.IsDBNull(3))
-                                        ? "0"
-                                        : (r.GetDouble(2) / r.GetDouble(3)).ToString(),
-                                    r.GetValue(5).ToString()
-                                )
-                            );
+                            if (r.IsDBNull(2) || r.GetDouble(2) == 0)
+                            {
+                                rawGrade = "0";
+                            }
+                            else
+                            {
+                                rawGrade = (r.IsDBNull(3) ? r.GetDouble(2) : (r.GetDouble(2) / r.GetDouble(3))).ToString();
+                            }
                         }
-                        else
-                        {
-                            submissions.Add(
-                                new AssignmentSubmission(
-                                    -1,
-                                    -1, ///// ???
-                                    r.GetInt32(0),
-                                    r.GetValue(1).ToString(),
-                                    rawGrade,
-                                    r.GetValue(5).ToString()
-                                )
-                            );
-                        }
+
+                        submissions.Add(
+                            new AssignmentSubmission(
+                                -1,
+                                -1, ///// ???
+                                r.GetInt32(0),
+                                r.GetValue(1).ToString(),
+                                rawGrade,
+                                r.GetValue(5).ToString()
+                            )
+                        );
                     }
                     catch (Exception e)
                     {

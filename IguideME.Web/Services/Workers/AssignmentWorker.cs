@@ -118,7 +118,7 @@ namespace IguideME.Web.Services.Workers
                             grade = LetterToGrade(submission.rawGrade);
                             break;
                         case AppGradingType.PassFail:
-                            _logger.LogInformation("passfail text: {Grade}", submission.Grade);
+                            _logger.LogInformation("passfail text: {Grade}", submission.rawGrade);
                             // TODO: test in canvas
                             grade = (submission.rawGrade == "FAIL" || submission.rawGrade == "0") ? 0 : 100;
                             break;
