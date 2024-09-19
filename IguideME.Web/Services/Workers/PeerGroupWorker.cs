@@ -378,119 +378,120 @@ namespace IguideME.Web.Services.Workers
 
                 CalculateGrades(peerGroup, tiles);
                 StorePeerStatistics(goalGrade, peerGroup);
-                CreateNotifications(groupedUsers[goalGrade], peerEntryGradesMap);
+                CreateNotifications(groupedUsers[goalGrade]);
             }
         }
 
-        void CreateNotifications(List<string> users, Dictionary<int, List<double>> grades)
+        void CreateNotifications(List<string> users)
         {
             this._logger.LogInformation("Creating Notifications for Peer Group");
-
             foreach (string user in users)
             {
-                _logger.LogInformation("Creating notification for user {}", user);
+                CreateNotificationsForUser(user);
+            }
+        }
 
-                foreach (KeyValuePair<int, List<double>> entry in grades)
+        void CreateNotificationsForUser(string user)
+        {
+            _logger.LogInformation("Creating notification for user {}", user);
+            foreach ((int tileID, List<double> peerGrades) in this.peerTileGradesMap)
+            {
+                _logger.LogInformation("test {} {}", _databaseManager.GetTileNotificationState(tileID), tileID);
+
+                // Get only tiles with notifications
+                if (_databaseManager.GetTileNotificationState(tileID))
                 {
-                    // Get only tiles with notifications
-                    if (_databaseManager.GetTileNotificationState(entry.Key))
-                    {
-                        _logger.LogInformation("Handling tile {}", entry.Key);
-
-                        List<AssignmentSubmission> userTileSubmissions =
-                            _databaseManager.GetTileSubmissionsForUser(
-                                entry.Key,
-                                user,
-                                this._syncID
-                            );
-
-                        // Find the submission with the highest ID, as it is the most recent
-                        int lastSubmissionID = -1;
-                        foreach (AssignmentSubmission submission in userTileSubmissions)
-                            if (submission.ID > lastSubmissionID)
-                                lastSubmissionID = submission.ID;
-
-                        // Create one list with all the submission grades and one more without the most recent submission
-                        List<double> currentSubmissionGrades = new();
-                        List<double> lastSubmissionGrades = new();
-                        foreach (AssignmentSubmission submission in userTileSubmissions)
-                        {
-                            currentSubmissionGrades.Add(submission.Grade);
-                            if (submission.ID != lastSubmissionID)
-                                lastSubmissionGrades.Add(submission.Grade);
-                        }
-
-                        double currentAverage = -1;
-                        double lastAverage = -1;
-                        double peerAverage = -1;
-                        // Store the three important Averages in variables
-                        if (currentSubmissionGrades.Count != 0)
-                            currentAverage = currentSubmissionGrades.Average();
-                        if (lastSubmissionGrades.Count != 0)
-                            lastAverage = lastSubmissionGrades.Average();
-                        if (entry.Value != null)
-                            peerAverage = entry.Value.Average();
-
-                        if (currentAverage != -1 && peerAverage != 0)
-                        {
-                            if (currentAverage >= peerAverage) // +1)
-                            {
-                                // outperform
-                                _databaseManager.RegisterNotification(
-                                    this._courseID,
-                                    user,
-                                    entry.Key,
-                                    (int)Notification_Types.outperforming,
-                                    this._syncID
-                                );
-                            }
-                            // else if (currentAverage >= peerAverage)
-                            // {
-                            //     // do nothing
-                            // }
-                            else if (currentAverage - lastAverage > 0)
-                            {
-                                // closing the gap
-                                _databaseManager.RegisterNotification(
-                                    this._courseID,
-                                    user,
-                                    entry.Key,
-                                    (int)Notification_Types.closing_gap,
-                                    this._syncID
-                                );
-                            }
-                            else if (
-                                (currentAverage - lastAverage <= 0)
-                                && (peerAverage - currentAverage <= 1)
-                            )
-                            {
-                                // falling behind
-                                _databaseManager.RegisterNotification(
-                                    this._courseID,
-                                    user,
-                                    entry.Key,
-                                    (int)Notification_Types.falling_behind,
-                                    this._syncID
-                                );
-                            }
-                            else if (
-                                (currentAverage - lastAverage <= 0)
-                                && (peerAverage - currentAverage > 1)
-                            )
-                            {
-                                // put more effort
-                                _databaseManager.RegisterNotification(
-                                    this._courseID,
-                                    user,
-                                    entry.Key,
-                                    (int)Notification_Types.more_effort,
-                                    this._syncID
-                                );
-                            }
-                        }
-                    }
+                    CreateTileNotifications(user, tileID, peerGrades);
                 }
             }
+        }
+
+        void CreateTileNotifications(string user, int tileID, List<double> peerGrades)
+        {
+            _logger.LogInformation("Handling tile {}", tileID);
+
+            if (!peerGrades.Any())
+            {
+                _logger.LogInformation("No peer grades found");
+                return;
+            }
+
+            List<AssignmentSubmission> submissions = _databaseManager.GetTileSubmissionsForUser(
+                    tileID,
+                    user,
+                    this._syncID
+            );
+
+            if (!submissions.Any())
+            {
+                _logger.LogInformation("No submissions found.");
+                return;
+            }
+
+            // Sort the submissions by their submission id. Since these are autoincrement this means that the most
+            // recent addition will be last.
+            submissions.Sort((A, B) => A.ID.CompareTo(B.ID));
+
+
+            List<double> subGrades = submissions.Select(sub => sub.Grade).ToList();
+            IEnumerable<double> oldSubmissions = subGrades.Take(submissions.Count - 1);
+
+            // Average means tile grade.
+            double currentAverage = subGrades.Average();
+            double lastAverage = oldSubmissions.Any() ? oldSubmissions.Average() : -1;
+            double peerAverage = peerGrades.Any() ? peerGrades.Average() : -1;
+
+            // Outperforming
+            if (currentAverage >= peerAverage)
+            {
+                _databaseManager.RegisterNotification(
+                    this._courseID,
+                    user,
+                    tileID,
+                    (int)Notification_Types.outperforming,
+                    this._syncID
+                );
+            }
+            // Closing the gap
+            else if (currentAverage - lastAverage > 0)
+            {
+                _databaseManager.RegisterNotification(
+                    this._courseID,
+                    user,
+                    tileID,
+                    (int)Notification_Types.closing_gap,
+                    this._syncID
+                );
+            }
+            // Falling behind
+            else if (
+                (currentAverage - lastAverage <= 0)
+                && (peerAverage - currentAverage <= 1)
+            )
+            {
+                _databaseManager.RegisterNotification(
+                    this._courseID,
+                    user,
+                    tileID,
+                    (int)Notification_Types.falling_behind,
+                    this._syncID
+                );
+            }
+            // Have to put more effort
+            else if (
+                (currentAverage - lastAverage <= 0)
+                && (peerAverage - currentAverage > 1)
+            )
+            {
+                _databaseManager.RegisterNotification(
+                    this._courseID,
+                    user,
+                    tileID,
+                    (int)Notification_Types.more_effort,
+                    this._syncID
+                );
+            }
+
         }
     }
 }

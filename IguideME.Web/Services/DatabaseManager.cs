@@ -1213,7 +1213,7 @@ namespace IguideME.Web.Services
             // When it is done by the user, we get the last available syncID, to replace the settings instead of register them
             long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
             User tempUser = new User(userID, courseID, -1, "", "-1", (int)UserRoles.student);
-            _logger.LogInformation("Updating settings for user {} for course {}: consent {} notifications () goal {} total {}", userID, courseID, consent, notifications, goalGrade, totalGrade);
+            // _logger.LogInformation("Updating settings for user {} for course {}: consent {} notifications {} goal {} total {}", userID, courseID, consent, notifications, goalGrade, totalGrade);
 
             using (
                 SQLiteDataReader r = Query(
@@ -1242,7 +1242,7 @@ namespace IguideME.Web.Services
                 }
             }
 
-            _logger.LogInformation("Actually updating user Notifications to {}", tempUser.Settings.Notifications);
+            // _logger.LogInformation("Actually updating user Notifications to {}", tempUser.Settings.Notifications);
 
             NonQuery(
                 DatabaseQueries.REGISTER_STUDENT_SETTINGS,
@@ -1876,9 +1876,8 @@ namespace IguideME.Web.Services
             return predictions;
         }
 
-        // TODO: probably switch to using grades version of submissions instead of Grade.
         public List<AssignmentSubmission> GetTileSubmissionsForUser(
-            int courseID,
+            int tileID,
             string userID,
             long syncID = 0
         )
@@ -1887,9 +1886,9 @@ namespace IguideME.Web.Services
 
             using (
                 SQLiteDataReader r1 = Query(
-                    DatabaseQueries.QUERY_COURSE_SUBMISSIONS_FOR_STUDENT,
+                    DatabaseQueries.QUERY_TILE_SUBMISSIONS_FOR_STUDENT,
                     new SQLiteParameter("userID", userID),
-                    new SQLiteParameter("courseID", courseID)
+                    new SQLiteParameter("tileID", tileID)
                 )
             )
             {
@@ -1900,16 +1899,11 @@ namespace IguideME.Web.Services
                             r1.GetInt32(0),
                             r1.GetInt32(1),
                             r1.GetValue(2).ToString(),
-                            r1.GetInt32(3),
+                            r1.GetDouble(3),
                             r1.GetInt32(4)
                         );
                     submissions.Add(submission);
                 }
-            }
-
-            foreach (AssignmentSubmission sub in submissions)
-            {
-                sub.Meta = GetEntryMeta(sub.ID);
             }
 
             return submissions;
