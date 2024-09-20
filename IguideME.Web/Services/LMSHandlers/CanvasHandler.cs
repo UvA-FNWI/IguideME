@@ -50,19 +50,24 @@ namespace IguideME.Web.Services
         /// <inheritdoc />
         public void SendMessage(string userID, string subject, string body)
         {
+            _logger.LogInformation("Created conversation for userID: {userID}", userID);
+            string recipient = userID.ToString();
+            _logger.LogInformation("Attempting to send message to {recipient}", recipient);
+
             try
             {
-                Conversation conv =
-                    new(this.Connector)
+                Conversation conv = new(this.Connector)
                     {
                         Subject = subject,
                         Body = body,
-                        Recipients = new string[1] { userID }
+                        Recipients = new string[] { recipient }
                     };
+
                 _logger.LogInformation(
-                    "Created conversation {title} for {recipients}",
-                    conv,
-                    conv.Recipients[0]
+                    "Created conversation with subject: {subject}, body: {body}, recipients: {recipients}",
+                    conv.Subject,
+                    conv.Body,
+                    string.Join(", ", conv.Recipients)
                 );
 
                 conv.Save();
