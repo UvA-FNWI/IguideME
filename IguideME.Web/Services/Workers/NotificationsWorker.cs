@@ -98,7 +98,7 @@ namespace IguideME.Web.Services.Workers
             {
                 body = "You are using IguideME, please find your personal feedback below. Visit IguideME in your course for more detailed information.\n\n" + body;
                 _logger.LogInformation("Sending notification to {ID}: {Body}", student.UserID, body);
-                _canvasHandler.SendMessage(student.UserID,
+                _canvasHandler.SendMessage(student.StudentNumber.ToString(),
                 "IguideME",
                 body
                 );
