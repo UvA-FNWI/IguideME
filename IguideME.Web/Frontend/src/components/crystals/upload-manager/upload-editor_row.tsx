@@ -15,8 +15,6 @@ const UploadEditorRow: FC<UploadEditorRowProps> = ({ rowData, rowIndex, columns,
   };
 
   const getClass = (id: number): 'id_column' | 'grade_column' | 'meta_column' => {
-    console.log('id:', id);
-    console.log('columns:', columns);
     switch (id) {
       case columns.id:
         return 'id_column';

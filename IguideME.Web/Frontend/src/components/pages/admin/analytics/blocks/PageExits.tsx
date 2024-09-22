@@ -4,12 +4,14 @@ import { type ColumnProps } from 'antd/es/table';
 import { type FC, memo, useMemo } from 'react';
 import { type SessionData } from '../analytics';
 import { type PageVisitData } from './PageVisits';
+import type { Tile } from '@/types/tile';
 
 interface PageExitsProps {
   sessions: Map<string, SessionData[]>;
+  tiles: Tile[];
 }
 
-const PageExits: FC<PageExitsProps> = memo(({ sessions }) => {
+const PageExits: FC<PageExitsProps> = memo(({ sessions, tiles }) => {
   const exitPageData: Map<string, { allTime: number; thisWeek: number }> = useMemo(() => {
     const exitPageData = new Map<string, { allTime: number; thisWeek: number }>();
 
@@ -23,7 +25,12 @@ const PageExits: FC<PageExitsProps> = memo(({ sessions }) => {
         .pop();
 
       if (exitPage) {
-        const page = exitPage.action_detail;
+        let page: string = '';
+        if (exitPage.action === ActionTypes.page) page = exitPage.action_detail;
+        else if (exitPage.action === ActionTypes.tile) {
+          page = tiles.find((tile) => tile.id === parseInt(exitPage.action_detail))?.title ?? 'Tile tile.id not found';
+        }
+
         const currentCount = exitPageData.get(page) ?? { allTime: 0, thisWeek: 0 };
 
         const newCount = {

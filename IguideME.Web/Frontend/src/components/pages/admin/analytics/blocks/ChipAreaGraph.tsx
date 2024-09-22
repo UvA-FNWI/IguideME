@@ -9,9 +9,11 @@ interface ChipAreaGraphProps {
 }
 
 const ChipAreaGraph: FC<ChipAreaGraphProps> = memo(({ graphData }): ReactElement => {
+  const adjustedGraphData = graphData.length === 1 ? [...graphData, { ...graphData[0] }] : graphData;
+
   return (
     <ResponsiveContainer width='100%' height='100%'>
-      <AreaChart data={graphData}>
+      <AreaChart data={adjustedGraphData}>
         <defs>
           <linearGradient id='colorUv' x1='0' y1='0' x2='0' y2='1'>
             <stop offset='5%' stopColor='#fc5f5f' stopOpacity={0.8} />

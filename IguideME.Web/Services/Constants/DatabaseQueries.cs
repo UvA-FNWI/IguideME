@@ -1745,6 +1745,7 @@ public static class DatabaseQueries
           FROM          `student_settings`
           WHERE         `course_id` = @courseID
           AND           `sync_id` = @syncID
+          AND           `consent` = true
           ;";
 
     public const string QUERY_ALL_ACTIONS_PER_COURSE =

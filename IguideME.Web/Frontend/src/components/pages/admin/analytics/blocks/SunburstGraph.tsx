@@ -2,6 +2,7 @@ import Sunburst from 'sunburst-chart';
 import { ActionTypes } from '@/utils/analytics';
 import { type FC, memo, useEffect, useMemo, useRef } from 'react';
 import { type SessionData } from '../analytics';
+import type { Tile } from '@/types/tile';
 
 /**
  * typeToColor converts an action type to a color.
@@ -29,6 +30,7 @@ function typeToColor(type: ActionTypes): string {
 
 interface SunburstGraphProps {
   sessions: Map<string, SessionData[]>;
+  tiles: Tile[];
 }
 
 interface TreeType {
@@ -38,7 +40,7 @@ interface TreeType {
   type: ActionTypes;
 }
 
-const SunburstGraph: FC<SunburstGraphProps> = memo(({ sessions }) => {
+const SunburstGraph: FC<SunburstGraphProps> = memo(({ sessions, tiles }) => {
   if (sessions.size === 0) {
     return <p>There haven&apos;t been any sessions yet.</p>;
   }
@@ -59,11 +61,18 @@ const SunburstGraph: FC<SunburstGraphProps> = memo(({ sessions }) => {
     Array.from(sessions.values()).forEach((session) => {
       let currentNode = root;
       let depth: number = 0;
+      let previousAction: string = 'Student Dashboard';
 
       session.slice(1).forEach((event: SessionData) => {
-        if (depth >= 6) return;
+        if (depth >= 10) return;
 
-        const currentAction = event.action_detail;
+        let currentAction = event.action_detail;
+        if (currentAction === previousAction) return;
+
+        if (event.action === ActionTypes.tile) {
+          currentAction = tiles.find((tile) => tile.id === parseInt(currentAction))?.title ?? 'Tile not found';
+        }
+
         // Check if a child node with the current action already exists
         let childNode = currentNode.children.find((child: TreeType) => child.name === currentAction);
         if (childNode) {
@@ -74,6 +83,7 @@ const SunburstGraph: FC<SunburstGraphProps> = memo(({ sessions }) => {
         }
 
         currentNode = childNode;
+        previousAction = currentAction;
         depth++;
       });
     });

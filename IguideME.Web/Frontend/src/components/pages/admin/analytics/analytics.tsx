@@ -9,6 +9,7 @@ import { ActionTypes, getAllEvents, getConsentInfo, type EventReturnType } from 
 import { useMemo, type FC, type ReactElement } from 'react';
 import { useGlobalContext } from '@/components/crystals/layout/GlobalStore/useGlobalStore';
 import { useShallow } from 'zustand/react/shallow';
+import { getTiles } from '@/api/tiles';
 
 export type SessionData = Omit<EventReturnType, 'user_id' | 'session_id' | 'course_id'>;
 
@@ -33,6 +34,15 @@ const GradeAnalytics: FC = (): ReactElement => {
     queryKey: ['analytics', 'consent', self.course_id],
     queryFn: async () => await getConsentInfo({ courseID: self.course_id }),
     enabled: self !== undefined,
+  });
+
+  const {
+    data: tiles,
+    isError: tilesIsError,
+    isLoading: tilesIsLoading,
+  } = useQuery({
+    queryKey: ['tiles'],
+    queryFn: async () => await getTiles(),
   });
 
   const sessions: Map<string, SessionData[]> = useMemo(() => {
@@ -92,7 +102,7 @@ const GradeAnalytics: FC = (): ReactElement => {
     return actionDetailLength;
   }, [sessions]);
 
-  if (analyticsIsError || consentInfoIsError) {
+  if (analyticsIsError || consentInfoIsError || tilesIsError) {
     return (
       <div className='relative h-96 w-96 rounded-xl bg-surface1'>
         <QueryError title='Failed to load usage analytic data' />
@@ -103,7 +113,7 @@ const GradeAnalytics: FC = (): ReactElement => {
   return (
     <>
       <AdminTitle title='Usage Analytics' description='View the usage analytics for your course.' />
-      <QueryLoading isLoading={analyticsIsLoading || consentInfoIsLoading}>
+      <QueryLoading isLoading={analyticsIsLoading || consentInfoIsLoading || tilesIsLoading}>
         <div className='flex w-full flex-col gap-4'>
           <AnalyticsChips analytics={analytics} consentInfo={consentInfo} sessions={sessions} />
           <div className='flex w-full max-w-[2000px] flex-wrap justify-center gap-4'>
@@ -117,13 +127,13 @@ const GradeAnalytics: FC = (): ReactElement => {
                 </p>
               }
             >
-              <SunburstGraph sessions={sessions} />
+              <SunburstGraph sessions={sessions} tiles={tiles ?? []} />
             </AnalyticsGraph>
             <AnalyticsTextBlock className='min-w-[560px] max-w-[900px] flex-1 flex-grow' title='Page Visits'>
-              <PageVisits actionDetailLength={actionDetailLength} analytics={analytics} />
+              <PageVisits actionDetailLength={actionDetailLength} analytics={analytics} tiles={tiles ?? []} />
             </AnalyticsTextBlock>
             <AnalyticsTextBlock className='min-w-[400px] max-w-[900px] flex-1 flex-grow' title='Exit Page Analysis'>
-              <PageExits sessions={sessions} />
+              <PageExits sessions={sessions} tiles={tiles ?? []} />
             </AnalyticsTextBlock>
           </div>
         </div>

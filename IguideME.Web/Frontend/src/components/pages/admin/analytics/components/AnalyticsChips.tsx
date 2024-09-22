@@ -1,7 +1,7 @@
 import { AnalyticsChip } from './AnalyticsBlockVariants';
 import { ChipAreaGraph, ConsentGraph } from '../blocks';
 import { type FC, type HTMLAttributes, memo, type ReactElement, useMemo } from 'react';
-import { type EventReturnType } from '@/utils/analytics';
+import { ActionTypes, type EventReturnType } from '@/utils/analytics';
 import { type SessionData } from '../analytics';
 
 interface AnalyticsChipProps extends HTMLAttributes<HTMLDivElement> {
@@ -20,8 +20,11 @@ const AnalyticsChips: FC<AnalyticsChipProps> = memo(({ analytics, consentInfo, s
     const sessionsByWeek = new Map<string, number>();
     if (!analytics) return [];
 
-    analytics.forEach((event) => {
-      const eventDate = new Date(event.timestamp);
+    const sortedAnalytics = analytics.sort((a, b) => a.session_id - b.session_id);
+
+    let previousSessionID: number = -1;
+    sortedAnalytics.forEach((event) => {
+      const eventDate = new Date(event.timestamp * 1000);
       const startOfWeek = new Date(
         eventDate.getFullYear(),
         eventDate.getMonth(),
@@ -29,24 +32,53 @@ const AnalyticsChips: FC<AnalyticsChipProps> = memo(({ analytics, consentInfo, s
       );
       startOfWeek.setHours(0, 0, 0, 0);
       const weekKey = startOfWeek.toISOString();
+
+      if (previousSessionID === event.session_id) return;
 
       const currentCount = sessionsByWeek.get(weekKey) ?? 0;
       sessionsByWeek.set(weekKey, currentCount + 1);
+      previousSessionID = event.session_id;
     });
 
+    // If no data, return the current week with a value of 0
+    if (sessionsByWeek.size === 0) {
+      const currentWeek = new Date();
+      currentWeek.setDate(currentWeek.getDate() - currentWeek.getDay() + 1);
+      currentWeek.setHours(0, 0, 0, 0);
+      return [{ name: currentWeek.toISOString(), value: 0 }];
+    }
+
+    // Fill in the gaps with 0 values
     const sortedWeekKeys = Array.from(sessionsByWeek.keys()).sort();
-    return sortedWeekKeys.map((weekKey) => ({
-      name: weekKey,
-      value: sessionsByWeek.get(weekKey) ?? 0,
-    }));
+    const startWeek = new Date(sortedWeekKeys[0]);
+    const thisWeek = new Date();
+    thisWeek.setDate(thisWeek.getDate() - thisWeek.getDay() + 1);
+    thisWeek.setHours(0, 0, 0, 0);
+
+    const allWeeks = [];
+    // eslint-disable-next-line no-unmodified-loop-condition -- loop is modified with date.setDate()
+    for (let week = new Date(startWeek); week <= thisWeek; week.setDate(week.getDate() + 7)) {
+      const weekKey = week.toISOString();
+      allWeeks.push({
+        name: weekKey,
+        value: sessionsByWeek.get(weekKey) ?? 0,
+      });
+    }
+
+    return allWeeks;
   }, [analytics]);
 
   const { conversionRateData, sessionLengthData } = useMemo(() => {
-    const visitData = new Map<string, { bounceCount: number; sessionCount: number; totalSessionLength: number }>();
-    if (!analytics) return { conversionRateData: [], sessionLengthData: [] };
+    const visitData = new Map<string, { bounceCount: number; sessionCount: number; sessionLengths: number[] }>();
+    if (sessions.size === 0) return { conversionRateData: [], sessionLengthData: [] };
 
-    analytics.forEach((event) => {
-      const eventDate = new Date(event.timestamp);
+    Array.from(sessions.values()).forEach((sessionEvents) => {
+      const sortedSessionEvents = sessionEvents.sort((a, b) => a.timestamp - b.timestamp);
+
+      const firstEvent = sortedSessionEvents[0];
+      const lastEvent = sortedSessionEvents[sessionEvents.length - 1];
+
+      const eventDate = new Date(firstEvent.timestamp * 1000);
       const startOfWeek = new Date(
         eventDate.getFullYear(),
         eventDate.getMonth(),
@@ -55,22 +87,14 @@ const AnalyticsChips: FC<AnalyticsChipProps> = memo(({ analytics, consentInfo, s
       startOfWeek.setHours(0, 0, 0, 0);
       const weekKey = startOfWeek.toISOString();
 
-      const currentData = visitData.get(weekKey) ?? { bounceCount: 0, sessionCount: 0, totalSessionLength: 0 };
+      const currentData = visitData.get(weekKey) ?? { bounceCount: 0, sessionCount: 0, sessionLengths: [] };
 
-      const sessionID = `${event.user_id}-${event.session_id}`;
-      const sessionEvents = sessions.get(sessionID);
-      if (!sessionEvents) return;
+      // A session is considered a bounce if it never clicked on a tile
+      const clickedTile = sessionEvents.some((event) => event.action === ActionTypes.tile);
+      if (!clickedTile) currentData.bounceCount += 1;
 
-      if (sessionEvents.length === 1) currentData.bounceCount += 1;
-
-      const sortedSessionEvents = sessionEvents.sort(
-        (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime(),
-      );
-      const firstEvent = sortedSessionEvents[0];
-      const lastEvent = sortedSessionEvents[sessionEvents.length - 1];
-      const sessionLength = new Date(lastEvent.timestamp).getTime() - new Date(firstEvent.timestamp).getTime();
-      currentData.totalSessionLength += sessionLength;
-
+      const sessionLength = (lastEvent.timestamp - firstEvent.timestamp) / 60;
+      currentData.sessionLengths.push(sessionLength);
       currentData.sessionCount += 1;
 
       visitData.set(weekKey, currentData);
@@ -92,10 +116,18 @@ const AnalyticsChips: FC<AnalyticsChipProps> = memo(({ analytics, consentInfo, s
     const sessionLengthData = sortedWeekKeys
       .map((weekKey) => {
         const data = visitData.get(weekKey);
-        const averageSessionLength = data ? data.totalSessionLength / 3600 / data.sessionCount : 0;
+        if (!data || data.sessionLengths.length === 0) {
+          return {
+            name: weekKey,
+            value: 0,
+          };
+        }
+
+        const sortedSessionLengths = data.sessionLengths.sort((a, b) => a - b);
+
         return {
           name: weekKey,
-          value: averageSessionLength,
+          value: sortedSessionLengths.reduce((acc, curr) => acc + curr, 0) / sortedSessionLengths.length,
         };
       })
       .sort((a, b) => new Date(a.name).getTime() - new Date(b.name).getTime());

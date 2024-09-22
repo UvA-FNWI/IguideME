@@ -3369,9 +3369,9 @@ namespace IguideME.Web.Services
             }
 
             return new(
-            CountConsents(courseID, now),
-            CountConsents(courseID, lastWeek),
-            CountUsers(courseID)
+                CountConsents(courseID, now),
+                CountConsents(courseID, lastWeek),
+                CountUsers(courseID)
             );
         }
     }

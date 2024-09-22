@@ -2,13 +2,15 @@ import { Table } from 'antd';
 import { ActionTypes, type EventReturnType, isThisWeek } from '@/utils/analytics';
 import { type FC, memo, type ReactElement, useCallback, useMemo } from 'react';
 import { type ColumnProps } from 'antd/es/table';
+import type { Tile } from '@/types/tile';
 
 interface PageVisitsProps {
   actionDetailLength: Map<string, number>;
   analytics?: EventReturnType[];
+  tiles: Tile[];
 }
 
-const PageVisits: FC<PageVisitsProps> = memo(({ actionDetailLength, analytics }): ReactElement => {
+const PageVisits: FC<PageVisitsProps> = memo(({ actionDetailLength, analytics, tiles }): ReactElement => {
   const pageVisitData = useMemo(() => {
     const pageVisitData = new Map<string, { allTime: number; thisWeek: number }>();
     if (!analytics) return pageVisitData;
@@ -16,7 +18,12 @@ const PageVisits: FC<PageVisitsProps> = memo(({ actionDetailLength, analytics })
     analytics.forEach((event) => {
       if (event.action !== ActionTypes.page && event.action !== ActionTypes.tile) return;
 
-      const page = event.action_detail;
+      let page: string = '';
+      if (event.action === ActionTypes.page) page = event.action_detail;
+      else if (event.action === ActionTypes.tile) {
+        page = tiles.find((tile) => tile.id === parseInt(event.action_detail))?.title ?? 'Tile tile.id not found';
+      }
+
       const currentCount = pageVisitData.get(page) ?? { allTime: 0, thisWeek: 0 };
 
       const newCount = {
