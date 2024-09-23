@@ -2,7 +2,7 @@ import { NotificationStatus, type Notifications, type StudentNotification } from
 import { HttpResponse, http } from 'msw';
 
 export const notificationsHandlers = [
-  http.get('app/notifications/*', ({ params }) => {
+  http.get('/app/notifications/user/*', ({ params }) => {
     const userID = params[0];
     return HttpResponse.json<Notifications>({
       outperforming: MOCK_NOTIFICATIONS_OUTPERFORMING.filter(
@@ -11,6 +11,38 @@ export const notificationsHandlers = [
       closing: MOCK_NOTIFICATIONS_CLOSING.filter((notification) => notification.userID === userID && notification.sent),
       falling: MOCK_NOTIFICATIONS_FALLING.filter((notification) => notification.userID === userID && notification.sent),
       effort: MOCK_NOTIFICATIONS_EFFORT.filter((notification) => notification.userID === userID && notification.sent),
+    });
+  }),
+
+  http.get('/app/notifications/course', () => {
+    return HttpResponse.json({
+      '1': {
+        end_timestamp: 1695800000,
+        student_name: 'John Doe',
+        notifications: [
+          {
+            tile_title: 'Title',
+            status: 0,
+            sent: false,
+          },
+          {
+            tile_title: 'Title',
+            status: 0,
+            sent: false,
+          },
+        ],
+      },
+      '2': {
+        end_timestamp: 1695900000,
+        student_name: 'Jane Smith',
+        notifications: [
+          {
+            tile_title: 'Title',
+            status: 1,
+            sent: true,
+          },
+        ],
+      },
     });
   }),
 ];

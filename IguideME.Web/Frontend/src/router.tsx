@@ -250,15 +250,15 @@ export const createRouter = (): ReturnType<typeof createBrowserRouter> =>
                       return { Component: Analytics.default };
                     },
                   },
-                  // {
-                  //   path: 'notification-centre',
-                  //   lazy: async () => {
-                  //     const NotificationCentre = await import(
-                  //       '@/components/pages/admin/notificationcentre/notificationcentre.tsx'
-                  //     );
-                  //     return { Component: NotificationCentre.default };
-                  //   },
-                  // },
+                  {
+                    path: 'notification-centre',
+                    lazy: async () => {
+                      const NotificationCentre = await import(
+                        '@/components/pages/admin/notificationcentre/notificationcentre.tsx'
+                      );
+                      return { Component: NotificationCentre.default };
+                    },
+                  },
                   {
                     path: 'settings',
                     lazy: async () => {

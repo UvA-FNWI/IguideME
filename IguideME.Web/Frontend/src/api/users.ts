@@ -1,5 +1,5 @@
 import apiClient from './axios';
-import { type Notifications } from '@/types/notifications';
+import { type CourseNotification, type Notifications } from '@/types/notifications';
 import { type User } from '@/types/user';
 
 export async function getStudents(): Promise<User[]> {
@@ -15,5 +15,8 @@ export async function getSelf(): Promise<User> {
   return await apiClient.get('app/self').then((response) => response.data);
 }
 export async function getStudentNotifications(id: string): Promise<Notifications> {
-  return await apiClient.get(`app/notifications/${id}`).then((response) => response.data);
+  return await apiClient.get(`app/notifications/user/${id}`).then((response) => response.data);
+}
+export async function getCourseNotifications(): Promise<Map<number, CourseNotification>> {
+  return await apiClient.get(`app/notifications/course`).then((response) => response.data);
 }

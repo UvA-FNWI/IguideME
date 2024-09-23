@@ -803,6 +803,21 @@ public static class DatabaseQueries
         WHERE           `user_id`=@userID
         AND             `sync_id`=@syncID;";
 
+    public const string QUERY_ALL_COURSE_NOTIFICATIONS =
+        @"SELECT    sh.sync_id,
+                    sh.end_timestamp,
+                    u.name as student_name,
+                    t.title as tile_title,
+                    n.status,
+                    n.sent
+        FROM sync_history sh
+        JOIN student_settings ss ON sh.sync_id = ss.sync_id
+        JOIN users u ON ss.user_id = u.user_id
+        JOIN notifications n ON ss.user_id = n.user_id AND n.sync_id = sh.sync_id
+        JOIN tiles t ON n.tile_id = t.tile_id
+        WHERE sh.course_id = @courseID
+        ;";
+
     public const string QUERY_PENDING_USER_NOTIFICATIONS =
         @"SELECT        `tile_id`,
                         `status`

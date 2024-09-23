@@ -144,7 +144,7 @@ namespace IguideME.Web.Controllers
 		}
 
 		[HttpGet]
-		[Route("/app/notifications/{userID}")]
+		[Route("/app/notifications/user/{userID}")]
 		[ProducesResponseType(StatusCodes.Status200OK)]
 		[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 		[ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -162,7 +162,23 @@ namespace IguideME.Web.Controllers
 			}
 		}
 
-
+        [HttpGet]
+		[Route("/app/notifications/course")]
+		[ProducesResponseType(StatusCodes.Status200OK)]
+		[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+		public ActionResult GetCourseNotifications()
+		{
+			if (IsAdministrator())
+			{
+				return Json(
+					_databaseManager.GetAllCourseNotifications(GetCourseID())
+				);
+			}
+			else
+			{
+				return Unauthorized();
+			}
+		}
 
 		[Authorize]
 		[Route("/app/course")]

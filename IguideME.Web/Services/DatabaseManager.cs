@@ -2345,6 +2345,49 @@ namespace IguideME.Web.Services
             return notifications;
         }
 
+        public Dictionary<int, CourseNotifications> GetAllCourseNotifications(int courseID)
+        {
+            Dictionary<int, CourseNotifications> result = [];
+
+            using (
+                SQLiteDataReader r = Query(
+                    DatabaseQueries.QUERY_ALL_COURSE_NOTIFICATIONS,
+                    new SQLiteParameter("courseID", courseID)
+                )
+            )
+            {
+                while (r.Read())
+                {
+                    int syncID = r.GetInt32(0);
+                    int endTimestamp = r.GetInt32(1);
+                    string studentName = r.GetString(2);
+                    string tileTitle = r.GetString(3);
+                    int status = r.GetInt32(4);
+                    bool sent = r.GetBoolean(5);
+
+                    if (!result.TryGetValue(syncID, out CourseNotifications value))
+                    {
+                        value = new CourseNotifications
+                        {
+                            EndTimestamp = endTimestamp,
+                            StudentName = studentName,
+                            Notifications = []
+                        };
+                        result[syncID] = value;
+                    }
+
+                    value.Notifications.Add(new NotificationDetail
+                    {
+                        TileTitle = tileTitle,
+                        Status = status,
+                        Sent = sent
+                    });
+                }
+            }
+
+            return result;
+        }
+
         public List<Notification> GetPendingNotifications(
             int courseID,
             string userID,

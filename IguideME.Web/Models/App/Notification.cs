@@ -56,4 +56,33 @@ namespace IguideME.Web.Models.App
             this.Effort = new();
         }
     }
+
+    public class NotificationDetail
+    {
+        [JsonProperty("tile_title")]
+        public string TileTitle { get; set; }
+
+        [JsonProperty("status")]
+        public int Status { get; set; }
+
+        [JsonProperty("sent")]
+        public bool Sent { get; set; }
+    }
+
+    public class CourseNotifications
+    {
+        [JsonProperty("end_timestamp")]
+        public int EndTimestamp { get; set; }
+
+        [JsonProperty("student_name")]
+        public string StudentName { get; set; }
+
+        [JsonProperty("notifications")]
+        public List<NotificationDetail> Notifications { get; set; }
+
+        public CourseNotifications()
+        {
+            Notifications = new List<NotificationDetail>();
+        }
+    }
 }
