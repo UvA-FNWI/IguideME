@@ -68,16 +68,16 @@ namespace IguideME.Web.Services.Workers
                 Tile tile = _databaseManager.GetTile(this._courseID, notification.TileID);
                 switch (notification.Status)
                 {
-                    case (int)Notification_Types.outperforming:
+                    case Notification_Types.outperforming:
                         outperforming += $"    - {tile.Title}\n";
                         break;
-                    case (int)Notification_Types.closing_gap:
+                    case Notification_Types.closing_gap:
                         closing += $"    - {tile.Title}\n";
                         break;
-                    case (int)Notification_Types.falling_behind:
+                    case Notification_Types.falling_behind:
                         falling += $"    - {tile.Title}\n";
                         break;
-                    case (int)Notification_Types.more_effort:
+                    case Notification_Types.more_effort:
                         moreEffort += $"    - {tile.Title}\n";
                         break;
                 }

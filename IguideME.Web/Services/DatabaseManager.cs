@@ -2295,48 +2295,26 @@ namespace IguideME.Web.Services
             {
                 while (r.Read())
                 {
-                    Notification_Types status = (Notification_Types)r.GetInt32(1);
-                    switch (status)
+                    Notification notification = new(
+                                    userID,
+                                    r.GetInt32(0),
+                                    r.GetInt32(1),
+                                    r.GetBoolean(2)
+                                );
+
+                    switch (notification.Status)
                     {
                         case Notification_Types.outperforming:
-                            notifications.Outperforming.Add(
-                                new Notification(
-                                    userID,
-                                    r.GetInt32(0),
-                                    r.GetInt32(1),
-                                    r.GetBoolean(2)
-                                )
-                            );
+                            notifications.Outperforming.Add(notification);
                             break;
                         case Notification_Types.closing_gap:
-                            notifications.Closing.Add(
-                                new Notification(
-                                    userID,
-                                    r.GetInt32(0),
-                                    r.GetInt32(1),
-                                    r.GetBoolean(2)
-                                )
-                            );
+                            notifications.Closing.Add(notification);
                             break;
                         case Notification_Types.falling_behind:
-                            notifications.Falling.Add(
-                                new Notification(
-                                    userID,
-                                    r.GetInt32(0),
-                                    r.GetInt32(1),
-                                    r.GetBoolean(2)
-                                )
-                            );
+                            notifications.Falling.Add(notification);
                             break;
                         case Notification_Types.more_effort:
-                            notifications.Effort.Add(
-                                new Notification(
-                                    userID,
-                                    r.GetInt32(0),
-                                    r.GetInt32(1),
-                                    r.GetBoolean(2)
-                                )
-                            );
+                            notifications.Effort.Add(notification);
                             break;
                     }
                 }
@@ -2345,9 +2323,9 @@ namespace IguideME.Web.Services
             return notifications;
         }
 
-        public Dictionary<int, CourseNotifications> GetAllCourseNotifications(int courseID)
+        public Dictionary<string, List<CourseNotification>> GetAllCourseNotifications(int courseID)
         {
-            Dictionary<int, CourseNotifications> result = [];
+            Dictionary<string, List<CourseNotification>> result = [];
 
             using (
                 SQLiteDataReader r = Query(
@@ -2358,25 +2336,18 @@ namespace IguideME.Web.Services
             {
                 while (r.Read())
                 {
-                    int syncID = r.GetInt32(0);
-                    int endTimestamp = r.GetInt32(1);
-                    string studentName = r.GetString(2);
-                    string tileTitle = r.GetString(3);
-                    int status = r.GetInt32(4);
-                    bool sent = r.GetBoolean(5);
+                    string studentName = r.GetString(0);
+                    string tileTitle = r.GetString(1);
+                    int status = r.GetInt32(2);
+                    long? sent = r.IsDBNull(3) ? null : r.GetInt64(3);
 
-                    if (!result.TryGetValue(syncID, out CourseNotifications value))
+                    if (!result.TryGetValue(studentName, out List<CourseNotification> notifications))
                     {
-                        value = new CourseNotifications
-                        {
-                            EndTimestamp = endTimestamp,
-                            StudentName = studentName,
-                            Notifications = []
-                        };
-                        result[syncID] = value;
+                        notifications = [];
+                        result[studentName] = notifications;
                     }
 
-                    value.Notifications.Add(new NotificationDetail
+                    notifications.Add(new CourseNotification
                     {
                         TileTitle = tileTitle,
                         Status = status,
@@ -2423,6 +2394,7 @@ namespace IguideME.Web.Services
 
             NonQuery(
                 DatabaseQueries.QUERY_MARK_NOTIFICATIONS_SENT,
+                new SQLiteParameter("time", DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()),
                 new SQLiteParameter("userID", userID),
                 new SQLiteParameter("syncID", activeSync)
             );

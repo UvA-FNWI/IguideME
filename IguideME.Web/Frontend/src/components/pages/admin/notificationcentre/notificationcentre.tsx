@@ -2,34 +2,26 @@ import { getCourseNotifications } from '@/api/users';
 import AdminTitle from '@/components/atoms/admin-titles/admin-titles';
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
-import { type CourseNotification, type CourseNotificationDetail, NotificationStatus } from '@/types/notifications';
+import { CourseNotificationDetail, NotificationStatus } from '@/types/notifications';
 import { useQuery } from '@tanstack/react-query';
-import { Select, Table } from 'antd';
-import type { ColumnsType } from 'antd/lib/table';
-import { useState, type FC, type ReactElement } from 'react';
+import { Table } from 'antd';
+import { useMemo, type FC, type ReactElement } from 'react';
 
-interface DataType {
-  key: string;
-  student_name: string;
-  received_notifications: string;
-  to_be_sent_notifications: string;
-}
-
-const columns: ColumnsType<DataType> = [
+const columns = [
   {
     title: 'Student Name',
-    dataIndex: 'student_name',
-    key: 'student_name',
+    dataIndex: 'studentName',
+    key: 'studentName',
   },
   {
     title: 'Received Notifications',
-    dataIndex: 'received_notifications',
-    key: 'received_notifications',
+    dataIndex: 'receivedNotifications',
+    key: 'receivedNotifications',
   },
   {
     title: 'To Be Sent Notifications',
-    dataIndex: 'to_be_sent_notifications',
-    key: 'to_be_sent_notifications',
+    dataIndex: 'toBeSentNotifications',
+    key: 'toBeSentNotifications',
   },
 ];
 
@@ -58,31 +50,53 @@ const NotificationCentre: FC = (): ReactElement => {
     queryFn: async () => await getCourseNotifications(),
   });
 
-  const [filteredData, setFilteredData] = useState<DataType[]>([]);
+  console.log('notifications', notifications);
 
-  const handleSelectChange = (value: number): void => {
-    const filtered = Object.entries(notifications ?? {})
-      .filter(([_, notification]) => (notification as CourseNotification).end_timestamp === value)
-      .map(([key, notification]) => {
-        const courseNotification = notification as CourseNotification;
-        const received = courseNotification.notifications
-          .filter((n: CourseNotificationDetail) => n.sent)
-          .map((n: CourseNotificationDetail) => `${NotificationStatusToText(n.status)} ${n.tile_title}`)
-          .join('\r\n');
-        const toBeSent = courseNotification.notifications
-          .filter((n: CourseNotificationDetail) => !n.sent)
-          .map((n: CourseNotificationDetail) => `${NotificationStatusToText(n.status)} ${n.tile_title}`)
+  const tableData = useMemo(() => {
+    return Object.entries(notifications || {}).map(
+      ([studentName, notifications]: [string, CourseNotificationDetail[]], index) => {
+        if (!notifications) {
+          return {
+            key: index,
+            studentName,
+            receivedNotifications: '',
+            toBeSentNotifications: '',
+          };
+        }
+
+        const receivedNotifications = notifications
+          .filter((n) => n.sent !== null)
+          .sort((a, b) => (b.sent as number) - (a.sent as number))
+          .reduce(
+            (acc, n) => {
+              const sentDate = new Date(n.sent!).toLocaleDateString();
+              if (!acc[sentDate]) {
+                acc[sentDate] = [];
+              }
+              acc[sentDate].push(`${NotificationStatusToText(n.status)} ${n.tile_title}`);
+              return acc;
+            },
+            {} as Record<string, string[]>,
+          );
+
+        const formattedNotifications = Object.entries(receivedNotifications)
+          .map(([date, notifications]) => `${date}\r\n${notifications.join('\r\n')}`)
+          .join('\r\n\r\n');
+
+        const toBeSentNotifications = notifications
+          .filter((n) => n.sent === null)
+          .map((n) => `${NotificationStatusToText(n.status)} ${n.tile_title}`)
           .join('\r\n');
 
         return {
-          key,
-          student_name: courseNotification.student_name,
-          received_notifications: received,
-          to_be_sent_notifications: toBeSent,
+          key: index,
+          studentName,
+          receivedNotifications: formattedNotifications,
+          toBeSentNotifications,
         };
-      });
-    setFilteredData(filtered);
-  };
+      },
+    );
+  }, [notifications]);
 
   return (
     <>
@@ -90,16 +104,7 @@ const NotificationCentre: FC = (): ReactElement => {
       {isError ?
         <QueryError className='relative' title='Failed to fetch notifications' />
       : <QueryLoading isLoading={isLoading}>
-          <div className='space-y-5'>
-            <Select className='w-full max-w-xs' placeholder='Select synchronization' onChange={handleSelectChange}>
-              {Object.values(notifications ?? {}).map((notification: CourseNotification) => (
-                <Select.Option key={notification.end_timestamp} value={notification.end_timestamp}>
-                  {new Date(notification.end_timestamp * 1000).toLocaleString()}
-                </Select.Option>
-              ))}
-            </Select>
-            <Table className='custom-table [&_td]:whitespace-pre' columns={columns} dataSource={filteredData} />
-          </div>
+          <Table columns={columns} dataSource={tableData} />
         </QueryLoading>
       }
     </>

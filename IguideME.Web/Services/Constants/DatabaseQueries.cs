@@ -10,12 +10,12 @@ public static class DatabaseQueries
         new()
         {
             {
-            "000_remove_external_data_tiles",
+            "001_drop_notifications",
             @"
-            DELETE FROM `tiles` WHERE `type` = 3
+            DROP TABLE notifications
             ;"
-            }
-        };
+            },
+       };
 
     // //================================ Tables ================================//
     /**
@@ -298,7 +298,7 @@ public static class DatabaseQueries
             `user_id`             STRING,
             `tile_id`             INTEGER,
             `status`              INTEGER,
-            `sent`              BOOLEAN DEFAULT false,
+            `sent`                INTEGER DEFAULT NULL,
             `sync_id`             INTEGER,
             PRIMARY KEY (`user_id`,`tile_id`,`sync_id`),
             FOREIGN KEY(`user_id`) REFERENCES `users`(`user_id`),
@@ -804,18 +804,15 @@ public static class DatabaseQueries
         AND             `sync_id`=@syncID;";
 
     public const string QUERY_ALL_COURSE_NOTIFICATIONS =
-        @"SELECT    sh.sync_id,
-                    sh.end_timestamp,
-                    u.name as student_name,
+        @"SELECT    u.name as student_name,
                     t.title as tile_title,
                     n.status,
                     n.sent
-        FROM sync_history sh
-        JOIN student_settings ss ON sh.sync_id = ss.sync_id
-        JOIN users u ON ss.user_id = u.user_id
-        JOIN notifications n ON ss.user_id = n.user_id AND n.sync_id = sh.sync_id
+        FROM notifications n
+        JOIN users u ON n.user_id = u.user_id
+        JOIN student_settings ss ON u.user_id = ss.user_id
         JOIN tiles t ON n.tile_id = t.tile_id
-        WHERE sh.course_id = @courseID
+        WHERE ss.course_id = @courseID
         ;";
 
     public const string QUERY_PENDING_USER_NOTIFICATIONS =
@@ -828,7 +825,7 @@ public static class DatabaseQueries
 
     public const string QUERY_MARK_NOTIFICATIONS_SENT =
         @"UPDATE        `notifications`
-        SET             `sent`= true
+        SET             `sent`= @time
         WHERE           `user_id`=@userID
         AND             `sync_id`=@syncID;";
 

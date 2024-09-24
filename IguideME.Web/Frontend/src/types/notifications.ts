@@ -23,11 +23,5 @@ export interface Notifications {
 export interface CourseNotificationDetail {
   tile_title: string;
   status: NotificationStatus;
-  sent: boolean;
-}
-
-export interface CourseNotification {
-  end_timestamp: number;
-  student_name: string;
-  notifications: CourseNotificationDetail[];
+  sent: number | null;
 }

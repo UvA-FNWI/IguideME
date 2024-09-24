@@ -20,7 +20,7 @@ namespace IguideME.Web.Models.App
         public int TileID { get; set; }
 
         [JsonProperty("status")]
-        public int Status { get; set; }
+        public Notification_Types Status { get; set; }
 
         [JsonProperty("sent")]
         public bool Sent { get; set; }
@@ -29,10 +29,17 @@ namespace IguideME.Web.Models.App
         {
             this.UserID = userID;
             this.TileID = tileID;
+            this.Status = (Notification_Types) status;
+            this.Sent = sent;
+        }
+         public Notification(string userID, int tileID, Notification_Types status, bool sent)
+        {
+            this.UserID = userID;
+            this.TileID = tileID;
             this.Status = status;
             this.Sent = sent;
         }
-    }
+   }
 
     public class Notifications
     {
@@ -69,20 +76,15 @@ namespace IguideME.Web.Models.App
         public bool Sent { get; set; }
     }
 
-    public class CourseNotifications
+    public class CourseNotification
     {
-        [JsonProperty("end_timestamp")]
-        public int EndTimestamp { get; set; }
+        [JsonProperty("tile_title")]
+        public string TileTitle { get; set; }
 
-        [JsonProperty("student_name")]
-        public string StudentName { get; set; }
+        [JsonProperty("status")]
+        public int Status { get; set; }
 
-        [JsonProperty("notifications")]
-        public List<NotificationDetail> Notifications { get; set; }
-
-        public CourseNotifications()
-        {
-            Notifications = new List<NotificationDetail>();
-        }
+        [JsonProperty("sent")]
+        public long? Sent { get; set; }
     }
 }
