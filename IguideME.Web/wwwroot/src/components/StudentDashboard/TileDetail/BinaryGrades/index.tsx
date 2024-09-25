@@ -15,7 +15,7 @@ export default class BinaryGrades extends Component<{
             <div id={"binaryEntries"}>
                 <Row gutter={[5, 5]}>
                     {submissions.map(s => {
-                        const success = s.grade.slice(0, 1) !== "0";
+                        const success = s.grade.toString().slice(0, 1) !== "0";
                         const entry = tileEntries.find(e => e.id === s.entry_id);
 
                         return (

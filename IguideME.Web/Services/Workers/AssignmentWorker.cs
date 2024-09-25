@@ -1,10 +1,8 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using IguideME.Web.Models;
 using IguideME.Web.Models.App;
 using IguideME.Web.Models.Impl;
 using IguideME.Web.Services.LMSHandlers;
-using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using Microsoft.Extensions.Logging;
 
 namespace IguideME.Web.Services.Workers
@@ -84,7 +82,6 @@ namespace IguideME.Web.Services.Workers
 
             foreach (AssignmentSubmission submission in submissions)
             {
-                double grade;
                 if (gradingTypes.TryGetValue(submission.AssignmentID.Value, out elem))
                 {
                     (max, type, entry_id) = elem;
@@ -112,21 +109,19 @@ namespace IguideME.Web.Services.Workers
                                 ""
                             );
 
-                            grade = double.Parse(clean);
+                            submission.Grade = double.Parse(clean);
                             break;
                         case AppGradingType.Letters:
-                            grade = LetterToGrade(submission.rawGrade);
+                            submission.Grade = LetterToGrade(submission.rawGrade);
                             break;
                         case AppGradingType.PassFail:
-                            _logger.LogInformation("passfail text: {Grade}", submission.rawGrade);
-                            // TODO: test in canvas
-                            grade = (submission.rawGrade == "FAIL" || submission.rawGrade == "0") ? 0 : 100;
+                            submission.Grade = (submission.rawGrade == "FAIL" || submission.rawGrade == "0") ? 0 : 100;
                             break;
                         case AppGradingType.NotGraded:
-                            grade = -1;
+                            submission.Grade = -1;
                             break;
                         default:
-                            grade = -1;
+                            submission.Grade = -1;
                             _logger.LogError(
                                 "Grade format {Type} is not supported, grade = {Grade}",
                                 type,

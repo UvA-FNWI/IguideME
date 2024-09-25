@@ -376,7 +376,6 @@ namespace IguideME.Web.Services
                     {
                         string rawGrade = r.GetValue(4).ToString();
 
-                        _logger.LogInformation("user {}, text {}, num {}, den {}", r.GetValue(1), r.GetValue(4), r.GetValue(2), r.GetValue(3));
                         if (rawGrade.IsNullOrEmpty())
                         {
                             if (r.IsDBNull(2) || r.GetDouble(2) == 0)

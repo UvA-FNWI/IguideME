@@ -53,7 +53,7 @@ namespace IguideME.Web.Services.Workers
                     // _logger.LogInformation("registering student with login {l} sis {s} user {u}", student.LoginID, student.SISUserID, student.ID);
 
                     DatabaseManager.Instance.RegisterUser(
-                        _courseID,
+                        student.CourseID,
                         student.StudentNumber,
                         student.UserID,
                         student.Name,
