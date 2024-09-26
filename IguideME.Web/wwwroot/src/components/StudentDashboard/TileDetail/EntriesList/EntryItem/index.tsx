@@ -18,7 +18,7 @@ export default class EntryItem extends Component<{
         <h2>{tileEntry.title}</h2>
         <Divider style={{ margin: '5px 0' }} />
 
-        <GradeStatistic grade={(+submission.grade).toFixed(1)} />
+        <GradeStatistic grade={(+submission.grade).toFixed(1)} passed={+submission.grade >= 55}/>
 
         {Object.keys(meta).length > 0 &&
           <div>

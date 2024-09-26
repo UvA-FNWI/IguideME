@@ -318,7 +318,7 @@ namespace IguideME.Web.Services
                                 true, //bool published,
                                 false, //bool muted,
                                 r.GetValue(3).ToString(),
-                                r.GetDouble(4),
+                                1, // r.GetDouble(4), brightspace gives us percentages directly, so we would be dividing twice.
                                 0, //Position
                                 mapGradingType(r.GetInt32(6)), // This is mapped to our local enum,
                                 "" //"Submission Type"

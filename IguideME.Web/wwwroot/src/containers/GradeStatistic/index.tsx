@@ -4,7 +4,7 @@ import { WarningOutlined, LikeOutlined } from "@ant-design/icons";
 import "./style.scss";
 
 export default class GradeStatistic extends Component<
-  { grade: string },
+  { grade: string, passed: boolean },
   { loading: boolean }
 > {
   state = { loading: true };
@@ -17,11 +17,11 @@ export default class GradeStatistic extends Component<
     this.setState({ loading: false });
   };
 
-  renderIcon = (grade: number): React.ReactNode => {
+  renderIcon = (grade: number, passed: boolean): React.ReactNode => {
     if (grade <= 0) {
       return <></>;
     }
-    if (grade >= 5.5) {
+    if (passed) {
       return <LikeOutlined className={"pass"} />;
     }
 
@@ -30,9 +30,9 @@ export default class GradeStatistic extends Component<
 
   render(): React.ReactNode {
     const { loading } = this.state;
-    const { grade } = this.props;
+    const { grade, passed} = this.props;
 
-    const prefix = this.renderIcon(parseFloat(grade));
+    const prefix = this.renderIcon(parseFloat(grade), passed);
 
     return (
       <div className={"gradeStatistic"}>

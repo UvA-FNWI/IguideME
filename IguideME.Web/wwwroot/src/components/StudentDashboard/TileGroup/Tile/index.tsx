@@ -53,7 +53,7 @@ export default class Tile extends Component<IProps, IState> {
           </span>
         );
       case "PREDICTION":
-        return <GradeStatistic grade={avg !== null ? avg!.toString() : "-"} />;
+        return <GradeStatistic grade={avg !== null ? avg!.toString() : "-"} passed={avg !== null && avg >= 55} />;
       case "BINARY":
         return (
           <>
@@ -64,7 +64,7 @@ export default class Tile extends Component<IProps, IState> {
               />
             )}
             <GradeStatistic
-              grade={avg !== null ? (avg * 10).toFixed(1) : "-"}
+              grade={avg !== null ? (avg * 10).toFixed(1) : "-"} passed={avg !== null && avg >= 0}
             />
           </>
         );
@@ -77,7 +77,7 @@ export default class Tile extends Component<IProps, IState> {
                 style={{ width: "100%" }}
               />
             )}
-            <GradeStatistic grade={avg !== null ? avg!.toFixed(1) : "-"} />
+            <GradeStatistic grade={avg !== null ? avg!.toFixed(1) : "-"} passed ={avg !== null && avg >= 55}/>
           </>
         );
       default:

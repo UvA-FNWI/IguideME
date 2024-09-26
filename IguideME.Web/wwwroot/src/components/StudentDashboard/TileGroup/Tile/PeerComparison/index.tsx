@@ -6,9 +6,6 @@ export default class PeerComparison extends Component<{ peerGrades: PeerGrades |
   render(): React.ReactNode {
     const { peerGrades } = this.props;
 
-    const round = (val: number) => {
-      return Math.round(val * 100) / 100;
-    }
 
     return (
       <div className={"peerComparison"}>
@@ -19,19 +16,19 @@ export default class PeerComparison extends Component<{ peerGrades: PeerGrades |
             <div className={"min"}>
               <small>min.</small>
               <br />
-              {round(peerGrades.min)}%
+              {peerGrades.min.toFixed(1)}%
             </div>
 
             <div className={"avg"}>
               <small>avg.</small>
               <br />
-              {round(peerGrades.avg)}%
+              {peerGrades.avg.toFixed(1)}%
             </div>
 
             <div className={"max"}>
               <small>max.</small>
               <br />
-              {round(peerGrades.max)}%
+              {peerGrades.max.toFixed(1)}%
             </div>
           </div> :
           <p>Not available</p>

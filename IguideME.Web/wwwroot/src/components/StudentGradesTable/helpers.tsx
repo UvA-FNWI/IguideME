@@ -37,13 +37,13 @@ function entriesColumns(
         // TODO: look at total points for colors.
         try {
           const gradeNum = parseFloat(text);
-          if (gradeNum < 5.5)
+          if (gradeNum < 55)
             return (
               <span className={"dangerText"}>
                 <b>{text}</b>
               </span>
             );
-          if (gradeNum >= 9.5)
+          if (gradeNum >= 95)
             return (
               <span className={"successText"}>
                 <b>{text}</b>
@@ -231,8 +231,8 @@ function tileToColumnData(
           tileEntries.map((e) => e.id).includes(s.entry_id),
       )
       .map((s) => parseInt(s.grade))
-      .filter((s) => s === 1)
-      .length.toString();
+      .filter((s) => s > 0)
+      .length.toFixed(0);
     return [[t.id, grade]];
   }
 
@@ -254,7 +254,7 @@ function tileToColumnData(
     const submission = submissions.find(
       (s) => s.entry_id === e.id && s.userID === student.userID,
     )!;
-    return [getEntryKey(e, tiles), submission ? submission.grade : ""];
+    return [getEntryKey(e, tiles), submission ? (+submission.grade).toFixed(1) : ""];
   });
 }
 
