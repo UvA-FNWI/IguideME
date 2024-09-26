@@ -353,19 +353,32 @@ namespace IguideME.Web.Services
 
             using (
                 NpgsqlDataReader r = Query(
-                    @$"SELECT       grade_results.grade_object_id,
+                    @$"
+                    SELECT          gr.grade_object_id,
                                     users.username,
-                                    grade_results.points_numerator,
-                                    grade_results.points_denominator,
-                                    grade_results.grade_text,
-                                    grade_results.grade_released_date
-                        FROM        grade_results
+                                    gr.points_numerator,
+                                    gr.points_denominator,
+                                    gr.grade_text,
+                                    gr.grade_released_date
+                        FROM        (
+                            SELECT  grade_object_id,
+                                    user_id,
+                                    points_numerator,
+                                    points_denominator,
+                                    grade_text,
+                                    grade_released_date,
+                                    org_unit_id,
+                                    is_released,
+                                    ROW_NUMBER() OVER (PARTITION BY grade_object_id, user_id ORDER BY version DESC) ranked_order
+                        FROM grade_results) gr
                         INNER JOIN  users
-                            ON      users.user_id = grade_results.user_id
-                        WHERE       grade_results.org_unit_id = @courseID
+                            ON      users.user_id = gr.user_id
+                        WHERE       gr.org_unit_id = @courseID
+                        AND         gr.ranked_order = 1 
                         AND         (is_released is null or is_released = TRUE)                        
-                        AND         grade_results.user_id
-                            IN      ({string.Join(",", users.Select((_, index) => $"@userID{index}"))})",
+                        AND         gr.user_id
+                            IN      ({string.Join(",", users.Select((_, index) => $"@userID{index}"))})
+                        ;",
                     parameters
                 )
             )
