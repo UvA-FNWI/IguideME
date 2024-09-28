@@ -3,7 +3,7 @@ import { getUserDiscussionEntries } from '@/api/grades';
 import { useTileViewStore } from '@/components/pages/student-dashboard/tileViewContext';
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
-import { Tile, TileType } from '@/types/tile';
+import { type Tile, TileType } from '@/types/tile';
 import { useQuery } from '@tanstack/react-query';
 import { Col } from 'antd';
 import { type FC, type ReactElement } from 'react';
@@ -29,8 +29,7 @@ const AltEntries: FC<Props> = ({ tile }): ReactElement => {
 };
 
 const AltAssignments: FC<Props> = ({ tile }): ReactElement => {
-  tile;
-  return <></>;
+  return <>{JSON.stringify(tile)}</>;
 };
 
 const AltDiscussions: FC<Props> = ({ tile }): ReactElement => {
@@ -94,11 +93,18 @@ interface DiscProps {
 }
 const DiscussionDisplay: FC<DiscProps> = ({ title, message }): ReactElement => {
   return (
-    <div className='border-border1 bg-surface1 h-[230px] w-max min-w-[270px] max-w-xs rounded-md border border-solid'>
-      <div className='h-full w-full p-2'>
-        <h3 className='text-text overflow-hidden text-ellipsis text-nowrap text-center font-bold'>{title}</h3>
+    <div
+      className='w-full min-w-[270px] overflow-hidden rounded-md border border-solid border-border1 bg-surface1'
+      style={{ maxWidth: '1fr' }}
+    >
+      <div className='h-full w-full p-4'>
+        <div className='group'>
+          <h3 className='overflow-hidden text-ellipsis text-nowrap text-center font-bold text-text group-hover:whitespace-normal'>
+            {title}
+          </h3>
+        </div>
         <div className='grid h-full w-full place-content-center'>
-          <div dangerouslySetInnerHTML={{ __html: message }}></div>
+          <div className='prose' dangerouslySetInnerHTML={{ __html: message }}></div>
         </div>
       </div>
     </div>
@@ -106,8 +112,7 @@ const DiscussionDisplay: FC<DiscProps> = ({ title, message }): ReactElement => {
 };
 
 const AltLearningGoals: FC<Props> = ({ tile }): ReactElement => {
-  tile;
-  return <></>;
+  return <>{JSON.stringify(tile)}</>;
 };
 
 export default AltEntries;
