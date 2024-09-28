@@ -89,10 +89,10 @@ const Dashboard: FC<DashboardProps> = ({ self }): ReactElement => {
   return (
     <>
       <div className='w-full px-1 md:px-3'>
-        <div className='flex min-h-header flex-col justify-center gap-3 py-3 lg:py-0'>
+        <div className='flex h-20 flex-col justify-center gap-3 py-3 lg:py-0'>
           <div className='relative flex items-center justify-between'>
             <StudentInfo />
-            <div className='absolute bottom-0 left-0 right-0 top-0 m-auto hidden h-header w-[400px] place-content-center md:grid'>
+            <div className='absolute bottom-0 left-0 right-0 top-0 m-auto hidden w-[400px] place-content-center md:grid'>
               <GradeDisplay />
             </div>
             <Segmented

@@ -95,7 +95,7 @@ GridGrades.displayName = 'GridGrades';
 const BarTooltip: FC<TooltipProps> = memo(({ active, payload, label }) => {
   if (active && payload?.length) {
     return (
-      <div className='border-text bg-crust/80 z-50 rounded-lg border border-solid p-2'>
+      <div className='z-50 rounded-lg border border-solid border-text bg-crust/80 p-2'>
         <p>
           {label}: {Number(payload[0].value.toFixed(1))}/10
         </p>
@@ -135,13 +135,13 @@ const GraphGrades: FC<Props> = memo(({ goal, total, pred }): ReactElement => {
           '330px'
         : '400px'
       }
-      height={40}
+      height={50}
     >
       <BarChart
         data={data}
         layout='vertical'
         margin={{
-          top: 0,
+          top: 20,
           right: 0,
           left: 0,
           bottom: 0,
@@ -154,7 +154,7 @@ const GraphGrades: FC<Props> = memo(({ goal, total, pred }): ReactElement => {
           <LabelList dataKey='name' position='insideLeft' fill='#ffffff' />
         </Bar>
         <ReferenceLine className='stroke-text [&>line]:!stroke-text' strokeDasharray='3 3' strokeWidth={2} x={goal}>
-          <Label value='goal' position='insideLeft' />
+          <Label value='goal' position='top' />
         </ReferenceLine>
       </BarChart>
     </ResponsiveContainer>
