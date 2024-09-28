@@ -15,6 +15,7 @@ import { Outlet, useNavigate } from 'react-router-dom';
 import { useShallow } from 'zustand/react/shallow';
 import { TileViewStoreProvider, useTileViewStore } from './tileViewContext';
 import { UseMediaQuery } from '@/hooks/UseMediaQuery';
+import Notifications from '@/components/particles/notifications/notifications';
 
 const StudentDashboard: FC = (): ReactElement => {
   const { studentId } = useRequiredParams(['studentId']);
@@ -112,6 +113,7 @@ const Dashboard: FC<DashboardProps> = ({ self }): ReactElement => {
         <div className='mb-3 w-full md:hidden'>
           <GradeDisplay />
         </div>
+        <Notifications />
         <Outlet />
       </div>
     </>

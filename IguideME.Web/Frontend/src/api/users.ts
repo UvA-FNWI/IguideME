@@ -1,4 +1,4 @@
-import { CourseNotificationDetail, type Notifications } from '@/types/notifications';
+import { type CourseNotificationDetail, type Notifications } from '@/types/notifications';
 import { type User } from '@/types/user';
 import apiClient from './axios';
 
