@@ -2225,6 +2225,28 @@ namespace IguideME.Web.Services
             return requirements;
         }
 
+        public void CleanupNotifications(int courseID)
+        {
+            try
+            {
+                NonQuery(
+                    DatabaseQueries.DELETE_OBSOLETE_NOTIFICATIONS
+                // TODO: notifications relationship with courses needs to be worked out better. Currently a sync deletes
+                // all unsent notifications from all courses.
+                // ,
+                // new SQLiteParameter("courseID", courseID)
+                );
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(
+                    "Error removing notifications: {message}\n{trace}",
+                    e.Message,
+                    e.StackTrace
+                );
+            }
+        }
+
         public void RegisterNotification(
             int courseID,
             string userID,

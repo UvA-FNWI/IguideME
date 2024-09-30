@@ -9,13 +9,13 @@ public static class DatabaseQueries
     public static readonly Dictionary<string, string> MIGRATIONS =
         new()
         {
-            {
-            "001_drop_notifications",
-            @"
-            DROP TABLE notifications
-            ;"
-            },
-       };
+            // {
+            // "001_drop_notifications",
+            // @"
+            // DROP TABLE notifications
+            // ;"
+            // },
+        };
 
     // //================================ Tables ================================//
     /**
@@ -462,6 +462,12 @@ public static class DatabaseQueries
           ORDER BY  `sync_id`
             DESC
           LIMIT 1;";
+
+    public const string DELETE_OBSOLETE_NOTIFICATIONS =
+        @"DELETE
+          FROM          `notifications`
+          WHERE         `sent` IS NULL;";
+
     public const string REGISTER_USER_NOTIFICATIONS =
         @"INSERT INTO   `notifications` (   `user_id`,
                                             `tile_id`,

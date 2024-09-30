@@ -384,6 +384,8 @@ namespace IguideME.Web.Services.Workers
 
         void CreateNotifications(List<string> users)
         {
+            this._logger.LogInformation("Cleaning up old notifications");
+            this._databaseManager.CleanupNotifications(this._courseID);
             this._logger.LogInformation("Creating Notifications for Peer Group");
             foreach (string user in users)
             {
@@ -396,7 +398,6 @@ namespace IguideME.Web.Services.Workers
             _logger.LogInformation("Creating notification for user {}", user);
             foreach ((int tileID, List<double> peerGrades) in this.peerTileGradesMap)
             {
-                _logger.LogInformation("test {} {}", _databaseManager.GetTileNotificationState(tileID), tileID);
 
                 // Get only tiles with notifications
                 if (_databaseManager.GetTileNotificationState(tileID))
