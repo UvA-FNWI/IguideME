@@ -289,6 +289,7 @@ namespace IguideME.Web.Controllers
 		{
 
 			var body = JObject.Parse(new StreamReader(Request.Body).ReadToEnd());
+            _logger.LogInformation("Body: {Body}", body);
 
 			// Check if all required fields are present
 			if (!body.ContainsKey("isRange") ||

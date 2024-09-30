@@ -66,7 +66,7 @@ const NotificationSettingsForm: FC<{
   const [checkedList, setCheckedList] = useState<string[]>(selectedDays ?? ['Tue', 'Thu']);
 
   const rangeChangeHandler = useCallback(() => {
-    form.resetFields();
+    form.setFieldsValue({ selectedDates: [] });
     setRange((prev) => !prev);
   }, [form]);
 
@@ -144,7 +144,16 @@ interface DatePickersProps {
 }
 
 const DatePickers: FC<DatePickersProps> = memo(({ isRange, checkedList, setCheckedList }): ReactElement => {
-  const checkBoxOptions = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const checkBoxOptions = [
+    { label: 'Mon', value: 'Monday' },
+    { label: 'Tue', value: 'Tuesday' },
+    { label: 'Wed', value: 'Wednesday' },
+    { label: 'Thu', value: 'Thursday' },
+    { label: 'Fri', value: 'Friday' },
+    { label: 'Sat', value: 'Saturday' },
+    { label: 'Sun', value: 'Sunday' },
+  ];
+
   const [error, setError] = useState<string | null>(null);
 
   const onGroupChange = useCallback((list: string[]) => {
@@ -158,7 +167,7 @@ const DatePickers: FC<DatePickersProps> = memo(({ isRange, checkedList, setCheck
   }, []);
 
   const onCheckAllChange = useCallback((e: CheckboxChangeEvent) => {
-    setCheckedList(e.target.checked ? checkBoxOptions : []);
+    setCheckedList(e.target.checked ? checkBoxOptions.map((option) => option.value) : []);
   }, []);
 
   const Range = (
@@ -170,7 +179,7 @@ const DatePickers: FC<DatePickersProps> = memo(({ isRange, checkedList, setCheck
       >
         <DatePicker.RangePicker
           className='w-full !max-w-72 [&_input]:!text-text'
-          disabledDate={(current) => current.toDate() < new Date()}
+          disabledDate={(current) => current.toDate().getTime() < new Date().setHours(0, 0, 0, 0)}
           format='YYYY-MM-DD'
           picker='week'
         />
@@ -202,7 +211,7 @@ const DatePickers: FC<DatePickersProps> = memo(({ isRange, checkedList, setCheck
     <Form.Item className='m-0' name='selectedDates' rules={[{ required: true, message: 'Please select a date' }]}>
       <DatePicker
         className='!w-full !max-w-72'
-        disabledDate={(current) => current.toDate() < new Date()}
+        disabledDate={(current) => current.toDate().getTime() < new Date().setHours(0, 0, 0, 0)}
         format='YYYY-MM-DD'
         multiple
         maxTagCount='responsive'

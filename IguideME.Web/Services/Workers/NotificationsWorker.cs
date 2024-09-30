@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using IguideME.Web.Models;
 using IguideME.Web.Models.App;
@@ -110,25 +111,40 @@ namespace IguideME.Web.Services.Workers
 
         }
 
-        private bool checkSend()
+        private bool CheckSend()
         {
             var notificationDates = _databaseManager.GetNotificationDates(_courseID);
 
-            string dataDates = notificationDates.selectedDates;
-            if (string.IsNullOrEmpty(dataDates))
-                return false;
+            string selectedDates = notificationDates.selectedDates;
+            if (string.IsNullOrEmpty(selectedDates)) return false;
 
-            // Check if any of the dates are in the future
-            string[] dates = dataDates.Split(", ");
+            string[] dates = selectedDates.Split(new [] { ", " }, StringSplitOptions.RemoveEmptyEntries);
+            DateTime today = DateTime.Now.Date;
 
             bool send = false;
-            foreach (string date in dates)
+            if (notificationDates.isRange)
             {
-                if (DateTime.Now <= DateTime.Parse(date))
+                string[] selectedDays = notificationDates.selectedDays.Split(new [] { ", " }, StringSplitOptions.RemoveEmptyEntries);
+                string firstSelectedDate = dates[0];
+                string lastSelectedDate = dates[^1];
+
+                // Check if today is in the range of firstSelectedDate and lastSelectedDate
+                if (today >= DateTime.Parse(firstSelectedDate) && today <= DateTime.Parse(lastSelectedDate))
                 {
-                    send = true;
-                    break;
+                    string todayDayOfWeek = today.DayOfWeek.ToString();
+                    foreach (string selectedDay in selectedDays)
+                    {
+                        if (todayDayOfWeek == selectedDay)
+                        {
+                            send = true;
+                            break;
+                        }
+                    }
                 }
+            }
+            else
+            {
+                send = dates.Any(date => DateTime.Parse(date).Date == today);
             }
 
             return _sendNotifications && send;
@@ -141,7 +157,7 @@ namespace IguideME.Web.Services.Workers
         {
             _logger.LogInformation("Starting notifications sync...");
 
-            if (!checkSend())
+            if (!CheckSend())
             {
                 _logger.LogInformation("Not sending notifications this sync");
                 return;
