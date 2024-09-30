@@ -2,10 +2,10 @@ import { getCourseNotifications } from '@/api/users';
 import AdminTitle from '@/components/atoms/admin-titles/admin-titles';
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
-import { CourseNotificationDetail, NotificationStatus } from '@/types/notifications';
+import { type CourseNotificationDetail, NotificationStatus } from '@/types/notifications';
 import { useQuery } from '@tanstack/react-query';
-import { Table } from 'antd';
-import { useMemo, type FC, type ReactElement } from 'react';
+import { Button, Table } from 'antd';
+import { useMemo, useState, type FC, type ReactElement } from 'react';
 
 const columns = [
   {
@@ -17,6 +17,7 @@ const columns = [
     title: 'Received Notifications',
     dataIndex: 'receivedNotifications',
     key: 'receivedNotifications',
+    render: (notifications: string) => <NotificationCell notifications={notifications} />,
   },
   {
     title: 'To Be Sent Notifications',
@@ -24,6 +25,36 @@ const columns = [
     key: 'toBeSentNotifications',
   },
 ];
+
+const NotificationCell = ({ notifications }: { notifications: string }): ReactElement => {
+  const [showAll, setShowAll] = useState(false);
+
+  const notificationBlocks = notifications
+    .trim()
+    .split('\r\n\r\n')
+    .map((block) => block.trim());
+
+  const notificationArray = notifications.split('\r\n');
+  const displayedNotifications = showAll ? notificationArray : notificationBlocks[0];
+
+  return (
+    <div className='flex flex-col gap-4'>
+      <span>{typeof displayedNotifications === 'string' ? displayedNotifications : notifications}</span>
+      <span>
+        {notificationBlocks.length > 1 && (
+          <Button
+            className='custom-default-button'
+            onClick={() => {
+              setShowAll((prev) => !prev);
+            }}
+          >
+            {showAll ? 'Show Less' : `Show More (${notificationBlocks.length - 1} more)`}
+          </Button>
+        )}
+      </span>
+    </div>
+  );
+};
 
 const NotificationStatusToText = (status: NotificationStatus): string => {
   switch (status) {
@@ -36,7 +67,7 @@ const NotificationStatusToText = (status: NotificationStatus): string => {
     case NotificationStatus.outperforming:
       return 'You are outperforming your peers in:';
     default:
-      return 'Unknown';
+      return 'Unknown:';
   }
 };
 
@@ -50,43 +81,32 @@ const NotificationCentre: FC = (): ReactElement => {
     queryFn: async () => await getCourseNotifications(),
   });
 
-  console.log('notifications', notifications);
-
   const tableData = useMemo(() => {
-    return Object.entries(notifications || {}).map(
+    return Object.entries(notifications ?? {}).map(
       ([studentName, notifications]: [string, CourseNotificationDetail[]], index) => {
-        if (!notifications) {
-          return {
-            key: index,
-            studentName,
-            receivedNotifications: '',
-            toBeSentNotifications: '',
-          };
-        }
-
         const receivedNotifications = notifications
           .filter((n) => n.sent !== null)
-          .sort((a, b) => (b.sent as number) - (a.sent as number))
-          .reduce(
-            (acc, n) => {
-              const sentDate = new Date(n.sent!).toLocaleDateString();
-              if (!acc[sentDate]) {
-                acc[sentDate] = [];
-              }
-              acc[sentDate].push(`${NotificationStatusToText(n.status)} ${n.tile_title}`);
-              return acc;
-            },
-            {} as Record<string, string[]>,
-          );
+          .sort((a, b) => b.sent! - a.sent!)
+          .reduce<Record<string, string[]>>((acc, n) => {
+            const sentDate = new Date(n.sent!).toLocaleDateString();
+            if (!acc[sentDate]) {
+              acc[sentDate] = [];
+            }
+            acc[sentDate].push(`${NotificationStatusToText(n.status)} ${n.tile_title}`);
+            return acc;
+          }, {});
 
         const formattedNotifications = Object.entries(receivedNotifications)
           .map(([date, notifications]) => `${date}\r\n${notifications.join('\r\n')}`)
           .join('\r\n\r\n');
 
-        const toBeSentNotifications = notifications
-          .filter((n) => n.sent === null)
-          .map((n) => `${NotificationStatusToText(n.status)} ${n.tile_title}`)
-          .join('\r\n');
+        const toBeSentNotifications = Array.from(
+          new Set(
+            notifications
+              .filter((n) => n.sent === null)
+              .map((n) => `${NotificationStatusToText(n.status)} ${n.tile_title}`),
+          ),
+        ).join('\r\n');
 
         return {
           key: index,
@@ -104,7 +124,7 @@ const NotificationCentre: FC = (): ReactElement => {
       {isError ?
         <QueryError className='relative' title='Failed to fetch notifications' />
       : <QueryLoading isLoading={isLoading}>
-          <Table columns={columns} dataSource={tableData} />
+          <Table className='[&_td]:!whitespace-pre' columns={columns} dataSource={tableData} />
         </QueryLoading>
       }
     </>
