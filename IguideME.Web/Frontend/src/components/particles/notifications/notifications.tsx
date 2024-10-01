@@ -23,6 +23,16 @@ const Notifications: FC = (): ReactElement | null => {
     return null;
   }
 
+  // If there are no notifications, we don't want to render the card
+  if (
+    notifications.outperforming.length === 0 &&
+    notifications.closing.length === 0 &&
+    notifications.falling.length === 0 &&
+    notifications.effort.length === 0
+  ) {
+    return null;
+  }
+
   const styledNotifications = [
     notifications.outperforming.length > 0 && (
       <div key='outperforming'>
