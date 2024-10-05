@@ -166,6 +166,12 @@ const MOCK_PEER_TILE_GRADES: Array<
       tileID: 2,
     },
     {
+      peerAvg: 65,
+      peerMin: 43,
+      peerMax: 89,
+      tileID: 3,
+    },
+    {
       peerAvg: 62.5,
       peerMin: 12.5,
       peerMax: 87.5,
@@ -207,6 +213,12 @@ const MOCK_PEER_TILE_GRADES: Array<
       tileID: 2,
     },
     {
+      peerAvg: 69.3,
+      peerMin: 40,
+      peerMax: 95,
+      tileID: 3,
+    },
+    {
       peerAvg: 67.5,
       peerMin: 12.5,
       peerMax: 100,
@@ -244,6 +256,12 @@ const MOCK_PEER_TILE_GRADES: Array<
       peerMin: 33,
       peerMax: 99,
       tileID: 2,
+    },
+    {
+      peerAvg: 79.3,
+      peerMin: 33,
+      peerMax: 100,
+      tileID: 3,
     },
     {
       peerAvg: 73.61111111111111,
@@ -287,6 +305,12 @@ const MOCK_PEER_TILE_GRADES: Array<
       tileID: 2,
     },
     {
+      peerAvg: 62,
+      peerMin: 23,
+      peerMax: 79,
+      tileID: 3,
+    },
+    {
       peerAvg: 73.21428571428571,
       peerMin: 37.5,
       peerMax: 100,
@@ -328,6 +352,12 @@ const MOCK_PEER_TILE_GRADES: Array<
       tileID: 2,
     },
     {
+      peerAvg: 52.6,
+      peerMin: 10,
+      peerMax: 99,
+      tileID: 3,
+    },
+    {
       peerAvg: 65,
       peerMin: 25,
       peerMax: 100,
@@ -365,6 +395,12 @@ const MOCK_PEER_TILE_GRADES: Array<
       peerMin: 0,
       peerMax: 99,
       tileID: 2,
+    },
+    {
+      peerAvg: 42.22222222222223,
+      peerMin: 15,
+      peerMax: 80,
+      tileID: 3,
     },
     {
       peerAvg: 72.22222222222223,
@@ -405,6 +441,12 @@ const MOCK_PEER_TILE_GRADES: Array<
       peerMin: 66,
       peerMax: 99,
       tileID: 2,
+    },
+    {
+      peerAvg: 86.5625,
+      peerMin: 50,
+      peerMax: 100,
+      tileID: 3,
     },
     {
       peerAvg: 76.5625,
@@ -448,6 +490,12 @@ const MOCK_PEER_TILE_GRADES: Array<
       tileID: 2,
     },
     {
+      peerAvg: 90,
+      peerMin: 72.5,
+      peerMax: 100,
+      tileID: 3,
+    },
+    {
       peerAvg: 80,
       peerMin: 62.5,
       peerMax: 100,
@@ -487,6 +535,12 @@ const MOCK_PEER_TILE_GRADES: Array<
       peerMin: 33,
       peerMax: 99,
       tileID: 2,
+    },
+    {
+      peerAvg: 80,
+      peerMin: 55,
+      peerMax: 100,
+      tileID: 3,
     },
     {
       peerAvg: 70,
@@ -533,6 +587,11 @@ const MOCK_TILE_GRADES: Array<{
         max: 5,
       },
       {
+        grade: 73,
+        tile_id: 3,
+        max: 100,
+      },
+      {
         grade: 87.5,
         tile_id: 4,
         max: 100,
@@ -568,6 +627,11 @@ const MOCK_TILE_GRADES: Array<{
         max: 5,
       },
       {
+        grade: 40,
+        tile_id: 3,
+        max: 100,
+      },
+      {
         grade: 12.5,
         tile_id: 4,
         max: 100,
@@ -603,6 +667,11 @@ const MOCK_TILE_GRADES: Array<{
         max: 5,
       },
       {
+        grade: 10,
+        tile_id: 3,
+        max: 100,
+      },
+      {
         grade: 62.5,
         tile_id: 4,
         max: 100,
@@ -636,6 +705,11 @@ const MOCK_TILE_GRADES: Array<{
         grade: 66,
         tile_id: 2,
         max: 5,
+      },
+      {
+        grade: 73,
+        tile_id: 3,
+        max: 100,
       },
       {
         grade: 87.5,
@@ -673,6 +747,11 @@ const MOCK_TILE_GRADES: Array<{
         max: 5,
       },
       {
+        grade: 40,
+        tile_id: 3,
+        max: 100,
+      },
+      {
         grade: 12.5,
         tile_id: 4,
         max: 100,
@@ -708,6 +787,11 @@ const MOCK_TILE_GRADES: Array<{
         max: 5,
       },
       {
+        grade: 10,
+        tile_id: 3,
+        max: 100,
+      },
+      {
         grade: 62.5,
         tile_id: 4,
         max: 100,
@@ -741,6 +825,11 @@ const MOCK_TILE_GRADES: Array<{
         grade: 66,
         tile_id: 2,
         max: 5,
+      },
+      {
+        grade: 73,
+        tile_id: 3,
+        max: 100,
       },
       {
         grade: 87.5,
@@ -778,6 +867,11 @@ const MOCK_TILE_GRADES: Array<{
         max: 5,
       },
       {
+        grade: 30,
+        tile_id: 3,
+        max: 100,
+      },
+      {
         grade: 62.5,
         tile_id: 4,
         max: 100,
@@ -811,6 +905,11 @@ const MOCK_TILE_GRADES: Array<{
         grade: 99,
         tile_id: 2,
         max: 5,
+      },
+      {
+        grade: 65,
+        tile_id: 3,
+        max: 100,
       },
       {
         grade: 62.5,
@@ -848,6 +947,11 @@ const MOCK_TILE_GRADES: Array<{
         max: 5,
       },
       {
+        grade: 10,
+        tile_id: 3,
+        max: 100,
+      },
+      {
         grade: 100,
         tile_id: 4,
         max: 100,
@@ -881,6 +985,11 @@ const MOCK_TILE_GRADES: Array<{
         grade: 33,
         tile_id: 2,
         max: 5,
+      },
+      {
+        grade: 40,
+        tile_id: 3,
+        max: 100,
       },
       {
         grade: 37.5,
@@ -918,6 +1027,11 @@ const MOCK_TILE_GRADES: Array<{
         max: 5,
       },
       {
+        grade: 10,
+        tile_id: 3,
+        max: 100,
+      },
+      {
         grade: 87.5,
         tile_id: 4,
         max: 100,
@@ -953,6 +1067,11 @@ const MOCK_TILE_GRADES: Array<{
         max: 5,
       },
       {
+        grade: 40,
+        tile_id: 3,
+        max: 100,
+      },
+      {
         grade: 62.5,
         tile_id: 4,
         max: 100,
@@ -986,6 +1105,11 @@ const MOCK_TILE_GRADES: Array<{
         grade: 33,
         tile_id: 2,
         max: 5,
+      },
+      {
+        grade: 40,
+        tile_id: 3,
+        max: 100,
       },
       {
         grade: 100,
@@ -1023,6 +1147,11 @@ const MOCK_TILE_GRADES: Array<{
         max: 5,
       },
       {
+        grade: 10,
+        tile_id: 3,
+        max: 100,
+      },
+      {
         grade: 62.5,
         tile_id: 4,
         max: 100,
@@ -1056,6 +1185,11 @@ const MOCK_TILE_GRADES: Array<{
         grade: 66,
         tile_id: 2,
         max: 5,
+      },
+      {
+        grade: 73,
+        tile_id: 3,
+        max: 100,
       },
       {
         grade: 87.5,
@@ -1093,6 +1227,11 @@ const MOCK_TILE_GRADES: Array<{
         max: 5,
       },
       {
+        grade: 16,
+        tile_id: 3,
+        max: 100,
+      },
+      {
         grade: 62.5,
         tile_id: 4,
         max: 100,
@@ -1126,6 +1265,11 @@ const MOCK_TILE_GRADES: Array<{
         grade: 99,
         tile_id: 2,
         max: 5,
+      },
+      {
+        grade: 16,
+        tile_id: 3,
+        max: 100,
       },
       {
         grade: 62.5,
@@ -1163,6 +1307,11 @@ const MOCK_TILE_GRADES: Array<{
         max: 5,
       },
       {
+        grade: 60,
+        tile_id: 3,
+        max: 100,
+      },
+      {
         grade: 100,
         tile_id: 4,
         max: 100,
@@ -1196,6 +1345,11 @@ const MOCK_TILE_GRADES: Array<{
         grade: 33,
         tile_id: 2,
         max: 5,
+      },
+      {
+        grade: 40,
+        tile_id: 3,
+        max: 100,
       },
       {
         grade: 37.5,
@@ -1233,6 +1387,11 @@ const MOCK_TILE_GRADES: Array<{
         max: 5,
       },
       {
+        grade: 70,
+        tile_id: 3,
+        max: 100,
+      },
+      {
         grade: 87.5,
         tile_id: 4,
         max: 100,
@@ -1268,6 +1427,11 @@ const MOCK_TILE_GRADES: Array<{
         max: 5,
       },
       {
+        grade: 40,
+        tile_id: 3,
+        max: 100,
+      },
+      {
         grade: 62.5,
         tile_id: 4,
         max: 100,
@@ -1301,6 +1465,11 @@ const MOCK_TILE_GRADES: Array<{
         grade: 33,
         tile_id: 2,
         max: 5,
+      },
+      {
+        grade: 40,
+        tile_id: 3,
+        max: 100,
       },
       {
         grade: 100,
@@ -1338,6 +1507,11 @@ const MOCK_TILE_GRADES: Array<{
         max: 5,
       },
       {
+        grade: 16,
+        tile_id: 3,
+        max: 100,
+      },
+      {
         grade: 62.5,
         tile_id: 4,
         max: 100,
@@ -1371,6 +1545,11 @@ const MOCK_TILE_GRADES: Array<{
         grade: 99,
         tile_id: 2,
         max: 5,
+      },
+      {
+        grade: 19,
+        tile_id: 3,
+        max: 100,
       },
       {
         grade: 62.5,
@@ -1408,6 +1587,11 @@ const MOCK_TILE_GRADES: Array<{
         max: 5,
       },
       {
+        grade: 69,
+        tile_id: 3,
+        max: 100,
+      },
+      {
         grade: 100,
         tile_id: 4,
         max: 100,
@@ -1441,6 +1625,11 @@ const MOCK_TILE_GRADES: Array<{
         grade: 33,
         tile_id: 2,
         max: 5,
+      },
+      {
+        grade: 40,
+        tile_id: 3,
+        max: 100,
       },
       {
         grade: 37.5,
@@ -1478,6 +1667,11 @@ const MOCK_TILE_GRADES: Array<{
         max: 5,
       },
       {
+        grade: 80,
+        tile_id: 3,
+        max: 100,
+      },
+      {
         grade: 87.5,
         tile_id: 4,
         max: 100,
@@ -1513,6 +1707,11 @@ const MOCK_TILE_GRADES: Array<{
         max: 5,
       },
       {
+        grade: 40,
+        tile_id: 3,
+        max: 100,
+      },
+      {
         grade: 62.5,
         tile_id: 4,
         max: 100,
@@ -1546,6 +1745,11 @@ const MOCK_TILE_GRADES: Array<{
         grade: 33,
         tile_id: 2,
         max: 5,
+      },
+      {
+        grade: 40,
+        tile_id: 3,
+        max: 100,
       },
       {
         grade: 100,
@@ -1583,6 +1787,11 @@ const MOCK_TILE_GRADES: Array<{
         max: 5,
       },
       {
+        grade: 56,
+        tile_id: 3,
+        max: 100,
+      },
+      {
         grade: 87.5,
         tile_id: 4,
         max: 100,
@@ -1616,6 +1825,11 @@ const MOCK_TILE_GRADES: Array<{
         grade: 99,
         tile_id: 2,
         max: 5,
+      },
+      {
+        grade: 66,
+        tile_id: 3,
+        max: 100,
       },
       {
         grade: 87.5,
@@ -1653,6 +1867,11 @@ const MOCK_TILE_GRADES: Array<{
         max: 5,
       },
       {
+        grade: 96,
+        tile_id: 3,
+        max: 100,
+      },
+      {
         grade: 100,
         tile_id: 4,
         max: 100,
@@ -1686,6 +1905,11 @@ const MOCK_TILE_GRADES: Array<{
         grade: 99,
         tile_id: 2,
         max: 5,
+      },
+      {
+        grade: 86,
+        tile_id: 3,
+        max: 100,
       },
       {
         grade: 62.5,
@@ -1723,6 +1947,11 @@ const MOCK_TILE_GRADES: Array<{
         max: 5,
       },
       {
+        grade: 56,
+        tile_id: 3,
+        max: 100,
+      },
+      {
         grade: 100,
         tile_id: 4,
         max: 100,
@@ -1756,6 +1985,11 @@ const MOCK_TILE_GRADES: Array<{
         grade: 99,
         tile_id: 2,
         max: 5,
+      },
+      {
+        grade: 46,
+        tile_id: 3,
+        max: 100,
       },
       {
         grade: 75,
@@ -1793,6 +2027,11 @@ const MOCK_TILE_GRADES: Array<{
         max: 5,
       },
       {
+        grade: 40,
+        tile_id: 3,
+        max: 100,
+      },
+      {
         grade: 37.5,
         tile_id: 4,
         max: 100,
@@ -1826,6 +2065,11 @@ const MOCK_TILE_GRADES: Array<{
         grade: 0,
         tile_id: 2,
         max: 5,
+      },
+      {
+        grade: 33,
+        tile_id: 3,
+        max: 100,
       },
       {
         grade: 25,
@@ -1863,6 +2107,11 @@ const MOCK_TILE_GRADES: Array<{
         max: 5,
       },
       {
+        grade: 40,
+        tile_id: 3,
+        max: 100,
+      },
+      {
         grade: 25,
         tile_id: 4,
         max: 100,
@@ -1896,6 +2145,11 @@ const MOCK_TILE_GRADES: Array<{
         grade: 66,
         tile_id: 2,
         max: 5,
+      },
+      {
+        grade: 73,
+        tile_id: 3,
+        max: 100,
       },
       {
         grade: 50,
@@ -1933,6 +2187,11 @@ const MOCK_TILE_GRADES: Array<{
         max: 5,
       },
       {
+        grade: 43,
+        tile_id: 3,
+        max: 100,
+      },
+      {
         grade: 25,
         tile_id: 4,
         max: 100,
@@ -1966,6 +2225,11 @@ const MOCK_TILE_GRADES: Array<{
         grade: 99,
         tile_id: 2,
         max: 5,
+      },
+      {
+        grade: 66,
+        tile_id: 3,
+        max: 100,
       },
       {
         grade: 100,
@@ -2003,6 +2267,11 @@ const MOCK_TILE_GRADES: Array<{
         max: 5,
       },
       {
+        grade: 76,
+        tile_id: 3,
+        max: 100,
+      },
+      {
         grade: 87.5,
         tile_id: 4,
         max: 100,
@@ -2036,6 +2305,11 @@ const MOCK_TILE_GRADES: Array<{
         grade: 99,
         tile_id: 2,
         max: 5,
+      },
+      {
+        grade: 46,
+        tile_id: 3,
+        max: 100,
       },
       {
         grade: 100,
@@ -2073,6 +2347,11 @@ const MOCK_TILE_GRADES: Array<{
         max: 5,
       },
       {
+        grade: 56,
+        tile_id: 3,
+        max: 100,
+      },
+      {
         grade: 50,
         tile_id: 4,
         max: 100,
@@ -2106,6 +2385,11 @@ const MOCK_TILE_GRADES: Array<{
         grade: 66,
         tile_id: 2,
         max: 5,
+      },
+      {
+        grade: 73,
+        tile_id: 3,
+        max: 100,
       },
       {
         grade: 75,
@@ -2143,6 +2427,11 @@ const MOCK_TILE_GRADES: Array<{
         max: 5,
       },
       {
+        grade: 46,
+        tile_id: 3,
+        max: 100,
+      },
+      {
         grade: 100,
         tile_id: 4,
         max: 100,
@@ -2176,6 +2465,11 @@ const MOCK_TILE_GRADES: Array<{
         grade: 33,
         tile_id: 2,
         max: 5,
+      },
+      {
+        grade: 40,
+        tile_id: 3,
+        max: 100,
       },
       {
         grade: 50,
@@ -2213,6 +2507,11 @@ const MOCK_TILE_GRADES: Array<{
         max: 5,
       },
       {
+        grade: 46,
+        tile_id: 3,
+        max: 100,
+      },
+      {
         grade: 62.5,
         tile_id: 4,
         max: 100,
@@ -2246,6 +2545,11 @@ const MOCK_TILE_GRADES: Array<{
         grade: 66,
         tile_id: 2,
         max: 5,
+      },
+      {
+        grade: 73,
+        tile_id: 3,
+        max: 100,
       },
       {
         grade: 87.5,
@@ -2283,6 +2587,11 @@ const MOCK_TILE_GRADES: Array<{
         max: 5,
       },
       {
+        grade: 46,
+        tile_id: 3,
+        max: 100,
+      },
+      {
         grade: 87.5,
         tile_id: 4,
         max: 100,
@@ -2316,6 +2625,11 @@ const MOCK_TILE_GRADES: Array<{
         grade: 99,
         tile_id: 2,
         max: 5,
+      },
+      {
+        grade: 46,
+        tile_id: 3,
+        max: 100,
       },
       {
         grade: 75,
@@ -2353,6 +2667,11 @@ const MOCK_TILE_GRADES: Array<{
         max: 5,
       },
       {
+        grade: 46,
+        tile_id: 3,
+        max: 100,
+      },
+      {
         grade: 62.5,
         tile_id: 4,
         max: 100,
@@ -2386,6 +2705,11 @@ const MOCK_TILE_GRADES: Array<{
         grade: 99,
         tile_id: 2,
         max: 5,
+      },
+      {
+        grade: 56,
+        tile_id: 3,
+        max: 100,
       },
       {
         grade: 50,
@@ -2423,6 +2747,11 @@ const MOCK_TILE_GRADES: Array<{
         max: 5,
       },
       {
+        grade: 73,
+        tile_id: 3,
+        max: 100,
+      },
+      {
         grade: 75,
         tile_id: 4,
         max: 100,
@@ -2456,6 +2785,11 @@ const MOCK_TILE_GRADES: Array<{
         grade: 99,
         tile_id: 2,
         max: 5,
+      },
+      {
+        grade: 56,
+        tile_id: 3,
+        max: 100,
       },
       {
         grade: 75,
@@ -2493,6 +2827,11 @@ const MOCK_TILE_GRADES: Array<{
         max: 5,
       },
       {
+        grade: 76,
+        tile_id: 3,
+        max: 100,
+      },
+      {
         grade: 100,
         tile_id: 4,
         max: 100,
@@ -2526,6 +2865,11 @@ const MOCK_TILE_GRADES: Array<{
         grade: 99,
         tile_id: 2,
         max: 5,
+      },
+      {
+        grade: 86,
+        tile_id: 3,
+        max: 100,
       },
       {
         grade: 75,
@@ -2563,6 +2907,11 @@ const MOCK_TILE_GRADES: Array<{
         max: 5,
       },
       {
+        grade: 40,
+        tile_id: 3,
+        max: 100,
+      },
+      {
         grade: 100,
         tile_id: 4,
         max: 100,
@@ -2596,6 +2945,11 @@ const MOCK_TILE_GRADES: Array<{
         grade: 99,
         tile_id: 2,
         max: 5,
+      },
+      {
+        grade: 86,
+        tile_id: 3,
+        max: 100,
       },
       {
         grade: 100,
@@ -2633,6 +2987,11 @@ const MOCK_TILE_GRADES: Array<{
         max: 5,
       },
       {
+        grade: 86,
+        tile_id: 3,
+        max: 100,
+      },
+      {
         grade: 75,
         tile_id: 4,
         max: 100,
@@ -2666,6 +3025,11 @@ const MOCK_TILE_GRADES: Array<{
         grade: 99,
         tile_id: 2,
         max: 5,
+      },
+      {
+        grade: 86,
+        tile_id: 3,
+        max: 100,
       },
       {
         grade: 87.5,
@@ -2703,6 +3067,11 @@ const MOCK_TILE_GRADES: Array<{
         max: 5,
       },
       {
+        grade: 66,
+        tile_id: 3,
+        max: 100,
+      },
+      {
         grade: 100,
         tile_id: 4,
         max: 100,
@@ -2736,6 +3105,11 @@ const MOCK_TILE_GRADES: Array<{
         grade: 99,
         tile_id: 2,
         max: 5,
+      },
+      {
+        grade: 66,
+        tile_id: 3,
+        max: 100,
       },
       {
         grade: 62.5,
@@ -2773,6 +3147,11 @@ const MOCK_TILE_GRADES: Array<{
         max: 5,
       },
       {
+        grade: 66,
+        tile_id: 3,
+        max: 100,
+      },
+      {
         grade: 75,
         tile_id: 4,
         max: 100,
@@ -2806,6 +3185,11 @@ const MOCK_TILE_GRADES: Array<{
         grade: 66,
         tile_id: 2,
         max: 5,
+      },
+      {
+        grade: 73,
+        tile_id: 3,
+        max: 100,
       },
       {
         grade: 62.5,
@@ -2843,6 +3227,11 @@ const MOCK_TILE_GRADES: Array<{
         max: 5,
       },
       {
+        grade: 73,
+        tile_id: 3,
+        max: 100,
+      },
+      {
         grade: 62.5,
         tile_id: 4,
         max: 100,
@@ -2876,6 +3265,11 @@ const MOCK_TILE_GRADES: Array<{
         grade: 99,
         tile_id: 2,
         max: 5,
+      },
+      {
+        grade: 66,
+        tile_id: 3,
+        max: 100,
       },
       {
         grade: 75,
@@ -2913,6 +3307,11 @@ const MOCK_TILE_GRADES: Array<{
         max: 5,
       },
       {
+        grade: 66,
+        tile_id: 3,
+        max: 100,
+      },
+      {
         grade: 100,
         tile_id: 4,
         max: 100,
@@ -2946,6 +3345,11 @@ const MOCK_TILE_GRADES: Array<{
         grade: 33,
         tile_id: 2,
         max: 5,
+      },
+      {
+        grade: 40,
+        tile_id: 3,
+        max: 100,
       },
       {
         grade: 25,
@@ -2983,6 +3387,11 @@ const MOCK_TILE_GRADES: Array<{
         max: 5,
       },
       {
+        grade: 66,
+        tile_id: 3,
+        max: 100,
+      },
+      {
         grade: 75,
         tile_id: 4,
         max: 100,
@@ -3016,6 +3425,11 @@ const MOCK_TILE_GRADES: Array<{
         grade: 66,
         tile_id: 2,
         max: 5,
+      },
+      {
+        grade: 73,
+        tile_id: 3,
+        max: 100,
       },
       {
         grade: 75,
