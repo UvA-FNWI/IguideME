@@ -6,11 +6,8 @@ export enum NotificationStatus {
 }
 
 export interface StudentNotification {
-  userID: string;
-  tile_id: number;
   tile_title: string;
   status: NotificationStatus;
-  sent: boolean;
 }
 
 export interface Notifications {

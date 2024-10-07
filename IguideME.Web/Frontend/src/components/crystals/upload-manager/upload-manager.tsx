@@ -1,28 +1,26 @@
+import { uploadData } from '@/api/tiles';
+import { Assignment } from '@/types/tile';
 import type { User } from '@/types/user';
 import { DownOutlined, QuestionCircleOutlined, RightOutlined } from '@ant-design/icons';
-import { Button, Col, Input, InputNumber, Row, Tooltip } from 'antd';
-import { useState, type ChangeEvent, type FC } from 'react';
-import UploadEditor from './upload-editor';
-import CSVReader, { type IFileInfo } from 'react-csv-reader';
-import type { Tile } from '@/types/tile';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { uploadData } from '@/api/tiles';
+import { Button, Col, InputNumber, Row, Tooltip } from 'antd';
+import { useState, type FC } from 'react';
+import CSVReader from 'react-csv-reader';
+import UploadEditor from './upload-editor';
 
 interface UploadManagerProps {
-  tile: Tile;
+  assignment: Assignment;
   closeUploadMenu: () => any;
   students: User[];
 }
 
-const UploadManager: FC<UploadManagerProps> = ({ tile, closeUploadMenu, students }) => {
+const UploadManager: FC<UploadManagerProps> = ({ assignment, closeUploadMenu, students }) => {
   const [data, setData] = useState<string[][]>([]);
-  const [title, setTitle] = useState<string>('');
   const [idColumn, setIdColumn] = useState<number>(0);
   const [gradeColumn, setGradeColumn] = useState<number>(0);
   const [editorCollapsed, setEditorCollapsed] = useState<boolean>(true);
 
-  const handleCSVUpload = (data: string[][], title: string): void => {
-    if (title.length < 1) setTitle(title);
+  const handleCSVUpload = (data: string[][]): void => {
     setData(data);
   };
 
@@ -47,10 +45,6 @@ const UploadManager: FC<UploadManagerProps> = ({ tile, closeUploadMenu, students
     setData(data);
   };
 
-  const changeTitle = (event: ChangeEvent<HTMLInputElement>): void => {
-    setTitle(event.target.value);
-  };
-
   const changeIDColumn = (nr: number | null): void => {
     setIdColumn(nr ?? 0);
   };
@@ -60,14 +54,14 @@ const UploadManager: FC<UploadManagerProps> = ({ tile, closeUploadMenu, students
   };
 
   const validate = (data: string[][]): boolean => {
-    return title.length > 0 && data.length > 1;
+    return data.length > 1;
   };
 
   const queryClient = useQueryClient();
   const { mutate: upload, isPending } = useMutation({
     mutationFn: uploadData,
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['tiles'] });
+      await queryClient.invalidateQueries({ queryKey: ['external-assignments'] });
     },
   });
 
@@ -96,8 +90,8 @@ const UploadManager: FC<UploadManagerProps> = ({ tile, closeUploadMenu, students
           >
             Upload CSV
             <CSVReader
-              onFileLoaded={(data: string[][], fileInfo: IFileInfo) => {
-                handleCSVUpload(data, fileInfo.name);
+              onFileLoaded={(data: string[][]) => {
+                handleCSVUpload(data);
               }}
               inputStyle={{ display: 'none' }}
               onError={() => {
@@ -111,27 +105,6 @@ const UploadManager: FC<UploadManagerProps> = ({ tile, closeUploadMenu, students
               }}
             />
           </label>
-        </Col>
-        <Col className='flex flex-col justify-between'>
-          <div className='flex flex-row items-center gap-1'>
-            <label>Entry title</label>
-            <Tooltip
-              title={
-                <span className='text-text'>
-                  Upon upload, the data will be saved as a tile entry, similarly to canvas assignments.
-                </span>
-              }
-              color='rgb(255, 255, 255)'
-            >
-              <QuestionCircleOutlined />
-            </Tooltip>
-          </div>
-          <Input
-            className='border-accent/50 bg-surface1 text-text hover:border-accent hover:bg-surface2 focus:border-accent focus:shadow-accent aria-invalid:!border-failure aria-invalid:shadow-none aria-invalid:focus:!shadow-sm aria-invalid:focus:!shadow-failure w-full focus:shadow-sm'
-            placeholder='Title'
-            value={title}
-            onChange={changeTitle}
-          />
         </Col>
         <Col className='flex flex-col justify-between'>
           <div className='flex flex-row items-center gap-1'>
@@ -149,7 +122,7 @@ const UploadManager: FC<UploadManagerProps> = ({ tile, closeUploadMenu, students
             </Tooltip>
           </div>
           <InputNumber
-            className='!border-accent/70 !bg-surface1 hover:!border-accent hover:!bg-surface2 [&_input]:!text-text w-[120px] !border border-solid'
+            className='w-[120px] !border border-solid !border-accent/70 !bg-surface1 hover:!border-accent hover:!bg-surface2 [&_input]:!text-text'
             min={0}
             value={idColumn}
             onChange={changeIDColumn}
@@ -171,7 +144,7 @@ const UploadManager: FC<UploadManagerProps> = ({ tile, closeUploadMenu, students
             </Tooltip>
           </div>
           <InputNumber
-            className='!border-accent/70 !bg-surface1 hover:!border-accent hover:!bg-surface2 [&_input]:!text-text w-[120px] !border border-solid'
+            className='w-[120px] !border border-solid !border-accent/70 !bg-surface1 hover:!border-accent hover:!bg-surface2 [&_input]:!text-text'
             min={0}
             value={gradeColumn}
             onChange={changeGradeColumn}
@@ -251,7 +224,7 @@ const UploadManager: FC<UploadManagerProps> = ({ tile, closeUploadMenu, students
           <Button
             className='custom-default-button'
             onClick={() => {
-              upload({ tileID: tile.id, idColumn, gradeColumn, title, data });
+              upload({ assignmentId: assignment.id, idColumn, gradeColumn, data });
             }}
             loading={isPending}
             disabled={!validate(data)}

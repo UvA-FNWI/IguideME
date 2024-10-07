@@ -147,7 +147,7 @@ namespace IguideME.Web.Services
                     courseID,
                     ass.Name,
                     ass.ID ?? -1,
-                    ass.IsPublished,
+                    ass.IsPublished ? 1 : 0,
                     ass.IsMuted,
                     ass.DueDate.HasValue
                         ? ((DateTimeOffset)ass.DueDate.Value).ToUnixTimeMilliseconds()
@@ -209,19 +209,20 @@ namespace IguideME.Web.Services
             return Connector
                 .FindCourseById(courseID)
                 .Quizzes.Where(quiz => quiz.Type != QuizType.Assignment)
+                // TODO: Filter out graded survey from assignments
                 .Select(quiz =>
                     (
                         new AppAssignment(
                             courseID,
                             quiz.Name,
                             quiz.ID ?? -1,
-                            quiz.IsPublished,
+                            quiz.IsPublished ? 1 : 0,
                             false,
                             quiz.DueDate.HasValue
                                 ? ((DateTimeOffset)quiz.DueDate.Value).ToUnixTimeMilliseconds()
                                 : 0,
                             quiz.PointsPossible ?? 0,
-                            AppGradingType.Points
+                            quiz.Type == QuizType.Survey || quiz.PointsPossible == null ? AppGradingType.PassFail : AppGradingType.Points
                         ),
                         quiz.Submissions.Where(sub => sub.Score != null)
                             .Select(sub => new AssignmentSubmission(

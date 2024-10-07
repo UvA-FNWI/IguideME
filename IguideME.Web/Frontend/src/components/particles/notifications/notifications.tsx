@@ -1,9 +1,9 @@
-import { RiseOutlined, TrophyOutlined, WarningOutlined } from '@ant-design/icons';
-import { type FC, type ReactElement } from 'react';
-import { Card } from 'antd';
 import { getStudentNotifications } from '@/api/users';
-import { useQuery } from '@tanstack/react-query';
 import { useTileViewStore } from '@/components/pages/student-dashboard/tileViewContext';
+import { RiseOutlined, TrophyOutlined, WarningOutlined } from '@ant-design/icons';
+import { useQuery } from '@tanstack/react-query';
+import { Card } from 'antd';
+import { type FC, type ReactElement } from 'react';
 
 const Notifications: FC = (): ReactElement | null => {
   const { user } = useTileViewStore((state) => ({
@@ -41,8 +41,8 @@ const Notifications: FC = (): ReactElement | null => {
           <p className='text-text'>You are outperforming your peers in:</p>
         </div>
         <ul className='list-disc pl-9 text-sm'>
-          {notifications.outperforming.map((notification) => (
-            <li className='text-text' key={notification.tile_id}>
+          {notifications.outperforming.map((notification, index) => (
+            <li className='text-text' key={index}>
               {notification.tile_title}
             </li>
           ))}
@@ -57,8 +57,8 @@ const Notifications: FC = (): ReactElement | null => {
           <p className='text-text'>You are closing the gap to your peers in:</p>
         </div>
         <ul className='list-disc pl-9 text-sm'>
-          {notifications.closing.map((notification) => (
-            <li className='text-text' key={notification.tile_id}>
+          {notifications.closing.map((notification, index) => (
+            <li className='text-text' key={index}>
               {notification.tile_title}
             </li>
           ))}
@@ -73,8 +73,8 @@ const Notifications: FC = (): ReactElement | null => {
           <p className='text-text'>You are falling behind in:</p>
         </div>
         <ul className='list-disc pl-9 text-sm'>
-          {notifications.falling.map((notification) => (
-            <li className='text-text' key={notification.tile_id}>
+          {notifications.falling.map((notification, index) => (
+            <li className='text-text' key={index}>
               {notification.tile_title}
             </li>
           ))}
@@ -89,8 +89,8 @@ const Notifications: FC = (): ReactElement | null => {
           <p className='text-text'>You have to put more effort in:</p>
         </div>
         <ul className='list-disc pl-9 text-sm'>
-          {notifications.effort.map((notification) => (
-            <li className='text-text' key={notification.tile_id}>
+          {notifications.effort.map((notification, index) => (
+            <li className='text-text' key={index}>
               {notification.tile_title}
             </li>
           ))}

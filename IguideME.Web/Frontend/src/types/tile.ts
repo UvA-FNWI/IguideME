@@ -43,11 +43,17 @@ export interface TileEntry {
   content_id: number;
 }
 
+enum PublilshedStatus {
+  NotPublished,
+  LMSPublished,
+  ExternalData,
+}
+
 export interface Assignment {
   id: number;
   course_id: number;
   title: string;
-  published: boolean;
+  published: PublilshedStatus;
   muted: boolean;
   due_date: number;
   max_grade: number;

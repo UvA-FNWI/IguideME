@@ -57,6 +57,7 @@ namespace IguideME.Web.Services.Workers
 				_logger.LogWarning("score {} {}", sub.UserID, sub.RawGrade);
 				sub.AssignmentID = assignment.ID;
 				sub.RawToGrade(assignment.GradingType, assignment.MaxGrade);
+				_logger.LogWarning("grade {} raw {} type {} max {}", sub.Grade, sub.RawGrade, assignment.GradingType, assignment.MaxGrade);
 				_databaseManager.CreateUserSubmission(sub);
 			}
 		}

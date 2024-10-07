@@ -2,6 +2,13 @@
 
 namespace IguideME.Web.Models.App
 {
+
+    public enum PublishStatus {
+        NotPublished,
+        LMSPublished,
+        ExternalData
+    }
+
     public class AppAssignment
     {
         [JsonProperty("id")]
@@ -17,7 +24,7 @@ namespace IguideME.Web.Models.App
         public int? ExternalID { get; set; }
 
         [JsonProperty("published")]
-        public bool Published { get; set; }
+        public PublishStatus Published { get; set; }
 
         [JsonProperty("muted")]
         public bool Muted { get; set; }
@@ -31,12 +38,13 @@ namespace IguideME.Web.Models.App
         [JsonProperty("grading_type")]
         public AppGradingType GradingType { get; set; }
 
+        [JsonConstructor]
         public AppAssignment(
             int id,
             int courseID,
             string title,
             int? externalID,
-            bool published,
+            PublishStatus published,
             bool muted,
             long dueDate,
             double maxGrade,
@@ -54,10 +62,32 @@ namespace IguideME.Web.Models.App
         }
 
         public AppAssignment(
+            int id,
             int courseID,
             string title,
             int? externalID,
-            bool published,
+            int published,
+            bool muted,
+            long dueDate,
+            double maxGrade,
+            AppGradingType gradingType)
+        {
+            this.ID = id;
+            this.CourseID = courseID;
+            this.Title = title;
+            this.ExternalID = externalID;
+            this.Published = (PublishStatus) published;
+            this.Muted = muted;
+            this.DueDate = dueDate;
+            this.MaxGrade = maxGrade;
+            this.GradingType = gradingType;
+        }
+
+        public AppAssignment(
+            int courseID,
+            string title,
+            int? externalID,
+            int published,
             bool muted,
             long dueDate,
             double maxGrade,
@@ -67,7 +97,7 @@ namespace IguideME.Web.Models.App
             this.CourseID = courseID;
             this.Title = title;
             this.ExternalID = externalID;
-            this.Published = published;
+            this.Published = (PublishStatus) published;
             this.Muted = muted;
             this.DueDate = dueDate;
             this.MaxGrade = maxGrade;
@@ -84,7 +114,7 @@ namespace IguideME.Web.Models.App
             this.CourseID = courseID;
             this.Title = title;
             this.ExternalID = -1;
-            this.Published = true;
+            this.Published = PublishStatus.LMSPublished;
             this.Muted = false;
             this.DueDate = 0;
             this.MaxGrade = maxGrade;

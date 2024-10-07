@@ -1,8 +1,8 @@
 import tailwindConfig from '@/../tailwind.config';
 import { useTileViewStore } from '@/components/pages/student-dashboard/tileViewContext';
 import { UseMediaQuery } from '@/hooks/UseMediaQuery';
-import { type TooltipProps } from '@/types/reactRecharts';
 import { varFixed } from '@/types/grades';
+import { type TooltipProps } from '@/types/reactRecharts';
 import { FrownOutlined, MehOutlined, SmileOutlined } from '@ant-design/icons';
 import { Space, Spin } from 'antd';
 import { memo, type FC, type ReactElement } from 'react';
@@ -142,7 +142,7 @@ const GraphGrades: FC<Props> = memo(({ goal, total, pred }): ReactElement => {
         layout='vertical'
         margin={{
           top: 20,
-          right: 0,
+          right: 15,
           left: 0,
           bottom: 0,
         }}
@@ -151,7 +151,7 @@ const GraphGrades: FC<Props> = memo(({ goal, total, pred }): ReactElement => {
         <YAxis axisLine dataKey='name' tick={false} tickSize={0} type='category' width={1} />
         <Tooltip content={<BarTooltip />} cursor={false} />
         <Bar dataKey='grade' className='[&>g>path]:!fill-overlay0' barSize={15} background={{ fill: '#eee' }}>
-          <LabelList dataKey='name' position='insideLeft' fill='#ffffff' />
+          <LabelList dataKey='name' position='insideLeft' fill='#ffffff' width={150} />
         </Bar>
         <ReferenceLine className='stroke-text [&>line]:!stroke-text' strokeDasharray='3 3' strokeWidth={2} x={goal}>
           <Label value='goal' position='top' />

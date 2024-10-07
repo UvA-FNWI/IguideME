@@ -1,6 +1,6 @@
 import type { Submission } from '@/types/grades';
+import { type LayoutColumn, type Tile, type TileGroup } from '@/types/tile';
 import apiClient from './axios';
-import { type Tile, type LayoutColumn, type TileGroup } from '@/types/tile';
 
 export async function getLayoutColumns(): Promise<LayoutColumn[]> {
   return await apiClient.get(`layout/columns`).then((response) => response.data);
@@ -59,22 +59,15 @@ export async function deleteTileEntry(id: number): Promise<void> {
 }
 
 interface UploadDataProps {
-  tileID: number;
+  assignmentId: number;
   idColumn: number;
   gradeColumn: number;
-  title: string;
   data: any[];
 }
 
-export async function uploadData({
-  tileID: tileID,
-  idColumn,
-  gradeColumn,
-  title,
-  data,
-}: UploadDataProps): Promise<any[]> {
+export async function uploadData({ assignmentId, idColumn, gradeColumn, data }: UploadDataProps): Promise<any[]> {
   return await apiClient
-    .post(`/entries/${tileID}/upload`, { idColumn, gradeColumn, title, data })
+    .post(`/entries/${assignmentId}/upload`, { idColumn, gradeColumn, data })
     .then((response) => response.data);
 }
 

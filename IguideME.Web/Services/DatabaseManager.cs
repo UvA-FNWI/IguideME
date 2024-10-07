@@ -28,7 +28,7 @@ namespace IguideME.Web.Services
             }
             else
             {
-                _connection_string = "Data Source=/data/IguideME2.db;Version=3;New=False;Compress=True;";
+                _connection_string = "Data Source=data/IguideME2.db;Version=3;New=False;Compress=True;";
             }
 
             // DatabaseManager.s_instance.RunMigrations();
@@ -549,6 +549,44 @@ namespace IguideME.Web.Services
             );
         }
 
+        public List<AppAssignment> GetExternalAssignments(int courseID) {
+            List<AppAssignment> assignments = new();
+
+            using (
+                SQLiteDataReader r = Query(
+                    DatabaseQueries.QUERY_COURSE_EXTERNAL_ASSIGNMENTS,
+                    new SQLiteParameter("courseID", courseID)
+                )
+            )
+            {
+                while (r.Read())
+                {
+                    try
+                    {
+                        AppAssignment row =
+                            new(
+                                r.GetInt32(0),
+                                r.GetInt32(1),
+                                r.GetValue(2).ToString(),
+                                r.GetInt32(3),
+                                r.GetInt32(4),
+                                r.GetBoolean(5),
+                                r.GetInt64(6),
+                                r.GetDouble(7),
+                                (AppGradingType)r.GetInt32(8)
+                            );
+                        assignments.Add(row);
+                    }
+                    catch (Exception e)
+                    {
+                        PrintQueryError("GetAssignments", 9, r, e);
+                    }
+                }
+            }
+
+            return assignments;
+        }
+
         public int RegisterAssignment(AppAssignment assignment)
         {
             int assignment_id = IDNonQuery(
@@ -572,13 +610,15 @@ namespace IguideME.Web.Services
             return assignment_id;
         }
 
+
+
         public int RegisterExternalAssignment(AppAssignment assignment)
         {
             int assignment_id = IDNonQuery(
                 DatabaseQueries.REGISTER_EXTERNAL_ASSIGNMENT,
                 new SQLiteParameter("courseID", assignment.CourseID),
                 new SQLiteParameter("title", assignment.Title),
-                new SQLiteParameter("published", assignment.Published),
+                new SQLiteParameter("published", PublishStatus.ExternalData),
                 new SQLiteParameter("muted", assignment.Muted),
                 new SQLiteParameter("dueDate", assignment.DueDate),
                 new SQLiteParameter("maxGrade", assignment.MaxGrade),
@@ -1242,6 +1282,7 @@ namespace IguideME.Web.Services
                 }
             }
 
+            _logger.LogInformation("Actually updating user total grade to {}", tempUser.Settings.TotalGrade);
             // _logger.LogInformation("Actually updating user Notifications to {}", tempUser.Settings.Notifications);
 
             NonQuery(
@@ -1366,7 +1407,7 @@ namespace IguideME.Web.Services
                 DatabaseQueries.REGISTER_TILE_GRADE,
                 new SQLiteParameter("userID", userID),
                 new SQLiteParameter("tileID", tileID),
-                new SQLiteParameter("Grade", grade),
+                new SQLiteParameter("Grade", double.IsNaN(grade) ? 0.0 : grade),
                 new SQLiteParameter("syncID", syncID)
             );
         }
@@ -2267,45 +2308,11 @@ namespace IguideME.Web.Services
             );
         }
 
-        public List<Notification> GetAllNotifications(int courseID)
+        public List<StudentNotification> GetAllUserNotifications(int courseID, string userID)
         {
-            string activeSync = String.Join("', '", this.GetRecentSyncs(courseID, 2));
+            long activeSync = this.GetCurrentSyncID(courseID);
 
-            // TODO: not sure how to write this as sqliteparameters
-            string query = String.Format(DatabaseQueries.QUERY_ALL_NOTIFICATIONS, activeSync);
-
-            List<Notification> notifications = new();
-
-            using (SQLiteDataReader r = Query(query))
-            {
-                while (r.Read())
-                {
-                    try
-                    {
-                        notifications.Add(
-                            new Notification(
-                                r.GetValue(0).ToString(),
-                                r.GetInt32(1),
-                                r.GetInt32(2),
-                                r.GetBoolean(3)
-                            )
-                        );
-                    }
-                    catch (Exception e)
-                    {
-                        PrintQueryError("GetAllNotifications", 3, r, e);
-                    }
-                }
-            }
-
-            return notifications;
-        }
-
-        public Notifications GetAllUserNotifications(int courseID, string userID, long syncID = 0)
-        {
-            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
-
-            Notifications notifications = new();
+            List<StudentNotification> notifications = new();
 
             using (
                 SQLiteDataReader r = Query(
@@ -2317,28 +2324,8 @@ namespace IguideME.Web.Services
             {
                 while (r.Read())
                 {
-                    Notification notification = new(
-                                    userID,
-                                    r.GetInt32(0),
-                                    r.GetInt32(1),
-                                    r.GetBoolean(2)
-                                );
-
-                    switch (notification.Status)
-                    {
-                        case Notification_Types.outperforming:
-                            notifications.Outperforming.Add(notification);
-                            break;
-                        case Notification_Types.closing_gap:
-                            notifications.Closing.Add(notification);
-                            break;
-                        case Notification_Types.falling_behind:
-                            notifications.Falling.Add(notification);
-                            break;
-                        case Notification_Types.more_effort:
-                            notifications.Effort.Add(notification);
-                            break;
-                    }
+                    StudentNotification notification = new(r.GetString(0), r.GetInt32(1));
+                    notifications.Add(notification);
                 }
             }
 
@@ -2362,6 +2349,8 @@ namespace IguideME.Web.Services
                     string tileTitle = r.GetString(1);
                     int status = r.GetInt32(2);
                     long? sent = r.IsDBNull(3) ? null : r.GetInt64(3);
+
+                    _logger.LogInformation("Student: {}, Tile: {}, Status: {}, Sent: {}", studentName, tileTitle, status, sent);
 
                     if (!result.TryGetValue(studentName, out List<CourseNotification> notifications))
                     {
@@ -2402,7 +2391,7 @@ namespace IguideME.Web.Services
                 while (r.Read())
                 {
                     notifications.Add(
-                        new Notification(userID, r.GetInt32(0), r.GetInt32(1), false)
+                        new Notification(userID, r.GetInt32(0), r.GetInt32(1), null)
                     );
                 }
             }
@@ -3004,7 +2993,7 @@ namespace IguideME.Web.Services
                                 r.GetInt32(1),
                                 r.GetValue(2).ToString(),
                                 r.GetInt32(3),
-                                r.GetBoolean(4),
+                                r.GetInt32(4),
                                 r.GetBoolean(5),
                                 r.GetInt64(6),
                                 r.GetDouble(7),
@@ -3041,7 +3030,7 @@ namespace IguideME.Web.Services
                                 r.GetInt32(1),
                                 r.GetValue(2).ToString(),
                                 r.GetInt32(3),
-                                r.GetBoolean(4),
+                                r.GetInt32(4),
                                 r.GetBoolean(5),
                                 r.GetInt64(6),
                                 r.GetDouble(7),

@@ -20,24 +20,32 @@ namespace IguideME.Web.Models.App
         public int TileID { get; set; }
 
         [JsonProperty("status")]
-        public Notification_Types Status { get; set; }
+        public int Status { get; set; }
 
         [JsonProperty("sent")]
-        public bool Sent { get; set; }
+        public long? Sent { get; set; }
 
-        public Notification(string userID, int tileID, int status, bool sent)
-        {
-            this.UserID = userID;
-            this.TileID = tileID;
-            this.Status = (Notification_Types) status;
-            this.Sent = sent;
-        }
-         public Notification(string userID, int tileID, Notification_Types status, bool sent)
+        public Notification(string userID, int tileID, int status, long? sent)
         {
             this.UserID = userID;
             this.TileID = tileID;
             this.Status = status;
             this.Sent = sent;
+        }
+    }
+
+    public class StudentNotification
+    {
+        [JsonProperty("tile_title")]
+        public string TileTitle { get; set; }
+
+        [JsonProperty("status")]
+        public Notification_Types Status { get; set; }
+
+        public StudentNotification(string tileTitle, int status)
+        {
+            this.TileTitle = tileTitle;
+            this.Status = (Notification_Types) status;
         }
    }
 
@@ -62,18 +70,6 @@ namespace IguideME.Web.Models.App
             this.Falling = new();
             this.Effort = new();
         }
-    }
-
-    public class NotificationDetail
-    {
-        [JsonProperty("tile_title")]
-        public string TileTitle { get; set; }
-
-        [JsonProperty("status")]
-        public int Status { get; set; }
-
-        [JsonProperty("sent")]
-        public bool Sent { get; set; }
     }
 
     public class CourseNotification

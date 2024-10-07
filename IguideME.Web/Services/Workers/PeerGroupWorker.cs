@@ -250,24 +250,44 @@ namespace IguideME.Web.Services.Workers
         /// <returns>The total Grade of the user.</returns>
         double CalculateUserTotalGrade(List<Tile> tiles, string userID)
         {
-            double userTotal = 0;
-            Dictionary<int, double> userEntryGradesMap =
-                _databaseManager.GetUserEntryGrades(_courseID, userID);
+            List<(double grade, double weight)> validSubmissions = [];
+            double unusedWeight = 0;
+
+            Dictionary<int, double> userEntryGradesMap = _databaseManager.GetUserEntryGrades(_courseID, userID);
 
             foreach (Tile tile in tiles)
             {
                 double userTileGrade = CalculateTileGrade(tile, userID, userEntryGradesMap);
-                userTotal += userTileGrade * tile.Weight;
+                if (userTileGrade == 0 || double.IsNaN(userTileGrade))
+                {
+                    unusedWeight += tile.Weight;
+                    continue;
+                }
+
+                validSubmissions.Add((userTileGrade, tile.Weight));
 
                 // Store the tile Grade for the peer statistics.
-                if (peerTileGradesMap.ContainsKey(tile.ID))
-                    peerTileGradesMap[tile.ID].Add(userTileGrade);
-                else
-                    peerTileGradesMap[tile.ID] = new();
-
+                if (peerTileGradesMap.TryGetValue(tile.ID, out List<double> value)) {
+                    value.Add(userTileGrade);
+                } else {
+                    peerTileGradesMap[tile.ID] = [];
+                }
             }
 
-            userTotal /= 10;
+            // Spread the unused weight over the valid tiles.
+            double userTotal = validSubmissions.Sum(tile => tile.grade * tile.weight);
+            if (unusedWeight > 0)
+            {
+                double weight = unusedWeight / validSubmissions.Count;
+                userTotal += validSubmissions.Sum(tile => tile.grade * weight);
+            }
+
+            // Make the grade a value between 0 and 10.
+            if (double.IsNaN(userTotal)) {
+                userTotal = 0;
+            } else if (userTotal > 0) {
+                userTotal /= 10;
+            }
 
             _databaseManager.UpdateUserSettings(
                 _courseID,
@@ -398,6 +418,7 @@ namespace IguideME.Web.Services.Workers
             _logger.LogInformation("Creating notification for user {}", user);
             foreach ((int tileID, List<double> peerGrades) in this.peerTileGradesMap)
             {
+                _logger.LogInformation("test {} {}", _databaseManager.GetTileNotificationState(tileID), tileID);
 
                 // Get only tiles with notifications
                 if (_databaseManager.GetTileNotificationState(tileID))

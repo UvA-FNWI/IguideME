@@ -153,7 +153,7 @@ namespace IguideME.Web.Controllers
 			if (userID == GetUserID() || IsAdministrator())
 			{
 				return Json(
-					_databaseManager.GetAllUserNotifications(GetCourseID(), userID, GetHashCode())
+					_databaseManager.GetAllUserNotifications(GetCourseID(), userID)
 				);
 			}
 			else

@@ -417,7 +417,7 @@ namespace IguideME.Web.Services
                                 r.GetInt32(1),
                                 r.GetValue(2).ToString(),
                                 r.GetInt32(0),
-                                true, //bool published,
+                                1, //bool published,
                                 false, //bool muted,
                                 r.IsDBNull(3)
                                     ? 0

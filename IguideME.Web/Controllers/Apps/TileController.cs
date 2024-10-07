@@ -708,26 +708,37 @@ namespace IguideME.Web.Controllers
 		// }
 
 		[Authorize(Policy = "IsInstructor")]
+		[HttpGet]
+		[Route("/external-assignments")]
+		public ActionResult GetExternalAssignments()
+		{
+			return Ok(_databaseManager.GetExternalAssignments(GetCourseID()));
+		}
+
+		[Authorize(Policy = "IsInstructor")]
 		[HttpPost]
-		[Route("/entries/{tileID}/upload")]
+		[Route("/external-assignments")]
+		public ActionResult PostAssignment([FromBody] AppAssignment assignment)
+		{
+			assignment.CourseID = this.GetCourseID();
+			return Ok(_databaseManager.RegisterExternalAssignment(assignment));
+		}
+
+		[Authorize(Policy = "IsInstructor")]
+		[HttpPost]
+		[Route("/entries/{assignmentID}/upload")]
 		[ProducesResponseType(StatusCodes.Status204NoContent)]
 		[ProducesResponseType(StatusCodes.Status400BadRequest)]
 		[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-		public ActionResult UploadTileData(int tileID, JObject data)
+		public ActionResult UploadTileData(int assignmentID, JObject data)
 		{
 			int courseID = this.GetCourseID();
 
 			int id_column = data["idColumn"].ToObject<int>();
 			int grade_column = data["gradeColumn"].ToObject<int>();
-			string title = data["title"].ToObject<string>();
 			JArray table = (JArray)data["data"];
 
 			string[] names = table[0].ToObject<string[]>();
-
-			int assignmentID = _databaseManager.RegisterExternalAssignment(new(courseID, title, 10, AppGradingType.Points));
-
-			// TODO: this is a bit of a hack, the ui probably needs to be redesigned a little instead.
-			_databaseManager.CreateTileEntry(new(tileID, assignmentID, title, 0));
 
 			// IEnumerable<int> range = Enumerable.Range(0, names.Length).Where(i => i != id_column && i != grade_column);
 			foreach (JArray row in table.Cast<JArray>().Skip(1))

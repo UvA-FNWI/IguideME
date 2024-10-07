@@ -2,7 +2,7 @@ import { getCourseNotifications } from '@/api/users';
 import AdminTitle from '@/components/atoms/admin-titles/admin-titles';
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
-import { type CourseNotificationDetail, NotificationStatus } from '@/types/notifications';
+import { NotificationStatus, type CourseNotificationDetail } from '@/types/notifications';
 import { useQuery } from '@tanstack/react-query';
 import { Button, Table } from 'antd';
 import { useMemo, useState, type FC, type ReactElement } from 'react';

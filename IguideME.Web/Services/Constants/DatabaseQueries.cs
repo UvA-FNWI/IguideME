@@ -345,14 +345,14 @@ public static class DatabaseQueries
             `role`            INTEGER DEFAULT 0
         );";
 
-    //TODO: I believe that external_id shouldn't be UNIQUE, but not sure
+    //TODO: I believe that external_id shouldn't be UNIQUE, but not sure, and published should be renamed
     public const string CREATE_TABLE_ASSIGNMENTS =
         @"CREATE TABLE IF NOT EXISTS `assignments` (
             `assignment_id`   INTEGER PRIMARY KEY AUTOINCREMENT,
             `course_id`       INTEGER,
             `title`           STRING,
             `external_id`     STRING DEFAULT null UNIQUE,
-            `published`       BOOLEAN DEFAULT true,
+            `published`       INTEGER DEFAULT 1,
             `muted`           BOOLEAN DEFAULT false,
             `due_date`        INTEGER DEAFULT NULL,
             `max_grade`       INTEGER,
@@ -603,6 +603,21 @@ public static class DatabaseQueries
         )
         ON CONFLICT (`external_id`) WHERE NOT NULL DO NOTHING";
 
+    public const string QUERY_COURSE_EXTERNAL_ASSIGNMENTS =
+        @"SELECT    `assignment_id`,
+                    `course_id`,
+                    `title`,
+                    `external_id`,
+                    `published`,
+                    `muted`,
+                    `due_date`,
+                    `max_grade`,
+                    `grading_type`
+        FROM        `assignments`
+        WHERE       `course_id`=@courseID
+        AND         `published`=2
+        ;";
+
     public const string REGISTER_EXTERNAL_ASSIGNMENT =
         @"INSERT OR REPLACE
             INTO   `assignments`
@@ -802,12 +817,12 @@ public static class DatabaseQueries
 
 
     public const string QUERY_ALL_USER_NOTIFICATIONS =
-        @"SELECT        `tile_id`,
-                        `status`,
-                        `sent`
-        FROM            `notifications`
-        WHERE           `user_id`=@userID
-        AND             `sync_id`=@syncID;";
+        @"SELECT        t.title as tile_title,
+                        n.status
+        FROM            notifications n
+        JOIN            tiles t ON n.tile_id = t.tile_id
+        WHERE           n.user_id=@userID
+        AND             n.sync_id=@syncID;";
 
     public const string QUERY_ALL_COURSE_NOTIFICATIONS =
         @"SELECT    u.name as student_name,
@@ -827,7 +842,7 @@ public static class DatabaseQueries
         FROM            `notifications`
         WHERE           `user_id`=@userID
         AND             `sync_id`=@syncID
-        AND             `sent`=false;";
+        AND             `sent is NULL;";
 
     public const string QUERY_MARK_NOTIFICATIONS_SENT =
         @"UPDATE        `notifications`

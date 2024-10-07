@@ -99,7 +99,7 @@ namespace IguideME.Web.Models.App
                     break;
                 case AppGradingType.PassFail:
                     _logger.LogInformation("passfail text: {Grade}", this.RawGrade);
-                    this.Grade = this.RawGrade == "PASS" ? 100 : 0;
+                    this.Grade = (this.RawGrade == "FAIL" || this.RawGrade == "0") ? 0 : 100;
                     break;
                 case AppGradingType.NotGraded:
                     this.Grade = -1;
