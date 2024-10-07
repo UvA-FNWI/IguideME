@@ -5,8 +5,8 @@ import UploadManager from '@/components/crystals/upload-manager/upload-manager';
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
 import { GradingType } from '@/types/grades';
-import { Assignment } from '@/types/tile';
-import { User } from '@/types/user';
+import { type Assignment } from '@/types/tile';
+import { type User } from '@/types/user';
 import { useRequiredParams } from '@/utils/params';
 import { PlusOutlined } from '@ant-design/icons';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -72,7 +72,7 @@ const Wizard: FC = (): ReactElement => {
     );
   } else if (assignmentError || studentsError) {
     return (
-      <div className='h-[100px] w-full rounded-lg bg-surface1'>
+      <div className='relative h-[100px] w-full rounded-lg bg-surface1'>
         <QueryError title='Error: Unable to load external data' />
       </div>
     );
@@ -117,7 +117,11 @@ const ViewExternalAssignment: FC<ViewExternalAssignmentProps> = ({ assignment, s
   return (
     <div className='rounded-md border border-solid border-border0 bg-surface2 px-8 py-4'>
       <div className='mb-5 flex items-center justify-between'>
-        <button onClick={() => setEditing(true)}>
+        <button
+          onClick={() => {
+            setEditing(true);
+          }}
+        >
           {editing ?
             <Tooltip title='Press Enter to save'>
               <Input
