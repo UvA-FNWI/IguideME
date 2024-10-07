@@ -9,6 +9,9 @@ import {
 import { http, HttpResponse } from 'msw';
 
 export const entriesHandlers = [
+  http.get('/external-assignments', () => {
+    return HttpResponse.json(MOCK_ASSIGNMENTS.filter((ass) => ass.published === 2));
+  }),
   http.get('/assignments', () => {
     const resp: any = {};
     MOCK_ASSIGNMENTS.forEach((ass) => {
@@ -135,7 +138,7 @@ export const MOCK_ASSIGNMENTS: Assignment[] = [
     id: 9,
     course_id: 17320,
     title: 'Perusall assignment 1',
-    published: 1,
+    published: 2,
     muted: false,
     due_date: 1707688872519,
     max_grade: 10.0,
@@ -145,7 +148,7 @@ export const MOCK_ASSIGNMENTS: Assignment[] = [
     id: 10,
     course_id: 17320,
     title: 'Perusall assignment 2',
-    published: 1,
+    published: 2,
     muted: false,
     due_date: 1707688872519,
     max_grade: 10.0,
@@ -155,7 +158,7 @@ export const MOCK_ASSIGNMENTS: Assignment[] = [
     id: 11,
     course_id: 17320,
     title: 'Perusall assignment 3',
-    published: 1,
+    published: 2,
     muted: false,
     due_date: 1707688872519,
     max_grade: 10.0,
