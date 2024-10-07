@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using IguideME.Web.Models;
 using IguideME.Web.Models.App;
@@ -713,6 +714,27 @@ namespace IguideME.Web.Controllers
 		public ActionResult GetExternalAssignments()
 		{
 			return Ok(_databaseManager.GetExternalAssignments(GetCourseID()));
+		}
+
+		[Authorize(Policy = "IsInstructor")]
+		[HttpPatch]
+		[Route("/external-assignments/{assignmentID}")]
+		public ActionResult PatchAssignment([FromBody] AppAssignment assignment)
+		{
+			assignment.CourseID = this.GetCourseID();
+			_databaseManager.UpdateExternalAssignment(assignment);
+			return Ok();
+		}
+
+		[Authorize(Policy = "IsInstructor")]
+		[HttpPatch]
+		[Route("/external-assignments/{assignmentID}/title")]
+		public ActionResult PatchAssignmentTitle(int assignmentID)
+		{
+			int courseID = this.GetCourseID();
+			var body = new StreamReader(Request.Body).ReadToEnd();
+			_databaseManager.UpdateExternalAssignmentTitle(assignmentID, courseID, (string)JObject.Parse(body)["title"]);
+			return Ok();
 		}
 
 		[Authorize(Policy = "IsInstructor")]

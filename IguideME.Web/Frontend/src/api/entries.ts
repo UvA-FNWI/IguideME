@@ -47,6 +47,10 @@ export async function deleteRequirement(id: number): Promise<void> {
   return await apiClient.delete(`learning-goals/requirements/${id}`);
 }
 
-export async function patchExternalAssignment({ id, title }: { id: number; title: string }): Promise<void> {
-  return await apiClient.patch(`external-assignments/${id}`, { title });
+export async function patchExternalAssignment(assignment: Assignment): Promise<void> {
+  return await apiClient.patch(`external-assignments/${assignment.id}`, assignment);
+}
+
+export async function patchExternalAssignmentTitle({ id, title }: { id: number; title: string }): Promise<void> {
+  return await apiClient.patch(`external-assignments/${id}/title`, { title });
 }

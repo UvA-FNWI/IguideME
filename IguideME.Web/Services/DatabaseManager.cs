@@ -28,7 +28,7 @@ namespace IguideME.Web.Services
             }
             else
             {
-                _connection_string = "Data Source=data/IguideME2.db;Version=3;New=False;Compress=True;";
+                _connection_string = "Data Source=/data/IguideME2.db;Version=3;New=False;Compress=True;";
             }
 
             // DatabaseManager.s_instance.RunMigrations();
@@ -549,7 +549,8 @@ namespace IguideME.Web.Services
             );
         }
 
-        public List<AppAssignment> GetExternalAssignments(int courseID) {
+        public List<AppAssignment> GetExternalAssignments(int courseID)
+        {
             List<AppAssignment> assignments = new();
 
             using (
@@ -632,6 +633,28 @@ namespace IguideME.Web.Services
                 );
 
             return assignment_id;
+        }
+
+        public void UpdateExternalAssignment(AppAssignment assignment)
+        {
+            int assignment_id = IDNonQuery(
+                DatabaseQueries.UPDATE_EXTERNAL_ASSIGNMENT,
+                new SQLiteParameter("ID", assignment.ID),
+                new SQLiteParameter("courseID", assignment.CourseID),
+                new SQLiteParameter("title", assignment.Title),
+                new SQLiteParameter("maxGrade", assignment.MaxGrade),
+                new SQLiteParameter("gradingType", assignment.GradingType)
+            );
+        }
+
+        public void UpdateExternalAssignmentTitle(int assignmentID, int courseID, string title)
+        {
+            int assignment_id = IDNonQuery(
+                DatabaseQueries.UPDATE_EXTERNAL_ASSIGNMENT_TITLE,
+                new SQLiteParameter("ID", assignmentID),
+                new SQLiteParameter("courseID", courseID),
+                new SQLiteParameter("title", title)
+            );
         }
 
         public void RegisterDiscussion(AppDiscussionTopic discussion, long syncID)

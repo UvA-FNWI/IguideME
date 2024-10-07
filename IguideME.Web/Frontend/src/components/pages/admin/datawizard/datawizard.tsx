@@ -1,5 +1,5 @@
 import { getStudentsByCourse } from '@/api/courses';
-import { getExternalAssignments, patchExternalAssignment, postExternalAssignment } from '@/api/entries';
+import { getExternalAssignments, patchExternalAssignmentTitle, postExternalAssignment } from '@/api/entries';
 import AdminTitle from '@/components/atoms/admin-titles/admin-titles';
 import UploadManager from '@/components/crystals/upload-manager/upload-manager';
 import QueryError from '@/components/particles/QueryError';
@@ -67,12 +67,12 @@ const Wizard: FC = (): ReactElement => {
   if (assignmentLoading || studentsLoading) {
     return (
       <QueryLoading isLoading={assignmentLoading || studentsLoading}>
-        <div className='h-[100px] w-full rounded-lg bg-surface1' />
+        <div className='bg-surface1 h-[100px] w-full rounded-lg' />
       </QueryLoading>
     );
   } else if (assignmentError || studentsError) {
     return (
-      <div className='relative h-[100px] w-full rounded-lg bg-surface1'>
+      <div className='bg-surface1 relative h-[100px] w-full rounded-lg'>
         <QueryError title='Error: Unable to load external data' />
       </div>
     );
@@ -85,7 +85,7 @@ const Wizard: FC = (): ReactElement => {
         onClick={addAssignment}
         block
         icon={<PlusOutlined />}
-        className='ml-auto !w-fit bg-accent/30 hover:border-solid hover:!border-border1 hover:!bg-accent/70 [&_span]:!text-text'
+        className='bg-accent/30 hover:!border-border1 hover:!bg-accent/70 [&_span]:!text-text ml-auto !w-fit hover:border-solid'
       >
         Add External Assignment
       </Button>
@@ -108,14 +108,14 @@ const ViewExternalAssignment: FC<ViewExternalAssignmentProps> = ({ assignment, s
 
   const queryClient = useQueryClient();
   const { mutate } = useMutation({
-    mutationFn: patchExternalAssignment,
+    mutationFn: patchExternalAssignmentTitle,
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['external-assignments'] });
     },
   });
 
   return (
-    <div className='rounded-md border border-solid border-border0 bg-surface2 px-8 py-4'>
+    <div className='border-border0 bg-surface2 rounded-md border border-solid px-8 py-4'>
       <div className='mb-5 flex items-center justify-between'>
         <button
           onClick={() => {
@@ -125,7 +125,7 @@ const ViewExternalAssignment: FC<ViewExternalAssignmentProps> = ({ assignment, s
           {editing ?
             <Tooltip title='Press Enter to save'>
               <Input
-                className='w-full border-accent bg-surface1 text-text hover:border-accent/50 hover:bg-surface1 focus:border-accent focus:bg-surface1 focus:shadow-sm focus:shadow-accent aria-invalid:!border-failure aria-invalid:shadow-none aria-invalid:focus:!shadow-sm aria-invalid:focus:!shadow-failure'
+                className='border-accent bg-surface1 text-text hover:border-accent/50 hover:bg-surface1 focus:border-accent focus:bg-surface1 focus:shadow-accent aria-invalid:!border-failure aria-invalid:shadow-none aria-invalid:focus:!shadow-sm aria-invalid:focus:!shadow-failure w-full focus:shadow-sm'
                 value={title}
                 autoFocus
                 onBlur={() => {

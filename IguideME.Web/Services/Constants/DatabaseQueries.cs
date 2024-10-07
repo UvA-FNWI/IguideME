@@ -618,6 +618,22 @@ public static class DatabaseQueries
         AND         `published`=2
         ;";
 
+    public const string UPDATE_EXTERNAL_ASSIGNMENT =
+        @"UPDATE    `assignments`
+        SET         `title`=@title,
+                    `max_grade`=@maxGrade,
+                    `grading_type`=@gradingType
+        WHERE       `assignments`.`assignment_id`=@ID
+        AND         `assignments`.`course_id`=@courseID
+        ;";
+
+    public const string UPDATE_EXTERNAL_ASSIGNMENT_TITLE =
+        @"UPDATE    `assignments`
+        SET         `title`=@title
+        WHERE       `assignments`.`assignment_id`=@ID
+        AND         `assignments`.`course_id`=@courseID
+        ;";
+
     public const string REGISTER_EXTERNAL_ASSIGNMENT =
         @"INSERT OR REPLACE
             INTO   `assignments`

@@ -30,7 +30,7 @@ const AssignmentSettingsForm: FC<AssignmentSettingsFormProps> = ({ assignment })
       }}
       onFinish={() => updateAssignment({ ...assignment, ...form.getFieldsValue() })}
     >
-      <div className='flex w-full max-w-xs flex-wrap items-center justify-center gap-4'>
+      <div className='flex flex-wrap items-center justify-center gap-4 md:justify-start'>
         <Form.Item
           label='Max Grade'
           name='max_grade'
