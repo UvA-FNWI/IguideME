@@ -242,5 +242,17 @@ namespace IguideME.Web.Controllers
 
             return allDates != null ? Json(allDates) : NotFound();
         }
+
+        [Authorize(Policy = "IsInstructor")]
+        [Route("/app/usage")]
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public ActionResult GetUsage()
+        {
+            return Json(DatabaseManager.Instance.GetUsage(GetCourseID()));
+        }
+
     }
 }

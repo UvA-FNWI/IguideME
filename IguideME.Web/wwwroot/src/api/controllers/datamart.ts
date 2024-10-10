@@ -23,6 +23,13 @@ export default class DataMartController extends Controller {
       ).then(response => response.data);
   }
 
+  static getUsage(): Promise<string> {
+
+    return this.client.post(
+      'app/usage', 
+      ).then(response => response.data);
+  }
+
   static startNewSync() {
     // when in debug mode always accept the handshake
     if (debug()) {

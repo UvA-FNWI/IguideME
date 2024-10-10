@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import Admin from "../../index";
-import {Divider, Space} from "antd";
+import {Button, Divider, Space} from "antd";
 import RequireConsent from "../../../../components/settings/RequireConsent";
 import AcceptList from "../../../../components/settings/AcceptList";
 import PeerGroups from "../../../../components/settings/PeerGroups";
@@ -18,6 +18,24 @@ export default class Settings extends Component {
         <Divider />
 
         <Space direction={"vertical"} style={{width: '100%'}}>
+        <Button onClick={() => {
+          let data1 = DataMartController.getUsage().then((data) => {
+            
+            console.log("data", data)
+
+            const csvData = new Blob([data], { type: 'text/csv' });
+
+            const csvURL = URL.createObjectURL(csvData);
+            const link = document.createElement('a');
+            link.href = csvURL;
+            link.download = `usage.csv`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            });
+            console.log("data1", data1)
+          }}>
+            Download Usage Data</Button>
           <RequireConsent />
           <AcceptList />
           <PeerGroups />
