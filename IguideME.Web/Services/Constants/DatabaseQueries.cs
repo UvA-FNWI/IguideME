@@ -627,6 +627,13 @@ public static class DatabaseQueries
         AND         `assignments`.`course_id`=@courseID
         ;";
 
+    public const string DELETE_EXTERNAL_ASSIGNMENT =
+        @"DELETE FROM    `assignments`
+        WHERE       `assignments`.`assignment_id`=@ID
+        AND         `assignments`.`course_id`=@courseID
+        AND         `assignments`.`published`=2
+        ;";
+
     public const string UPDATE_EXTERNAL_ASSIGNMENT_TITLE =
         @"UPDATE    `assignments`
         SET         `title`=@title

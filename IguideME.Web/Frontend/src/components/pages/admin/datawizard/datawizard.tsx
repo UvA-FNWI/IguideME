@@ -1,5 +1,5 @@
 import { getStudentsByCourse } from '@/api/courses';
-import { getExternalAssignments, patchExternalAssignmentTitle, postExternalAssignment } from '@/api/entries';
+import { getExternalAssignments, patchExternalAssignmentTitle, postExternalAssignment, deleteExternalAssignment } from '@/api/entries';
 import AdminTitle from '@/components/atoms/admin-titles/admin-titles';
 import UploadManager from '@/components/crystals/upload-manager/upload-manager';
 import QueryError from '@/components/particles/QueryError';
@@ -13,6 +13,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button, Input, Tooltip } from 'antd';
 import { useState, type FC, type ReactElement } from 'react';
 import AssignmentSettingsForm from './assignment-settings-form';
+import Swal from 'sweetalert2';
 
 const DataWizard: FC = (): ReactElement => {
   return (
@@ -107,8 +108,15 @@ const ViewExternalAssignment: FC<ViewExternalAssignmentProps> = ({ assignment, s
   const [uploadMenuOpen, setUploadMenuOpen] = useState<boolean>(false);
 
   const queryClient = useQueryClient();
-  const { mutate } = useMutation({
+  const { mutate: patchExternalAssignment } = useMutation({
     mutationFn: patchExternalAssignmentTitle,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['external-assignments'] });
+    },
+  });
+
+  const { mutate: deleteExternalAss } = useMutation({
+    mutationFn: deleteExternalAssignment,
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['external-assignments'] });
     },
@@ -116,7 +124,7 @@ const ViewExternalAssignment: FC<ViewExternalAssignmentProps> = ({ assignment, s
 
   return (
     <div className='border-border0 bg-surface2 rounded-md border border-solid px-8 py-4'>
-      <div className='mb-5 flex items-center justify-between'>
+      <div className='mb-5 flex items-center justify-between flex-wrap'>
         <button
           onClick={() => {
             setEditing(true);
@@ -136,7 +144,7 @@ const ViewExternalAssignment: FC<ViewExternalAssignmentProps> = ({ assignment, s
                 }}
                 onKeyDown={(e) => {
                   if (e.key !== 'Enter') return;
-                  mutate({
+                  patchExternalAssignment({
                     id: assignment.id,
                     title,
                   });
@@ -152,14 +160,36 @@ const ViewExternalAssignment: FC<ViewExternalAssignmentProps> = ({ assignment, s
           }
         </button>
         {!uploadMenuOpen && (
-          <Button
-            className='custom-default-button ml-auto'
-            onClick={() => {
-              setUploadMenuOpen(true);
-            }}
-          >
-            New Upload
-          </Button>
+          <div className='ml-auto flex justify-center items-center gap-2 flex-wrap'>
+            <Button
+              className='custom-default-button'
+              onClick={() => {
+                setUploadMenuOpen(true);
+              }}
+            >
+              New Upload
+            </Button>
+            <Button
+              className='custom-danger-button'
+                onClick={() => {
+                  void Swal.fire({
+                    title: 'Warning: This will permanently delete the tile!',
+                    icon: 'warning',
+                    focusCancel: true,
+                    showCancelButton: true,
+                    confirmButtonText: 'Delete',
+                    cancelButtonText: 'Cancel',
+                    customClass: {},
+                  }).then((result) => {
+                    if (result.isConfirmed) {
+                      deleteExternalAss({assignmentID: assignment.id});
+                    }
+                  });
+                }}
+            >
+              Delete External Assignment
+            </Button>
+          </div>
         )}
       </div>
       {uploadMenuOpen && (

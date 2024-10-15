@@ -54,3 +54,7 @@ export async function patchExternalAssignment(assignment: Assignment): Promise<v
 export async function patchExternalAssignmentTitle({ id, title }: { id: number; title: string }): Promise<void> {
   return await apiClient.patch(`external-assignments/${id}/title`, { title });
 }
+
+export async function deleteExternalAssignment({assignmentID}: {assignmentID: number}): Promise<void> {
+  return await apiClient.delete(`external-assignments/${assignmentID}`);
+}

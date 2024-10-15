@@ -727,6 +727,16 @@ namespace IguideME.Web.Controllers
 		}
 
 		[Authorize(Policy = "IsInstructor")]
+		[HttpDelete]
+		[Route("/external-assignments/{assignmentID}")]
+		public ActionResult DeleteAssignment(int assignmentID)
+		{
+			int courseID = this.GetCourseID();
+			_databaseManager.DeleteExternalAssignment(assignmentID, courseID);
+			return Ok();
+		}
+
+		[Authorize(Policy = "IsInstructor")]
 		[HttpPatch]
 		[Route("/external-assignments/{assignmentID}/title")]
 		public ActionResult PatchAssignmentTitle(int assignmentID)

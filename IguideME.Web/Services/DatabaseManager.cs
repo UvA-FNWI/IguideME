@@ -647,6 +647,15 @@ namespace IguideME.Web.Services
             );
         }
 
+        public void DeleteExternalAssignment(int assignmentID, int courseID)
+        {
+            int assignment_id = IDNonQuery(
+                DatabaseQueries.DELETE_EXTERNAL_ASSIGNMENT,
+                new SQLiteParameter("ID", assignmentID),
+                new SQLiteParameter("courseID", courseID)
+            );
+        }
+
         public void UpdateExternalAssignmentTitle(int assignmentID, int courseID, string title)
         {
             int assignment_id = IDNonQuery(
