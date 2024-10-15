@@ -25,7 +25,7 @@ export default class DataMartController extends Controller {
 
   static getUsage(): Promise<string> {
 
-    return this.client.post(
+    return this.client.get(
       'app/usage', 
       ).then(response => response.data);
   }
