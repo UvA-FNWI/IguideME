@@ -1151,16 +1151,10 @@ public static class DatabaseQueries
         ORDER BY    `name` ASC;";
 
     public const string QUERY_USAGE =
-        @"SELECT    `user_tracker`.`id`,
-                    `user_tracker`.`time`,
+        @"SELECT    `user_tracker`.`time`,
                     `user_tracker`.`user_id`,
                     `user_tracker`.`action`
             FROM    `user_tracker`
-        INNER JOIN  `canvas_users`
-            ON      `canvas_users`.`user_id`=`user_tracker`.`user_id`
-            WHERE   `canvas_users`.`sync_hash`=@hash
-            AND     `canvas_users`.`course_id`=@courseID
-            GROUP BY `user_tracker`.`user_id`
         ;";
 
     public const string QUERY_USERS_WITH_ROLE_FOR_COURSE =

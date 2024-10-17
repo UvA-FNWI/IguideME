@@ -628,7 +628,7 @@ namespace IguideME.Web.Services
         public string GetUsage(int courseID)
         {
             _logger.LogInformation("userID: #actions");
-            string csv = "";
+            string csv = "time, userID, action\r\n";
             using (
                 SQLiteDataReader r = Query(
                     DatabaseQueries.QUERY_USAGE,
@@ -639,7 +639,7 @@ namespace IguideME.Web.Services
             {
                 while (r.Read())
                 {
-                    csv += $"{r.GetInt32(0)}, {r.GetValue(1)}, {r.GetValue(2)}, {r.GetValue(3)}\r\n";
+                    csv += $"{r.GetValue(0)}, {r.GetValue(1)}, {r.GetValue(2)}\r\n";
                 }
             }
             return csv;
