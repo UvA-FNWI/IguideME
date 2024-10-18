@@ -6,7 +6,7 @@ import mkcert from 'vite-plugin-mkcert';
 // https://vitejs.dev/config/
 export default defineConfig((env) => ({
   plugins: [react(), mkcert()],
-  base: env.mode === 'production' ? '/dist/' : '/',
+  base: env.mode === 'production' ? '/dist/' : '/front',
   server: {
     https: true,
     port: 3000,
