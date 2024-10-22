@@ -848,13 +848,12 @@ public static class DatabaseQueries
         AND             n.sync_id=@syncID;";
 
     public const string QUERY_ALL_COURSE_NOTIFICATIONS =
-        @"SELECT    u.name as student_name,
+        @"SELECT    n.user_id as user_id,
                     t.title as tile_title,
                     n.status,
                     n.sent
         FROM notifications n
-        JOIN users u ON n.user_id = u.user_id
-        JOIN student_settings ss ON u.user_id = ss.user_id
+        JOIN student_settings ss ON n.user_id = ss.user_id
         JOIN tiles t ON n.tile_id = t.tile_id
         WHERE ss.course_id = @courseID
         ;";
@@ -940,7 +939,29 @@ public static class DatabaseQueries
         LIMIT       1;
     ";
 
-    public const string QUERY_TILE_GRADES =
+    public const string QUERY_USER_ASSIGNMENT_GRADES =
+        @"SELECT    `submissions`.`assignment_id`,
+                    `assignments`.`grading_type`,
+                    `submissions`.`Grade`,
+                    `assignments`.`max_grade`
+        FROM        `submissions`
+        INNER JOIN  `assignments`
+            USING   (`assignment_id`)
+        WHERE       `assignments`.`course_id`=@courseID
+        AND         `submissions`.`user_id`=@userID
+        ;";
+
+    public const string QUERY_TILE_IDS_OF_TYPE =
+        @"SELECT    `tile_id`
+        FROM        `tiles`
+        INNER JOIN  `tile_groups`
+            USING   (`group_id`)
+        WHERE       `tile_groups`.`course_id`=@courseID
+        AND         `tiles`.type=@type
+        AND         `tiles`.alt=@alt
+        ;";
+
+    public const string QUERY_USER_TILE_GRADES =
         @"SELECT    `grade`, `tile_id`
         FROM        `tile_grades`
         WHERE       `sync_id`=@syncID
@@ -1201,7 +1222,7 @@ public static class DatabaseQueries
                     `discussions`.`author`,
                     `discussions`.`date`,
                     `discussions`.`message`,
-                    (SELECT COUNT(*) FROM `discussion_entries` WHERE `discussion_entries`.`discussion_id`=@contentID)
+                    (SELECT COUNT(*) FROM `discussion_entries` WHERE `discussion_entries`.`discussion_id`=@)
         FROM        `discussions`
         WHERE       `discussions`.`course_id`=@courseID
         AND         `discussions`.`discussion_id`=@contentID

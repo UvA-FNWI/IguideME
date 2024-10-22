@@ -2,7 +2,7 @@ import { postConsentSettings, postGoalGrade, postNotificationSettings } from '@/
 import { getSelf } from '@/api/users';
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
-import { type User, UserRoles } from '@/types/user';
+import { ConsentEnum, type User, UserRoles } from '@/types/user';
 import { ActionTypes, trackEvent } from '@/utils/analytics';
 import { useRequiredParams } from '@/utils/params';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -47,7 +47,7 @@ const StudentSettings: FC = (): ReactElement => {
         : <>
             <Notifications notifications={self.settings ? self.settings.notifications : false} user={self} />
             <GoalGrade goalGrade={self.settings ? self.settings.goal_grade : 0} user={self} />
-            <Consent consent={self.settings ? self.settings.consent : false} />
+            <Consent consent={self.settings ? self.settings.consent : ConsentEnum.None} />
           </>
         }
       </div>
@@ -160,7 +160,7 @@ const GoalGrade: FC<GoalProps> = ({ goalGrade, user }): ReactElement => {
 };
 
 interface ConsentProps {
-  consent: boolean;
+  consent: ConsentEnum;
 }
 const Consent: FC<ConsentProps> = ({ consent }): ReactElement => {
   const queryClient = useQueryClient();
@@ -184,14 +184,14 @@ const Consent: FC<ConsentProps> = ({ consent }): ReactElement => {
       <h2 className='mb-2 text-2xl'>Informed Consent</h2>
       <Collapse
         bordered={false}
-        className='[&>div>div]:!p-0 [&_svg]:!text-text'
+        className='[&_svg]:!text-text [&>div>div]:!p-0'
         ghost
         items={[
           {
             key: 1,
             label: (
               <>
-                <p className='text-justify text-text'>
+                <p className='text-text text-justify'>
                   &quot;Ik verklaar dat ik de informatie heb gelezen en begrepen. Ik geef toestemming voor deelname aan
                   dit onderwijsonderzoek en het gebruik van mijn gegevens daarin. Ik behoud mijn recht om deze
                   toestemming stop te zetten zonder een expliciete reden op te geven en om mijn deelname aan dit
@@ -208,7 +208,7 @@ const Consent: FC<ConsentProps> = ({ consent }): ReactElement => {
 
       <Checkbox
         className='custom-checkbox mt-4'
-        checked={consent}
+        checked={consent === ConsentEnum.Accepted}
         onChange={(e) => {
           saveConsent(e.target.checked ? 1 : 2);
         }}
@@ -220,7 +220,7 @@ const Consent: FC<ConsentProps> = ({ consent }): ReactElement => {
 };
 
 const ConsentText: FC = () => (
-  <div className='prose w-full rounded-lg bg-surface2 p-2 text-justify prose-h1:text-text prose-h2:text-text prose-h3:text-text'>
+  <div className='prose bg-surface2 prose-h1:text-text prose-h2:text-text prose-h3:text-text w-full rounded-lg p-2 text-justify'>
     <h1>IguideME</h1>
     <h2>INFORMED CONSENT SLIMMER COLLEGEJAAR</h2>
     <p>

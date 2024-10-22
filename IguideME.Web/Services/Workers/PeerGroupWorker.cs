@@ -253,7 +253,7 @@ namespace IguideME.Web.Services.Workers
             List<(double grade, double weight)> validSubmissions = [];
             double unusedWeight = 0;
 
-            Dictionary<int, double> userEntryGradesMap = _databaseManager.GetUserEntryGrades(_courseID, userID);
+            Dictionary<int, double> userEntryGradesMap = _databaseManager.GetUserAssignmentGrades(_courseID, userID);
 
             foreach (Tile tile in tiles)
             {
@@ -267,9 +267,12 @@ namespace IguideME.Web.Services.Workers
                 validSubmissions.Add((userTileGrade, tile.Weight));
 
                 // Store the tile Grade for the peer statistics.
-                if (peerTileGradesMap.TryGetValue(tile.ID, out List<double> value)) {
+                if (peerTileGradesMap.TryGetValue(tile.ID, out List<double> value))
+                {
                     value.Add(userTileGrade);
-                } else {
+                }
+                else
+                {
                     peerTileGradesMap[tile.ID] = [];
                 }
             }
@@ -283,9 +286,12 @@ namespace IguideME.Web.Services.Workers
             }
 
             // Make the grade a value between 0 and 10.
-            if (double.IsNaN(userTotal)) {
+            if (double.IsNaN(userTotal))
+            {
                 userTotal = 0;
-            } else if (userTotal > 0) {
+            }
+            else if (userTotal > 0)
+            {
                 userTotal /= 10;
             }
 

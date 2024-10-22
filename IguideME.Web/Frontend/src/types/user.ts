@@ -13,10 +13,16 @@ export interface User {
   settings: UserSettings | undefined;
 }
 
+export enum ConsentEnum {
+  None,
+  Accepted,
+  Refused,
+}
+
 export interface UserSettings {
   goal_grade: number;
   predicted_grade: number;
   total_grade: number;
-  consent: boolean;
+  consent: ConsentEnum;
   notifications: boolean;
 }

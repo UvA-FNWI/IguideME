@@ -7,8 +7,12 @@ namespace IguideME.Web.Models
 
 	public class TilesGrades
 	{
+
+		[JsonProperty(PropertyName = "tile_id")]
 		public int tile_id { get; set; }
+		[JsonProperty(PropertyName = "grade")]
 		public double grade { get; set; }
+		[JsonProperty(PropertyName = "max")]
 		public double max { get; set; }
 		public TilesGrades(int id, double grade, double max)
 		{
@@ -21,13 +25,15 @@ namespace IguideME.Web.Models
 
 	public class UserTileGrades
 	{
+		[JsonProperty(PropertyName = "userID")]
 		public string userID { get; set; }
-		public int goal { get; set; }
+
+		[JsonProperty(PropertyName = "tile_grades")]
 		public TilesGrades[] tile_grades { get; set; }
-		public UserTileGrades(string userID, int goal, TilesGrades[] grades)
+
+		public UserTileGrades(string userID, TilesGrades[] grades)
 		{
 			this.userID = userID;
-			this.goal = goal;
 			this.tile_grades = grades;
 		}
 

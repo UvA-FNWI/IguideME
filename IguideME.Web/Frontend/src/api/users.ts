@@ -1,9 +1,4 @@
-import {
-  Notifications,
-  NotificationStatus,
-  StudentNotification,
-  type CourseNotificationDetail,
-} from '@/types/notifications';
+import { NotificationMap, Notifications, NotificationStatus, StudentNotification } from '@/types/notifications';
 import { type User } from '@/types/user';
 import apiClient from './axios';
 
@@ -31,6 +26,7 @@ export async function getStudentNotifications(id: string): Promise<Notifications
     effort: data.filter((notification) => notification.status === NotificationStatus.more_effort),
   };
 }
-export async function getCourseNotifications(): Promise<Map<string, CourseNotificationDetail[]>> {
+
+export async function getCourseNotifications(): Promise<NotificationMap> {
   return await apiClient.get(`app/notifications/course`).then((response) => response.data);
 }

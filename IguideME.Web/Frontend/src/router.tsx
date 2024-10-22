@@ -251,15 +251,6 @@ export const createRouter = (): ReturnType<typeof createBrowserRouter> =>
                     },
                   },
                   {
-                    path: 'notification-centre',
-                    lazy: async () => {
-                      const NotificationCentre = await import(
-                        '@/components/pages/admin/notificationcentre/notificationcentre.tsx'
-                      );
-                      return { Component: NotificationCentre.default };
-                    },
-                  },
-                  {
                     path: 'settings',
                     lazy: async () => {
                       const AdminSettings = await import('@/components/pages/admin/settings/settings.tsx');

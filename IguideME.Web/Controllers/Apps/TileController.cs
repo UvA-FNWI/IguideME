@@ -71,7 +71,17 @@ namespace IguideME.Web.Controllers
 		[Route("/tiles/grades")]
 		public ActionResult GetAllTileGrades()
 		{
+
 			return Ok(_databaseManager.GetAllTileGrades(GetCourseID()));
+		}
+
+		[Authorize(Policy = "IsInstructor")]
+		[HttpGet]
+		[Route("/entries/grades")]
+		public ActionResult GetAllEntryGrades()
+		{
+
+			return Ok(_databaseManager.GetAllEntryGrades(GetCourseID()));
 		}
 
 		[Authorize]

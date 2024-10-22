@@ -1,7 +1,7 @@
 import { getStudentAcceptStatus, postConsentSettings } from '@/api/student_settings';
 import { getSelf } from '@/api/users';
 import { ConsentText, GoalGrade } from '@/components/pages/student-settings/student-settings';
-import { UserRoles } from '@/types/user';
+import { ConsentEnum, UserRoles } from '@/types/user';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button } from 'antd';
 import { useEffect, type FC, type ReactElement } from 'react';
@@ -61,12 +61,12 @@ const PermissionValidator: FC = (): ReactElement => {
 
   if (self.role === UserRoles.instructor) return <Outlet />;
 
-  if (!self.settings?.consent) {
+  if (self.settings?.consent !== ConsentEnum.Accepted) {
     return (
       <div className='mx-auto max-w-3xl space-y-5 p-5'>
         <h1 className='text-xl font-bold tracking-tight'>Informed Consent</h1>
         <ConsentText />
-        <p className='text-justify text-text'>
+        <p className='text-text text-justify'>
           &quot;Ik verklaar dat ik de informatie heb gelezen en begrepen. Ik geef toestemming voor deelname aan dit
           onderwijsonderzoek en het gebruik van mijn gegevens daarin. Ik behoud mijn recht om deze toestemming stop te
           zetten zonder een expliciete reden op te geven en om mijn deelname aan dit experiment op elk moment stop te

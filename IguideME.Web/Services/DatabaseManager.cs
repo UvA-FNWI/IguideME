@@ -878,7 +878,6 @@ namespace IguideME.Web.Services
                             r2.GetInt32(3),
                             r2.GetBoolean(4)
                         );
-                        _logger.LogInformation("User {} notifications {}", user.UserID, user.Settings.Notifications);
                     }
                 }
             }
@@ -1818,7 +1817,7 @@ namespace IguideME.Web.Services
             );
         }
 
-        public Dictionary<int, double> GetUserEntryGrades(int courseID, string userID)
+        public Dictionary<int, double> GetUserAssignmentGrades(int courseID, string userID)
         {
             Dictionary<int, double> grades = new();
 
@@ -2377,17 +2376,17 @@ namespace IguideME.Web.Services
             {
                 while (r.Read())
                 {
-                    string studentName = r.GetString(0);
+                    string studentID = r.GetString(0);
                     string tileTitle = r.GetString(1);
                     int status = r.GetInt32(2);
                     long? sent = r.IsDBNull(3) ? null : r.GetInt64(3);
 
-                    _logger.LogInformation("Student: {}, Tile: {}, Status: {}, Sent: {}", studentName, tileTitle, status, sent);
+                    _logger.LogInformation("Student: {}, Tile: {}, Status: {}, Sent: {}", studentID, tileTitle, status, sent);
 
-                    if (!result.TryGetValue(studentName, out List<CourseNotification> notifications))
+                    if (!result.TryGetValue(studentID, out List<CourseNotification> notifications))
                     {
                         notifications = [];
-                        result[studentName] = notifications;
+                        result[studentID] = notifications;
                     }
 
                     notifications.Add(new CourseNotification
@@ -2925,11 +2924,119 @@ namespace IguideME.Web.Services
             List<User> students = GetUsersWithSettings(courseID);
             return students.Select((student) => new UserTileGrades(
                 student.UserID,
-                student.Settings.GoalGrade,
                 GetUserTileAVGs(student.UserID, courseID).ToArray()
             )
 
              ).ToArray();
+
+        }
+
+        public List<EntryGrades> GetUserEntryAssignmentGrades(int courseID, string userID)
+        {
+            List<EntryGrades> grades = new();
+
+            using (
+                SQLiteDataReader r = Query(
+                    DatabaseQueries.QUERY_USER_ASSIGNMENT_GRADES,
+                    new SQLiteParameter("courseID", courseID),
+                    new SQLiteParameter("userID", userID)
+                )
+            )
+            {
+                while (r.Read())
+                {
+                    try
+                    {
+                        grades.Add(new(r.GetInt32(0), r.GetInt32(1), r.GetDouble(2), r.GetDouble(3)));
+                    }
+                    catch (Exception e)
+                    {
+                        PrintQueryError(System.Reflection.MethodBase.GetCurrentMethod().ToString(), 3, r, e);
+                    }
+                }
+            }
+            return grades;
+        }
+
+        public List<int> GetTileIDsOfType(int courseID, TileType type, int alt)
+        {
+            List<int> tileIDs = new();
+
+            using (
+                SQLiteDataReader r = Query(
+                    DatabaseQueries.QUERY_TILE_IDS_OF_TYPE,
+                    new SQLiteParameter("courseID", courseID),
+                    new SQLiteParameter("alt", alt),
+                    new SQLiteParameter("type", type)
+                )
+            )
+            {
+                while (r.Read())
+                {
+                    try
+                    {
+                        tileIDs.Add(r.GetInt32(0));
+                    }
+                    catch (Exception e)
+                    {
+                        PrintQueryError(System.Reflection.MethodBase.GetCurrentMethod().ToString(), 3, r, e);
+                    }
+                }
+            }
+            return tileIDs;
+        }
+
+        public List<EntryGrades> GetUserDiscussionGrades(int courseID, string userID)
+        {
+            long syncID = this.GetCurrentSyncID(courseID);
+            List<EntryGrades> grades = new();
+            List<int> tiles = GetTileIDsOfType(courseID, TileType.discussions, 0);
+            if (tiles.Count == 0)
+            {
+                return grades;
+            }
+
+            IEnumerable<TileEntry> entries = tiles.SelectMany(id => GetTileEntries(id));
+            foreach (TileEntry entry in entries)
+            {
+                grades.Add(new(entry.ContentID, AppGradingType.NotGraded, GetDiscussionCountForUserForEntry(entry.ContentID, userID), -1));
+            }
+
+            return grades;
+        }
+
+        public List<EntryGrades> GetUserLearningGrades(int courseID, string userID)
+        {
+            List<EntryGrades> grades = new();
+            List<LearningGoal> goals = GetGoals(courseID, true);
+
+            foreach (LearningGoal goal in goals)
+            {
+                int grade = 0;
+                foreach (GoalRequirement req in goal.Requirements)
+                {
+                    grade += GetGoalRequirementResult(req, userID) ? 1 : 0;
+                }
+                grades.Add(new EntryGrades(goal.ID, AppGradingType.Points, grade, goal.Requirements.Count));
+            }
+            return grades;
+        }
+
+        public Dictionary<string, EntryGrades[]> GetAllEntryGrades(int courseID)
+        {
+            List<User> students = GetUsersWithSettings(courseID);
+            Dictionary<string, EntryGrades[]> userGradesMap = new();
+
+            students.ForEach((student) => userGradesMap.Add(
+                student.UserID,
+                GetUserEntryAssignmentGrades(courseID, student.UserID)
+                .Concat(GetUserDiscussionGrades(courseID, student.UserID))
+                .Concat(GetUserLearningGrades(courseID, student.UserID))
+                .ToArray()
+            )
+
+             );
+            return userGradesMap;
 
         }
 
@@ -2939,7 +3046,7 @@ namespace IguideME.Web.Services
             List<TilesGrades> avgs = new();
             using (
                 SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_TILE_GRADES,
+                    DatabaseQueries.QUERY_USER_TILE_GRADES,
                     new SQLiteParameter("userID", userID),
                     new SQLiteParameter("syncID", syncID)
                 )
@@ -2949,7 +3056,7 @@ namespace IguideME.Web.Services
                 {
                     try
                     {
-                        avgs.Append(new(r.GetInt32(1), r.GetDouble(0), -1));
+                        avgs.Add(new(r.GetInt32(1), r.GetDouble(0), -1));
                     }
                     catch (Exception e)
                     {

@@ -141,4 +141,35 @@ namespace IguideME.Web.Models.App
             };
         }
     }
+
+    public class EntryGrades
+    {
+        [JsonProperty(PropertyName = "content_id")]
+        public int ContentID { get; set; }
+
+        [JsonProperty(PropertyName = "grading_type")]
+        public AppGradingType GradingType { get; set; }
+
+        [JsonProperty(PropertyName = "grade")]
+        public double Grade { get; set; }
+
+        [JsonProperty(PropertyName = "max")]
+        public double Max { get; set; }
+
+        public EntryGrades(int content_id, AppGradingType type, double grade, double max)
+        {
+            this.ContentID = content_id;
+            this.GradingType = type;
+            this.Grade = grade;
+            this.Max = max;
+        }
+
+        public EntryGrades(int content_id, int type, double grade, double max)
+        {
+            this.ContentID = content_id;
+            this.GradingType = (AppGradingType)type;
+            this.Grade = grade;
+            this.Max = max;
+        }
+    }
 }

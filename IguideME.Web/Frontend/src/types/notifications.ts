@@ -17,6 +17,10 @@ export interface Notifications {
   effort: StudentNotification[];
 }
 
+export type NotificationMap = {
+  [key: string]: CourseNotificationDetail[];
+};
+
 export interface CourseNotificationDetail {
   tile_title: string;
   status: NotificationStatus;

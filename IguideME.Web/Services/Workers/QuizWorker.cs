@@ -54,10 +54,10 @@ namespace IguideME.Web.Services.Workers
 			foreach (AssignmentSubmission sub in submissions)
 			{
 				// TODO: WE NEED TO CHANGE THE SUBMISSION IDs FROM EXTERNAL QUIZ ID TO INTERNAL ASSIGNMENT ID
-				_logger.LogWarning("score {} {}", sub.UserID, sub.RawGrade);
+				// _logger.LogWarning("score {} {}", sub.UserID, sub.RawGrade);
 				sub.AssignmentID = assignment.ID;
 				sub.RawToGrade(assignment.GradingType, assignment.MaxGrade);
-				_logger.LogWarning("grade {} raw {} type {} max {}", sub.Grade, sub.RawGrade, assignment.GradingType, assignment.MaxGrade);
+				// _logger.LogWarning("grade {} raw {} type {} max {}", sub.Grade, sub.RawGrade, assignment.GradingType, assignment.MaxGrade);
 				_databaseManager.CreateUserSubmission(sub);
 			}
 		}

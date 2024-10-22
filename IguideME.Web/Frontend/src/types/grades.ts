@@ -15,6 +15,17 @@ export interface Grades {
   type: GradingType;
 }
 
+export type EntryGradeMap = {
+  [key: string]: EntryGrade[];
+};
+
+export interface EntryGrade {
+  content_id: number;
+  grading_type: GradingType;
+  grade: number;
+  max: number;
+}
+
 export interface TileGrade {
   tile_id: number;
   grade: number;
