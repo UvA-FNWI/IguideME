@@ -21,13 +21,13 @@ const CourseSelection: FC = (): ReactElement => {
     queryFn: async () => await getCoursesByUser(self.userID),
   });
 
-  const loadingCard = (
-    <Card className='w-[240px]' hoverable>
+  const loadingCards = Array.from({ length: 6 }).map((_, index) => (
+    <Card className='w-[240px]' hoverable key={index}>
       <Skeleton loading active>
         <Card.Meta title='Card title' description='This is the description' />
       </Skeleton>
     </Card>
-  );
+  ));
 
   if (isError) return <QueryError title='Failed to load courses' />;
 
@@ -43,7 +43,7 @@ const CourseSelection: FC = (): ReactElement => {
           children: (
             <div className='flex w-full flex-wrap gap-8'>
               {isLoading || !data ?
-                Array.from({ length: 6 }).map(() => loadingCard)
+                loadingCards
               : data.length > 0 ?
                 data.map((course) => <CourseCard course={course} key={course.id} />)
               : <div>No courses found</div>}
@@ -59,7 +59,7 @@ const CourseSelection: FC = (): ReactElement => {
               children: (
                 <div className='flex w-full flex-wrap gap-8'>
                   {isLoading || !data ?
-                    Array.from({ length: 6 }).map(() => loadingCard)
+                    loadingCards
                   : data.length > 0 ?
                     data
                       .filter((course) => course.workflowState === WorkflowStates.UNPUBLISHED)
@@ -75,7 +75,7 @@ const CourseSelection: FC = (): ReactElement => {
               children: (
                 <div className='flex w-full flex-wrap gap-8'>
                   {isLoading || !data ?
-                    Array.from({ length: 6 }).map(() => loadingCard)
+                    loadingCards
                   : data.length > 0 ?
                     data
                       .filter((course) => course.workflowState === WorkflowStates.AVAILABLE)
@@ -93,7 +93,7 @@ const CourseSelection: FC = (): ReactElement => {
           children: (
             <div className='flex w-full flex-wrap gap-8'>
               {isLoading || !data ?
-                Array.from({ length: 6 }).map(() => loadingCard)
+                loadingCards
               : data.length > 0 ?
                 data
                   .filter((course) => course.workflowState === WorkflowStates.COMPLETED)
@@ -115,7 +115,7 @@ const CourseCard: FC<{ course: Course }> = memo(({ course }): ReactElement => {
   return (
     <Card
       key={course.id}
-      className='custom-card w-[240px] !bg-surface2'
+      className='custom-card !bg-surface2 w-[240px]'
       hoverable
       cover={course.courseImage ? <img alt={`${course.name}'s cover image`} src={course.courseImage} /> : undefined}
       onClick={() => {
