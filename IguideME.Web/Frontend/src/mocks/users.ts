@@ -1,4 +1,4 @@
-import { type User, UserRoles } from '@/types/user';
+import { ConsentEnum, type User, UserRoles } from '@/types/user';
 import { http, HttpResponse } from 'msw';
 
 const TEST_USER: User = {
@@ -9,7 +9,7 @@ const TEST_USER: User = {
   sortable_name: 'Admin, Course',
   role: UserRoles.instructor,
   settings: {
-    consent: true,
+    consent: 1,
     goal_grade: 10,
     predicted_grade: 9,
     total_grade: 9.5,
@@ -46,7 +46,7 @@ export const MOCK_STUDENTS: User[] = [
     name: 'Vernon Dursley',
     role: UserRoles.student,
     settings: {
-      consent: true,
+      consent: ConsentEnum.Accepted,
       goal_grade: 1,
       predicted_grade: 0,
       total_grade: 0,
@@ -61,7 +61,7 @@ export const MOCK_STUDENTS: User[] = [
     name: 'Tonette Sakamoto',
     role: UserRoles.student,
     settings: {
-      consent: true,
+      consent: ConsentEnum.Accepted,
       goal_grade: 10,
       predicted_grade: 9.123234,
       total_grade: 9.5,
@@ -76,7 +76,7 @@ export const MOCK_STUDENTS: User[] = [
     name: 'Kaladin Stormblessed',
     role: UserRoles.student,
     settings: {
-      consent: true,
+      consent: ConsentEnum.Accepted,
       goal_grade: 10,
       predicted_grade: 9,
       total_grade: 9,
@@ -91,7 +91,7 @@ export const MOCK_STUDENTS: User[] = [
     name: 'Carman Muff',
     role: UserRoles.student,
     settings: {
-      consent: false,
+      consent: ConsentEnum.Refused,
       goal_grade: 8,
       predicted_grade: 7.54,
       total_grade: 7,
@@ -106,7 +106,7 @@ export const MOCK_STUDENTS: User[] = [
     name: 'Leopoldo Spengler',
     role: UserRoles.student,
     settings: {
-      consent: true,
+      consent: ConsentEnum.Accepted,
       goal_grade: 9,
       predicted_grade: 8,
       total_grade: 8.3,
@@ -121,7 +121,7 @@ export const MOCK_STUDENTS: User[] = [
     name: 'Gwen Stacy',
     role: UserRoles.student,
     settings: {
-      consent: true,
+      consent: ConsentEnum.Accepted,
       goal_grade: 7,
       predicted_grade: 6,
       total_grade: 6,
@@ -136,7 +136,7 @@ export const MOCK_STUDENTS: User[] = [
     name: 'Felice Estell',
     role: UserRoles.student,
     settings: {
-      consent: true,
+      consent: ConsentEnum.Accepted,
       goal_grade: 5,
       predicted_grade: 4.0,
       total_grade: 4.1,
@@ -151,7 +151,7 @@ export const MOCK_STUDENTS: User[] = [
     name: 'Melissa Hadsell',
     role: UserRoles.student,
     settings: {
-      consent: true,
+      consent: ConsentEnum.Accepted,
       goal_grade: 4,
       predicted_grade: 3,
       total_grade: 3,
@@ -166,7 +166,7 @@ export const MOCK_STUDENTS: User[] = [
     name: 'Tami Cupples',
     role: UserRoles.student,
     settings: {
-      consent: true,
+      consent: ConsentEnum.Accepted,
       goal_grade: 9,
       predicted_grade: 8,
       total_grade: 8,
@@ -181,7 +181,7 @@ export const MOCK_STUDENTS: User[] = [
     name: 'Holley Templin',
     role: UserRoles.student,
     settings: {
-      consent: true,
+      consent: ConsentEnum.Accepted,
       goal_grade: 8,
       predicted_grade: 7,
       total_grade: 7,
@@ -196,7 +196,7 @@ export const MOCK_STUDENTS: User[] = [
     name: 'Barrett Rhymer',
     role: UserRoles.student,
     settings: {
-      consent: true,
+      consent: ConsentEnum.Accepted,
       goal_grade: 7,
       predicted_grade: 6,
       total_grade: 6,
@@ -211,7 +211,7 @@ export const MOCK_STUDENTS: User[] = [
     name: 'Cayla Payer',
     role: UserRoles.student,
     settings: {
-      consent: true,
+      consent: ConsentEnum.Accepted,
       goal_grade: 8,
       predicted_grade: 7.89,
       total_grade: 7.89,
@@ -226,7 +226,7 @@ export const MOCK_STUDENTS: User[] = [
     name: 'Donna Daughdrill',
     role: UserRoles.student,
     settings: {
-      consent: true,
+      consent: ConsentEnum.Accepted,
       goal_grade: 9,
       predicted_grade: 8,
       total_grade: 8,
@@ -241,7 +241,7 @@ export const MOCK_STUDENTS: User[] = [
     name: 'Dayna Kubicek',
     role: UserRoles.student,
     settings: {
-      consent: true,
+      consent: ConsentEnum.Accepted,
       goal_grade: 7,
       predicted_grade: 6,
       total_grade: 6.21,
@@ -256,7 +256,7 @@ export const MOCK_STUDENTS: User[] = [
     name: 'Analisa Gathright',
     role: UserRoles.student,
     settings: {
-      consent: true,
+      consent: ConsentEnum.Accepted,
       goal_grade: 6,
       predicted_grade: 5,
       total_grade: 5,
@@ -271,7 +271,7 @@ export const MOCK_STUDENTS: User[] = [
     name: 'Alyson Burkey',
     role: UserRoles.student,
     settings: {
-      consent: true,
+      consent: ConsentEnum.Accepted,
       goal_grade: 6,
       predicted_grade: 5,
       total_grade: 5.34,
@@ -286,7 +286,7 @@ export const MOCK_STUDENTS: User[] = [
     name: 'Loretta Habib',
     role: UserRoles.student,
     settings: {
-      consent: true,
+      consent: ConsentEnum.Accepted,
       goal_grade: 6,
       predicted_grade: 5,
       total_grade: 5,
@@ -301,7 +301,7 @@ export const MOCK_STUDENTS: User[] = [
     name: 'Franklin Lindenberg',
     role: UserRoles.student,
     settings: {
-      consent: true,
+      consent: ConsentEnum.Accepted,
       goal_grade: 6,
       predicted_grade: 5.85,
       total_grade: 5,
@@ -316,7 +316,7 @@ export const MOCK_STUDENTS: User[] = [
     name: 'Felipe Gwyn',
     role: UserRoles.student,
     settings: {
-      consent: true,
+      consent: ConsentEnum.Accepted,
       goal_grade: 5,
       predicted_grade: 4.9999991,
       total_grade: 4.0000000012,
@@ -331,7 +331,7 @@ export const MOCK_STUDENTS: User[] = [
     name: 'Stan Foran',
     role: UserRoles.student,
     settings: {
-      consent: true,
+      consent: ConsentEnum.Accepted,
       goal_grade: 9,
       predicted_grade: 8.5,
       total_grade: 8.100001,
@@ -346,7 +346,7 @@ export const MOCK_STUDENTS: User[] = [
     name: 'Dollie Bomba',
     role: UserRoles.student,
     settings: {
-      consent: true,
+      consent: ConsentEnum.Accepted,
       goal_grade: 8,
       predicted_grade: 7,
       total_grade: 7,
@@ -361,7 +361,7 @@ export const MOCK_STUDENTS: User[] = [
     name: 'Xochitl Sperber',
     role: UserRoles.student,
     settings: {
-      consent: true,
+      consent: ConsentEnum.Accepted,
       goal_grade: 7,
       predicted_grade: 6,
       total_grade: 6,
@@ -376,7 +376,7 @@ export const MOCK_STUDENTS: User[] = [
     name: 'Quiana Rape',
     role: UserRoles.student,
     settings: {
-      consent: false,
+      consent: ConsentEnum.Refused,
       goal_grade: 5,
       predicted_grade: 4,
       total_grade: 4,
@@ -391,7 +391,7 @@ export const MOCK_STUDENTS: User[] = [
     name: 'Adena Spraggins',
     role: UserRoles.student,
     settings: {
-      consent: false,
+      consent: ConsentEnum.None,
       goal_grade: 9,
       predicted_grade: 8,
       total_grade: 8,
@@ -406,7 +406,7 @@ export const MOCK_STUDENTS: User[] = [
     name: 'Jung Hur',
     role: UserRoles.student,
     settings: {
-      consent: true,
+      consent: ConsentEnum.Accepted,
       goal_grade: 7,
       predicted_grade: 6,
       total_grade: 6,
@@ -421,7 +421,7 @@ export const MOCK_STUDENTS: User[] = [
     name: 'Lorita Kaye',
     role: UserRoles.student,
     settings: {
-      consent: false,
+      consent: ConsentEnum.Refused,
       goal_grade: 9,
       predicted_grade: 8,
       total_grade: 8,
@@ -436,7 +436,7 @@ export const MOCK_STUDENTS: User[] = [
     name: 'Galina Yepez',
     role: UserRoles.student,
     settings: {
-      consent: false,
+      consent: ConsentEnum.None,
       goal_grade: 10,
       predicted_grade: 9,
       total_grade: 9,
@@ -451,7 +451,7 @@ export const MOCK_STUDENTS: User[] = [
     name: 'Gwenn Dorrell',
     role: UserRoles.student,
     settings: {
-      consent: false,
+      consent: ConsentEnum.Refused,
       goal_grade: 10,
       predicted_grade: 9,
       total_grade: 9,
@@ -466,7 +466,7 @@ export const MOCK_STUDENTS: User[] = [
     name: 'Ana Demayo',
     role: UserRoles.student,
     settings: {
-      consent: true,
+      consent: ConsentEnum.Accepted,
       goal_grade: 6,
       predicted_grade: 5,
       total_grade: 5,
@@ -481,7 +481,7 @@ export const MOCK_STUDENTS: User[] = [
     name: 'Austin Guilbault',
     role: UserRoles.student,
     settings: {
-      consent: false,
+      consent: ConsentEnum.Refused,
       goal_grade: 6,
       predicted_grade: 5,
       total_grade: 5,
@@ -496,7 +496,7 @@ export const MOCK_STUDENTS: User[] = [
     name: 'Regenia Elder',
     role: UserRoles.student,
     settings: {
-      consent: false,
+      consent: ConsentEnum.Refused,
       goal_grade: 10,
       predicted_grade: 9,
       total_grade: 9,
@@ -511,7 +511,7 @@ export const MOCK_STUDENTS: User[] = [
     name: 'Marceline Buch',
     role: UserRoles.student,
     settings: {
-      consent: false,
+      consent: ConsentEnum.None,
       goal_grade: 5,
       predicted_grade: 4,
       total_grade: 4,
@@ -526,7 +526,7 @@ export const MOCK_STUDENTS: User[] = [
     name: 'Louetta Curlin',
     role: UserRoles.student,
     settings: {
-      consent: true,
+      consent: ConsentEnum.Accepted,
       goal_grade: 4,
       predicted_grade: 3,
       total_grade: 3,
@@ -541,7 +541,7 @@ export const MOCK_STUDENTS: User[] = [
     name: 'Debrah Kutz',
     role: UserRoles.student,
     settings: {
-      consent: false,
+      consent: ConsentEnum.Refused,
       goal_grade: 8,
       predicted_grade: 7,
       total_grade: 7,
@@ -556,7 +556,7 @@ export const MOCK_STUDENTS: User[] = [
     name: 'Winifred Soto',
     role: UserRoles.student,
     settings: {
-      consent: false,
+      consent: ConsentEnum.None,
       goal_grade: 9,
       predicted_grade: 8,
       total_grade: 8,
@@ -571,7 +571,7 @@ export const MOCK_STUDENTS: User[] = [
     name: 'Mozell Arteaga',
     role: UserRoles.student,
     settings: {
-      consent: true,
+      consent: ConsentEnum.Accepted,
       goal_grade: 8,
       predicted_grade: 7,
       total_grade: 7,
@@ -586,7 +586,7 @@ export const MOCK_STUDENTS: User[] = [
     name: 'Donte Phu',
     role: UserRoles.student,
     settings: {
-      consent: false,
+      consent: ConsentEnum.Refused,
       goal_grade: 3,
       predicted_grade: 2,
       total_grade: 2,
@@ -601,7 +601,7 @@ export const MOCK_STUDENTS: User[] = [
     name: 'Darleen Birt',
     role: UserRoles.student,
     settings: {
-      consent: false,
+      consent: ConsentEnum.Refused,
       goal_grade: 6,
       predicted_grade: 5,
       total_grade: 5,
@@ -616,7 +616,7 @@ export const MOCK_STUDENTS: User[] = [
     name: 'Connie Speegle',
     role: UserRoles.student,
     settings: {
-      consent: false,
+      consent: ConsentEnum.Refused,
       goal_grade: 8,
       predicted_grade: 7,
       total_grade: 7,
@@ -631,7 +631,7 @@ export const MOCK_STUDENTS: User[] = [
     name: 'Suzi Roger',
     role: UserRoles.student,
     settings: {
-      consent: true,
+      consent: ConsentEnum.Accepted,
       goal_grade: 5,
       predicted_grade: 4,
       total_grade: 4,
@@ -646,7 +646,7 @@ export const MOCK_STUDENTS: User[] = [
     name: 'Elroy Saini',
     role: UserRoles.student,
     settings: {
-      consent: false,
+      consent: ConsentEnum.Refused,
       goal_grade: 6,
       predicted_grade: 5,
       total_grade: 5,
@@ -661,7 +661,7 @@ export const MOCK_STUDENTS: User[] = [
     name: 'Terrence Zerr',
     role: UserRoles.student,
     settings: {
-      consent: true,
+      consent: ConsentEnum.Accepted,
       goal_grade: 9,
       predicted_grade: 8,
       total_grade: 8,
@@ -676,7 +676,7 @@ export const MOCK_STUDENTS: User[] = [
     name: 'Norman Heitz',
     role: UserRoles.student,
     settings: {
-      consent: false,
+      consent: ConsentEnum.None,
       goal_grade: 8,
       predicted_grade: 7,
       total_grade: 7,
@@ -691,7 +691,7 @@ export const MOCK_STUDENTS: User[] = [
     name: 'Robbin Defrancisco',
     role: UserRoles.student,
     settings: {
-      consent: false,
+      consent: ConsentEnum.Refused,
       goal_grade: 7,
       predicted_grade: 6,
       total_grade: 6,
@@ -706,7 +706,7 @@ export const MOCK_STUDENTS: User[] = [
     name: 'Paula Uhrig',
     role: UserRoles.student,
     settings: {
-      consent: false,
+      consent: ConsentEnum.Refused,
       goal_grade: 5,
       predicted_grade: 4,
       total_grade: 4,
@@ -721,7 +721,7 @@ export const MOCK_STUDENTS: User[] = [
     name: 'Chrissy Pan',
     role: UserRoles.student,
     settings: {
-      consent: false,
+      consent: ConsentEnum.Refused,
       goal_grade: 6,
       predicted_grade: 5,
       total_grade: 5,
@@ -736,7 +736,7 @@ export const MOCK_STUDENTS: User[] = [
     name: 'Cris Loken',
     role: UserRoles.student,
     settings: {
-      consent: true,
+      consent: ConsentEnum.Accepted,
       goal_grade: 9,
       predicted_grade: 8,
       total_grade: 8,
@@ -751,7 +751,7 @@ export const MOCK_STUDENTS: User[] = [
     name: 'Tad Bank',
     role: UserRoles.student,
     settings: {
-      consent: true,
+      consent: ConsentEnum.Accepted,
       goal_grade: 5,
       predicted_grade: 4,
       total_grade: 4,
@@ -766,7 +766,7 @@ export const MOCK_STUDENTS: User[] = [
     name: 'Bree Rivers',
     role: UserRoles.student,
     settings: {
-      consent: true,
+      consent: ConsentEnum.Accepted,
       goal_grade: 7,
       predicted_grade: 6,
       total_grade: 6,
@@ -781,7 +781,7 @@ export const MOCK_STUDENTS: User[] = [
     name: 'Edythe Marrone',
     role: UserRoles.student,
     settings: {
-      consent: true,
+      consent: ConsentEnum.Accepted,
       goal_grade: 9,
       predicted_grade: 8,
       total_grade: 8,
@@ -796,7 +796,7 @@ export const MOCK_STUDENTS: User[] = [
     name: 'Judie Lombardi',
     role: UserRoles.student,
     settings: {
-      consent: false,
+      consent: ConsentEnum.None,
       goal_grade: 7,
       predicted_grade: 6,
       total_grade: 6,
@@ -811,7 +811,7 @@ export const MOCK_STUDENTS: User[] = [
     name: 'Marth Keeling',
     role: UserRoles.student,
     settings: {
-      consent: true,
+      consent: ConsentEnum.Accepted,
       goal_grade: 6,
       predicted_grade: 5,
       total_grade: 5,
@@ -826,7 +826,7 @@ export const MOCK_STUDENTS: User[] = [
     name: 'Adria Laven',
     role: UserRoles.student,
     settings: {
-      consent: true,
+      consent: ConsentEnum.Accepted,
       goal_grade: 7,
       predicted_grade: 6,
       total_grade: 6,
@@ -841,7 +841,7 @@ export const MOCK_STUDENTS: User[] = [
     name: 'Su Glickman',
     role: UserRoles.student,
     settings: {
-      consent: true,
+      consent: ConsentEnum.Accepted,
       goal_grade: 0,
       predicted_grade: 7,
       total_grade: 7,
@@ -896,7 +896,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Su Glickman',
       role: 0,
       settings: {
-        consent: true,
+        consent: ConsentEnum.Accepted,
         goal_grade: 0,
         predicted_grade: -1,
         total_grade: -1,
@@ -911,7 +911,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Vernon Dursley',
       role: 0,
       settings: {
-        consent: true,
+        consent: ConsentEnum.Accepted,
         goal_grade: 1,
         predicted_grade: 0,
         total_grade: 0,
@@ -926,7 +926,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Donte Phu',
       role: 0,
       settings: {
-        consent: false,
+        consent: ConsentEnum.Refused,
         goal_grade: 3,
         predicted_grade: 2,
         total_grade: 2,
@@ -941,7 +941,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Melissa Hadsell',
       role: 0,
       settings: {
-        consent: true,
+        consent: ConsentEnum.Accepted,
         goal_grade: 4,
         predicted_grade: 3,
         total_grade: 3,
@@ -956,7 +956,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Louetta Curlin',
       role: 0,
       settings: {
-        consent: true,
+        consent: ConsentEnum.Accepted,
         goal_grade: 4,
         predicted_grade: 3,
         total_grade: 3,
@@ -973,7 +973,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Vernon Dursley',
       role: 0,
       settings: {
-        consent: true,
+        consent: ConsentEnum.Accepted,
         goal_grade: 1,
         predicted_grade: 0,
         total_grade: 0,
@@ -988,7 +988,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Donte Phu',
       role: 0,
       settings: {
-        consent: false,
+        consent: ConsentEnum.Refused,
         goal_grade: 3,
         predicted_grade: 2,
         total_grade: 2,
@@ -1003,7 +1003,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Melissa Hadsell',
       role: 0,
       settings: {
-        consent: true,
+        consent: ConsentEnum.Accepted,
         goal_grade: 4,
         predicted_grade: 3,
         total_grade: 3,
@@ -1018,7 +1018,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Louetta Curlin',
       role: 0,
       settings: {
-        consent: true,
+        consent: ConsentEnum.Accepted,
         goal_grade: 4,
         predicted_grade: 3,
         total_grade: 3,
@@ -1037,7 +1037,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Donte Phu',
       role: 0,
       settings: {
-        consent: false,
+        consent: ConsentEnum.None,
         goal_grade: 3,
         predicted_grade: 2,
         total_grade: 2,
@@ -1052,7 +1052,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Melissa Hadsell',
       role: 0,
       settings: {
-        consent: true,
+        consent: ConsentEnum.Accepted,
         goal_grade: 4,
         predicted_grade: 3,
         total_grade: 3,
@@ -1067,7 +1067,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Louetta Curlin',
       role: 0,
       settings: {
-        consent: true,
+        consent: ConsentEnum.Accepted,
         goal_grade: 4,
         predicted_grade: 3,
         total_grade: 3,
@@ -1082,7 +1082,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Felice Estell',
       role: 0,
       settings: {
-        consent: true,
+        consent: ConsentEnum.Accepted,
         goal_grade: 5,
         predicted_grade: 4,
         total_grade: 4,
@@ -1097,7 +1097,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Felipe Gwyn',
       role: 0,
       settings: {
-        consent: true,
+        consent: ConsentEnum.Accepted,
         goal_grade: 5,
         predicted_grade: 4,
         total_grade: 4,
@@ -1112,7 +1112,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Quiana Rape',
       role: 0,
       settings: {
-        consent: false,
+        consent: ConsentEnum.Refused,
         goal_grade: 5,
         predicted_grade: 4,
         total_grade: 4,
@@ -1127,7 +1127,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Marceline Buch',
       role: 0,
       settings: {
-        consent: false,
+        consent: ConsentEnum.Refused,
         goal_grade: 5,
         predicted_grade: 4,
         total_grade: 4,
@@ -1142,7 +1142,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Suzi Roger',
       role: 0,
       settings: {
-        consent: true,
+        consent: ConsentEnum.Accepted,
         goal_grade: 5,
         predicted_grade: 4,
         total_grade: 4,
@@ -1157,7 +1157,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Paula Uhrig',
       role: 0,
       settings: {
-        consent: false,
+        consent: ConsentEnum.None,
         goal_grade: 5,
         predicted_grade: 4,
         total_grade: 4,
@@ -1172,7 +1172,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Tad Bank',
       role: 0,
       settings: {
-        consent: true,
+        consent: ConsentEnum.Accepted,
         goal_grade: 5,
         predicted_grade: 4,
         total_grade: 4,
@@ -1189,7 +1189,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Melissa Hadsell',
       role: 0,
       settings: {
-        consent: true,
+        consent: ConsentEnum.Accepted,
         goal_grade: 4,
         predicted_grade: 3,
         total_grade: 3,
@@ -1204,7 +1204,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Louetta Curlin',
       role: 0,
       settings: {
-        consent: true,
+        consent: ConsentEnum.Accepted,
         goal_grade: 4,
         predicted_grade: 3,
         total_grade: 3,
@@ -1219,7 +1219,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Felice Estell',
       role: 0,
       settings: {
-        consent: true,
+        consent: ConsentEnum.Accepted,
         goal_grade: 5,
         predicted_grade: 4,
         total_grade: 4,
@@ -1234,7 +1234,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Felipe Gwyn',
       role: 0,
       settings: {
-        consent: true,
+        consent: ConsentEnum.Accepted,
         goal_grade: 5,
         predicted_grade: 4,
         total_grade: 4,
@@ -1249,7 +1249,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Quiana Rape',
       role: 0,
       settings: {
-        consent: false,
+        consent: ConsentEnum.Refused,
         goal_grade: 5,
         predicted_grade: 4,
         total_grade: 4,
@@ -1264,7 +1264,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Marceline Buch',
       role: 0,
       settings: {
-        consent: false,
+        consent: ConsentEnum.Refused,
         goal_grade: 5,
         predicted_grade: 4,
         total_grade: 4,
@@ -1279,7 +1279,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Suzi Roger',
       role: 0,
       settings: {
-        consent: true,
+        consent: ConsentEnum.Accepted,
         goal_grade: 5,
         predicted_grade: 4,
         total_grade: 4,
@@ -1294,7 +1294,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Paula Uhrig',
       role: 0,
       settings: {
-        consent: false,
+        consent: ConsentEnum.None,
         goal_grade: 5,
         predicted_grade: 4,
         total_grade: 4,
@@ -1309,7 +1309,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Tad Bank',
       role: 0,
       settings: {
-        consent: true,
+        consent: ConsentEnum.Accepted,
         goal_grade: 5,
         predicted_grade: 4,
         total_grade: 4,
@@ -1326,7 +1326,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Felice Estell',
       role: 0,
       settings: {
-        consent: true,
+        consent: ConsentEnum.Accepted,
         goal_grade: 5,
         predicted_grade: 4,
         total_grade: 4,
@@ -1341,7 +1341,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Felipe Gwyn',
       role: 0,
       settings: {
-        consent: true,
+        consent: ConsentEnum.Accepted,
         goal_grade: 5,
         predicted_grade: 4,
         total_grade: 4,
@@ -1356,7 +1356,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Quiana Rape',
       role: 0,
       settings: {
-        consent: false,
+        consent: ConsentEnum.Refused,
         goal_grade: 5,
         predicted_grade: 4,
         total_grade: 4,
@@ -1371,7 +1371,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Marceline Buch',
       role: 0,
       settings: {
-        consent: false,
+        consent: ConsentEnum.Refused,
         goal_grade: 5,
         predicted_grade: 4,
         total_grade: 4,
@@ -1386,7 +1386,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Suzi Roger',
       role: 0,
       settings: {
-        consent: true,
+        consent: ConsentEnum.Accepted,
         goal_grade: 5,
         predicted_grade: 4,
         total_grade: 4,
@@ -1401,7 +1401,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Paula Uhrig',
       role: 0,
       settings: {
-        consent: false,
+        consent: ConsentEnum.None,
         goal_grade: 5,
         predicted_grade: 4,
         total_grade: 4,
@@ -1416,7 +1416,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Tad Bank',
       role: 0,
       settings: {
-        consent: true,
+        consent: ConsentEnum.Accepted,
         goal_grade: 5,
         predicted_grade: 4,
         total_grade: 4,
@@ -1433,7 +1433,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Analisa Gathright',
       role: 0,
       settings: {
-        consent: true,
+        consent: ConsentEnum.Accepted,
         goal_grade: 6,
         predicted_grade: 5,
         total_grade: 5,
@@ -1448,7 +1448,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Alyson Burkey',
       role: 0,
       settings: {
-        consent: true,
+        consent: ConsentEnum.Accepted,
         goal_grade: 6,
         predicted_grade: 5,
         total_grade: 5,
@@ -1463,7 +1463,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Loretta Habib',
       role: 0,
       settings: {
-        consent: true,
+        consent: ConsentEnum.Accepted,
         goal_grade: 6,
         predicted_grade: 5,
         total_grade: 5,
@@ -1478,7 +1478,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Franklin Lindenberg',
       role: 0,
       settings: {
-        consent: true,
+        consent: ConsentEnum.Accepted,
         goal_grade: 6,
         predicted_grade: 5,
         total_grade: 5,
@@ -1493,7 +1493,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Ana Demayo',
       role: 0,
       settings: {
-        consent: true,
+        consent: ConsentEnum.Accepted,
         goal_grade: 6,
         predicted_grade: 5,
         total_grade: 5,
@@ -1508,7 +1508,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Austin Guilbault',
       role: 0,
       settings: {
-        consent: false,
+        consent: ConsentEnum.Refused,
         goal_grade: 6,
         predicted_grade: 5,
         total_grade: 5,
@@ -1523,7 +1523,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Darleen Birt',
       role: 0,
       settings: {
-        consent: false,
+        consent: ConsentEnum.Refused,
         goal_grade: 6,
         predicted_grade: 5,
         total_grade: 5,
@@ -1538,7 +1538,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Elroy Saini',
       role: 0,
       settings: {
-        consent: false,
+        consent: ConsentEnum.Refused,
         goal_grade: 6,
         predicted_grade: 5,
         total_grade: 5,
@@ -1553,7 +1553,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Chrissy Pan',
       role: 0,
       settings: {
-        consent: false,
+        consent: ConsentEnum.Refused,
         goal_grade: 6,
         predicted_grade: 5,
         total_grade: 5,
@@ -1568,7 +1568,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Marth Keeling',
       role: 0,
       settings: {
-        consent: true,
+        consent: ConsentEnum.Accepted,
         goal_grade: 6,
         predicted_grade: 5,
         total_grade: 5,
@@ -1585,7 +1585,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Gwen Stacy',
       role: 0,
       settings: {
-        consent: true,
+        consent: ConsentEnum.Accepted,
         goal_grade: 7,
         predicted_grade: 6,
         total_grade: 6,
@@ -1600,7 +1600,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Barrett Rhymer',
       role: 0,
       settings: {
-        consent: true,
+        consent: ConsentEnum.Accepted,
         goal_grade: 7,
         predicted_grade: 6,
         total_grade: 6,
@@ -1615,7 +1615,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Dayna Kubicek',
       role: 0,
       settings: {
-        consent: true,
+        consent: ConsentEnum.Accepted,
         goal_grade: 7,
         predicted_grade: 6,
         total_grade: 6,
@@ -1630,7 +1630,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Xochitl Sperber',
       role: 0,
       settings: {
-        consent: true,
+        consent: ConsentEnum.Accepted,
         goal_grade: 7,
         predicted_grade: 6,
         total_grade: 6,
@@ -1645,7 +1645,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Jung Hur',
       role: 0,
       settings: {
-        consent: true,
+        consent: ConsentEnum.Accepted,
         goal_grade: 7,
         predicted_grade: 6,
         total_grade: 6,
@@ -1660,7 +1660,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Robbin Defrancisco',
       role: 0,
       settings: {
-        consent: false,
+        consent: ConsentEnum.None,
         goal_grade: 7,
         predicted_grade: 6,
         total_grade: 6,
@@ -1675,7 +1675,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Bree Rivers',
       role: 0,
       settings: {
-        consent: true,
+        consent: ConsentEnum.Accepted,
         goal_grade: 7,
         predicted_grade: 6,
         total_grade: 6,
@@ -1690,7 +1690,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Judie Lombardi',
       role: 0,
       settings: {
-        consent: false,
+        consent: ConsentEnum.Refused,
         goal_grade: 7,
         predicted_grade: 6,
         total_grade: 6,
@@ -1705,7 +1705,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Adria Laven',
       role: 0,
       settings: {
-        consent: true,
+        consent: ConsentEnum.Accepted,
         goal_grade: 7,
         predicted_grade: 6,
         total_grade: 6,
@@ -1722,7 +1722,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Carman Muff',
       role: 0,
       settings: {
-        consent: false,
+        consent: ConsentEnum.Refused,
         goal_grade: 8,
         predicted_grade: 7,
         total_grade: 7,
@@ -1737,7 +1737,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Holley Templin',
       role: 0,
       settings: {
-        consent: true,
+        consent: ConsentEnum.Accepted,
         goal_grade: 8,
         predicted_grade: 7,
         total_grade: 7,
@@ -1752,7 +1752,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Cayla Payer',
       role: 0,
       settings: {
-        consent: true,
+        consent: ConsentEnum.Accepted,
         goal_grade: 8,
         predicted_grade: 7,
         total_grade: 7,
@@ -1767,7 +1767,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Dollie Bomba',
       role: 0,
       settings: {
-        consent: true,
+        consent: ConsentEnum.Accepted,
         goal_grade: 8,
         predicted_grade: 7,
         total_grade: 7,
@@ -1782,7 +1782,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Debrah Kutz',
       role: 0,
       settings: {
-        consent: false,
+        consent: ConsentEnum.Refused,
         goal_grade: 8,
         predicted_grade: 7,
         total_grade: 7,
@@ -1797,7 +1797,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Mozell Arteaga',
       role: 0,
       settings: {
-        consent: true,
+        consent: ConsentEnum.Accepted,
         goal_grade: 8,
         predicted_grade: 7,
         total_grade: 7,
@@ -1812,7 +1812,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Connie Speegle',
       role: 0,
       settings: {
-        consent: false,
+        consent: ConsentEnum.Refused,
         goal_grade: 8,
         predicted_grade: 7,
         total_grade: 7,
@@ -1827,7 +1827,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Norman Heitz',
       role: 0,
       settings: {
-        consent: false,
+        consent: ConsentEnum.None,
         goal_grade: 8,
         predicted_grade: 7,
         total_grade: 7,
@@ -1844,7 +1844,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Leopoldo Spengler',
       role: 0,
       settings: {
-        consent: true,
+        consent: ConsentEnum.Accepted,
         goal_grade: 9,
         predicted_grade: 8,
         total_grade: 8,
@@ -1859,7 +1859,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Tami Cupples',
       role: 0,
       settings: {
-        consent: true,
+        consent: ConsentEnum.Accepted,
         goal_grade: 9,
         predicted_grade: 8,
         total_grade: 8,
@@ -1874,7 +1874,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Donna Daughdrill',
       role: 0,
       settings: {
-        consent: true,
+        consent: ConsentEnum.Accepted,
         goal_grade: 9,
         predicted_grade: 8,
         total_grade: 8,
@@ -1889,7 +1889,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Stan Foran',
       role: 0,
       settings: {
-        consent: true,
+        consent: ConsentEnum.Accepted,
         goal_grade: 9,
         predicted_grade: 8,
         total_grade: 8,
@@ -1904,7 +1904,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Adena Spraggins',
       role: 0,
       settings: {
-        consent: false,
+        consent: ConsentEnum.Refused,
         goal_grade: 9,
         predicted_grade: 8,
         total_grade: 8,
@@ -1919,7 +1919,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Lorita Kaye',
       role: 0,
       settings: {
-        consent: false,
+        consent: ConsentEnum.Refused,
         goal_grade: 9,
         predicted_grade: 8,
         total_grade: 8,
@@ -1934,7 +1934,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Winifred Soto',
       role: 0,
       settings: {
-        consent: false,
+        consent: ConsentEnum.Refused,
         goal_grade: 9,
         predicted_grade: 8,
         total_grade: 8,
@@ -1949,7 +1949,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Terrence Zerr',
       role: 0,
       settings: {
-        consent: true,
+        consent: ConsentEnum.Accepted,
         goal_grade: 9,
         predicted_grade: 8,
         total_grade: 8,
@@ -1964,7 +1964,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Cris Loken',
       role: 0,
       settings: {
-        consent: true,
+        consent: ConsentEnum.Accepted,
         goal_grade: 9,
         predicted_grade: 8,
         total_grade: 8,
@@ -1979,7 +1979,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Edythe Marrone',
       role: 0,
       settings: {
-        consent: true,
+        consent: ConsentEnum.Accepted,
         goal_grade: 9,
         predicted_grade: 8,
         total_grade: 8,
@@ -1996,7 +1996,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Tonette Sakamoto',
       role: 0,
       settings: {
-        consent: true,
+        consent: ConsentEnum.Accepted,
         goal_grade: 10,
         predicted_grade: 9,
         total_grade: 9,
@@ -2011,7 +2011,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Kaladin Stormblessed',
       role: 0,
       settings: {
-        consent: true,
+        consent: ConsentEnum.Accepted,
         goal_grade: 10,
         predicted_grade: 9,
         total_grade: 9,
@@ -2026,7 +2026,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Galina Yepez',
       role: 0,
       settings: {
-        consent: false,
+        consent: ConsentEnum.Refused,
         goal_grade: 10,
         predicted_grade: 9,
         total_grade: 9,
@@ -2041,7 +2041,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Gwenn Dorrell',
       role: 0,
       settings: {
-        consent: false,
+        consent: ConsentEnum.None,
         goal_grade: 10,
         predicted_grade: 9,
         total_grade: 9,
@@ -2056,7 +2056,7 @@ export const MOCK_PEER_GROUPS: User[][] = [
       name: 'Regenia Elder',
       role: 0,
       settings: {
-        consent: false,
+        consent: ConsentEnum.Refused,
         goal_grade: 10,
         predicted_grade: 9,
         total_grade: 9,
