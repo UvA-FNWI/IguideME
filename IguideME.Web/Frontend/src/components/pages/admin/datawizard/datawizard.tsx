@@ -1,5 +1,10 @@
 import { getStudentsByCourse } from '@/api/courses';
-import { getExternalAssignments, patchExternalAssignmentTitle, postExternalAssignment, deleteExternalAssignment } from '@/api/entries';
+import {
+  getExternalAssignments,
+  patchExternalAssignmentTitle,
+  postExternalAssignment,
+  deleteExternalAssignment,
+} from '@/api/entries';
 import AdminTitle from '@/components/atoms/admin-titles/admin-titles';
 import UploadManager from '@/components/crystals/upload-manager/upload-manager';
 import QueryError from '@/components/particles/QueryError';
@@ -57,6 +62,7 @@ const Wizard: FC = (): ReactElement => {
       id: -1,
       course_id: -1,
       title: 'Title',
+      html_url: '',
       published: 2,
       muted: false,
       due_date: -1,
@@ -124,7 +130,7 @@ const ViewExternalAssignment: FC<ViewExternalAssignmentProps> = ({ assignment, s
 
   return (
     <div className='border-border0 bg-surface2 rounded-md border border-solid px-8 py-4'>
-      <div className='mb-5 flex items-center justify-between flex-wrap'>
+      <div className='mb-5 flex flex-wrap items-center justify-between'>
         <button
           onClick={() => {
             setEditing(true);
@@ -160,7 +166,7 @@ const ViewExternalAssignment: FC<ViewExternalAssignmentProps> = ({ assignment, s
           }
         </button>
         {!uploadMenuOpen && (
-          <div className='ml-auto flex justify-center items-center gap-2 flex-wrap'>
+          <div className='ml-auto flex flex-wrap items-center justify-center gap-2'>
             <Button
               className='custom-default-button'
               onClick={() => {
@@ -171,21 +177,21 @@ const ViewExternalAssignment: FC<ViewExternalAssignmentProps> = ({ assignment, s
             </Button>
             <Button
               className='custom-danger-button'
-                onClick={() => {
-                  void Swal.fire({
-                    title: 'Warning: This will permanently delete the tile!',
-                    icon: 'warning',
-                    focusCancel: true,
-                    showCancelButton: true,
-                    confirmButtonText: 'Delete',
-                    cancelButtonText: 'Cancel',
-                    customClass: {},
-                  }).then((result) => {
-                    if (result.isConfirmed) {
-                      deleteExternalAss({assignmentID: assignment.id});
-                    }
-                  });
-                }}
+              onClick={() => {
+                void Swal.fire({
+                  title: 'Warning: This will permanently delete the tile!',
+                  icon: 'warning',
+                  focusCancel: true,
+                  showCancelButton: true,
+                  confirmButtonText: 'Delete',
+                  cancelButtonText: 'Cancel',
+                  customClass: {},
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                    deleteExternalAss({ assignmentID: assignment.id });
+                  }
+                });
+              }}
             >
               Delete External Assignment
             </Button>
