@@ -864,7 +864,7 @@ public static class DatabaseQueries
         FROM            `notifications`
         WHERE           `user_id`=@userID
         AND             `sync_id`=@syncID
-        AND             `sent is NULL;";
+        AND             sent is NULL;";
 
     public const string QUERY_MARK_NOTIFICATIONS_SENT =
         @"UPDATE        `notifications`
