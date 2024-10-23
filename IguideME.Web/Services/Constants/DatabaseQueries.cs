@@ -1265,7 +1265,7 @@ public static class DatabaseQueries
                     `discussions`.`html_url`,
                     `discussions`.`date`,
                     `discussions`.`message`,
-                    (SELECT COUNT(*) FROM `discussion_entries` WHERE `discussion_entries`.`discussion_id`=@)
+                    (SELECT COUNT(*) FROM `discussion_entries` WHERE `discussion_entries`.`discussion_id`=@contentID)
         FROM        `discussions`
         WHERE       `discussions`.`course_id`=@courseID
         AND         `discussions`.`discussion_id`=@contentID
