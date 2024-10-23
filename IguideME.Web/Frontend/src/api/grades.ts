@@ -1,12 +1,5 @@
 import { type DiscussionEntry, type DiscussionTopic, type LearningGoal } from '@/types/tile';
-import {
-  type Submission,
-  type Grades,
-  type TileGrade,
-  type UserGrade,
-  EntryGrade,
-  EntryGradeMap,
-} from '@/types/grades';
+import { type Submission, type Grades, type TileGrade, type UserGrade, EntryGradeMap } from '@/types/grades';
 import apiClient from './axios';
 
 export async function getCompareGrades(id: number, type: string): Promise<UserGrade[]> {

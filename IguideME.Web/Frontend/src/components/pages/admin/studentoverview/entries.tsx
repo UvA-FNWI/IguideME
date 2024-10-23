@@ -20,9 +20,14 @@ export const getEntryColumns = (tiles: Tile[]): TableColumnsType<CommonData & En
     .map((tile) => ({
       title: tile.title,
       children: tile.entries.map((entry) => ({
-        title: entry.title,
+        title: (
+          <div className='text-ellipsis' style={{ width: '6vw', maxHeight: 100 }}>
+            {entry.title}
+          </div>
+        ),
         dataIndex: 'grade' + entry.content_id,
         key: 'grade' + entry.content_id,
+        width: '8vw',
         sorter: (a, b) => (a[`grade${entry.content_id}`] ?? -1) - (b[`grade${entry.content_id}`] ?? -1),
         render: (value: number, record) => {
           const type = record[`type${entry.content_id}`] ?? GradingType.NotGraded;

@@ -39,9 +39,10 @@ export const getTileColumns = (tiles: Tile[]): TableColumnsType<CommonData & Til
       return true;
     },
     render: (value: number, record) => {
+      const grade = record[`grade${tile.id}`];
       return (
         <div className={tile.gradingType !== GradingType.NotGraded && value < 50 ? 'text-failure' : ''}>
-          {printGrade(tile.gradingType, record[`grade${tile.id}`] ?? -1, record[`max${tile.id}`] ?? -1, false)}
+          {grade === undefined ? '...' : printGrade(tile.gradingType, grade, record[`max${tile.id}`] ?? -1, false)}
         </div>
       );
     },

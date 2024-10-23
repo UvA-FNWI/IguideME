@@ -35,6 +35,9 @@ export const userHandlers = [
   http.get('/student/*', ({ params }) => {
     return HttpResponse.json<User | undefined>(MOCK_STUDENTS.find((student) => student.userID === params[0]));
   }),
+  http.get('/datamart/accept-list/*', () => {
+    return HttpResponse.json<boolean>(true);
+  }),
 ];
 
 export const MOCK_STUDENTS: User[] = [

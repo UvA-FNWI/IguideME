@@ -269,7 +269,7 @@ export const createRouter = (): ReturnType<typeof createBrowserRouter> =>
       },
     ],
     {
-      basename: import.meta.env.MODE === 'mock' ? '/' : '/front',
+      basename: '/front',
       future: {
         v7_fetcherPersist: true,
         v7_normalizeFormMethod: true,

@@ -15,12 +15,14 @@ export const getNotificationColumns = (): TableColumnsType<CommonData & Notifica
       title: 'Received Notifications',
       dataIndex: 'received',
       key: 'received',
+      width: '40%',
       render: (notifications: string | undefined) => <NotificationCell notifications={notifications} />,
     },
     {
       title: 'To Be Sent Notifications',
       dataIndex: 'to_be_sent',
       key: 'to_be_sent',
+      width: '40%',
     },
   ];
 };

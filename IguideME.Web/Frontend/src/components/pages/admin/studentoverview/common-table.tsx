@@ -78,6 +78,8 @@ const CommonTable: FC<Props> = ({ type }): ReactElement => {
       key: 'name',
       title: 'Student' as any,
       dataIndex: 'name',
+      fixed: true,
+      width: '16vw',
       ...useAntFilterDropdown('name'),
       sorter: (a: CommonData, b: CommonData) => a.student.sortable_name.localeCompare(b.student.sortable_name),
     },
@@ -94,7 +96,7 @@ const CommonTable: FC<Props> = ({ type }): ReactElement => {
         className='custom-table'
         columns={columns}
         dataSource={getData()}
-        scroll={{ x: 900, y: 600 }}
+        scroll={{ x: 'max-content', y: 600 }}
         loading={isLoading || !students}
         sticky
       />

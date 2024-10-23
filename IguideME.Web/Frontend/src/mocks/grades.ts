@@ -6,7 +6,7 @@ import { MOCK_PERUSALL_SUBMISSIONS } from './submissions/perusal';
 import { MOCK_PRACTICE_SESSIONS } from './submissions/practice-sessions';
 import { MOCK_QUIZ_SUBMISSIONS } from './submissions/quizzes';
 import { type LearningGoal, LogicalExpression } from '@/types/tile';
-import { type Submission, Grades, TileGrade, UserGrade } from '@/types/grades';
+import { type Submission, EntryGradeMap, Grades, GradingType, TileGrade, UserGrade } from '@/types/grades';
 import { MOCK_STUDENTS } from './users';
 import { MOCK_TILES } from './tiles';
 
@@ -51,6 +51,57 @@ export const gradeHandlers = [
         tile_grades: Array<TileGrade>;
       }>
     >(MOCK_TILE_GRADES);
+  }),
+  http.get('/entries/grades', () => {
+    let result: EntryGradeMap = {};
+    MOCK_STUDENTS.forEach((student) => {
+      result[student.userID] = [];
+      MOCK_GOALS.forEach((goal) => {
+        let grade = 0;
+        goal.requirements.forEach((req) => {
+          const ass_grade =
+            MOCK_SUBMISSIONS.find((sub) => sub.assignmentID === req.assignment_id && sub.userID === student.userID)
+              ?.grades.grade ?? 0;
+          switch (req.expression) {
+            case LogicalExpression.NotEqual:
+              grade += +(ass_grade !== req.value);
+              break;
+            case LogicalExpression.Less:
+              grade += +(ass_grade < req.value);
+              break;
+            case LogicalExpression.LessEqual:
+              grade += +(ass_grade <= req.value);
+              break;
+            case LogicalExpression.Equal:
+              grade += +(ass_grade === req.value);
+              break;
+            case LogicalExpression.GreaterEqual:
+              grade += +(ass_grade > req.value);
+              break;
+            case LogicalExpression.Greater:
+              grade += +(ass_grade >= req.value);
+              break;
+          }
+        });
+        result[student.userID].push({
+          content_id: goal.id,
+          grade,
+          grading_type: GradingType.Points,
+          max: goal.requirements.length,
+        });
+      });
+    });
+    MOCK_SUBMISSIONS.forEach((sub) => {
+      result[sub.userID]?.push({
+        content_id: sub.assignmentID,
+        grade: sub.grades.grade,
+        max: sub.grades.max,
+        grading_type: sub.grades.type,
+      });
+    });
+    // Skipping discussions as the mocks only cover the alt version, and that is not included in this call
+
+    return HttpResponse.json<EntryGradeMap>(result);
   }),
   http.get('/assignments/*/submissions/*', ({ params }) => {
     return HttpResponse.json<Submission | undefined>(
