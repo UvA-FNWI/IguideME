@@ -9,12 +9,13 @@ public static class DatabaseQueries
     public static readonly Dictionary<string, string> MIGRATIONS =
         new()
         {
-            // {
-            // "001_drop_notifications",
-            // @"
-            // DROP TABLE notifications
-            // ;"
-            // },
+            {
+            "004_add_url_columns",
+            @"
+            ALTER TABLE assignments ADD html_url STRING;
+            ALTER TABLE discussions ADD html_url STRING;
+            ;"
+            },
         };
 
     // //================================ Tables ================================//
@@ -351,6 +352,7 @@ public static class DatabaseQueries
             `assignment_id`   INTEGER PRIMARY KEY AUTOINCREMENT,
             `course_id`       INTEGER,
             `title`           STRING,
+            `html_url`        STRING,
             `external_id`     STRING DEFAULT null UNIQUE,
             `published`       INTEGER DEFAULT 1,
             `muted`           BOOLEAN DEFAULT false,
@@ -365,6 +367,7 @@ public static class DatabaseQueries
             `discussion_id`   INTEGER PRIMARY KEY,
             `course_id`       INTEGER,
             `title`           STRING,
+            `html_url`        STRING,
             `author`          STRING,
             `date`            INTEGER,
             `message`         TEXT DEFAULT NULL,
@@ -586,6 +589,7 @@ public static class DatabaseQueries
                         (   `external_id`,
                             `course_id`,
                             `title`,
+                            `html_url`,
                             `published`,
                             `muted`,
                             `due_date`,
@@ -595,6 +599,7 @@ public static class DatabaseQueries
             @externalID,
             @courseID,
             @title,
+            @htmlUrl,
             @published,
             @muted,
             @dueDate,
@@ -669,6 +674,7 @@ public static class DatabaseQueries
                         (   `discussion_id`,
                             `course_id`,
                             `title`,
+                            `html_url`,
                             `author`,
                             `date`,
                             `message`)
@@ -676,6 +682,7 @@ public static class DatabaseQueries
             @discussionID,
             @courseID,
             @title,
+            @htmlUrl,
             @authorName,
             @date,
             @message
@@ -1143,6 +1150,11 @@ public static class DatabaseQueries
                 WHEN    1   THEN `discussions`.`title`
                 WHEN    2   THEN `learning_goals`.`title`
             END title,
+            CASE `tiles`.`type`
+                WHEN    0   THEN `assignments`.`html_url`
+                WHEN    1   THEN `discussions`.`html_url`
+                WHEN    2   THEN ''
+            END title,
             `tile_entries`.`weight`
         FROM        `tile_entries`
         INNER JOIN  `tiles`
@@ -1208,6 +1220,7 @@ public static class DatabaseQueries
         @"SELECT    `assignment_id`,
                     `course_id`,
                     `title`,
+                    `html_url`,
                     `external_id`,
                     `published`,
                     `muted`,
@@ -1222,6 +1235,7 @@ public static class DatabaseQueries
         @"SELECT    `assignment_id`,
                     `course_id`,
                     `title`,
+                    `html_url`,
                     `external_id`,
                     `published`,
                     `muted`,
@@ -1237,6 +1251,7 @@ public static class DatabaseQueries
         @"SELECT    `discussions`.`discussion_id`,
                     `discussions`.`title`,
                     `discussions`.`author`,
+                    `discussions`.`html_url`,
                     `discussions`.`date`,
                     `discussions`.`message`
         FROM        `discussions`
@@ -1247,6 +1262,7 @@ public static class DatabaseQueries
         @"SELECT    `discussions`.`discussion_id`,
                     `discussions`.`title`,
                     `discussions`.`author`,
+                    `discussions`.`html_url`,
                     `discussions`.`date`,
                     `discussions`.`message`,
                     (SELECT COUNT(*) FROM `discussion_entries` WHERE `discussion_entries`.`discussion_id`=@)

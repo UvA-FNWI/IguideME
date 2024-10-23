@@ -98,6 +98,7 @@ namespace IguideME.Web.Services.Workers
             foreach (AppAssignment assignment in assignments)
             {
                 _logger.LogInformation("Processing assignment: {Name}", assignment.Title);
+
                 // The internal id is obtained after the assignment is registered in the database.
                 assignment.ID = _databaseManager.RegisterAssignment(assignment);
 

@@ -116,17 +116,21 @@ namespace IguideME.Web.Models
 		[JsonProperty(PropertyName = "title")]
 		public string Title { get; set; }
 
+		[JsonProperty(PropertyName = "html_url")]
+		public string HtmlUrl { get; set; }
+
 		[JsonProperty(PropertyName = "content_id")]
 		public int ContentID { get; set; }
 
 		[JsonProperty(PropertyName = "weight")]
 		public double Weight { get; set; }
 
-		public TileEntry(int tileID, int ContentID, string title, double weight)
+		public TileEntry(int tileID, int ContentID, string title, string url, double weight)
 		{
 			this.TileID = tileID;
 			this.ContentID = ContentID;
 			this.Title = title;
+			this.HtmlUrl = url;
 			this.Weight = weight;
 		}
 	}

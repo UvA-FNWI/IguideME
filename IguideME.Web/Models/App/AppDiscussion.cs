@@ -23,6 +23,9 @@ namespace IguideME.Web.Models.App
         [JsonProperty("author")]
         public string Author { get; set; }
 
+        [JsonProperty("html_url")]
+        public string HtmlUrl { get; set; }
+
         [JsonProperty("date")]
         public long Date { get; set; }
 
@@ -40,6 +43,7 @@ namespace IguideME.Web.Models.App
             int courseID,
             string title,
             string author,
+            string url,
             long date,
             string message,
             IEnumerable<AppDiscussionEntry> entries)
@@ -48,6 +52,7 @@ namespace IguideME.Web.Models.App
             this.CourseID = courseID;
             this.Title = title;
             this.Author = author;
+            this.HtmlUrl = url;
             this.Date = date;
             this.Message = message;
             this.Entries = entries;
@@ -58,6 +63,7 @@ namespace IguideME.Web.Models.App
             int courseID,
             string title,
             string author,
+            string url,
             long date,
             string message,
             AppGrades grades)
@@ -66,6 +72,7 @@ namespace IguideME.Web.Models.App
             this.CourseID = courseID;
             this.Title = title;
             this.Author = author;
+            this.HtmlUrl = url;
             this.Date = date;
             this.Message = message;
             this.Grades = grades;

@@ -57,11 +57,11 @@ namespace IguideME.Web.Services
             try
             {
                 Conversation conv = new(this.Connector)
-                    {
-                        Subject = subject,
-                        Body = body,
-                        Recipients = new string[] { recipient }
-                    };
+                {
+                    Subject = subject,
+                    Body = body,
+                    Recipients = new string[] { recipient }
+                };
 
                 _logger.LogInformation(
                     "Created conversation with subject: {subject}, body: {body}, recipients: {recipients}",
@@ -146,6 +146,7 @@ namespace IguideME.Web.Services
                 .Select(ass => new AppAssignment(
                     courseID,
                     ass.Name,
+                    ass.Url,
                     ass.ID ?? -1,
                     ass.IsPublished ? 1 : 0,
                     ass.IsMuted,
@@ -215,6 +216,7 @@ namespace IguideME.Web.Services
                         new AppAssignment(
                             courseID,
                             quiz.Name,
+                            quiz.Url,
                             quiz.ID ?? -1,
                             quiz.IsPublished ? 1 : 0,
                             false,
@@ -247,6 +249,7 @@ namespace IguideME.Web.Services
                                 courseID,
                                 topic.Title,
                                 _databaseManager.GetUserIDFromName(courseID, topic.UserName),
+                                topic.Url,
                                 topic.PostedAt.HasValue ? ((DateTimeOffset)topic.PostedAt).ToUnixTimeMilliseconds() : 0,
                                 topic.Message,
                                 topic.Entries.SelectMany(entry =>

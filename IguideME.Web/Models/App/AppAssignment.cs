@@ -3,7 +3,8 @@
 namespace IguideME.Web.Models.App
 {
 
-    public enum PublishStatus {
+    public enum PublishStatus
+    {
         NotPublished,
         LMSPublished,
         ExternalData
@@ -22,6 +23,9 @@ namespace IguideME.Web.Models.App
 
         [JsonProperty("external_id")]
         public int? ExternalID { get; set; }
+
+        [JsonProperty("html_url")]
+        public string HtmlUrl { get; set; }
 
         [JsonProperty("published")]
         public PublishStatus Published { get; set; }
@@ -43,6 +47,7 @@ namespace IguideME.Web.Models.App
             int id,
             int courseID,
             string title,
+            string url,
             int? externalID,
             PublishStatus published,
             bool muted,
@@ -59,12 +64,14 @@ namespace IguideME.Web.Models.App
             this.DueDate = dueDate;
             this.MaxGrade = maxGrade;
             this.GradingType = gradingType;
+            this.HtmlUrl = url;
         }
 
         public AppAssignment(
             int id,
             int courseID,
             string title,
+            string url,
             int? externalID,
             int published,
             bool muted,
@@ -75,8 +82,9 @@ namespace IguideME.Web.Models.App
             this.ID = id;
             this.CourseID = courseID;
             this.Title = title;
+            this.HtmlUrl = url;
             this.ExternalID = externalID;
-            this.Published = (PublishStatus) published;
+            this.Published = (PublishStatus)published;
             this.Muted = muted;
             this.DueDate = dueDate;
             this.MaxGrade = maxGrade;
@@ -86,6 +94,7 @@ namespace IguideME.Web.Models.App
         public AppAssignment(
             int courseID,
             string title,
+            string url,
             int? externalID,
             int published,
             bool muted,
@@ -96,8 +105,9 @@ namespace IguideME.Web.Models.App
             this.ID = -1;
             this.CourseID = courseID;
             this.Title = title;
+            this.HtmlUrl = url;
             this.ExternalID = externalID;
-            this.Published = (PublishStatus) published;
+            this.Published = (PublishStatus)published;
             this.Muted = muted;
             this.DueDate = dueDate;
             this.MaxGrade = maxGrade;

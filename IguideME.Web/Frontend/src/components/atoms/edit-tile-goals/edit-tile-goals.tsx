@@ -66,6 +66,7 @@ const TileGoalsSelect: FC<TileGoalsSelectProps> = ({ goals, value: entries, onCh
           const goal = goals.find((g) => g.id === id);
           return {
             title: goal ? goal.title : 'No title found',
+            html_url: '',
             tile_id: -1, // Set the correct id on the backend
             weight: 0,
             content_id: id,
@@ -124,7 +125,7 @@ const TileGoalsSelect: FC<TileGoalsSelectProps> = ({ goals, value: entries, onCh
       />
 
       <Select
-        className='w-full [&>div]:!border-accent/70 [&>div]:!bg-surface1 [&>div]:!shadow-none [&>div]:hover:!border-accent [&>div]:hover:!bg-surface2 [&_span]:!text-text'
+        className='[&>div]:!border-accent/70 [&>div]:!bg-surface1 [&>div]:hover:!border-accent [&>div]:hover:!bg-surface2 [&_span]:!text-text w-full [&>div]:!shadow-none'
         dropdownClassName='bg-surface1 [&_div]:!text-text selectionSelected'
         value={selectedGoals}
         mode='multiple'

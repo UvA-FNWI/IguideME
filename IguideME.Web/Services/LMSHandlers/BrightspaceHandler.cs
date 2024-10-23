@@ -416,6 +416,7 @@ namespace IguideME.Web.Services
                             new AppAssignment(
                                 r.GetInt32(1),
                                 r.GetValue(2).ToString(),
+                                "",
                                 r.GetInt32(0),
                                 1, //bool published,
                                 false, //bool muted,

@@ -64,6 +64,7 @@ const SelectAssignments: FC<SelectAssignmentsProps> = ({ value: entries, onChang
           const ass = assignments.get(id);
           return {
             title: ass ? ass.title : 'No title found',
+            html_url: ass ? ass.html_url : '',
             tile_id: -1, // Set the correct id on the backend
             weight: 0,
             content_id: id,

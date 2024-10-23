@@ -31,7 +31,7 @@ namespace IguideME.Web.Services
                 _connection_string = "Data Source=/data/IguideME2.db;Version=3;New=False;Compress=True;";
             }
 
-            // DatabaseManager.s_instance.RunMigrations();
+            DatabaseManager.s_instance.RunMigrations();
             DatabaseManager.s_instance.CreateTables();
         }
 
@@ -569,6 +569,7 @@ namespace IguideME.Web.Services
                                 r.GetInt32(0),
                                 r.GetInt32(1),
                                 r.GetValue(2).ToString(),
+                                "",
                                 r.GetInt32(3),
                                 r.GetInt32(4),
                                 r.GetBoolean(5),
@@ -595,6 +596,7 @@ namespace IguideME.Web.Services
                 new SQLiteParameter("externalID", assignment.ExternalID),
                 new SQLiteParameter("courseID", assignment.CourseID),
                 new SQLiteParameter("title", assignment.Title),
+                new SQLiteParameter("htmlUrl", assignment.HtmlUrl),
                 new SQLiteParameter("published", assignment.Published),
                 new SQLiteParameter("muted", assignment.Muted),
                 new SQLiteParameter("dueDate", assignment.DueDate),
@@ -673,6 +675,7 @@ namespace IguideME.Web.Services
                 new SQLiteParameter("discussionID", discussion.ID),
                 new SQLiteParameter("courseID", discussion.CourseID),
                 new SQLiteParameter("title", discussion.Title),
+                new SQLiteParameter("htmlUrl", discussion.HtmlUrl),
                 new SQLiteParameter("authorName", discussion.Author),
                 new SQLiteParameter("date", discussion.Date),
                 new SQLiteParameter("message", discussion.Message)
@@ -2463,6 +2466,7 @@ namespace IguideME.Web.Services
                                 r.GetInt32(0),
                                 r.GetInt32(1),
                                 "This is another title",
+                                "",
                                 r.GetDouble(2)
                             )
                         );
@@ -3238,12 +3242,13 @@ namespace IguideME.Web.Services
                                 r.GetInt32(0),
                                 r.GetInt32(1),
                                 r.GetValue(2).ToString(),
-                                r.GetInt32(3),
+                                r.GetValue(3).ToString(),
                                 r.GetInt32(4),
-                                r.GetBoolean(5),
-                                r.GetInt64(6),
-                                r.GetDouble(7),
-                                (AppGradingType)r.GetInt32(8)
+                                r.GetInt32(5),
+                                r.GetBoolean(6),
+                                r.GetInt64(7),
+                                r.GetDouble(8),
+                                (AppGradingType)r.GetInt32(9)
                             );
                         assignments.Add(r.GetInt32(0), row);
                     }
@@ -3275,12 +3280,13 @@ namespace IguideME.Web.Services
                                 r.GetInt32(0),
                                 r.GetInt32(1),
                                 r.GetValue(2).ToString(),
-                                r.GetInt32(3),
+                                r.GetValue(3).ToString(),
                                 r.GetInt32(4),
-                                r.GetBoolean(5),
-                                r.GetInt64(6),
-                                r.GetDouble(7),
-                                (AppGradingType)r.GetInt32(8)
+                                r.GetInt32(5),
+                                r.GetBoolean(6),
+                                r.GetInt64(7),
+                                r.GetDouble(8),
+                                (AppGradingType)r.GetInt32(9)
                             );
                     }
                     catch (Exception e)
@@ -3312,8 +3318,9 @@ namespace IguideME.Web.Services
                             courseID,
                             r.GetValue(1).ToString(),
                             r.GetValue(2).ToString(),
-                            r.GetInt32(3),
-                            r.GetValue(4).ToString(),
+                            r.GetValue(3).ToString(),
+                            r.GetInt32(4),
+                            r.GetValue(5).ToString(),
                             new List<AppDiscussionEntry>() { }
                         );
                     discussions.Add(row);
@@ -3376,8 +3383,9 @@ namespace IguideME.Web.Services
                         courseID,
                         r.GetValue(1).ToString(),
                         r.GetValue(2).ToString(),
-                        r.GetInt32(3),
-                        r.GetValue(4).ToString(),
+                        r.GetValue(3).ToString(),
+                        r.GetInt32(4),
+                        r.GetValue(5).ToString(),
                         new AppGrades(
                                100 * grade / max,
                              100 * comparison.Minimum / max,
@@ -3554,7 +3562,8 @@ namespace IguideME.Web.Services
                             r.GetInt32(0),
                             r.GetInt32(1),
                             r.GetValue(2).ToString(),
-                            r.GetDouble(3)
+                            r.GetValue(3).ToString(),
+                            r.GetDouble(4)
                         )
                     );
                 }

@@ -44,27 +44,19 @@ export const AssignmentDetail: FC<Props> = ({ entry }): ReactElement => {
   switch (viewType) {
     case 'graph':
       return (
-        <div className='h-full w-full p-2'>
-          <h3 className='text-text overflow-hidden text-ellipsis text-nowrap text-center font-bold'>{entry.title}</h3>
-          <div className='grid h-full w-full place-content-center'>
-            <GraphGrade {...submission.grades} />
-          </div>
+        <div className='grid h-5/6 w-full place-content-center'>
+          <GraphGrade {...submission.grades} />
         </div>
       );
     case 'grid':
       return (
-        <div className='h-full w-full p-2'>
-          <h3 className='text-text h-1/5 max-w-[270px] overflow-hidden text-ellipsis text-nowrap text-center font-bold'>
-            {entry.title}
-          </h3>
-          <div className='flex h-4/5 w-full flex-col justify-between'>
-            <div className='grid flex-grow place-content-center'>
-              <GradeView {...submission.grades} />
-            </div>
-            <div>
-              <Divider className='border-text m-0 p-0' />
-              <PeerComparison grades={submission.grades} />
-            </div>
+        <div className='flex h-4/5 w-full flex-col justify-between'>
+          <div className='grid flex-grow place-content-center'>
+            <GradeView {...submission.grades} />
+          </div>
+          <div>
+            <Divider className='border-text m-0 p-0' />
+            <PeerComparison grades={submission.grades} />
           </div>
         </div>
       );
@@ -98,25 +90,19 @@ export const DiscussionDetail: FC<Props> = ({ entry }): ReactElement => {
   switch (viewType) {
     case 'graph':
       return (
-        <div className='h-full w-full p-2'>
-          <h3 className='text-text overflow-hidden text-ellipsis text-nowrap text-center font-bold'>{entry.title}</h3>
-          <div className='grid h-full w-full place-content-center'>
-            <GraphGrade {...discussion.grades} />
-          </div>
+        <div className='grid h-full w-full place-content-center'>
+          <GraphGrade {...discussion.grades} />
         </div>
       );
     case 'grid':
       return (
-        <div className='h-full w-full p-2'>
-          <h3 className='text-text overflow-hidden text-ellipsis text-nowrap text-center font-bold'>{entry.title}</h3>
-          <div className='flex h-4/5 w-full flex-col justify-between'>
-            <div className='grid flex-grow place-content-center'>
-              <GradeView {...discussion.grades} />
-            </div>
-            <div>
-              <Divider className='border-text m-0 p-0' />
-              <PeerComparison grades={discussion.grades} />
-            </div>
+        <div className='flex h-4/5 w-full flex-col justify-between'>
+          <div className='grid flex-grow place-content-center'>
+            <GradeView {...discussion.grades} />
+          </div>
+          <div>
+            <Divider className='border-text m-0 p-0' />
+            <PeerComparison grades={discussion.grades} />
           </div>
         </div>
       );
@@ -158,7 +144,6 @@ export const LearningGoalDetail: FC<Props> = ({ entry }): ReactElement => {
   return (
     <div className='h-full w-full p-2'>
       <div className='flex h-1/5 items-baseline justify-between gap-4'>
-        <h3 className='text-text overflow-hidden text-ellipsis text-nowrap font-bold'>{entry.title}</h3>
         {learningGoal.results?.every((b) => b) ?
           <span className='text-subtext1 flex place-content-center gap-2 text-sm'>
             Passed

@@ -39,6 +39,7 @@ export enum TileType {
 export interface TileEntry {
   tile_id: number;
   title: string;
+  html_url: string;
   weight: number;
   content_id: number;
 }
@@ -53,6 +54,7 @@ export interface Assignment {
   id: number;
   course_id: number;
   title: string;
+  html_url: string;
   published: PublilshedStatus;
   muted: boolean;
   due_date: number;
@@ -66,6 +68,7 @@ export interface DiscussionTopic {
   course_id: number;
   title: string;
   author: string;
+  html_url: string;
   date: number;
   message: string;
   grades?: Grades;
