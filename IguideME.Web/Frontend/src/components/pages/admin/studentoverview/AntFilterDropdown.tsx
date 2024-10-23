@@ -7,10 +7,10 @@ import { SearchOutlined } from '@ant-design/icons';
 import { Button, Input, Space, type InputRef, type TableColumnType } from 'antd';
 import type { FilterDropdownProps } from 'antd/lib/table/interface';
 import { useRef, useState } from 'react';
-import type { TableData } from './studentoverview';
+import type { CommonData } from './common-table';
 import Highlighter from 'react-highlight-words';
 
-type DataType = keyof TableData;
+type DataType = keyof CommonData;
 
 export const useAntFilterDropdown = (dataIndex: DataType): TableColumnType<DataType> => {
   const [searchText, setSearchText] = useState('');
