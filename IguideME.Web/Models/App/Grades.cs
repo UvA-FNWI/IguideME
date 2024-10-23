@@ -3,6 +3,25 @@ using Newtonsoft.Json;
 namespace IguideME.Web.Models.App
 {
 
+	public class UserGrade
+	{
+		[JsonProperty(PropertyName = "userID")]
+		public string userID { get; set; }
+
+		[JsonProperty(PropertyName = "grade")]
+		public double Grade { get; set; }
+
+		[JsonProperty(PropertyName = "max")]
+		public double Max { get; set; }
+
+		public UserGrade(string userID, double grade, double max)
+		{
+			this.userID = userID;
+			this.Grade = grade;
+			this.Max = max;
+		}
+	}
+
 	public enum AppGradingType
 	{
 		PassFail,

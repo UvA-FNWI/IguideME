@@ -967,6 +967,33 @@ public static class DatabaseQueries
         WHERE       `sync_id`=@syncID
         AND         `user_id`=@userID;";
 
+    public const string QUERY_TILE_COMPARE_GRADES =
+        @"SELECT    `user_id`,
+                    `grade`
+        FROM        `tile_grades`
+        WHERE       `sync_id`=@syncID
+        AND         `tile_id`=@tileID
+        ;";
+
+    public const string QUERY_ASSIGNMENT_COMPARE_GRADES =
+        @"SELECT    `submissions`.`user_id`,
+                    `submissions`.`grade`, 
+                    `assignments`.`max_grade`
+        FROM        `submissions`
+        INNER JOIN  `assignments`
+            USING   (`assignment_id`)
+        WHERE       `assignment_id`=@assignmentID
+        AND         `course_id`=@courseID
+        ;";
+
+    public const string QUERY_DISCUSSION_COMPARE_GRADES =
+        @"SELECT     author,
+                     COUNT(author)
+        FROM         `discussion_entries`
+        WHERE        `discussion_id` = @discussionID
+        AND          `course_id` = @courseID
+        ;";
+
     public const string QUERY_TILE_GRADE =
         @"SELECT    `grade`
         FROM        `tile_grades`

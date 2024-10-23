@@ -51,7 +51,7 @@ function findTitle(tiles: Tile[], type: string, id: string): string {
   return tiles.reduce<string>((acc, tile) => {
     if (
       (tile.type === TileType.assignments && type !== 'ass') ||
-      (tile.type === TileType.discussions && type !== 'dics') ||
+      (tile.type === TileType.discussions && type !== 'disc') ||
       (tile.type === TileType.learning_outcomes && type !== 'goal')
     ) {
       return acc;
@@ -96,8 +96,8 @@ function GradeAnalyzer(): ReactElement {
           <Card size='small' title={<h2 className='text-lg'>Select two tiles or entries to compare</h2>}>
             {isError ?
               <div className='flex flex-col items-center justify-center gap-2'>
-                <ExclamationCircleOutlined className='h-12 w-12 text-failure' />
-                <i className='text-base text-failure'>Error: Failed to retrieve the tiles and entries.</i>
+                <ExclamationCircleOutlined className='text-failure h-12 w-12' />
+                <i className='text-failure text-base'>Error: Failed to retrieve the tiles and entries.</i>
               </div>
             : <SelectComparison
                 defaultValues={

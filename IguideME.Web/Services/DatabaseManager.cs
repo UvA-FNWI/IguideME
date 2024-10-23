@@ -131,13 +131,13 @@ namespace IguideME.Web.Services
             }
         }
 
-        private void PrintQueryError(string title, int rows, SQLiteDataReader r, Exception e)
+        private void PrintQueryError(string title, int columns, SQLiteDataReader r, Exception e)
         {
             string error = $"{title}\nRequested:\nColumn | Data Type | Value | Type\n";
 
             try
             {
-                for (int i = 0; i <= rows; i++)
+                for (int i = 0; i <= columns; i++)
                     error +=
                         $"{r.GetName(i)} {r.GetDataTypeName(i)} {r.GetValue(i)} {r.GetValue(i).GetType()}\n";
 
@@ -2917,6 +2917,113 @@ namespace IguideME.Web.Services
                 }
             }
             return (-1, AppGradingType.Points);
+        }
+
+        public List<UserGrade> GetCompareGrades(int courseID, string id, string type)
+        {
+            return type switch
+            {
+                "tile" => GetTileCompare(courseID, id),
+                "ass" => GetAssignmentCompare(courseID, id),
+                "disc" => GetDiscussionCompare(courseID, id),
+                "goal" => GetLearningGoalCompare(courseID, id),
+                _ => throw new InvalidOperationException("Invalid compare type")
+            };
+        }
+
+        public List<UserGrade> GetTileCompare(int courseID, string tileID)
+        {
+            long syncID = this.GetCurrentSyncID(courseID);
+            List<UserGrade> grades = new();
+
+            using (
+                SQLiteDataReader r = Query(
+                    DatabaseQueries.QUERY_TILE_COMPARE_GRADES,
+                    new SQLiteParameter("syncID", syncID),
+                    new SQLiteParameter("tileID", tileID)
+                )
+            )
+            {
+                while (r.Read())
+                {
+                    try
+                    {
+                        grades.Add(new(r.GetValue(0).ToString(), r.GetDouble(1), 10));
+                    }
+                    catch (Exception e)
+                    {
+                        PrintQueryError(System.Reflection.MethodBase.GetCurrentMethod().ToString(), 1, r, e);
+                    }
+                }
+            }
+            return grades;
+        }
+
+        public List<UserGrade> GetAssignmentCompare(int courseID, string assignmentID)
+        {
+            List<UserGrade> grades = new();
+
+            using (
+                SQLiteDataReader r = Query(
+                    DatabaseQueries.QUERY_ASSIGNMENT_COMPARE_GRADES,
+                    new SQLiteParameter("assignmentID", assignmentID),
+                    new SQLiteParameter("courseID", courseID)
+                )
+            )
+            {
+                while (r.Read())
+                {
+                    try
+                    {
+                        grades.Add(new(r.GetValue(0).ToString(), r.GetDouble(1), r.GetDouble(2)));
+                    }
+                    catch (Exception e)
+                    {
+                        PrintQueryError(System.Reflection.MethodBase.GetCurrentMethod().ToString(), 2, r, e);
+                    }
+                }
+            }
+            return grades;
+        }
+
+        public List<UserGrade> GetDiscussionCompare(int courseID, string discussionID)
+        {
+            List<UserGrade> grades = new();
+            double max = 0;
+
+            using (
+                SQLiteDataReader r = Query(
+                    DatabaseQueries.QUERY_DISCUSSION_COMPARE_GRADES,
+                    new SQLiteParameter("discussionID", discussionID),
+                    new SQLiteParameter("courseID", courseID)
+                )
+            )
+            {
+                while (r.Read())
+                {
+                    try
+                    {
+                        grades.Add(new(r.GetValue(0).ToString(), r.GetDouble(1), -1));
+                        max += r.GetDouble(1);
+                    }
+                    catch (Exception e)
+                    {
+                        PrintQueryError(System.Reflection.MethodBase.GetCurrentMethod().ToString(), 1, r, e);
+                    }
+                }
+            }
+            foreach (UserGrade grade in grades)
+            {
+                grade.Max = max;
+            }
+            return grades;
+        }
+
+        public List<UserGrade> GetLearningGoalCompare(int courseID, string assignmentID)
+        {
+            // TODO: Implement.
+            return new();
+
         }
 
         public UserTileGrades[] GetAllTileGrades(int courseID)

@@ -68,6 +68,15 @@ namespace IguideME.Web.Controllers
 
 		[Authorize(Policy = "IsInstructor")]
 		[HttpGet]
+		[Route("/grades/{id}")]
+		public ActionResult GetCompareGrades(string id, [FromQuery(Name = "type")] string type)
+		{
+
+			return Ok(_databaseManager.GetCompareGrades(GetCourseID(), id, type));
+		}
+
+		[Authorize(Policy = "IsInstructor")]
+		[HttpGet]
 		[Route("/tiles/grades")]
 		public ActionResult GetAllTileGrades()
 		{
