@@ -112,9 +112,13 @@ const SelectAssignments: FC<SelectAssignmentsProps> = ({ value: entries, onChang
               align: 'center',
               render: (_: string, entry: TileEntry) => {
                 const assignment = assignments.get(entry.content_id);
-                return assignment !== undefined && assignment.published ?
-                    <CheckCircleOutlined className='text-success' />
-                  : <CloseCircleOutlined className='text-failure' />;
+                return (
+                  <a href={assignment?.html_url} target='_blank' rel='noopener noreferrer'>
+                    {assignment !== undefined && assignment.published ?
+                      <CheckCircleOutlined className='text-success' />
+                    : <CloseCircleOutlined className='text-failure' />}
+                  </a>
+                );
               },
             },
             {
