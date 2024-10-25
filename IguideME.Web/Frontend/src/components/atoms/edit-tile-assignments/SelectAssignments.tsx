@@ -1,8 +1,8 @@
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
-import { CheckCircleOutlined, CloseCircleOutlined, DeleteFilled } from '@ant-design/icons';
+import { ApartmentOutlined, CheckCircleOutlined, CloseCircleOutlined, DeleteFilled } from '@ant-design/icons';
 import { getAssignments } from '@/api/entries';
-import { InputNumber, Select, Table } from 'antd';
+import { InputNumber, Select, Table, Tooltip } from 'antd';
 import { useQuery } from '@tanstack/react-query';
 import { useCallback, useEffect, useMemo, useState, type FC, type ReactElement } from 'react';
 
@@ -134,7 +134,16 @@ const SelectAssignments: FC<SelectAssignmentsProps> = ({ value: entries, onChang
               },
             },
             {
-              title: 'Weight',
+              title: (
+                <div className='flex w-20 place-content-center items-center justify-between'>
+                  <div>Weight</div>
+                  <div>
+                    <Tooltip title='Evenly distribute weights over entries'>
+                      <ApartmentOutlined onClick={distributeWeights} />
+                    </Tooltip>
+                  </div>
+                </div>
+              ),
               dataIndex: 'weight',
               key: 'weight',
               align: 'center',
@@ -198,6 +207,11 @@ const SelectAssignments: FC<SelectAssignmentsProps> = ({ value: entries, onChang
       </div>
     </QueryLoading>
   );
+  function distributeWeights() {
+    const weight = 1 / entries.length;
+    entries.forEach((entry) => (entry.weight = weight));
+    setEntries(entries);
+  }
 };
 
 export default SelectAssignments;
