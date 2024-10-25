@@ -16,6 +16,12 @@ public static class DatabaseQueries
             ALTER TABLE discussions ADD html_url STRING;
             ;"
             },
+            {
+            "005_update_assignments",
+            @"
+            DELETE FROM assignments WHERE published!=2
+            ;"
+            },
         };
 
     // //================================ Tables ================================//
