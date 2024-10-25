@@ -94,15 +94,21 @@ export const useAntFilterDropdown = (dataIndex: DataType): TableColumnType<DataT
         setTimeout(() => searchInput.current?.select(), 100);
       }
     },
-    render: (text) =>
-      searchedColumn === dataIndex ?
-        <Highlighter
-          highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
-          searchWords={[searchText]}
-          autoEscape
-          textToHighlight={text ? text.toString() : ''}
-        />
-      : text,
+    render: (text, record: any) => (
+      <div>
+        <div className='w-full'>
+          {searchedColumn === dataIndex ?
+            <Highlighter
+              highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+              searchWords={[searchText]}
+              autoEscape
+              textToHighlight={text ? text.toString() : ''}
+            />
+          : text}
+        </div>
+        <div className='px-2 text-xs'>{record.student.userID}</div>
+      </div>
+    ),
   });
 
   return getColumnSearchProps(dataIndex);

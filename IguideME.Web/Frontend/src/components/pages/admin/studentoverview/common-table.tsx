@@ -12,6 +12,7 @@ import { getTiles } from '@/api/tiles';
 import { getTileColumns, getTileData } from './tiles';
 import { getAllEntryGrades, getAllUserTileGrades } from '@/api/grades';
 import { getEntryColumns, getEntryData } from './entries';
+import { getErrorColumn } from './error-column';
 
 export interface CommonData {
   key: string;
@@ -35,8 +36,8 @@ const CommonTable: FC<Props> = ({ type }): ReactElement => {
 
   const {
     data: notifications,
-    // isNotificationError,
-    // isNotificationLoading,
+    isError: isNotificationError,
+    isLoading: isNotificationLoading,
   } = useQuery({
     queryKey: ['course-notifications'],
     queryFn: async () => await getCourseNotifications(),
@@ -45,8 +46,8 @@ const CommonTable: FC<Props> = ({ type }): ReactElement => {
 
   const {
     data: tiles,
-    // isTileError,
-    // isTileLoading,
+    isError: isTileError,
+    isLoading: isTileLoading,
   } = useQuery({
     queryKey: ['tiles'],
     queryFn: async () => await getTiles(),
@@ -55,8 +56,8 @@ const CommonTable: FC<Props> = ({ type }): ReactElement => {
 
   const {
     data: tile_grades,
-    // isTileGradesError,
-    // isTileGradesLoading,
+    isError: isTileGradesError,
+    isLoading: isTileGradesLoading,
   } = useQuery({
     queryKey: ['tile-grades'],
     queryFn: async () => await getAllUserTileGrades(),
@@ -65,8 +66,8 @@ const CommonTable: FC<Props> = ({ type }): ReactElement => {
 
   const {
     data: entry_grades,
-    // isEntryGradesError,
-    // isEntryGradesLoading,
+    isError: isEntryGradesError,
+    isLoading: isEntryGradesLoading,
   } = useQuery({
     queryKey: ['entry-grades'],
     queryFn: async () => await getAllEntryGrades(),
@@ -76,7 +77,7 @@ const CommonTable: FC<Props> = ({ type }): ReactElement => {
   const columns = [
     {
       key: 'name',
-      title: 'Student' as any,
+      title: 'Student',
       dataIndex: 'name',
       fixed: true,
       width: '16vw',
@@ -87,7 +88,11 @@ const CommonTable: FC<Props> = ({ type }): ReactElement => {
   ];
 
   if (isError) {
-    return <QueryError className='top-20' title='Failed to fetch student data' />;
+    return (
+      <div className='flex flex-col'>
+        <QueryError className='top-20' title='Failed to fetch student data' />
+      </div>
+    );
   }
 
   return (
@@ -97,7 +102,14 @@ const CommonTable: FC<Props> = ({ type }): ReactElement => {
         columns={columns}
         dataSource={getData()}
         scroll={{ x: 'max-content', y: 600 }}
-        loading={isLoading || !students}
+        loading={
+          isLoading ||
+          !students ||
+          isNotificationLoading ||
+          isTileLoading ||
+          isTileGradesLoading ||
+          isEntryGradesLoading
+        }
         sticky
       />
     </div>
@@ -108,10 +120,15 @@ const CommonTable: FC<Props> = ({ type }): ReactElement => {
       case GradeTableType.settings:
         return getSettingsColumns();
       case GradeTableType.tile:
+        if (isTileError) return getErrorColumn('tiles');
+        if (isTileGradesError) return getErrorColumn('tile grades');
         return tiles ? getTileColumns(tiles) : [];
       case GradeTableType.entry:
+        if (isTileError) return getErrorColumn('tiles and entries');
+        if (isEntryGradesError) return getErrorColumn('entry grades');
         return tiles ? getEntryColumns(tiles) : [];
       case GradeTableType.notifications:
+        if (isNotificationError) return getErrorColumn('notifications');
         return getNotificationColumns();
     }
   }
@@ -124,11 +141,20 @@ const CommonTable: FC<Props> = ({ type }): ReactElement => {
       case GradeTableType.settings:
         return getSettingsData(students);
       case GradeTableType.tile:
-        return getTileData(students, tile_grades);
+        return getTileData(
+          students.filter((student) => student.settings?.consent === 1),
+          tile_grades,
+        );
       case GradeTableType.entry:
-        return getEntryData(students, entry_grades);
+        return getEntryData(
+          students.filter((student) => student.settings?.consent === 1),
+          entry_grades,
+        );
       case GradeTableType.notifications:
-        return getNotificationData(students, notifications);
+        return getNotificationData(
+          students.filter((student) => student.settings?.consent === 1),
+          notifications,
+        );
     }
   }
 };

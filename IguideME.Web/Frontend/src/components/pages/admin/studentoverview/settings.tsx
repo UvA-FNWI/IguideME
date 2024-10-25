@@ -36,10 +36,10 @@ export const getSettingsColumns = (): TableColumnsType<CommonData & SettingsData
           render: (text: string, record: CommonData & SettingsData) => {
             if (Number(text) !== -1) {
               return (
-                <p className={record.total && record.total < 5.5 ? 'text-failure' : ''}>{record.total ?? 'N/A'}</p>
+                <p className={record.total && record.total < 5.5 ? 'text-failure' : ''}>{record.total ?? '...'}</p>
               );
             } else {
-              return 'N/A';
+              return '...';
             }
           },
         },
@@ -51,11 +51,11 @@ export const getSettingsColumns = (): TableColumnsType<CommonData & SettingsData
         //     if (Number(text) !== -1) {
         //       return (
         //         <p className={record.predicted && record.predicted < 5.5 ? 'text-failure' : ''}>
-        //           {record.predicted ?? 'N/A'}
+        //           {record.predicted ?? '...'}
         //         </p>
         //       );
         //     } else {
-        //       return 'N/A';
+        //       return '...';
         //     }
         //   },
         // },
@@ -65,9 +65,9 @@ export const getSettingsColumns = (): TableColumnsType<CommonData & SettingsData
           sorter: (a, b) => (a.goal ?? -1) - (b.goal ?? -1),
           render: (text: string, record: CommonData & SettingsData) => {
             if (Number(text) !== -1) {
-              return <p className={record.goal && record.goal < 5.5 ? 'text-failure' : ''}>{record.goal ?? 'N/A'}</p>;
+              return <p className={record.goal && record.goal < 5.5 ? 'text-failure' : ''}>{record.goal ?? '...'}</p>;
             } else {
-              return 'N/A';
+              return '...';
             }
           },
         },

@@ -14,10 +14,15 @@ interface TileData {
 
 export const getTileColumns = (tiles: Tile[]): TableColumnsType<CommonData & TileData> => {
   return tiles.map((tile) => ({
-    title: tile.title,
+    title: (
+      <div className='text-ellipsis' style={{ width: '6vw', maxHeight: 100 }}>
+        {tile.title}
+      </div>
+    ),
     dataIndex: 'grade' + tile.id,
     key: 'grade' + tile.id,
     sorter: (a, b) => (a[`grade${tile.id}`] ?? -1) - (b[`grade${tile.id}`] ?? -1),
+    width: '9vw',
     filters:
       tile.gradingType !== GradingType.NotGraded ?
         [

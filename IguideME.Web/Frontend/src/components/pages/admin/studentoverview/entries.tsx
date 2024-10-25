@@ -18,7 +18,11 @@ export const getEntryColumns = (tiles: Tile[]): TableColumnsType<CommonData & En
   return tiles
     .filter((tile) => tile.entries.length > 0)
     .map((tile) => ({
-      title: tile.title,
+      title: (
+        <div className='text-ellipsis' style={{ minWidth: '5vw', maxHeight: 100 }}>
+          {tile.title}
+        </div>
+      ),
       children: tile.entries.map((entry) => ({
         title: (
           <div className='text-ellipsis' style={{ width: '6vw', maxHeight: 100 }}>
@@ -27,18 +31,31 @@ export const getEntryColumns = (tiles: Tile[]): TableColumnsType<CommonData & En
         ),
         dataIndex: 'grade' + entry.content_id,
         key: 'grade' + entry.content_id,
-        width: '8vw',
+        width: '9vw',
+        filters: [
+          {
+            text: 'Passing grade',
+            value: 1,
+          },
+          {
+            text: 'Failing',
+            value: -1,
+          },
+        ],
+        onFilter: (value, record) => {
+          if (typeof value === 'number') {
+            return value * ((record[`grade${entry.content_id}`] ?? 0) - 50) >= 0;
+          }
+          console.warn('Warning, unknown value found in getEntryColumns', value);
+          return true;
+        },
         sorter: (a, b) => (a[`grade${entry.content_id}`] ?? -1) - (b[`grade${entry.content_id}`] ?? -1),
         render: (value: number, record) => {
           const type = record[`type${entry.content_id}`] ?? GradingType.NotGraded;
+          const grade = record[`grade${entry.content_id}`];
           return (
             <div className={type !== GradingType.NotGraded && value < 50 ? 'text-failure' : ''}>
-              {printGrade(
-                type,
-                record[`grade${entry.content_id}`] ?? -1,
-                record[`max${entry.content_id}`] ?? -1,
-                false,
-              )}
+              {grade ? printGrade(type, grade, record[`max${entry.content_id}`] ?? -1, false) : '...'}
             </div>
           );
         },
