@@ -15,10 +15,11 @@ import { type User } from '@/types/user';
 import { useRequiredParams } from '@/utils/params';
 import { PlusOutlined } from '@ant-design/icons';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Button, Input, Tooltip } from 'antd';
+import { Button, Card } from 'antd';
 import { useState, type FC, type ReactElement } from 'react';
 import AssignmentSettingsForm from './assignment-settings-form';
 import Swal from 'sweetalert2';
+import EditTitle from '@/components/crystals/edit-title/edit-title';
 
 const DataWizard: FC = (): ReactElement => {
   return (
@@ -74,12 +75,12 @@ const Wizard: FC = (): ReactElement => {
   if (assignmentLoading || studentsLoading) {
     return (
       <QueryLoading isLoading={assignmentLoading || studentsLoading}>
-        <div className='bg-surface1 h-[100px] w-full rounded-lg' />
+        <div className='h-[100px] w-full rounded-lg bg-surface1' />
       </QueryLoading>
     );
   } else if (assignmentError || studentsError) {
     return (
-      <div className='bg-surface1 relative h-[100px] w-full rounded-lg'>
+      <div className='relative h-[100px] w-full rounded-lg bg-surface1'>
         <QueryError title='Error: Unable to load external data' />
       </div>
     );
@@ -92,7 +93,7 @@ const Wizard: FC = (): ReactElement => {
         onClick={addAssignment}
         block
         icon={<PlusOutlined />}
-        className='bg-accent/30 hover:!border-border1 hover:!bg-accent/70 [&_span]:!text-text ml-auto !w-fit hover:border-solid'
+        className='ml-auto !w-fit bg-accent/30 hover:border-solid hover:!border-border1 hover:!bg-accent/70 [&_span]:!text-text'
       >
         Add External Assignment
       </Button>
@@ -109,8 +110,6 @@ interface ViewExternalAssignmentProps {
 }
 
 const ViewExternalAssignment: FC<ViewExternalAssignmentProps> = ({ assignment, students }): ReactElement => {
-  const [editing, setEditing] = useState<boolean>(false);
-  const [title, setTitle] = useState<string>(assignment.title);
   const [uploadMenuOpen, setUploadMenuOpen] = useState<boolean>(false);
 
   const queryClient = useQueryClient();
@@ -128,78 +127,57 @@ const ViewExternalAssignment: FC<ViewExternalAssignmentProps> = ({ assignment, s
     },
   });
 
+  const saveTitleChange = (title: string): void => {
+    patchExternalAssignment({
+      id: assignment.id,
+      title,
+    });
+  };
+
   return (
-    <div className='border-border0 bg-surface2 rounded-md border border-solid px-8 py-4'>
-      <div className='mb-5 flex flex-wrap items-center justify-between'>
-        <button
-          onClick={() => {
-            setEditing(true);
-          }}
-        >
-          {editing ?
-            <Tooltip title='Press Enter to save'>
-              <Input
-                className='border-accent bg-surface1 text-text hover:border-accent/50 hover:bg-surface1 focus:border-accent focus:bg-surface1 focus:shadow-accent aria-invalid:!border-failure aria-invalid:shadow-none aria-invalid:focus:!shadow-sm aria-invalid:focus:!shadow-failure w-full focus:shadow-sm'
-                value={title}
-                autoFocus
-                onBlur={() => {
-                  setEditing(false);
+    <Card
+      className='custom-card-no-hover !bg-surface2'
+      size='small'
+      title={
+        <div className='flex py-3'>
+          <EditTitle title={assignment.title} onSave={saveTitleChange} />
+          {!uploadMenuOpen && (
+            <div className='ml-auto flex flex-wrap items-center justify-center gap-2'>
+              <Button
+                className='custom-default-button'
+                onClick={() => {
+                  setUploadMenuOpen(true);
                 }}
-                onChange={(e) => {
-                  setTitle(e.target.value);
-                }}
-                onKeyDown={(e) => {
-                  if (e.key !== 'Enter') return;
-                  patchExternalAssignment({
-                    id: assignment.id,
-                    title,
+              >
+                New Upload
+              </Button>
+              <Button
+                className='custom-danger-button'
+                onClick={() => {
+                  void Swal.fire({
+                    title: 'Warning: This will permanently delete the tile!',
+                    icon: 'warning',
+                    focusCancel: true,
+                    showCancelButton: true,
+                    confirmButtonText: 'Delete',
+                    cancelButtonText: 'Cancel',
+                    customClass: {},
+                  }).then((result) => {
+                    if (result.isConfirmed) {
+                      deleteExternalAss({ assignmentID: assignment.id });
+                    }
                   });
-                  setEditing(false);
                 }}
-              />
-            </Tooltip>
-          : <Tooltip title='Click to edit'>
-              <h3 className='text-lg'>
-                <b>{assignment.title}</b>
-              </h3>
-            </Tooltip>
-          }
-        </button>
-        {!uploadMenuOpen && (
-          <div className='ml-auto flex flex-wrap items-center justify-center gap-2'>
-            <Button
-              className='custom-default-button'
-              onClick={() => {
-                setUploadMenuOpen(true);
-              }}
-            >
-              New Upload
-            </Button>
-            <Button
-              className='custom-danger-button'
-              onClick={() => {
-                void Swal.fire({
-                  title: 'Warning: This will permanently delete the tile!',
-                  icon: 'warning',
-                  focusCancel: true,
-                  showCancelButton: true,
-                  confirmButtonText: 'Delete',
-                  cancelButtonText: 'Cancel',
-                  customClass: {},
-                }).then((result) => {
-                  if (result.isConfirmed) {
-                    deleteExternalAss({ assignmentID: assignment.id });
-                  }
-                });
-              }}
-            >
-              Delete External Assignment
-            </Button>
-          </div>
-        )}
-      </div>
+              >
+                Delete External Assignment
+              </Button>
+            </div>
+          )}
+        </div>
+      }
+    >
       {uploadMenuOpen && (
-        <div className='mb-5 flex'>
+        <div className='mb-5 flex !p-3'>
           <UploadManager
             assignment={assignment}
             students={students}
@@ -213,7 +191,7 @@ const ViewExternalAssignment: FC<ViewExternalAssignmentProps> = ({ assignment, s
         <h4 className='text-lg'>Settings</h4>
         <AssignmentSettingsForm assignment={assignment} />
       </div>
-    </div>
+    </Card>
   );
 };
 

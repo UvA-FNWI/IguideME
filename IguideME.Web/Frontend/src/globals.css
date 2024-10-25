@@ -334,6 +334,16 @@ textarea:not([rows]) {
   }
 }
 
+.custom-card-no-hover {
+  .ant-card-body {
+    background-color: hsl(var(--surface2)) !important;
+
+    div {
+      color: hsl(var(--text)) !important;
+    }
+  }
+}
+
 .custom-table {
   .ant-table-thead > tr > th {
     background-color: hsl(var(--surface1)) !important;

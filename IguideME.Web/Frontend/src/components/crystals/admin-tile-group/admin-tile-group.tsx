@@ -8,16 +8,14 @@ import { DeleteFilled, PlusOutlined } from '@ant-design/icons';
 import { SortableContext, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Button, Col, Divider, Input, Row, Tooltip } from 'antd';
-import { useMemo, useState, type FC, type ReactElement } from 'react';
+import { Button, Col, Divider, Row } from 'antd';
+import { useMemo, type FC, type ReactElement } from 'react';
+import EditTitle from '../edit-title/edit-title';
 
 interface Props {
   group: TileGroup;
 }
 const AdminTileGroupView: FC<Props> = ({ group }): ReactElement => {
-  const [editing, setEditing] = useState<boolean>(false);
-  const [title, setTitle] = useState<string>(group.title);
-
   const { data, isError, isLoading } = useQuery({
     queryKey: ['tiles'],
     queryFn: getTiles,
@@ -55,7 +53,6 @@ const AdminTileGroupView: FC<Props> = ({ group }): ReactElement => {
       type: 'Group',
       group,
     },
-    disabled: editing,
   });
 
   const style = {
@@ -100,40 +97,12 @@ const AdminTileGroupView: FC<Props> = ({ group }): ReactElement => {
     >
       <Row className='cursor-grab content-center justify-between' {...attributes} {...listeners}>
         <Col className='cursor-text'>
-          <h2
-            className='p-1 text-lg'
-            onClick={() => {
-              setEditing(true);
+          <EditTitle
+            title={group.title}
+            onSave={(title) => {
+              patchGroup({ ...group, title });
             }}
-          >
-            {!editing ?
-              group.title
-            : editing && (
-                <Tooltip title='Press Enter to save'>
-                  <Input
-                    className='w-full border-accent bg-surface1 text-text hover:border-accent/50 hover:bg-surface1 focus:border-accent focus:bg-surface1 focus:shadow-sm focus:shadow-accent aria-invalid:!border-failure aria-invalid:shadow-none aria-invalid:focus:!shadow-sm aria-invalid:focus:!shadow-failure'
-                    value={title}
-                    autoFocus
-                    onBlur={() => {
-                      setEditing(false);
-                    }}
-                    onChange={(e) => {
-                      setTitle(e.target.value);
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key !== 'Enter') return;
-                      patchGroup({
-                        id: group.id,
-                        title,
-                        position: group.position,
-                      });
-                      setEditing(false);
-                    }}
-                  />
-                </Tooltip>
-              )
-            }
-          </h2>
+          />
         </Col>
         <Col>
           <DeleteFilled
