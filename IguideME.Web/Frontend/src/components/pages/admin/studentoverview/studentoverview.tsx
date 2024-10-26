@@ -15,7 +15,7 @@ const StudentOverview: FC = (): ReactElement => {
   const [selectedTableType, setSelectedTableType] = useState<GradeTableType>(0);
 
   return (
-    <div>
+    <div className='flex flex-col'>
       <AdminTitle description='An overview of students grades and consent.' title='Student Overview' />
       <div className='my-3 flex w-full justify-center'>
         <Segmented

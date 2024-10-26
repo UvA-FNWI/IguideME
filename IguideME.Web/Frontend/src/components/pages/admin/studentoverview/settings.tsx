@@ -1,8 +1,8 @@
-import { ConsentEnum, User } from '@/types/user';
+import { ConsentEnum, type User } from '@/types/user';
 import { CheckCircleOutlined, CloseCircleOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { Tooltip } from 'antd';
 import type { TableColumnsType } from 'antd/lib';
-import { CommonData } from './common-table';
+import { type CommonData } from './common-table';
 
 export interface SettingsData {
   consent?: ConsentEnum;
@@ -12,7 +12,7 @@ export interface SettingsData {
   notifications?: boolean;
 }
 
-export const getSettingsData = (students: User[]): (CommonData & SettingsData)[] => {
+export const getSettingsData = (students: User[]): Array<CommonData & SettingsData> => {
   return students.map((student) => ({
     student,
     key: student.userID,
@@ -36,10 +36,10 @@ export const getSettingsColumns = (): TableColumnsType<CommonData & SettingsData
           render: (text: string, record: CommonData & SettingsData) => {
             if (Number(text) !== -1) {
               return (
-                <p className={record.total && record.total < 5.5 ? 'text-failure' : ''}>{record.total ?? 'N/A'}</p>
+                <p className={record.total && record.total < 5.5 ? 'text-failure' : ''}>{record.total ?? '...'}</p>
               );
             } else {
-              return 'N/A';
+              return '...';
             }
           },
         },
@@ -51,11 +51,11 @@ export const getSettingsColumns = (): TableColumnsType<CommonData & SettingsData
         //     if (Number(text) !== -1) {
         //       return (
         //         <p className={record.predicted && record.predicted < 5.5 ? 'text-failure' : ''}>
-        //           {record.predicted ?? 'N/A'}
+        //           {record.predicted ?? '...'}
         //         </p>
         //       );
         //     } else {
-        //       return 'N/A';
+        //       return '...';
         //     }
         //   },
         // },
@@ -65,9 +65,9 @@ export const getSettingsColumns = (): TableColumnsType<CommonData & SettingsData
           sorter: (a, b) => (a.goal ?? -1) - (b.goal ?? -1),
           render: (text: string, record: CommonData & SettingsData) => {
             if (Number(text) !== -1) {
-              return <p className={record.goal && record.goal < 5.5 ? 'text-failure' : ''}>{record.goal ?? 'N/A'}</p>;
+              return <p className={record.goal && record.goal < 5.5 ? 'text-failure' : ''}>{record.goal ?? '...'}</p>;
             } else {
-              return 'N/A';
+              return '...';
             }
           },
         },

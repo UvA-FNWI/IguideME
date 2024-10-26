@@ -1316,9 +1316,6 @@ namespace IguideME.Web.Services
                 }
             }
 
-            _logger.LogInformation("Actually updating user total grade to {}", tempUser.Settings.TotalGrade);
-            // _logger.LogInformation("Actually updating user Notifications to {}", tempUser.Settings.Notifications);
-
             NonQuery(
                 DatabaseQueries.REGISTER_STUDENT_SETTINGS,
                 new SQLiteParameter("CourseID", courseID),
@@ -2358,7 +2355,7 @@ namespace IguideME.Web.Services
             {
                 while (r.Read())
                 {
-                    StudentNotification notification = new(r.GetString(0), r.GetInt32(1));
+                    StudentNotification notification = new(r.GetValue(0).ToString(), r.GetInt32(1));
                     notifications.Add(notification);
                 }
             }
@@ -2379,8 +2376,8 @@ namespace IguideME.Web.Services
             {
                 while (r.Read())
                 {
-                    string studentID = r.GetString(0);
-                    string tileTitle = r.GetString(1);
+                    string studentID = r.GetValue(0).ToString();
+                    string tileTitle = r.GetValue(1).ToString();
                     int status = r.GetInt32(2);
                     long? sent = r.IsDBNull(3) ? null : r.GetInt64(3);
 

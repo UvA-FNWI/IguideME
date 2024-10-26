@@ -32,7 +32,7 @@ export const useAntFilterDropdown = (dataIndex: DataType): TableColumnType<DataT
   const getColumnSearchProps = (dataIndex: DataType): TableColumnType<DataType> => ({
     filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
       <div
-        className='border-primary bg-surface1 border-2 p-2'
+        className='border-2 border-primary bg-surface1 p-2'
         onKeyDown={(e) => {
           e.stopPropagation();
         }}
@@ -47,7 +47,7 @@ export const useAntFilterDropdown = (dataIndex: DataType): TableColumnType<DataT
           onPressEnter={() => {
             handleSearch(selectedKeys as string[], confirm, dataIndex);
           }}
-          className='border-accent/50 bg-surface1 text-text hover:border-accent hover:bg-surface2 focus:border-accent focus:shadow-accent aria-invalid:!border-failure aria-invalid:shadow-none aria-invalid:focus:!shadow-sm aria-invalid:focus:!shadow-failure mb-2 block focus:shadow-sm'
+          className='mb-2 block border-accent/50 bg-surface1 text-text hover:border-accent hover:bg-surface2 focus:border-accent focus:shadow-sm focus:shadow-accent aria-invalid:!border-failure aria-invalid:shadow-none aria-invalid:focus:!shadow-sm aria-invalid:focus:!shadow-failure'
         />
         <Space>
           <Button
@@ -73,7 +73,7 @@ export const useAntFilterDropdown = (dataIndex: DataType): TableColumnType<DataT
           <Button
             type='link'
             size='small'
-            className='text-text hover:!text-text focus:!text-text underline'
+            className='text-text underline hover:!text-text focus:!text-text'
             onClick={() => {
               close();
             }}
@@ -94,15 +94,21 @@ export const useAntFilterDropdown = (dataIndex: DataType): TableColumnType<DataT
         setTimeout(() => searchInput.current?.select(), 100);
       }
     },
-    render: (text) =>
-      searchedColumn === dataIndex ?
-        <Highlighter
-          highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
-          searchWords={[searchText]}
-          autoEscape
-          textToHighlight={text ? text.toString() : ''}
-        />
-      : text,
+    render: (text, record: any) => (
+      <div>
+        <div className='w-full'>
+          {searchedColumn === dataIndex ?
+            <Highlighter
+              highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+              searchWords={[searchText]}
+              autoEscape
+              textToHighlight={text ? text.toString() : ''}
+            />
+          : text}
+        </div>
+        <div className='px-2 text-xs'>{record.student.userID}</div>
+      </div>
+    ),
   });
 
   return getColumnSearchProps(dataIndex);

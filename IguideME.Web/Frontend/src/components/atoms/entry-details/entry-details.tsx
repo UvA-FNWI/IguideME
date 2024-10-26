@@ -143,7 +143,7 @@ export const LearningGoalDetail: FC<Props> = ({ entry }): ReactElement => {
 
   return (
     <div className='h-full w-full p-2'>
-      <div className='flex h-1/5 items-baseline justify-between gap-4'>
+      <div className='flex h-1/6 items-baseline justify-center gap-4'>
         {learningGoal.results?.every((b) => b) ?
           <span className='text-subtext1 flex place-content-center gap-2 text-sm'>
             Passed
@@ -156,7 +156,7 @@ export const LearningGoalDetail: FC<Props> = ({ entry }): ReactElement => {
         }
       </div>
 
-      <div className='flex h-4/5 w-full flex-col overflow-auto'>
+      <div className='flex h-5/6 w-full flex-col overflow-auto'>
         <h4 className='text-subtext1 mb-2 flex-shrink-0 underline'>Sub-goals</h4>
         <ul className='text-subtext1 h-full flex-grow overflow-auto'>
           {learningGoal.requirements.map((req, i) => {

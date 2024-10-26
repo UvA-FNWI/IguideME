@@ -31,6 +31,7 @@ export const getNotificationData = (
   students: User[],
   notifications: NotificationMap | undefined,
 ): Array<CommonData & NotificationData> => {
+  console.log('students', students);
   return students.map((student, index) => {
     const studentNotifications = notifications?.[student.userID];
     if (!studentNotifications) {

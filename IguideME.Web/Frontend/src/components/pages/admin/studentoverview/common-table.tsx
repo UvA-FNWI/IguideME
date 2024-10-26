@@ -34,6 +34,8 @@ const CommonTable: FC<Props> = ({ type }): ReactElement => {
     queryFn: getStudentsWithSettings,
   });
 
+  console.log('students main', students);
+
   const {
     data: notifications,
     isError: isNotificationError,
@@ -77,7 +79,7 @@ const CommonTable: FC<Props> = ({ type }): ReactElement => {
   const columns = [
     {
       key: 'name',
-      title: 'Student' as any,
+      title: 'Student',
       dataIndex: 'name',
       fixed: true,
       width: '16vw',
@@ -147,7 +149,10 @@ const CommonTable: FC<Props> = ({ type }): ReactElement => {
       case GradeTableType.entry:
         return getEntryData(students, entryGrades);
       case GradeTableType.notifications:
-        return getNotificationData(students, notifications);
+        return getNotificationData(
+          students.filter((student) => student.settings?.consent === 1),
+          notifications,
+        );
     }
   }
 };
