@@ -1,12 +1,12 @@
-import { NotificationMap, NotificationStatus } from '@/types/notifications';
-import { Button, TableColumnsType } from 'antd';
+import { type NotificationMap, NotificationStatus } from '@/types/notifications';
+import { Button, type TableColumnsType } from 'antd';
 import { useState, type ReactElement } from 'react';
-import { CommonData } from './common-table';
-import { User } from '@/types/user';
+import { type CommonData } from './common-table';
+import { type User } from '@/types/user';
 
-interface NotificationData {
+export interface NotificationData {
   received?: string;
-  to_be_sent?: string;
+  toBeSent?: string;
 }
 
 export const getNotificationColumns = (): TableColumnsType<CommonData & NotificationData> => {
@@ -20,8 +20,8 @@ export const getNotificationColumns = (): TableColumnsType<CommonData & Notifica
     },
     {
       title: 'To Be Sent Notifications',
-      dataIndex: 'to_be_sent',
-      key: 'to_be_sent',
+      dataIndex: 'toBeSent',
+      key: 'toBeSent',
       width: '40%',
     },
   ];
@@ -30,20 +30,22 @@ export const getNotificationColumns = (): TableColumnsType<CommonData & Notifica
 export const getNotificationData = (
   students: User[],
   notifications: NotificationMap | undefined,
-): (CommonData & NotificationData)[] => {
+): Array<CommonData & NotificationData> => {
   return students.map((student, index) => {
-    const student_notifications = notifications?.[student.userID];
-    if (!student_notifications) {
+    const studentNotifications = notifications?.[student.userID];
+    if (!studentNotifications) {
       return { student, name: student.name, key: index.toString() };
     }
-    const received = student_notifications
+
+    const received = studentNotifications
       ?.filter((n) => n.sent !== null)
-      .sort((a, b) => b.sent! - a.sent!)
+      // @ts-expect-error: TS18047 -- All null elements have been filtered out
+      .sort((a, b) => b.sent - a.sent)
       .reduce<Record<string, string[]>>((acc, n) => {
-        const sentDate = new Date(n.sent!).toLocaleDateString();
-        if (!acc[sentDate]) {
-          acc[sentDate] = [];
-        }
+        // @ts-expect-error: TS18047 -- All null elements have been filtered out
+        const sentDate = new Date(n.sent).toLocaleDateString();
+        // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+        if (!acc[sentDate]) acc[sentDate] = [];
         acc[sentDate].push(`${NotificationStatusToText(n.status)} ${n.tile_title}`);
         return acc;
       }, {});
@@ -52,9 +54,9 @@ export const getNotificationData = (
       .map(([date, notifications]) => `${date}\r\n${notifications.join('\r\n')}`)
       .join('\r\n\r\n');
 
-    const to_be_sent = Array.from(
+    const toBeSent = Array.from(
       new Set(
-        student_notifications
+        studentNotifications
           .filter((n) => n.sent === null)
           .map((n) => `${NotificationStatusToText(n.status)} ${n.tile_title}`),
       ),
@@ -65,7 +67,7 @@ export const getNotificationData = (
       student,
       name: student.name,
       received: formatted,
-      to_be_sent,
+      toBeSent,
     };
   });
 };

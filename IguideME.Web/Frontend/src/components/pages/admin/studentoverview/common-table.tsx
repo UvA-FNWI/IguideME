@@ -2,16 +2,17 @@ import { getCourseNotifications, getStudentsWithSettings } from '@/api/users';
 import QueryError from '@/components/particles/QueryError';
 import { useQuery } from '@tanstack/react-query';
 import { Table } from 'antd';
-import { FC, ReactElement } from 'react';
+import { type FC, type ReactElement } from 'react';
 import { useAntFilterDropdown } from './AntFilterDropdown';
-import { User } from '@/types/user';
+import { type User } from '@/types/user';
 import { GradeTableType } from './studentoverview';
-import { getSettingsColumns, getSettingsData } from './settings';
-import { getNotificationColumns, getNotificationData } from './notifications';
+import { getSettingsColumns, getSettingsData, type SettingsData } from './settings';
+import { getNotificationColumns, getNotificationData, type NotificationData } from './notifications';
 import { getTiles } from '@/api/tiles';
-import { getTileColumns, getTileData } from './tiles';
+import { getTileColumns, getTileData, type TileData } from './tiles';
 import { getAllEntryGrades, getAllUserTileGrades } from '@/api/grades';
-import { getEntryColumns, getEntryData } from './entries';
+import { getEntryColumns, getEntryData, type EntryData } from './entries';
+import type { ColumnsType } from 'antd/lib/table';
 
 export interface CommonData {
   key: string;
@@ -26,8 +27,8 @@ interface Props {
 const CommonTable: FC<Props> = ({ type }): ReactElement => {
   const {
     data: students,
-    isError,
-    isLoading,
+    isError: studentError,
+    isLoading: studentLoading,
   } = useQuery({
     queryKey: ['students', 'settings'],
     queryFn: getStudentsWithSettings,
@@ -35,8 +36,8 @@ const CommonTable: FC<Props> = ({ type }): ReactElement => {
 
   const {
     data: notifications,
-    // isNotificationError,
-    // isNotificationLoading,
+    isError: isNotificationError,
+    isLoading: isNotificationLoading,
   } = useQuery({
     queryKey: ['course-notifications'],
     queryFn: async () => await getCourseNotifications(),
@@ -45,8 +46,8 @@ const CommonTable: FC<Props> = ({ type }): ReactElement => {
 
   const {
     data: tiles,
-    // isTileError,
-    // isTileLoading,
+    isError: isTileError,
+    isLoading: isTileLoading,
   } = useQuery({
     queryKey: ['tiles'],
     queryFn: async () => await getTiles(),
@@ -54,9 +55,9 @@ const CommonTable: FC<Props> = ({ type }): ReactElement => {
   });
 
   const {
-    data: tile_grades,
-    // isTileGradesError,
-    // isTileGradesLoading,
+    data: tileGrades,
+    isError: isTileGradesError,
+    isLoading: isTileGradesLoading,
   } = useQuery({
     queryKey: ['tile-grades'],
     queryFn: async () => await getAllUserTileGrades(),
@@ -64,9 +65,9 @@ const CommonTable: FC<Props> = ({ type }): ReactElement => {
   });
 
   const {
-    data: entry_grades,
-    // isEntryGradesError,
-    // isEntryGradesLoading,
+    data: entryGrades,
+    isError: isEntryGradesError,
+    isLoading: isEntryGradesLoading,
   } = useQuery({
     queryKey: ['entry-grades'],
     queryFn: async () => await getAllEntryGrades(),
@@ -86,24 +87,33 @@ const CommonTable: FC<Props> = ({ type }): ReactElement => {
     ...getColumns(),
   ];
 
-  if (isError) {
-    return <QueryError className='top-20' title='Failed to fetch student data' />;
+  if (studentError || isNotificationError || isTileError || isTileGradesError || isEntryGradesError) {
+    return (
+      <div className='relative h-full w-full'>
+        <QueryError title='Failed to load data' subTitle='Please refresh the page or try again later.' />
+      </div>
+    );
   }
 
   return (
     <div>
       <Table<CommonData & any>
-        className='custom-table'
+        className='custom-table [&_td]:!whitespace-pre'
         columns={columns}
         dataSource={getData()}
         scroll={{ x: 'max-content', y: 600 }}
-        loading={isLoading || !students}
+        loading={
+          studentLoading || isNotificationLoading || isTileLoading || isTileGradesLoading || isEntryGradesLoading
+        }
         sticky
       />
     </div>
   );
 
-  function getColumns() {
+  function getColumns():
+    | ColumnsType<CommonData & SettingsData>
+    | ColumnsType<CommonData & EntryData>
+    | ColumnsType<CommonData & TileData> {
     switch (type) {
       case GradeTableType.settings:
         return getSettingsColumns();
@@ -116,7 +126,10 @@ const CommonTable: FC<Props> = ({ type }): ReactElement => {
     }
   }
 
-  function getData() {
+  function getData():
+    | Array<CommonData & SettingsData>
+    | Array<CommonData & TileData>
+    | Array<CommonData & NotificationData> {
     if (!students) {
       return [];
     }
@@ -124,9 +137,15 @@ const CommonTable: FC<Props> = ({ type }): ReactElement => {
       case GradeTableType.settings:
         return getSettingsData(students);
       case GradeTableType.tile:
-        return getTileData(students, tile_grades);
+        return getTileData(
+          students,
+          (tileGrades ?? []).map((grade) => ({
+            ...grade,
+            tileGrades: grade.tile_grades,
+          })),
+        );
       case GradeTableType.entry:
-        return getEntryData(students, entry_grades);
+        return getEntryData(students, entryGrades);
       case GradeTableType.notifications:
         return getNotificationData(students, notifications);
     }

@@ -1,13 +1,13 @@
-import { Tile } from '@/types/tile';
-import { TableColumnsType } from 'antd';
-import { CommonData } from './common-table';
-import { GradingType, printGrade, TileGrade } from '@/types/grades';
-import { User } from '@/types/user';
+import { type Tile } from '@/types/tile';
+import { type TableColumnsType } from 'antd';
+import { type CommonData } from './common-table';
+import { GradingType, printGrade, type TileGrade } from '@/types/grades';
+import { type User } from '@/types/user';
 
 type StartsWithGrade = `grade${string}`;
 type StartsWithMax = `max${string}`;
 
-interface TileData {
+export interface TileData {
   [key: StartsWithGrade]: number | undefined;
   [key: StartsWithMax]: number | undefined;
 }
@@ -51,15 +51,15 @@ export const getTileColumns = (tiles: Tile[]): TableColumnsType<CommonData & Til
 
 export const getTileData = (
   students: User[],
-  tile_grades:
+  tileGrades:
     | Array<{
         userID: string;
-        tile_grades: TileGrade[];
+        tileGrades: TileGrade[];
       }>
     | undefined,
-): (CommonData & TileData)[] => {
+): Array<CommonData & TileData> => {
   return students.map((student, index) => {
-    const t_grades = tile_grades?.find((tg) => tg.userID === student.userID)?.tile_grades;
+    const tGrades = tileGrades?.find((tg) => tg.userID === student.userID)?.tileGrades;
 
     const result: CommonData & TileData = {
       key: index.toString(),
@@ -67,7 +67,7 @@ export const getTileData = (
       name: student.name,
     };
 
-    t_grades?.forEach((tg) => {
+    tGrades?.forEach((tg) => {
       result[`grade${tg.tile_id}`] = tg.grade;
       result[`max${tg.tile_id}`] = tg.max;
     });

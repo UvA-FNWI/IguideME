@@ -1,14 +1,14 @@
-import { TableColumnsType } from 'antd';
-import { CommonData } from './common-table';
-import { Tile } from '@/types/tile';
-import { EntryGradeMap, GradingType, printGrade } from '@/types/grades';
-import { User } from '@/types/user';
+import { type TableColumnsType } from 'antd';
+import { type CommonData } from './common-table';
+import { type Tile } from '@/types/tile';
+import { type EntryGradeMap, GradingType, printGrade } from '@/types/grades';
+import { type User } from '@/types/user';
 
 type StartsWithGrade = `grade${string}`;
 type StartsWithMax = `max${string}`;
 type StartsWithType = `type${string}`;
 
-interface EntryData {
+export interface EntryData {
   [key: StartsWithGrade]: number | undefined;
   [key: StartsWithMax]: number | undefined;
   [key: StartsWithType]: number | undefined;
@@ -46,16 +46,16 @@ export const getEntryColumns = (tiles: Tile[]): TableColumnsType<CommonData & En
     }));
 };
 
-export const getEntryData = (students: User[], grades: EntryGradeMap | undefined): (CommonData & EntryData)[] => {
+export const getEntryData = (students: User[], grades: EntryGradeMap | undefined): Array<CommonData & EntryData> => {
   return students.map((student, index) => {
-    const e_grades = grades?.[student.userID];
+    const eGrades = grades?.[student.userID];
     const result: CommonData & EntryData = {
       key: index.toString(),
       student,
       name: student.name,
     };
 
-    e_grades?.forEach((eg) => {
+    eGrades?.forEach((eg) => {
       result[`grade${eg.content_id}`] = eg.grade;
       result[`max${eg.content_id}`] = eg.max;
       result[`type${eg.content_id}`] = eg.grading_type;

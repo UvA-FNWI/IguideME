@@ -13,12 +13,13 @@ export const enum GradeTableType {
 
 const StudentOverview: FC = (): ReactElement => {
   const [selectedTableType, setSelectedTableType] = useState<GradeTableType>(0);
+
   return (
     <div>
       <AdminTitle description='An overview of students grades and consent.' title='Student Overview' />
       <div className='my-3 flex w-full justify-center'>
         <Segmented
-          className='custom-segmented !bg-surface2 w-fit'
+          className='custom-segmented w-fit !bg-surface2'
           options={[
             { label: 'Settings', value: GradeTableType.settings, icon: <SettingOutlined /> },
             { label: 'Tile', value: GradeTableType.tile, icon: <AppstoreOutlined /> },
