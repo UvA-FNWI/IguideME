@@ -28,14 +28,15 @@ const EditTitle: FC<EditTitleProps> = ({ title, onSave }) => {
           />
         </Form.Item>
         <Form.Item>
-          <Button icon={<SaveOutlined />} type='primary' htmlType='submit'>
+          <Button icon={<SaveOutlined />} iconPosition='end' type='primary' htmlType='submit'>
             Save
           </Button>
         </Form.Item>
       </Form>
     : <Button
-        className='custom-default-button'
+        className='custom-default-button border-none'
         icon={<EditOutlined />}
+        iconPosition='end'
         onClick={() => {
           setEditing(true);
         }}
