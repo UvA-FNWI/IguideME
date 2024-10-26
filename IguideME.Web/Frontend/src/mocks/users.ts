@@ -29,7 +29,9 @@ export const userHandlers = [
   }),
   http.post('/student/settings/goal-grade', async ({ request }) => {
     const grade = (await request.json()) as number;
-    TEST_USER.settings!.goal_grade = grade;
+    if (TEST_USER.settings) {
+      TEST_USER.settings.goal_grade = grade;
+    }
     return HttpResponse.json<User>(TEST_USER);
   }),
   http.get('/student/*', ({ params }) => {
@@ -852,42 +854,6 @@ export const MOCK_STUDENTS: User[] = [
     },
   },
 ];
-
-// const studmap = new Map<number, User[]>();
-// MOCK_STUDENTS.forEach((stud) => {
-//   if (studmap.get(stud.settings!.goal_grade) === undefined) {
-//     studmap.set(stud.settings!.goal_grade, [stud]);
-//   } else {
-//     studmap.get(stud.settings!.goal_grade).push(stud);
-//   }
-// });
-
-// const peergroups = new Map<number, User[]>();
-
-// for (let i = 0; i <= 10; i++) {
-//   if (studmap.get(i) === undefined) {
-//     continue;
-//   }
-
-//   peergroups.set(i, [...studmap.get(i)]);
-//   for (let offset = 1; peergroups.get(i).length < 5 && offset < 10; offset++) {
-//     // Check if there are peers with higher grades.
-//     if (i + offset <= 10) {
-//       // Fill with found peers
-//       peergroups.set(i, peergroups.get(i).concat(studmap.get(i + offset)));
-//     }
-
-//     // Check if no more peers are required
-//     if (peergroups.get(i).length >= 5) break;
-
-//     // Check if there are peers with lower grades.
-//     if (i - offset >= 1) {
-//       // Fill with found peers
-//       peergroups.get(i).concat(studmap.get(i - offset));
-//     }
-//   }
-// }
-// console.log("test", peergroups);
 
 export const MOCK_PEER_GROUPS: User[][] = [
   [

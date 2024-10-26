@@ -34,8 +34,6 @@ const CommonTable: FC<Props> = ({ type }): ReactElement => {
     queryFn: getStudentsWithSettings,
   });
 
-  console.log('students main', students);
-
   const {
     data: notifications,
     isError: isNotificationError,
