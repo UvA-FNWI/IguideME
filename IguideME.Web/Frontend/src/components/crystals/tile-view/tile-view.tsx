@@ -56,7 +56,6 @@ const ViewTile: FC<Props> = memo(({ tile, textStyle }): ReactElement => {
 
   function renderViewType(): ReactElement {
     if (isError) return <QueryError className='grid place-content-center' title='Failed to load grades' />;
-    else if (!grades) return <></>;
 
     if (tile.type === TileType.assignments && tile.gradingType === GradingType.NotGraded) {
       return (
@@ -69,19 +68,19 @@ const ViewTile: FC<Props> = memo(({ tile, textStyle }): ReactElement => {
       case 'graph':
         return (
           <Row className='h-4/5 content-center justify-center'>
-            <GraphTile type={tile.type} grades={grades} />
+            <GraphTile type={tile.type} grades={grades ?? {grade: 0, peerAvg: 0, peerMax: 0, peerMin: 0, max: 0, type: GradingType.NotGraded}} />
           </Row>
         );
       case 'grid':
         return (
           <>
             <Row className='h-1/2 content-center justify-center'>
-              <GridTile type={tile.type} grades={grades} />
+              <GridTile type={tile.type} grades={grades ??{grade: 0, peerAvg: 0, peerMax: 0, peerMin: 0, max: 0, type: GradingType.NotGraded}} />
             </Row>
             <Row className='h-[30%] w-full content-start justify-center'>
               <Col className='h-full w-full'>
                 <Divider className='border-text m-0 p-0' />
-                <PeerComparison grades={grades} />
+                <PeerComparison grades={grades ?? {grade: 0, peerAvg: 0, peerMax: 0, peerMin: 0, max: 0, type: GradingType.NotGraded}} />
               </Col>{' '}
             </Row>
           </>

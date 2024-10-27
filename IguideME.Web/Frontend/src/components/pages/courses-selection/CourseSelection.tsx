@@ -5,7 +5,7 @@ import { UserRoles } from '@/types/user';
 import { AppstoreOutlined, CheckOutlined, EyeInvisibleOutlined, EyeOutlined } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
 import { Card, Skeleton, Tabs } from 'antd';
-import { type FC, memo, type ReactElement } from 'react';
+import { type FC, memo, type ReactElement, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useShallow } from 'zustand/react/shallow';
 
@@ -30,6 +30,15 @@ const CourseSelection: FC = (): ReactElement => {
   ));
 
   if (isError) return <QueryError title='Failed to load courses' />;
+
+  const navigate = useNavigate();
+  useEffect(() => {
+    const firstVisit = sessionStorage.getItem('firstVisit');
+    if (!firstVisit && self.course_id) {
+      sessionStorage.setItem('firstVisit', 'true');
+      navigate(`/${self.course_id}`);
+    }
+  }, [self.course_id]);
 
   return (
     <Tabs

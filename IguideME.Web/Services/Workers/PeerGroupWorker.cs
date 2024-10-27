@@ -424,8 +424,6 @@ namespace IguideME.Web.Services.Workers
             _logger.LogInformation("Creating notification for user {}", user);
             foreach ((int tileID, List<double> peerGrades) in this.peerTileGradesMap)
             {
-                _logger.LogInformation("test {} {}", _databaseManager.GetTileNotificationState(tileID), tileID);
-
                 // Get only tiles with notifications
                 if (_databaseManager.GetTileNotificationState(tileID))
                 {

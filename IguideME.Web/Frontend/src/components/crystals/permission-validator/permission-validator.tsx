@@ -1,9 +1,9 @@
-import { getStudentAcceptStatus, postConsentSettings } from '@/api/student_settings';
+import { postConsentSettings } from '@/api/student_settings';
 import { getSelf } from '@/api/users';
 import { ConsentText, GoalGrade } from '@/components/pages/student-settings/student-settings';
 import { ConsentEnum, UserRoles } from '@/types/user';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Button } from 'antd';
+import { Button, Collapse } from 'antd';
 import { useEffect, type FC, type ReactElement } from 'react';
 import { Loading as LoadingDots } from 'react-loading-dot';
 import { Outlet } from 'react-router-dom';
@@ -30,14 +30,14 @@ const PermissionValidator: FC = (): ReactElement => {
     queryFn: getSelf,
   });
 
-  const {
-    data: accepted,
-    isError: acceptedError,
-    isLoading: acceptedLoading,
-  } = useQuery({
-    queryKey: ['accepted', self?.userID],
-    queryFn: async () => await getStudentAcceptStatus(self ? self.userID : ''),
-  });
+  // const {
+  //   data: accepted,
+  //   isError: acceptedError,
+  //   isLoading: acceptedLoading,
+  // } = useQuery({
+  //   queryKey: ['accepted', self?.userID],
+  //   queryFn: async () => await getStudentAcceptStatus(self ? self.userID : ''),
+  // });
 
   const queryClient = useQueryClient();
   const { mutate: saveConsent, status } = useMutation({
@@ -65,13 +65,33 @@ const PermissionValidator: FC = (): ReactElement => {
     return (
       <div className='mx-auto max-w-3xl space-y-5 p-5'>
         <h1 className='text-xl font-bold tracking-tight'>Informed Consent</h1>
+        <p className='text-xs text-text'></p>
+        <Collapse
+        bordered={false}
+        className='[&_svg]:!text-text [&>div>div]:!p-0'
+        ghost
+        items={[
+          {
+            key: 1,
+            label: (
+              <>
+                <p className='text-text text-justify'>
+                Here you will be asked to sign the Informed consent. Click <u>here</u> to show the content of the Informed consent.
+                </p>
+              </>
+            ),
+            children: <ConsentText />,
+            showArrow: true,
+          },
+        ]}
+      />
+        <ul className='list-disc list-inside'>
+          <li>By choosing "Yes" in this form, I declare that I have read the document entitled “informed consent IguideME”,
+          understood it, and consent to my personal data being processed for the purposes stated above.</li>
+          <li>By choosing "No" in the form, I declare that I have read the document entitled “informed consent IguideME”,
+          understood it, and do not consent to my personal data being processed for the purposes stated above.</li>
+        </ul>
         <ConsentText />
-        <p className='text-text text-justify'>
-          &quot;Ik verklaar dat ik de informatie heb gelezen en begrepen. Ik geef toestemming voor deelname aan dit
-          onderwijsonderzoek en het gebruik van mijn gegevens daarin. Ik behoud mijn recht om deze toestemming stop te
-          zetten zonder een expliciete reden op te geven en om mijn deelname aan dit experiment op elk moment stop te
-          zetten.&quot;
-        </p>
 
         <div className='flex w-full items-center justify-center gap-4'>
           <Button
@@ -80,7 +100,7 @@ const PermissionValidator: FC = (): ReactElement => {
               saveConsent(2);
             }}
           >
-            Deny
+            No
           </Button>
           <Button
             className='custom-default-button'
@@ -88,27 +108,27 @@ const PermissionValidator: FC = (): ReactElement => {
               saveConsent(1);
             }}
           >
-            Accept
+            Yes
           </Button>
         </div>
       </div>
     );
   }
 
-  if (acceptedLoading) {
-    return <IguideMELoading />;
-  } else if (acceptedError || accepted === undefined) {
-    return <h1 className='text-lg'>Your account has not yet been processed, try again tomorrow!</h1>;
-  }
+  // if (acceptedLoading) {
+  //   return <IguideMELoading />;
+  // } else if (acceptedError || accepted === undefined) {
+  //   return <h1 className='text-lg'>Your account has not yet been processed, try again tomorrow!</h1>;
+  // }
 
-  if (!accepted) {
-    return (
-      <div className='mx-auto max-w-3xl p-5'>
-        <h1 className='text-xl font-bold tracking-tight'>No access</h1>
-        <p>You do not have access to this application. If you think this is an error, please contact the teacher.</p>
-      </div>
-    );
-  }
+  // if (!accepted) {
+  //   return (
+  //     <div className='mx-auto max-w-3xl p-5'>
+  //       <h1 className='text-xl font-bold tracking-tight'>No access</h1>
+  //       <p>You do not have access to this application. If you think this is an error, please contact the teacher.</p>
+  //     </div>
+  //   );
+  // }
 
   if (self.settings.goal_grade <= 0) {
     return (

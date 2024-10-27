@@ -16,11 +16,11 @@ const ThemeSwitcher: FC<ThemeSwitcherProps> = memo(({ className, isSidebarClosed
 
   return (
     <div className={cn(`flex min-h-11 items-center justify-between gap-4 rounded-md`, className)} {...props}>
-      <p>Toggle theme</p>
+      {!isSidebarClosed && <p>Toggle theme</p>}
       <Tooltip title='Toggle Theme' open={isSidebarClosed ? undefined : false} placement='right'>
         <Switch
-          className='[&_span]:!bg-surface2'
-          checkedChildren={<MoonOutlined className='text-text' />}
+          className={`[&_span]:!bg-surface2 ${isSidebarClosed ? '!rotate-90' : ''}`}
+          checkedChildren={<MoonOutlined className={`text-text ${isSidebarClosed ? '!-rotate-90' : ''}`} />}
           unCheckedChildren={<SunOutlined className='text-text' />}
           checked={theme === 'dark'}
           onChange={() => {

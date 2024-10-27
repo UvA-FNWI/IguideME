@@ -68,7 +68,7 @@ const AnalyticsChips: FC<AnalyticsChipProps> = memo(({ analytics, consentInfo, s
     return allWeeks;
   }, [analytics]);
 
-  const { conversionRateData, sessionLengthData } = useMemo(() => {
+  const { conversionRateData } = useMemo(() => {
     const visitData = new Map<string, { bounceCount: number; sessionCount: number; sessionLengths: number[] }>();
     if (sessions.size === 0) return { conversionRateData: [], sessionLengthData: [] };
 
@@ -123,11 +123,11 @@ const AnalyticsChips: FC<AnalyticsChipProps> = memo(({ analytics, consentInfo, s
           };
         }
 
-        const sortedSessionLengths = data.sessionLengths.sort((a, b) => a - b);
+        const totalSessionLength = data.sessionLengths.reduce((acc, curr) => acc + curr, 0);
 
         return {
           name: weekKey,
-          value: sortedSessionLengths.reduce((acc, curr) => acc + curr, 0) / sortedSessionLengths.length,
+          value: totalSessionLength / data.sessionLengths.length,
         };
       })
       .sort((a, b) => new Date(a.name).getTime() - new Date(b.name).getTime());
@@ -185,7 +185,7 @@ const AnalyticsChips: FC<AnalyticsChipProps> = memo(({ analytics, consentInfo, s
         <ChipAreaGraph graphData={conversionRateData} />
       </AnalyticsChip>
 
-      <AnalyticsChip
+      {/* <AnalyticsChip
         change={
           sessionLengthData.length > 1 ?
             Math.round(
@@ -204,7 +204,7 @@ const AnalyticsChips: FC<AnalyticsChipProps> = memo(({ analytics, consentInfo, s
         unit='number'
       >
         <ChipAreaGraph graphData={sessionLengthData} />
-      </AnalyticsChip>
+      </AnalyticsChip> */}
     </div>
   );
 });

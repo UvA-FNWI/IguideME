@@ -79,7 +79,9 @@ function TileDetailView(): ReactElement {
         <div className='flex w-full justify-normal p-1'>
           <GroupView title={tile ? tile.title : ''}>
             {isError ?
-              <QueryError className='grid place-content-center' title='Failed to load tile' />
+              <div className='relative w-full h-full'>
+                <QueryError className='grid place-content-center' title='Failed to load tile' />
+              </div>
             : tile?.alt ?
               <AltEntries tile={tile} />
             : tile?.entries.map((entry) => <EntryView entry={entry} key={entry.content_id} type={tile.type} />)}

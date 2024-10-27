@@ -38,7 +38,11 @@ export const AssignmentDetail: FC<Props> = ({ entry }): ReactElement => {
       </QueryLoading>
     );
   } else if (isError || !submission) {
-    return <QueryError className='grid place-content-center' title='No submission found' />;
+    return (
+      <div className='relative h-3/4'>
+        <QueryError className='grid place-content-center' title='No submission found' />
+        </div>
+    );
   }
 
   switch (viewType) {
@@ -84,7 +88,11 @@ export const DiscussionDetail: FC<Props> = ({ entry }): ReactElement => {
       </QueryLoading>
     );
   } else if (isError || !discussion || !discussion.grades) {
-    return <QueryError className='grid place-content-center' title='No submission found' />;
+    return (
+      <div className='relative h-3/4'>
+      <QueryError className='grid place-content-center' title='No submission found' />
+      </div>
+    );
   }
 
   switch (viewType) {
@@ -138,7 +146,11 @@ export const LearningGoalDetail: FC<Props> = ({ entry }): ReactElement => {
       </QueryLoading>
     );
   } else if (isError || !learningGoal || assIsError || !assignments) {
-    return <QueryError className='grid place-content-center' title='No submission found' />;
+    return (
+      <div className='relative h-3/4'>
+        <QueryError className='grid place-content-center' title='No submission found' />
+        </div>
+    );
   }
 
   return (

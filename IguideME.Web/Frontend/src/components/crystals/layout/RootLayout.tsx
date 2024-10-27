@@ -239,7 +239,7 @@ interface SideNavigationDropdownProps extends SideNavigationLinkProps {
 }
 
 const SideNavigationDropdown: FC<SideNavigationDropdownProps> = memo(({ items, ...props }): ReactElement => {
-  const [open, setOpen] = useState<boolean>(false);
+  const [open, setOpen] = useState<boolean>(true);
 
   const { isSidebarClosed } = useLayoutStore(useShallow((state) => ({ isSidebarClosed: state.isSidebarClosed })));
   const height =

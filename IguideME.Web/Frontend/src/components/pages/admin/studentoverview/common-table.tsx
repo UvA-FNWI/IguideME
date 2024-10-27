@@ -44,6 +44,8 @@ const CommonTable: FC<Props> = ({ type }): ReactElement => {
     enabled: type === GradeTableType.notifications,
   });
 
+  console.log("notifications", notifications);
+
   const {
     data: tiles,
     isError: isTileError,

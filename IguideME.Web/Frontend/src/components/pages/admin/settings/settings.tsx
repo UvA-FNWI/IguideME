@@ -1,6 +1,6 @@
 import AdminBlock from '@/components/atoms/admin-block/admin-block';
 import AdminTitle from '@/components/atoms/admin-titles/admin-titles';
-import AcceptListSettings from '@/components/crystals/accept-list-settings/accept-list-settings';
+// import AcceptListSettings from '@/components/crystals/accept-list-settings/accept-list-settings';
 import NotificationSettings from '@/components/crystals/notification-settings/notification-settings';
 import PeerSettings from '@/components/crystals/peer-settings/peer-settings';
 import { type FC, type ReactElement } from 'react';
@@ -12,9 +12,9 @@ const AdminSettings: FC = (): ReactElement => {
       <AdminBlock title='Peer groups'>
         <PeerSettings />
       </AdminBlock>
-      <AdminBlock title='Accept list'>
+      {/* <AdminBlock title='Accept list'>
         <AcceptListSettings />
-      </AdminBlock>
+      </AdminBlock> */}
       <AdminBlock title='Notifications'>
         <NotificationSettings />
       </AdminBlock>
