@@ -11,7 +11,7 @@ export function CorrelationGraph({
   compareTitles: CompareTitles;
 }): ReactElement {
   return (
-    <ResponsiveContainer className='h-80 w-full min-w-80'>
+    <ResponsiveContainer className='min-h-80 w-full min-w-80 max-w-[800px]'>
       <ScatterChart margin={{ top: 10, right: 0, bottom: 20, left: 20 }}>
         <CartesianGrid />
         <XAxis type='number' dataKey='x' name={compareTitles.a}>

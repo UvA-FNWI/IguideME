@@ -43,7 +43,7 @@ function CorrelationStatistics({ gradeData }: { gradeData: GradeData[] }): React
   );
 
   return (
-    <Card size='small' title={<h3 className='text-base text-text'>Correlation statistics</h3>}>
+    <Card size='small' title={<h3 className='text-text text-base'>Correlation statistics</h3>}>
       <div className='[&>p]:text-sm'>
         <p>Correlation Coefficient: {correlationCoefficient.toFixed(5)}</p>
         <p>Average X: {varFixed(averageX)}</p>
@@ -80,7 +80,7 @@ function GradeCorrelation({ gradesA, gradesB, compareTitles }: GradeCorrelationP
     .filter((gradePair) => gradePair !== undefined);
 
   return (
-    <div className='flex flex-col justify-between gap-8 lg:flex-row'>
+    <div className='flex min-h-[50vh] flex-col justify-between gap-8 lg:flex-row'>
       <div className='w-fit shrink-0'>
         {gradeData.length === 0 ?
           <Card size='small' title={<h3 className='text-base'>Correlation statistics</h3>} className='flex-1'>

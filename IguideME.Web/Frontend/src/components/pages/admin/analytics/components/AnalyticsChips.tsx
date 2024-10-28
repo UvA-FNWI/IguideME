@@ -100,6 +100,7 @@ const AnalyticsChips: FC<AnalyticsChipProps> = memo(({ analytics, consentInfo, s
       visitData.set(weekKey, currentData);
     });
 
+    console.log('bounc', visitData);
     const sortedWeekKeys = Array.from(visitData.keys()).sort();
 
     const conversionRateData = sortedWeekKeys
@@ -141,6 +142,7 @@ const AnalyticsChips: FC<AnalyticsChipProps> = memo(({ analytics, consentInfo, s
     };
   }, [analytics, sessions]);
 
+  console.log('conversion', conversionRateData);
   return (
     <div className='flex w-full max-w-[2000px] flex-wrap justify-center gap-4'>
       <AnalyticsChip

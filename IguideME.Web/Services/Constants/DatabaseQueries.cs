@@ -9,19 +9,19 @@ public static class DatabaseQueries
     public static readonly Dictionary<string, string> MIGRATIONS =
         new()
         {
-            {
-            "004_add_url_columns",
-            @"
-            ALTER TABLE assignments ADD html_url STRING;
-            ALTER TABLE discussions ADD html_url STRING;
-            ;"
-            },
-            {
-            "005_update_assignments",
-            @"
-            DELETE FROM assignments WHERE published!=2
-            ;"
-            },
+            //     {
+            //     "004_add_url_columns",
+            //     @"
+            //     ALTER TABLE assignments ADD html_url STRING;
+            //     ALTER TABLE discussions ADD html_url STRING;
+            //     ;"
+            //     },
+            //     {
+            //     "005_update_assignments",
+            //     @"
+            //     DELETE FROM assignments WHERE published!=2
+            //     ;"
+            //     },
         };
 
     // //================================ Tables ================================//

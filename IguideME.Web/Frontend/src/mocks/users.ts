@@ -2,7 +2,7 @@ import { ConsentEnum, type User, UserRoles } from '@/types/user';
 import { http, HttpResponse } from 'msw';
 
 const TEST_USER: User = {
-  course_id: 994,
+  course_id: 1,
   studentnumber: 42,
   userID: '42',
   name: 'Course Admin',
