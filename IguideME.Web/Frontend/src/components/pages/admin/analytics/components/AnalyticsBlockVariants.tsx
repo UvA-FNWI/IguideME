@@ -10,11 +10,12 @@ interface AnalyticsChipProps extends HTMLAttributes<HTMLDivElement> {
   children: ReactElement;
   display?: string | number;
   title?: string;
+  tooltip: ReactElement;
   unit: 'percentage' | 'number';
 }
 
 const AnalyticsChip: FC<AnalyticsChipProps> = memo(
-  ({ change, children, className, display, title, unit, ...props }): ReactElement => {
+  ({ change, children, className, display, title, tooltip, unit, ...props }): ReactElement => {
     const status =
       change > 0 ? 'positive'
       : change < 0 ? 'negative'
@@ -25,20 +26,29 @@ const AnalyticsChip: FC<AnalyticsChipProps> = memo(
       : status === 'negative' ? Decrease
       : null;
 
-    const statusText = status === 'positive' ? '+' : '';
+    const statusText =
+      status === 'positive' ? '+'
+      : status === 'negative' ? ''
+      : 'No change'; // Add a neutral text for equal status
 
     return (
       <div
         className={cn(
-          'flex h-[150px] min-w-[300px] max-w-[500px] flex-1 flex-grow items-center justify-between rounded-xl bg-surface1 p-6',
+          'relative flex h-[150px] min-w-[300px] max-w-[500px] flex-1 flex-grow items-center justify-between rounded-xl border bg-surface1 p-6 lg:h-[200px] lg:min-w-[500px] lg:max-w-[550px]',
           className,
         )}
         {...props}
       >
         <div className='flex h-full flex-col justify-between pr-8'>
-          <h4 className='text-lg text-text/75'>{title ?? 'Unknown title'}</h4>
+          <h4 className='whitespace-nowrap text-lg text-text/75'>{title ?? 'Unknown title'}</h4>
           <p className='text-2xl font-black'>{display ?? 'No data found'}</p>
-          <span className={`flex gap-2 text-xs ${status === 'positive' ? 'text-success' : 'text-failure'}`}>
+          <span
+            className={`flex gap-2 text-xs ${
+              status === 'positive' ? 'text-success'
+              : status === 'negative' ? 'text-failure'
+              : 'text-text/80'
+            }`}
+          >
             {statusIcon && <img src={statusIcon} alt={status} className='h-4 w-4' />}
             {statusText}
             {status !== 'equal' && change}
@@ -46,6 +56,9 @@ const AnalyticsChip: FC<AnalyticsChipProps> = memo(
           </span>
         </div>
         <div className='h-[90px] min-w-[90px] flex-grow'>{children}</div>
+        <AntToolTip className='absolute right-4 top-4' placement='bottom' title={tooltip}>
+          <QuestionCircleOutlined className='text-xl text-success' />
+        </AntToolTip>
       </div>
     );
   },

@@ -1,4 +1,4 @@
-import { Area, AreaChart, ResponsiveContainer } from 'recharts';
+import { Area, AreaChart, ResponsiveContainer, Tooltip, type TooltipProps } from 'recharts';
 import { type FC, memo, type ReactElement } from 'react';
 
 interface ChipAreaGraphProps {
@@ -7,6 +7,25 @@ interface ChipAreaGraphProps {
     value: number;
   }>;
 }
+
+interface CustomTooltipProps extends TooltipProps<number, string> {
+  active?: boolean;
+  label?: string;
+  payload?: Array<{ value: number }>;
+}
+
+const CustomTooltip = ({ active, label, payload }: CustomTooltipProps): ReactElement | null => {
+  if (active && payload?.length) {
+    const y = Number.isInteger(payload[0].value) ? payload[0].value : payload[0].value.toFixed(2);
+    return (
+      <div className='bg-surface1 p-3'>
+        <p>{`Week ${Number(label) + 1}: ${y}`}</p>
+      </div>
+    );
+  }
+
+  return null;
+};
 
 const ChipAreaGraph: FC<ChipAreaGraphProps> = memo(({ graphData }): ReactElement => {
   const adjustedGraphData = graphData.length === 1 ? [...graphData, { ...graphData[0] }] : graphData;
@@ -21,6 +40,7 @@ const ChipAreaGraph: FC<ChipAreaGraphProps> = memo(({ graphData }): ReactElement
           </linearGradient>
         </defs>
         <Area type='monotone' dataKey='value' stroke='#fc5f5f' fill='url(#colorUv)' strokeWidth={2} dot={false} />
+        <Tooltip content={<CustomTooltip />} />
       </AreaChart>
     </ResponsiveContainer>
   );

@@ -15,92 +15,65 @@ interface AnalyticsChipProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 const AnalyticsChips: FC<AnalyticsChipProps> = memo(({ analytics, consentInfo, sessions }): ReactElement => {
-  /** sessionData holds the analytic data for the number of sessions per week */
-  const sessionData = useMemo(() => {
-    const sessionsByWeek = new Map<string, number>();
-    if (!analytics) return [];
+  const { conversionRateData, retentionRateData, sessionData, sessionLengthData } = useMemo(() => {
+    const visitData = new Map<
+      string,
+      { bounceCount: number; sessionCount: number; sessionLengths: number[]; returningUsers: number }
+    >();
 
-    const sortedAnalytics = analytics.sort((a, b) => a.session_id - b.session_id);
-
-    let previousSessionID: number = -1;
-    sortedAnalytics.forEach((event) => {
-      const eventDate = new Date(event.timestamp * 1000);
-      const startOfWeek = new Date(
-        eventDate.getFullYear(),
-        eventDate.getMonth(),
-        eventDate.getDate() - eventDate.getDay() + 1,
-      );
-      startOfWeek.setHours(0, 0, 0, 0);
-      const weekKey = startOfWeek.toISOString();
-
-      if (previousSessionID === event.session_id) return;
-
-      const currentCount = sessionsByWeek.get(weekKey) ?? 0;
-      sessionsByWeek.set(weekKey, currentCount + 1);
-      previousSessionID = event.session_id;
-    });
-
-    // If no data, return the current week with a value of 0
-    if (sessionsByWeek.size === 0) {
-      const currentWeek = new Date();
-      currentWeek.setDate(currentWeek.getDate() - currentWeek.getDay() + 1);
-      currentWeek.setHours(0, 0, 0, 0);
-      return [{ name: currentWeek.toISOString(), value: 0 }];
+    if (sessions.size === 0) {
+      return { conversionRateData: [], retentionRateData: [], sessionData: [], sessionLengthData: [] };
     }
 
-    // Fill in the gaps with 0 values
-    const sortedWeekKeys = Array.from(sessionsByWeek.keys()).sort();
-    const startWeek = new Date(sortedWeekKeys[0]);
-    const thisWeek = new Date();
-    thisWeek.setDate(thisWeek.getDate() - thisWeek.getDay() + 1);
-    thisWeek.setHours(0, 0, 0, 0);
-
-    const allWeeks = [];
-    // eslint-disable-next-line no-unmodified-loop-condition -- loop is modified with date.setDate()
-    for (let week = new Date(startWeek); week <= thisWeek; week.setDate(week.getDate() + 7)) {
-      const weekKey = week.toISOString();
-      allWeeks.push({
-        name: weekKey,
-        value: sessionsByWeek.get(weekKey) ?? 0,
-      });
-    }
-
-    return allWeeks;
-  }, [analytics]);
-
-  const { conversionRateData } = useMemo(() => {
-    const visitData = new Map<string, { bounceCount: number; sessionCount: number; sessionLengths: number[] }>();
-    if (sessions.size === 0) return { conversionRateData: [], sessionLengthData: [] };
-
+    const seenUsers = new Set<string>();
+    const seenUsersPerWeek = new Map<string, Set<string>>();
     Array.from(sessions.values()).forEach((sessionEvents) => {
       const sortedSessionEvents = sessionEvents.sort((a, b) => a.timestamp - b.timestamp);
 
       const firstEvent = sortedSessionEvents[0];
       const lastEvent = sortedSessionEvents[sessionEvents.length - 1];
 
-      const eventDate = new Date(firstEvent.timestamp * 1000);
+      const eventDate = new Date(firstEvent.timestamp);
+      const dayOfWeek = eventDate.getDay();
       const startOfWeek = new Date(
         eventDate.getFullYear(),
         eventDate.getMonth(),
-        eventDate.getDate() - eventDate.getDay() + 1,
+        eventDate.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1),
       );
       startOfWeek.setHours(0, 0, 0, 0);
       const weekKey = startOfWeek.toISOString();
 
-      const currentData = visitData.get(weekKey) ?? { bounceCount: 0, sessionCount: 0, sessionLengths: [] };
+      const currentData = visitData.get(weekKey) ?? {
+        bounceCount: 0,
+        sessionCount: 0,
+        sessionLengths: [],
+        returningUsers: 0,
+      };
 
       // A session is considered a bounce if it never clicked on a tile
       const clickedTile = sessionEvents.some((event) => event.action === ActionTypes.tile);
       if (!clickedTile) currentData.bounceCount += 1;
 
-      const sessionLength = (lastEvent.timestamp - firstEvent.timestamp) / 60;
+      const sessionLength = (lastEvent.timestamp - firstEvent.timestamp) / 1000 / 60;
       currentData.sessionLengths.push(sessionLength);
       currentData.sessionCount += 1;
+
+      if (!seenUsers.has(firstEvent.user_id)) {
+        seenUsers.add(firstEvent.user_id);
+      } else {
+        if (!seenUsersPerWeek.has(weekKey)) {
+          seenUsersPerWeek.set(weekKey, new Set<string>());
+        }
+
+        if (!seenUsersPerWeek.get(weekKey)?.has(firstEvent.user_id)) {
+          seenUsersPerWeek.get(weekKey)?.add(firstEvent.user_id);
+          currentData.returningUsers += 1;
+        }
+      }
 
       visitData.set(weekKey, currentData);
     });
 
-    console.log('bounc', visitData);
     const sortedWeekKeys = Array.from(visitData.keys()).sort();
 
     const conversionRateData = sortedWeekKeys
@@ -110,6 +83,27 @@ const AnalyticsChips: FC<AnalyticsChipProps> = memo(({ analytics, consentInfo, s
         return {
           name: weekKey,
           value: conversionRate,
+        };
+      })
+      .sort((a, b) => new Date(a.name).getTime() - new Date(b.name).getTime());
+
+    const retentionRateData = sortedWeekKeys
+      .map((weekKey) => {
+        const data = visitData.get(weekKey);
+        const retentionRate = data ? data.returningUsers / seenUsers.size : 0;
+        return {
+          name: weekKey,
+          value: retentionRate,
+        };
+      })
+      .sort((a, b) => new Date(a.name).getTime() - new Date(b.name).getTime());
+
+    const sessionData = sortedWeekKeys
+      .map((weekKey) => {
+        const data = visitData.get(weekKey);
+        return {
+          name: weekKey,
+          value: data ? data.sessionCount : 0,
         };
       })
       .sort((a, b) => new Date(a.name).getTime() - new Date(b.name).getTime());
@@ -137,23 +131,18 @@ const AnalyticsChips: FC<AnalyticsChipProps> = memo(({ analytics, consentInfo, s
       /** conversionRateData holds the analytic data for the conversion rate per week.
        * The conversion rate measures the percentage of users who visit the site and then perform any action. */
       conversionRateData,
+      /** retentionRateData holds the analytic data for the retention rate per week.
+       * The retention rate measures the percentage of users who return to the site after their first visit. */
+      retentionRateData,
+      /** sessionData holds the analytic data for the total number of visits per week. */
+      sessionData,
       /** sessionLengthData holds the analytic data for the average session length per week. */
       sessionLengthData,
     };
   }, [analytics, sessions]);
 
-  console.log('conversion', conversionRateData);
   return (
     <div className='flex w-full max-w-[2000px] flex-wrap justify-center gap-4'>
-      <AnalyticsChip
-        change={consentInfo ? consentInfo.current_consent - consentInfo.prev_consent : 0}
-        display={consentInfo?.current_consent}
-        title='Consent'
-        unit='number'
-      >
-        <ConsentGraph consentInfo={consentInfo} />
-      </AnalyticsChip>
-
       <AnalyticsChip
         change={
           sessionData.length > 1 ?
@@ -162,19 +151,33 @@ const AnalyticsChips: FC<AnalyticsChipProps> = memo(({ analytics, consentInfo, s
         }
         display={sessionData.length > 0 ? sessionData[sessionData.length - 1].value : undefined}
         title='Total Visits'
+        tooltip={<p className='text-xs text-white'>Total number of visits to IguideME per week.</p>}
         unit='number'
       >
         <ChipAreaGraph graphData={sessionData} />
       </AnalyticsChip>
 
       <AnalyticsChip
+        change={consentInfo ? consentInfo.current_consent - consentInfo.prev_consent : 0}
+        display={consentInfo?.current_consent}
+        title='Consent'
+        tooltip={<p className='text-xs text-white'>Total number of users who have given consent to IguideME.</p>}
+        unit='number'
+      >
+        <ConsentGraph consentInfo={consentInfo} />
+      </AnalyticsChip>
+
+      <AnalyticsChip
         change={
           conversionRateData.length > 1 ?
-            Math.round(
-              conversionRateData[conversionRateData.length - 1]?.value -
-                conversionRateData[conversionRateData.length - 2]?.value,
+            Number(
+              (
+                (conversionRateData[conversionRateData.length - 1]?.value -
+                  conversionRateData[conversionRateData.length - 2]?.value) *
+                100
+              ).toFixed(2),
             )
-          : 0
+          : 0.0
         }
         display={
           conversionRateData.length > 0 ?
@@ -182,17 +185,48 @@ const AnalyticsChips: FC<AnalyticsChipProps> = memo(({ analytics, consentInfo, s
           : undefined
         }
         title='Conversion Rate'
+        tooltip={
+          <p className='text-xs text-white'>Percentage of users who visit the site and then click on any tile.</p>
+        }
         unit='percentage'
       >
         <ChipAreaGraph graphData={conversionRateData} />
       </AnalyticsChip>
 
-      {/* <AnalyticsChip
+      <AnalyticsChip
+        change={
+          retentionRateData.length > 1 ?
+            Number(
+              (
+                (retentionRateData[retentionRateData.length - 1]?.value -
+                  retentionRateData[retentionRateData.length - 2]?.value) *
+                100
+              ).toFixed(2),
+            )
+          : 0.0
+        }
+        display={
+          retentionRateData.length > 0 ?
+            (retentionRateData[retentionRateData.length - 1]?.value * 100).toFixed(2) + '%'
+          : undefined
+        }
+        title='Retention Rate'
+        tooltip={
+          <p className='text-xs text-white'>Percentage of users who return to IguideME after their first visit.</p>
+        }
+        unit='percentage'
+      >
+        <ChipAreaGraph graphData={retentionRateData} />
+      </AnalyticsChip>
+
+      <AnalyticsChip
         change={
           sessionLengthData.length > 1 ?
-            Math.round(
-              sessionLengthData[sessionLengthData.length - 1]?.value -
-                sessionLengthData[sessionLengthData.length - 2]?.value,
+            Number(
+              (
+                sessionLengthData[sessionLengthData.length - 1]?.value -
+                sessionLengthData[sessionLengthData.length - 2]?.value
+              ).toFixed(0),
             )
           : 0
         }
@@ -203,10 +237,11 @@ const AnalyticsChips: FC<AnalyticsChipProps> = memo(({ analytics, consentInfo, s
           : undefined
         }
         title='Session Length'
+        tooltip={<p className='text-xs text-white'>Average session length in minutes per week.</p>}
         unit='number'
       >
         <ChipAreaGraph graphData={sessionLengthData} />
-      </AnalyticsChip> */}
+      </AnalyticsChip>
     </div>
   );
 });

@@ -11,7 +11,7 @@ import { useGlobalContext } from '@/components/crystals/layout/GlobalStore/useGl
 import { useShallow } from 'zustand/react/shallow';
 import { getTiles } from '@/api/tiles';
 
-export type SessionData = Omit<EventReturnType, 'user_id' | 'session_id' | 'course_id'>;
+export type SessionData = Omit<EventReturnType, 'session_id' | 'course_id'>;
 
 const GradeAnalytics: FC = (): ReactElement => {
   const { self } = useGlobalContext(useShallow((state) => ({ self: state.self })));
@@ -51,8 +51,8 @@ const GradeAnalytics: FC = (): ReactElement => {
 
     analytics.forEach((event) => {
       // eslint-disable-next-line @typescript-eslint/naming-convention
-      const { user_id, session_id, course_id, ...rest } = event;
-      const sessionID = `${user_id}-${session_id}`;
+      const { session_id, course_id, ...rest } = event;
+      const sessionID = `${rest.user_id}-${session_id}`;
 
       if (sessionData.has(sessionID)) {
         const existingData = sessionData.get(sessionID);
@@ -102,6 +102,30 @@ const GradeAnalytics: FC = (): ReactElement => {
     return actionDetailLength;
   }, [sessions]);
 
+  const currentWeek = useMemo(() => {
+    if (!analytics) return new Date();
+
+    let latestTimestamp = 0;
+
+    // Find latest timestamp
+    analytics.forEach((event) => {
+      if (event.timestamp > latestTimestamp) {
+        latestTimestamp = event.timestamp;
+      }
+    });
+
+    const latestEvent = new Date(latestTimestamp);
+    const dayOfWeek = latestEvent.getDay();
+    const startOfWeek = new Date(
+      latestEvent.getFullYear(),
+      latestEvent.getMonth(),
+      latestEvent.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1),
+    );
+    startOfWeek.setHours(0, 0, 0, 0);
+
+    return startOfWeek;
+  }, [analytics]);
+
   if (analyticsIsError || consentInfoIsError || tilesIsError) {
     return (
       <div className='relative h-96 w-96 rounded-xl bg-surface1'>
@@ -130,10 +154,15 @@ const GradeAnalytics: FC = (): ReactElement => {
               <SunburstGraph sessions={sessions} tiles={tiles ?? []} />
             </AnalyticsGraph>
             <AnalyticsTextBlock className='min-w-[560px] max-w-[900px] flex-1 flex-grow' title='Page Visits'>
-              <PageVisits actionDetailLength={actionDetailLength} analytics={analytics} tiles={tiles ?? []} />
+              <PageVisits
+                actionDetailLength={actionDetailLength}
+                analytics={analytics}
+                currentWeek={currentWeek}
+                tiles={tiles ?? []}
+              />
             </AnalyticsTextBlock>
             <AnalyticsTextBlock className='min-w-[400px] max-w-[900px] flex-1 flex-grow' title='Exit Page Analysis'>
-              <PageExits sessions={sessions} tiles={tiles ?? []} />
+              <PageExits currentWeek={currentWeek} sessions={sessions} tiles={tiles ?? []} />
             </AnalyticsTextBlock>
           </div>
         </div>
