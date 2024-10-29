@@ -44,7 +44,7 @@ const CommonTable: FC<Props> = ({ type }): ReactElement => {
     enabled: type === GradeTableType.notifications,
   });
 
-  console.log("notifications", notifications);
+  console.log('notifications', notifications);
 
   const {
     data: tiles,
@@ -89,7 +89,13 @@ const CommonTable: FC<Props> = ({ type }): ReactElement => {
     ...getColumns(),
   ];
 
-  if (studentError || isNotificationError || isTileError || isTileGradesError || isEntryGradesError) {
+  if (
+    studentError ||
+    (isNotificationError && type === GradeTableType.notifications) ||
+    (isTileError && (type === GradeTableType.tile || type === GradeTableType.entry)) ||
+    (isTileGradesError && type === GradeTableType.tile) ||
+    (isEntryGradesError && type === GradeTableType.entry)
+  ) {
     return (
       <div className='relative h-full w-full'>
         <QueryError title='Failed to load data' subTitle='Please refresh the page or try again later.' />
@@ -105,7 +111,11 @@ const CommonTable: FC<Props> = ({ type }): ReactElement => {
         dataSource={getData()}
         scroll={{ x: 'max-content', y: 600 }}
         loading={
-          studentLoading || isNotificationLoading || isTileLoading || isTileGradesLoading || isEntryGradesLoading
+          studentLoading ||
+          (isNotificationLoading && type === GradeTableType.notifications) ||
+          (isTileLoading && (type === GradeTableType.tile || type === GradeTableType.entry)) ||
+          (isTileGradesLoading && type === GradeTableType.tile) ||
+          (isEntryGradesLoading && type === GradeTableType.entry)
         }
         sticky
       />

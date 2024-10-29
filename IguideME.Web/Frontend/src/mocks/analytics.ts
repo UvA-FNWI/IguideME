@@ -2,15 +2,15 @@ import { http, HttpResponse } from 'msw';
 import { ActionTypes, type EventReturnType } from '@/utils/analytics';
 
 const BIAS = 0.6;
-const STUDENTS = 1000;
+const STUDENTS = 100;
 
 const MIN_PARTICIPANTS = Math.floor(STUDENTS * BIAS);
-const MAX_PARTICIPANTS = Math.floor(STUDENTS * 0.85);
+const MAX_PARTICIPANTS = Math.floor(STUDENTS * BIAS);
 const PREV_PARTICIPANTS = Math.floor(Math.random() * STUDENTS);
 const PARTICIPANTS = Math.floor(Math.random() * (MAX_PARTICIPANTS - MIN_PARTICIPANTS + 1)) + MIN_PARTICIPANTS;
 
 const COURSE_LENGTH = 16; // weeks
-const WEEKLY_EVENTS = 2;
+const WEEKLY_EVENTS = 12;
 
 export const analyticsHandlers = [
   // Using results instead of events as some adblockers block it otherwise.
