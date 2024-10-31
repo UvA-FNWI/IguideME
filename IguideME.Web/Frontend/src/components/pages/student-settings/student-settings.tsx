@@ -182,21 +182,21 @@ const Consent: FC<ConsentProps> = ({ consent }): ReactElement => {
   return (
     <div>
       <h2 className='mb-2 text-2xl'>Informed Consent</h2>
+      <p className='mb-4 text-justify text-text'>
+        If you wish to revoke your consent, please note that you will no longer have access to the personalized feedback
+        and insights provided by the tool. To revoke your consent, uncheck the box below.
+      </p>
       <Collapse
         bordered={false}
-        className='[&_svg]:!text-text [&>div>div]:!p-0'
+        className='[&>div>div]:!p-0 [&_svg]:!text-text'
         ghost
         items={[
           {
             key: 1,
             label: (
-              <>
-                <p className='text-text text-justify'>
-                By accepting the informed consent, I declare that I have read the document entitled “informed consent IguideME”,
-                understood it, and consent to my personal data being processed for the purposes stated above.<br/>
-                  <span className='sr-only'>Click anywhere on this text to open the informed consent.</span>
-                </p>
-              </>
+              <p className='text-justify text-text'>
+                Click <u>here</u> to show the content of the Informed consent.
+              </p>
             ),
             children: <ConsentText />,
             showArrow: true,
@@ -218,71 +218,56 @@ const Consent: FC<ConsentProps> = ({ consent }): ReactElement => {
 };
 
 const ConsentText: FC = () => (
-  <div className='prose bg-surface2 prose-h1:text-text prose-h2:text-text prose-h3:text-text w-full rounded-lg p-2 text-justify'>
+  <div className='prose w-full rounded-lg bg-surface2 p-2 text-justify prose-h1:text-text prose-h2:text-text prose-h3:text-text'>
     <h1>IguideME</h1>
     <h2>INFORMED CONSENT IGUIDEME</h2>
     <p>
       Dear Learner,
       <br />
-      In this document, the so-called &quot;informed consent&quot;, the goal of the personalized feedback tool IguideME will be explained,
-      as well as which data will be collected to support your learning process, and how the tool works. Read the text below
-      carefully.
+      In this document, the so-called &quot;informed consent&quot;, the goal of the personalized feedback tool IguideME
+      will be explained, as well as which data will be collected to support your learning process, and how the tool
+      works. Read the text below carefully.
     </p>
     <h3>Goal</h3>
     <p>
-    The goal of “IguideME” is to provide insight into the learning process, the learning outcomes and the use of study materials
-    via personalized feedback to students and lecturers. Previous research has shown that IguideME supports self-regulated
-    learning and academic achievement. In other words, you may benefit from IguideME by becoming a more active participant
-    of your own learning process and score higher grades.
-    <br />
-    <br />
-    For more details see <a>https://doi.org/10.18608/jla.2023.7853</a>.
-      <br /><br/>
-      By tracking your progress and the use of study materials the lecturer can further support your learning process and optimize
-      course didactics.
+      The goal of “IguideME” is to provide insight into the learning process, the learning outcomes and the use of study
+      materials via personalized feedback to students and lecturers. Previous research has shown that IguideME supports
+      self-regulated learning and academic achievement. In other words, you may benefit from IguideME by becoming a more
+      active participant of your own learning process and score higher grades.
+      <br />
+      <br />
+      For more details see <a>https://doi.org/10.18608/jla.2023.7853</a>.
+      <br />
+      <br />
+      By tracking your progress and the use of study materials the lecturer can further support your learning process
+      and optimize course didactics.
     </p>
     <h3>Data collection, peer comparison and personalized feedback</h3>
     <p>
-    IguideME collects personal data (name and student ID) as well as learning activity data (e.g., grades for assignments that do
-    and do not count towards the final grade or derivatives thereof e.g., quality of submitted assignments or number of submitted
-    assignments) from the digital learning environment (Canvas) as well as from other tools that are used in the course.
-    Furthermore, usage analytics will be performed (e.g., total visits, page visits and session length within IguideME) which are
-    only visible for the lecturer.
-    <br /><br/>
-    Based on a goal grade that you provide in IguideME, you will be compared to peers with a comparable grade (peer-comparison)
-    and receive personalized feedback via notifications in the digital learning environment  and/or e-mail about learning activities
-    performed. You may also receive a predicted course grade that will be automatically calculated from the learning activity data
-    using historical data. Your personal data will not be shown to other students but will be used to calculate the average
-    performance of the peer group and this average will be shown in the dashboard. The lecturer receives an overview of all
-    personalized data and may contact you in case your learning performance is lagging behind.
+      IguideME collects personal data (name and student ID) as well as learning activity data (e.g., grades for
+      assignments that do and do not count towards the final grade or derivatives thereof e.g., quality of submitted
+      assignments or number of submitted assignments) from the digital learning environment (Canvas) as well as from
+      other tools that are used in the course. Furthermore, usage analytics will be performed (e.g., total visits, page
+      visits and session length within IguideME) which are only visible for the lecturer.
+      <br />
+      <br />
+      Based on a goal grade that you provide in IguideME, you will be compared to peers with a comparable grade
+      (peer-comparison) and receive personalized feedback via notifications in the digital learning environment and/or
+      e-mail about learning activities performed. You may also receive a predicted course grade that will be
+      automatically calculated from the learning activity data using historical data. Your personal data will not be
+      shown to other students but will be used to calculate the average performance of the peer group and this average
+      will be shown in the dashboard. The lecturer receives an overview of all personalized data and may contact you in
+      case your learning performance is lagging behind.
     </p>
     <h3>Voluntariness</h3>
     <p>
-    The use of IguideME is voluntary. By changing the consent from “yes” into “no”, the data that you have generated will be
-    removed from IguideME.
+      The use of IguideME is voluntary. By changing the consent from “yes” into “no”, the data that you have generated
+      will be removed from IguideME.
     </p>
     <h3>Insurance</h3>
-    <p>
-    The regular liability insurance of the University of Amsterdam is valid.
-    </p>
+    <p>The regular liability insurance of the University of Amsterdam is valid.</p>
     <h3>Additional Information</h3>
-    <p>
-    In case of any questions about IguideME, please contact dr. Erwin (E.A.) van Vliet, e.a.vanvliet@uva.nl
-    </p>
-    <h2>CONSENT FORM</h2>
-    <p>Here you will be asked to sign the Informed consent. </p>
-    <ul>
-      <li className='text-text'>
-        Door in dit formulier <i>&quot;Ja&quot;</i> te kiezen, verklaar je dat je het document getiteld &quot;informed
-        consent Slimmer Collegejaar&quot; hebt gelezen en begrepen en dat je akkoord gaat met de procedure zoals
-        beschreven.
-      </li>
-      <li className='text-text'>
-        Door in dit formulier <i>&quot;Nee&quot;</i> te kiezen, verklaart je dat je het document met de titel
-        &quot;informed consent Slimmer Collegejaar&quot; hebt gelezen en begrepen en bevestigt dat je niet aan dit
-        onderzoek wilt deelnemen.
-      </li>
-    </ul>
+    <p>In case of any questions about IguideME, please contact dr. Erwin (E.A.) van Vliet, e.a.vanvliet@uva.nl</p>
   </div>
 );
 

@@ -64,34 +64,45 @@ const PermissionValidator: FC = (): ReactElement => {
   if (self.settings?.consent !== ConsentEnum.Accepted) {
     return (
       <div className='mx-auto max-w-3xl space-y-5 p-5'>
-        <h1 className='text-xl font-bold tracking-tight'>Informed Consent</h1>
+        <h1 className='text-2xl font-bold tracking-tight'>Informed Consent</h1>
+        <p className='mt-4'>
+          Welcome to IguideME! Before you can access the application, we need your informed consent. IguideME is a
+          personalized feedback tool designed to enhance your learning experience by providing insights into your
+          learning process and outcomes. By consenting, you agree to the collection and use of your data as described in
+          the consent form below. If you choose not to consent, you will not be able to use IguideME.
+        </p>
         <p className='text-xs text-text'></p>
         <Collapse
-        bordered={false}
-        className='[&_svg]:!text-text [&>div>div]:!p-0'
-        ghost
-        items={[
-          {
-            key: 1,
-            label: (
-              <>
-                <p className='text-text text-justify'>
-                Here you will be asked to sign the Informed consent. Click <u>here</u> to show the content of the Informed consent.
-                </p>
-              </>
-            ),
-            children: <ConsentText />,
-            showArrow: true,
-          },
-        ]}
-      />
-        <ul className='list-disc list-inside'>
-          <li>By choosing "Yes" in this form, I declare that I have read the document entitled “informed consent IguideME”,
-          understood it, and consent to my personal data being processed for the purposes stated above.</li>
-          <li>By choosing "No" in the form, I declare that I have read the document entitled “informed consent IguideME”,
-          understood it, and do not consent to my personal data being processed for the purposes stated above.</li>
+          bordered={false}
+          className='[&>div>div]:!p-0 [&_svg]:!text-text'
+          ghost
+          items={[
+            {
+              key: 1,
+              label: (
+                <>
+                  <p className='text-justify text-text'>
+                    Click <u>here</u> to show the content of the Informed consent.
+                  </p>
+                </>
+              ),
+              children: <ConsentText />,
+              showArrow: true,
+            },
+          ]}
+        />
+        <ul className='list-inside list-disc'>
+          <li>
+            By choosing "Yes" in this form, I declare that I have read the document entitled “informed consent
+            IguideME”, understood it, and consent to my personal data being processed for the purposes stated in the
+            consent form.
+          </li>
+          <li>
+            By choosing "No" in the form, I declare that I have read the document entitled “informed consent IguideME”,
+            understood it, and do not consent to my personal data being processed for the purposes stated in the consent
+            form.
+          </li>
         </ul>
-        <ConsentText />
 
         <div className='flex w-full items-center justify-center gap-4'>
           <Button
