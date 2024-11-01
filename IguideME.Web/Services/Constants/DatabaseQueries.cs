@@ -612,7 +612,14 @@ public static class DatabaseQueries
             @maxGrade,
             @gradingType
         )
-        ON CONFLICT (`external_id`) WHERE NOT NULL DO NOTHING";
+        ON CONFLICT (`external_id`) DO UPDATE SET
+            title=excluded.title,
+            published=excluded.published,
+            muted=excluded.muted,
+            due_date=excluded.due_date,
+            max_grade=excluded.max_grade,
+            grading_type=excluded.grading_type
+             ";
 
     public const string QUERY_COURSE_EXTERNAL_ASSIGNMENTS =
         @"SELECT    `assignment_id`,
