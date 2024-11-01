@@ -699,7 +699,14 @@ public static class DatabaseQueries
             @authorName,
             @date,
             @message
-        );";
+        )
+        ON CONFLICT ( `discussion_id` )
+        DO UPDATE SET 
+        `title` = @title,
+        `author` = @authorName,
+        `message` = @message,
+        `date` = @date
+        ;";
 
     public const string REGISTER_DISCUSSION_ENTRY =
         @"INSERT OR REPLACE
@@ -721,7 +728,9 @@ public static class DatabaseQueries
             @message
         )
         ON CONFLICT ( `parent_id`, `entry_id` )
-        DO UPDATE SET `message` = @message
+        DO UPDATE SET 
+        `message` = @message,
+        `date` = @date
         ;";
 
     public const string REGISTER_USER_FOR_COURSE =
