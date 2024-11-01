@@ -148,17 +148,20 @@ const CommonTable: FC<Props> = ({ type }): ReactElement => {
         return getSettingsData(students);
       case GradeTableType.tile:
         return getTileData(
-          students,
+          students.filter((student) => student.settings && student.settings.consent === 1),
           (tileGrades ?? []).map((grade) => ({
             ...grade,
             tileGrades: grade.tile_grades,
           })),
         );
       case GradeTableType.entry:
-        return getEntryData(students, entryGrades);
+        return getEntryData(
+          students.filter((student) => student.settings && student.settings.consent === 1),
+          entryGrades,
+        );
       case GradeTableType.notifications:
         return getNotificationData(
-          students.filter((student) => student.settings?.consent === 1),
+          students.filter((student) => student.settings && student.settings.consent === 1),
           notifications,
         );
     }
