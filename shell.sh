@@ -8,6 +8,7 @@ pnpm --cwd $FRONTEND_ROOT install;
 
 
 alias frontend-dev='pnpm -C $FRONTEND_ROOT dev'
+alias frontend-build='pnpm -C $FRONTEND_ROOT build'
 alias mock-frontend='pnpm -C $FRONTEND_ROOT mock'
 alias iguideme-packages='pnpm -C $FRONTEND_ROOT'
 alias backend-dev='dotnet watch --project $PROJECT_ROOT/IguideME.Web/ --no-hot-reload';
@@ -26,6 +27,7 @@ You can use the following assist commands:
 
   ---Frontend------------------------------------------------------------------
     ${m}frontend-dev              ${c}Build and run the frontend (watcher)${e}
+    ${m}frontend-build            ${c}Build the frontend${e}
     ${m}mock-frontend             ${c}Run the frontend with mocking (watcher)${e}
     ${m}iguideme-packages         ${c}Manage Node packages${e}
                                           
