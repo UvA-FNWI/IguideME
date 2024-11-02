@@ -136,7 +136,7 @@ const ViewExternalAssignment: FC<ViewExternalAssignmentProps> = ({ assignment, s
 
   return (
     <Card
-      className='custom-card-no-hover !bg-surface2'
+      className='custom-card-no-hover !bg-surface1'
       size='small'
       title={
         <div className='flex py-3'>

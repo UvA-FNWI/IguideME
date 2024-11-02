@@ -1,5 +1,5 @@
 import { uploadData } from '@/api/tiles';
-import { Assignment } from '@/types/tile';
+import { type Assignment } from '@/types/tile';
 import type { User } from '@/types/user';
 import { DownOutlined, QuestionCircleOutlined, RightOutlined } from '@ant-design/icons';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -66,7 +66,7 @@ const UploadManager: FC<UploadManagerProps> = ({ assignment, closeUploadMenu, st
   });
 
   return (
-    <div id='uploadManager'>
+    <div>
       <Row className='mb-2' gutter={[10, 10]}>
         <Col className='flex flex-col justify-between'>
           <div className='flex flex-row items-center gap-1'>

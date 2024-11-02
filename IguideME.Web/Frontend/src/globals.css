@@ -335,9 +335,9 @@ textarea:not([rows]) {
 }
 
 .custom-card-no-hover {
-  .ant-card-body {
-    background-color: hsl(var(--surface2)) !important;
+  border: 1px solid hsl(var(--text)) !important;
 
+  .ant-card-body {
     div {
       color: hsl(var(--text)) !important;
     }
