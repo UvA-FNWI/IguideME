@@ -1,4 +1,4 @@
-import { ActionTypes } from '@/utils/analytics';
+import { ActionTypes, isThisWeek } from '@/utils/analytics';
 import { Table } from 'antd';
 import { type ColumnProps } from 'antd/es/table';
 import { type FC, memo, useMemo } from 'react';
@@ -7,12 +7,11 @@ import { type PageVisitData } from './PageVisits';
 import type { Tile } from '@/types/tile';
 
 interface PageExitsProps {
-  currentWeek: Date;
   sessions: Map<string, SessionData[]>;
   tiles: Tile[];
 }
 
-const PageExits: FC<PageExitsProps> = memo(({ currentWeek, sessions, tiles }) => {
+const PageExits: FC<PageExitsProps> = memo(({ sessions, tiles }) => {
   const exitPageData: Map<string, { allTime: number; thisWeek: number }> = useMemo(() => {
     const exitPageData = new Map<string, { allTime: number; thisWeek: number }>();
 
@@ -36,7 +35,7 @@ const PageExits: FC<PageExitsProps> = memo(({ currentWeek, sessions, tiles }) =>
 
         const newCount = {
           allTime: currentCount.allTime + 1,
-          thisWeek: currentCount.thisWeek + (new Date(exitPage.timestamp) >= currentWeek ? 1 : 0),
+          thisWeek: currentCount.thisWeek + (isThisWeek(exitPage.timestamp) ? 1 : 0),
         };
 
         exitPageData.set(page, newCount);

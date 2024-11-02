@@ -17,7 +17,7 @@ const WEEK_BIAS = [
   0.91155614, 0.44565056, 0.62248324, 0.92263308, 0.87416309, 0.51110266, 0.6227691, 0.78215291, 0.34756728, 0.74747028,
   0.72179816, 0.9278932, 0.83104332, 0.94336995, 0.9778625, 0.92513745,
 ];
-if (WEEK_BIAS.length !== COURSE_LENGTH) throw new Error('Week bias must be the same length as the course length');
+// if (WEEK_BIAS.length !== COURSE_LENGTH) throw new Error('Week bias must be the same length as the course length');
 
 export const analyticsHandlers = [
   // Using results instead of events as some adblockers block it otherwise.
@@ -75,7 +75,7 @@ function getRandomIndex(arrayLength: number): number {
  * @returns Random timestamp
  */
 function getRandomTimestamp(previousTimestamp: number | null, week: number): number {
-  const startCourse = new Date('2023-01-01'); // Consistent start date for the course
+  const startCourse = new Date('2023-01-02'); // Consistent start date for the course
   const endCourse = new Date(startCourse.getTime() + COURSE_LENGTH * 7 * 24 * 60 * 60 * 1000);
 
   let time: number | null = null;

@@ -1,5 +1,5 @@
 import { Table } from 'antd';
-import { ActionTypes, type EventReturnType } from '@/utils/analytics';
+import { ActionTypes, isThisWeek, type EventReturnType } from '@/utils/analytics';
 import { type FC, memo, type ReactElement, useCallback, useMemo } from 'react';
 import { type ColumnProps } from 'antd/es/table';
 import type { Tile } from '@/types/tile';
@@ -7,11 +7,10 @@ import type { Tile } from '@/types/tile';
 interface PageVisitsProps {
   actionDetailLength: Map<string, number>;
   analytics?: EventReturnType[];
-  currentWeek: Date;
   tiles: Tile[];
 }
 
-const PageVisits: FC<PageVisitsProps> = memo(({ actionDetailLength, analytics, currentWeek, tiles }): ReactElement => {
+const PageVisits: FC<PageVisitsProps> = memo(({ actionDetailLength, analytics, tiles }): ReactElement => {
   const pageVisitData = useMemo(() => {
     const pageVisitData = new Map<string, { allTime: number; pageName: string; thisWeek: number }>();
     if (!analytics) return pageVisitData;
@@ -30,7 +29,7 @@ const PageVisits: FC<PageVisitsProps> = memo(({ actionDetailLength, analytics, c
       const newCount = {
         allTime: currentCount.allTime + 1,
         pageName: currentCount.pageName,
-        thisWeek: currentCount.thisWeek + (new Date(event.timestamp) >= currentWeek ? 1 : 0),
+        thisWeek: currentCount.thisWeek + (isThisWeek(event.timestamp) ? 1 : 0),
       };
 
       pageVisitData.set(event.action_detail, newCount);

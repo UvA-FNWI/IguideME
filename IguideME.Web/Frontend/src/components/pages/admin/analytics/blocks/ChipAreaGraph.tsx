@@ -12,14 +12,17 @@ interface CustomTooltipProps extends TooltipProps<number, string> {
   active?: boolean;
   label?: string;
   payload?: Array<{ value: number }>;
+  isSingleWeek: boolean;
 }
 
-const CustomTooltip = ({ active, label, payload }: CustomTooltipProps): ReactElement | null => {
+const CustomTooltip = ({ active, label, payload, isSingleWeek }: CustomTooltipProps): ReactElement | null => {
   if (active && payload?.length) {
     const y = Number.isInteger(payload[0].value) ? payload[0].value : payload[0].value.toFixed(2);
+
+    const weekLabel = isSingleWeek ? 'Week 1' : `Week ${Number(label) + 1}`;
     return (
       <div className='bg-surface1 p-3'>
-        <p>{`Week ${Number(label) + 1}: ${y}`}</p>
+        <p>{`${weekLabel}: ${y}`}</p>
       </div>
     );
   }
@@ -40,7 +43,7 @@ const ChipAreaGraph: FC<ChipAreaGraphProps> = memo(({ graphData }): ReactElement
           </linearGradient>
         </defs>
         <Area type='monotone' dataKey='value' stroke='#fc5f5f' fill='url(#colorUv)' strokeWidth={2} dot={false} />
-        <Tooltip content={<CustomTooltip />} />
+        <Tooltip content={<CustomTooltip isSingleWeek={graphData.length === 1} />} />
       </AreaChart>
     </ResponsiveContainer>
   );
