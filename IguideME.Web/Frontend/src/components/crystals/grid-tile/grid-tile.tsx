@@ -28,19 +28,16 @@ const GridTile: FC<GridTileProps> = ({ type, grades }): ReactElement => {
 export const GradeView: FC<Grades> = ({ grade, max, peerAvg, type }): ReactElement => {
   return (
     <Space className='content-end'>
-      {grade === 0 ?
-        '...'
-      : <>
-          <div>
-            {grade < 50 ?
-              <FrownOutlined className='text-lg text-failure' />
-            : grade >= peerAvg || (max === -1 && grade > 0) ?
-              <SmileOutlined className='text-lg text-success' />
-            : <MehOutlined className='text-lg text-meh' />}
-          </div>
-          <p className='text-lg'>{printGrade(type, grade, max)}</p>
-        </>
-      }
+      <>
+        <div>
+          {grade < 50 ?
+            <FrownOutlined className='text-failure text-lg' />
+          : grade >= peerAvg || (max === -1 && grade > 0) ?
+            <SmileOutlined className='text-success text-lg' />
+          : <MehOutlined className='text-meh text-lg' />}
+        </div>
+        <p className='text-lg'>{printGrade(type, grade, max)}</p>
+      </>
     </Space>
   );
 };

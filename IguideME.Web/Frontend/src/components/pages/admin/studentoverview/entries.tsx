@@ -3,6 +3,7 @@ import { type CommonData } from './common-table';
 import { type Tile } from '@/types/tile';
 import { type EntryGradeMap, GradingType, printGrade } from '@/types/grades';
 import { type User } from '@/types/user';
+import { objectExists } from '@/helpers/general';
 
 type StartsWithGrade = `grade${string}`;
 type StartsWithMax = `max${string}`;
@@ -55,7 +56,7 @@ export const getEntryColumns = (tiles: Tile[]): TableColumnsType<CommonData & En
           const grade = record[`grade${entry.content_id}`];
           return (
             <div className={type !== GradingType.NotGraded && value < 50 ? 'text-failure' : ''}>
-              {grade ? printGrade(type, grade, record[`max${entry.content_id}`] ?? -1, false) : '...'}
+              {objectExists(grade) ? printGrade(type, grade, record[`max${entry.content_id}`] ?? -1, false) : '...'}
             </div>
           );
         },

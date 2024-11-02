@@ -37,11 +37,12 @@ export const AssignmentDetail: FC<Props> = ({ entry }): ReactElement => {
         <div className='h-[180px] w-[270px]' />
       </QueryLoading>
     );
-  } else if (isError || !submission) {
+  }
+  if (isError || !submission) {
     return (
       <div className='relative h-3/4'>
         <QueryError className='grid place-content-center' title='No submission found' />
-        </div>
+      </div>
     );
   }
 
@@ -90,7 +91,7 @@ export const DiscussionDetail: FC<Props> = ({ entry }): ReactElement => {
   } else if (isError || !discussion || !discussion.grades) {
     return (
       <div className='relative h-3/4'>
-      <QueryError className='grid place-content-center' title='No submission found' />
+        <QueryError className='grid place-content-center' title='No submission found' />
       </div>
     );
   }
@@ -149,7 +150,7 @@ export const LearningGoalDetail: FC<Props> = ({ entry }): ReactElement => {
     return (
       <div className='relative h-3/4'>
         <QueryError className='grid place-content-center' title='No submission found' />
-        </div>
+      </div>
     );
   }
 
