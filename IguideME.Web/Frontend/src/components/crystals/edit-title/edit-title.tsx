@@ -26,19 +26,21 @@ const EditTitle: FC<EditTitleProps> = ({ title, onSave }) => {
           setEditing(false);
         }}
       >
-        <Form.Item name='title' rules={[{ required: true, message: 'Title is required' }]}>
+        <Form.Item className='!m-0' name='title' rules={[{ required: true, message: 'Title is required' }]}>
           <Input
             className='w-full border-accent bg-surface1 text-text hover:border-accent/50 hover:bg-surface1 focus:border-accent focus:bg-surface1 focus:shadow-sm focus:shadow-accent aria-invalid:!border-failure aria-invalid:shadow-none aria-invalid:focus:!shadow-sm aria-invalid:focus:!shadow-failure'
             autoFocus
           />
         </Form.Item>
-        <Form.Item>
+        <Form.Item className='!m-0'>
           <Button
             icon={<SaveOutlined />}
             iconPosition='end'
             type='primary'
             htmlType='submit'
-            onMouseDown={(event) => event.preventDefault()}
+            onMouseDown={(event) => {
+              event.preventDefault();
+            }}
           >
             Save
           </Button>

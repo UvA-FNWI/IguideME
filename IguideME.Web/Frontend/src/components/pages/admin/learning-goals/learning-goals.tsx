@@ -16,7 +16,8 @@ import {
 import { toast } from 'sonner';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { LogicalExpression, type GoalRequirement, type LearningGoal } from '@/types/tile';
-import { useEffect, useState, type FC, type ReactElement } from 'react';
+import { useEffect, type FC, type ReactElement } from 'react';
+import EditTitle from '@/components/crystals/edit-title/edit-title';
 
 const { Item } = Form;
 
@@ -87,9 +88,6 @@ const LearningGoals: FC = (): ReactElement => {
 };
 
 const ViewLearningGoal: FC<GoalProps> = ({ goal }): ReactElement => {
-  const [title, setTitle] = useState<string>(goal.title);
-  const [editing, setEditing] = useState<boolean>(false);
-
   const queryClient = useQueryClient();
   const { mutate: patchGoal } = useMutation({
     mutationFn: patchLearningGoal,
@@ -124,34 +122,12 @@ const ViewLearningGoal: FC<GoalProps> = ({ goal }): ReactElement => {
   return (
     <div className='font-tnum rounded-lg border border-solid border-border0 bg-surface1 p-[10px]'>
       <div className='flex w-full justify-between'>
-        <h2
-          onClick={() => {
-            setEditing(true);
+        <EditTitle
+          title={goal.title}
+          onSave={(title: string) => {
+            patchGoal({ ...goal, title });
           }}
-          className='font-tnum p-1 text-lg'
-        >
-          {!editing ?
-            goal.title
-          : editing && (
-              <Input
-                className='w-full !border-accent !bg-surface1 text-text hover:!border-accent hover:bg-surface1 focus:!border-accent focus:shadow-sm focus:shadow-accent aria-invalid:!border-failure aria-invalid:shadow-none aria-invalid:focus:!shadow-sm aria-invalid:focus:!shadow-failure'
-                value={title}
-                autoFocus
-                onBlur={() => {
-                  setEditing(false);
-                }}
-                onChange={(e) => {
-                  setTitle(e.target.value);
-                }}
-                onKeyDown={(e) => {
-                  if (e.key !== 'Enter') return;
-                  patchGoal({ ...goal, title });
-                  setEditing(false);
-                }}
-              />
-            )
-          }
-        </h2>
+        />
         <DeleteFilled
           onClick={() => {
             removeGoal(goal.id);
