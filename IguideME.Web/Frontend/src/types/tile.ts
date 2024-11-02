@@ -40,11 +40,12 @@ export interface TileEntry {
   tile_id: number;
   title: string;
   html_url: string;
+  published: PublilshedStatus;
   weight: number;
   content_id: number;
 }
 
-enum PublilshedStatus {
+export enum PublilshedStatus {
   NotPublished,
   LMSPublished,
   ExternalData,

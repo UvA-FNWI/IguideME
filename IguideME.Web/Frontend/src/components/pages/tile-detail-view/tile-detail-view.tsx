@@ -13,6 +13,7 @@ import { useTileViewStore } from '../student-dashboard/tileViewContext';
 import { type ReactElement, useCallback, useEffect } from 'react';
 import AltEntries from '@/components/atoms/alt-entries/alt-entries';
 import { useRequiredParams } from '@/utils/params';
+import { PublilshedStatus } from '@/types/tile';
 
 function TileDetailView(): ReactElement {
   const { tileId } = useRequiredParams(['tileId']);
@@ -79,12 +80,15 @@ function TileDetailView(): ReactElement {
         <div className='flex w-full justify-normal p-1'>
           <GroupView title={tile ? tile.title : ''}>
             {isError ?
-              <div className='relative w-full h-full'>
+              <div className='relative h-full w-full'>
                 <QueryError className='grid place-content-center' title='Failed to load tile' />
               </div>
             : tile?.alt ?
               <AltEntries tile={tile} />
-            : tile?.entries.map((entry) => <EntryView entry={entry} key={entry.content_id} type={tile.type} />)}
+            : tile?.entries
+                .filter((entry) => entry.published !== PublilshedStatus.NotPublished)
+                .map((entry) => <EntryView entry={entry} key={entry.content_id} type={tile.type} />)
+            }
           </GroupView>
         </div>
       </QueryLoading>

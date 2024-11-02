@@ -158,6 +158,7 @@ namespace IguideME.Web.Services.Workers
         {
             double tileGrade = 0;
 
+            double totalWeight = 0;
 
             foreach (TileEntry entry in tile.Entries)
             {
@@ -165,6 +166,7 @@ namespace IguideME.Web.Services.Workers
                 if (userEntryGradesMap.TryGetValue(entry.ContentID, out entryGrade))
                 {
                     tileGrade += entryGrade * entry.Weight;
+                    totalWeight += entry.Weight;
 
                     // Store the entry Grade for the peer statistics.
                     if (peerEntryGradesMap.ContainsKey(entry.ContentID))
@@ -172,6 +174,12 @@ namespace IguideME.Web.Services.Workers
                     else
                         peerEntryGradesMap[entry.ContentID] = new();
                 }
+            }
+
+            // Rescale to 100% if the weights don't at least add up to 100%, especially useful for when not al grades are received yet
+            if (totalWeight < 1)
+            {
+                tileGrade /= totalWeight;
             }
 
             return tileGrade;

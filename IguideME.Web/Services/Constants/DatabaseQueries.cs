@@ -1177,6 +1177,11 @@ public static class DatabaseQueries
                 WHEN    1   THEN `discussions`.`html_url`
                 WHEN    2   THEN ''
             END title,
+            CASE `tiles`.`type`
+                WHEN    0   THEN `assignments`.`published`
+                WHEN    1   THEN 1
+                WHEN    2   THEN 2
+            END title,
             `tile_entries`.`weight`
         FROM        `tile_entries`
         INNER JOIN  `tiles`
@@ -1582,6 +1587,7 @@ public static class DatabaseQueries
         INNER JOIN  `assignments`
             USING   (`assignment_id`)
         WHERE       `assignments`.`course_id`=@courseID
+        AND         `assignments`.`published`!=0
         AND         `submissions`.`user_id`=@userID
         ;";
 

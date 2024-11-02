@@ -6,7 +6,7 @@ import { InputNumber, Select, Table, Tooltip } from 'antd';
 import { useQuery } from '@tanstack/react-query';
 import { useCallback, useEffect, useMemo, useState, type FC, type ReactElement } from 'react';
 
-import { type Assignment, type TileEntry } from '@/types/tile';
+import { PublilshedStatus, type Assignment, type TileEntry } from '@/types/tile';
 import { printGradingType } from '@/types/grades';
 
 interface SelectAssignmentsProps {
@@ -65,6 +65,7 @@ const SelectAssignments: FC<SelectAssignmentsProps> = ({ value: entries, onChang
           return {
             title: ass ? ass.title : 'No title found',
             html_url: ass ? ass.html_url : '',
+            published: ass?.published ?? PublilshedStatus.NotPublished,
             tile_id: -1, // Set the correct id on the backend
             weight: 0,
             content_id: id,

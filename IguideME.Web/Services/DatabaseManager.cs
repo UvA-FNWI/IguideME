@@ -2464,6 +2464,7 @@ namespace IguideME.Web.Services
                                 r.GetInt32(1),
                                 "This is another title",
                                 "",
+                                2,
                                 r.GetDouble(2)
                             )
                         );
@@ -3560,7 +3561,8 @@ namespace IguideME.Web.Services
                             r.GetInt32(1),
                             r.GetValue(2).ToString(),
                             r.GetValue(3).ToString(),
-                            r.GetDouble(4)
+                            r.GetInt32(4),
+                            r.GetDouble(5)
                         )
                     );
                 }

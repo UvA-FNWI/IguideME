@@ -119,18 +119,22 @@ namespace IguideME.Web.Models
 		[JsonProperty(PropertyName = "html_url")]
 		public string HtmlUrl { get; set; }
 
+		[JsonProperty(PropertyName = "published")]
+		public PublishStatus Published { get; set; }
+
 		[JsonProperty(PropertyName = "content_id")]
 		public int ContentID { get; set; }
 
 		[JsonProperty(PropertyName = "weight")]
 		public double Weight { get; set; }
 
-		public TileEntry(int tileID, int ContentID, string title, string url, double weight)
+		public TileEntry(int tileID, int ContentID, string title, string url, int published, double weight)
 		{
 			this.TileID = tileID;
 			this.ContentID = ContentID;
 			this.Title = title;
 			this.HtmlUrl = url;
+			this.Published = (PublishStatus)published;
 			this.Weight = weight;
 		}
 	}
