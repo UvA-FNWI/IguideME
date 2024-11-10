@@ -40,9 +40,10 @@ interface Props {
 }
 
 const GridGrades: FC<Props> = memo(({ goal, total, pred }): ReactElement => {
-  const happy = <SmileOutlined size={10} className='text-success' />;
-  const meh = <MehOutlined size={10} className='text-meh' />;
-  const unhappy = <FrownOutlined size={10} className='text-failure' />;
+  const happy = <SmileOutlined className='text-success' />;
+  const meh = <MehOutlined className='text-meh' />;
+  const neutral = <MehOutlined className='text-text/40' />;
+  const unhappy = <FrownOutlined className='text-failure' />;
 
   return (
     <div className='flex w-full items-center justify-center gap-6'>
@@ -67,7 +68,9 @@ const GridGrades: FC<Props> = memo(({ goal, total, pred }): ReactElement => {
               happy
             : total >= 5.5 ?
               meh
-            : unhappy}
+            : total > 0 ?
+              unhappy
+            : neutral}
             {varFixed(total)}
           </Space>
         </h2>
@@ -95,7 +98,7 @@ GridGrades.displayName = 'GridGrades';
 const BarTooltip: FC<TooltipProps> = memo(({ active, payload, label }) => {
   if (active && payload?.length) {
     return (
-      <div className='z-50 rounded-lg border border-solid border-text bg-crust/80 p-2'>
+      <div className='border-text bg-crust/80 z-50 rounded-lg border border-solid p-2'>
         <p>
           {label}: {Number(payload[0].value.toFixed(1))}/10
         </p>
