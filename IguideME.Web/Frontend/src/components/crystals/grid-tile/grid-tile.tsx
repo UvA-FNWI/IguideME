@@ -29,14 +29,19 @@ export const GradeView: FC<Grades> = ({ grade, max, peerAvg, type }): ReactEleme
   return (
     <Space className='content-end'>
       <>
-        <div>
-          {grade < 50 ?
-            <FrownOutlined className='text-failure text-lg' />
-          : grade >= peerAvg || (max === -1 && grade > 0) ?
-            <SmileOutlined className='text-success text-lg' />
-          : <MehOutlined className='text-meh text-lg' />}
-        </div>
-        <p className='text-lg'>{printGrade(type, grade, max)}</p>
+        {grade === 0 && peerAvg === 0 ?
+          'N/A'
+        : <>
+            <div>
+              {grade < 50 ?
+                <FrownOutlined className='text-failure text-lg' />
+              : grade >= peerAvg ?
+                <SmileOutlined className='text-success text-lg' />
+              : <MehOutlined className='text-meh text-lg' />}
+            </div>
+            <p className='text-lg'>{printGrade(type, grade, max)}</p>
+          </>
+        }
       </>
     </Space>
   );
@@ -51,10 +56,10 @@ const Discussions: FC<Grades> = ({ grade, max }): ReactElement => {
   );
 };
 
-const Learnings: FC<Grades> = ({ grade, max, type }): ReactElement => {
+const Learnings: FC<Grades> = ({ grade, max, type, peerMax }): ReactElement => {
   return (
     <Space>
-      <p>{grade === 0 ? '...' : <>{printGrade(type, grade, max)}</>}</p>
+      <p>{peerMax === 0 ? '...' : <>{printGrade(type, grade, max)}</>}</p>
       <TrophyOutlined className='text-success' />
     </Space>
   );
