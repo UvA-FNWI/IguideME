@@ -25,7 +25,7 @@ namespace IguideME.Web.Services.Workers
         private readonly DatabaseManager _databaseManager;
         private readonly int _courseID;
         private readonly long _syncID;
-        private Dictionary<int, List<double>> peerEntryGradesMap;
+        private Dictionary<(Comparison_Component_Types, int), List<double>> peerEntryGradesMap;
         private Dictionary<int, List<double>> peerTileGradesMap;
         private List<double> peerTotalGrades;
 
@@ -165,19 +165,21 @@ namespace IguideME.Web.Services.Workers
                 double entryGrade;
                 if (userEntryGradesMap.TryGetValue(entry.ContentID, out entryGrade))
                 {
-                    tileGrade += entryGrade * entry.Weight;
-                    totalWeight += entry.Weight;
-
+                    if (entryGrade > 0)
+                    {
+                        tileGrade += entryGrade * entry.Weight;
+                        totalWeight += entry.Weight;
+                    }
                     // Store the entry Grade for the peer statistics.
-                    if (peerEntryGradesMap.ContainsKey(entry.ContentID))
-                        peerEntryGradesMap[entry.ContentID].Add(entryGrade);
-                    else
-                        peerEntryGradesMap[entry.ContentID] = new();
+                    if (!peerEntryGradesMap.ContainsKey((Comparison_Component_Types.assignment, entry.ContentID)))
+                        peerEntryGradesMap[(Comparison_Component_Types.assignment, entry.ContentID)] = new();
+
+                    peerEntryGradesMap[(Comparison_Component_Types.assignment, entry.ContentID)].Add(entryGrade);
                 }
             }
 
             // Rescale to 100% if the weights don't at least add up to 100%, especially useful for when not al grades are received yet
-            if (totalWeight < 1)
+            if (totalWeight > 0 && totalWeight < 1)
             {
                 tileGrade /= totalWeight;
             }
@@ -196,7 +198,7 @@ namespace IguideME.Web.Services.Workers
         {
             double tileGrade = 0;
 
-            // Alt for a discussion tile means to count all posts by the user instead of only specified.
+            // Alt for a discussion tile means to count all posts by the user instead of only the ones specified.
             if (tile.Alt)
             {
                 tileGrade = _databaseManager.GetDiscussionCountForUser(_courseID, userID);
@@ -210,15 +212,14 @@ namespace IguideME.Web.Services.Workers
                     tileGrade += entryGrade;
 
                     // Store the entry Grade for the peer statistics.
-                    if (peerEntryGradesMap.ContainsKey(entry.ContentID))
-                        peerEntryGradesMap[entry.ContentID].Add(entryGrade);
-                    else
-                        peerEntryGradesMap[entry.ContentID] = new();
+                    if (!peerEntryGradesMap.ContainsKey((Comparison_Component_Types.discussion, entry.ContentID)))
+                        peerEntryGradesMap[(Comparison_Component_Types.discussion, entry.ContentID)] = new();
+
+                    peerEntryGradesMap[(Comparison_Component_Types.discussion, entry.ContentID)].Add(entryGrade);
                 }
             }
 
             double max = _databaseManager.GetTileMax(tile.ID, _courseID).max;
-            // _logger.LogWarning("tileGrade {tileGrade} max {max} tile {tile}", tileGrade, max, )
 
             return 100 * tileGrade / max;
         }
@@ -239,7 +240,6 @@ namespace IguideME.Web.Services.Workers
                 goal.Requirements = _databaseManager.GetGoalRequirements(goal.ID);
                 foreach (GoalRequirement requirement in goal.Requirements)
                 {
-                    // goal.Results.Add(_databaseManager.GetGoalRequirementResult(requirement, userID));
                     if (_databaseManager.GetGoalRequirementResult(requirement, userID))
                     {
                         tileGrade++;
@@ -258,49 +258,29 @@ namespace IguideME.Web.Services.Workers
         /// <returns>The total Grade of the user.</returns>
         double CalculateUserTotalGrade(List<Tile> tiles, string userID)
         {
-            List<(double grade, double weight)> validSubmissions = [];
-            double unusedWeight = 0;
+            double userTotal = 0;
+            double totalWeight = 0;
 
             Dictionary<int, double> userEntryGradesMap = _databaseManager.GetUserAssignmentGrades(_courseID, userID);
 
             foreach (Tile tile in tiles)
             {
                 double userTileGrade = CalculateTileGrade(tile, userID, userEntryGradesMap);
-                if (userTileGrade == 0 || double.IsNaN(userTileGrade))
+                if (userTileGrade > 0)
                 {
-                    unusedWeight += tile.Weight;
-                    continue;
+                    userTotal += userTileGrade * tile.Weight;
+                    totalWeight += tile.Weight;
                 }
-
-                validSubmissions.Add((userTileGrade, tile.Weight));
 
                 // Store the tile Grade for the peer statistics.
-                if (peerTileGradesMap.TryGetValue(tile.ID, out List<double> value))
-                {
-                    value.Add(userTileGrade);
-                }
-                else
-                {
-                    peerTileGradesMap[tile.ID] = [];
-                }
+                if (!peerTileGradesMap.ContainsKey(tile.ID))
+                    peerTileGradesMap[tile.ID] = new();
+                peerTileGradesMap[tile.ID].Add(userTileGrade);
             }
 
-            // Spread the unused weight over the valid tiles.
-            double userTotal = validSubmissions.Sum(tile => tile.grade * tile.weight);
-            if (unusedWeight > 0)
+            if (totalWeight > 0 && totalWeight < 1)
             {
-                double weight = unusedWeight / validSubmissions.Count;
-                userTotal += validSubmissions.Sum(tile => tile.grade * weight);
-            }
-
-            // Make the grade a value between 0 and 10.
-            if (double.IsNaN(userTotal))
-            {
-                userTotal = 0;
-            }
-            else if (userTotal > 0)
-            {
-                userTotal /= 10;
+                userTotal /= totalWeight;
             }
 
             _databaseManager.UpdateUserSettings(
@@ -308,7 +288,7 @@ namespace IguideME.Web.Services.Workers
                 userID,
                 null,
                 null,
-                userTotal,
+                userTotal / 10, // Grade is expected to range 0 to 10, not 100
                 null,
                 null,
                 _syncID
@@ -325,31 +305,32 @@ namespace IguideME.Web.Services.Workers
         /// <param name="peerGroup">the users in the current peergroup.</param>
         void StorePeerStatistics(int goalGrade, List<string> peerGroup)
         {
-            foreach ((int key, List<double> value) in peerEntryGradesMap)
-                if (value.Count > 0)
+            foreach (((Comparison_Component_Types type, int key), List<double> entryGrades) in peerEntryGradesMap)
+                if (entryGrades.Count > 0)
                     _databaseManager.CreateUserPeer(
                         goalGrade,
                         peerGroup,
                         key,
-                        value.Average(),
-                        value.Min(),
-                        value.Max(),
-                        (int)Comparison_Component_Types.assignment,
+                        entryGrades.Average(),
+                        entryGrades.Min(),
+                        entryGrades.Max(),
+                        (int)type,
                         _syncID
                     );
-
-            foreach ((int key, List<double> value) in peerTileGradesMap)
-                if (value.Count > 0)
+            foreach ((int key, List<double> tileGrades) in peerTileGradesMap)
+            {
+                if (tileGrades.Count > 0)
                     _databaseManager.CreateUserPeer(
                         goalGrade,
                         peerGroup,
                         key,
-                        value.Average(),
-                        value.Min(),
-                        value.Max(),
+                        tileGrades.Average(),
+                        tileGrades.Min(),
+                        tileGrades.Max(),
                         (int)Comparison_Component_Types.tile,
                         _syncID
                     );
+            }
 
             if (peerTotalGrades.Count > 0)
             {
