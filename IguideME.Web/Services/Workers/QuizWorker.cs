@@ -50,7 +50,6 @@ namespace IguideME.Web.Services.Workers
 		public void RegisterSubmissions(IEnumerable<AssignmentSubmission> submissions, AppAssignment assignment)
 		{
 			_logger.LogInformation("Registering submissions...");
-			_logger.LogInformation("Registering id {} with {}", assignment.ID, submissions);
 			foreach (AssignmentSubmission sub in submissions)
 			{
 				// TODO: WE NEED TO CHANGE THE SUBMISSION IDs FROM EXTERNAL QUIZ ID TO INTERNAL ASSIGNMENT ID

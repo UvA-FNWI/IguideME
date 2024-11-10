@@ -27,13 +27,15 @@ namespace IguideME.Web.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult Track([FromBody] NewUserTrackerEntry entry)
         {
-            _databaseManager.InsertUserAction(
-                entry.UserID,
-                entry.Action,
-                entry.ActionDetail,
-                entry.CourseID
-            );
-
+            if (!IsAdministrator())
+            {
+                _databaseManager.InsertUserAction(
+                            entry.UserID,
+                            entry.Action,
+                            entry.ActionDetail,
+                            entry.CourseID
+                        );
+            }
             return Ok("User action has been saved.");
         }
 
