@@ -385,12 +385,6 @@ namespace IguideME.Web.Controllers
 		[Route("/datamart/accept-list")]
 		public ActionResult CreateAcceptList([FromBody] AcceptList[] acceptList)
 		{
-			_logger.LogWarning("list {}", acceptList);
-			foreach (AcceptList accept in acceptList)
-			{
-				_logger.LogWarning("accept {}", accept);
-			}
-
 			_databaseManager.ResetAcceptList(GetCourseID());
 
 			foreach (AcceptList list in acceptList)
