@@ -1900,7 +1900,6 @@ namespace IguideME.Web.Services
             if (activeSync == 0)
                 return null;
 
-
             using (
                 SQLiteDataReader r = Query(
                     DatabaseQueries.QUERY_PEER_GROUP_RESULTS,
@@ -3374,7 +3373,7 @@ namespace IguideME.Web.Services
             {
                 if (r.Read())
                 {
-                    int max = r.GetInt32(5);
+                    int max = r.GetInt32(6);
                     max = max == 0 ? 1 : max;
                     return new(
                         r.GetInt32(0),
