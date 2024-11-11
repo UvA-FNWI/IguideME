@@ -64,8 +64,8 @@ const AltDiscussions: FC<Props> = ({ tile }): ReactElement => {
     );
   } else if (entryError || topicError || !discussionEntries || !discussionTopics) {
     return (
-      <div className='relative h-3/4'>
-      <QueryError className='grid place-content-center' title='No submission found' />
+      <div className='relative h-[200px] w-full'>
+        <QueryError className='grid place-content-center !p-0' title='No submission found' />
       </div>
     );
   }

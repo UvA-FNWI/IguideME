@@ -318,6 +318,41 @@ textarea:not([rows]) {
   }
 }
 
+.custom-card-student-dashboard .ant-card-head,
+.custom-card-student-dashboard .ant-card-cover,
+.custom-card-student-dashboard .ant-card-body,
+.custom-card-student-dashboard .ant-card-actions {
+  background-color: hsl(var(--surface1)) !important;
+}
+
+:where(.css-dev-only-do-not-override-qnu6hi).ant-card {
+  background-color: hsl(var(--surface1)) !important;
+}
+
+.custom-card-student-dashboard {
+  border: none !important;
+  width: 260px !important;
+  height: 280px !important;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.custom-card-student-dashboard .ant-card-body {
+  height: 0px !important;
+  padding: 0px !important;
+  flex-shrink: 0;
+}
+
+.custom-card-student-dashboard .ant-card-cover {
+  margin-top: 4px !important;
+  flex-grow: 1;
+}
+
+.custom-card-student-dashboard .ant-card-actions {
+  flex-shrink: 0;
+}
+
 .custom-card {
   &:hover {
     box-shadow:
@@ -331,6 +366,10 @@ textarea:not([rows]) {
     div {
       color: hsl(var(--text)) !important;
     }
+  }
+
+  .ant-card-cover img {
+    height: 170px !important;
   }
 }
 

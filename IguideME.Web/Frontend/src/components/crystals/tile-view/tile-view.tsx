@@ -2,27 +2,28 @@ import GraphTile from '@/components/crystals/graph-tile/graph-tile.tsx';
 import GridTile from '@/components/crystals/grid-tile/grid-tile.tsx';
 import PeerComparison from '@/components/particles/peer-comparison/peercomparison';
 import QueryError from '@/components/particles/QueryError';
-import QueryLoading from '@/components/particles/QueryLoading';
-import { cn } from '@/utils/cn';
-import { Col, Divider, Row } from 'antd';
+import { Card, Divider, Row } from 'antd';
 import { getUserTileGrades } from '@/api/grades';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useTileViewStore } from '@/components/pages/student-dashboard/tileViewContext';
-import { TileType, type Tile } from '@/types/tile';
+import { type Tile, TileType } from '@/types/tile';
 import { memo, type FC, type ReactElement } from 'react';
-import { GradingType } from '@/types/grades';
+import { GradingType, type Grades } from '@/types/grades';
+import { useShallow } from 'zustand/react/shallow';
+import { SlidersOutlined } from '@ant-design/icons';
 
 interface Props {
   tile: Tile;
-  textStyle?: string;
 }
 
-const ViewTile: FC<Props> = memo(({ tile, textStyle }): ReactElement => {
-  const { user, viewType } = useTileViewStore((state) => ({
-    user: state.user,
-    viewType: state.viewType,
-  }));
+const ViewTile: FC<Props> = memo(({ tile }): ReactElement => {
+  const { user, viewType } = useTileViewStore(
+    useShallow((state) => ({
+      user: state.user,
+      viewType: state.viewType,
+    })),
+  );
 
   const {
     data: grades,
@@ -36,54 +37,70 @@ const ViewTile: FC<Props> = memo(({ tile, textStyle }): ReactElement => {
   const navigate = useNavigate();
 
   return (
-    <QueryLoading isLoading={isLoading}>
-      <div
-        aria-disabled={isLoading || isError}
-        className={`${
-          isError ? 'cursor-not-allowed' : 'cursor-pointer'
-        } border-border1 bg-surface1 relative h-[230px] w-[270px] rounded-md border border-solid p-2`}
-        onClick={() => {
-          if (!(isError || isLoading)) navigate(tile.id + '/');
-        }}
-      >
-        <Row className='h-1/5 content-center justify-center'>
-          <h3 className={cn('text-lg', textStyle)}>{tile.title}</h3>
-        </Row>
-        {renderViewType()}
-      </div>
-    </QueryLoading>
+    <div
+      className={`${tile.type === TileType.assignments && tile.gradingType === GradingType.NotGraded ? 'grayscale-[30%] saturate-[.80]' : ''}`}
+    >
+      <Card
+        actions={[
+          <a
+            className='!text-text/60 hover:!text-text'
+            onClick={() => {
+              navigate(tile.id + '/');
+            }}
+            key='details'
+          >
+            See assignments
+          </a>,
+        ]}
+        className='custom-card-student-dashboard'
+        cover={
+          grades ?
+            renderViewType(grades)
+          : <div className='!flex h-full w-full !items-center !justify-center'>
+              <SlidersOutlined className='text-text/50' style={{ fontSize: '400%' }} />
+            </div>
+        }
+        loading={isLoading}
+        size='small'
+        title={
+          <div className='w-full flex-col text-center'>
+            <h3 className='text-lg font-normal'>{tile.title}</h3>
+            {tile.type === TileType.assignments && tile.gradingType === GradingType.NotGraded && !grades ?
+              <p className='text-xs text-text/60'>Not graded / No grades yet</p>
+            : <>
+                {tile.type === TileType.assignments && tile.gradingType === GradingType.NotGraded && (
+                  <p className='text-xs text-text/60'>Not graded</p>
+                )}
+                {!grades && <p className='text-xs text-text/60'>No grades yet</p>}
+              </>
+            }
+          </div>
+        }
+      />
+    </div>
   );
 
-  function renderViewType(): ReactElement {
+  function renderViewType(grades: Grades): ReactElement {
     if (isError) return <QueryError className='grid place-content-center' title='Failed to load grades' />;
 
-    if (tile.type === TileType.assignments && tile.gradingType === GradingType.NotGraded) {
-      return (
-        <Row className='h-4/5 content-center justify-center'>
-          <p className='text-text'>Not Graded</p>
-        </Row>
-      );
-    }
     switch (viewType) {
       case 'graph':
         return (
           <Row className='h-4/5 content-center justify-center'>
-            <GraphTile type={tile.type} grades={grades ?? {grade: 0, peerAvg: 0, peerMax: 0, peerMin: 0, max: 0, type: GradingType.NotGraded}} />
+            <GraphTile type={tile.type} grades={grades} />
           </Row>
         );
-      case 'grid':
+      case 'grades':
         return (
-          <>
-            <Row className='h-1/2 content-center justify-center'>
-              <GridTile type={tile.type} grades={grades ??{grade: 0, peerAvg: 0, peerMax: 0, peerMin: 0, max: 0, type: GradingType.NotGraded}} />
-            </Row>
-            <Row className='h-[30%] w-full content-start justify-center'>
-              <Col className='h-full w-full'>
-                <Divider className='border-text m-0 p-0' />
-                <PeerComparison grades={grades ?? {grade: 0, peerAvg: 0, peerMax: 0, peerMin: 0, max: 0, type: GradingType.NotGraded}} />
-              </Col>{' '}
-            </Row>
-          </>
+          <div className='!flex h-full flex-col'>
+            <div className='grid flex-grow place-content-center'>
+              <GridTile type={tile.type} grades={grades} />
+            </div>
+            <div className='shrink-0'>
+              <Divider className='m-0 border-text p-0' />
+              <PeerComparison grades={grades} />
+            </div>
+          </div>
         );
       default:
         throw new Error('Unknown tile type');

@@ -11,24 +11,24 @@ const GraphGrade: FC<Grades> = ({ grade, peerAvg, peerMin, peerMax, max, type })
     if (active && payload && payload.length > 1) {
       const data = payload[1].payload;
       return (
-        <div className='border-text bg-surface1/85 z-50 rounded-lg border border-solid p-2'>
+        <div className='z-50 rounded-lg border border-solid border-text bg-surface1/85 p-2'>
           <div>
             {data.name === 'You' ?
               <div>
-                <div className='bg-primary inline-block h-3 w-3' /> Grade: {printGrade(type, Number(data.grade), max)}
+                <div className='inline-block h-3 w-3 bg-primary' /> Grade: {printGrade(type, Number(data.grade), max)}
               </div>
             : <>
                 <div className='inline-block h-3 w-3' style={{ backgroundColor: '#eee' }}>
                   <div className='h-1/2' />
-                  <div className='bg-secondary h-1/2 w-full opacity-20'></div>
+                  <div className='h-1/2 w-full bg-secondary opacity-20'></div>
                 </div>{' '}
                 High: {printGrade(type, Number(data.peerMax), max)}
                 <br />
-                <div className='bg-secondary inline-block h-3 w-3' /> Average:{' '}
+                <div className='inline-block h-3 w-3 bg-secondary' /> Average:{' '}
                 {printGrade(type, Number(data.grade), max)}
                 <br />
                 <div className='inline-block h-3 w-3' style={{ backgroundColor: '#eee' }}>
-                  <div className='bg-secondary h-1/2 w-full opacity-20'></div>
+                  <div className='h-1/2 w-full bg-secondary opacity-20'></div>
                 </div>{' '}
                 Low: {printGrade(type, Number(data.peerMin), max)}
               </>
@@ -61,11 +61,12 @@ const GraphGrade: FC<Grades> = ({ grade, peerAvg, peerMin, peerMax, max, type })
         },
       ]}
       margin={{
-        top: 10,
-        right: 20,
-        left: 20,
-        bottom: 10,
+        top: 20,
+        right: 10,
+        left: 10,
+        bottom: 0,
       }}
+      className='!w-full'
       width={250}
       height={180}
     >

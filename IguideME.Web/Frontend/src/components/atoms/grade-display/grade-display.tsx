@@ -24,7 +24,7 @@ const GradeDisplay: FC = (): ReactElement => {
   const pred = user.settings.predicted_grade;
 
   switch (viewType) {
-    case 'grid':
+    case 'grades':
       return <GridGrades goal={goal} total={total} pred={pred} />;
     case 'graph':
       return <GraphGrades goal={goal} total={total} pred={pred} />;

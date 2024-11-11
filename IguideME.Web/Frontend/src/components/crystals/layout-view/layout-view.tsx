@@ -25,7 +25,7 @@ const ViewLayout: FC = (): ReactElement => {
   });
 
   const loading = LoadingLayoutColumns || LoadingTileGroups;
-  const error = ErrorLayoutColumns || ErrorTileGroups || columns === undefined || tilegroups === undefined;
+  const error = ErrorLayoutColumns || ErrorTileGroups;
 
   if (loading || error) {
     return (
@@ -44,7 +44,7 @@ const ViewLayout: FC = (): ReactElement => {
     );
   }
 
-  if (columns.find((col) => col.groups.length > 0) === undefined) {
+  if (columns?.find((col) => col.groups.length > 0) === undefined) {
     return (
       <div className='pointer-events-none absolute inset-0 grid h-screen w-screen place-content-center'>
         <QueryError
@@ -68,7 +68,7 @@ const ViewLayout: FC = (): ReactElement => {
         <Fragment key={index}>
           <div className='flex flex-col gap-3 xl:hidden'>
             {column.groups.map((id) => {
-              const group = tilegroups.find((group) => group.id === id);
+              const group = tilegroups?.find((group) => group.id === id);
               return (
                 group !== undefined && (
                   <div className='space-y-3' key={id}>
@@ -81,7 +81,7 @@ const ViewLayout: FC = (): ReactElement => {
           <Col key={column.id} span={Math.round((24 * column.width) / 100)} className='hidden flex-shrink xl:block'>
             <div className='grid h-full gap-3'>
               {column.groups.map((id) => {
-                const group = tilegroups.find((group) => group.id === id);
+                const group = tilegroups?.find((group) => group.id === id);
                 return (
                   group !== undefined && (
                     <div

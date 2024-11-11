@@ -2,25 +2,34 @@ import GraphGrade from '../graph-grade/graph-grade';
 import PeerComparison from '@/components/particles/peer-comparison/peercomparison';
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
-import { CheckCircleOutlined, CheckOutlined, CloseCircleOutlined, CloseOutlined } from '@ant-design/icons';
+import {
+  CheckCircleOutlined,
+  CheckOutlined,
+  CloseCircleOutlined,
+  CloseOutlined,
+  SlidersOutlined,
+} from '@ant-design/icons';
 import { Divider } from 'antd';
 import { getAssignments } from '@/api/entries';
 import { GradeView } from '@/components/crystals/grid-tile/grid-tile';
 import { useQuery } from '@tanstack/react-query';
 import { useTileViewStore } from '@/components/pages/student-dashboard/tileViewContext';
-import { printLogicalExpression, type TileEntry } from '@/types/tile';
+import { printLogicalExpression, type TileEntry, type ViewType } from '@/types/tile';
 import { type FC, type ReactElement } from 'react';
 import { getAssignmentSubmission, getDiscussionEntries, getLearningGoal } from '@/api/grades';
+import { useShallow } from 'zustand/react/shallow';
 
 interface Props {
   entry: TileEntry;
+  viewType: ViewType;
 }
 
-export const AssignmentDetail: FC<Props> = ({ entry }): ReactElement => {
-  const { user, viewType } = useTileViewStore((state) => ({
-    user: state.user,
-    viewType: state.viewType,
-  }));
+export const AssignmentDetail: FC<Props> = ({ entry, viewType }): ReactElement => {
+  const { user } = useTileViewStore(
+    useShallow((state) => ({
+      user: state.user,
+    })),
+  );
 
   const {
     data: submission,
@@ -38,10 +47,19 @@ export const AssignmentDetail: FC<Props> = ({ entry }): ReactElement => {
       </QueryLoading>
     );
   }
-  if (isError || !submission) {
+
+  if (isError) {
     return (
-      <div className='relative h-3/4'>
+      <div className='relative h-full'>
         <QueryError className='grid place-content-center' title='No submission found' />
+      </div>
+    );
+  }
+
+  if (!submission) {
+    return (
+      <div className='!flex h-full w-full !items-center !justify-center'>
+        <SlidersOutlined className='text-text/50' style={{ fontSize: '400%' }} />
       </div>
     );
   }
@@ -53,14 +71,14 @@ export const AssignmentDetail: FC<Props> = ({ entry }): ReactElement => {
           <GraphGrade {...submission.grades} />
         </div>
       );
-    case 'grid':
+    case 'grades':
       return (
-        <div className='flex h-4/5 w-full flex-col justify-between'>
+        <div className='!flex h-full w-full flex-col justify-between'>
           <div className='grid flex-grow place-content-center'>
             <GradeView {...submission.grades} />
           </div>
-          <div>
-            <Divider className='border-text m-0 p-0' />
+          <div className='shrink-0'>
+            <Divider className='m-0 border-text p-0' />
             <PeerComparison grades={submission.grades} />
           </div>
         </div>
@@ -70,8 +88,8 @@ export const AssignmentDetail: FC<Props> = ({ entry }): ReactElement => {
   }
 };
 
-export const DiscussionDetail: FC<Props> = ({ entry }): ReactElement => {
-  const { user, viewType } = useTileViewStore((state) => ({ user: state.user, viewType: state.viewType }));
+export const DiscussionDetail: FC<Props> = ({ entry, viewType }): ReactElement => {
+  const { user } = useTileViewStore(useShallow((state) => ({ user: state.user })));
 
   const {
     data: discussion,
@@ -88,10 +106,20 @@ export const DiscussionDetail: FC<Props> = ({ entry }): ReactElement => {
         <div className='h-[180px] w-[270px]' />
       </QueryLoading>
     );
-  } else if (isError || !discussion || !discussion.grades) {
+  }
+
+  if (isError) {
     return (
       <div className='relative h-3/4'>
         <QueryError className='grid place-content-center' title='No submission found' />
+      </div>
+    );
+  }
+
+  if (!discussion?.grades) {
+    return (
+      <div className='!flex h-full w-full !items-center !justify-center'>
+        <SlidersOutlined className='text-text/50' style={{ fontSize: '400%' }} />
       </div>
     );
   }
@@ -103,14 +131,14 @@ export const DiscussionDetail: FC<Props> = ({ entry }): ReactElement => {
           <GraphGrade {...discussion.grades} />
         </div>
       );
-    case 'grid':
+    case 'grades':
       return (
         <div className='flex h-4/5 w-full flex-col justify-between'>
           <div className='grid flex-grow place-content-center'>
             <GradeView {...discussion.grades} />
           </div>
           <div>
-            <Divider className='border-text m-0 p-0' />
+            <Divider className='m-0 border-text p-0' />
             <PeerComparison grades={discussion.grades} />
           </div>
         </div>
@@ -146,10 +174,20 @@ export const LearningGoalDetail: FC<Props> = ({ entry }): ReactElement => {
         <div className='h-[180px] w-[270px]' />
       </QueryLoading>
     );
-  } else if (isError || !learningGoal || assIsError || !assignments) {
+  }
+
+  if (isError || assIsError) {
     return (
       <div className='relative h-3/4'>
         <QueryError className='grid place-content-center' title='No submission found' />
+      </div>
+    );
+  }
+
+  if (!learningGoal || !assignments) {
+    return (
+      <div className='!flex h-full w-full !items-center !justify-center'>
+        <SlidersOutlined className='text-text/50' style={{ fontSize: '400%' }} />
       </div>
     );
   }
@@ -158,7 +196,7 @@ export const LearningGoalDetail: FC<Props> = ({ entry }): ReactElement => {
     <div className='h-full w-full p-2'>
       <div className='flex h-1/6 items-baseline justify-center gap-4'>
         {learningGoal.results?.every((b) => b) ?
-          <span className='text-subtext1 flex place-content-center gap-2 text-sm'>
+          <span className='flex place-content-center gap-2 text-sm text-subtext1'>
             Passed
             <CheckCircleOutlined className='text-text [&_svg]:!fill-success' />
           </span>
@@ -170,8 +208,8 @@ export const LearningGoalDetail: FC<Props> = ({ entry }): ReactElement => {
       </div>
 
       <div className='flex h-5/6 w-full flex-col overflow-auto'>
-        <h4 className='text-subtext1 mb-2 flex-shrink-0 underline'>Sub-goals</h4>
-        <ul className='text-subtext1 h-full flex-grow overflow-auto'>
+        <h4 className='mb-2 flex-shrink-0 text-subtext1 underline'>Sub-goals</h4>
+        <ul className='h-full flex-grow overflow-auto text-subtext1'>
           {learningGoal.requirements.map((req, i) => {
             const result = learningGoal.results?.[i];
             const ass = assignments.get(req.assignment_id);
@@ -181,11 +219,11 @@ export const LearningGoalDetail: FC<Props> = ({ entry }): ReactElement => {
               <li className='list-item text-nowrap text-sm' key={i}>
                 {result ?
                   <>
-                    <CheckOutlined className='text-success mr-2 text-xs' />
+                    <CheckOutlined className='mr-2 text-xs text-success' />
                     {ass.title} {printLogicalExpression(req.expression)} {req.value}
                   </>
                 : <>
-                    <CloseOutlined className='text-failure mr-2 text-xs' />
+                    <CloseOutlined className='mr-2 text-xs text-failure' />
                     {ass.title} {printLogicalExpression(req.expression)} {req.value}
                   </>
                 }

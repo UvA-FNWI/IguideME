@@ -1,6 +1,6 @@
 import { type Grades, type GradingType } from './grades';
 
-export type ViewType = 'graph' | 'grid';
+export type ViewType = 'graph' | 'grades';
 
 export interface LayoutColumn {
   id: number;

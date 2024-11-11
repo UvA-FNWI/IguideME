@@ -3,19 +3,19 @@ import GradeDisplay from '@/components/atoms/grade-display/grade-display';
 import StudentInfo from '@/components/atoms/student-info/student-info';
 import { useGlobalContext } from '@/components/crystals/layout/GlobalStore/useGlobalStore';
 import Loading from '@/components/particles/loading';
-import { type ViewType } from '@/types/tile';
 import { UserRoles, type User } from '@/types/user';
 import { ActionTypes, trackEvent } from '@/utils/analytics';
 import { useRequiredParams } from '@/utils/params';
-import { AppstoreOutlined, BarChartOutlined } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
-import { Segmented } from 'antd';
 import { useEffect, type FC, type ReactElement } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { useShallow } from 'zustand/react/shallow';
 import { TileViewStoreProvider, useTileViewStore } from './tileViewContext';
-import { UseMediaQuery } from '@/hooks/UseMediaQuery';
 import Notifications from '@/components/particles/notifications/notifications';
+import { Segmented } from 'antd';
+import { AppstoreOutlined, BarChartOutlined } from '@ant-design/icons';
+import { UseMediaQuery } from '@/hooks/UseMediaQuery';
+import type { ViewType } from '@/types/tile';
 
 const StudentDashboard: FC = (): ReactElement => {
   const { studentId } = useRequiredParams(['studentId']);
@@ -101,7 +101,7 @@ const Dashboard: FC<DashboardProps> = ({ self }): ReactElement => {
               size={isMobile ? 'large' : 'middle'}
               options={[
                 { label: isMobile ? '' : 'Graph', value: 'graph', icon: <BarChartOutlined /> },
-                { label: isMobile ? '' : 'Grid', value: 'grid', icon: <AppstoreOutlined /> },
+                { label: isMobile ? '' : 'Grades', value: 'grades', icon: <AppstoreOutlined /> },
               ]}
               value={viewType}
               onChange={(value) => {
