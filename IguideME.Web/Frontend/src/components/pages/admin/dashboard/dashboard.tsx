@@ -1,13 +1,18 @@
-// /------------------------- Module imports -------------------------/
 import AdminTitle from '@/components/atoms/admin-titles/admin-titles';
 import SyncManager from '@/components/crystals/syncmanager/syncmanager';
-import { Divider, Table } from 'antd';
+import { Divider, Table, type TableColumnsType } from 'antd';
 import { getRelativeTimeString, getRelativeTimeTimer } from '@/helpers/time';
 import { getSynchronizations } from '@/api/syncing';
 import { useQuery } from '@tanstack/react-query';
 import { type FC, type ReactElement } from 'react';
 
-// /-------------------------- Own imports ---------------------------/
+interface Sync {
+  start_timestamp: number;
+  end_timestamp: number | null;
+  duration: [number, number] | null;
+  status: string;
+  key: number;
+}
 
 const Dashboard: FC = (): ReactElement => {
   const { data, isError, isLoading } = useQuery({
@@ -22,11 +27,10 @@ const Dashboard: FC = (): ReactElement => {
   const format = new Intl.DateTimeFormat(navigator.language, { dateStyle: 'long', timeStyle: 'short' });
   const since = latestSuccessful !== undefined ? getRelativeTimeString(latestSuccessful.start_timestamp) : '';
 
-  const syncs = synchronizations?.map((s, i) => {
-    const start = format.format(new Date(s.start_timestamp));
+  const syncs: Sync[] | undefined = synchronizations?.map((s, i) => {
     if (s.end_timestamp === null) {
       return {
-        start_timestamp: start,
+        start_timestamp: s.start_timestamp,
         end_timestamp: null,
         duration: null,
         status: s.status,
@@ -34,12 +38,10 @@ const Dashboard: FC = (): ReactElement => {
       };
     }
 
-    const end = format.format(new Date(s.end_timestamp));
-
     return {
-      start_timestamp: start,
-      end_timestamp: end,
-      duration: getRelativeTimeTimer(s.start_timestamp, s.end_timestamp),
+      start_timestamp: s.start_timestamp,
+      end_timestamp: s.end_timestamp,
+      duration: [s.start_timestamp, s.end_timestamp],
       status: s.status,
       key: i,
     };
@@ -71,27 +73,50 @@ const Dashboard: FC = (): ReactElement => {
   );
 };
 
-const columns = [
+const columns: TableColumnsType<Sync> = [
   {
     title: 'Start timestamp',
     dataIndex: 'start_timestamp',
     key: 'start_timestamp',
+    sorter: (a, b) => a.start_timestamp - b.start_timestamp,
+    render: (val: number) =>
+      new Intl.DateTimeFormat('en-US', { dateStyle: 'long', timeStyle: 'short' }).format(new Date(val)),
   },
   {
     title: 'End timestamp',
     dataIndex: 'end_timestamp',
     key: 'end_timestamp',
+    sorter: (a, b) => {
+      if (a.end_timestamp === null || b.end_timestamp === null) return 0;
+      return a.end_timestamp - b.end_timestamp;
+    },
+    render: (val: number | null) =>
+      val ? new Intl.DateTimeFormat('en-US', { dateStyle: 'long', timeStyle: 'short' }).format(new Date(val)) : 'N/A',
   },
   {
     title: 'Duration',
     dataIndex: 'duration',
     key: 'duration',
+    sorter: (a, b) => {
+      const aDuration = a.duration === null ? 0 : a.duration[1] - a.duration[0];
+      const bDuration = b.duration === null ? 0 : b.duration[1] - b.duration[0];
+      return aDuration - bDuration;
+    },
+    render: (val: [number, number] | null) => {
+      if (val === null) return 'N/A';
+      return getRelativeTimeTimer(val[0], val[1]);
+    },
   },
   {
     title: 'Status',
     dataIndex: 'status',
     key: 'status',
     render: (val: string, _: any) => <code>{val}</code>,
+    filters: [
+      { text: 'COMPLETE', value: 'COMPLETE' },
+      { text: 'FAILED', value: 'FAILED' },
+    ],
+    onFilter: (value, record) => record.status === value,
   },
 ];
 
