@@ -4,15 +4,42 @@ import { ApartmentOutlined, CheckCircleOutlined, CloseCircleOutlined, DeleteFill
 import { getAssignments } from '@/api/entries';
 import { InputNumber, Select, Table, Tooltip } from 'antd';
 import { useQuery } from '@tanstack/react-query';
-import { useCallback, useEffect, useMemo, useState, type FC, type ReactElement } from 'react';
-
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  type CSSProperties,
+  type FC,
+  type HTMLAttributes,
+  type ReactElement,
+} from 'react';
 import { PublilshedStatus, type Assignment, type TileEntry } from '@/types/tile';
 import { printGradingType } from '@/types/grades';
+import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { DndContext, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 
 interface SelectAssignmentsProps {
   value: TileEntry[];
   onChange: (value: TileEntry[]) => void;
 }
+
+const Row: FC<HTMLAttributes<HTMLTableRowElement> & { 'data-row-key': string }> = (props) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: props['data-row-key'],
+  });
+
+  const style: CSSProperties = {
+    ...props.style,
+    transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
+    transition,
+    cursor: 'move',
+    ...(isDragging ? { position: 'relative', zIndex: 9999 } : {}),
+  };
+
+  return <tr {...props} ref={setNodeRef} style={style} {...attributes} {...listeners} />;
+};
 
 const SelectAssignments: FC<SelectAssignmentsProps> = ({ value: entries, onChange: setEntries }): ReactElement => {
   const { data, isError, isLoading } = useQuery({
@@ -62,12 +89,14 @@ const SelectAssignments: FC<SelectAssignmentsProps> = ({ value: entries, onChang
       setEntries(
         selected.map((id) => {
           const ass = assignments.get(id);
+          const existingEntry = entries.find((entry) => entry.content_id === id);
+
           return {
             title: ass ? ass.title : 'No title found',
             html_url: ass ? ass.html_url : '',
             published: ass?.published ?? PublilshedStatus.NotPublished,
             tile_id: -1, // Set the correct id on the backend
-            weight: 0,
+            weight: existingEntry?.weight ?? 0,
             content_id: id,
           };
         }),
@@ -93,101 +122,127 @@ const SelectAssignments: FC<SelectAssignmentsProps> = ({ value: entries, onChang
     [entries, selectedAssignments],
   );
 
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 1,
+      },
+    }),
+  );
+
+  const onDragEnd = ({ active, over }: any): void => {
+    if (active.id !== over?.id) {
+      const newEntries = arrayMove(
+        entries,
+        entries.findIndex((entry) => entry.content_id === active.id),
+        entries.findIndex((entry) => entry.content_id === over?.id),
+      );
+      setEntries(newEntries);
+    }
+  };
+
   if (isError) return <QueryError className='static [&_span]:!text-2xl' title={'Error: Could not load assignments'} />;
 
   return (
     <QueryLoading isLoading={isLoading}>
       <div className='flex flex-col gap-1 overflow-x-auto'>
-        <Table
-          className='[&_div]:!text-text [&_td]:!bg-surface1 [&_td]:!text-text [&_th]:!bg-surface1 [&_th]:!text-text'
-          columns={[
-            {
-              title: 'Name',
-              dataIndex: 'title',
-              key: 'title',
-            },
-            {
-              title: 'Published',
-              dataIndex: 'published',
-              key: 'published',
-              align: 'center',
-              render: (_: string, entry: TileEntry) => {
-                const assignment = assignments.get(entry.content_id);
-                return (
-                  <a href={assignment?.html_url} target='_blank' rel='noopener noreferrer'>
-                    {assignment !== undefined && assignment.published ?
-                      <CheckCircleOutlined className='text-success' />
-                    : <CloseCircleOutlined className='text-failure' />}
-                  </a>
-                );
-              },
-            },
-            {
-              title: 'Grading',
-              dataIndex: 'grading',
-              key: 'grading',
-              align: 'center',
-              render: (_: string, entry: TileEntry) => {
-                const assignment = assignments.get(entry.content_id);
-                if (assignment !== undefined) {
-                  return printGradingType(assignment?.grading_type);
-                }
-              },
-            },
-            {
-              title: (
-                <div className='flex w-20 place-content-center items-center justify-between'>
-                  <div>Weight</div>
-                  <div>
-                    <Tooltip title='Evenly distribute weights over entries'>
-                      <ApartmentOutlined onClick={distributeWeights} />
-                    </Tooltip>
-                  </div>
-                </div>
-              ),
-              dataIndex: 'weight',
-              key: 'weight',
-              align: 'center',
-              render: (_: string, entry: TileEntry) => {
-                return (
-                  <InputNumber
-                    className='antNumberInput !border-accent/70 !bg-surface1 hover:!border-accent hover:!bg-surface2 [&_input]:!text-text w-full !border border-solid'
-                    value={entry.weight}
-                    onChange={(val) => {
-                      changeWeight(entry, val);
-                    }}
-                    formatter={(value) => `${((value ?? 0) * 100).toFixed(1)}%`}
-                    parser={(value) => parseFloat((value ?? '0').replace('%', '')) / 100}
-                    step={0.01}
-                    variant='borderless'
-                  />
-                );
-              },
-            },
-            {
-              title: '',
-              dataIndex: 'action',
-              key: 'action',
-              align: 'center',
-              render: (_: string, entry: TileEntry) => {
-                return (
-                  <DeleteFilled
-                    className='text-failure'
-                    onClick={() => {
-                      removeEntry(entry.content_id);
-                    }}
-                  />
-                );
-              },
-            },
-          ]}
-          pagination={false}
-          dataSource={entries.sort((a, b) => a.title.localeCompare(b.title))}
-          rowKey='content_id'
-        />
+        <DndContext sensors={sensors} modifiers={[restrictToVerticalAxis]} onDragEnd={onDragEnd}>
+          <SortableContext items={entries.map((i) => i.content_id)} strategy={verticalListSortingStrategy}>
+            <Table
+              className='[&_div]:!text-text [&_td]:!bg-surface1 [&_td]:!text-text [&_th]:!bg-surface1 [&_th]:!text-text'
+              components={{
+                body: { row: Row },
+              }}
+              columns={[
+                {
+                  title: 'Name',
+                  dataIndex: 'title',
+                  key: 'title',
+                },
+                {
+                  title: 'Published',
+                  dataIndex: 'published',
+                  key: 'published',
+                  align: 'center',
+                  render: (_: string, entry: TileEntry) => {
+                    const assignment = assignments.get(entry.content_id);
+                    return (
+                      <a href={assignment?.html_url} target='_blank' rel='noopener noreferrer'>
+                        {assignment !== undefined && Boolean(assignment.published) ?
+                          <CheckCircleOutlined className='text-success' />
+                        : <CloseCircleOutlined className='text-failure' />}
+                      </a>
+                    );
+                  },
+                },
+                {
+                  title: 'Grading',
+                  dataIndex: 'grading',
+                  key: 'grading',
+                  align: 'center',
+                  render: (_: string, entry: TileEntry) => {
+                    const assignment = assignments.get(entry.content_id);
+                    if (assignment !== undefined) {
+                      return printGradingType(assignment?.grading_type);
+                    }
+                  },
+                },
+                {
+                  title: (
+                    <div className='flex w-20 place-content-center items-center justify-between'>
+                      <div>Weight</div>
+                      <div>
+                        <Tooltip title='Evenly distribute weights over entries'>
+                          <ApartmentOutlined onClick={distributeWeights} />
+                        </Tooltip>
+                      </div>
+                    </div>
+                  ),
+                  dataIndex: 'weight',
+                  key: 'weight',
+                  align: 'center',
+                  render: (_: string, entry: TileEntry) => {
+                    return (
+                      <InputNumber
+                        className='antNumberInput w-full !border border-solid !border-accent/70 !bg-surface1 hover:!border-accent hover:!bg-surface2 [&_input]:!text-text'
+                        value={entry.weight}
+                        onChange={(val) => {
+                          changeWeight(entry, val);
+                        }}
+                        formatter={(value) => `${((value ?? 0) * 100).toFixed(1)}%`}
+                        parser={(value) => parseFloat((value ?? '0').replace('%', '')) / 100}
+                        step={0.01}
+                        variant='borderless'
+                      />
+                    );
+                  },
+                },
+                {
+                  title: '',
+                  dataIndex: 'action',
+                  key: 'action',
+                  align: 'center',
+                  render: (_: string, entry: TileEntry) => {
+                    return (
+                      <DeleteFilled
+                        className='text-failure'
+                        onClick={() => {
+                          removeEntry(entry.content_id);
+                        }}
+                      />
+                    );
+                  },
+                },
+              ]}
+              pagination={false}
+              dataSource={entries}
+              rowKey='content_id'
+            />
+          </SortableContext>
+        </DndContext>
 
         <Select
-          className='[&>div]:hover:!border-accent[&_span]:!text-text [&>div]:!border-accent/70 [&>div]:!bg-surface1 [&>div]:hover:!bg-surface2 w-full [&>div]:!shadow-none'
+          className='[&>div]:hover:!border-accent[&_span]:!text-text w-full [&>div]:!border-accent/70 [&>div]:!bg-surface1 [&>div]:!shadow-none [&>div]:hover:!bg-surface2'
           dropdownClassName='bg-surface1 [&_div]:!text-text selectionSelected'
           value={selectedAssignments}
           mode='multiple'
@@ -208,10 +263,11 @@ const SelectAssignments: FC<SelectAssignmentsProps> = ({ value: entries, onChang
       </div>
     </QueryLoading>
   );
-  function distributeWeights() {
+
+  function distributeWeights(): void {
     const weight = 1 / entries.length;
     entries.forEach((entry) => (entry.weight = weight));
-    setEntries(entries);
+    setEntries([...entries]);
   }
 };
 
