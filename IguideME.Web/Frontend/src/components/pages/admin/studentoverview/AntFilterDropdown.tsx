@@ -23,10 +23,10 @@ export const useAntFilterDropdown = (dataIndex: DataType): TableColumnType<DataT
     setSearchedColumn(dataIndex);
   };
 
-  // TODO: The filters are not correctly reset when the user clicks on the reset button
-  const handleReset = (clearFilters: () => void): void => {
+  const handleReset = (clearFilters: () => void, confirm: FilterDropdownProps['confirm']): void => {
     clearFilters();
     setSearchText('');
+    confirm();
   };
 
   const getColumnSearchProps = (dataIndex: DataType): TableColumnType<DataType> => ({
@@ -63,7 +63,7 @@ export const useAntFilterDropdown = (dataIndex: DataType): TableColumnType<DataT
           </Button>
           <Button
             onClick={() => {
-              clearFilters && handleReset(clearFilters);
+              clearFilters && handleReset(clearFilters, confirm);
             }}
             size='small'
             className='custom-default-button w-20'
@@ -84,11 +84,13 @@ export const useAntFilterDropdown = (dataIndex: DataType): TableColumnType<DataT
       </div>
     ),
     filterIcon: () => <SearchOutlined className='text-text' />,
-    onFilter: (value, record) =>
-      record[dataIndex as any]
-        .toString()
-        .toLowerCase()
-        .includes((value as string).toLowerCase()),
+    onFilter: (value, record) => {
+      const searchValue = (value as string).toLowerCase();
+      return (
+        record[dataIndex as any].toString().toLowerCase().includes(searchValue) ||
+        (record as unknown as CommonData).student.userID.toString().toLowerCase().includes(searchValue)
+      );
+    },
     onFilterDropdownOpenChange: (visible) => {
       if (visible) {
         setTimeout(() => searchInput.current?.select(), 100);
@@ -102,11 +104,20 @@ export const useAntFilterDropdown = (dataIndex: DataType): TableColumnType<DataT
               highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
               searchWords={[searchText]}
               autoEscape
-              textToHighlight={text ? text.toString() : ''}
+              textToHighlight={(text as string | undefined) ? text.toString() : ''}
             />
           : text}
         </div>
-        <div className='px-2 text-xs'>{record.student.userID}</div>
+        <div className='px-2 text-xs'>
+          {searchedColumn === dataIndex ?
+            <Highlighter
+              highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+              searchWords={[searchText]}
+              autoEscape
+              textToHighlight={record.student.userID.toString()}
+            />
+          : record.student.userID}
+        </div>
       </div>
     ),
   });
