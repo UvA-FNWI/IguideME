@@ -66,7 +66,7 @@ namespace IguideME.Web.Services.Workers
         {
             List<string>[] groupedUsers = new List<string>[11];
 
-            for (int goalGrade = 1; goalGrade <= 10; goalGrade++)
+            for (int goalGrade = 0; goalGrade <= 10; goalGrade++)
             {
                 groupedUsers[goalGrade] = _databaseManager.GetUserIDsWithGoalGrade(
                     this._courseID,
