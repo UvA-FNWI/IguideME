@@ -99,11 +99,11 @@ export const getSettingsColumns = (): TableColumnsType<CommonData & SettingsData
             const consentB = b.consent === undefined ? 0 : +b.consent;
             return consentB - consentA;
           },
-          render: (value: ConsentEnum) => {
+          render: (value: ConsentEnum, record) => {
             if (value === ConsentEnum.Accepted) {
               return (
-                <Tooltip title='Consent given'>
-                  <CheckCircleOutlined className='text-success' />
+                <Tooltip title={record.goal ? 'Consent given' : 'Consent given without setting goal grade'}>
+                  <CheckCircleOutlined className={record.goal ? 'text-success' : 'text-meh'} />
                 </Tooltip>
               );
             } else if (value === ConsentEnum.Refused) {
