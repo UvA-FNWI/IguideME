@@ -198,7 +198,7 @@ app.UseLti(
             ltiConfig["AuthenticateUrl"] ?? throw new Exception("Authenticate url not set"),
         JwksUrl = ltiConfig["JwksUrl"] ?? throw new Exception("Jwks url not set"),
         SigningKey = key,
-        RedirectUrl = FRONTEND_PREFIX,
+        RedirectUrl = FRONTEND_PREFIX + "/lti",
         ClaimsMapping = p =>
         {
             string courseID;

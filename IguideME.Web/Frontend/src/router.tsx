@@ -8,6 +8,7 @@ import PermissionValidator from './components/crystals/permission-validator/perm
 import CourseSelection from './components/pages/courses-selection/CourseSelection';
 import NotFound from './components/pages/NotFound';
 import { type User } from './types/user';
+import { parseJwt } from './helpers/general';
 
 export const createRouter = (): ReturnType<typeof createBrowserRouter> =>
   createBrowserRouter(
@@ -16,6 +17,15 @@ export const createRouter = (): ReturnType<typeof createBrowserRouter> =>
         path: '/',
         element: <PermissionValidator />,
         children: [
+          {
+            path: 'lti',
+            loader: async () => {
+              const jwt = document.location.hash.slice(1);
+              const parsed = parseJwt(jwt);
+              const courseID = parsed['courseid'];
+              return redirect('/' + courseID);
+            },
+          },
           {
             path: '/',
             element: <Layout />,
