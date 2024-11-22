@@ -247,19 +247,23 @@ const SelectAssignments: FC<SelectAssignmentsProps> = ({
             render: (_: string, entry: TileEntry) => {
               return (
                 <InputNumber
+                  addonAfter='%'
                   changeOnWheel
                   className='antNumberInput w-full !border border-solid !border-accent/70 !bg-surface1 hover:!border-accent hover:!bg-surface2 [&_input]:!text-text'
                   data-no-drag
-                  value={entry.weight}
+                  value={entry.weight * 100}
                   onChange={(val) => {
-                    changeWeight(entry, val);
+                    changeWeight(entry, val ? val / 100 : 0);
                   }}
                   onFocus={(e) => {
                     e.target.select();
                   }}
-                  formatter={(value) => `${((value ?? 0) * 100).toFixed(1)}%`}
-                  parser={(value) => parseFloat((value ?? '0').replace('%', '')) / 100}
-                  step={0.01}
+                  min={0}
+                  step={0.1}
+                  parser={(value) => {
+                    return value ? parseFloat(value) : 0;
+                  }}
+                  precision={1}
                   variant='borderless'
                 />
               );
