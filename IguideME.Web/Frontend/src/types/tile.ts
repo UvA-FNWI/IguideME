@@ -40,12 +40,12 @@ export interface TileEntry {
   tile_id: number;
   title: string;
   html_url: string;
-  published: PublilshedStatus;
+  published: PublishedStatus;
   weight: number;
   content_id: number;
 }
 
-export enum PublilshedStatus {
+export enum PublishedStatus {
   NotPublished,
   LMSPublished,
   ExternalData,
@@ -56,7 +56,7 @@ export interface Assignment {
   course_id: number;
   title: string;
   html_url: string;
-  published: PublilshedStatus;
+  published: PublishedStatus;
   muted: boolean;
   due_date: number;
   max_grade: number;

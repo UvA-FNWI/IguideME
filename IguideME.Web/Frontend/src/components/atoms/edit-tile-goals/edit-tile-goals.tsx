@@ -3,7 +3,7 @@ import QueryLoading from '@/components/particles/QueryLoading';
 import { CheckOutlined, CloseOutlined, DeleteFilled } from '@ant-design/icons';
 import { Form, Input, Select, Switch, Table } from 'antd';
 import { getLearningGoals } from '@/api/entries';
-import { PublilshedStatus, type LearningGoal, type TileEntry } from '@/types/tile';
+import { PublishedStatus, type LearningGoal, type TileEntry } from '@/types/tile';
 import { useDrawerStore } from '@/components/crystals/tile-group-board/useDrawerStore';
 import { useQuery } from '@tanstack/react-query';
 import { useCallback, useState, type FC, type ReactElement } from 'react';
@@ -67,7 +67,7 @@ const TileGoalsSelect: FC<TileGoalsSelectProps> = ({ goals, value: entries, onCh
           return {
             title: goal ? goal.title : 'No title found',
             html_url: '',
-            published: PublilshedStatus.ExternalData,
+            published: PublishedStatus.ExternalData,
             tile_id: -1, // Set the correct id on the backend
             weight: 0,
             content_id: id,
@@ -126,7 +126,7 @@ const TileGoalsSelect: FC<TileGoalsSelectProps> = ({ goals, value: entries, onCh
       />
 
       <Select
-        className='[&>div]:!border-accent/70 [&>div]:!bg-surface1 [&>div]:hover:!border-accent [&>div]:hover:!bg-surface2 [&_span]:!text-text w-full [&>div]:!shadow-none'
+        className='w-full [&>div]:!border-accent/70 [&>div]:!bg-surface1 [&>div]:!shadow-none [&>div]:hover:!border-accent [&>div]:hover:!bg-surface2 [&_span]:!text-text'
         dropdownClassName='bg-surface1 [&_div]:!text-text selectionSelected'
         value={selectedGoals}
         mode='multiple'

@@ -2,10 +2,12 @@ import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
 import {
   ApartmentOutlined,
-  CheckCircleOutlined,
-  CloseCircleOutlined,
+  BuildOutlined,
+  CloudOutlined,
   DeleteFilled,
+  EyeInvisibleOutlined,
   MenuOutlined,
+  QuestionCircleOutlined,
 } from '@ant-design/icons';
 import { getAssignments } from '@/api/entries';
 import { InputNumber, Select, Table, Tooltip } from 'antd';
@@ -20,7 +22,7 @@ import {
   type HTMLAttributes,
   type ReactElement,
 } from 'react';
-import { PublilshedStatus, type Assignment, type TileEntry } from '@/types/tile';
+import { PublishedStatus, type Assignment, type TileEntry } from '@/types/tile';
 import { printGradingType } from '@/types/grades';
 import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { DndContext, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
@@ -153,7 +155,7 @@ const SelectAssignments: FC<SelectAssignmentsProps> = ({
           return {
             title: ass ? ass.title : 'No title found',
             html_url: ass ? ass.html_url : '',
-            published: ass?.published ?? PublilshedStatus.NotPublished,
+            published: ass?.published ?? PublishedStatus.NotPublished,
             tile_id: -1, // Set the correct id on the backend
             weight: existingEntry?.weight ?? 0,
             content_id: id,
@@ -211,9 +213,23 @@ const SelectAssignments: FC<SelectAssignmentsProps> = ({
               const assignment = assignments.get(entry.content_id);
               return (
                 <a href={assignment?.html_url} target='_blank' rel='noopener noreferrer'>
-                  {assignment !== undefined && Boolean(assignment.published) ?
-                    <CheckCircleOutlined className='text-success' />
-                  : <CloseCircleOutlined className='text-failure' />}
+                  {assignment !== undefined ?
+                    assignment.published === PublishedStatus.LMSPublished ?
+                      <Tooltip title='Published on LMS'>
+                        <CloudOutlined className='text-text' />
+                      </Tooltip>
+                    : assignment.published === PublishedStatus.ExternalData ?
+                      <Tooltip title='External data'>
+                        <BuildOutlined className='text-text' />
+                      </Tooltip>
+                    : <Tooltip title='Not published'>
+                        <EyeInvisibleOutlined className='text-failure' />
+                      </Tooltip>
+
+                  : <Tooltip title='Unknown'>
+                      <QuestionCircleOutlined className='text-failure' />
+                    </Tooltip>
+                  }
                 </a>
               );
             },

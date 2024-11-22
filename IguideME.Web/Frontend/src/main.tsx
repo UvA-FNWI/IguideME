@@ -61,7 +61,7 @@ enableMocking()
         </StrictMode>,
       );
     },
-    () => {
-      console.error('Setup unsuccesful');
+    (error) => {
+      console.error('Setup unsuccessful', error);
     },
   );
