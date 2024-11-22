@@ -1,4 +1,3 @@
-import { Row } from 'antd';
 import { type FC, type PropsWithChildren, type ReactElement } from 'react';
 
 interface Props {
@@ -10,9 +9,7 @@ const GroupView: FC<PropsWithChildren<Props>> = ({ title, children }): ReactElem
       <div className='m-3'>
         <h2 className='overflow-hidden text-ellipsis whitespace-nowrap text-center text-lg font-bold'>{title}</h2>
       </div>
-      <Row className='my-[10px justify-evenly' gutter={[10, 78]}>
-        {children}
-      </Row>
+      <div className='flex flex-wrap justify-center gap-8'>{children}</div>
     </div>
   );
 };
