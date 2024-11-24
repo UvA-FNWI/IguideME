@@ -109,6 +109,7 @@ namespace IguideME.Web.Services.Workers
                 // We register the internal assignmentID in the submission entity, this is to support external data
                 foreach (AssignmentSubmission sub in submissions)
                 {
+                    _logger.LogInformation("submission: {} {}", sub.UserID, sub.RawGrade);
                     if (sub.AssignmentID == assignment.ExternalID)
                     {
                         sub.AssignmentID = assignment.ID;

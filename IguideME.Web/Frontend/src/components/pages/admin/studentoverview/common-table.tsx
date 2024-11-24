@@ -33,6 +33,7 @@ const CommonTable: FC<Props> = ({ type }): ReactElement => {
     queryKey: ['students', 'settings'],
     queryFn: getStudentsWithSettings,
   });
+  console.log('Students', students);
 
   const {
     data: notifications,
@@ -63,6 +64,7 @@ const CommonTable: FC<Props> = ({ type }): ReactElement => {
     queryFn: async () => await getAllUserTileGrades(),
     enabled: type === GradeTableType.tile,
   });
+  console.log('Tile grades', tileGrades);
 
   const {
     data: entryGrades,
@@ -73,6 +75,7 @@ const CommonTable: FC<Props> = ({ type }): ReactElement => {
     queryFn: async () => await getAllEntryGrades(),
     enabled: type === GradeTableType.entry,
   });
+  console.log('Entry grades', entryGrades);
 
   const columns = [
     {
