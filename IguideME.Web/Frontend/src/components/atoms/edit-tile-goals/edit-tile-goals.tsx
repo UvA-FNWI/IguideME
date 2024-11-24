@@ -1,7 +1,7 @@
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
-import { CheckOutlined, CloseOutlined, DeleteFilled } from '@ant-design/icons';
-import { Form, Input, Select, Switch, Table } from 'antd';
+import { DeleteFilled } from '@ant-design/icons';
+import { Form, Input, Select, Table } from 'antd';
 import { getLearningGoals } from '@/api/entries';
 import { PublishedStatus, type LearningGoal, type TileEntry } from '@/types/tile';
 import { useDrawerStore } from '@/components/crystals/tile-group-board/useDrawerStore';
@@ -22,11 +22,6 @@ const EditTileGoals: FC = (): ReactElement => {
         <Input type='hidden' />
       </Form.Item>
       <p className='mb-1'>Goals:</p>
-      <div className='col-span-2'>
-        <Form.Item name='alt' noStyle valuePropName='checked'>
-          <Switch className='float-end' checkedChildren={<CheckOutlined />} unCheckedChildren={<CloseOutlined />} />
-        </Form.Item>
-      </div>
       <div className='col-span-3'>
         <QueryLoading isLoading={isLoading}>
           <Form.Item name='entries' className='m-0 w-full'>
