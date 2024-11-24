@@ -5,7 +5,7 @@ import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
 import Swal from 'sweetalert2';
 import { arrayMove, SortableContext } from '@dnd-kit/sortable';
-import { Button, Drawer, Row } from 'antd';
+import { App, Button, Drawer, Row } from 'antd';
 import { createPortal } from 'react-dom';
 import { getTileGroups, getTiles, patchTile, patchTileGroupOrder, patchTileOrder, postTileGroup } from '@/api/tiles';
 import { PlusOutlined } from '@ant-design/icons';
@@ -47,32 +47,134 @@ const TileGroupBoard: FC = (): ReactElement => {
 
   const { isChanged, setIsChanged, editTitle, setEditTile } = useDrawerStore();
 
+  const { message } = App.useApp();
   const queryClient = useQueryClient();
+
   const { mutate: postGroup } = useMutation({
     mutationFn: postTileGroup,
+
+    onMutate: () => {
+      void message.open({
+        key: 'group-add',
+        type: 'loading',
+        content: 'Adding tile group...',
+      });
+    },
+
+    onError: () => {
+      void message.open({
+        key: 'group-add',
+        type: 'error',
+        content: 'Error adding tile group',
+        duration: 3,
+      });
+    },
+
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['tile-groups'] });
+
+      void message.open({
+        key: 'group-add',
+        type: 'success',
+        content: 'Tile group added successfully',
+        duration: 3,
+      });
     },
   });
 
   const { mutate: updateTileGroupOrder } = useMutation({
     mutationFn: patchTileGroupOrder,
+
+    onMutate: () => {
+      void message.open({
+        key: 'group-order',
+        type: 'loading',
+        content: 'Saving group order...',
+      });
+    },
+
+    onError: () => {
+      void message.open({
+        key: 'group-order',
+        type: 'error',
+        content: 'Error saving group order',
+        duration: 3,
+      });
+    },
+
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['tile-groups'] });
+
+      void message.open({
+        key: 'group-order',
+        type: 'success',
+        content: 'Group order saved successfully',
+        duration: 3,
+      });
     },
   });
 
   const { mutate: updateTileOrder } = useMutation({
     mutationFn: patchTileOrder,
+
+    onMutate: () => {
+      void message.open({
+        key: 'tile-order',
+        type: 'loading',
+        content: 'Saving tile order...',
+      });
+    },
+
+    onError: () => {
+      void message.open({
+        key: 'tile-order',
+        type: 'error',
+        content: 'Error saving tile order',
+        duration: 3,
+      });
+    },
+
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['tiles'] });
+
+      void message.open({
+        key: 'tile-order',
+        type: 'success',
+        content: 'Tile order saved successfully',
+        duration: 3,
+      });
     },
   });
 
   const { mutate: updateTile } = useMutation({
     mutationFn: patchTile,
+
+    onMutate: () => {
+      void message.open({
+        key: 'tile-move',
+        type: 'loading',
+        content: 'Moving tile...',
+      });
+    },
+
+    onError: () => {
+      void message.open({
+        key: 'tile-move',
+        type: 'error',
+        content: 'Error moving tile',
+        duration: 3,
+      });
+    },
+
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['tiles'] });
+
+      void message.open({
+        key: 'tile-move',
+        type: 'success',
+        content: 'Tile moved successfully',
+        duration: 3,
+      });
     },
   });
 

@@ -504,6 +504,14 @@ textarea:not([rows]) {
       }
     }
   }
+
+  input {
+    color: hsl(var(--text)) !important;
+  }
+
+  input::placeholder {
+    color: hsl(var(--text)) !important;
+  }
 }
 
 .custom-slider {

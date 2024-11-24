@@ -1,7 +1,7 @@
 import AdminTitle from '@/components/atoms/admin-titles/admin-titles';
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
-import { Button, Divider, Form, Input, InputNumber, Select } from 'antd';
+import { App, Button, Divider, Form, Input, InputNumber, Select } from 'antd';
 import { DeleteFilled, PlusOutlined } from '@ant-design/icons';
 import {
   deleteLearningGoal,
@@ -13,7 +13,6 @@ import {
   postGoalRequirement,
   postLearningGoal,
 } from '@/api/entries';
-import { toast } from 'sonner';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { LogicalExpression, type GoalRequirement, type LearningGoal } from '@/types/tile';
 import { useEffect, type FC, type ReactElement } from 'react';
@@ -38,11 +37,37 @@ const LearningGoals: FC = (): ReactElement => {
     queryFn: getLearningGoals,
   });
 
+  const { message } = App.useApp();
   const queryClient = useQueryClient();
   const { mutate: postGoal } = useMutation({
     mutationFn: postLearningGoal,
+
+    onMutate: () => {
+      void message.open({
+        key: 'goal-add',
+        type: 'loading',
+        content: 'Adding learning goal...',
+      });
+    },
+
+    onError: () => {
+      void message.open({
+        key: 'goal-add',
+        type: 'error',
+        content: 'Error adding learning goal',
+        duration: 3,
+      });
+    },
+
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['learning-goals'] });
+
+      void message.open({
+        key: 'goal-add',
+        type: 'success',
+        content: 'Learning goal added successfully',
+        duration: 3,
+      });
     },
   });
 
@@ -88,24 +113,101 @@ const LearningGoals: FC = (): ReactElement => {
 };
 
 const ViewLearningGoal: FC<GoalProps> = ({ goal }): ReactElement => {
+  const { message } = App.useApp();
   const queryClient = useQueryClient();
+
   const { mutate: patchGoal } = useMutation({
     mutationFn: patchLearningGoal,
+
+    onMutate: () => {
+      void message.open({
+        key: 'goal-title',
+        type: 'loading',
+        content: 'Saving title...',
+      });
+    },
+
+    onError: () => {
+      void message.open({
+        key: 'goal-title',
+        type: 'error',
+        content: 'Error saving title',
+        duration: 3,
+      });
+    },
+
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['learning-goals'] });
+
+      void message.open({
+        key: 'goal-title',
+        type: 'success',
+        content: 'Title saved successfully',
+        duration: 3,
+      });
     },
   });
   const { mutate: removeGoal } = useMutation({
     mutationFn: deleteLearningGoal,
+
+    onMutate: () => {
+      void message.open({
+        key: 'goal-delete',
+        type: 'loading',
+        content: 'Deleting learning goal...',
+      });
+    },
+
+    onError: () => {
+      void message.open({
+        key: 'goal-delete',
+        type: 'error',
+        content: 'Error deleting learning goal',
+        duration: 3,
+      });
+    },
+
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['learning-goals'] });
+
+      void message.open({
+        key: 'goal-delete',
+        type: 'success',
+        content: 'Learning goal deleted successfully',
+        duration: 3,
+      });
     },
   });
 
   const { mutate: postRequirement } = useMutation({
     mutationFn: postGoalRequirement,
+
+    onMutate: () => {
+      void message.open({
+        key: 'requirement-add',
+        type: 'loading',
+        content: 'Adding requirement...',
+      });
+    },
+
+    onError: () => {
+      void message.open({
+        key: 'requirement-add',
+        type: 'error',
+        content: 'Error adding requirement',
+        duration: 3,
+      });
+    },
+
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['learning-goals'] });
+
+      void message.open({
+        key: 'requirement-add',
+        type: 'success',
+        content: 'Requirement added successfully',
+        duration: 3,
+      });
     },
   });
 
@@ -166,43 +268,71 @@ const ViewGoalRequirement: FC<ReqProps> = ({ requirement }): ReactElement => {
     queryFn: getAssignments,
   });
 
-  const { mutate: saveRequirement, status: saveStatus } = useMutation({
+  const { message } = App.useApp();
+
+  const { mutate: saveRequirement } = useMutation({
     mutationFn: patchGoalRequirement,
+
+    onMutate: () => {
+      void message.open({
+        key: 'requirement-save',
+        type: 'loading',
+        content: 'Saving requirement...',
+      });
+    },
+
+    onError: () => {
+      void message.open({
+        key: 'requirement-save',
+        type: 'error',
+        content: 'Error saving requirement',
+        duration: 3,
+      });
+    },
+
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['learning-goals'] });
+
+      void message.open({
+        key: 'requirement-save',
+        type: 'success',
+        content: 'Requirement saved successfully',
+        duration: 3,
+      });
     },
   });
 
-  const { mutate: removeRequirement, status: deleteStatus } = useMutation({
+  const { mutate: removeRequirement } = useMutation({
     mutationFn: deleteRequirement,
+
+    onMutate: () => {
+      void message.open({
+        key: 'requirement-delete',
+        type: 'loading',
+        content: 'Deleting requirement...',
+      });
+    },
+
+    onError: () => {
+      void message.open({
+        key: 'requirement-delete',
+        type: 'error',
+        content: 'Error deleting requirement',
+        duration: 3,
+      });
+    },
+
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['learning-goals'] });
+
+      void message.open({
+        key: 'requirement-delete',
+        type: 'success',
+        content: 'Requirement deleted successfully',
+        duration: 3,
+      });
     },
   });
-
-  useEffect(() => {
-    if (saveStatus === 'success') {
-      toast.success('Requirement saved successfully', {
-        closeButton: true,
-      });
-    } else if (saveStatus === 'error') {
-      toast.error('Error saving requirement', {
-        closeButton: true,
-      });
-    }
-  }, [saveStatus]);
-
-  useEffect(() => {
-    if (deleteStatus === 'success') {
-      toast.success('Requirement deleted successfully', {
-        closeButton: true,
-      });
-    } else if (deleteStatus === 'error') {
-      toast.error('Error deleting requirement', {
-        closeButton: true,
-      });
-    }
-  }, [deleteStatus]);
 
   const [form] = Form.useForm<GoalRequirement>();
   useEffect(() => {

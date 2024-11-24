@@ -15,7 +15,7 @@ import { type User } from '@/types/user';
 import { useRequiredParams } from '@/utils/params';
 import { PlusOutlined } from '@ant-design/icons';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Button, Card } from 'antd';
+import { App, Button, Card } from 'antd';
 import { useState, type FC, type ReactElement } from 'react';
 import AssignmentSettingsForm from './assignment-settings-form';
 import Swal from 'sweetalert2';
@@ -50,11 +50,37 @@ const Wizard: FC = (): ReactElement => {
     queryFn: async () => await getStudentsByCourse(courseId),
   });
 
+  const { message } = App.useApp();
   const queryClient = useQueryClient();
   const { mutate: postAssignment } = useMutation({
     mutationFn: postExternalAssignment,
+
+    onMutate: () => {
+      void message.open({
+        key: 'external-assignment',
+        type: 'loading',
+        content: 'Adding external assignment...',
+      });
+    },
+
+    onError: () => {
+      void message.open({
+        key: 'external-assignment',
+        type: 'error',
+        content: 'Error adding external assignment',
+        duration: 3,
+      });
+    },
+
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['external-assignments'] });
+
+      void message.open({
+        key: 'external-assignment',
+        type: 'success',
+        content: 'External assignment added successfully',
+        duration: 3,
+      });
     },
   });
 
@@ -112,18 +138,69 @@ interface ViewExternalAssignmentProps {
 const ViewExternalAssignment: FC<ViewExternalAssignmentProps> = ({ assignment, students }): ReactElement => {
   const [uploadMenuOpen, setUploadMenuOpen] = useState<boolean>(false);
 
+  const { message } = App.useApp();
   const queryClient = useQueryClient();
   const { mutate: patchExternalAssignment } = useMutation({
     mutationFn: patchExternalAssignmentTitle,
+
+    onMutate: () => {
+      void message.open({
+        key: 'external-assignment-patch',
+        type: 'loading',
+        content: 'Saving title...',
+      });
+    },
+
+    onError: () => {
+      void message.open({
+        key: 'external-assignment-patch',
+        type: 'error',
+        content: 'Error saving title',
+        duration: 3,
+      });
+    },
+
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['external-assignments'] });
+
+      void message.open({
+        key: 'external-assignment-patch',
+        type: 'success',
+        content: 'Title saved successfully',
+        duration: 3,
+      });
     },
   });
 
   const { mutate: deleteExternalAss } = useMutation({
     mutationFn: deleteExternalAssignment,
+
+    onMutate: () => {
+      void message.open({
+        key: 'external-assignment-delete',
+        type: 'loading',
+        content: 'Deleting external assignment...',
+      });
+    },
+
+    onError: () => {
+      void message.open({
+        key: 'external-assignment-delete',
+        type: 'error',
+        content: 'Error deleting external assignment',
+        duration: 3,
+      });
+    },
+
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['external-assignments'] });
+
+      void message.open({
+        key: 'external-assignment-delete',
+        type: 'success',
+        content: 'External assignment deleted successfully',
+        duration: 3,
+      });
     },
   });
 

@@ -6,10 +6,9 @@ import { ConsentEnum, type User, UserRoles } from '@/types/user';
 import { ActionTypes, trackEvent } from '@/utils/analytics';
 import { useRequiredParams } from '@/utils/params';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Checkbox, Collapse, Radio, Switch } from 'antd';
+import { App, Checkbox, Collapse, Radio, Switch } from 'antd';
 import { type FC, type ReactElement, useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
-import { toast } from 'sonner';
 
 const StudentSettings: FC = (): ReactElement => {
   const { courseId, studentId } = useRequiredParams(['courseId', 'studentId']);
@@ -61,11 +60,37 @@ interface NotificationProps {
 }
 
 const Notifications: FC<NotificationProps> = ({ notifications, user }): ReactElement => {
+  const { message } = App.useApp();
   const queryClient = useQueryClient();
-  const { mutate: saveNotifications, status } = useMutation({
+  const { mutate: saveNotifications } = useMutation({
     mutationFn: postNotificationSettings,
+
+    onMutate: () => {
+      void message.open({
+        key: 'notifications',
+        type: 'loading',
+        content: 'Saving notification settings...',
+      });
+    },
+
+    onError: () => {
+      void message.open({
+        key: 'notifications',
+        type: 'error',
+        content: 'Error saving notification settings',
+        duration: 3,
+      });
+    },
+
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['self'] });
+
+      void message.open({
+        key: 'notifications',
+        type: 'success',
+        content: 'Notification settings saved successfully',
+        duration: 3,
+      });
 
       trackEvent({
         userID: user.userID,
@@ -77,14 +102,6 @@ const Notifications: FC<NotificationProps> = ({ notifications, user }): ReactEle
       });
     },
   });
-
-  useEffect(() => {
-    if (status === 'success') {
-      toast.success(`Successfully ${notifications ? 'enabled' : 'disabled'} your notifications.`, {
-        closeButton: true,
-      });
-    }
-  }, [status]);
 
   return (
     <div>
@@ -111,21 +128,39 @@ interface GoalProps {
 const GoalGrade: FC<GoalProps> = ({ goalGrade, user }): ReactElement => {
   const [currentGoalGrade, setCurrentGoalGrade] = useState<number>(goalGrade);
 
+  const { message } = App.useApp();
   const queryClient = useQueryClient();
-  const { mutate: saveGoalGrade, status } = useMutation({
+  const { mutate: saveGoalGrade } = useMutation({
     mutationFn: postGoalGrade,
+
+    onMutate: () => {
+      void message.open({
+        key: 'goal',
+        type: 'loading',
+        content: 'Saving goal grade...',
+      });
+    },
+
+    onError: () => {
+      void message.open({
+        key: 'goal',
+        type: 'error',
+        content: 'Error saving goal grade',
+        duration: 3,
+      });
+    },
+
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['self'] });
+
+      void message.open({
+        key: 'goal',
+        type: 'success',
+        content: 'Goal grade saved successfully',
+        duration: 3,
+      });
     },
   });
-
-  useEffect(() => {
-    if (status === 'success') {
-      toast.success(`Successfully updated your goal grade to ${goalGrade}.`, {
-        closeButton: true,
-      });
-    }
-  }, [status]);
 
   return (
     <div id='desiredGrade'>
@@ -163,21 +198,39 @@ interface ConsentProps {
   consent: ConsentEnum;
 }
 const Consent: FC<ConsentProps> = ({ consent }): ReactElement => {
+  const { message } = App.useApp();
   const queryClient = useQueryClient();
-  const { mutate: saveConsent, status } = useMutation({
+  const { mutate: saveConsent } = useMutation({
     mutationFn: postConsentSettings,
+
+    onMutate: () => {
+      void message.open({
+        key: 'consent',
+        type: 'loading',
+        content: 'Saving consent settings...',
+      });
+    },
+
+    onError: () => {
+      void message.open({
+        key: 'consent',
+        type: 'error',
+        content: 'Error saving consent settings',
+        duration: 3,
+      });
+    },
+
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['self'] });
+
+      void message.open({
+        key: 'consent',
+        type: 'success',
+        content: 'Consent settings saved successfully',
+        duration: 3,
+      });
     },
   });
-
-  useEffect(() => {
-    if (status === 'success') {
-      toast.success(`Successfully ${consent ? 'registered' : 'withdrawn'} your consent.`, {
-        closeButton: true,
-      });
-    }
-  }, [status]);
 
   return (
     <div>

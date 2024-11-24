@@ -7,6 +7,7 @@ import { RouterProvider } from 'react-router-dom';
 import NextThemesProvider from './components/crystals/ThemeSwitcher/NextThemesProvider.tsx';
 import './globals.css';
 import { createRouter } from './router.tsx';
+import { App } from 'antd';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -42,10 +43,9 @@ enableMocking()
   .then(
     () => {
       // Routing for the frontend. This is separate from the routing on the backend.
-      // Routes that end with /> are endpoints but routes that have other routes listed before </Route>
-      // will have those routes render within an Outlet component.
-      ReactDOM.createRoot(document.getElementById('root')!).render(
-        <StrictMode>
+      const rootElement = document.getElementById('root');
+      if (rootElement) {
+        const AppContent = (
           <QueryClientProvider client={queryClient}>
             <NextThemesProvider
               attribute='class'
@@ -54,12 +54,24 @@ enableMocking()
               enableSystem
               themes={['light', 'dark']}
             >
-              <RouterProvider router={createRouter()} />
+              <App
+                message={{
+                  maxCount: 3,
+                }}
+              >
+                <RouterProvider router={createRouter()} />
+              </App>
             </NextThemesProvider>
             {import.meta.env.MODE === 'mock' && <ReactQueryDevtools initialIsOpen={false} />}
           </QueryClientProvider>
-        </StrictMode>,
-      );
+        );
+
+        ReactDOM.createRoot(rootElement).render(
+          import.meta.env.MODE !== 'production' ? <StrictMode>{AppContent}</StrictMode> : AppContent,
+        );
+      } else {
+        console.error('Root element not found');
+      }
     },
     (error) => {
       console.error('Setup unsuccessful', error);

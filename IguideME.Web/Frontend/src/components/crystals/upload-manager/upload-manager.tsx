@@ -3,7 +3,7 @@ import { type Assignment } from '@/types/tile';
 import type { User } from '@/types/user';
 import { DownOutlined, QuestionCircleOutlined, RightOutlined } from '@ant-design/icons';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Button, Col, InputNumber, Row, Tooltip } from 'antd';
+import { App, Button, Col, InputNumber, Row, Tooltip } from 'antd';
 import { useState, type FC } from 'react';
 import CSVReader from 'react-csv-reader';
 import UploadEditor from './upload-editor';
@@ -57,11 +57,37 @@ const UploadManager: FC<UploadManagerProps> = ({ assignment, closeUploadMenu, st
     return data.length > 1;
   };
 
+  const { message } = App.useApp();
   const queryClient = useQueryClient();
   const { mutate: upload, isPending } = useMutation({
     mutationFn: uploadData,
+
+    onMutate: () => {
+      void message.open({
+        key: 'upload',
+        type: 'loading',
+        content: 'Uploading data...',
+      });
+    },
+
+    onError: () => {
+      void message.open({
+        key: 'upload',
+        type: 'error',
+        content: 'Error uploading data',
+        duration: 3,
+      });
+    },
+
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['external-assignments'] });
+
+      void message.open({
+        key: 'upload',
+        type: 'success',
+        content: 'Data uploaded successfully',
+        duration: 3,
+      });
     },
   });
 

@@ -3,7 +3,7 @@ import EditTileDiscussions from '@/components/atoms/edit-tile-discussions/edit-t
 import EditTileGoals from '@/components/atoms/edit-tile-goals/edit-tile-goals';
 import Swal from 'sweetalert2';
 import { BellOutlined, CheckCircleOutlined, StopOutlined } from '@ant-design/icons';
-import { Button, Form, Input, Select } from 'antd';
+import { App, Button, Form, Input, Select } from 'antd';
 import { deleteTile, patchTile } from '@/api/tiles';
 import { useDrawerStore } from '../tile-group-board/useDrawerStore';
 import { useForm, useWatch } from 'antd/es/form/Form';
@@ -27,17 +27,69 @@ const EditTile: FC<Props> = ({ tile }): ReactElement => {
     setEditTile: state.setEditTile,
   }));
 
+  const { message } = App.useApp();
+
   const { mutate: saveTile } = useMutation({
     mutationFn: patchTile,
+
+    onMutate: () => {
+      void message.open({
+        key: 'tile-save',
+        type: 'loading',
+        content: 'Saving tile...',
+      });
+    },
+
+    onError: () => {
+      void message.open({
+        key: 'tile-save',
+        type: 'error',
+        content: 'Error saving tile',
+        duration: 3,
+      });
+    },
+
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['tiles'] });
+
+      void message.open({
+        key: 'tile-save',
+        type: 'success',
+        content: 'Tile saved successfully',
+        duration: 3,
+      });
     },
   });
 
   const { mutate: removeTile } = useMutation({
     mutationFn: deleteTile,
+
+    onMutate: () => {
+      void message.open({
+        key: 'tile-remove',
+        type: 'loading',
+        content: 'Removing tile...',
+      });
+    },
+
+    onError: () => {
+      void message.open({
+        key: 'tile-remove',
+        type: 'error',
+        content: 'Error removing tile',
+        duration: 3,
+      });
+    },
+
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['tiles'] });
+
+      void message.open({
+        key: 'tile-remove',
+        type: 'success',
+        content: 'Tile removed successfully',
+        duration: 3,
+      });
     },
   });
 

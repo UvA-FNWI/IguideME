@@ -13,7 +13,7 @@ import {
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Col, Row, Space, Tooltip } from 'antd';
+import { App, Col, Row, Space, Tooltip } from 'antd';
 import { useMemo, type FC, type ReactElement } from 'react';
 import Swal from 'sweetalert2';
 import { useDrawerStore } from '../tile-group-board/useDrawerStore';
@@ -24,18 +24,69 @@ interface Props {
 }
 
 const AdminTileView: FC<Props> = ({ tile, move }): ReactElement => {
+  const { message } = App.useApp();
   const queryClient = useQueryClient();
   const { mutate: removeTile } = useMutation({
     mutationFn: deleteTile,
+
+    onMutate: () => {
+      void message.open({
+        key: 'tile-remove',
+        type: 'loading',
+        content: 'Removing tile...',
+      });
+    },
+
+    onError: () => {
+      void message.open({
+        key: 'tile-remove',
+        type: 'error',
+        content: 'Error removing tile',
+        duration: 3,
+      });
+    },
+
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['tiles'] });
+
+      void message.open({
+        key: 'tile-remove',
+        type: 'success',
+        content: 'Tile removed successfully',
+        duration: 3,
+      });
     },
   });
 
   const { mutate: updateTile } = useMutation({
     mutationFn: patchTile,
+
+    onMutate: () => {
+      void message.open({
+        key: 'tile-update',
+        type: 'loading',
+        content: 'Updating tile...',
+      });
+    },
+
+    onError: () => {
+      void message.open({
+        key: 'tile-update',
+        type: 'error',
+        content: 'Error updating tile',
+        duration: 3,
+      });
+    },
+
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['tiles'] });
+
+      void message.open({
+        key: 'tile-update',
+        type: 'success',
+        content: 'Tile updated successfully',
+        duration: 3,
+      });
     },
   });
 

@@ -1,6 +1,6 @@
 import styles from './syncclock.module.css';
 import Swal from 'sweetalert2';
-import { Button } from 'antd';
+import { App, Button } from 'antd';
 import { cn } from '@/utils/cn';
 import { getRelativeTimeTimer } from '@/helpers/time';
 import { JobStatus } from '@/types/synchronization';
@@ -8,6 +8,7 @@ import { pollSync, startNewSync, stopCurrentSync } from '@/api/syncing';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTheme } from 'next-themes';
 import { type FC, type ReactElement, useEffect, useState } from 'react';
+import { WarningOutlined } from '@ant-design/icons';
 
 const SyncClock: FC = (): ReactElement => {
   const { theme } = useTheme();
@@ -20,12 +21,29 @@ const SyncClock: FC = (): ReactElement => {
     elapsed = getRelativeTimeTimer(startTime, Date.now());
   }
 
+  const { notification } = App.useApp();
   const { mutate: initiateSync } = useMutation({
     mutationFn: startNewSync,
+
+    onMutate: () => {
+      notification.open({
+        key: 'sync',
+        message: 'Synchronization started',
+        description: 'Please wait while the synchronization is in progress. IguideME is unusable during this time.',
+        icon: <WarningOutlined className='text-orange-500' />,
+        placement: 'top',
+        showProgress: true,
+        duration: 10,
+      });
+    },
   });
 
   const { mutate: abortSync } = useMutation({
     mutationFn: stopCurrentSync,
+
+    onSuccess: () => {
+      notification.destroy('sync');
+    },
   });
 
   const { data, isError } = useQuery({

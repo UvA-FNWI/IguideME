@@ -3,7 +3,7 @@ import { getStudentsWithSettings } from '@/api/users';
 import type { User } from '@/types/user';
 import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Button, Col, Divider, Row, Space, Switch } from 'antd';
+import { App, Button, Col, Divider, Row, Space, Switch } from 'antd';
 import { useEffect, useState, type FC, type ReactElement } from 'react';
 import Swal from 'sweetalert2';
 
@@ -23,6 +23,7 @@ const AcceptListSettings: FC = (): ReactElement => {
     isLoading: acceptedLoading,
   } = useQuery({ queryKey: ['acceptedStudents'], queryFn: getAcceptedStudents });
 
+  const { message } = App.useApp();
   const queryClient = useQueryClient();
   const {
     mutate: setAcceptedStudentsRoute,
@@ -30,8 +31,33 @@ const AcceptListSettings: FC = (): ReactElement => {
     status,
   } = useMutation({
     mutationFn: postAcceptedStudents,
+
+    onMutate: () => {
+      void message.open({
+        key: 'accepted',
+        type: 'loading',
+        content: 'Saving accepted students...',
+      });
+    },
+
+    onError: () => {
+      void message.open({
+        key: 'accepted',
+        type: 'error',
+        content: 'Error saving accepted students',
+        duration: 3,
+      });
+    },
+
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['acceptedStudents'] });
+
+      void message.open({
+        key: 'accepted',
+        type: 'success',
+        content: 'Accepted students saved successfully',
+        duration: 3,
+      });
     },
   });
 
@@ -135,7 +161,7 @@ const AcceptListSettings: FC = (): ReactElement => {
           Random assign
         </Button>
         <Button
-          className='bg-success hover:!bg-success/80 [&_span]:text-text min-w-20 !border-none hover:!border-none'
+          className='min-w-20 !border-none bg-success hover:!border-none hover:!bg-success/80 [&_span]:text-text'
           disabled={isPending}
           onClick={() => {
             setAcceptedStudentsRoute(acceptedStudents.map((s) => ({ userID: s.userID, accepted: true })));
@@ -154,7 +180,7 @@ const AcceptListSettings: FC = (): ReactElement => {
             .map((student: User) => (
               <Col xs={12} md={8} lg={6} xl={4} key={student.userID}>
                 <div
-                  className={`py-[5px] ${isObjectInArray(student, acceptedStudents) ? 'text-primary font-bold' : ''}`}
+                  className={`py-[5px] ${isObjectInArray(student, acceptedStudents) ? 'font-bold text-primary' : ''}`}
                   onClick={() => {
                     if (isObjectInArray(student, acceptedStudents)) {
                       setAcceptedStudents(acceptedStudents.filter((s) => s.userID !== student.userID));

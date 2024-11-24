@@ -3,11 +3,10 @@ import { getSelf } from '@/api/users';
 import { ConsentText, GoalGrade } from '@/components/pages/student-settings/student-settings';
 import { ConsentEnum, UserRoles } from '@/types/user';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Button, Collapse } from 'antd';
-import { useEffect, type FC, type ReactElement } from 'react';
+import { App, Button, Collapse } from 'antd';
+import { type FC, type ReactElement } from 'react';
 import { Loading as LoadingDots } from 'react-loading-dot';
 import { Outlet } from 'react-router-dom';
-import { toast } from 'sonner';
 
 const IguideMELoading: FC = () => {
   return (
@@ -39,19 +38,39 @@ const PermissionValidator: FC = (): ReactElement => {
   //   queryFn: async () => await getStudentAcceptStatus(self ? self.userID : ''),
   // });
 
+  const { message } = App.useApp();
   const queryClient = useQueryClient();
-  const { mutate: saveConsent, status } = useMutation({
+  const { mutate: saveConsent } = useMutation({
     mutationFn: postConsentSettings,
+
+    onMutate: () => {
+      void message.open({
+        key: 'consent',
+        type: 'loading',
+        content: 'Saving consent settings...',
+      });
+    },
+
+    onError: () => {
+      void message.open({
+        key: 'consent',
+        type: 'error',
+        content: 'Error saving consent settings',
+        duration: 3,
+      });
+    },
+
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['self'] });
+
+      void message.open({
+        key: 'consent',
+        type: 'success',
+        content: 'Consent settings saved successfully',
+        duration: 3,
+      });
     },
   });
-
-  useEffect(() => {
-    if (status === 'error') {
-      toast.error('Failed to save consent settings');
-    }
-  }, [status]);
 
   if (selfLoading) {
     return <IguideMELoading />;
@@ -93,14 +112,14 @@ const PermissionValidator: FC = (): ReactElement => {
         />
         <ul className='list-inside list-disc'>
           <li>
-            By choosing "Yes" in this form, I declare that I have read the document entitled “informed consent
+            By choosing &quot;Yes&quot; in this form, I declare that I have read the document entitled “informed consent
             IguideME”, understood it, and consent to my personal data being processed for the purposes stated in the
             consent form.
           </li>
           <li>
-            By choosing "No" in the form, I declare that I have read the document entitled “informed consent IguideME”,
-            understood it, and do not consent to my personal data being processed for the purposes stated in the consent
-            form.
+            By choosing &quot;No&quot; in the form, I declare that I have read the document entitled “informed consent
+            IguideME”, understood it, and do not consent to my personal data being processed for the purposes stated in
+            the consent form.
           </li>
         </ul>
 

@@ -1,6 +1,6 @@
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
-import { Button, Form } from 'antd';
+import { App, Button, Form } from 'antd';
 import { getConsentSettings, postConsentSettings } from '@/api/course_settings';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { type FC, type ReactElement } from 'react';
@@ -11,11 +11,37 @@ const ConsentSettings: FC = (): ReactElement => {
     queryFn: getConsentSettings,
   });
 
+  const { message } = App.useApp();
   const queryClient = useQueryClient();
   const { mutate: saveConsent } = useMutation({
     mutationFn: postConsentSettings,
+
+    onMutate: () => {
+      void message.open({
+        key: 'consent',
+        type: 'loading',
+        content: 'Saving consent settings...',
+      });
+    },
+
+    onError: () => {
+      void message.open({
+        key: 'consent',
+        type: 'error',
+        content: 'Error saving consent settings',
+        duration: 3,
+      });
+    },
+
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['consent-settings'] });
+
+      void message.open({
+        key: 'consent',
+        type: 'success',
+        content: 'Consent settings saved successfully',
+        duration: 3,
+      });
     },
   });
 

@@ -2,11 +2,10 @@ import ConfigLayoutColumn from '@/components/atoms/layout-column/layout-column';
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
 import { arrayMove, SortableContext } from '@dnd-kit/sortable';
-import { Button } from 'antd';
+import { App, Button } from 'antd';
 import { createPortal } from 'react-dom';
 import { getLayoutColumns, postLayoutColumns } from '@/api/tiles';
 import { PlusOutlined } from '@ant-design/icons';
-import { toast } from 'sonner';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTheme } from 'next-themes';
 import { type FC, type ReactElement, useCallback, useEffect, useMemo, useState } from 'react';
@@ -29,24 +28,38 @@ const LayoutConfigurator: FC = (): ReactElement => {
     queryFn: getLayoutColumns,
   });
 
-  const { mutate: saveLayout, status } = useMutation({
+  const { message } = App.useApp();
+  const { mutate: saveLayout } = useMutation({
     mutationFn: postLayoutColumns,
+
+    onMutate: async () => {
+      void message.open({
+        key: 'layout',
+        type: 'loading',
+        content: 'Saving layout...',
+      });
+    },
+
+    onError: () => {
+      void message.open({
+        key: 'layout',
+        type: 'error',
+        content: 'Error saving layout',
+        duration: 3,
+      });
+    },
+
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['layout-columns'] });
+
+      void message.open({
+        key: 'layout',
+        type: 'success',
+        content: 'Layout saved successfully',
+        duration: 3,
+      });
     },
   });
-
-  useEffect(() => {
-    if (status === 'success') {
-      toast.success('Layout saved successfully', {
-        closeButton: true,
-      });
-    } else if (status === 'error') {
-      toast.error('Error saving layout', {
-        closeButton: true,
-      });
-    }
-  }, [status]);
 
   const [active, setActive] = useState<LayoutColumn | null>(null);
   const [columns, setColumns] = useState<LayoutColumn[]>([]);

@@ -1,13 +1,12 @@
 import dayjs from 'dayjs';
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
-import { Button, Checkbox, DatePicker, Divider, Form, Segmented } from 'antd';
+import { App, Button, Checkbox, DatePicker, Divider, Form, Segmented } from 'antd';
 import { getNotificationSettings, postNotificationSettings } from '@/api/course_settings';
-import { toast } from 'sonner';
 import { useForm } from 'antd/es/form/Form';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { type CheckboxChangeEvent } from 'antd/es/checkbox';
-import { memo, useCallback, useEffect, useMemo, useState, type FC, type ReactElement } from 'react';
+import { memo, useCallback, useMemo, useState, type FC, type ReactElement } from 'react';
 import { type DateObject } from 'react-multi-date-picker';
 
 export interface NotificationAdminSettings {
@@ -70,25 +69,39 @@ const NotificationSettingsForm: FC<{
     setRange((prev) => !prev);
   }, [form]);
 
+  const { message } = App.useApp();
   const queryClient = useQueryClient();
-  const { mutate, status } = useMutation({
+  const { mutate } = useMutation({
     mutationFn: postNotificationSettings,
+
+    onMutate: () => {
+      void message.open({
+        key: 'notification-settings',
+        type: 'loading',
+        content: 'Saving notification settings...',
+      });
+    },
+
+    onError: () => {
+      void message.open({
+        key: 'notification-settings',
+        type: 'error',
+        content: 'Error saving notification settings',
+        duration: 3,
+      });
+    },
+
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['notification-settings'] });
+
+      void message.open({
+        key: 'notification-settings',
+        type: 'success',
+        content: 'Notification settings saved successfully',
+        duration: 3,
+      });
     },
   });
-
-  useEffect(() => {
-    if (status === 'success') {
-      toast.success('Notification settings saved successfully', {
-        closeButton: true,
-      });
-    } else if (status === 'error') {
-      toast.error('Failed to save notification settings', {
-        closeButton: true,
-      });
-    }
-  }, [status]);
 
   const submit = useCallback(
     (data: Data): void => {

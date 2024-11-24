@@ -8,7 +8,7 @@ import { DeleteFilled, PlusOutlined } from '@ant-design/icons';
 import { SortableContext, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Button, Col, Divider, Row } from 'antd';
+import { App, Button, Col, Divider, Row } from 'antd';
 import { useMemo, type FC, type ReactElement } from 'react';
 import EditTitle from '../edit-title/edit-title';
 
@@ -25,24 +25,100 @@ const AdminTileGroupView: FC<Props> = ({ group }): ReactElement => {
 
   const queryClient = useQueryClient();
 
+  const { message } = App.useApp();
   const { mutate: addTile } = useMutation({
     mutationFn: postTile,
+
+    onMutate: () => {
+      void message.open({
+        key: 'tile-add',
+        type: 'loading',
+        content: 'Adding tile...',
+      });
+    },
+
+    onError: () => {
+      void message.open({
+        key: 'tile-add',
+        type: 'error',
+        content: 'Error adding tile',
+        duration: 3,
+      });
+    },
+
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['tiles'] });
+
+      void message.open({
+        key: 'tile-add',
+        type: 'success',
+        content: 'Tile added successfully',
+        duration: 3,
+      });
     },
   });
 
   const { mutate: patchGroup } = useMutation({
     mutationFn: patchTileGroup,
+
+    onMutate: () => {
+      void message.open({
+        key: 'group-patch',
+        type: 'loading',
+        content: 'Saving group...',
+      });
+    },
+
+    onError: () => {
+      void message.open({
+        key: 'group-patch',
+        type: 'error',
+        content: 'Error saving group',
+        duration: 3,
+      });
+    },
+
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['tile-groups'] });
+
+      void message.open({
+        key: 'group-patch',
+        type: 'success',
+        content: 'Group saved successfully',
+        duration: 3,
+      });
     },
   });
 
   const { mutate: deleteGroup } = useMutation({
     mutationFn: deleteTileGroup,
+
+    onMutate: () => {
+      void message.open({
+        key: 'group-delete',
+        type: 'loading',
+        content: 'Deleting group...',
+      });
+    },
+
+    onError: () => {
+      void message.open({
+        key: 'group-delete',
+        type: 'error',
+        content: 'Error deleting group',
+        duration: 3,
+      });
+    },
+
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['tile-groups'] });
+
+      void message.open({
+        key: 'group-delete',
+        type: 'success',
+        content: 'Group deleted successfully',
+        duration: 3,
+      });
     },
   });
 

@@ -13,7 +13,7 @@ import { useTileViewStore } from '../student-dashboard/tileViewContext';
 import { type ReactElement, useCallback, useEffect } from 'react';
 import AltEntries from '@/components/atoms/alt-entries/alt-entries';
 import { useRequiredParams } from '@/utils/params';
-import { PublilshedStatus } from '@/types/tile';
+import { PublishedStatus } from '@/types/tile';
 
 function TileDetailView(): ReactElement {
   const { tileId } = useRequiredParams(['tileId']);
@@ -86,7 +86,7 @@ function TileDetailView(): ReactElement {
             : tile?.alt ?
               <AltEntries tile={tile} />
             : tile?.entries
-                .filter((entry) => entry.published !== PublilshedStatus.NotPublished)
+                .filter((entry) => entry.published !== PublishedStatus.NotPublished)
                 .map((entry) => <EntryView entry={entry} key={entry.content_id} type={tile.type} />)
             }
           </GroupView>

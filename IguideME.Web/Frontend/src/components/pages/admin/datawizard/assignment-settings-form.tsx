@@ -2,7 +2,7 @@ import { patchExternalAssignment } from '@/api/entries';
 import { GradingType } from '@/types/grades';
 import { type Assignment } from '@/types/tile';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Button, Form, InputNumber, Select } from 'antd';
+import { App, Button, Form, InputNumber, Select } from 'antd';
 import { type FC, type ReactElement } from 'react';
 
 interface AssignmentSettingsFormProps {
@@ -12,11 +12,37 @@ interface AssignmentSettingsFormProps {
 const AssignmentSettingsForm: FC<AssignmentSettingsFormProps> = ({ assignment }): ReactElement => {
   const [form] = Form.useForm();
 
+  const { message } = App.useApp();
   const queryClient = useQueryClient();
   const { mutate: updateAssignment } = useMutation({
     mutationFn: patchExternalAssignment, // TODO: Replace with actual function
+
+    onMutate: () => {
+      void message.open({
+        key: 'external-assignment',
+        type: 'loading',
+        content: 'Saving external assignment...',
+      });
+    },
+
+    onError: () => {
+      void message.open({
+        key: 'external-assignment',
+        type: 'error',
+        content: 'Error saving external assignment',
+        duration: 3,
+      });
+    },
+
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['external-assignments'] });
+
+      void message.open({
+        key: 'external-assignment',
+        type: 'success',
+        content: 'External assignment saved successfully',
+        duration: 3,
+      });
     },
   });
 
