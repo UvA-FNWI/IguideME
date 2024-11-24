@@ -185,10 +185,10 @@ namespace IguideME.Web.Services
         /// <inheritdoc />
         public IEnumerable<AssignmentSubmission> GetSubmissions(int courseID, List<User> users)
         {
-            List<AssignmentSubmission> submissions = new();
+            IEnumerable<AssignmentSubmission> submissions = new List<AssignmentSubmission>();
             for (int i = 0; i < users.Count; i += 100)
             {
-                submissions.Concat(GetSubmissionsBatch(courseID, users.GetRange(i, Math.Min(100, users.Count - i))));
+                submissions = submissions.Concat(GetSubmissionsBatch(courseID, users.GetRange(i, Math.Min(100, users.Count - i))));
             };
             return submissions;
 

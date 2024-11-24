@@ -91,8 +91,6 @@ namespace IguideME.Web.Services.Workers
                 this._courseID,
                 users
             );
-            _logger.LogInformation("submission length: {}", submissions.Count());
-            _logger.LogInformation("submissions: {}", submissions);
 
             Dictionary<int, (double, AppGradingType)> gradingTypes = new();
             List<AssignmentSubmission> assignmentSubmissionsWithTiles = new();
