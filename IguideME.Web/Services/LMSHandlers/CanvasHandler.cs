@@ -139,24 +139,6 @@ namespace IguideME.Web.Services
         /// <inheritdoc />
         public IEnumerable<AppAssignment> GetAssignments(int courseID)
         {
-
-            foreach (Assignment ass in Connector
-                .FindCourseById(courseID)
-                .Assignments.Where(assignment => assignment != null))
-            {
-                if (ass.Name == "MFL - Assignment 2 - Week 2 (Ch 4, 5, 6) BONUS" || ass.Name == "MFL - Assignment 1 - Week 1 (Chapter 1, 2, 3) BONUS" || ass.Name == "MFL - Assignment 3 - Week 3 (Ch 7, 8) BONUS")
-                {
-                    _logger.LogInformation("Found assignment");
-                    ass.Submissions.ForEach(sub =>
-                    {
-                        _logger.LogInformation("Found submission: {} {}", sub.UserID, sub.Grade);
-
-                    }
-                );
-
-                }
-
-            }
             return Connector
                 .FindCourseById(courseID)
                 .Assignments.Where(assignment => assignment != null)
