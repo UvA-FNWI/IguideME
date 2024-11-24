@@ -6,7 +6,7 @@ import { MOCK_STUDENTS } from './users';
 export const courseHandlers = [
   http.get('/api/courses/:courseId', ({ params }) => {
     const courseId = params.courseId;
-    const course = exampleCourses.find((course) => course.id === +courseId);
+    const course = exampleCourses.find((course) => course.id === +courseId!);
 
     if (!course) return new HttpResponse(null, { status: 404 });
     return HttpResponse.json<Course>(course);
@@ -18,7 +18,7 @@ export const courseHandlers = [
 
   http.get('/api/courses/:courseId/students', ({ params }) => {
     const courseId = params.courseId;
-    const course = exampleCourses.find((course) => course.id === +courseId);
+    const course = exampleCourses.find((course) => course.id === +courseId!);
     if (!course) return new HttpResponse(null, { status: 404 });
 
     return HttpResponse.json<User[]>(MOCK_STUDENTS);
