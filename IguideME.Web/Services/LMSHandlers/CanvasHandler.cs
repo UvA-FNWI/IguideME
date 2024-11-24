@@ -185,7 +185,17 @@ namespace IguideME.Web.Services
         /// <inheritdoc />
         public IEnumerable<AssignmentSubmission> GetSubmissions(int courseID, List<User> users)
         {
-            _logger.LogInformation("Getting submissions for users:\n{}", users.Select(user => user.UserID));
+            List<AssignmentSubmission> submissions = new();
+            for (int i = 0; i < users.Count; i += 100)
+            {
+                submissions.Concat(GetSubmissionsBatch(courseID, users.GetRange(i, Math.Min(100, users.Count - i))));
+            };
+            return submissions;
+
+        }
+
+        public IEnumerable<AssignmentSubmission> GetSubmissionsBatch(int courseID, List<User> users)
+        {
             return Connector
                 .FindCourseById(courseID)
                 .GetSubmissions(users.Select(user => user.UserID).ToArray(), false)
