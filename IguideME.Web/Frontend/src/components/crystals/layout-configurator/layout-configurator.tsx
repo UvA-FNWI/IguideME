@@ -1,15 +1,10 @@
-import ConfigLayoutColumn from '@/components/atoms/layout-column/layout-column';
-import QueryError from '@/components/particles/QueryError';
-import QueryLoading from '@/components/particles/QueryLoading';
 import { arrayMove, SortableContext } from '@dnd-kit/sortable';
 import { App, Button } from 'antd';
 import { createPortal } from 'react-dom';
 import { getLayoutColumns, postLayoutColumns } from '@/api/tiles';
 import { PlusOutlined } from '@ant-design/icons';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useTheme } from 'next-themes';
-import { type FC, type ReactElement, useCallback, useEffect, useMemo, useState } from 'react';
-
+import { type FC, type ReactElement, useEffect, useMemo, useState } from 'react';
 import { type LayoutColumn } from '@/types/tile';
 import {
   DndContext,
@@ -20,6 +15,7 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
+import Column from './Column';
 
 const LayoutConfigurator: FC = (): ReactElement => {
   const queryClient = useQueryClient();
@@ -71,7 +67,7 @@ const LayoutConfigurator: FC = (): ReactElement => {
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 20,
+        distance: 5,
       },
     }),
   );
@@ -88,6 +84,12 @@ const LayoutConfigurator: FC = (): ReactElement => {
     ]);
   };
 
+  function onDragStart(event: DragStartEvent): void {
+    if (event.active.data.current !== undefined) {
+      setActive(columns.find((col) => col.id === event.active.id) ?? null);
+    }
+  }
+
   function onDragEnd(event: DragEndEvent): void {
     setActive(null);
     const { active, over } = event;
@@ -100,64 +102,31 @@ const LayoutConfigurator: FC = (): ReactElement => {
     setColumns(arrayMove(columns, activeIndex, overIndex));
   }
 
-  const parentOnChange = useCallback(
-    (newColumn: LayoutColumn) => {
-      const columnIndex = columns.findIndex((col) => col.id === newColumn.id);
-      if (columns[columnIndex] !== newColumn) {
-        const newColumns = [...columns];
-        newColumns[columnIndex] = newColumn;
-        setColumns(newColumns);
-      }
-    },
-    [columns],
-  );
-
-  function onDragStart(event: DragStartEvent): void {
-    if (event.active.data.current !== undefined) {
-      setActive(columns.find((col) => col.id === event.active.id) ?? null);
-    }
-  }
-
   const removeColumn = (id: number): void => {
     setColumns(columns.filter((col) => col.id !== id));
   };
 
-  const save = (): void => {
-    if (columns !== null) saveLayout(columns);
+  const handleSettingChange = (column: LayoutColumn): void => {
+    const index = columns.findIndex((col) => col.id === column.id);
+    columns[index] = column;
+    setColumns([...columns]);
   };
-
-  const { theme } = useTheme();
-  const loadingState = Array.from({ length: 2 }).map((_, i) => (
-    <QueryLoading isLoading={isLoading} key={i}>
-      <article
-        className={`m-2 h-[360px] w-[425px] rounded-md bg-surface1 p-3 ${theme === 'light' ? 'shadow-statusCard' : ''}`}
-      />
-    </QueryLoading>
-  ));
-
-  const errorState = (
-    <article
-      className={`m-2 h-[360px] w-[425px] rounded-md bg-surface1 p-3 ${theme === 'light' ? 'shadow-statusCard' : ''} relative`}
-    >
-      <QueryError className='grid place-content-center' title='Error: Could not load layout columns' />
-    </article>
-  );
 
   return (
     <DndContext sensors={sensors} onDragStart={onDragStart} onDragEnd={onDragEnd}>
       <SortableContext items={columnIds}>
-        <div className='flex flex-col gap-2'>
-          <div className='flex flex-wrap gap-2 overflow-x-auto'>
-            {isLoading ?
-              loadingState
-            : isError ?
-              errorState
-            : columns.map((column) => (
-                <div className='min-w-fit' key={column.id}>
-                  <ConfigLayoutColumn column={column} remove={removeColumn} parentOnChange={parentOnChange} />
-                </div>
-              ))
-            }
+        <div className='space-y-8'>
+          <div className='flex flex-wrap gap-8 overflow-x-auto'>
+            {columns.map((column) => (
+              <Column
+                key={column.id}
+                column={column}
+                isLoading={isLoading}
+                isError={isError}
+                handleSettingChange={handleSettingChange}
+                removeColumn={removeColumn}
+              />
+            ))}
           </div>
           <Button
             onClick={addColumn}
@@ -171,12 +140,24 @@ const LayoutConfigurator: FC = (): ReactElement => {
       </SortableContext>
       <Button
         className='mt-2 min-w-20 !border-none bg-success hover:!border-none hover:!bg-success/80 [&_span]:text-text'
-        onClick={save}
+        onClick={() => {
+          saveLayout(columns);
+        }}
       >
         Save
       </Button>
       {createPortal(
-        <DragOverlay>{active !== null && <ConfigLayoutColumn column={active} />}</DragOverlay>,
+        <DragOverlay>
+          {active !== null && (
+            <Column
+              column={active}
+              isLoading={isLoading}
+              isError={isError}
+              handleSettingChange={handleSettingChange}
+              removeColumn={removeColumn}
+            />
+          )}
+        </DragOverlay>,
         document.body,
       )}
     </DndContext>

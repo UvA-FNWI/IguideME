@@ -514,6 +514,18 @@ textarea:not([rows]) {
   }
 }
 
+.antNumberInput {
+  .ant-input-number-input {
+    background-color: hsl(var(--surface1)) !important;
+    border-color: hsl(var(--text)) !important;
+    color: hsl(var(--text)) !important;
+
+    &:hover {
+      border-color: hsl(var(--primary)) !important;
+    }
+  }
+}
+
 .custom-slider {
   .ant-slider-rail {
     background-color: hsl(var(--surface2)) !important;
