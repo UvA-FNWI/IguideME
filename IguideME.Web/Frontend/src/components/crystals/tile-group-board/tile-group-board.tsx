@@ -14,7 +14,6 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   DndContext,
   type DragEndEvent,
-  type DragOverEvent,
   DragOverlay,
   type DragStartEvent,
   PointerSensor,
@@ -43,7 +42,6 @@ const TileGroupBoard: FC = (): ReactElement => {
 
   const [activeGroup, setActiveGroup] = useState<TileGroup | null>(null);
   const [activeTile, setActiveTile] = useState<Tile | null>(null);
-  const [move, setMove] = useState<boolean>(false);
 
   const { isChanged, setIsChanged, editTitle, setEditTile } = useDrawerStore();
 
@@ -247,7 +245,7 @@ const TileGroupBoard: FC = (): ReactElement => {
         loadingState
       : isError || tilegroups === undefined ?
         errorState
-      : <DndContext onDragStart={onDragStart} onDragEnd={onDragEnd} onDragOver={onDragOver} sensors={sensors}>
+      : <DndContext onDragStart={onDragStart} onDragEnd={onDragEnd} sensors={sensors}>
           <>
             <SortableContext items={groupIds}>
               {tilegroups.map((group, index) => (
@@ -272,7 +270,7 @@ const TileGroupBoard: FC = (): ReactElement => {
           {createPortal(
             <DragOverlay>
               {activeGroup !== null && <AdminTileGroupView group={activeGroup} />}
-              {activeTile !== null && <AdminTileView tile={activeTile} move={move} />}
+              {activeTile !== null && <AdminTileView tile={activeTile} />}
             </DragOverlay>,
             document.body,
           )}
@@ -294,34 +292,9 @@ const TileGroupBoard: FC = (): ReactElement => {
     }
   }
 
-  function onDragOver(event: DragOverEvent): void {
-    setMove(false);
-
-    const { active, over } = event;
-    if (over === null) return;
-
-    const activeID = active.id;
-    const overID = over.id;
-    if (activeID === overID) return;
-
-    const activeData = active.data.current;
-    const overData = over.data.current;
-
-    if (activeData === undefined) return;
-    if (overData === undefined) return;
-    if (activeData.type === 'Group') return;
-
-    if (activeData.type === 'Tile') {
-      if (overData.type === 'Group' && activeData.tile.group_id === +overID - 1) return;
-      if (overData.type === 'Tile' && activeData.tile.group_id === overData.tile.group_id) return;
-      setMove(true);
-    }
-  }
-
   function onDragEnd(event: DragEndEvent): void {
     setActiveGroup(null);
     setActiveTile(null);
-    setMove(false);
     const { active, over } = event;
     if (over === null) return;
 
@@ -362,12 +335,15 @@ const TileGroupBoard: FC = (): ReactElement => {
 
     switch (overData.type) {
       case 'Group':
-        (activeData.tile as Tile).group_id !== +overID - 1 && moveTileToGroup(activeData.tile as Tile, +overID - 1);
+        (activeData.tile as Tile).group_id !== +overID - 1 &&
+          moveTileToGroup(activeData.tile as Tile, +overID - 1, null);
         return;
       case 'Tile':
-        (activeData.tile as Tile).group_id === (overData.tile as Tile).group_id ?
-          swapTiles(+(activeID as string).substring(1) - 1, +(overID as string).substring(1) - 1, overData)
-        : moveTileToGroup(activeData.tile as Tile, overData.til.group_id as number);
+        if ((activeData.tile as Tile).group_id === (overData.tile as Tile).group_id) {
+          swapTiles(+(activeID as string).substring(1) - 1, +(overID as string).substring(1) - 1, overData);
+        } else {
+          moveTileToGroup(activeData.tile as Tile, (overData.tile as Tile).group_id, (overData.tile as Tile).position);
+        }
         return;
       default:
         console.warn('Unknown over object type encountered during drop', activeData.type);
@@ -383,15 +359,15 @@ const TileGroupBoard: FC = (): ReactElement => {
     updateTileOrder(arrayMove(ids, activeIndex, overIndex));
   }
 
-  function moveTileToGroup(tile: Tile, gid: number): void {
+  function moveTileToGroup(tile: Tile, gid: number, position: number | null): void {
     if (tiles === undefined) return;
 
-    const gtiles = tiles.filter((tile) => tile.group_id === gid);
-    // Set the position of the tile to the last of the new group
+    const groupTiles = tiles.filter((tile) => tile.group_id === gid);
+    const newPosition = (position ?? (groupTiles.length > 0 ? groupTiles[groupTiles.length - 1].position : 0)) + 1;
     updateTile({
       ...tile,
       group_id: gid,
-      position: (gtiles.length > 0 ? gtiles[gtiles.length - 1].position : 0) + 1,
+      position: newPosition,
     });
   }
 };

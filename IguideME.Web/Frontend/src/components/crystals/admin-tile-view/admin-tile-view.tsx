@@ -11,19 +11,17 @@ import {
   FormOutlined,
 } from '@ant-design/icons';
 import { useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { App, Col, Row, Space, Tooltip } from 'antd';
-import { useMemo, type FC, type ReactElement } from 'react';
+import { type CSSProperties, type FC, type ReactElement } from 'react';
 import Swal from 'sweetalert2';
 import { useDrawerStore } from '../tile-group-board/useDrawerStore';
 
 interface Props {
   tile: Tile;
-  move?: boolean;
 }
 
-const AdminTileView: FC<Props> = ({ tile, move }): ReactElement => {
+const AdminTileView: FC<Props> = ({ tile }): ReactElement => {
   const { message } = App.useApp();
   const queryClient = useQueryClient();
   const { mutate: removeTile } = useMutation({
@@ -102,15 +100,10 @@ const AdminTileView: FC<Props> = ({ tile, move }): ReactElement => {
     },
   });
 
-  const tileStyle = useMemo(
-    () =>
-      `font-tnum m-0 h-full w-60 rounded-md border border-solid border-border1 p-3 ${tile.visible ? 'bg-success/10' : 'bg-failure/10'}`,
-    [tile],
-  );
-
-  const style = {
+  const style: CSSProperties = {
+    transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
     transition,
-    transform: CSS.Transform.toString(transform),
+    ...(isDragging ? { position: 'relative', zIndex: 9999 } : {}),
   };
 
   const toggleVisible = (): void => {
@@ -121,23 +114,9 @@ const AdminTileView: FC<Props> = ({ tile, move }): ReactElement => {
     updateTile({ ...tile, notifications: !tile.notifications });
   };
 
-  if (isDragging) {
-    return <div className={tileStyle} ref={setNodeRef} style={style} />;
-  }
-
-  if (move === true) {
-    return (
-      <div className={tileStyle} ref={setNodeRef} style={style}>
-        <div className='flex h-full items-center justify-center'>
-          <p>Move here</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div
-      className={tileStyle}
+      className={`font-tnum m-0 h-full w-60 rounded-md border border-solid border-border1 p-3 ${tile.visible ? 'bg-success/10' : 'bg-failure/10'} ${isDragging ? 'opacity-40' : ''}`}
       ref={setNodeRef}
       style={style}
       {...attributes}

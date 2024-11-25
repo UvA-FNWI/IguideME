@@ -6,10 +6,9 @@ import { GradingType } from '@/types/grades';
 import { TileType, type TileGroup } from '@/types/tile';
 import { DeleteFilled, PlusOutlined } from '@ant-design/icons';
 import { SortableContext, useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { App, Button, Col, Divider, Row } from 'antd';
-import { useMemo, type FC, type ReactElement } from 'react';
+import { useMemo, type CSSProperties, type FC, type ReactElement } from 'react';
 import EditTitle from '../edit-title/edit-title';
 
 interface Props {
@@ -131,23 +130,14 @@ const AdminTileGroupView: FC<Props> = ({ group }): ReactElement => {
     },
   });
 
-  const style = {
+  const style: CSSProperties = {
+    transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
     transition,
-    transform: CSS.Transform.toString(transform),
+    ...(isDragging ? { position: 'relative', zIndex: 9999 } : {}),
   };
 
   // Add 1 to the id's because dnd doesn't like 0 as an id.
   const tileIds = useMemo(() => (tiles === undefined ? [] : tiles.map((tile) => `t${tile.id + 1}`)), [tiles]);
-
-  if (isDragging) {
-    return (
-      <div
-        className='min-h-[235px] rounded-lg border border-dashed border-text bg-accent/50 p-[10px]'
-        ref={setNodeRef}
-        style={style}
-      />
-    );
-  }
 
   const loadingState = Array(Math.floor(Math.random() * 5) + 1)
     .fill(0)
@@ -167,7 +157,7 @@ const AdminTileGroupView: FC<Props> = ({ group }): ReactElement => {
 
   return (
     <div
-      className='my-4 min-h-[235px] rounded-lg border border-solid border-border0 bg-surface1 p-[10px]'
+      className={`my-4 min-h-[235px] rounded-lg border border-solid border-border0 bg-surface1 p-[10px] ${isDragging ? 'opacity-40' : ''}`}
       ref={setNodeRef}
       style={style}
     >
