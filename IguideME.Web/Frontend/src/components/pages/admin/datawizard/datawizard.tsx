@@ -232,7 +232,7 @@ const ViewExternalAssignment: FC<ViewExternalAssignmentProps> = ({ assignment, s
                 className='custom-danger-button'
                 onClick={() => {
                   void Swal.fire({
-                    title: 'Warning: This will permanently delete the tile!',
+                    title: 'Warning: This will permanently delete the assignment!',
                     icon: 'warning',
                     focusCancel: true,
                     showCancelButton: true,

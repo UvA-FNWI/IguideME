@@ -17,7 +17,7 @@ interface UploadManagerProps {
 const UploadManager: FC<UploadManagerProps> = ({ assignment, closeUploadMenu, students }) => {
   const [data, setData] = useState<string[][]>([]);
   const [idColumn, setIdColumn] = useState<number>(0);
-  const [gradeColumn, setGradeColumn] = useState<number>(0);
+  const [gradeColumn, setGradeColumn] = useState<number>(1);
   const [editorCollapsed, setEditorCollapsed] = useState<boolean>(true);
 
   const handleCSVUpload = (data: string[][]): void => {
@@ -32,17 +32,19 @@ const UploadManager: FC<UploadManagerProps> = ({ assignment, closeUploadMenu, st
   };
 
   const addMissing = (): void => {
+    const newData = [...data];
+
     students.forEach((student) => {
-      for (let i = 1; i < data.length; i++) {
-        if (data[i][idColumn] === student.userID.toString()) return;
+      for (let i = 1; i < newData.length; i++) {
+        if (newData[i][idColumn] === student.userID.toString()) return;
       }
 
-      const newRow: string[] = Array(data[0].length).fill('');
+      const newRow: string[] = Array(newData[0].length).fill('');
       newRow[idColumn] = student.userID.toString();
-      data.push(newRow);
+      newData.push(newRow);
     });
 
-    setData(data);
+    setData(newData);
   };
 
   const changeIDColumn = (nr: number | null): void => {
