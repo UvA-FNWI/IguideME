@@ -15,7 +15,7 @@ import {
 } from '@/api/entries';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { LogicalExpression, type GoalRequirement, type LearningGoal } from '@/types/tile';
-import { useEffect, type FC, type ReactElement } from 'react';
+import { useEffect, useMemo, type FC, type ReactElement } from 'react';
 import EditTitle from '@/components/crystals/edit-title/edit-title';
 
 const { Item } = Form;
@@ -147,6 +147,7 @@ const ViewLearningGoal: FC<GoalProps> = ({ goal }): ReactElement => {
       });
     },
   });
+
   const { mutate: removeGoal } = useMutation({
     mutationFn: deleteLearningGoal,
 
@@ -343,6 +344,15 @@ const ViewGoalRequirement: FC<ReqProps> = ({ requirement }): ReactElement => {
     }
   }, [isLoading, isError, requirement, form]);
 
+  const selectOptions = useMemo(() => {
+    if (assignments === undefined) return [];
+
+    return [...assignments.values()].map((ass) => ({
+      value: ass.id,
+      label: ass.title,
+    }));
+  }, [assignments]);
+
   return (
     <div className='font-tnum mb-[10px] w-full rounded-lg border border-solid border-border1 p-[10px]'>
       <Form<GoalRequirement>
@@ -368,7 +378,14 @@ const ViewGoalRequirement: FC<ReqProps> = ({ requirement }): ReactElement => {
             className='grid grid-cols-3 gap-1 overflow-x-auto'
             style={{ gridTemplateColumns: '300px min-content min-content' }}
           >
-            <Item name='assignment_id' noStyle>
+            <Item
+              name='assignment_id'
+              noStyle
+              getValueProps={(value) => ({
+                value: value === -1 ? undefined : value,
+              })}
+              getValueFromEvent={(value) => (value === undefined ? -1 : value)}
+            >
               <Select
                 aria-disabled={isLoading || isError}
                 className='w-full [&>div]:!border-accent/60 [&>div]:!bg-surface1 [&>div]:!shadow-none [&>div]:hover:!border-accent [&>div]:hover:!bg-surface2 [&_span]:!text-text'
@@ -376,19 +393,12 @@ const ViewGoalRequirement: FC<ReqProps> = ({ requirement }): ReactElement => {
                 disabled={isLoading || isError}
                 showSearch
                 optionFilterProp='label'
-                options={
-                  assignments === undefined ?
-                    []
-                  : [...assignments.values()].map((ass) => ({
-                      value: ass.id,
-                      label: ass.title,
-                    }))
-                }
+                options={selectOptions}
                 placeholder={
                   isLoading ? 'Loading assignments ...'
                   : isError ?
                     'Failed to load assignments'
-                  : undefined
+                  : 'Please select an assignment'
                 }
               />
             </Item>
