@@ -89,7 +89,7 @@ const Dashboard: FC<DashboardProps> = ({ self }): ReactElement => {
 
   return (
     <>
-      <div className='w-full px-1 md:px-3'>
+      <div className='flex w-full flex-col px-1 md:px-3'>
         <div className='flex h-20 flex-col justify-center gap-3 py-3 lg:py-0'>
           <div className='relative flex items-center justify-between'>
             <StudentInfo />

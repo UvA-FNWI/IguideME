@@ -22,7 +22,7 @@ export const createRouter = (): ReturnType<typeof createBrowserRouter> =>
             loader: async () => {
               const jwt = document.location.hash.slice(1);
               const parsed = parseJwt(jwt);
-              const courseID = parsed['courseid'];
+              const courseID = parsed.courseid;
               return redirect('/' + courseID);
             },
           },

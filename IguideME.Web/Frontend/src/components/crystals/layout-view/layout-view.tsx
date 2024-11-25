@@ -29,7 +29,7 @@ const ViewLayout: FC = (): ReactElement => {
 
   if (loading || error) {
     return (
-      <div className='absolute inset-0 grid h-screen w-screen place-content-center'>
+      <div className='grid flex-grow place-content-center'>
         {loading ?
           <Spin
             className='[&>div]:right-[-45px] [&>div]:min-w-max'
@@ -46,7 +46,7 @@ const ViewLayout: FC = (): ReactElement => {
 
   if (columns?.find((col) => col.groups.length > 0) === undefined) {
     return (
-      <div className='pointer-events-none absolute inset-0 grid h-screen w-screen place-content-center'>
+      <div className='pointer-events-none grid flex-grow place-content-center'>
         <QueryError
           className='grid place-content-center'
           title='The dashboard has not been set up yet.'
