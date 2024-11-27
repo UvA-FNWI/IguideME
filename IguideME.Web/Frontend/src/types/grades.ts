@@ -15,9 +15,7 @@ export interface Grades {
   type: GradingType;
 }
 
-export type EntryGradeMap = {
-  [key: string]: EntryGrade[];
-};
+export type EntryGradeMap = Record<string, EntryGrade[]>;
 
 export interface EntryGrade {
   content_id: number;

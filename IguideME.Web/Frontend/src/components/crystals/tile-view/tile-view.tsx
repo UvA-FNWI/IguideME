@@ -7,7 +7,7 @@ import { getUserTileGrades } from '@/api/grades';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useTileViewStore } from '@/components/pages/student-dashboard/tileViewContext';
-import { type Tile, TileType } from '@/types/tile';
+import { type Tile } from '@/types/tile';
 import { memo, type FC, type ReactElement } from 'react';
 import { GradingType, type Grades } from '@/types/grades';
 import { useShallow } from 'zustand/react/shallow';
@@ -36,10 +36,21 @@ const ViewTile: FC<Props> = memo(({ tile }): ReactElement => {
 
   const navigate = useNavigate();
 
+  const notCounts = tile.gradingType === GradingType.NotGraded || tile.weight === 0;
+  let subTitle = '';
+
+  if (notCounts) {
+    subTitle = 'Not graded';
+  } else {
+    subTitle = `Graded ${tile.weight * 100}%`;
+  }
+
+  if (!grades) {
+    subTitle += subTitle.length > 0 ? ' / No grades yet' : 'No grades yet';
+  }
+
   return (
-    <div
-      className={`${tile.type === TileType.assignments && tile.gradingType === GradingType.NotGraded ? 'grayscale-[30%] saturate-[.80]' : ''}`}
-    >
+    <div className={`${notCounts ? 'grayscale-[30%] saturate-[.80]' : ''}`}>
       <Card
         actions={[
           <a
@@ -65,15 +76,7 @@ const ViewTile: FC<Props> = memo(({ tile }): ReactElement => {
         title={
           <div className='w-full flex-col text-center'>
             <h3 className='text-lg font-normal'>{tile.title}</h3>
-            {tile.type === TileType.assignments && tile.gradingType === GradingType.NotGraded && !grades ?
-              <p className='text-xs text-text/60'>Not graded / No grades yet</p>
-            : <>
-                {tile.type === TileType.assignments && tile.gradingType === GradingType.NotGraded && (
-                  <p className='text-xs text-text/60'>Not graded</p>
-                )}
-                {!grades && <p className='text-xs text-text/60'>No grades yet</p>}
-              </>
-            }
+            <p className='text-xs text-text/60'>{subTitle}</p>
           </div>
         }
       />
