@@ -630,7 +630,7 @@ public static class DatabaseQueries
         INNER JOIN  `assignments`
             USING   (`assignment_id`)
         WHERE       `assignments`.`course_id`=@courseID
-        AND         `assignment`.`assignment_id`=@assignmentID
+        AND         `assignments`.`assignment_id`=@assignmentID
         ;";
 
     public const string QUERY_COURSE_EXTERNAL_ASSIGNMENTS =
