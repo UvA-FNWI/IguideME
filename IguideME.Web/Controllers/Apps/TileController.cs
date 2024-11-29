@@ -736,6 +736,14 @@ namespace IguideME.Web.Controllers
 		}
 
 		[Authorize(Policy = "IsInstructor")]
+		[HttpGet]
+		[Route("/assignments/{assignmentID}/submissions")]
+		public ActionResult GetAssignmentSubmissions(int assignmentID)
+		{
+			return Ok(_databaseManager.GetAssignmentSubmissions(GetCourseID(), assignmentID));
+		}
+
+		[Authorize(Policy = "IsInstructor")]
 		[HttpPatch]
 		[Route("/external-assignments/{assignmentID}")]
 		public ActionResult PatchAssignment([FromBody] AppAssignment assignment)

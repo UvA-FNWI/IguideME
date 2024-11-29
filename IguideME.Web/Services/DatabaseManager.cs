@@ -549,6 +549,44 @@ namespace IguideME.Web.Services
             );
         }
 
+        public List<AssignmentSubmission> GetAssignmentSubmissions(int courseID, int assignmentID)
+        {
+            List<AssignmentSubmission> submissions = new();
+            using (
+                SQLiteDataReader r = Query(
+                    DatabaseQueries.QUERY_COURSE_ASSIGNMENT_SUBMISSIONS,
+                    new SQLiteParameter("courseID", courseID),
+                    new SQLiteParameter("assignmentID", assignmentID)
+                )
+            )
+            {
+                while (r.Read())
+                {
+                    try
+                    {
+
+                        AssignmentSubmission submission =
+                            new(
+                                r.GetInt32(0),
+                                assignmentID,
+                                r.GetValue(1).ToString(),
+                                r.GetInt32(2),
+                                r.GetInt32(3)
+                            );
+                        submissions.Add(submission);
+                    }
+                    catch (Exception e)
+                    {
+                        PrintQueryError("GetAssignmentSubmissions", 4, r, e);
+                    }
+
+                }
+
+            }
+            return submissions;
+
+        }
+
         public List<AppAssignment> GetExternalAssignments(int courseID)
         {
             List<AppAssignment> assignments = new();
@@ -561,7 +599,6 @@ namespace IguideME.Web.Services
             )
             {
                 while (r.Read())
-                {
                     try
                     {
                         AppAssignment row =
@@ -583,374 +620,463 @@ namespace IguideME.Web.Services
                     {
                         PrintQueryError("GetAssignments", 9, r, e);
                     }
-                }
             }
+        }
 
             return assignments;
         }
 
-        public int RegisterAssignment(AppAssignment assignment)
-        {
-            int assignment_id = IDNonQuery(
-                DatabaseQueries.REGISTER_ASSIGNMENT,
-                new SQLiteParameter("externalID", assignment.ExternalID),
-                new SQLiteParameter("courseID", assignment.CourseID),
-                new SQLiteParameter("title", assignment.Title),
-                new SQLiteParameter("htmlUrl", assignment.HtmlUrl),
-                new SQLiteParameter("published", assignment.Published),
-                new SQLiteParameter("muted", assignment.Muted),
-                new SQLiteParameter("dueDate", assignment.DueDate),
-                new SQLiteParameter("maxGrade", assignment.MaxGrade),
-                new SQLiteParameter("gradingType", assignment.GradingType)
+    public int RegisterAssignment(AppAssignment assignment)
+    {
+        int assignment_id = IDNonQuery(
+            DatabaseQueries.REGISTER_ASSIGNMENT,
+            new SQLiteParameter("externalID", assignment.ExternalID),
+            new SQLiteParameter("courseID", assignment.CourseID),
+            new SQLiteParameter("title", assignment.Title),
+            new SQLiteParameter("htmlUrl", assignment.HtmlUrl),
+            new SQLiteParameter("published", assignment.Published),
+            new SQLiteParameter("muted", assignment.Muted),
+            new SQLiteParameter("dueDate", assignment.DueDate),
+            new SQLiteParameter("maxGrade", assignment.MaxGrade),
+            new SQLiteParameter("gradingType", assignment.GradingType)
+        );
+
+        if (assignment_id == 0)
+            assignment_id = GetInternalAssignmentID(
+                (int)assignment.ExternalID,
+                assignment.CourseID
             );
 
-            if (assignment_id == 0)
-                assignment_id = GetInternalAssignmentID(
-                    (int)assignment.ExternalID,
-                    assignment.CourseID
-                );
-
-            return assignment_id;
-        }
+        return assignment_id;
+    }
 
 
 
-        public int RegisterExternalAssignment(AppAssignment assignment)
-        {
-            int assignment_id = IDNonQuery(
-                DatabaseQueries.REGISTER_EXTERNAL_ASSIGNMENT,
-                new SQLiteParameter("courseID", assignment.CourseID),
-                new SQLiteParameter("title", assignment.Title),
-                new SQLiteParameter("published", PublishStatus.ExternalData),
-                new SQLiteParameter("muted", assignment.Muted),
-                new SQLiteParameter("dueDate", assignment.DueDate),
-                new SQLiteParameter("maxGrade", assignment.MaxGrade),
-                new SQLiteParameter("gradingType", assignment.GradingType)
+    public int RegisterExternalAssignment(AppAssignment assignment)
+    {
+        int assignment_id = IDNonQuery(
+            DatabaseQueries.REGISTER_EXTERNAL_ASSIGNMENT,
+            new SQLiteParameter("courseID", assignment.CourseID),
+            new SQLiteParameter("title", assignment.Title),
+            new SQLiteParameter("published", PublishStatus.ExternalData),
+            new SQLiteParameter("muted", assignment.Muted),
+            new SQLiteParameter("dueDate", assignment.DueDate),
+            new SQLiteParameter("maxGrade", assignment.MaxGrade),
+            new SQLiteParameter("gradingType", assignment.GradingType)
+        );
+
+        if (assignment_id == 0)
+            assignment_id = GetInternalAssignmentID(
+                (int)assignment.ExternalID,
+                assignment.CourseID
             );
 
-            if (assignment_id == 0)
-                assignment_id = GetInternalAssignmentID(
-                    (int)assignment.ExternalID,
-                    assignment.CourseID
-                );
+        return assignment_id;
+    }
 
-            return assignment_id;
+    public void UpdateExternalAssignment(AppAssignment assignment)
+    {
+        int assignment_id = IDNonQuery(
+            DatabaseQueries.UPDATE_EXTERNAL_ASSIGNMENT,
+            new SQLiteParameter("ID", assignment.ID),
+            new SQLiteParameter("courseID", assignment.CourseID),
+            new SQLiteParameter("title", assignment.Title),
+            new SQLiteParameter("maxGrade", assignment.MaxGrade),
+            new SQLiteParameter("gradingType", assignment.GradingType)
+        );
+    }
+
+    public void DeleteExternalAssignment(int assignmentID, int courseID)
+    {
+        int assignment_id = IDNonQuery(
+            DatabaseQueries.DELETE_EXTERNAL_ASSIGNMENT,
+            new SQLiteParameter("ID", assignmentID),
+            new SQLiteParameter("courseID", courseID)
+        );
+    }
+
+    public void UpdateExternalAssignmentTitle(int assignmentID, int courseID, string title)
+    {
+        int assignment_id = IDNonQuery(
+            DatabaseQueries.UPDATE_EXTERNAL_ASSIGNMENT_TITLE,
+            new SQLiteParameter("ID", assignmentID),
+            new SQLiteParameter("courseID", courseID),
+            new SQLiteParameter("title", title)
+        );
+    }
+
+    public void RegisterDiscussion(AppDiscussionTopic discussion, long syncID)
+    {
+        NonQuery(
+            DatabaseQueries.REGISTER_DISCUSSION,
+            new SQLiteParameter("discussionID", discussion.ID),
+            new SQLiteParameter("courseID", discussion.CourseID),
+            new SQLiteParameter("title", discussion.Title),
+            new SQLiteParameter("htmlUrl", discussion.HtmlUrl),
+            new SQLiteParameter("authorName", discussion.Author),
+            new SQLiteParameter("date", discussion.Date),
+            new SQLiteParameter("message", discussion.Message)
+        );
+    }
+
+    public void RegisterDiscussionEntry(AppDiscussionEntry entry)
+    {
+        // This seems to be possible when a teacher replies, but discussions without an author are useless to us
+        // so no need to save them.
+        if (entry.Author == null)
+        {
+            return;
         }
 
-        public void UpdateExternalAssignment(AppAssignment assignment)
-        {
-            int assignment_id = IDNonQuery(
-                DatabaseQueries.UPDATE_EXTERNAL_ASSIGNMENT,
-                new SQLiteParameter("ID", assignment.ID),
-                new SQLiteParameter("courseID", assignment.CourseID),
-                new SQLiteParameter("title", assignment.Title),
-                new SQLiteParameter("maxGrade", assignment.MaxGrade),
-                new SQLiteParameter("gradingType", assignment.GradingType)
-            );
-        }
+        NonQuery(
+            DatabaseQueries.REGISTER_DISCUSSION_ENTRY,
+            new SQLiteParameter("entryID", entry.ID),
+            new SQLiteParameter("discussionID", entry.DiscussionID),
+            new SQLiteParameter("parentID", entry.ParentID),
+            new SQLiteParameter("userID", entry.Author),
+            new SQLiteParameter("date", entry.Date),
+            new SQLiteParameter("courseID", entry.CourseID),
+            new SQLiteParameter("message", entry.Message)
+        );
+    }
 
-        public void DeleteExternalAssignment(int assignmentID, int courseID)
+    public List<User> GetUsers(
+        int courseID,
+        UserRoles role = UserRoles.student,
+        long syncID = 0
+    )
+    {
+        long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
+        if (activeSync == 0)
         {
-            int assignment_id = IDNonQuery(
-                DatabaseQueries.DELETE_EXTERNAL_ASSIGNMENT,
-                new SQLiteParameter("ID", assignmentID),
-                new SQLiteParameter("courseID", courseID)
-            );
+            _logger.LogWarning("Hash is null, returning empty user list.");
+            return new List<User>() { };
         }
+        List<User> users = new();
 
-        public void UpdateExternalAssignmentTitle(int assignmentID, int courseID, string title)
-        {
-            int assignment_id = IDNonQuery(
-                DatabaseQueries.UPDATE_EXTERNAL_ASSIGNMENT_TITLE,
-                new SQLiteParameter("ID", assignmentID),
+        using (
+            SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_USERS_WITH_ROLE_FOR_COURSE,
                 new SQLiteParameter("courseID", courseID),
-                new SQLiteParameter("title", title)
-            );
-        }
-
-        public void RegisterDiscussion(AppDiscussionTopic discussion, long syncID)
-        {
-            NonQuery(
-                DatabaseQueries.REGISTER_DISCUSSION,
-                new SQLiteParameter("discussionID", discussion.ID),
-                new SQLiteParameter("courseID", discussion.CourseID),
-                new SQLiteParameter("title", discussion.Title),
-                new SQLiteParameter("htmlUrl", discussion.HtmlUrl),
-                new SQLiteParameter("authorName", discussion.Author),
-                new SQLiteParameter("date", discussion.Date),
-                new SQLiteParameter("message", discussion.Message)
-            );
-        }
-
-        public void RegisterDiscussionEntry(AppDiscussionEntry entry)
-        {
-            // This seems to be possible when a teacher replies, but discussions without an author are useless to us
-            // so no need to save them.
-            if (entry.Author == null)
-            {
-                return;
-            }
-
-            NonQuery(
-                DatabaseQueries.REGISTER_DISCUSSION_ENTRY,
-                new SQLiteParameter("entryID", entry.ID),
-                new SQLiteParameter("discussionID", entry.DiscussionID),
-                new SQLiteParameter("parentID", entry.ParentID),
-                new SQLiteParameter("userID", entry.Author),
-                new SQLiteParameter("date", entry.Date),
-                new SQLiteParameter("courseID", entry.CourseID),
-                new SQLiteParameter("message", entry.Message)
-            );
-        }
-
-        public List<User> GetUsers(
-            int courseID,
-            UserRoles role = UserRoles.student,
-            long syncID = 0
+                new SQLiteParameter("role", (int)role),
+                new SQLiteParameter("syncID", activeSync)
+            )
         )
         {
-            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
-            if (activeSync == 0)
+            // collect all users
+            while (r.Read())
             {
-                _logger.LogWarning("Hash is null, returning empty user list.");
-                return new List<User>() { };
+                User user =
+                    new(
+                        r.GetValue(0).ToString(),
+                        courseID,
+                        r.GetInt32(1),
+                        r.GetValue(2).ToString(),
+                        r.GetValue(3).ToString(),
+                        role == UserRoles.student ? r.GetInt32(4) : 1
+                    );
+                users.Add(user);
             }
-            List<User> users = new();
-
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_USERS_WITH_ROLE_FOR_COURSE,
-                    new SQLiteParameter("courseID", courseID),
-                    new SQLiteParameter("role", (int)role),
-                    new SQLiteParameter("syncID", activeSync)
-                )
-            )
-            {
-                // collect all users
-                while (r.Read())
-                {
-                    User user =
-                        new(
-                            r.GetValue(0).ToString(),
-                            courseID,
-                            r.GetInt32(1),
-                            r.GetValue(2).ToString(),
-                            r.GetValue(3).ToString(),
-                            role == UserRoles.student ? r.GetInt32(4) : 1
-                        );
-                    users.Add(user);
-                }
-            }
-
-            return users;
         }
 
-        public int CountUsers(int courseID, UserRoles role = UserRoles.student, long syncID = 0)
+        return users;
+    }
+
+    public int CountUsers(int courseID, UserRoles role = UserRoles.student, long syncID = 0)
+    {
+
+        long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
+        if (activeSync == 0)
         {
-
-            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
-            if (activeSync == 0)
-            {
-                return 0;
-            }
-
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_COUNT_USERS,
-                    new SQLiteParameter("courseID", courseID),
-                    new SQLiteParameter("role", role),
-                    new SQLiteParameter("syncID", activeSync)
-                )
-            )
-                if (r.Read())
-                    return r.GetInt32(0);
-
             return 0;
         }
 
-        public int CountConsents(int courseID, long syncID)
+        using (
+            SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_COUNT_USERS,
+                new SQLiteParameter("courseID", courseID),
+                new SQLiteParameter("role", role),
+                new SQLiteParameter("syncID", activeSync)
+            )
+        )
+            if (r.Read())
+                return r.GetInt32(0);
+
+        return 0;
+    }
+
+    public int CountConsents(int courseID, long syncID)
+    {
+        using SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_NUMBER_CONSENT_PER_COURSE,
+                new SQLiteParameter("courseID", courseID),
+                new SQLiteParameter("syncID", syncID)
+        );
+        if (r.Read())
         {
-            using SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_NUMBER_CONSENT_PER_COURSE,
+            return r.GetInt32(0);
+        }
+        return 0;
+    }
+
+    public List<User> GetUsersWithGrantedConsent(
+        int courseID,
+        UserRoles role = UserRoles.student,
+        long syncID = 0
+    )
+    {
+        long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
+        if (activeSync == 0)
+        {
+            _logger.LogWarning("Hash is null, returning empty user list.");
+            return new List<User>() { };
+        }
+
+        List<User> users = new();
+
+        using (
+            SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_CONSENTED_STUDENTS_FOR_COURSE,
+                new SQLiteParameter("courseID", courseID),
+                new SQLiteParameter("syncID", activeSync)
+            )
+        )
+        {
+            while (r.Read())
+            {
+                User user =
+                    new(
+                        r.GetValue(0).ToString(),
+                        courseID,
+                        r.GetInt32(1),
+                        r.GetValue(2).ToString(),
+                        r.GetValue(3).ToString(),
+                        role == UserRoles.student ? r.GetInt32(4) : 1
+                    );
+                users.Add(user);
+            }
+        }
+
+        return users;
+    }
+
+    public List<User> GetUsersWithSettings(
+        int courseID,
+        UserRoles role = UserRoles.student,
+        long syncID = 0
+    )
+    {
+        long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
+        if (activeSync == 0)
+        {
+            _logger.LogWarning("Hash is null, returning empty user list.");
+            return new List<User>() { };
+        }
+
+        List<User> users = new();
+
+        using (
+            SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_USERS_WITH_ROLE_FOR_COURSE,
+                new SQLiteParameter("courseID", courseID),
+                new SQLiteParameter("role", role),
+                new SQLiteParameter("syncID", activeSync)
+            )
+        )
+        {
+            while (r.Read())
+            {
+                User user =
+                    new(
+                        r.GetValue(0).ToString(),
+                        courseID,
+                        r.GetInt32(1),
+                        r.GetValue(2).ToString(),
+                        r.GetValue(3).ToString(),
+                        role == UserRoles.student ? r.GetInt32(4) : 1
+                    );
+                users.Add(user);
+            }
+        }
+
+        foreach (User user in users)
+        {
+            using (
+                SQLiteDataReader r2 = Query(
+                    DatabaseQueries.QUERY_LAST_STUDENT_SETTINGS,
                     new SQLiteParameter("courseID", courseID),
-                    new SQLiteParameter("syncID", syncID)
-            );
+                    new SQLiteParameter("userID", user.UserID)
+                )
+            )
+            {
+                if (r2.Read())
+                {
+                    user.Settings = new(
+                        r2.GetInt32(0),
+                        r2.GetDouble(1),
+                        r2.GetDouble(2),
+                        r2.GetInt32(3),
+                        r2.GetBoolean(4)
+                    );
+                }
+            }
+        }
+        return users;
+    }
+
+    public string GetUserID(int studentNumber)
+    {
+        using (
+            SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_USER_ID,
+                new SQLiteParameter("studentNumber", studentNumber)
+            )
+        )
+        {
             if (r.Read())
             {
-                return r.GetInt32(0);
+                return r.GetValue(0).ToString();
             }
-            return 0;
         }
+        return null;
+    }
 
-        public List<User> GetUsersWithGrantedConsent(
-            int courseID,
-            UserRoles role = UserRoles.student,
-            long syncID = 0
+    public string GetUserIDFromName(int courseID, string name)
+    {
+        using (
+            SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_USER_ID_FROM_NAME,
+                new SQLiteParameter("name", name)
+            )
         )
         {
-            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
-            if (activeSync == 0)
+            if (r.Read())
             {
-                _logger.LogWarning("Hash is null, returning empty user list.");
-                return new List<User>() { };
+                return r.GetValue(0).ToString();
             }
-
-            List<User> users = new();
-
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_CONSENTED_STUDENTS_FOR_COURSE,
-                    new SQLiteParameter("courseID", courseID),
-                    new SQLiteParameter("syncID", activeSync)
-                )
-            )
-            {
-                while (r.Read())
-                {
-                    User user =
-                        new(
-                            r.GetValue(0).ToString(),
-                            courseID,
-                            r.GetInt32(1),
-                            r.GetValue(2).ToString(),
-                            r.GetValue(3).ToString(),
-                            role == UserRoles.student ? r.GetInt32(4) : 1
-                        );
-                    users.Add(user);
-                }
-            }
-
-            return users;
         }
+        return null;
+    }
 
-        public List<User> GetUsersWithSettings(
-            int courseID,
-            UserRoles role = UserRoles.student,
-            long syncID = 0
+    public string GetConsentedStudentID(int courseID, int studentNumber)
+    {
+        using (
+            SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_CONSENTED_USER_ID_FROM_STUDENT_NUMBER,
+                new SQLiteParameter("courseID", courseID),
+                new SQLiteParameter("studentNumber", studentNumber)
+            )
         )
         {
-            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
-            if (activeSync == 0)
-            {
-                _logger.LogWarning("Hash is null, returning empty user list.");
-                return new List<User>() { };
-            }
+            if (r.Read())
+                return r.GetValue(0).ToString();
+        }
+        return null;
+    }
 
-            List<User> users = new();
-
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_USERS_WITH_ROLE_FOR_COURSE,
-                    new SQLiteParameter("courseID", courseID),
-                    new SQLiteParameter("role", role),
-                    new SQLiteParameter("syncID", activeSync)
-                )
+    public User GetUser(int courseID, string userID)
+    {
+        User user = null;
+        using (
+            SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_USER_DATA_FOR_COURSE,
+                new SQLiteParameter("courseID", courseID),
+                new SQLiteParameter("userID", userID)
             )
+        )
+        {
+            if (r.Read())
             {
-                while (r.Read())
-                {
-                    User user =
-                        new(
-                            r.GetValue(0).ToString(),
-                            courseID,
-                            r.GetInt32(1),
-                            r.GetValue(2).ToString(),
-                            r.GetValue(3).ToString(),
-                            role == UserRoles.student ? r.GetInt32(4) : 1
-                        );
-                    users.Add(user);
-                }
+                user = new(
+                    r.GetValue(0).ToString(),
+                    courseID,
+                    r.GetInt32(1),
+                    r.GetValue(2).ToString(),
+                    r.GetValue(3).ToString(),
+                    r.GetInt32(4)
+                );
             }
-
-            foreach (User user in users)
-            {
-                using (
-                    SQLiteDataReader r2 = Query(
-                        DatabaseQueries.QUERY_LAST_STUDENT_SETTINGS,
-                        new SQLiteParameter("courseID", courseID),
-                        new SQLiteParameter("userID", user.UserID)
-                    )
-                )
-                {
-                    if (r2.Read())
-                    {
-                        user.Settings = new(
-                            r2.GetInt32(0),
-                            r2.GetDouble(1),
-                            r2.GetDouble(2),
-                            r2.GetInt32(3),
-                            r2.GetBoolean(4)
-                        );
-                    }
-                }
-            }
-            return users;
         }
 
-        public string GetUserID(int studentNumber)
+        if (user is null)
         {
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_USER_ID,
-                    new SQLiteParameter("studentNumber", studentNumber)
-                )
-            )
-            {
-                if (r.Read())
-                {
-                    return r.GetValue(0).ToString();
-                }
-            }
-            return null;
+            _logger.LogWarning("User {u} not found for course {c}", userID, courseID);
         }
 
-        public string GetUserIDFromName(int courseID, string name)
+        if (user?.Role == UserRoles.student)
         {
             using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_USER_ID_FROM_NAME,
-                    new SQLiteParameter("name", name)
-                )
-            )
-            {
-                if (r.Read())
-                {
-                    return r.GetValue(0).ToString();
-                }
-            }
-            return null;
-        }
-
-        public string GetConsentedStudentID(int courseID, int studentNumber)
-        {
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_CONSENTED_USER_ID_FROM_STUDENT_NUMBER,
-                    new SQLiteParameter("courseID", courseID),
-                    new SQLiteParameter("studentNumber", studentNumber)
-                )
-            )
-            {
-                if (r.Read())
-                    return r.GetValue(0).ToString();
-            }
-            return null;
-        }
-
-        public User GetUser(int courseID, string userID)
-        {
-            User user = null;
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_USER_DATA_FOR_COURSE,
+                SQLiteDataReader r2 = Query(
+                    DatabaseQueries.QUERY_LAST_STUDENT_SETTINGS,
                     new SQLiteParameter("courseID", courseID),
                     new SQLiteParameter("userID", userID)
                 )
             )
             {
-                if (r.Read())
+                if (r2.Read())
                 {
-                    user = new(
+                    user.Settings = new(
+                        r2.GetInt32(0),
+                        r2.GetDouble(1),
+                        r2.GetDouble(2),
+                        r2.GetInt32(3),
+                        r2.GetBoolean(4)
+                    );
+                }
+            }
+        }
+
+        return user;
+    }
+
+    // public User GetUser(int courseID, string userID)
+    // {
+    //     User user = null;
+    //     using (
+    //         SQLiteDataReader r = Query(
+    //             DatabaseQueries.QUERY_CONSENTED_USER_DATA_FOR_COURSE,
+    //             new SQLiteParameter("courseID", courseID),
+    //             new SQLiteParameter("userID", userID)
+    //         )
+    //     )
+    //     {
+    //         if (r.Read())
+    //         {
+    //             user = new User(
+    //                 r.GetValue(0).ToString(),
+    //                 courseID,
+    //                 r.GetInt32(1),
+    //                 r.GetValue(2).ToString(),
+    //                 r.GetValue(3).ToString(),
+    //                 r.GetValue(5) != null ? r.GetInt32(5) : 1
+    //             );
+    //         }
+    //     }
+
+    //     return user;
+    // }
+
+    public List<User> GetUsersWithGoalGrade(int courseID, int goalGrade, long syncID = 0)
+    {
+        long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
+        if (activeSync == 0)
+            return new List<User> { };
+
+        List<User> users = new();
+
+        using (
+            SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_STUDENTS_WITH_GOAL_GRADE,
+                new SQLiteParameter("courseID", courseID),
+                new SQLiteParameter("goalGrade", goalGrade)
+            )
+        )
+        {
+            // collect all users
+            while (r.Read())
+            {
+                User user =
+                    new(
                         r.GetValue(0).ToString(),
                         courseID,
                         r.GetInt32(1),
@@ -958,649 +1084,513 @@ namespace IguideME.Web.Services
                         r.GetValue(3).ToString(),
                         r.GetInt32(4)
                     );
-                }
+                users.Add(user);
             }
-
-            if (user is null)
-            {
-                _logger.LogWarning("User {u} not found for course {c}", userID, courseID);
-            }
-
-            if (user?.Role == UserRoles.student)
-            {
-                using (
-                    SQLiteDataReader r2 = Query(
-                        DatabaseQueries.QUERY_LAST_STUDENT_SETTINGS,
-                        new SQLiteParameter("courseID", courseID),
-                        new SQLiteParameter("userID", userID)
-                    )
-                )
-                {
-                    if (r2.Read())
-                    {
-                        user.Settings = new(
-                            r2.GetInt32(0),
-                            r2.GetDouble(1),
-                            r2.GetDouble(2),
-                            r2.GetInt32(3),
-                            r2.GetBoolean(4)
-                        );
-                    }
-                }
-            }
-
-            return user;
         }
 
-        // public User GetUser(int courseID, string userID)
-        // {
-        //     User user = null;
-        //     using (
-        //         SQLiteDataReader r = Query(
-        //             DatabaseQueries.QUERY_CONSENTED_USER_DATA_FOR_COURSE,
-        //             new SQLiteParameter("courseID", courseID),
-        //             new SQLiteParameter("userID", userID)
-        //         )
-        //     )
-        //     {
-        //         if (r.Read())
-        //         {
-        //             user = new User(
-        //                 r.GetValue(0).ToString(),
-        //                 courseID,
-        //                 r.GetInt32(1),
-        //                 r.GetValue(2).ToString(),
-        //                 r.GetValue(3).ToString(),
-        //                 r.GetValue(5) != null ? r.GetInt32(5) : 1
-        //             );
-        //         }
-        //     }
+        return users;
+    }
 
-        //     return user;
-        // }
+    public List<string> GetUserIDsWithGoalGrade(int courseID, int goalGrade, long syncID = 0)
+    {
+        List<string> users = new();
 
-        public List<User> GetUsersWithGoalGrade(int courseID, int goalGrade, long syncID = 0)
-        {
-            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
-            if (activeSync == 0)
-                return new List<User> { };
-
-            List<User> users = new();
-
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_STUDENTS_WITH_GOAL_GRADE,
-                    new SQLiteParameter("courseID", courseID),
-                    new SQLiteParameter("goalGrade", goalGrade)
-                )
-            )
-            {
-                // collect all users
-                while (r.Read())
-                {
-                    User user =
-                        new(
-                            r.GetValue(0).ToString(),
-                            courseID,
-                            r.GetInt32(1),
-                            r.GetValue(2).ToString(),
-                            r.GetValue(3).ToString(),
-                            r.GetInt32(4)
-                        );
-                    users.Add(user);
-                }
-            }
-
+        long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
+        if (activeSync == 0)
             return users;
-        }
-
-        public List<string> GetUserIDsWithGoalGrade(int courseID, int goalGrade, long syncID = 0)
-        {
-            List<string> users = new();
-
-            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
-            if (activeSync == 0)
-                return users;
 
 
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_STUDENT_IDS_WITH_GOAL_GRADE,
-                    new SQLiteParameter("courseID", courseID),
-                    new SQLiteParameter("goalGrade", goalGrade)
-                )
-            )
-            {
-                // collect all users
-                while (r.Read())
-                {
-                    users.Add(r.GetValue(0).ToString());
-                }
-            }
-
-            return users;
-        }
-
-        public int CreateGradePredictionModel(int courseID, float intercept)
-        {
-            NonQuery($"UPDATE `grade_prediction_model` SET `enabled`=False"); // TODO: Choose model in a UI.
-            return IDNonQuery(
-                DatabaseQueries.REGISTER_GRADE_PREDICTION_MODEL,
+        using (
+            SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_STUDENT_IDS_WITH_GOAL_GRADE,
                 new SQLiteParameter("courseID", courseID),
-                new SQLiteParameter("intercept", intercept)
-            );
-        }
-
-        public int CreateGradePredictionModelParameter(int modelID, int parameterID, float weight)
-        {
-            return IDNonQuery(
-                DatabaseQueries.REGISTER_GRADE_PREDICTION_MODEL_PARAMETER,
-                new SQLiteParameter("modelID", modelID),
-                new SQLiteParameter("parameterID", parameterID),
-                new SQLiteParameter("weight", weight)
-            );
-        }
-
-        public List<GradePredictionModel> GetGradePredictionModels(int courseID)
-        {
-            List<GradePredictionModel> models = new();
-            GradePredictionModel model;
-
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_GRADE_PREDICTION_MODELS_FOR_COURSE,
-                    new SQLiteParameter("courseID", courseID)
-                )
+                new SQLiteParameter("goalGrade", goalGrade)
             )
-            {
-                while (r.Read())
-                {
-                    try
-                    {
-                        model = new GradePredictionModel(
-                            r.GetInt32(0),
-                            courseID,
-                            r.GetBoolean(2),
-                            r.GetFloat(1)
-                        );
-                        // model.getParameters();
-                        models.Add(model);
-                    }
-                    catch (Exception e)
-                    {
-                        PrintQueryError("GetGrade{redictionModels", 2, r, e);
-                    }
-                }
-            }
-
-            models.ForEach(
-                (GradePredictionModel model) =>
-                    model.Parameters = GetGradePredictionModelParameters(model.ID)
-            );
-
-            return models;
-        }
-
-        public GradePredictionModel GetGradePredictionModel(int courseID)
-        {
-            GradePredictionModel model = null;
-
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_GRADE_PREDICTION_MODEL_FOR_COURSE,
-                    new SQLiteParameter("courseID", courseID)
-                )
-            )
-            {
-                if (r.Read())
-                {
-                    model = new GradePredictionModel(r.GetInt32(0), courseID, true, r.GetFloat(1));
-                }
-            }
-
-            if (model != null)
-                model.Parameters = GetGradePredictionModelParameters(model.ID);
-            return model;
-        }
-
-        public List<GradePredictionModelParameter> GetGradePredictionModelParameters(int modelID)
-        {
-            List<GradePredictionModelParameter> parameters = new();
-
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_GRADE_PREDICTION_MODEL_PARAMETERS_FOR_MODEL,
-                    new SQLiteParameter("modelID", modelID)
-                )
-            )
-            {
-                while (r.Read())
-                {
-                    GradePredictionModelParameter parameter =
-                        new(r.GetInt32(0), r.GetInt32(1), r.GetInt32(2), r.GetFloat(3));
-                    parameters.Add(parameter);
-                }
-            }
-
-            return parameters;
-        }
-
-        public void InitializeUserSettings(int courseID, string userID, long syncID)
-        {
-            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
-            long old_sync = 0;
-
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_LAST_STUDENT_SETTINGS,
-                    new SQLiteParameter("courseID", courseID),
-                    new SQLiteParameter("userID", userID)
-                )
-            )
-            {
-                if (r.Read())
-                    old_sync = long.Parse(r.GetValue(5).ToString());
-            }
-
-            if (old_sync != 0)
-                NonQuery(
-                    DatabaseQueries.QUERY_UPDATE_STUDENT_SETTINGS,
-                    new SQLiteParameter("courseID", courseID),
-                    new SQLiteParameter("userID", userID),
-                    new SQLiteParameter("oldSyncID", old_sync),
-                    new SQLiteParameter("syncID", activeSync)
-                );
-            else
-                NonQuery(
-                    DatabaseQueries.INITIALIZE_STUDENT_SETTINGS,
-                    new SQLiteParameter("courseID", courseID),
-                    new SQLiteParameter("userID", userID),
-                    new SQLiteParameter("syncID", activeSync)
-                );
-        }
-
-        public bool GetTileNotificationState(int tileID)
-        {
-            bool result = false;
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_TILE_NOTIFICATIONS_STATE,
-                    new SQLiteParameter("tileID", tileID)
-                )
-            )
-            {
-                if (r.Read())
-                {
-                    try
-                    {
-                        result = r.GetBoolean(0);
-                    }
-                    catch (Exception e)
-                    {
-                        PrintQueryError("GetTileNotificationState", 0, r, e);
-                    }
-                }
-                return result;
-            }
-        }
-
-        public bool GetNotificationEnable(int courseID, string userID, long syncID)
-        {
-            bool result = true;
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_NOTIFICATIONS_ENABLE,
-                    new SQLiteParameter("courseID", courseID),
-                    new SQLiteParameter("userID", userID),
-                    new SQLiteParameter("syncID", syncID)
-                )
-            )
-            {
-                if (r.Read())
-                {
-                    try
-                    {
-                        _logger.LogInformation("notif: {} {}", r.IsDBNull(0), r.GetBoolean(0));
-                        if (r.IsDBNull(0)) result = false;
-                        else result = r.GetBoolean(0);
-                    }
-                    catch (Exception e)
-                    {
-                        PrintQueryError("GetNotificationEnable", 0, r, e);
-                    }
-                }
-                return result;
-            }
-        }
-
-        public void UpdateUserSettings(
-            int courseID,
-            string userID,
-            int? consent,
-            int? goalGrade,
-            double? totalGrade,
-            double? predictedGrade,
-            bool? notifications,
-            long syncID
         )
         {
-            // When it is done by the user, we get the last available syncID, to replace the settings instead of register them
-            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
-            User tempUser = new User(userID, courseID, -1, "", "-1", (int)UserRoles.student);
-            // _logger.LogInformation("Updating settings for user {} for course {}: consent {} notifications {} goal {} total {}", userID, courseID, consent, notifications, goalGrade, totalGrade);
-
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_LAST_STUDENT_SETTINGS,
-                    new SQLiteParameter("courseID", courseID),
-                    new SQLiteParameter("userID", userID)
-                )
-            )
+            // collect all users
+            while (r.Read())
             {
-                while (r.Read())
+                users.Add(r.GetValue(0).ToString());
+            }
+        }
+
+        return users;
+    }
+
+    public int CreateGradePredictionModel(int courseID, float intercept)
+    {
+        NonQuery($"UPDATE `grade_prediction_model` SET `enabled`=False"); // TODO: Choose model in a UI.
+        return IDNonQuery(
+            DatabaseQueries.REGISTER_GRADE_PREDICTION_MODEL,
+            new SQLiteParameter("courseID", courseID),
+            new SQLiteParameter("intercept", intercept)
+        );
+    }
+
+    public int CreateGradePredictionModelParameter(int modelID, int parameterID, float weight)
+    {
+        return IDNonQuery(
+            DatabaseQueries.REGISTER_GRADE_PREDICTION_MODEL_PARAMETER,
+            new SQLiteParameter("modelID", modelID),
+            new SQLiteParameter("parameterID", parameterID),
+            new SQLiteParameter("weight", weight)
+        );
+    }
+
+    public List<GradePredictionModel> GetGradePredictionModels(int courseID)
+    {
+        List<GradePredictionModel> models = new();
+        GradePredictionModel model;
+
+        using (
+            SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_GRADE_PREDICTION_MODELS_FOR_COURSE,
+                new SQLiteParameter("courseID", courseID)
+            )
+        )
+        {
+            while (r.Read())
+            {
+                try
                 {
-                    try
-                    {
-                        tempUser.Settings = new UserSettings(
-                            goalGrade ?? (r.IsDBNull(0) ? -1 : r.GetInt32(0)),
-                            totalGrade ?? (r.IsDBNull(1) ? 0.0 : r.GetDouble(1)),
-                            predictedGrade ?? (r.IsDBNull(2) ? 0.0 : r.GetDouble(2)),
-                            consent ?? (r.IsDBNull(3) ? 0 : r.GetInt32(3)),
-                            notifications ?? (!r.IsDBNull(4) && r.GetBoolean(4))
-                        );
-                    }
-                    catch (Exception e)
-                    {
-                        PrintQueryError("UpdateUserSettings", 0, r, e);
-                    }
+                    model = new GradePredictionModel(
+                        r.GetInt32(0),
+                        courseID,
+                        r.GetBoolean(2),
+                        r.GetFloat(1)
+                    );
+                    // model.getParameters();
+                    models.Add(model);
+                }
+                catch (Exception e)
+                {
+                    PrintQueryError("GetGrade{redictionModels", 2, r, e);
                 }
             }
+        }
 
+        models.ForEach(
+            (GradePredictionModel model) =>
+                model.Parameters = GetGradePredictionModelParameters(model.ID)
+        );
+
+        return models;
+    }
+
+    public GradePredictionModel GetGradePredictionModel(int courseID)
+    {
+        GradePredictionModel model = null;
+
+        using (
+            SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_GRADE_PREDICTION_MODEL_FOR_COURSE,
+                new SQLiteParameter("courseID", courseID)
+            )
+        )
+        {
+            if (r.Read())
+            {
+                model = new GradePredictionModel(r.GetInt32(0), courseID, true, r.GetFloat(1));
+            }
+        }
+
+        if (model != null)
+            model.Parameters = GetGradePredictionModelParameters(model.ID);
+        return model;
+    }
+
+    public List<GradePredictionModelParameter> GetGradePredictionModelParameters(int modelID)
+    {
+        List<GradePredictionModelParameter> parameters = new();
+
+        using (
+            SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_GRADE_PREDICTION_MODEL_PARAMETERS_FOR_MODEL,
+                new SQLiteParameter("modelID", modelID)
+            )
+        )
+        {
+            while (r.Read())
+            {
+                GradePredictionModelParameter parameter =
+                    new(r.GetInt32(0), r.GetInt32(1), r.GetInt32(2), r.GetFloat(3));
+                parameters.Add(parameter);
+            }
+        }
+
+        return parameters;
+    }
+
+    public void InitializeUserSettings(int courseID, string userID, long syncID)
+    {
+        long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
+        long old_sync = 0;
+
+        using (
+            SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_LAST_STUDENT_SETTINGS,
+                new SQLiteParameter("courseID", courseID),
+                new SQLiteParameter("userID", userID)
+            )
+        )
+        {
+            if (r.Read())
+                old_sync = long.Parse(r.GetValue(5).ToString());
+        }
+
+        if (old_sync != 0)
             NonQuery(
-                DatabaseQueries.REGISTER_STUDENT_SETTINGS,
-                new SQLiteParameter("CourseID", courseID),
-                new SQLiteParameter("UserID", userID),
-                new SQLiteParameter("PredictedGrade", tempUser.Settings.PredictedGrade),
-                new SQLiteParameter("TotalGrade", tempUser.Settings.TotalGrade),
-                new SQLiteParameter("GoalGrade", tempUser.Settings.GoalGrade),
-                new SQLiteParameter("Consent", tempUser.Settings.Consent),
-                new SQLiteParameter("Notifications", tempUser.Settings.Notifications),
+                DatabaseQueries.QUERY_UPDATE_STUDENT_SETTINGS,
+                new SQLiteParameter("courseID", courseID),
+                new SQLiteParameter("userID", userID),
+                new SQLiteParameter("oldSyncID", old_sync),
                 new SQLiteParameter("syncID", activeSync)
             );
-        }
-
-        public double GetUserTotalGrade(int courseID, string userID)
-        {
-            double result = -1;
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_TOTAL_GRADE_FOR_USER,
-                    new SQLiteParameter("courseID", courseID),
-                    new SQLiteParameter("userID", userID)
-                )
-            )
-            {
-                if (r.Read())
-                {
-                    try
-                    {
-                        result = r.GetDouble(0);
-                    }
-                    catch (Exception e)
-                    {
-                        PrintQueryError("GetUserTotalGrade", 0, r, e);
-                    }
-                }
-                return result;
-            }
-        }
-
-        public int GetUserGoalGrade(int courseID, string userID, long syncID)
-        {
-            int result = -1;
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_GOAL_GRADE_FOR_USER,
-                    new SQLiteParameter("courseID", courseID),
-                    new SQLiteParameter("userID", userID)
-                )
-            )
-            {
-                if (r.Read())
-                {
-                    try
-                    {
-                        result = Convert.ToInt32(r.GetValue(0).ToString());
-                    }
-                    catch (Exception e)
-                    {
-                        PrintQueryError("GetUserGoalGrade", 0, r, e);
-                    }
-                }
-                return result;
-            }
-        }
-
-        /// 0 means that we don't compare for assignment/tile/etc., but total average
-        public void CreateUserPeer(
-            int goalGrade,
-            List<string> userIDs,
-            int componentID,
-            double avgGrade,
-            double minGrade,
-            double maxGrade,
-            int componentType,
-            long syncID
-        )
-        {
-            string combinedIDs = string.Join(",", userIDs);
+        else
             NonQuery(
-                DatabaseQueries.REGISTER_USER_PEER,
-                new SQLiteParameter("goalGrade", goalGrade),
-                new SQLiteParameter("combinedIDs", combinedIDs),
-                new SQLiteParameter("componentID", componentID),
-                new SQLiteParameter("avgGrade", avgGrade),
-                new SQLiteParameter("minGrade", minGrade),
-                new SQLiteParameter("maxGrade", maxGrade),
-                new SQLiteParameter("componentType", componentType),
-                new SQLiteParameter("syncID", syncID)
-            );
-        }
-
-        public List<String> GetPeersFromGroup(int courseID, int goalGrade, long syncID = 0)
-        {
-            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
-            if (activeSync == 0)
-                return new List<string> { };
-
-            List<String> peers = new();
-
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_GROUP_PEERS,
-                    new SQLiteParameter("courseID", courseID),
-                    new SQLiteParameter("goalGrade", goalGrade),
-                    new SQLiteParameter("syncID", activeSync)
-                )
-            )
-            {
-                while (r.Read())
-                {
-                    peers.Add(r.GetValue(0).ToString());
-                }
-            }
-            return peers;
-        }
-
-        public void CreateTileGradeForUser(string userID, int tileID, double grade, long syncID)
-        {
-            NonQuery(
-                DatabaseQueries.REGISTER_TILE_GRADE,
+                DatabaseQueries.INITIALIZE_STUDENT_SETTINGS,
+                new SQLiteParameter("courseID", courseID),
                 new SQLiteParameter("userID", userID),
-                new SQLiteParameter("tileID", tileID),
-                new SQLiteParameter("Grade", double.IsNaN(grade) ? 0.0 : grade),
-                new SQLiteParameter("syncID", syncID)
+                new SQLiteParameter("syncID", activeSync)
             );
-        }
+    }
 
-        public double GetLatestTileGradeForUser(string userID, int tileID)
-        {
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_TILE_GRADE_FOR_USER,
-                    new SQLiteParameter("userID", userID),
-                    new SQLiteParameter("tileID", tileID)
-                )
+    public bool GetTileNotificationState(int tileID)
+    {
+        bool result = false;
+        using (
+            SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_TILE_NOTIFICATIONS_STATE,
+                new SQLiteParameter("tileID", tileID)
             )
-            {
-                if (r.Read())
-                {
-                    try
-                    {
-                        return r.GetDouble(0);
-                    }
-                    catch (Exception e)
-                    {
-                        PrintQueryError("GetLatestTileGradeForUser", 4, r, e);
-                    }
-                }
-            }
-            return 0;
-        }
-
-        public int GetInternalAssignmentID(int externalID, int courseID)
-        {
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_ASSIGNMENT_ID_FROM_EXTERNAL,
-                    new SQLiteParameter("externalID", externalID),
-                    new SQLiteParameter("courseID", courseID)
-                )
-            )
-            {
-                if (r.Read())
-                {
-                    try
-                    {
-                        return r.GetInt32(0);
-                    }
-                    catch (Exception e)
-                    {
-                        PrintQueryError("GetInternalAssignmentID", 4, r, e);
-                    }
-                }
-            }
-            return 0;
-        }
-
-        public bool AssignmentHasEntry(int courseID, int assignmentID)
-        {
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_CONTENT_HAS_ENTRY,
-                    new SQLiteParameter("assignmentID", assignmentID),
-                    new SQLiteParameter("contentType", TileType.assignments)
-                )
-            )
-            {
-                // If we find anything then it has an entry.
-                if (r.Read())
-                {
-                    return true;
-                }
-            }
-            return false;
-
-        }
-
-        public int CreateUserSubmission(AssignmentSubmission submission)
-        {
-            return IDNonQuery(
-                DatabaseQueries.REGISTER_USER_SUBMISSION,
-                new SQLiteParameter("assignmentID", submission.AssignmentID),
-                new SQLiteParameter("userID", submission.UserID),
-                new SQLiteParameter("Grade", submission.Grade),
-                new SQLiteParameter("date", submission.Date)
-            );
-        }
-
-        public void CreateSubmissionMeta(int submissionID, string key, string value)
-        {
-            NonQuery(
-                DatabaseQueries.REGISTER_SUBMISSION_META,
-                new SQLiteParameter("submissionID", submissionID),
-                new SQLiteParameter("key", key),
-                new SQLiteParameter("value", value)
-            );
-        }
-
-        // TODO: probably switch to using grades version of submissions instead of Grade.
-        public List<AssignmentSubmission> GetCourseSubmissions(int courseID, long syncID = 0)
-        {
-            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
-            if (activeSync == 0)
-                return new List<AssignmentSubmission>() { };
-
-            List<AssignmentSubmission> submissions = new();
-
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_COURSE_SUBMISSIONS,
-                    new SQLiteParameter("courseID", courseID),
-                    new SQLiteParameter("syncID", activeSync)
-                )
-            )
-            {
-                while (r.Read())
-                {
-                    try
-                    {
-                        AssignmentSubmission submission =
-                            new(
-                                r.GetInt32(0),
-                                r.GetInt32(1),
-                                r.GetValue(2).ToString(),
-                                r.GetInt32(3),
-                                r.GetInt32(4)
-                            );
-                        submissions.Add(submission);
-                    }
-                    catch (Exception e)
-                    {
-                        PrintQueryError("GetCourseSubmissions", 4, r, e);
-                    }
-                }
-            }
-
-            foreach (AssignmentSubmission sub in submissions)
-            {
-                sub.Meta = GetEntryMeta(sub.ID);
-            }
-
-            return submissions;
-        }
-
-        public List<AssignmentSubmission> GetCourseSubmissionsForStudent(
-            int courseID,
-            string userID,
-            long syncID = 0
         )
         {
-            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
-            if (activeSync == 0)
-                return new List<AssignmentSubmission>() { };
-
-            List<AssignmentSubmission> submissions = new();
-
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_COURSE_SUBMISSIONS_FOR_STUDENT,
-                    new SQLiteParameter("courseID", courseID),
-                    new SQLiteParameter("userID", userID)
-                )
-            )
+            if (r.Read())
             {
-                while (r.Read())
+                try
+                {
+                    result = r.GetBoolean(0);
+                }
+                catch (Exception e)
+                {
+                    PrintQueryError("GetTileNotificationState", 0, r, e);
+                }
+            }
+            return result;
+        }
+    }
+
+    public bool GetNotificationEnable(int courseID, string userID, long syncID)
+    {
+        bool result = true;
+        using (
+            SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_NOTIFICATIONS_ENABLE,
+                new SQLiteParameter("courseID", courseID),
+                new SQLiteParameter("userID", userID),
+                new SQLiteParameter("syncID", syncID)
+            )
+        )
+        {
+            if (r.Read())
+            {
+                try
+                {
+                    _logger.LogInformation("notif: {} {}", r.IsDBNull(0), r.GetBoolean(0));
+                    if (r.IsDBNull(0)) result = false;
+                    else result = r.GetBoolean(0);
+                }
+                catch (Exception e)
+                {
+                    PrintQueryError("GetNotificationEnable", 0, r, e);
+                }
+            }
+            return result;
+        }
+    }
+
+    public void UpdateUserSettings(
+        int courseID,
+        string userID,
+        int? consent,
+        int? goalGrade,
+        double? totalGrade,
+        double? predictedGrade,
+        bool? notifications,
+        long syncID
+    )
+    {
+        // When it is done by the user, we get the last available syncID, to replace the settings instead of register them
+        long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
+        User tempUser = new User(userID, courseID, -1, "", "-1", (int)UserRoles.student);
+        // _logger.LogInformation("Updating settings for user {} for course {}: consent {} notifications {} goal {} total {}", userID, courseID, consent, notifications, goalGrade, totalGrade);
+
+        using (
+            SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_LAST_STUDENT_SETTINGS,
+                new SQLiteParameter("courseID", courseID),
+                new SQLiteParameter("userID", userID)
+            )
+        )
+        {
+            while (r.Read())
+            {
+                try
+                {
+                    tempUser.Settings = new UserSettings(
+                        goalGrade ?? (r.IsDBNull(0) ? -1 : r.GetInt32(0)),
+                        totalGrade ?? (r.IsDBNull(1) ? 0.0 : r.GetDouble(1)),
+                        predictedGrade ?? (r.IsDBNull(2) ? 0.0 : r.GetDouble(2)),
+                        consent ?? (r.IsDBNull(3) ? 0 : r.GetInt32(3)),
+                        notifications ?? (!r.IsDBNull(4) && r.GetBoolean(4))
+                    );
+                }
+                catch (Exception e)
+                {
+                    PrintQueryError("UpdateUserSettings", 0, r, e);
+                }
+            }
+        }
+
+        NonQuery(
+            DatabaseQueries.REGISTER_STUDENT_SETTINGS,
+            new SQLiteParameter("CourseID", courseID),
+            new SQLiteParameter("UserID", userID),
+            new SQLiteParameter("PredictedGrade", tempUser.Settings.PredictedGrade),
+            new SQLiteParameter("TotalGrade", tempUser.Settings.TotalGrade),
+            new SQLiteParameter("GoalGrade", tempUser.Settings.GoalGrade),
+            new SQLiteParameter("Consent", tempUser.Settings.Consent),
+            new SQLiteParameter("Notifications", tempUser.Settings.Notifications),
+            new SQLiteParameter("syncID", activeSync)
+        );
+    }
+
+    public double GetUserTotalGrade(int courseID, string userID)
+    {
+        double result = -1;
+        using (
+            SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_TOTAL_GRADE_FOR_USER,
+                new SQLiteParameter("courseID", courseID),
+                new SQLiteParameter("userID", userID)
+            )
+        )
+        {
+            if (r.Read())
+            {
+                try
+                {
+                    result = r.GetDouble(0);
+                }
+                catch (Exception e)
+                {
+                    PrintQueryError("GetUserTotalGrade", 0, r, e);
+                }
+            }
+            return result;
+        }
+    }
+
+    public int GetUserGoalGrade(int courseID, string userID, long syncID)
+    {
+        int result = -1;
+        using (
+            SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_GOAL_GRADE_FOR_USER,
+                new SQLiteParameter("courseID", courseID),
+                new SQLiteParameter("userID", userID)
+            )
+        )
+        {
+            if (r.Read())
+            {
+                try
+                {
+                    result = Convert.ToInt32(r.GetValue(0).ToString());
+                }
+                catch (Exception e)
+                {
+                    PrintQueryError("GetUserGoalGrade", 0, r, e);
+                }
+            }
+            return result;
+        }
+    }
+
+    /// 0 means that we don't compare for assignment/tile/etc., but total average
+    public void CreateUserPeer(
+        int goalGrade,
+        List<string> userIDs,
+        int componentID,
+        double avgGrade,
+        double minGrade,
+        double maxGrade,
+        int componentType,
+        long syncID
+    )
+    {
+        string combinedIDs = string.Join(",", userIDs);
+        NonQuery(
+            DatabaseQueries.REGISTER_USER_PEER,
+            new SQLiteParameter("goalGrade", goalGrade),
+            new SQLiteParameter("combinedIDs", combinedIDs),
+            new SQLiteParameter("componentID", componentID),
+            new SQLiteParameter("avgGrade", avgGrade),
+            new SQLiteParameter("minGrade", minGrade),
+            new SQLiteParameter("maxGrade", maxGrade),
+            new SQLiteParameter("componentType", componentType),
+            new SQLiteParameter("syncID", syncID)
+        );
+    }
+
+    public List<String> GetPeersFromGroup(int courseID, int goalGrade, long syncID = 0)
+    {
+        long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
+        if (activeSync == 0)
+            return new List<string> { };
+
+        List<String> peers = new();
+
+        using (
+            SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_GROUP_PEERS,
+                new SQLiteParameter("courseID", courseID),
+                new SQLiteParameter("goalGrade", goalGrade),
+                new SQLiteParameter("syncID", activeSync)
+            )
+        )
+        {
+            while (r.Read())
+            {
+                peers.Add(r.GetValue(0).ToString());
+            }
+        }
+        return peers;
+    }
+
+    public void CreateTileGradeForUser(string userID, int tileID, double grade, long syncID)
+    {
+        NonQuery(
+            DatabaseQueries.REGISTER_TILE_GRADE,
+            new SQLiteParameter("userID", userID),
+            new SQLiteParameter("tileID", tileID),
+            new SQLiteParameter("Grade", double.IsNaN(grade) ? 0.0 : grade),
+            new SQLiteParameter("syncID", syncID)
+        );
+    }
+
+    public double GetLatestTileGradeForUser(string userID, int tileID)
+    {
+        using (
+            SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_TILE_GRADE_FOR_USER,
+                new SQLiteParameter("userID", userID),
+                new SQLiteParameter("tileID", tileID)
+            )
+        )
+        {
+            if (r.Read())
+            {
+                try
+                {
+                    return r.GetDouble(0);
+                }
+                catch (Exception e)
+                {
+                    PrintQueryError("GetLatestTileGradeForUser", 4, r, e);
+                }
+            }
+        }
+        return 0;
+    }
+
+    public int GetInternalAssignmentID(int externalID, int courseID)
+    {
+        using (
+            SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_ASSIGNMENT_ID_FROM_EXTERNAL,
+                new SQLiteParameter("externalID", externalID),
+                new SQLiteParameter("courseID", courseID)
+            )
+        )
+        {
+            if (r.Read())
+            {
+                try
+                {
+                    return r.GetInt32(0);
+                }
+                catch (Exception e)
+                {
+                    PrintQueryError("GetInternalAssignmentID", 4, r, e);
+                }
+            }
+        }
+        return 0;
+    }
+
+    public bool AssignmentHasEntry(int courseID, int assignmentID)
+    {
+        using (
+            SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_CONTENT_HAS_ENTRY,
+                new SQLiteParameter("assignmentID", assignmentID),
+                new SQLiteParameter("contentType", TileType.assignments)
+            )
+        )
+        {
+            // If we find anything then it has an entry.
+            if (r.Read())
+            {
+                return true;
+            }
+        }
+        return false;
+
+    }
+
+    public int CreateUserSubmission(AssignmentSubmission submission)
+    {
+        return IDNonQuery(
+            DatabaseQueries.REGISTER_USER_SUBMISSION,
+            new SQLiteParameter("assignmentID", submission.AssignmentID),
+            new SQLiteParameter("userID", submission.UserID),
+            new SQLiteParameter("Grade", submission.Grade),
+            new SQLiteParameter("date", submission.Date)
+        );
+    }
+
+    public void CreateSubmissionMeta(int submissionID, string key, string value)
+    {
+        NonQuery(
+            DatabaseQueries.REGISTER_SUBMISSION_META,
+            new SQLiteParameter("submissionID", submissionID),
+            new SQLiteParameter("key", key),
+            new SQLiteParameter("value", value)
+        );
+    }
+
+    // TODO: probably switch to using grades version of submissions instead of Grade.
+    public List<AssignmentSubmission> GetCourseSubmissions(int courseID, long syncID = 0)
+    {
+        long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
+        if (activeSync == 0)
+            return new List<AssignmentSubmission>() { };
+
+        List<AssignmentSubmission> submissions = new();
+
+        using (
+            SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_COURSE_SUBMISSIONS,
+                new SQLiteParameter("courseID", courseID),
+                new SQLiteParameter("syncID", activeSync)
+            )
+        )
+        {
+            while (r.Read())
+            {
+                try
                 {
                     AssignmentSubmission submission =
                         new(
@@ -1612,462 +1602,509 @@ namespace IguideME.Web.Services
                         );
                     submissions.Add(submission);
                 }
-            }
-
-            foreach (AssignmentSubmission sub in submissions)
-            {
-                sub.Meta = GetEntryMeta(sub.ID);
-            }
-
-            return submissions;
-        }
-
-        public LearningGoal GetLearningGoalForUser(int courseID, int entryID, string userID)
-        {
-            LearningGoal goal = new(entryID, "Backend only title, use the entry title instead");
-            goal.Requirements = GetGoalRequirements(entryID);
-            foreach (GoalRequirement requirement in goal.Requirements)
-            {
-                goal.Results.Add(GetGoalRequirementResult(requirement, userID));
-            };
-            return goal;
-        }
-
-        public List<LearningGoal> GetLearningGoalsForTile(int tileID)
-        {
-            List<LearningGoal> goals = new();
-
-            using SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_TILE_LEARNING_GOALS,
-                    new SQLiteParameter("tileID", tileID)
-                );
-            while (r.Read())
-            {
-                goals.Add(new(r.GetInt32(0), r.GetValue(1).ToString()));
-            }
-
-            return goals;
-        }
-
-
-        public bool GetGoalRequirementResult(GoalRequirement requirement, string userID)
-        {
-            using SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_ASSIGNMENT_GRADE,
-                    new SQLiteParameter("assignmentID", requirement.AssignmentID),
-                    new SQLiteParameter("userID", userID)
-                );
-
-            if (r.Read())
-            {
-                double grade = r.GetDouble(0);
-                return requirement.Expression switch
+                catch (Exception e)
                 {
-                    LogicalExpressions.NotEqual => grade != requirement.Value,
-                    LogicalExpressions.Less => grade < requirement.Value,
-                    LogicalExpressions.LessEqual => grade <= requirement.Value,
-                    LogicalExpressions.Equal => grade == requirement.Value,
-                    LogicalExpressions.GreaterEqual => grade > requirement.Value,
-                    LogicalExpressions.Greater => grade >= requirement.Value,
-                    _ => throw new InvalidOperationException("Invalid logical expression")
-                };
+                    PrintQueryError("GetCourseSubmissions", 4, r, e);
+                }
             }
-
-            return false;
         }
 
-        public AssignmentSubmission GetAssignmentSubmissionForUser(
-            int courseID,
-            int entryID,
-            string userID
+        foreach (AssignmentSubmission sub in submissions)
+        {
+            sub.Meta = GetEntryMeta(sub.ID);
+        }
+
+        return submissions;
+    }
+
+    public List<AssignmentSubmission> GetCourseSubmissionsForStudent(
+        int courseID,
+        string userID,
+        long syncID = 0
+    )
+    {
+        long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
+        if (activeSync == 0)
+            return new List<AssignmentSubmission>() { };
+
+        List<AssignmentSubmission> submissions = new();
+
+        using (
+            SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_COURSE_SUBMISSIONS_FOR_STUDENT,
+                new SQLiteParameter("courseID", courseID),
+                new SQLiteParameter("userID", userID)
+            )
         )
         {
-            int goal = GetUserGoalGrade(courseID, userID, GetCurrentSyncID(courseID));
-            PeerComparisonData comparison = GetUserPeerComparison(courseID, goal, Comparison_Component_Types.assignment, entryID);
-            AppAssignment ass = GetAssignment(courseID, entryID);
-
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_USER_SUBMISSION_FOR_ENTRY_FOR_USER,
-                    new SQLiteParameter("entryID", entryID),
-                    new SQLiteParameter("userID", userID)
-                )
-            )
+            while (r.Read())
             {
-                if (r.Read())
-                {
-                    return new(
+                AssignmentSubmission submission =
+                    new(
                         r.GetInt32(0),
                         r.GetInt32(1),
                         r.GetValue(2).ToString(),
-                        new AppGrades(
-                            r.GetDouble(3),
-                            comparison.Minimum,
-                            comparison.Average,
-                            comparison.Maximum,
-                            ass.MaxGrade,
-                            ass.GradingType
-                        ),
-                        r.GetInt64(4)
+                        r.GetInt32(3),
+                        r.GetInt32(4)
                     );
-                }
+                submissions.Add(submission);
             }
-
-            return null;
         }
 
-        public PeerGroup GetPeerGroup(int courseID)
+        foreach (AssignmentSubmission sub in submissions)
         {
-            PeerGroup group = null;
-
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_PEER_GROUP_FOR_COURSE,
-                    new SQLiteParameter("courseID", courseID)
-                )
-            )
-            {
-                if (r.Read())
-                {
-                    group = new PeerGroup(r.GetInt32(0));
-                }
-            }
-
-            return group;
+            sub.Meta = GetEntryMeta(sub.ID);
         }
 
-        public PublicInformedConsent GetPublicInformedConsent(int courseID)
+        return submissions;
+    }
+
+    public LearningGoal GetLearningGoalForUser(int courseID, int entryID, string userID)
+    {
+        LearningGoal goal = new(entryID, "Backend only title, use the entry title instead");
+        goal.Requirements = GetGoalRequirements(entryID);
+        foreach (GoalRequirement requirement in goal.Requirements)
         {
-            PublicInformedConsent consent = null;
+            goal.Results.Add(GetGoalRequirementResult(requirement, userID));
+        };
+        return goal;
+    }
 
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_CONSENT_FOR_COURSE,
-                    new SQLiteParameter("courseID", courseID)
-                )
-            )
-            {
-                if (r.Read())
-                {
-                    consent = new PublicInformedConsent(
-                        r.GetValue(0).ToString(),
-                        r.GetValue(1).ToString()
-                    );
-                }
-            }
+    public List<LearningGoal> GetLearningGoalsForTile(int tileID)
+    {
+        List<LearningGoal> goals = new();
 
-            return consent;
+        using SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_TILE_LEARNING_GOALS,
+                new SQLiteParameter("tileID", tileID)
+            );
+        while (r.Read())
+        {
+            goals.Add(new(r.GetInt32(0), r.GetValue(1).ToString()));
         }
 
-        public void UpdateInformedConsent(int courseID, string text, long syncID)
-        {
-            NonQuery(
-                DatabaseQueries.UPDATE_CONSENT_FOR_COURSE,
-                new SQLiteParameter("courseID", courseID),
-                new SQLiteParameter("text", text)
+        return goals;
+    }
+
+
+    public bool GetGoalRequirementResult(GoalRequirement requirement, string userID)
+    {
+        using SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_ASSIGNMENT_GRADE,
+                new SQLiteParameter("assignmentID", requirement.AssignmentID),
+                new SQLiteParameter("userID", userID)
             );
 
-            // Then we remove consent from all students
-
-            // First we find all their ids and save them in a list
-            List<int> consentedStudentIds = new List<int>();
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_CONSENTED_STUDENTS_FOR_COURSE,
-                    new SQLiteParameter("courseID", courseID),
-                    new SQLiteParameter("syncID", syncID)
-                )
-            )
+        if (r.Read())
+        {
+            double grade = r.GetDouble(0);
+            return requirement.Expression switch
             {
-                while (r.Read())
-                {
-                    try
-                    {
-                        // add the id of every consented student to the list
-                        consentedStudentIds.Add(r.GetInt32(0));
-                    }
-                    catch (Exception e)
-                    {
-                        PrintQueryError("UpdateInformedConsent", 0, r, e);
-                    }
-                }
+                LogicalExpressions.NotEqual => grade != requirement.Value,
+                LogicalExpressions.Less => grade < requirement.Value,
+                LogicalExpressions.LessEqual => grade <= requirement.Value,
+                LogicalExpressions.Equal => grade == requirement.Value,
+                LogicalExpressions.GreaterEqual => grade > requirement.Value,
+                LogicalExpressions.Greater => grade >= requirement.Value,
+                _ => throw new InvalidOperationException("Invalid logical expression")
+            };
+        }
+
+        return false;
+    }
+
+    public AssignmentSubmission GetAssignmentSubmissionForUser(
+        int courseID,
+        int entryID,
+        string userID
+    )
+    {
+        int goal = GetUserGoalGrade(courseID, userID, GetCurrentSyncID(courseID));
+        PeerComparisonData comparison = GetUserPeerComparison(courseID, goal, Comparison_Component_Types.assignment, entryID);
+        AppAssignment ass = GetAssignment(courseID, entryID);
+
+        using (
+            SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_USER_SUBMISSION_FOR_ENTRY_FOR_USER,
+                new SQLiteParameter("entryID", entryID),
+                new SQLiteParameter("userID", userID)
+            )
+        )
+        {
+            if (r.Read())
+            {
+                return new(
+                    r.GetInt32(0),
+                    r.GetInt32(1),
+                    r.GetValue(2).ToString(),
+                    new AppGrades(
+                        r.GetDouble(3),
+                        comparison.Minimum,
+                        comparison.Average,
+                        comparison.Maximum,
+                        ass.MaxGrade,
+                        ass.GradingType
+                    ),
+                    r.GetInt64(4)
+                );
             }
         }
 
-        public void UpdateNotificationDates(int courseID,
-                                            bool isRange,
-                                            string selectedDays,
-                                            string selectedDates)
+        return null;
+    }
+
+    public PeerGroup GetPeerGroup(int courseID)
+    {
+        PeerGroup group = null;
+
+        using (
+            SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_PEER_GROUP_FOR_COURSE,
+                new SQLiteParameter("courseID", courseID)
+            )
+        )
         {
-            NonQuery(
-                DatabaseQueries.UPDATE_NOTIFICATION_DATES_FOR_COURSE,
+            if (r.Read())
+            {
+                group = new PeerGroup(r.GetInt32(0));
+            }
+        }
+
+        return group;
+    }
+
+    public PublicInformedConsent GetPublicInformedConsent(int courseID)
+    {
+        PublicInformedConsent consent = null;
+
+        using (
+            SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_CONSENT_FOR_COURSE,
+                new SQLiteParameter("courseID", courseID)
+            )
+        )
+        {
+            if (r.Read())
+            {
+                consent = new PublicInformedConsent(
+                    r.GetValue(0).ToString(),
+                    r.GetValue(1).ToString()
+                );
+            }
+        }
+
+        return consent;
+    }
+
+    public void UpdateInformedConsent(int courseID, string text, long syncID)
+    {
+        NonQuery(
+            DatabaseQueries.UPDATE_CONSENT_FOR_COURSE,
+            new SQLiteParameter("courseID", courseID),
+            new SQLiteParameter("text", text)
+        );
+
+        // Then we remove consent from all students
+
+        // First we find all their ids and save them in a list
+        List<int> consentedStudentIds = new List<int>();
+        using (
+            SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_CONSENTED_STUDENTS_FOR_COURSE,
                 new SQLiteParameter("courseID", courseID),
-                new SQLiteParameter("isRange", isRange),
-                new SQLiteParameter("selectedDays", selectedDays),
-                new SQLiteParameter("selectedDates", selectedDates)
-            );
-        }
-
-        public void UpdateCoursePeerGroups(int courseID, int groupSize)
-        {
-            NonQuery(
-                DatabaseQueries.UPDATE_PEER_GROUP_FOR_COURSE,
-                new SQLiteParameter("courseID", courseID),
-                new SQLiteParameter("groupSize", groupSize)
-            );
-        }
-
-        public Dictionary<int, double> GetUserAssignmentGrades(int courseID, string userID)
-        {
-            Dictionary<int, double> grades = new();
-
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_COURSE_SUBMISSIONS_FOR_STUDENT,
-                    new SQLiteParameter("courseID", courseID),
-                    new SQLiteParameter("userID", userID)
-                )
+                new SQLiteParameter("syncID", syncID)
             )
-            {
-                while (r.Read())
-                {
-                    try
-                    {
-                        // We save all the retrieved grades in a dictionary with
-                        // the assignment.id as key and a list of grades as value
-                        grades.Add(r.GetInt32(1), r.GetDouble(3));
-                    }
-                    catch (Exception e)
-                    {
-                        PrintQueryError("GetUserAssignmentGrades", 3, r, e);
-                    }
-                }
-            }
-            return grades;
-        }
-
-        public int GetDiscussionCountForUser(int courseID, string userID)
-        {
-
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_DISCUSSIONS_COUNTER_FOR_USER,
-                    new SQLiteParameter("courseID", courseID),
-                    new SQLiteParameter("userID", userID)
-                )
-            )
-            {
-                if (r.Read())
-                {
-                    return r.GetInt32(0);
-                }
-
-            }
-
-            return 0;
-        }
-
-        public int GetDiscussionCountForUserForEntry(int contentID, string userID)
-        {
-
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_DISCUSSIONS_COUNTER_FOR_USER_FOR_ENTRY,
-                    new SQLiteParameter("discussionID", contentID),
-                    new SQLiteParameter("userID", userID)
-                )
-            )
-            {
-                if (r.Read())
-                {
-                    return r.GetInt32(0);
-                }
-
-            }
-
-            return 0;
-        }
-
-        public PeerComparisonData GetUserPeerComparison(
-            int courseID,
-            long goalGrade,
-            Comparison_Component_Types componentType,
-            int componentID,
-            long syncID = 0
         )
         {
-            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
-            if (activeSync == 0)
-                return null;
-
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_PEER_GROUP_RESULTS,
-                    new SQLiteParameter("goalGrade", goalGrade),
-                    new SQLiteParameter("componentType", componentType),
-                    new SQLiteParameter("componentID", componentID),
-                    new SQLiteParameter("syncID", activeSync)
-                )
-            )
-            {
-                if (r.Read())
-                {
-                    try
-                    {
-                        return new(componentID, r.GetDouble(0), r.GetDouble(1), r.GetDouble(2));
-                    }
-                    catch (Exception e)
-                    {
-                        PrintQueryError("GetUserPeerComparison2", 3, r, e);
-                    }
-                }
-            }
-            return new(componentID, 0, 0, 0);
-        }
-
-        public List<PredictedGrade> GetPredictedGrades(int courseID, string userID)
-        {
-            List<PredictedGrade> predictions = new();
-
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_PREDICTED_GRADES_FOR_USER,
-                    new SQLiteParameter("courseID", courseID),
-                    new SQLiteParameter("userID", userID)
-                )
-            )
-            {
-                while (r.Read())
-                {
-                    PredictedGrade prediction = new(userID, r.GetInt64(1), r.GetDouble(0));
-                    predictions.Add(prediction);
-                }
-            }
-
-            return predictions;
-        }
-
-        public List<AssignmentSubmission> GetTileSubmissionsForUser(
-            int tileID,
-            string userID,
-            long syncID = 0
-        )
-        {
-            List<AssignmentSubmission> submissions = new();
-
-            using (
-                SQLiteDataReader r1 = Query(
-                    DatabaseQueries.QUERY_TILE_SUBMISSIONS_FOR_STUDENT,
-                    new SQLiteParameter("userID", userID),
-                    new SQLiteParameter("tileID", tileID)
-                )
-            )
-            {
-                while (r1.Read())
-                {
-                    AssignmentSubmission submission =
-                        new(
-                            r1.GetInt32(0),
-                            r1.GetInt32(1),
-                            r1.GetValue(2).ToString(),
-                            r1.GetDouble(3),
-                            r1.GetInt32(4)
-                        );
-                    submissions.Add(submission);
-                }
-            }
-
-            return submissions;
-        }
-
-        public List<AssignmentSubmission> GetTileSubmissions(
-            int tileID,
-            long syncID = 0
-        )
-        {
-            List<AssignmentSubmission> submissions = new();
-
-            using (
-                SQLiteDataReader r1 = Query(
-                    DatabaseQueries.QUERY_TILE_SUBMISSIONS_FOR_STUDENT,
-                    new SQLiteParameter("tileID", tileID)
-                )
-            )
-            {
-                while (r1.Read())
-                {
-                    AssignmentSubmission submission =
-                        new(
-                            r1.GetInt32(0),
-                            r1.GetInt32(1),
-                            r1.GetValue(2).ToString(),
-                            r1.GetDouble(3),
-                            r1.GetInt32(4)
-                        );
-                    submissions.Add(submission);
-                }
-            }
-
-            return submissions;
-        }
-
-        public Dictionary<int, List<List<object>>> GetHistoricComparison(
-            int courseID,
-            string userID,
-            long syncID = 0
-        )
-        {
-            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
-            if (activeSync == 0)
-                return new Dictionary<int, List<List<object>>>();
-
-            Dictionary<int, List<List<object>>> comparisson_history = new();
-
-            using (
-                SQLiteDataReader r1 = Query(
-                    DatabaseQueries.QUERY_GRADE_COMPARISSON_HISTORY,
-                    new SQLiteParameter("courseID", courseID),
-                    new SQLiteParameter("Grade", GetUserGoalGrade(courseID, userID, syncID)),
-                    new SQLiteParameter("userID", userID)
-                )
-            )
+            while (r.Read())
             {
                 try
                 {
-                    // Initialize last elements
-                    double last_user_avg = -1; //user
-                    double last_peer_avg = -1; //avg
-                    double last_peer_max = -1; //Max
-                    double last_peer_min = -1; //min
+                    // add the id of every consented student to the list
+                    consentedStudentIds.Add(r.GetInt32(0));
+                }
+                catch (Exception e)
+                {
+                    PrintQueryError("UpdateInformedConsent", 0, r, e);
+                }
+            }
+        }
+    }
 
-                    while (r1.Read())
+    public void UpdateNotificationDates(int courseID,
+                                        bool isRange,
+                                        string selectedDays,
+                                        string selectedDates)
+    {
+        NonQuery(
+            DatabaseQueries.UPDATE_NOTIFICATION_DATES_FOR_COURSE,
+            new SQLiteParameter("courseID", courseID),
+            new SQLiteParameter("isRange", isRange),
+            new SQLiteParameter("selectedDays", selectedDays),
+            new SQLiteParameter("selectedDates", selectedDates)
+        );
+    }
+
+    public void UpdateCoursePeerGroups(int courseID, int groupSize)
+    {
+        NonQuery(
+            DatabaseQueries.UPDATE_PEER_GROUP_FOR_COURSE,
+            new SQLiteParameter("courseID", courseID),
+            new SQLiteParameter("groupSize", groupSize)
+        );
+    }
+
+    public Dictionary<int, double> GetUserAssignmentGrades(int courseID, string userID)
+    {
+        Dictionary<int, double> grades = new();
+
+        using (
+            SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_COURSE_SUBMISSIONS_FOR_STUDENT,
+                new SQLiteParameter("courseID", courseID),
+                new SQLiteParameter("userID", userID)
+            )
+        )
+        {
+            while (r.Read())
+            {
+                try
+                {
+                    // We save all the retrieved grades in a dictionary with
+                    // the assignment.id as key and a list of grades as value
+                    grades.Add(r.GetInt32(1), r.GetDouble(3));
+                }
+                catch (Exception e)
+                {
+                    PrintQueryError("GetUserAssignmentGrades", 3, r, e);
+                }
+            }
+        }
+        return grades;
+    }
+
+    public int GetDiscussionCountForUser(int courseID, string userID)
+    {
+
+        using (
+            SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_DISCUSSIONS_COUNTER_FOR_USER,
+                new SQLiteParameter("courseID", courseID),
+                new SQLiteParameter("userID", userID)
+            )
+        )
+        {
+            if (r.Read())
+            {
+                return r.GetInt32(0);
+            }
+
+        }
+
+        return 0;
+    }
+
+    public int GetDiscussionCountForUserForEntry(int contentID, string userID)
+    {
+
+        using (
+            SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_DISCUSSIONS_COUNTER_FOR_USER_FOR_ENTRY,
+                new SQLiteParameter("discussionID", contentID),
+                new SQLiteParameter("userID", userID)
+            )
+        )
+        {
+            if (r.Read())
+            {
+                return r.GetInt32(0);
+            }
+
+        }
+
+        return 0;
+    }
+
+    public PeerComparisonData GetUserPeerComparison(
+        int courseID,
+        long goalGrade,
+        Comparison_Component_Types componentType,
+        int componentID,
+        long syncID = 0
+    )
+    {
+        long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
+        if (activeSync == 0)
+            return null;
+
+        using (
+            SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_PEER_GROUP_RESULTS,
+                new SQLiteParameter("goalGrade", goalGrade),
+                new SQLiteParameter("componentType", componentType),
+                new SQLiteParameter("componentID", componentID),
+                new SQLiteParameter("syncID", activeSync)
+            )
+        )
+        {
+            if (r.Read())
+            {
+                try
+                {
+                    return new(componentID, r.GetDouble(0), r.GetDouble(1), r.GetDouble(2));
+                }
+                catch (Exception e)
+                {
+                    PrintQueryError("GetUserPeerComparison2", 3, r, e);
+                }
+            }
+        }
+        return new(componentID, 0, 0, 0);
+    }
+
+    public List<PredictedGrade> GetPredictedGrades(int courseID, string userID)
+    {
+        List<PredictedGrade> predictions = new();
+
+        using (
+            SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_PREDICTED_GRADES_FOR_USER,
+                new SQLiteParameter("courseID", courseID),
+                new SQLiteParameter("userID", userID)
+            )
+        )
+        {
+            while (r.Read())
+            {
+                PredictedGrade prediction = new(userID, r.GetInt64(1), r.GetDouble(0));
+                predictions.Add(prediction);
+            }
+        }
+
+        return predictions;
+    }
+
+    public List<AssignmentSubmission> GetTileSubmissionsForUser(
+        int tileID,
+        string userID,
+        long syncID = 0
+    )
+    {
+        List<AssignmentSubmission> submissions = new();
+
+        using (
+            SQLiteDataReader r1 = Query(
+                DatabaseQueries.QUERY_TILE_SUBMISSIONS_FOR_STUDENT,
+                new SQLiteParameter("userID", userID),
+                new SQLiteParameter("tileID", tileID)
+            )
+        )
+        {
+            while (r1.Read())
+            {
+                AssignmentSubmission submission =
+                    new(
+                        r1.GetInt32(0),
+                        r1.GetInt32(1),
+                        r1.GetValue(2).ToString(),
+                        r1.GetDouble(3),
+                        r1.GetInt32(4)
+                    );
+                submissions.Add(submission);
+            }
+        }
+
+        return submissions;
+    }
+
+    public List<AssignmentSubmission> GetTileSubmissions(
+        int tileID,
+        long syncID = 0
+    )
+    {
+        List<AssignmentSubmission> submissions = new();
+
+        using (
+            SQLiteDataReader r1 = Query(
+                DatabaseQueries.QUERY_TILE_SUBMISSIONS_FOR_STUDENT,
+                new SQLiteParameter("tileID", tileID)
+            )
+        )
+        {
+            while (r1.Read())
+            {
+                AssignmentSubmission submission =
+                    new(
+                        r1.GetInt32(0),
+                        r1.GetInt32(1),
+                        r1.GetValue(2).ToString(),
+                        r1.GetDouble(3),
+                        r1.GetInt32(4)
+                    );
+                submissions.Add(submission);
+            }
+        }
+
+        return submissions;
+    }
+
+    public Dictionary<int, List<List<object>>> GetHistoricComparison(
+        int courseID,
+        string userID,
+        long syncID = 0
+    )
+    {
+        long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
+        if (activeSync == 0)
+            return new Dictionary<int, List<List<object>>>();
+
+        Dictionary<int, List<List<object>>> comparisson_history = new();
+
+        using (
+            SQLiteDataReader r1 = Query(
+                DatabaseQueries.QUERY_GRADE_COMPARISSON_HISTORY,
+                new SQLiteParameter("courseID", courseID),
+                new SQLiteParameter("Grade", GetUserGoalGrade(courseID, userID, syncID)),
+                new SQLiteParameter("userID", userID)
+            )
+        )
+        {
+            try
+            {
+                // Initialize last elements
+                double last_user_avg = -1; //user
+                double last_peer_avg = -1; //avg
+                double last_peer_max = -1; //Max
+                double last_peer_min = -1; //min
+
+                while (r1.Read())
+                {
+                    // Initialize varaibles with the values to be put inside the lists
+                    int tile_id = r1.GetInt32(0); //tile
+                    double user_avg = r1.GetDouble(1); //user
+                    double peer_avg = r1.GetDouble(2); //avg
+                    double peer_max = r1.GetDouble(3); //Max
+                    double peer_min = r1.GetDouble(4); //min
+
+                    DateTime labelDate = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+                    labelDate = labelDate.AddMilliseconds(
+                        long.Parse(r1.GetValue(5).ToString())
+                    );
+                    string label = String.Format("{0:dd/MM/yyyy}", labelDate); //sync_hash
+
+                    // If this entry is different than the last, we add it
+                    if (
+                        last_user_avg != user_avg
+                        || last_peer_avg != peer_avg
+                        || last_peer_max != peer_max
+                        || last_peer_min != peer_min
+                    )
                     {
-                        // Initialize varaibles with the values to be put inside the lists
-                        int tile_id = r1.GetInt32(0); //tile
-                        double user_avg = r1.GetDouble(1); //user
-                        double peer_avg = r1.GetDouble(2); //avg
-                        double peer_max = r1.GetDouble(3); //Max
-                        double peer_min = r1.GetDouble(4); //min
-
-                        DateTime labelDate = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
-                        labelDate = labelDate.AddMilliseconds(
-                            long.Parse(r1.GetValue(5).ToString())
-                        );
-                        string label = String.Format("{0:dd/MM/yyyy}", labelDate); //sync_hash
-
-                        // If this entry is different than the last, we add it
-                        if (
-                            last_user_avg != user_avg
-                            || last_peer_avg != peer_avg
-                            || last_peer_max != peer_max
-                            || last_peer_min != peer_min
-                        )
+                        // If we have gone in a new tile, we create new pair
+                        if (!comparisson_history.ContainsKey(tile_id))
                         {
-                            // If we have gone in a new tile, we create new pair
-                            if (!comparisson_history.ContainsKey(tile_id))
-                            {
-                                // Use tile id as key and create new list to add the values
-                                comparisson_history[tile_id] = new List<List<object>>
+                            // Use tile id as key and create new list to add the values
+                            comparisson_history[tile_id] = new List<List<object>>
                                 {
                                     new List<object> { label },
                                     new List<object> { user_avg },
@@ -2075,1307 +2112,1242 @@ namespace IguideME.Web.Services
                                     new List<object> { peer_max },
                                     new List<object> { peer_min }
                                 };
-                            }
-                            else
-                            {
-                                comparisson_history[tile_id][0].Add(label);
-                                comparisson_history[tile_id][1].Add(user_avg);
-                                comparisson_history[tile_id][2].Add(peer_avg);
-                                comparisson_history[tile_id][3].Add(peer_max);
-                                comparisson_history[tile_id][4].Add(peer_min);
-                            }
-
-                            // Update last values
-                            last_user_avg = user_avg;
-                            last_peer_avg = peer_avg;
-                            last_peer_max = peer_max;
-                            last_peer_min = peer_min;
                         }
+                        else
+                        {
+                            comparisson_history[tile_id][0].Add(label);
+                            comparisson_history[tile_id][1].Add(user_avg);
+                            comparisson_history[tile_id][2].Add(peer_avg);
+                            comparisson_history[tile_id][3].Add(peer_max);
+                            comparisson_history[tile_id][4].Add(peer_min);
+                        }
+
+                        // Update last values
+                        last_user_avg = user_avg;
+                        last_peer_avg = peer_avg;
+                        last_peer_max = peer_max;
+                        last_peer_min = peer_min;
                     }
                 }
-                catch (Exception e)
-                {
-                    PrintQueryError("GetHistoricComparison", 3, r1, e);
-                }
-            }
-            return comparisson_history;
-        }
-
-        public List<LearningGoal> GetGoals(int courseID, bool autoLoadRequirements = false)
-        {
-            List<LearningGoal> goals = new();
-
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_LEARNING_GOALS,
-                    new SQLiteParameter("courseID", courseID)
-                )
-            )
-            {
-                while (r.Read())
-                {
-                    try
-                    {
-                        goals.Add(new LearningGoal(r.GetInt32(0), r.GetValue(1).ToString()));
-                    }
-                    catch (Exception e)
-                    {
-                        PrintQueryError("GetGoals", 2, r, e);
-                    }
-                }
-            }
-
-            foreach (LearningGoal g in goals)
-            {
-                if (autoLoadRequirements)
-                    g.Requirements = GetGoalRequirements(g.ID);
-            }
-            return goals;
-        }
-
-        public List<LearningGoal> GetGoals(int courseID, int tileID)
-        {
-            List<LearningGoal> goals = new();
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_TILE_LEARNING_GOALS,
-                    new SQLiteParameter("tileID", tileID)
-                )
-            )
-            {
-                while (r.Read())
-                {
-                    try
-                    {
-                        goals.Add(new LearningGoal(r.GetInt32(0), r.GetValue(1).ToString()));
-                    }
-                    catch (Exception e)
-                    {
-                        PrintQueryError("GetGoals", 1, r, e);
-                    }
-                }
-            }
-            return goals;
-        }
-
-        public LearningGoal GetGoal(int courseID, int id)
-        {
-            LearningGoal goal = null;
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_LEARNING_GOAL,
-                    new SQLiteParameter("goalID", id)
-                )
-            )
-            {
-                if (r.Read())
-                {
-                    try
-                    {
-                        goal = new LearningGoal(id, r.GetValue(0).ToString());
-                    }
-                    catch (Exception e)
-                    {
-                        PrintQueryError("GetGoals", 0, r, e);
-                    }
-                }
-            }
-            return goal;
-        }
-
-        public void CreateGoal(int courseID, LearningGoal goal)
-        {
-            NonQuery(
-                DatabaseQueries.REGISTER_LEARNING_GOAL,
-                new SQLiteParameter("courseID", courseID),
-                new SQLiteParameter("title", goal.Title)
-            );
-        }
-
-        public void UpdateGoal(int courseID, LearningGoal goal)
-        {
-            NonQuery(
-                DatabaseQueries.UPDATE_LEARNING_GOAL,
-                new SQLiteParameter("goalID", goal.ID),
-                new SQLiteParameter("courseID", courseID),
-                new SQLiteParameter("title", goal.Title)
-            );
-        }
-
-        public void DeleteGoal(int courseID, LearningGoal goal)
-        {
-            goal.Requirements = GetGoalRequirements(goal.ID);
-
-            DeleteGoalRequirements(goal.ID);
-            goal.Requirements.Clear();
-
-            NonQuery(DatabaseQueries.DELETE_LEARNING_GOAL, new SQLiteParameter("goalID", goal.ID));
-        }
-
-        public void DeleteGoal(int courseID, int id)
-        {
-            LearningGoal goal = GetGoal(courseID, id);
-            if (goal == null)
-                return;
-
-            DeleteGoal(courseID, goal);
-        }
-
-        public void DeleteGoals(int courseID, int tileID)
-        {
-            List<LearningGoal> goals = GetGoals(courseID, tileID);
-            foreach (LearningGoal goal in goals)
-            {
-                DeleteGoal(courseID, goal);
-            }
-        }
-
-        public void CreateGoalRequirement(GoalRequirement requirement)
-        {
-            NonQuery(
-                DatabaseQueries.REGISTER_GOAL_REQUIREMENT,
-                new SQLiteParameter("goalID", requirement.GoalID),
-                new SQLiteParameter("assignmentID", requirement.AssignmentID),
-                new SQLiteParameter("expresson", requirement.Expression),
-                new SQLiteParameter("value", requirement.Value)
-            );
-        }
-
-        public void UpdateGoalRequirement(GoalRequirement requirement)
-        {
-            NonQuery(
-                DatabaseQueries.UPDATE_LEARNING_GOAL_REQUIREMENT,
-                new SQLiteParameter("requirementID", requirement.ID),
-                new SQLiteParameter("assignmentID", requirement.AssignmentID),
-                new SQLiteParameter("expression", requirement.Expression),
-                new SQLiteParameter("value", requirement.Value)
-            );
-        }
-
-        public void DeleteGoalRequirements(int goalID)
-        {
-            NonQuery(
-                DatabaseQueries.DELETE_GOAL_REQUIREMENTS,
-                new SQLiteParameter("goalID", goalID)
-            );
-        }
-
-        public void DeleteGoalRequirement(int requirementID)
-        {
-            NonQuery(
-                DatabaseQueries.DELETE_GOAL_REQUIREMENT,
-                new SQLiteParameter("requirementID", requirementID)
-            );
-        }
-
-        public List<GoalRequirement> GetGoalRequirements(int goalID)
-        {
-            List<GoalRequirement> requirements = new();
-
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_GOAL_REQUIREMENTS,
-                    new SQLiteParameter("goalID", goalID)
-                )
-            )
-            {
-                while (r.Read())
-                {
-                    requirements.Add(
-                        new GoalRequirement(
-                            r.GetInt32(0),
-                            r.GetInt32(1),
-                            r.GetInt32(2),
-                            r.GetInt32(3),
-                            r.GetDouble(4)
-                        )
-                    );
-                }
-            }
-
-            return requirements;
-        }
-
-        public void CleanupNotifications(int courseID)
-        {
-            try
-            {
-                NonQuery(
-                    DatabaseQueries.DELETE_OBSOLETE_NOTIFICATIONS
-                // TODO: notifications relationship with courses needs to be worked out better. Currently a sync deletes
-                // all unsent notifications from all courses.
-                // ,
-                // new SQLiteParameter("courseID", courseID)
-                );
             }
             catch (Exception e)
             {
-                _logger.LogError(
-                    "Error removing notifications: {message}\n{trace}",
-                    e.Message,
-                    e.StackTrace
+                PrintQueryError("GetHistoricComparison", 3, r1, e);
+            }
+        }
+        return comparisson_history;
+    }
+
+    public List<LearningGoal> GetGoals(int courseID, bool autoLoadRequirements = false)
+    {
+        List<LearningGoal> goals = new();
+
+        using (
+            SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_LEARNING_GOALS,
+                new SQLiteParameter("courseID", courseID)
+            )
+        )
+        {
+            while (r.Read())
+            {
+                try
+                {
+                    goals.Add(new LearningGoal(r.GetInt32(0), r.GetValue(1).ToString()));
+                }
+                catch (Exception e)
+                {
+                    PrintQueryError("GetGoals", 2, r, e);
+                }
+            }
+        }
+
+        foreach (LearningGoal g in goals)
+        {
+            if (autoLoadRequirements)
+                g.Requirements = GetGoalRequirements(g.ID);
+        }
+        return goals;
+    }
+
+    public List<LearningGoal> GetGoals(int courseID, int tileID)
+    {
+        List<LearningGoal> goals = new();
+        using (
+            SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_TILE_LEARNING_GOALS,
+                new SQLiteParameter("tileID", tileID)
+            )
+        )
+        {
+            while (r.Read())
+            {
+                try
+                {
+                    goals.Add(new LearningGoal(r.GetInt32(0), r.GetValue(1).ToString()));
+                }
+                catch (Exception e)
+                {
+                    PrintQueryError("GetGoals", 1, r, e);
+                }
+            }
+        }
+        return goals;
+    }
+
+    public LearningGoal GetGoal(int courseID, int id)
+    {
+        LearningGoal goal = null;
+        using (
+            SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_LEARNING_GOAL,
+                new SQLiteParameter("goalID", id)
+            )
+        )
+        {
+            if (r.Read())
+            {
+                try
+                {
+                    goal = new LearningGoal(id, r.GetValue(0).ToString());
+                }
+                catch (Exception e)
+                {
+                    PrintQueryError("GetGoals", 0, r, e);
+                }
+            }
+        }
+        return goal;
+    }
+
+    public void CreateGoal(int courseID, LearningGoal goal)
+    {
+        NonQuery(
+            DatabaseQueries.REGISTER_LEARNING_GOAL,
+            new SQLiteParameter("courseID", courseID),
+            new SQLiteParameter("title", goal.Title)
+        );
+    }
+
+    public void UpdateGoal(int courseID, LearningGoal goal)
+    {
+        NonQuery(
+            DatabaseQueries.UPDATE_LEARNING_GOAL,
+            new SQLiteParameter("goalID", goal.ID),
+            new SQLiteParameter("courseID", courseID),
+            new SQLiteParameter("title", goal.Title)
+        );
+    }
+
+    public void DeleteGoal(int courseID, LearningGoal goal)
+    {
+        goal.Requirements = GetGoalRequirements(goal.ID);
+
+        DeleteGoalRequirements(goal.ID);
+        goal.Requirements.Clear();
+
+        NonQuery(DatabaseQueries.DELETE_LEARNING_GOAL, new SQLiteParameter("goalID", goal.ID));
+    }
+
+    public void DeleteGoal(int courseID, int id)
+    {
+        LearningGoal goal = GetGoal(courseID, id);
+        if (goal == null)
+            return;
+
+        DeleteGoal(courseID, goal);
+    }
+
+    public void DeleteGoals(int courseID, int tileID)
+    {
+        List<LearningGoal> goals = GetGoals(courseID, tileID);
+        foreach (LearningGoal goal in goals)
+        {
+            DeleteGoal(courseID, goal);
+        }
+    }
+
+    public void CreateGoalRequirement(GoalRequirement requirement)
+    {
+        NonQuery(
+            DatabaseQueries.REGISTER_GOAL_REQUIREMENT,
+            new SQLiteParameter("goalID", requirement.GoalID),
+            new SQLiteParameter("assignmentID", requirement.AssignmentID),
+            new SQLiteParameter("expresson", requirement.Expression),
+            new SQLiteParameter("value", requirement.Value)
+        );
+    }
+
+    public void UpdateGoalRequirement(GoalRequirement requirement)
+    {
+        NonQuery(
+            DatabaseQueries.UPDATE_LEARNING_GOAL_REQUIREMENT,
+            new SQLiteParameter("requirementID", requirement.ID),
+            new SQLiteParameter("assignmentID", requirement.AssignmentID),
+            new SQLiteParameter("expression", requirement.Expression),
+            new SQLiteParameter("value", requirement.Value)
+        );
+    }
+
+    public void DeleteGoalRequirements(int goalID)
+    {
+        NonQuery(
+            DatabaseQueries.DELETE_GOAL_REQUIREMENTS,
+            new SQLiteParameter("goalID", goalID)
+        );
+    }
+
+    public void DeleteGoalRequirement(int requirementID)
+    {
+        NonQuery(
+            DatabaseQueries.DELETE_GOAL_REQUIREMENT,
+            new SQLiteParameter("requirementID", requirementID)
+        );
+    }
+
+    public List<GoalRequirement> GetGoalRequirements(int goalID)
+    {
+        List<GoalRequirement> requirements = new();
+
+        using (
+            SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_GOAL_REQUIREMENTS,
+                new SQLiteParameter("goalID", goalID)
+            )
+        )
+        {
+            while (r.Read())
+            {
+                requirements.Add(
+                    new GoalRequirement(
+                        r.GetInt32(0),
+                        r.GetInt32(1),
+                        r.GetInt32(2),
+                        r.GetInt32(3),
+                        r.GetDouble(4)
+                    )
                 );
             }
         }
 
-        public void RegisterNotification(
-            int courseID,
-            string userID,
-            int tileID,
-            int status,
-            long syncID = 0
-        )
-        {
-            _logger.LogInformation("Registering notification: {} for tile {} for user {}", status, tileID, userID);
-            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
+        return requirements;
+    }
 
+    public void CleanupNotifications(int courseID)
+    {
+        try
+        {
             NonQuery(
-                DatabaseQueries.REGISTER_USER_NOTIFICATIONS,
-                new SQLiteParameter("userID", userID),
-                new SQLiteParameter("tileID", tileID),
-                new SQLiteParameter("status", status),
-                new SQLiteParameter("syncID", activeSync)
+                DatabaseQueries.DELETE_OBSOLETE_NOTIFICATIONS
+            // TODO: notifications relationship with courses needs to be worked out better. Currently a sync deletes
+            // all unsent notifications from all courses.
+            // ,
+            // new SQLiteParameter("courseID", courseID)
             );
         }
-
-        public List<StudentNotification> GetAllUserNotifications(int courseID, string userID)
+        catch (Exception e)
         {
-            long activeSync = this.GetCurrentSyncID(courseID);
-
-            List<StudentNotification> notifications = new();
-
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_ALL_USER_NOTIFICATIONS,
-                    new SQLiteParameter("userID", userID),
-                    new SQLiteParameter("syncID", activeSync)
-                )
-            )
-            {
-                while (r.Read())
-                {
-                    StudentNotification notification = new(r.GetValue(0).ToString(), r.GetInt32(1));
-                    notifications.Add(notification);
-                }
-            }
-
-            return notifications;
+            _logger.LogError(
+                "Error removing notifications: {message}\n{trace}",
+                e.Message,
+                e.StackTrace
+            );
         }
+    }
 
-        public Dictionary<string, List<CourseNotification>> GetAllCourseNotifications(int courseID)
-        {
-            Dictionary<string, List<CourseNotification>> result = [];
+    public void RegisterNotification(
+        int courseID,
+        string userID,
+        int tileID,
+        int status,
+        long syncID = 0
+    )
+    {
+        _logger.LogInformation("Registering notification: {} for tile {} for user {}", status, tileID, userID);
+        long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
 
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_ALL_COURSE_NOTIFICATIONS,
-                    new SQLiteParameter("courseID", courseID)
-                )
+        NonQuery(
+            DatabaseQueries.REGISTER_USER_NOTIFICATIONS,
+            new SQLiteParameter("userID", userID),
+            new SQLiteParameter("tileID", tileID),
+            new SQLiteParameter("status", status),
+            new SQLiteParameter("syncID", activeSync)
+        );
+    }
+
+    public List<StudentNotification> GetAllUserNotifications(int courseID, string userID)
+    {
+        long activeSync = this.GetCurrentSyncID(courseID);
+
+        List<StudentNotification> notifications = new();
+
+        using (
+            SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_ALL_USER_NOTIFICATIONS,
+                new SQLiteParameter("userID", userID),
+                new SQLiteParameter("syncID", activeSync)
             )
-            {
-                while (r.Read())
-                {
-                    string studentID = r.GetValue(0).ToString();
-                    string tileTitle = r.GetValue(1).ToString();
-                    int status = r.GetInt32(2);
-                    long? sent = r.IsDBNull(3) ? null : r.GetInt64(3);
-
-                    _logger.LogInformation("Student: {}, Tile: {}, Status: {}, Sent: {}", studentID, tileTitle, status, sent);
-
-                    if (!result.TryGetValue(studentID, out List<CourseNotification> notifications))
-                    {
-                        notifications = [];
-                        result[studentID] = notifications;
-                    }
-
-                    notifications.Add(new CourseNotification
-                    {
-                        TileTitle = tileTitle,
-                        Status = status,
-                        Sent = sent
-                    });
-                }
-            }
-
-            return result;
-        }
-
-        public List<Notification> GetPendingNotifications(
-            int courseID,
-            string userID,
-            long syncID = 0
         )
         {
-            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
-
-            List<Notification> notifications = new();
-
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_PENDING_USER_NOTIFICATIONS,
-                    new SQLiteParameter("userID", userID),
-                    new SQLiteParameter("syncID", activeSync)
-                )
-            )
+            while (r.Read())
             {
-                while (r.Read())
+                StudentNotification notification = new(r.GetValue(0).ToString(), r.GetInt32(1));
+                notifications.Add(notification);
+            }
+        }
+
+        return notifications;
+    }
+
+    public Dictionary<string, List<CourseNotification>> GetAllCourseNotifications(int courseID)
+    {
+        Dictionary<string, List<CourseNotification>> result = [];
+
+        using (
+            SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_ALL_COURSE_NOTIFICATIONS,
+                new SQLiteParameter("courseID", courseID)
+            )
+        )
+        {
+            while (r.Read())
+            {
+                string studentID = r.GetValue(0).ToString();
+                string tileTitle = r.GetValue(1).ToString();
+                int status = r.GetInt32(2);
+                long? sent = r.IsDBNull(3) ? null : r.GetInt64(3);
+
+                _logger.LogInformation("Student: {}, Tile: {}, Status: {}, Sent: {}", studentID, tileTitle, status, sent);
+
+                if (!result.TryGetValue(studentID, out List<CourseNotification> notifications))
                 {
-                    notifications.Add(
-                        new Notification(userID, r.GetInt32(0), r.GetInt32(1), null)
+                    notifications = [];
+                    result[studentID] = notifications;
+                }
+
+                notifications.Add(new CourseNotification
+                {
+                    TileTitle = tileTitle,
+                    Status = status,
+                    Sent = sent
+                });
+            }
+        }
+
+        return result;
+    }
+
+    public List<Notification> GetPendingNotifications(
+        int courseID,
+        string userID,
+        long syncID = 0
+    )
+    {
+        long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
+
+        List<Notification> notifications = new();
+
+        using (
+            SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_PENDING_USER_NOTIFICATIONS,
+                new SQLiteParameter("userID", userID),
+                new SQLiteParameter("syncID", activeSync)
+            )
+        )
+        {
+            while (r.Read())
+            {
+                notifications.Add(
+                    new Notification(userID, r.GetInt32(0), r.GetInt32(1), null)
+                );
+            }
+        }
+
+        return notifications;
+    }
+
+    public void MarkNotificationsSent(int courseID, string userID, long syncID = 0)
+    {
+        long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
+
+        NonQuery(
+            DatabaseQueries.QUERY_MARK_NOTIFICATIONS_SENT,
+            new SQLiteParameter("time", DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()),
+            new SQLiteParameter("userID", userID),
+            new SQLiteParameter("syncID", activeSync)
+        );
+    }
+
+    public List<TileEntry> GetAllTileEntries(int courseID)
+    {
+        List<TileEntry> entries = new();
+
+        using (
+            SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_ALL_TILE_ENTRIES,
+                new SQLiteParameter("courseID", courseID)
+            )
+        )
+        {
+            while (r.Read())
+            {
+                try
+                {
+                    // TODO: Title??
+                    entries.Add(
+                        new TileEntry(
+                            r.GetInt32(0),
+                            r.GetInt32(1),
+                            "This is another title",
+                            "",
+                            2,
+                            r.GetDouble(2)
+                        )
                     );
                 }
-            }
-
-            return notifications;
-        }
-
-        public void MarkNotificationsSent(int courseID, string userID, long syncID = 0)
-        {
-            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
-
-            NonQuery(
-                DatabaseQueries.QUERY_MARK_NOTIFICATIONS_SENT,
-                new SQLiteParameter("time", DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()),
-                new SQLiteParameter("userID", userID),
-                new SQLiteParameter("syncID", activeSync)
-            );
-        }
-
-        public List<TileEntry> GetAllTileEntries(int courseID)
-        {
-            List<TileEntry> entries = new();
-
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_ALL_TILE_ENTRIES,
-                    new SQLiteParameter("courseID", courseID)
-                )
-            )
-            {
-                while (r.Read())
+                catch (Exception e)
                 {
-                    try
-                    {
-                        // TODO: Title??
-                        entries.Add(
-                            new TileEntry(
-                                r.GetInt32(0),
-                                r.GetInt32(1),
-                                "This is another title",
-                                "",
-                                2,
-                                r.GetDouble(2)
-                            )
-                        );
-                    }
-                    catch (Exception e)
-                    {
-                        PrintQueryError("GetEntries", 3, r, e);
-                    }
+                    PrintQueryError("GetEntries", 3, r, e);
                 }
             }
-
-            return entries;
         }
 
-        public void CreateTileEntry(TileEntry entry)
-        {
+        return entries;
+    }
+
+    public void CreateTileEntry(TileEntry entry)
+    {
+        NonQuery(
+            DatabaseQueries.REGISTER_TILE_ENTRY,
+            new SQLiteParameter("tileID", entry.TileID),
+            new SQLiteParameter("contentID", entry.ContentID),
+            new SQLiteParameter("weight", entry.Weight)
+        );
+    }
+
+    public void CreateTileEntries(int tileID, List<TileEntry> entries)
+    {
+        foreach (TileEntry entry in entries)
             NonQuery(
                 DatabaseQueries.REGISTER_TILE_ENTRY,
-                new SQLiteParameter("tileID", entry.TileID),
+                new SQLiteParameter("tileID", tileID),
                 new SQLiteParameter("contentID", entry.ContentID),
                 new SQLiteParameter("weight", entry.Weight)
             );
-        }
+    }
 
-        public void CreateTileEntries(int tileID, List<TileEntry> entries)
-        {
-            foreach (TileEntry entry in entries)
-                NonQuery(
-                    DatabaseQueries.REGISTER_TILE_ENTRY,
-                    new SQLiteParameter("tileID", tileID),
-                    new SQLiteParameter("contentID", entry.ContentID),
-                    new SQLiteParameter("weight", entry.Weight)
-                );
-        }
+    public void DeleteAllTileEntries(int tileID)
+    {
+        NonQuery(
+            DatabaseQueries.DELETE_ALL_TILE_ENTRIES_OF_TILE,
+            new SQLiteParameter("tileID", tileID)
+        );
+    }
 
-        public void DeleteAllTileEntries(int tileID)
-        {
-            NonQuery(
-                DatabaseQueries.DELETE_ALL_TILE_ENTRIES_OF_TILE,
-                new SQLiteParameter("tileID", tileID)
-            );
-        }
+    public void DeleteTileEntry(int entryID)
+    {
+        NonQuery(DatabaseQueries.DELETE_TILE_ENTRY, new SQLiteParameter("contentID", entryID));
+    }
 
-        public void DeleteTileEntry(int entryID)
-        {
-            NonQuery(DatabaseQueries.DELETE_TILE_ENTRY, new SQLiteParameter("contentID", entryID));
-        }
-
-        /////////////////////////////////////////////////////////////////////////////////
-        //////////////////////////         ACCEPT LIST         //////////////////////////
-        /////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////         ACCEPT LIST         //////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////
 
 
-        public void RegisterAcceptedStudent(
-            int courseID,
-            string studentID,
-            bool accepted)
-        {
-            NonQuery(DatabaseQueries.REGISTER_ACCEPTED_STUDENT,
-                new SQLiteParameter("courseID", courseID),
-                new SQLiteParameter("studentID", studentID),
-                new SQLiteParameter("accepted", accepted)
-            );
-        }
+    public void RegisterAcceptedStudent(
+        int courseID,
+        string studentID,
+        bool accepted)
+    {
+        NonQuery(DatabaseQueries.REGISTER_ACCEPTED_STUDENT,
+            new SQLiteParameter("courseID", courseID),
+            new SQLiteParameter("studentID", studentID),
+            new SQLiteParameter("accepted", accepted)
+        );
+    }
 
-        public void ResetAcceptList(int courseID)
-        {
-            NonQuery(DatabaseQueries.RESET_ACCEPT_LIST,
+    public void ResetAcceptList(int courseID)
+    {
+        NonQuery(DatabaseQueries.RESET_ACCEPT_LIST,
+            new SQLiteParameter("courseID", courseID)
+        );
+    }
+
+    public void SetAcceptListRequired(int courseID, bool enabled)
+    {
+        NonQuery(DatabaseQueries.REQUIRE_ACCEPT_LIST,
+            new SQLiteParameter("courseID", courseID),
+            new SQLiteParameter("enabled", enabled)
+        );
+    }
+
+    public List<AcceptList> GetAcceptList(int courseID)
+    {
+        List<AcceptList> keys = new();
+
+        using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_ACCEPT_LIST,
                 new SQLiteParameter("courseID", courseID)
-            );
-        }
-
-        public void SetAcceptListRequired(int courseID, bool enabled)
+            ))
         {
-            NonQuery(DatabaseQueries.REQUIRE_ACCEPT_LIST,
-                new SQLiteParameter("courseID", courseID),
-                new SQLiteParameter("enabled", enabled)
-            );
-        }
-
-        public List<AcceptList> GetAcceptList(int courseID)
-        {
-            List<AcceptList> keys = new();
-
-            using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_ACCEPT_LIST,
-                    new SQLiteParameter("courseID", courseID)
-                ))
+            while (r.Read())
             {
-                while (r.Read())
-                {
-                    keys.Add(
-                        new AcceptList(
-                            r.GetValue(0).ToString(),
-                            r.GetBoolean(1)
-                        ));
-                }
+                keys.Add(
+                    new AcceptList(
+                        r.GetValue(0).ToString(),
+                        r.GetBoolean(1)
+                    ));
             }
-
-            return keys;
         }
 
-        /////////////////////////////////////////////////////////////////////////////////
-        //////////////////////////         END OF LIST         //////////////////////////
-        /////////////////////////////////////////////////////////////////////////////////
+        return keys;
+    }
 
-        public List<string> GetEntryMetaKeys(int submissionID)
-        {
-            List<string> keys = new();
+    /////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////         END OF LIST         //////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////
 
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_TILE_ENTRY_META_KEYS,
-                    new SQLiteParameter("submissionID", submissionID)
-                )
+    public List<string> GetEntryMetaKeys(int submissionID)
+    {
+        List<string> keys = new();
+
+        using (
+            SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_TILE_ENTRY_META_KEYS,
+                new SQLiteParameter("submissionID", submissionID)
             )
-            {
-                while (r.Read())
-                {
-                    keys.Add(r.GetValue(0).ToString());
-                }
-            }
-            return keys;
-        }
-
-
-        public Dictionary<string, string> GetEntryMeta(int submissionID)
-        {
-            Dictionary<string, string> meta = new();
-
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_TILE_ENTRY_SUBMISSION_META,
-                    new SQLiteParameter("submissionID", submissionID)
-                )
-            )
-            {
-                while (r.Read())
-                {
-                    try
-                    {
-                        meta.Add(r.GetValue(0).ToString(), r.GetValue(1).ToString());
-                    }
-                    catch (Exception e)
-                    {
-                        PrintQueryError("GetSubmissionMeta", 1, r, e);
-                    }
-                }
-            }
-            return meta;
-        }
-
-        public void UpdateTile(Tile tile)
-        {
-            NonQuery(
-                DatabaseQueries.UPDATE_TILE,
-                new SQLiteParameter("tileID", tile.ID),
-                new SQLiteParameter("groupID", tile.GroupID),
-                new SQLiteParameter("title", tile.Title),
-                new SQLiteParameter("order", tile.Order),
-                new SQLiteParameter("type", (int)tile.Type),
-                new SQLiteParameter("weight", tile.Weight),
-                new SQLiteParameter("gradingType", (int)tile.GradingType),
-                new SQLiteParameter("alt", tile.Alt),
-                new SQLiteParameter("visible", tile.Visible),
-                new SQLiteParameter("notifications", tile.Notifications)
-            );
-        }
-
-        public void UpdateTileOrder(int[] tileIDs)
-        {
-            for (int i = 0; i < tileIDs.Length; i++)
-            {
-                NonQuery(
-                    DatabaseQueries.UPDATE_TILE_ORDER,
-                    new SQLiteParameter("tileID", tileIDs[i]),
-                    new SQLiteParameter("order", i)
-                );
-            }
-        }
-
-        public List<Tile> GetTiles(int courseID, bool autoLoadEntries = false)
-        {
-            List<Tile> tiles = new();
-
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_TILES,
-                    new SQLiteParameter("courseID", courseID)
-                )
-            )
-            {
-                while (r.Read())
-                {
-                    try
-                    {
-                        Tile row =
-                            new(
-                                r.GetInt32(0),
-                                r.GetInt32(1),
-                                r.GetValue(2).ToString(),
-                                r.GetInt32(3),
-                                (TileType)r.GetInt32(4),
-                                r.GetDouble(5),
-                                (AppGradingType)r.GetInt32(6),
-                                r.GetBoolean(7),
-                                r.GetBoolean(8),
-                                r.GetBoolean(9)
-                            );
-                        tiles.Add(row);
-                    }
-                    catch (Exception e)
-                    {
-                        PrintQueryError("GetTiles", 9, r, e);
-                    }
-                }
-            }
-
-            foreach (Tile t in tiles)
-            {
-                if (autoLoadEntries)
-                    t.Entries = GetTileEntries(t.ID);
-            }
-
-            return tiles;
-        }
-
-        public List<Tile> GetGroupTiles(int courseID, string groupID, bool autoLoadEntries = false)
-        {
-            List<Tile> tiles = new();
-
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_TILES_FOR_GROUP,
-                    new SQLiteParameter("courseID", courseID),
-                    new SQLiteParameter("groupID", groupID)
-                )
-            )
-            {
-                while (r.Read())
-                {
-                    try
-                    {
-                        Tile row =
-                            new(
-                                r.GetInt32(0),
-                                r.GetInt32(1),
-                                r.GetValue(2).ToString(),
-                                r.GetInt32(3),
-                                (TileType)r.GetInt32(4),
-                                r.GetDouble(5),
-                                (AppGradingType)r.GetInt32(6),
-                                r.GetBoolean(7),
-                                r.GetBoolean(8),
-                                r.GetBoolean(9)
-                            );
-                        tiles.Add(row);
-                    }
-                    catch (Exception e)
-                    {
-                        PrintQueryError("GetTiles", 9, r, e);
-                    }
-                }
-            }
-
-            foreach (Tile t in tiles)
-            {
-                if (autoLoadEntries)
-                    t.Entries = GetTileEntries(t.ID);
-            }
-
-            return tiles;
-        }
-
-        // public Tile FillTileContent(Tile tile)
-        // {
-        //     switch(tile.Type)
-        //     {
-        //         case Tile_type.assignments:
-        //             using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_COURSE_ASSIGNMENTS,
-        //                 new SQLiteParameter("tileID", courseID)))
-        //             {
-        //                 while (r.Read())
-        //                 {
-        //                     try
-        //                     {
-
-        //                     }
-        //                     catch (Exception e)
-        //                     {
-        //                         PrintQueryError("FillTileContent", 9, r, e);
-        //                     }
-        //                 }
-        //             }
-        //         break;
-        //         case Tile_type.discussions:
-        //         break;
-        //         case Tile_type.learning_outcomes:
-        //         break;
-        //     }
-
-        //     return tile;
-        // }
-
-        public void CreateLayoutTileGroup(int courseID, string title, int position)
-        {
-            // List<LayoutColumn> cols = this.GetLayoutColumns(courseID);
-            // if (cols.Count < 1) return;
-
-            NonQuery(
-                DatabaseQueries.REGISTER_TILE_GROUP,
-                // new SQLiteParameter("columnID", cols[0].ID),
-                new SQLiteParameter("title", title),
-                new SQLiteParameter("order", position),
-                new SQLiteParameter("courseID", courseID)
-            );
-        }
-
-        public LayoutTileGroup UpdateTileGroup(
-            int courseID,
-            int tileGroupID,
-            int columnID,
-            string title,
-            int order
         )
         {
+            while (r.Read())
+            {
+                keys.Add(r.GetValue(0).ToString());
+            }
+        }
+        return keys;
+    }
+
+
+    public Dictionary<string, string> GetEntryMeta(int submissionID)
+    {
+        Dictionary<string, string> meta = new();
+
+        using (
+            SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_TILE_ENTRY_SUBMISSION_META,
+                new SQLiteParameter("submissionID", submissionID)
+            )
+        )
+        {
+            while (r.Read())
+            {
+                try
+                {
+                    meta.Add(r.GetValue(0).ToString(), r.GetValue(1).ToString());
+                }
+                catch (Exception e)
+                {
+                    PrintQueryError("GetSubmissionMeta", 1, r, e);
+                }
+            }
+        }
+        return meta;
+    }
+
+    public void UpdateTile(Tile tile)
+    {
+        NonQuery(
+            DatabaseQueries.UPDATE_TILE,
+            new SQLiteParameter("tileID", tile.ID),
+            new SQLiteParameter("groupID", tile.GroupID),
+            new SQLiteParameter("title", tile.Title),
+            new SQLiteParameter("order", tile.Order),
+            new SQLiteParameter("type", (int)tile.Type),
+            new SQLiteParameter("weight", tile.Weight),
+            new SQLiteParameter("gradingType", (int)tile.GradingType),
+            new SQLiteParameter("alt", tile.Alt),
+            new SQLiteParameter("visible", tile.Visible),
+            new SQLiteParameter("notifications", tile.Notifications)
+        );
+    }
+
+    public void UpdateTileOrder(int[] tileIDs)
+    {
+        for (int i = 0; i < tileIDs.Length; i++)
+        {
             NonQuery(
-                DatabaseQueries.UPDATE_TILE_GROUP,
-                new SQLiteParameter("columnID", columnID),
-                new SQLiteParameter("title", title),
-                new SQLiteParameter("order", order),
-                new SQLiteParameter("groupID", tileGroupID)
+                DatabaseQueries.UPDATE_TILE_ORDER,
+                new SQLiteParameter("tileID", tileIDs[i]),
+                new SQLiteParameter("order", i)
             );
-
-            return GetLayoutTileGroup(courseID, tileGroupID);
         }
+    }
 
-        public void UpdateTileGroupOrder(int[] tileGroupIDs)
-        {
-            for (int i = 0; i < tileGroupIDs.Length; i++)
-            {
-                NonQuery(
-                    DatabaseQueries.UPDATE_TILE_GROUP_ORDER,
-                    new SQLiteParameter("groupID", tileGroupIDs[i]),
-                    new SQLiteParameter("order", i)
-                );
-            }
-        }
+    public List<Tile> GetTiles(int courseID, bool autoLoadEntries = false)
+    {
+        List<Tile> tiles = new();
 
-        public void DeleteLayoutTileGroup(int groupID)
-        {
-            NonQuery(DatabaseQueries.DELETE_TILE_GROUP, new SQLiteParameter("groupID", groupID));
-        }
-
-        public LayoutTileGroup GetLayoutTileGroup(int courseID, int groupID)
-        {
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_TILE_GROUP,
-                    new SQLiteParameter("courseID", courseID),
-                    new SQLiteParameter("groupID", groupID)
-                )
+        using (
+            SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_TILES,
+                new SQLiteParameter("courseID", courseID)
             )
-            {
-                if (r.Read())
-                    return new LayoutTileGroup(
-                        r.GetInt32(0),
-                        courseID,
-                        r.GetValue(1).ToString(),
-                        r.GetInt32(2),
-                        r.GetInt32(3)
-                    );
-            }
-            return null;
-        }
-
-        public List<LayoutTileGroup> GetLayoutTileGroups(int courseID)
+        )
         {
-            List<LayoutTileGroup> tileGroups = new();
-
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_TILE_GROUPS,
-                    new SQLiteParameter("courseID", courseID)
-                )
-            )
+            while (r.Read())
             {
-                while (r.Read())
+                try
                 {
-                    try
-                    {
-                        LayoutTileGroup row =
-                            new(
-                                r.GetInt32(0),
-                                courseID,
-                                r.GetValue(1).ToString(),
-                                r.GetInt32(2),
-                                r.GetInt32(3)
-                            );
-                        tileGroups.Add(row);
-                    }
-                    catch (Exception e)
-                    {
-                        PrintQueryError("GetLayoutTileGroups", 3, r, e);
-                    }
-                }
-            }
-
-            return tileGroups;
-        }
-
-        public double GetTileAVG(int tileID, string userID, int courseID)
-        {
-            long syncID = this.GetCurrentSyncID(courseID);
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_TILE_GRADE,
-                    new SQLiteParameter("tileID", tileID),
-                    new SQLiteParameter("userID", userID),
-                    new SQLiteParameter("syncID", syncID)
-                )
-            )
-            {
-                if (r.Read())
-                {
-                    try
-                    {
-                        return r.GetDouble(0);
-                    }
-                    catch (Exception e)
-                    {
-                        PrintQueryError("GetLayoutTileGroups", 3, r, e);
-                    }
-                }
-            }
-            return -1;
-
-        }
-
-        public (int max, AppGradingType type) GetTileMax(int tileID, int courseID)
-        {
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_TILE_GRADE_MAX_AND_TYPE,
-                    new SQLiteParameter("tileID", tileID),
-                    new SQLiteParameter("courseID", courseID)
-                )
-            )
-            {
-                if (r.Read())
-                {
-                    return (Convert.ToInt32(r.GetDouble(0)), (AppGradingType)r.GetInt32(1));
-                }
-            }
-            return (-1, AppGradingType.Points);
-        }
-
-        public List<UserGrade> GetCompareGrades(int courseID, string id, string type)
-        {
-            return type switch
-            {
-                "tile" => GetTileCompare(courseID, id),
-                "ass" => GetAssignmentCompare(courseID, id),
-                "disc" => GetDiscussionCompare(courseID, id),
-                "goal" => GetLearningGoalCompare(courseID, id),
-                _ => throw new InvalidOperationException("Invalid compare type")
-            };
-        }
-
-        public List<UserGrade> GetTileCompare(int courseID, string tileID)
-        {
-            long syncID = this.GetCurrentSyncID(courseID);
-            List<UserGrade> grades = new();
-
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_TILE_COMPARE_GRADES,
-                    new SQLiteParameter("syncID", syncID),
-                    new SQLiteParameter("tileID", tileID)
-                )
-            )
-            {
-                while (r.Read())
-                {
-                    try
-                    {
-                        grades.Add(new(r.GetValue(0).ToString(), r.GetDouble(1), 10));
-                    }
-                    catch (Exception e)
-                    {
-                        PrintQueryError(System.Reflection.MethodBase.GetCurrentMethod().ToString(), 1, r, e);
-                    }
-                }
-            }
-            return grades;
-        }
-
-        public List<UserGrade> GetAssignmentCompare(int courseID, string assignmentID)
-        {
-            List<UserGrade> grades = new();
-
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_ASSIGNMENT_COMPARE_GRADES,
-                    new SQLiteParameter("assignmentID", assignmentID),
-                    new SQLiteParameter("courseID", courseID)
-                )
-            )
-            {
-                while (r.Read())
-                {
-                    try
-                    {
-                        grades.Add(new(r.GetValue(0).ToString(), r.GetDouble(1), r.GetDouble(2)));
-                    }
-                    catch (Exception e)
-                    {
-                        PrintQueryError(System.Reflection.MethodBase.GetCurrentMethod().ToString(), 2, r, e);
-                    }
-                }
-            }
-            return grades;
-        }
-
-        public List<UserGrade> GetDiscussionCompare(int courseID, string discussionID)
-        {
-            List<UserGrade> grades = new();
-            double max = 0;
-
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_DISCUSSION_COMPARE_GRADES,
-                    new SQLiteParameter("discussionID", discussionID),
-                    new SQLiteParameter("courseID", courseID)
-                )
-            )
-            {
-                while (r.Read())
-                {
-                    try
-                    {
-                        grades.Add(new(r.GetValue(0).ToString(), r.GetDouble(1), -1));
-                        max += r.GetDouble(1);
-                    }
-                    catch (Exception e)
-                    {
-                        PrintQueryError(System.Reflection.MethodBase.GetCurrentMethod().ToString(), 1, r, e);
-                    }
-                }
-            }
-            foreach (UserGrade grade in grades)
-            {
-                grade.Max = max;
-            }
-            return grades;
-        }
-
-        public List<UserGrade> GetLearningGoalCompare(int courseID, string assignmentID)
-        {
-            // TODO: Implement.
-            return new();
-
-        }
-
-        public UserTileGrades[] GetAllTileGrades(int courseID)
-        {
-            List<User> students = GetUsersWithSettings(courseID);
-            return students.Select((student) => new UserTileGrades(
-                student.UserID,
-                GetUserTileAVGs(student.UserID, courseID).ToArray()
-            )
-
-             ).ToArray();
-
-        }
-
-        public List<EntryGrades> GetUserEntryAssignmentGrades(int courseID, string userID)
-        {
-            List<EntryGrades> grades = new();
-
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_USER_ASSIGNMENT_GRADES,
-                    new SQLiteParameter("courseID", courseID),
-                    new SQLiteParameter("userID", userID)
-                )
-            )
-            {
-                while (r.Read())
-                {
-                    try
-                    {
-                        grades.Add(new(r.GetInt32(0), r.GetInt32(1), r.GetDouble(2), r.GetDouble(3)));
-                    }
-                    catch (Exception e)
-                    {
-                        PrintQueryError(System.Reflection.MethodBase.GetCurrentMethod().ToString(), 3, r, e);
-                    }
-                }
-            }
-            return grades;
-        }
-
-        public List<int> GetTileIDsOfType(int courseID, TileType type, int alt)
-        {
-            List<int> tileIDs = new();
-
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_TILE_IDS_OF_TYPE,
-                    new SQLiteParameter("courseID", courseID),
-                    new SQLiteParameter("alt", alt),
-                    new SQLiteParameter("type", type)
-                )
-            )
-            {
-                while (r.Read())
-                {
-                    try
-                    {
-                        tileIDs.Add(r.GetInt32(0));
-                    }
-                    catch (Exception e)
-                    {
-                        PrintQueryError(System.Reflection.MethodBase.GetCurrentMethod().ToString(), 3, r, e);
-                    }
-                }
-            }
-            return tileIDs;
-        }
-
-        public List<EntryGrades> GetUserDiscussionGrades(int courseID, string userID)
-        {
-            long syncID = this.GetCurrentSyncID(courseID);
-            List<EntryGrades> grades = new();
-            List<int> tiles = GetTileIDsOfType(courseID, TileType.discussions, 0);
-            if (tiles.Count == 0)
-            {
-                return grades;
-            }
-
-            IEnumerable<TileEntry> entries = tiles.SelectMany(id => GetTileEntries(id));
-            foreach (TileEntry entry in entries)
-            {
-                grades.Add(new(entry.ContentID, AppGradingType.NotGraded, GetDiscussionCountForUserForEntry(entry.ContentID, userID), -1));
-            }
-
-            return grades;
-        }
-
-        public List<EntryGrades> GetUserLearningGrades(int courseID, string userID)
-        {
-            List<EntryGrades> grades = new();
-            List<LearningGoal> goals = GetGoals(courseID, true);
-
-            foreach (LearningGoal goal in goals)
-            {
-                int grade = 0;
-                foreach (GoalRequirement req in goal.Requirements)
-                {
-                    grade += GetGoalRequirementResult(req, userID) ? 1 : 0;
-                }
-                grades.Add(new EntryGrades(goal.ID, AppGradingType.Points, grade, goal.Requirements.Count));
-            }
-            return grades;
-        }
-
-        public Dictionary<string, EntryGrades[]> GetAllEntryGrades(int courseID)
-        {
-            List<User> students = GetUsersWithSettings(courseID);
-            Dictionary<string, EntryGrades[]> userGradesMap = new();
-
-            students.ForEach((student) => userGradesMap.Add(
-                student.UserID,
-                GetUserEntryAssignmentGrades(courseID, student.UserID)
-                .Concat(GetUserDiscussionGrades(courseID, student.UserID))
-                .Concat(GetUserLearningGrades(courseID, student.UserID))
-                .ToArray()
-            )
-
-             );
-            return userGradesMap;
-
-        }
-
-        public List<TilesGrades> GetUserTileAVGs(string userID, int courseID)
-        {
-            long syncID = this.GetCurrentSyncID(courseID);
-            List<TilesGrades> avgs = new();
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_USER_TILE_GRADES,
-                    new SQLiteParameter("userID", userID),
-                    new SQLiteParameter("syncID", syncID)
-                )
-            )
-            {
-                while (r.Read())
-                {
-                    try
-                    {
-                        avgs.Add(new(r.GetInt32(1), r.GetDouble(0), -1));
-                    }
-                    catch (Exception e)
-                    {
-                        PrintQueryError("GetLayoutTileGroups", 3, r, e);
-                    }
-                }
-            }
-            foreach (TilesGrades grades in avgs)
-            {
-                grades.max = GetTileMax(grades.tile_id, courseID).max;
-            }
-            return avgs;
-
-        }
-
-        public AppGrades GetTileGrade(int tileID, string userID, int courseID)
-        {
-            double tileGrade = GetTileAVG(tileID, userID, courseID);
-            (int max, AppGradingType type) = GetTileMax(tileID, courseID);
-
-            long syncID = this.GetCurrentSyncID(courseID);
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_TILE_PEER_GRADES,
-                    new SQLiteParameter("tileID", tileID),
-                    new SQLiteParameter("userID", userID),
-                    new SQLiteParameter("type", Comparison_Component_Types.tile),
-                    new SQLiteParameter("syncID", syncID)
-                )
-            )
-            {
-                if (r.Read())
-                {
-                    try
-                    {
-                        return new(
-                            tileGrade,
-                            r.GetDouble(0),
-                            r.GetDouble(1),
-                            r.GetDouble(2),
-                            max,
-                            type
+                    Tile row =
+                        new(
+                            r.GetInt32(0),
+                            r.GetInt32(1),
+                            r.GetValue(2).ToString(),
+                            r.GetInt32(3),
+                            (TileType)r.GetInt32(4),
+                            r.GetDouble(5),
+                            (AppGradingType)r.GetInt32(6),
+                            r.GetBoolean(7),
+                            r.GetBoolean(8),
+                            r.GetBoolean(9)
                         );
-                    }
-                    catch (Exception e)
-                    {
-                        PrintQueryError("GetLayoutTileGroups", 3, r, e);
-                    }
+                    tiles.Add(row);
+                }
+                catch (Exception e)
+                {
+                    PrintQueryError("GetTiles", 9, r, e);
                 }
             }
-
-            return null;
         }
 
-        public Dictionary<int, AppAssignment> GetAssignmentsMap(int courseID)
+        foreach (Tile t in tiles)
         {
-            Dictionary<int, AppAssignment> assignments = new();
+            if (autoLoadEntries)
+                t.Entries = GetTileEntries(t.ID);
+        }
 
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_COURSE_ASSIGNMENTS,
-                    new SQLiteParameter("courseID", courseID)
-                )
+        return tiles;
+    }
+
+    public List<Tile> GetGroupTiles(int courseID, string groupID, bool autoLoadEntries = false)
+    {
+        List<Tile> tiles = new();
+
+        using (
+            SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_TILES_FOR_GROUP,
+                new SQLiteParameter("courseID", courseID),
+                new SQLiteParameter("groupID", groupID)
             )
+        )
+        {
+            while (r.Read())
             {
-                while (r.Read())
+                try
                 {
-                    try
-                    {
-                        AppAssignment row =
-                            new(
-                                r.GetInt32(0),
-                                r.GetInt32(1),
-                                r.GetValue(2).ToString(),
-                                r.GetValue(3).ToString(),
-                                r.GetInt32(4),
-                                r.GetInt32(5),
-                                r.GetBoolean(6),
-                                r.GetInt64(7),
-                                r.GetDouble(8),
-                                (AppGradingType)r.GetInt32(9)
-                            );
-                        assignments.Add(r.GetInt32(0), row);
-                    }
-                    catch (Exception e)
-                    {
-                        PrintQueryError("GetAssignments", 9, r, e);
-                    }
+                    Tile row =
+                        new(
+                            r.GetInt32(0),
+                            r.GetInt32(1),
+                            r.GetValue(2).ToString(),
+                            r.GetInt32(3),
+                            (TileType)r.GetInt32(4),
+                            r.GetDouble(5),
+                            (AppGradingType)r.GetInt32(6),
+                            r.GetBoolean(7),
+                            r.GetBoolean(8),
+                            r.GetBoolean(9)
+                        );
+                    tiles.Add(row);
+                }
+                catch (Exception e)
+                {
+                    PrintQueryError("GetTiles", 9, r, e);
                 }
             }
-
-            return assignments;
         }
 
-        public AppAssignment GetAssignment(int courseID, int internalID)
+        foreach (Tile t in tiles)
         {
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_ASSIGNMENT,
-                    new SQLiteParameter("courseID", courseID),
-                    new SQLiteParameter("internalID", internalID)
-                )
-            )
-            {
-                if (r.Read())
-                {
-                    try
-                    {
-                        return new(
-                                r.GetInt32(0),
-                                r.GetInt32(1),
-                                r.GetValue(2).ToString(),
-                                r.GetValue(3).ToString(),
-                                r.GetInt32(4),
-                                r.GetInt32(5),
-                                r.GetBoolean(6),
-                                r.GetInt64(7),
-                                r.GetDouble(8),
-                                (AppGradingType)r.GetInt32(9)
-                            );
-                    }
-                    catch (Exception e)
-                    {
-                        PrintQueryError("GetAssignments", 9, r, e);
-                    }
-                }
-            }
-
-            return null;
+            if (autoLoadEntries)
+                t.Entries = GetTileEntries(t.ID);
         }
 
-        public List<AppDiscussionTopic> GetDiscussions(int courseID)
-        {
-            List<AppDiscussionTopic> discussions = new();
+        return tiles;
+    }
 
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_COURSE_TOPICS,
-                    new SQLiteParameter("courseID", courseID)
-                )
+    // public Tile FillTileContent(Tile tile)
+    // {
+    //     switch(tile.Type)
+    //     {
+    //         case Tile_type.assignments:
+    //             using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_COURSE_ASSIGNMENTS,
+    //                 new SQLiteParameter("tileID", courseID)))
+    //             {
+    //                 while (r.Read())
+    //                 {
+    //                     try
+    //                     {
+
+    //                     }
+    //                     catch (Exception e)
+    //                     {
+    //                         PrintQueryError("FillTileContent", 9, r, e);
+    //                     }
+    //                 }
+    //             }
+    //         break;
+    //         case Tile_type.discussions:
+    //         break;
+    //         case Tile_type.learning_outcomes:
+    //         break;
+    //     }
+
+    //     return tile;
+    // }
+
+    public void CreateLayoutTileGroup(int courseID, string title, int position)
+    {
+        // List<LayoutColumn> cols = this.GetLayoutColumns(courseID);
+        // if (cols.Count < 1) return;
+
+        NonQuery(
+            DatabaseQueries.REGISTER_TILE_GROUP,
+            // new SQLiteParameter("columnID", cols[0].ID),
+            new SQLiteParameter("title", title),
+            new SQLiteParameter("order", position),
+            new SQLiteParameter("courseID", courseID)
+        );
+    }
+
+    public LayoutTileGroup UpdateTileGroup(
+        int courseID,
+        int tileGroupID,
+        int columnID,
+        string title,
+        int order
+    )
+    {
+        NonQuery(
+            DatabaseQueries.UPDATE_TILE_GROUP,
+            new SQLiteParameter("columnID", columnID),
+            new SQLiteParameter("title", title),
+            new SQLiteParameter("order", order),
+            new SQLiteParameter("groupID", tileGroupID)
+        );
+
+        return GetLayoutTileGroup(courseID, tileGroupID);
+    }
+
+    public void UpdateTileGroupOrder(int[] tileGroupIDs)
+    {
+        for (int i = 0; i < tileGroupIDs.Length; i++)
+        {
+            NonQuery(
+                DatabaseQueries.UPDATE_TILE_GROUP_ORDER,
+                new SQLiteParameter("groupID", tileGroupIDs[i]),
+                new SQLiteParameter("order", i)
+            );
+        }
+    }
+
+    public void DeleteLayoutTileGroup(int groupID)
+    {
+        NonQuery(DatabaseQueries.DELETE_TILE_GROUP, new SQLiteParameter("groupID", groupID));
+    }
+
+    public LayoutTileGroup GetLayoutTileGroup(int courseID, int groupID)
+    {
+        using (
+            SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_TILE_GROUP,
+                new SQLiteParameter("courseID", courseID),
+                new SQLiteParameter("groupID", groupID)
             )
+        )
+        {
+            if (r.Read())
+                return new LayoutTileGroup(
+                    r.GetInt32(0),
+                    courseID,
+                    r.GetValue(1).ToString(),
+                    r.GetInt32(2),
+                    r.GetInt32(3)
+                );
+        }
+        return null;
+    }
+
+    public List<LayoutTileGroup> GetLayoutTileGroups(int courseID)
+    {
+        List<LayoutTileGroup> tileGroups = new();
+
+        using (
+            SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_TILE_GROUPS,
+                new SQLiteParameter("courseID", courseID)
+            )
+        )
+        {
+            while (r.Read())
             {
-                while (r.Read())
+                try
                 {
-                    AppDiscussionTopic row =
+                    LayoutTileGroup row =
                         new(
                             r.GetInt32(0),
                             courseID,
                             r.GetValue(1).ToString(),
-                            r.GetValue(2).ToString(),
-                            r.GetValue(3).ToString(),
-                            r.GetInt32(4),
-                            r.GetValue(5).ToString(),
-                            new List<AppDiscussionEntry>() { }
+                            r.GetInt32(2),
+                            r.GetInt32(3)
                         );
-                    discussions.Add(row);
+                    tileGroups.Add(row);
+                }
+                catch (Exception e)
+                {
+                    PrintQueryError("GetLayoutTileGroups", 3, r, e);
                 }
             }
-
-            return discussions;
         }
-        public List<AppDiscussionEntry> GetUserDiscussionEntries(int courseID, string userID)
-        {
-            List<AppDiscussionEntry> discussions = new();
 
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_COURSE_DISCUSSION_ENTRIES_FOR_USER,
-                    new SQLiteParameter("courseID", courseID),
-                    new SQLiteParameter("userID", userID)
-                )
+        return tileGroups;
+    }
+
+    public double GetTileAVG(int tileID, string userID, int courseID)
+    {
+        long syncID = this.GetCurrentSyncID(courseID);
+        using (
+            SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_TILE_GRADE,
+                new SQLiteParameter("tileID", tileID),
+                new SQLiteParameter("userID", userID),
+                new SQLiteParameter("syncID", syncID)
             )
+        )
+        {
+            if (r.Read())
             {
-                while (r.Read())
+                try
                 {
-                    AppDiscussionEntry row =
+                    return r.GetDouble(0);
+                }
+                catch (Exception e)
+                {
+                    PrintQueryError("GetLayoutTileGroups", 3, r, e);
+                }
+            }
+        }
+        return -1;
+
+    }
+
+    public (int max, AppGradingType type) GetTileMax(int tileID, int courseID)
+    {
+        using (
+            SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_TILE_GRADE_MAX_AND_TYPE,
+                new SQLiteParameter("tileID", tileID),
+                new SQLiteParameter("courseID", courseID)
+            )
+        )
+        {
+            if (r.Read())
+            {
+                return (Convert.ToInt32(r.GetDouble(0)), (AppGradingType)r.GetInt32(1));
+            }
+        }
+        return (-1, AppGradingType.Points);
+    }
+
+    public List<UserGrade> GetCompareGrades(int courseID, string id, string type)
+    {
+        return type switch
+        {
+            "tile" => GetTileCompare(courseID, id),
+            "ass" => GetAssignmentCompare(courseID, id),
+            "disc" => GetDiscussionCompare(courseID, id),
+            "goal" => GetLearningGoalCompare(courseID, id),
+            _ => throw new InvalidOperationException("Invalid compare type")
+        };
+    }
+
+    public List<UserGrade> GetTileCompare(int courseID, string tileID)
+    {
+        long syncID = this.GetCurrentSyncID(courseID);
+        List<UserGrade> grades = new();
+
+        using (
+            SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_TILE_COMPARE_GRADES,
+                new SQLiteParameter("syncID", syncID),
+                new SQLiteParameter("tileID", tileID)
+            )
+        )
+        {
+            while (r.Read())
+            {
+                try
+                {
+                    grades.Add(new(r.GetValue(0).ToString(), r.GetDouble(1), 10));
+                }
+                catch (Exception e)
+                {
+                    PrintQueryError(System.Reflection.MethodBase.GetCurrentMethod().ToString(), 1, r, e);
+                }
+            }
+        }
+        return grades;
+    }
+
+    public List<UserGrade> GetAssignmentCompare(int courseID, string assignmentID)
+    {
+        List<UserGrade> grades = new();
+
+        using (
+            SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_ASSIGNMENT_COMPARE_GRADES,
+                new SQLiteParameter("assignmentID", assignmentID),
+                new SQLiteParameter("courseID", courseID)
+            )
+        )
+        {
+            while (r.Read())
+            {
+                try
+                {
+                    grades.Add(new(r.GetValue(0).ToString(), r.GetDouble(1), r.GetDouble(2)));
+                }
+                catch (Exception e)
+                {
+                    PrintQueryError(System.Reflection.MethodBase.GetCurrentMethod().ToString(), 2, r, e);
+                }
+            }
+        }
+        return grades;
+    }
+
+    public List<UserGrade> GetDiscussionCompare(int courseID, string discussionID)
+    {
+        List<UserGrade> grades = new();
+        double max = 0;
+
+        using (
+            SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_DISCUSSION_COMPARE_GRADES,
+                new SQLiteParameter("discussionID", discussionID),
+                new SQLiteParameter("courseID", courseID)
+            )
+        )
+        {
+            while (r.Read())
+            {
+                try
+                {
+                    grades.Add(new(r.GetValue(0).ToString(), r.GetDouble(1), -1));
+                    max += r.GetDouble(1);
+                }
+                catch (Exception e)
+                {
+                    PrintQueryError(System.Reflection.MethodBase.GetCurrentMethod().ToString(), 1, r, e);
+                }
+            }
+        }
+        foreach (UserGrade grade in grades)
+        {
+            grade.Max = max;
+        }
+        return grades;
+    }
+
+    public List<UserGrade> GetLearningGoalCompare(int courseID, string assignmentID)
+    {
+        // TODO: Implement.
+        return new();
+
+    }
+
+    public UserTileGrades[] GetAllTileGrades(int courseID)
+    {
+        List<User> students = GetUsersWithSettings(courseID);
+        return students.Select((student) => new UserTileGrades(
+            student.UserID,
+            GetUserTileAVGs(student.UserID, courseID).ToArray()
+        )
+
+         ).ToArray();
+
+    }
+
+    public List<EntryGrades> GetUserEntryAssignmentGrades(int courseID, string userID)
+    {
+        List<EntryGrades> grades = new();
+
+        using (
+            SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_USER_ASSIGNMENT_GRADES,
+                new SQLiteParameter("courseID", courseID),
+                new SQLiteParameter("userID", userID)
+            )
+        )
+        {
+            while (r.Read())
+            {
+                try
+                {
+                    grades.Add(new(r.GetInt32(0), r.GetInt32(1), r.GetDouble(2), r.GetDouble(3)));
+                }
+                catch (Exception e)
+                {
+                    PrintQueryError(System.Reflection.MethodBase.GetCurrentMethod().ToString(), 3, r, e);
+                }
+            }
+        }
+        return grades;
+    }
+
+    public List<int> GetTileIDsOfType(int courseID, TileType type, int alt)
+    {
+        List<int> tileIDs = new();
+
+        using (
+            SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_TILE_IDS_OF_TYPE,
+                new SQLiteParameter("courseID", courseID),
+                new SQLiteParameter("alt", alt),
+                new SQLiteParameter("type", type)
+            )
+        )
+        {
+            while (r.Read())
+            {
+                try
+                {
+                    tileIDs.Add(r.GetInt32(0));
+                }
+                catch (Exception e)
+                {
+                    PrintQueryError(System.Reflection.MethodBase.GetCurrentMethod().ToString(), 3, r, e);
+                }
+            }
+        }
+        return tileIDs;
+    }
+
+    public List<EntryGrades> GetUserDiscussionGrades(int courseID, string userID)
+    {
+        long syncID = this.GetCurrentSyncID(courseID);
+        List<EntryGrades> grades = new();
+        List<int> tiles = GetTileIDsOfType(courseID, TileType.discussions, 0);
+        if (tiles.Count == 0)
+        {
+            return grades;
+        }
+
+        IEnumerable<TileEntry> entries = tiles.SelectMany(id => GetTileEntries(id));
+        foreach (TileEntry entry in entries)
+        {
+            grades.Add(new(entry.ContentID, AppGradingType.NotGraded, GetDiscussionCountForUserForEntry(entry.ContentID, userID), -1));
+        }
+
+        return grades;
+    }
+
+    public List<EntryGrades> GetUserLearningGrades(int courseID, string userID)
+    {
+        List<EntryGrades> grades = new();
+        List<LearningGoal> goals = GetGoals(courseID, true);
+
+        foreach (LearningGoal goal in goals)
+        {
+            int grade = 0;
+            foreach (GoalRequirement req in goal.Requirements)
+            {
+                grade += GetGoalRequirementResult(req, userID) ? 1 : 0;
+            }
+            grades.Add(new EntryGrades(goal.ID, AppGradingType.Points, grade, goal.Requirements.Count));
+        }
+        return grades;
+    }
+
+    public Dictionary<string, EntryGrades[]> GetAllEntryGrades(int courseID)
+    {
+        List<User> students = GetUsersWithSettings(courseID);
+        Dictionary<string, EntryGrades[]> userGradesMap = new();
+
+        students.ForEach((student) => userGradesMap.Add(
+            student.UserID,
+            GetUserEntryAssignmentGrades(courseID, student.UserID)
+            .Concat(GetUserDiscussionGrades(courseID, student.UserID))
+            .Concat(GetUserLearningGrades(courseID, student.UserID))
+            .ToArray()
+        )
+
+         );
+        return userGradesMap;
+
+    }
+
+    public List<TilesGrades> GetUserTileAVGs(string userID, int courseID)
+    {
+        long syncID = this.GetCurrentSyncID(courseID);
+        List<TilesGrades> avgs = new();
+        using (
+            SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_USER_TILE_GRADES,
+                new SQLiteParameter("userID", userID),
+                new SQLiteParameter("syncID", syncID)
+            )
+        )
+        {
+            while (r.Read())
+            {
+                try
+                {
+                    avgs.Add(new(r.GetInt32(1), r.GetDouble(0), -1));
+                }
+                catch (Exception e)
+                {
+                    PrintQueryError("GetLayoutTileGroups", 3, r, e);
+                }
+            }
+        }
+        foreach (TilesGrades grades in avgs)
+        {
+            grades.max = GetTileMax(grades.tile_id, courseID).max;
+        }
+        return avgs;
+
+    }
+
+    public AppGrades GetTileGrade(int tileID, string userID, int courseID)
+    {
+        double tileGrade = GetTileAVG(tileID, userID, courseID);
+        (int max, AppGradingType type) = GetTileMax(tileID, courseID);
+
+        long syncID = this.GetCurrentSyncID(courseID);
+        using (
+            SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_TILE_PEER_GRADES,
+                new SQLiteParameter("tileID", tileID),
+                new SQLiteParameter("userID", userID),
+                new SQLiteParameter("type", Comparison_Component_Types.tile),
+                new SQLiteParameter("syncID", syncID)
+            )
+        )
+        {
+            if (r.Read())
+            {
+                try
+                {
+                    return new(
+                        tileGrade,
+                        r.GetDouble(0),
+                        r.GetDouble(1),
+                        r.GetDouble(2),
+                        max,
+                        type
+                    );
+                }
+                catch (Exception e)
+                {
+                    PrintQueryError("GetLayoutTileGroups", 3, r, e);
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public Dictionary<int, AppAssignment> GetAssignmentsMap(int courseID)
+    {
+        Dictionary<int, AppAssignment> assignments = new();
+
+        using (
+            SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_COURSE_ASSIGNMENTS,
+                new SQLiteParameter("courseID", courseID)
+            )
+        )
+        {
+            while (r.Read())
+            {
+                try
+                {
+                    AppAssignment row =
                         new(
                             r.GetInt32(0),
                             r.GetInt32(1),
-                            r.GetInt32(2),
-                            courseID,
+                            r.GetValue(2).ToString(),
                             r.GetValue(3).ToString(),
                             r.GetInt32(4),
-                            r.GetValue(5).ToString()
+                            r.GetInt32(5),
+                            r.GetBoolean(6),
+                            r.GetInt64(7),
+                            r.GetDouble(8),
+                            (AppGradingType)r.GetInt32(9)
                         );
-                    discussions.Add(row);
+                    assignments.Add(r.GetInt32(0), row);
+                }
+                catch (Exception e)
+                {
+                    PrintQueryError("GetAssignments", 9, r, e);
                 }
             }
-
-            return discussions;
         }
 
-        public AppDiscussionTopic GetTopicGradesForUser(int courseID, int contentID, string userID)
-        {
-            int goal = GetUserGoalGrade(courseID, userID, GetCurrentSyncID(courseID));
-            int grade = GetDiscussionCountForUserForEntry(contentID, userID);
-            PeerComparisonData comparison = GetUserPeerComparison(courseID, goal, Comparison_Component_Types.discussion, contentID);
+        return assignments;
+    }
 
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_TOPIC_FOR_USER,
-                    new SQLiteParameter("courseID", courseID),
-                    new SQLiteParameter("contentID", contentID)
-                )
+    public AppAssignment GetAssignment(int courseID, int internalID)
+    {
+        using (
+            SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_ASSIGNMENT,
+                new SQLiteParameter("courseID", courseID),
+                new SQLiteParameter("internalID", internalID)
             )
+        )
+        {
+            if (r.Read())
             {
-                if (r.Read())
+                try
                 {
-                    int max = r.GetInt32(6);
-                    max = max == 0 ? 1 : max;
                     return new(
+                            r.GetInt32(0),
+                            r.GetInt32(1),
+                            r.GetValue(2).ToString(),
+                            r.GetValue(3).ToString(),
+                            r.GetInt32(4),
+                            r.GetInt32(5),
+                            r.GetBoolean(6),
+                            r.GetInt64(7),
+                            r.GetDouble(8),
+                            (AppGradingType)r.GetInt32(9)
+                        );
+                }
+                catch (Exception e)
+                {
+                    PrintQueryError("GetAssignments", 9, r, e);
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public List<AppDiscussionTopic> GetDiscussions(int courseID)
+    {
+        List<AppDiscussionTopic> discussions = new();
+
+        using (
+            SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_COURSE_TOPICS,
+                new SQLiteParameter("courseID", courseID)
+            )
+        )
+        {
+            while (r.Read())
+            {
+                AppDiscussionTopic row =
+                    new(
                         r.GetInt32(0),
                         courseID,
                         r.GetValue(1).ToString(),
@@ -3383,275 +3355,340 @@ namespace IguideME.Web.Services
                         r.GetValue(3).ToString(),
                         r.GetInt32(4),
                         r.GetValue(5).ToString(),
-                        new AppGrades(
-                               100 * grade / max,
-                             100 * comparison.Minimum / max,
-                             100 * comparison.Average / max,
-                             100 * comparison.Maximum / max,
-                                 max,
-                                 AppGradingType.Points
+                        new List<AppDiscussionEntry>() { }
+                    );
+                discussions.Add(row);
+            }
+        }
+
+        return discussions;
+    }
+    public List<AppDiscussionEntry> GetUserDiscussionEntries(int courseID, string userID)
+    {
+        List<AppDiscussionEntry> discussions = new();
+
+        using (
+            SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_COURSE_DISCUSSION_ENTRIES_FOR_USER,
+                new SQLiteParameter("courseID", courseID),
+                new SQLiteParameter("userID", userID)
+            )
+        )
+        {
+            while (r.Read())
+            {
+                AppDiscussionEntry row =
+                    new(
+                        r.GetInt32(0),
+                        r.GetInt32(1),
+                        r.GetInt32(2),
+                        courseID,
+                        r.GetValue(3).ToString(),
+                        r.GetInt32(4),
+                        r.GetValue(5).ToString()
+                    );
+                discussions.Add(row);
+            }
+        }
+
+        return discussions;
+    }
+
+    public AppDiscussionTopic GetTopicGradesForUser(int courseID, int contentID, string userID)
+    {
+        int goal = GetUserGoalGrade(courseID, userID, GetCurrentSyncID(courseID));
+        int grade = GetDiscussionCountForUserForEntry(contentID, userID);
+        PeerComparisonData comparison = GetUserPeerComparison(courseID, goal, Comparison_Component_Types.discussion, contentID);
+
+        using (
+            SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_TOPIC_FOR_USER,
+                new SQLiteParameter("courseID", courseID),
+                new SQLiteParameter("contentID", contentID)
+            )
+        )
+        {
+            if (r.Read())
+            {
+                int max = r.GetInt32(6);
+                max = max == 0 ? 1 : max;
+                return new(
+                    r.GetInt32(0),
+                    courseID,
+                    r.GetValue(1).ToString(),
+                    r.GetValue(2).ToString(),
+                    r.GetValue(3).ToString(),
+                    r.GetInt32(4),
+                    r.GetValue(5).ToString(),
+                    new AppGrades(
+                           100 * grade / max,
+                         100 * comparison.Minimum / max,
+                         100 * comparison.Average / max,
+                         100 * comparison.Maximum / max,
+                             max,
+                             AppGradingType.Points
+                    )
+                );
+            }
+        }
+
+        return null;
+    }
+
+    public List<LayoutColumn> GetLayoutColumns(int courseID)
+    {
+        List<LayoutColumn> layoutList = new List<LayoutColumn>();
+
+        using (
+            SQLiteDataReader r2 = Query(
+                DatabaseQueries.QUERY_LAYOUT_COLUMNS,
+                new SQLiteParameter("courseID", courseID)
+            )
+        )
+        {
+            while (r2.Read())
+            {
+                try
+                {
+                    layoutList.Add(
+                        new LayoutColumn(
+                            r2.GetInt32(0),
+                            r2.GetInt32(1),
+                            r2.GetInt32(2),
+                            new List<int>()
                         )
                     );
                 }
-            }
-
-            return null;
-        }
-
-        public List<LayoutColumn> GetLayoutColumns(int courseID)
-        {
-            List<LayoutColumn> layoutList = new List<LayoutColumn>();
-
-            using (
-                SQLiteDataReader r2 = Query(
-                    DatabaseQueries.QUERY_LAYOUT_COLUMNS,
-                    new SQLiteParameter("courseID", courseID)
-                )
-            )
-            {
-                while (r2.Read())
+                catch (Exception e)
                 {
-                    try
-                    {
-                        layoutList.Add(
-                            new LayoutColumn(
-                                r2.GetInt32(0),
-                                r2.GetInt32(1),
-                                r2.GetInt32(2),
-                                new List<int>()
-                            )
-                        );
-                    }
-                    catch (Exception e)
-                    {
-                        PrintQueryError("GetLayoutColumn", 2, r2, e);
-                    }
+                    PrintQueryError("GetLayoutColumn", 2, r2, e);
                 }
             }
-
-            foreach (LayoutColumn lcolumn in layoutList)
-                using (
-                    SQLiteDataReader r = Query(
-                        DatabaseQueries.QUERY_ALL_TILE_GROUPS_IN_LAYOUT_COLUMN,
-                        new SQLiteParameter("columnID", lcolumn.ID)
-                    )
-                )
-                {
-                    while (r.Read())
-                    {
-                        try
-                        {
-                            lcolumn.TileGroups.Add(r.GetInt32(0));
-                        }
-                        catch (Exception e)
-                        {
-                            PrintQueryError("GetLayoutColumn", 2, r, e);
-                        }
-                    }
-                }
-            return layoutList;
         }
 
-        public void DeleteAllLayoutColumns(int courseID)
-        {
-            NonQuery(
-                DatabaseQueries.RELEASE_ALL_COURSE_TILE_GROUPS_FROM_COLUMNS,
-                new SQLiteParameter("courseID", courseID)
-            );
-            NonQuery(
-                DatabaseQueries.DELETE_ALL_LAYOUT_COLUMNS,
-                new SQLiteParameter("courseID", courseID)
-            );
-        }
-
-        public void CreateLayoutColumns(List<LayoutColumn> layoutColumns, int courseID)
-        {
-            foreach (LayoutColumn column in layoutColumns)
-            {
-                int id = IDNonQuery(
-                    DatabaseQueries.REGISTER_LAYOUT_COLUMN,
-                    new SQLiteParameter("courseID", courseID),
-                    new SQLiteParameter("size", column.Width),
-                    new SQLiteParameter("order", column.Position)
-                );
-
-                if (column.TileGroups != null)
-                    foreach (int groupID in column.TileGroups)
-                    {
-                        NonQuery(
-                            DatabaseQueries.TIE_TILE_GROUP_TO_COLUMN,
-                            new SQLiteParameter("columnID", id),
-                            new SQLiteParameter("groupID", groupID)
-                        );
-                    }
-            }
-        }
-
-        public Tile GetTile(int courseID, int tileID, bool autoLoadEntries = false)
-        {
-            Tile tile;
+        foreach (LayoutColumn lcolumn in layoutList)
             using (
                 SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_TILE,
-                    new SQLiteParameter("courseID", courseID),
-                    new SQLiteParameter("tileID", tileID)
-                )
-            )
-            {
-                if (r.Read())
-                {
-                    tile = new(
-                                        r.GetInt32(0),
-                                        r.GetInt32(1),
-                                        r.GetValue(2).ToString(),
-                                        r.GetInt32(3),
-                                        (TileType)r.GetInt32(4),
-                                        r.GetDouble(5),
-                                        (AppGradingType)r.GetInt32(6),
-                                        r.GetBoolean(7),
-                                        r.GetBoolean(8),
-                                        r.GetBoolean(9)
-                                    );
-                    if (autoLoadEntries)
-                    {
-                        tile.Entries = GetTileEntries(tile.ID);
-                    }
-                    return tile;
-                }
-            }
-
-            return null;
-        }
-
-        public void CreateTile(
-            Tile tile
-        )
-        {
-            int id = IDNonQuery(
-                DatabaseQueries.REGISTER_TILE,
-                new SQLiteParameter("groupID", tile.GroupID),
-                new SQLiteParameter("title", tile.Title),
-                new SQLiteParameter("order", tile.Order),
-                new SQLiteParameter("type", tile.Type),
-                new SQLiteParameter("weight", tile.Weight),
-                new SQLiteParameter("gradingType", tile.GradingType),
-                new SQLiteParameter("alt", tile.Alt),
-                new SQLiteParameter("visible", tile.Visible),
-                new SQLiteParameter("notifications", tile.Notifications)
-            );
-        }
-
-        public List<TileEntry> GetTileEntries(int tileID)
-        {
-            List<TileEntry> entries = new();
-
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_ENTRIES_FOR_TILE,
-                    new SQLiteParameter("tileID", tileID)
+                    DatabaseQueries.QUERY_ALL_TILE_GROUPS_IN_LAYOUT_COLUMN,
+                    new SQLiteParameter("columnID", lcolumn.ID)
                 )
             )
             {
                 while (r.Read())
                 {
-                    entries.Add(
-                        new TileEntry(
-                            r.GetInt32(0),
-                            r.GetInt32(1),
-                            r.GetValue(2).ToString(),
-                            r.GetValue(3).ToString(),
-                            r.GetInt32(4),
-                            r.GetDouble(5)
-                        )
-                    );
+                    try
+                    {
+                        lcolumn.TileGroups.Add(r.GetInt32(0));
+                    }
+                    catch (Exception e)
+                    {
+                        PrintQueryError("GetLayoutColumn", 2, r, e);
+                    }
                 }
             }
+        return layoutList;
+    }
 
-            return entries;
-        }
+    public void DeleteAllLayoutColumns(int courseID)
+    {
+        NonQuery(
+            DatabaseQueries.RELEASE_ALL_COURSE_TILE_GROUPS_FROM_COLUMNS,
+            new SQLiteParameter("courseID", courseID)
+        );
+        NonQuery(
+            DatabaseQueries.DELETE_ALL_LAYOUT_COLUMNS,
+            new SQLiteParameter("courseID", courseID)
+        );
+    }
 
-        public void DeleteTile(int courseID, int tileID)
+    public void CreateLayoutColumns(List<LayoutColumn> layoutColumns, int courseID)
+    {
+        foreach (LayoutColumn column in layoutColumns)
         {
-            DeleteGoals(courseID, tileID);
-            NonQuery(DatabaseQueries.DELETE_TILE, new SQLiteParameter("tileID", tileID));
-        }
-
-        public bool GetUserConsent(int courseID, string userID)
-        {
-            using (
-                SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_CONSENT_FOR_USER,
-                    new SQLiteParameter("courseID", courseID),
-                    new SQLiteParameter("userID", userID)
-                )
-            )
-            {
-                if (r.Read())
-                    return r.GetInt32(0) == 1;
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// Inserts a user action into the database.
-        /// </summary>
-        /// <param name="userID">The ID of the user performing the action.</param>
-        /// <param name="action">The type of action performed by the user.</param>
-        /// <param name="actionDetail">Additional details about the action.</param>
-        /// <param name="courseID">The ID of the course associated with the action.</param>
-        /// <param name="timeStamp">The timestamp of when the action occurred, represented as the number of seconds since the Unix epoch.</param>
-        public void InsertUserAction(string userID, ActionTypes action, string actionDetail, int courseID)
-        {
-            NonQuery(DatabaseQueries.INSERT_USER_ACTION,
-                new SQLiteParameter("userID", userID),
-                new SQLiteParameter("action", action),
-                new SQLiteParameter("actionDetail", actionDetail),
-                new SQLiteParameter("courseID", courseID)
+            int id = IDNonQuery(
+                DatabaseQueries.REGISTER_LAYOUT_COLUMN,
+                new SQLiteParameter("courseID", courseID),
+                new SQLiteParameter("size", column.Width),
+                new SQLiteParameter("order", column.Position)
             );
+
+            if (column.TileGroups != null)
+                foreach (int groupID in column.TileGroups)
+                {
+                    NonQuery(
+                        DatabaseQueries.TIE_TILE_GROUP_TO_COLUMN,
+                        new SQLiteParameter("columnID", id),
+                        new SQLiteParameter("groupID", groupID)
+                    );
+                }
+        }
+    }
+
+    public Tile GetTile(int courseID, int tileID, bool autoLoadEntries = false)
+    {
+        Tile tile;
+        using (
+            SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_TILE,
+                new SQLiteParameter("courseID", courseID),
+                new SQLiteParameter("tileID", tileID)
+            )
+        )
+        {
+            if (r.Read())
+            {
+                tile = new(
+                                    r.GetInt32(0),
+                                    r.GetInt32(1),
+                                    r.GetValue(2).ToString(),
+                                    r.GetInt32(3),
+                                    (TileType)r.GetInt32(4),
+                                    r.GetDouble(5),
+                                    (AppGradingType)r.GetInt32(6),
+                                    r.GetBoolean(7),
+                                    r.GetBoolean(8),
+                                    r.GetBoolean(9)
+                                );
+                if (autoLoadEntries)
+                {
+                    tile.Entries = GetTileEntries(tile.ID);
+                }
+                return tile;
+            }
         }
 
-        public List<UserTracker> RetrieveAllActionsPerCourse(int courseID)
-        {
-            List<UserTracker> actions = [];
+        return null;
+    }
 
-            using SQLiteDataReader r = Query(
-                    DatabaseQueries.QUERY_ALL_ACTIONS_PER_COURSE,
-                    new SQLiteParameter("courseID", courseID)
-                );
+    public void CreateTile(
+        Tile tile
+    )
+    {
+        int id = IDNonQuery(
+            DatabaseQueries.REGISTER_TILE,
+            new SQLiteParameter("groupID", tile.GroupID),
+            new SQLiteParameter("title", tile.Title),
+            new SQLiteParameter("order", tile.Order),
+            new SQLiteParameter("type", tile.Type),
+            new SQLiteParameter("weight", tile.Weight),
+            new SQLiteParameter("gradingType", tile.GradingType),
+            new SQLiteParameter("alt", tile.Alt),
+            new SQLiteParameter("visible", tile.Visible),
+            new SQLiteParameter("notifications", tile.Notifications)
+        );
+    }
+
+    public List<TileEntry> GetTileEntries(int tileID)
+    {
+        List<TileEntry> entries = new();
+
+        using (
+            SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_ENTRIES_FOR_TILE,
+                new SQLiteParameter("tileID", tileID)
+            )
+        )
+        {
             while (r.Read())
             {
-                actions.Add(
-                    new UserTracker(
-                        r.GetInt64(0),
-                        r.GetValue(1).ToString(),
-                        (ActionTypes)r.GetInt32(2),
+                entries.Add(
+                    new TileEntry(
+                        r.GetInt32(0),
+                        r.GetInt32(1),
+                        r.GetValue(2).ToString(),
                         r.GetValue(3).ToString(),
                         r.GetInt32(4),
-                        courseID
+                        r.GetDouble(5)
                     )
                 );
             }
-
-            return actions;
         }
 
-        public ConsentInfo RetrieveAnalyticConsentInfoPerCourse(int courseID)
+        return entries;
+    }
+
+    public void DeleteTile(int courseID, int tileID)
+    {
+        DeleteGoals(courseID, tileID);
+        NonQuery(DatabaseQueries.DELETE_TILE, new SQLiteParameter("tileID", tileID));
+    }
+
+    public bool GetUserConsent(int courseID, string userID)
+    {
+        using (
+            SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_CONSENT_FOR_USER,
+                new SQLiteParameter("courseID", courseID),
+                new SQLiteParameter("userID", userID)
+            )
+        )
         {
-            long now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-            long lastWeek = now - (7 * 24 * 60 * 60 * 1000);
-            List<long> syncs = GetSyncsSince(courseID, lastWeek);
-            now = GetCurrentSyncID(courseID);
+            if (r.Read())
+                return r.GetInt32(0) == 1;
+        }
+        return false;
+    }
 
-            if (syncs.Count > 0)
-            {
-                lastWeek = syncs[0];
-            }
+    /// <summary>
+    /// Inserts a user action into the database.
+    /// </summary>
+    /// <param name="userID">The ID of the user performing the action.</param>
+    /// <param name="action">The type of action performed by the user.</param>
+    /// <param name="actionDetail">Additional details about the action.</param>
+    /// <param name="courseID">The ID of the course associated with the action.</param>
+    /// <param name="timeStamp">The timestamp of when the action occurred, represented as the number of seconds since the Unix epoch.</param>
+    public void InsertUserAction(string userID, ActionTypes action, string actionDetail, int courseID)
+    {
+        NonQuery(DatabaseQueries.INSERT_USER_ACTION,
+            new SQLiteParameter("userID", userID),
+            new SQLiteParameter("action", action),
+            new SQLiteParameter("actionDetail", actionDetail),
+            new SQLiteParameter("courseID", courseID)
+        );
+    }
 
-            return new(
-                CountConsents(courseID, now),
-                CountConsents(courseID, lastWeek),
-                CountUsers(courseID)
+    public List<UserTracker> RetrieveAllActionsPerCourse(int courseID)
+    {
+        List<UserTracker> actions = [];
+
+        using SQLiteDataReader r = Query(
+                DatabaseQueries.QUERY_ALL_ACTIONS_PER_COURSE,
+                new SQLiteParameter("courseID", courseID)
+            );
+        while (r.Read())
+        {
+            actions.Add(
+                new UserTracker(
+                    r.GetInt64(0),
+                    r.GetValue(1).ToString(),
+                    (ActionTypes)r.GetInt32(2),
+                    r.GetValue(3).ToString(),
+                    r.GetInt32(4),
+                    courseID
+                )
             );
         }
+
+        return actions;
     }
+
+    public ConsentInfo RetrieveAnalyticConsentInfoPerCourse(int courseID)
+    {
+        long now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        long lastWeek = now - (7 * 24 * 60 * 60 * 1000);
+        List<long> syncs = GetSyncsSince(courseID, lastWeek);
+        now = GetCurrentSyncID(courseID);
+
+        if (syncs.Count > 0)
+        {
+            lastWeek = syncs[0];
+        }
+
+        return new(
+            CountConsents(courseID, now),
+            CountConsents(courseID, lastWeek),
+            CountUsers(courseID)
+        );
+    }
+}
 }

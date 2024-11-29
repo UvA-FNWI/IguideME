@@ -265,7 +265,7 @@ const SelectAssignments: FC<SelectAssignmentsProps> = ({
                 <InputNumber
                   addonAfter='%'
                   changeOnWheel
-                  className='antNumberInput w-full !border border-solid !border-accent/70 !bg-surface1 hover:!border-accent hover:!bg-surface2 [&_input]:!text-text'
+                  className='antNumberInput !border-accent/70 !bg-surface1 hover:!border-accent hover:!bg-surface2 [&_input]:!text-text w-full !border border-solid'
                   data-no-drag
                   value={entry.weight * 100}
                   onChange={(val) => {
@@ -308,7 +308,7 @@ const SelectAssignments: FC<SelectAssignmentsProps> = ({
       />
 
       <Select
-        className='[&>div]:hover:!border-accent[&_span]:!text-text w-full [&>div]:!border-accent/70 [&>div]:!bg-surface1 [&>div]:!shadow-none [&>div]:hover:!bg-surface2'
+        className='[&>div]:hover:!border-accent[&_span]:!text-text [&>div]:!border-accent/70 [&>div]:!bg-surface1 [&>div]:hover:!bg-surface2 w-full [&>div]:!shadow-none'
         popupClassName='bg-surface1 [&_div]:!text-text selectionSelected'
         value={selectedAssignments}
         mode='multiple'

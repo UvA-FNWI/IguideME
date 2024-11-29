@@ -7,6 +7,7 @@ import { PublishedStatus, type LearningGoal, type TileEntry } from '@/types/tile
 import { useDrawerStore } from '@/components/crystals/tile-group-board/useDrawerStore';
 import { useQuery } from '@tanstack/react-query';
 import { useCallback, useState, type FC, type ReactElement } from 'react';
+import { useWatch } from 'antd/es/form/Form';
 
 const EditTileGoals: FC = (): ReactElement => {
   const { data, isError, isLoading } = useQuery({
@@ -16,19 +17,29 @@ const EditTileGoals: FC = (): ReactElement => {
 
   if (isError) return <QueryError className='static [&_span]:!text-2xl' title={'Error: Could not load goals'} />;
 
+  const alt: boolean = useWatch('alt');
+
   return (
     <>
       <Form.Item name='gradingType' hidden>
         <Input type='hidden' />
       </Form.Item>
       <p className='mb-1'>Goals:</p>
-      <div className='col-span-3'>
-        <QueryLoading isLoading={isLoading}>
-          <Form.Item name='entries' className='m-0 w-full'>
-            <TileGoalsSelect goals={data ?? []} value={[]} onChange={() => {}} />
-          </Form.Item>
-        </QueryLoading>
+      <div className='col-span-2'>
+        All:{' '}
+        <Form.Item name='alt' noStyle valuePropName='checked'>
+          <Switch className='float-end' checkedChildren={<CheckOutlined />} unCheckedChildren={<CloseOutlined />} />
+        </Form.Item>
       </div>
+      {!alt && (
+        <div className='col-span-3'>
+          <QueryLoading isLoading={isLoading}>
+            <Form.Item name='entries' className='m-0 w-full'>
+              <TileGoalsSelect goals={data ?? []} value={[]} onChange={() => {}} />
+            </Form.Item>
+          </QueryLoading>
+        </div>
+      )}{' '}
     </>
   );
 };

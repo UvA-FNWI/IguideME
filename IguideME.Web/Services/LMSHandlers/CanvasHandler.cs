@@ -185,6 +185,7 @@ namespace IguideME.Web.Services
         /// <inheritdoc />
         public IEnumerable<AssignmentSubmission> GetSubmissions(int courseID, List<User> users)
         {
+            _logger.LogInformation("Getting submissions for users:\n{}", users.Select(user => user.UserID));
             return Connector
                 .FindCourseById(courseID)
                 .GetSubmissions(users.Select(user => user.UserID).ToArray(), false)

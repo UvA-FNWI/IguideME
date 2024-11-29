@@ -621,6 +621,18 @@ public static class DatabaseQueries
             grading_type=excluded.grading_type
              ";
 
+    public const string QUERY_COURSE_ASSIGNMENT_SUBMISSIONS =
+        @"SELECT    `submissions`.`submission_id`,
+                    `submissions`.`user_id`,
+                    `submissions`.`Grade`,
+                    `submissions`.`date`
+        FROM        `submissions`
+        INNER JOIN  `assignments`
+            USING   (`assignment_id`)
+        WHERE       `assignments`.`course_id`=@courseID
+        AND         `assignment`.`assignment_id`=@assignmentID
+        ;";
+
     public const string QUERY_COURSE_EXTERNAL_ASSIGNMENTS =
         @"SELECT    `assignment_id`,
                     `course_id`,
