@@ -8,12 +8,16 @@ export async function getAssignments(): Promise<Map<number, Assignment>> {
     return new Map<number, Assignment>(Object.entries(response.data).map(([k, v]) => [+k, v]));
   });
 }
-export async function getExternalAssignments(): Promise<Array<Assignment>> {
+export async function getExternalAssignments(): Promise<Assignment[]> {
   return await apiClient.get('external-assignments').then((response) => response.data);
 }
 
+export async function getExternalAssignment(assignmentId: number) {
+  return await apiClient.get(`assignments/${assignmentId}/submissions`).then((response) => response.data);
+}
+
 export async function postExternalAssignment(ass: Assignment): Promise<void> {
-  return await apiClient.post(`external-assignments`, ass);
+  await apiClient.post(`external-assignments`, ass);
 }
 
 export async function getTopics(): Promise<DiscussionTopic[]> {
@@ -24,37 +28,37 @@ export async function getLearningGoals(): Promise<LearningGoal[]> {
 }
 
 export async function postLearningGoal(goal: LearningGoal): Promise<void> {
-  return await apiClient.post(`learning-goals/${goal.id}`, goal);
+  await apiClient.post(`learning-goals/${goal.id}`, goal);
 }
 
 export async function patchLearningGoal(goal: LearningGoal): Promise<void> {
-  return await apiClient.patch(`learning-goals/${goal.id}`, goal);
+  await apiClient.patch(`learning-goals/${goal.id}`, goal);
 }
 
 export async function deleteLearningGoal(id: number): Promise<void> {
-  return await apiClient.delete(`learning-goals/${id}`);
+  await apiClient.delete(`learning-goals/${id}`);
 }
 
 export async function postGoalRequirement(requirement: GoalRequirement): Promise<void> {
-  return await apiClient.post(`learning-goals/requirements/${requirement.id}`, requirement);
+  await apiClient.post(`learning-goals/requirements/${requirement.id}`, requirement);
 }
 
 export async function patchGoalRequirement(requirement: GoalRequirement): Promise<void> {
-  return await apiClient.patch(`learning-goals/requirements/${requirement.id}`, requirement);
+  await apiClient.patch(`learning-goals/requirements/${requirement.id}`, requirement);
 }
 
 export async function deleteRequirement(id: number): Promise<void> {
-  return await apiClient.delete(`learning-goals/requirements/${id}`);
+  await apiClient.delete(`learning-goals/requirements/${id}`);
 }
 
 export async function patchExternalAssignment(assignment: Assignment): Promise<void> {
-  return await apiClient.patch(`external-assignments/${assignment.id}`, assignment);
+  await apiClient.patch(`external-assignments/${assignment.id}`, assignment);
 }
 
 export async function patchExternalAssignmentTitle({ id, title }: { id: number; title: string }): Promise<void> {
-  return await apiClient.patch(`external-assignments/${id}/title`, { title });
+  await apiClient.patch(`external-assignments/${id}/title`, { title });
 }
 
-export async function deleteExternalAssignment({assignmentID}: {assignmentID: number}): Promise<void> {
-  return await apiClient.delete(`external-assignments/${assignmentID}`);
+export async function deleteExternalAssignment({ assignmentID }: { assignmentID: number }): Promise<void> {
+  await apiClient.delete(`external-assignments/${assignmentID}`);
 }

@@ -138,6 +138,17 @@ interface ViewExternalAssignmentProps {
 const ViewExternalAssignment: FC<ViewExternalAssignmentProps> = ({ assignment, students }): ReactElement => {
   const [uploadMenuOpen, setUploadMenuOpen] = useState<boolean>(false);
 
+  const {
+    data: externalAssignment,
+    isError,
+    isLoading,
+  } = useQuery({
+    queryKey: ['external-assignments', assignment.id],
+    queryFn: async () => await getExternalAssignment(assignment.id),
+  });
+
+  console.log('externalAssignment', externalAssignment);
+
   const { message } = App.useApp();
   const queryClient = useQueryClient();
   const { mutate: patchExternalAssignment } = useMutation({

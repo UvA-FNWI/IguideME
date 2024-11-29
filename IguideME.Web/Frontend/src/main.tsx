@@ -56,6 +56,7 @@ enableMocking()
             >
               <App
                 message={{
+                  duration: 0,
                   maxCount: 3,
                 }}
               >

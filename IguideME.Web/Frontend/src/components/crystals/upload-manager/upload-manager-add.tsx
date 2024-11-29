@@ -30,7 +30,10 @@ const UploadManagerAdd: FC<UploadManagerAddProps> = ({ form, students }) => {
     const allStudents = students.map((student) => student.userID);
     const seenStudents = new Set<string>();
 
-    for (let i = 1; i < value.length; i++) {
+    console.log('value', value);
+    console.log('value.length', value.length);
+
+    for (let i = 0; i < value.length; i++) {
       if (value[i].length === 0 || !value[i][idColumn] || !value[i][gradeColumn]) {
         continue;
       }
