@@ -1,14 +1,19 @@
-import { Col, Input, Row } from 'antd';
-import type { ChangeEvent, FC } from 'react';
+import { Col, Input, Row, type FormInstance } from 'antd';
+import { type ChangeEvent, type FC } from 'react';
+import type { UploadManagerAddFormValues } from './upload-manager-show';
+import { useWatch } from 'antd/lib/form/Form';
 
 interface UploadEditorRowProps {
   rowData: string[];
   rowIndex: number;
-  columns: { grade: number; id: number };
+  form: FormInstance<UploadManagerAddFormValues>;
   changeDataExtern: (value: string, rowIndex: number, colIndex: number) => void;
 }
 
-const UploadEditorRow: FC<UploadEditorRowProps> = ({ rowData, rowIndex, columns, changeDataExtern }) => {
+const UploadEditorRow: FC<UploadEditorRowProps> = ({ rowData, rowIndex, form, changeDataExtern }) => {
+  const gradeColumn = useWatch('gradeColumn', form);
+  const idColumn = useWatch('idColumn', form);
+
   const changeData = (event: ChangeEvent<HTMLInputElement>, colIndex: number): void => {
     const value = event.target.value;
     changeDataExtern(value, rowIndex, colIndex);
@@ -16,9 +21,9 @@ const UploadEditorRow: FC<UploadEditorRowProps> = ({ rowData, rowIndex, columns,
 
   const getClass = (id: number): 'id_column' | 'grade_column' | 'meta_column' => {
     switch (id) {
-      case columns.id:
+      case idColumn:
         return 'id_column';
-      case columns.grade:
+      case gradeColumn:
         return 'grade_column';
       default:
         return 'meta_column';
@@ -30,7 +35,7 @@ const UploadEditorRow: FC<UploadEditorRowProps> = ({ rowData, rowIndex, columns,
       {rowData.map((col: any, colIndex: number) => (
         <Col key={colIndex}>
           <Input
-            className={`w-[120px] ${
+            className={`h-8 w-[120px] ${
               getClass(colIndex) === 'id_column' ? 'bg-orange-400'
               : getClass(colIndex) === 'grade_column' ? 'bg-blue-400'
               : ''

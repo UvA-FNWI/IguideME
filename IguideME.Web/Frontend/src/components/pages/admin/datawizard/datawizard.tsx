@@ -6,7 +6,6 @@ import {
   deleteExternalAssignment,
 } from '@/api/entries';
 import AdminTitle from '@/components/atoms/admin-titles/admin-titles';
-import UploadManager from '@/components/crystals/upload-manager/upload-manager';
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
 import { GradingType } from '@/types/grades';
@@ -15,11 +14,12 @@ import { type User } from '@/types/user';
 import { useRequiredParams } from '@/utils/params';
 import { PlusOutlined } from '@ant-design/icons';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { App, Button, Card } from 'antd';
+import { App, Button, Card, Drawer } from 'antd';
 import { useState, type FC, type ReactElement } from 'react';
 import AssignmentSettingsForm from './assignment-settings-form';
 import Swal from 'sweetalert2';
 import EditTitle from '@/components/crystals/edit-title/edit-title';
+import UploadManagerShow from '@/components/crystals/upload-manager/upload-manager-show';
 
 const DataWizard: FC = (): ReactElement => {
   return (
@@ -226,7 +226,7 @@ const ViewExternalAssignment: FC<ViewExternalAssignmentProps> = ({ assignment, s
                   setUploadMenuOpen(true);
                 }}
               >
-                New Upload
+                Show / Modify Uploads
               </Button>
               <Button
                 className='custom-danger-button'
@@ -253,20 +253,34 @@ const ViewExternalAssignment: FC<ViewExternalAssignmentProps> = ({ assignment, s
         </div>
       }
     >
-      {uploadMenuOpen && (
-        <div className='mb-5 flex !p-3'>
-          <UploadManager
-            assignment={assignment}
-            students={students}
-            closeUploadMenu={() => {
-              setUploadMenuOpen(false);
-            }}
-          />
+      <Drawer
+        className='!bg-mantle [&>div>div>div]:!text-text [&_button]:!text-text'
+        width='min(100vw,800px)'
+        title='Uploads'
+        open={uploadMenuOpen}
+        onClose={() => {
+          setUploadMenuOpen(false);
+        }}
+      >
+        <UploadManagerShow assignment={assignment} students={students} />
+      </Drawer>
+      <div className='flex flex-wrap justify-between'>
+        <div className='shrink-0 space-y-2'>
+          <h4 className='text-lg'>Settings</h4>
+          <AssignmentSettingsForm assignment={assignment} />
         </div>
-      )}
-      <div className='space-y-2'>
-        <h4 className='text-lg'>Settings</h4>
-        <AssignmentSettingsForm assignment={assignment} />
+        <div className='mx-4 w-px shrink-0 bg-text/10' />
+        <div className='flex flex-grow'>
+          <div>
+            <Card size='small' title={<h5 className='text-base text-text'>Statistics</h5>}>
+              <div className='text-sm'>
+                <p>Due Date: {assignment.due_date}</p>
+                <p>Max Grade: {assignment.max_grade}</p>
+                <p>Grading Type: {assignment.grading_type}</p>
+              </div>
+            </Card>
+          </div>
+        </div>
       </div>
     </Card>
   );
