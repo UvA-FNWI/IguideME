@@ -12,7 +12,7 @@ export async function getExternalAssignments(): Promise<Assignment[]> {
   return await apiClient.get('external-assignments').then((response) => response.data);
 }
 
-export async function getExternalAssignment(assignmentId: number) {
+export async function getExternalAssignmentSubmissions(assignmentId: number) {
   return await apiClient.get(`assignments/${assignmentId}/submissions`).then((response) => response.data);
 }
 

@@ -551,6 +551,7 @@ namespace IguideME.Web.Services
 
         public List<AssignmentSubmission> GetAssignmentSubmissions(int courseID, int assignmentID)
         {
+            _logger.LogWarning("getting submissions for {}", assignmentID);
             List<AssignmentSubmission> submissions = new();
             using (
                 SQLiteDataReader r = Query(
@@ -570,7 +571,7 @@ namespace IguideME.Web.Services
                                 r.GetInt32(0),
                                 assignmentID,
                                 r.GetValue(1).ToString(),
-                                r.GetInt32(2),
+                                r.GetDouble(2),
                                 r.GetInt32(3)
                             );
                         submissions.Add(submission);

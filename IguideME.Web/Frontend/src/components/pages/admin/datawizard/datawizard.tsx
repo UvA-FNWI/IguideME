@@ -4,6 +4,7 @@ import {
   patchExternalAssignmentTitle,
   postExternalAssignment,
   deleteExternalAssignment,
+  getExternalAssignmentSubmissions,
 } from '@/api/entries';
 import AdminTitle from '@/components/atoms/admin-titles/admin-titles';
 import QueryError from '@/components/particles/QueryError';
@@ -101,12 +102,12 @@ const Wizard: FC = (): ReactElement => {
   if (assignmentLoading || studentsLoading) {
     return (
       <QueryLoading isLoading={assignmentLoading || studentsLoading}>
-        <div className='h-[100px] w-full rounded-lg bg-surface1' />
+        <div className='bg-surface1 h-[100px] w-full rounded-lg' />
       </QueryLoading>
     );
   } else if (assignmentError || studentsError) {
     return (
-      <div className='relative h-[100px] w-full rounded-lg bg-surface1'>
+      <div className='bg-surface1 relative h-[100px] w-full rounded-lg'>
         <QueryError title='Error: Unable to load external data' />
       </div>
     );
@@ -119,7 +120,7 @@ const Wizard: FC = (): ReactElement => {
         onClick={addAssignment}
         block
         icon={<PlusOutlined />}
-        className='ml-auto !w-fit bg-accent/30 hover:border-solid hover:!border-border1 hover:!bg-accent/70 [&_span]:!text-text'
+        className='bg-accent/30 hover:!border-border1 hover:!bg-accent/70 [&_span]:!text-text ml-auto !w-fit hover:border-solid'
       >
         Add External Assignment
       </Button>
@@ -144,7 +145,7 @@ const ViewExternalAssignment: FC<ViewExternalAssignmentProps> = ({ assignment, s
     isLoading,
   } = useQuery({
     queryKey: ['external-assignments', assignment.id],
-    queryFn: async () => await getExternalAssignment(assignment.id),
+    queryFn: async () => await getExternalAssignmentSubmissions(assignment.id),
   });
 
   console.log('externalAssignment', externalAssignment);
@@ -280,10 +281,10 @@ const ViewExternalAssignment: FC<ViewExternalAssignmentProps> = ({ assignment, s
           <h4 className='text-lg'>Settings</h4>
           <AssignmentSettingsForm assignment={assignment} />
         </div>
-        <div className='mx-4 w-px shrink-0 bg-text/10' />
+        <div className='bg-text/10 mx-4 w-px shrink-0' />
         <div className='flex flex-grow'>
           <div>
-            <Card size='small' title={<h5 className='text-base text-text'>Statistics</h5>}>
+            <Card size='small' title={<h5 className='text-text text-base'>Statistics</h5>}>
               <div className='text-sm'>
                 <p>Due Date: {assignment.due_date}</p>
                 <p>Max Grade: {assignment.max_grade}</p>
