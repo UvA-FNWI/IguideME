@@ -665,7 +665,14 @@ public static class DatabaseQueries
         ;
         DELETE FROM `submissions` 
         WHERE       `submissions`.`assignment_id`=@ID
-        ";
+        ;
+        DELETE      `tile_entries` 
+        FROM        `tile_entries`
+        INNER JOIN  `tiles`        
+        USING       (`tile_id`)
+        WHERE       `tiles`.`type`=0
+        AND         `tile_entries`.`content_id`=@ID
+        ;";
 
     public const string UPDATE_EXTERNAL_ASSIGNMENT_TITLE =
         @"UPDATE    `assignments`
