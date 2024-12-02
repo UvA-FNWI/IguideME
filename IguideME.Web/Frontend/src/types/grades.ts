@@ -1,3 +1,12 @@
+export interface ExternalSubmission {
+  assignment_id: number;
+  date: number;
+  grade: number;
+  grades: Grades | null;
+  id: number;
+  userID: string;
+}
+
 export interface Submission {
   id: number;
   assignmentID: number;

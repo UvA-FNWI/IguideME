@@ -1,5 +1,6 @@
 import { type Assignment, type DiscussionTopic, type GoalRequirement, type LearningGoal } from '@/types/tile';
 import apiClient from './axios';
+import type { ExternalSubmission } from '@/types/grades';
 
 type GetAssignmentsData = Record<string, Assignment>;
 
@@ -12,7 +13,7 @@ export async function getExternalAssignments(): Promise<Assignment[]> {
   return await apiClient.get('external-assignments').then((response) => response.data);
 }
 
-export async function getExternalAssignmentSubmissions(assignmentId: number) {
+export async function getExternalAssignmentSubmissions(assignmentId: number): Promise<ExternalSubmission[]> {
   return await apiClient.get(`assignments/${assignmentId}/submissions`).then((response) => response.data);
 }
 

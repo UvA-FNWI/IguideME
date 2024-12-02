@@ -4,7 +4,6 @@ import {
   patchExternalAssignmentTitle,
   postExternalAssignment,
   deleteExternalAssignment,
-  getExternalAssignmentSubmissions,
 } from '@/api/entries';
 import AdminTitle from '@/components/atoms/admin-titles/admin-titles';
 import QueryError from '@/components/particles/QueryError';
@@ -21,6 +20,7 @@ import AssignmentSettingsForm from './assignment-settings-form';
 import Swal from 'sweetalert2';
 import EditTitle from '@/components/crystals/edit-title/edit-title';
 import UploadManagerShow from '@/components/crystals/upload-manager/upload-manager-show';
+import ExternalAssignmentStatistics from './assignment-statistics';
 
 const DataWizard: FC = (): ReactElement => {
   return (
@@ -102,12 +102,12 @@ const Wizard: FC = (): ReactElement => {
   if (assignmentLoading || studentsLoading) {
     return (
       <QueryLoading isLoading={assignmentLoading || studentsLoading}>
-        <div className='bg-surface1 h-[100px] w-full rounded-lg' />
+        <div className='h-[100px] w-full rounded-lg bg-surface1' />
       </QueryLoading>
     );
   } else if (assignmentError || studentsError) {
     return (
-      <div className='bg-surface1 relative h-[100px] w-full rounded-lg'>
+      <div className='relative h-[100px] w-full rounded-lg bg-surface1'>
         <QueryError title='Error: Unable to load external data' />
       </div>
     );
@@ -120,7 +120,7 @@ const Wizard: FC = (): ReactElement => {
         onClick={addAssignment}
         block
         icon={<PlusOutlined />}
-        className='bg-accent/30 hover:!border-border1 hover:!bg-accent/70 [&_span]:!text-text ml-auto !w-fit hover:border-solid'
+        className='ml-auto !w-fit bg-accent/30 hover:border-solid hover:!border-border1 hover:!bg-accent/70 [&_span]:!text-text'
       >
         Add External Assignment
       </Button>
@@ -138,17 +138,6 @@ interface ViewExternalAssignmentProps {
 
 const ViewExternalAssignment: FC<ViewExternalAssignmentProps> = ({ assignment, students }): ReactElement => {
   const [uploadMenuOpen, setUploadMenuOpen] = useState<boolean>(false);
-
-  const {
-    data: externalAssignment,
-    isError,
-    isLoading,
-  } = useQuery({
-    queryKey: ['external-assignments', assignment.id],
-    queryFn: async () => await getExternalAssignmentSubmissions(assignment.id),
-  });
-
-  console.log('externalAssignment', externalAssignment);
 
   const { message } = App.useApp();
   const queryClient = useQueryClient();
@@ -281,17 +270,9 @@ const ViewExternalAssignment: FC<ViewExternalAssignmentProps> = ({ assignment, s
           <h4 className='text-lg'>Settings</h4>
           <AssignmentSettingsForm assignment={assignment} />
         </div>
-        <div className='bg-text/10 mx-4 w-px shrink-0' />
+        <div className='mx-4 w-px shrink-0 bg-text/10' />
         <div className='flex flex-grow'>
-          <div>
-            <Card size='small' title={<h5 className='text-text text-base'>Statistics</h5>}>
-              <div className='text-sm'>
-                <p>Due Date: {assignment.due_date}</p>
-                <p>Max Grade: {assignment.max_grade}</p>
-                <p>Grading Type: {assignment.grading_type}</p>
-              </div>
-            </Card>
-          </div>
+          <ExternalAssignmentStatistics assignment={assignment} />
         </div>
       </div>
     </Card>
