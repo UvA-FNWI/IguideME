@@ -648,6 +648,12 @@ public static class DatabaseQueries
         AND         `published`=2
         ;";
 
+    public const string UPDATE_EXTERNAL_ASSIGNMENT_SUBMISSIONS =
+        @"UPDATE    `submissions`
+        SET         `Grade`=`Grade` * @oldMaxGrade / @maxGrade
+        WHERE       `submissions`.`assignment_id`=@ID
+        ;";
+
     public const string UPDATE_EXTERNAL_ASSIGNMENT =
         @"UPDATE    `assignments`
         SET         `title`=@title,

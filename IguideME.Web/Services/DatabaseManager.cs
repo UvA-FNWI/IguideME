@@ -676,7 +676,18 @@ namespace IguideME.Web.Services
 
         public void UpdateExternalAssignment(AppAssignment assignment)
         {
-            int assignment_id = IDNonQuery(
+            double old_max = GetAssignment(assignment.CourseID, assignment.ID).MaxGrade;
+            if (assignment.MaxGrade != old_max)
+            {
+                NonQuery(
+                    DatabaseQueries.UPDATE_EXTERNAL_ASSIGNMENT_SUBMISSIONS,
+                    new SQLiteParameter("ID", assignment.ID),
+                    new SQLiteParameter("oldMaxGrade", old_max),
+                    new SQLiteParameter("maxGrade", assignment.MaxGrade)
+                );
+
+            }
+            NonQuery(
                 DatabaseQueries.UPDATE_EXTERNAL_ASSIGNMENT,
                 new SQLiteParameter("ID", assignment.ID),
                 new SQLiteParameter("courseID", assignment.CourseID),
@@ -3591,6 +3602,7 @@ namespace IguideME.Web.Services
             {
                 while (r.Read())
                 {
+                    _logger.LogWarning("Test {}", r.GetValue(0));
                     entries.Add(
                         new TileEntry(
                             r.GetInt32(0),

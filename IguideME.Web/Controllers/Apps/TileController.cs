@@ -514,7 +514,7 @@ namespace IguideME.Web.Controllers
 		[ProducesResponseType(StatusCodes.Status204NoContent)]
 		[ProducesResponseType(StatusCodes.Status400BadRequest)]
 		[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-		public ActionResult UploadTileData(int assignmentID, JObject data)
+		public ActionResult UploadExternalData(int assignmentID, JObject data)
 		{
 			int courseID = this.GetCourseID();
 
@@ -523,6 +523,8 @@ namespace IguideME.Web.Controllers
 			JArray table = (JArray)data["data"];
 
 			string[] names = table[0].ToObject<string[]>();
+
+			AppAssignment ass = _databaseManager.GetAssignment(courseID, assignmentID);
 
 			// IEnumerable<int> range = Enumerable.Range(0, names.Length).Where(i => i != id_column && i != grade_column);
 			foreach (JArray row in table.Cast<JArray>().Skip(1))
@@ -537,7 +539,7 @@ namespace IguideME.Web.Controllers
 				-1,
 					assignmentID,
 					values[id_column],
-					Grade * 10,
+					Grade * 100 / (ass.MaxGrade > 0 ? ass.MaxGrade : 1),
 					DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
 				));
 
