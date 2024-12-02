@@ -662,7 +662,10 @@ public static class DatabaseQueries
         WHERE       `assignments`.`assignment_id`=@ID
         AND         `assignments`.`course_id`=@courseID
         AND         `assignments`.`published`=2
-        ;";
+        ;
+        DELETE FROM `submissions` 
+        WHERE       `submissions`.`assignment_id`=@ID
+        ";
 
     public const string UPDATE_EXTERNAL_ASSIGNMENT_TITLE =
         @"UPDATE    `assignments`
