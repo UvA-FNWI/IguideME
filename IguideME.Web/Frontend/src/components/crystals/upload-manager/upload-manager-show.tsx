@@ -1,11 +1,12 @@
+import { getExternalAssignmentSubmissions } from '@/api/entries';
+import { uploadData } from '@/api/tiles';
+import { GradingType, printGrade } from '@/types/grades';
 import type { Assignment } from '@/types/tile';
 import type { User } from '@/types/user';
-import { App, Button, Drawer, Form, Table } from 'antd';
-import UploadManagerAdd from './upload-manager-add';
-import { useCallback, useMemo, useState, type FC } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { uploadData } from '@/api/tiles';
-import { getExternalAssignmentSubmissions } from '@/api/entries';
+import { App, Button, Drawer, Form, Table } from 'antd';
+import { useCallback, useMemo, useState, type FC } from 'react';
+import UploadManagerAdd from './upload-manager-add';
 
 export interface UploadManagerProps {
   assignment: Assignment;
@@ -29,7 +30,12 @@ const UploadManagerShow: FC<UploadManagerProps> = ({ assignment, students }) => 
 
     return submissions.map((submission) => ({
       studentId: submission.userID,
-      grade: submission.grade,
+      grade: printGrade(
+        assignment.grading_type,
+        submission.grade,
+        assignment.max_grade,
+        assignment.grading_type === GradingType.NotGraded,
+      ),
     }));
   }, [submissions]);
 
@@ -120,7 +126,13 @@ const UploadManagerShow: FC<UploadManagerProps> = ({ assignment, students }) => 
                 title: 'Grade',
                 dataIndex: 'grade',
                 key: 'grade',
-                sorter: (a, b) => a.grade - b.grade,
+                sorter: (a, b) => {
+                  if (!isNaN(parseFloat(a.grade)) && !isNaN(parseFloat(b.grade))) {
+                    return parseFloat(a.grade) - parseFloat(b.grade);
+                  } else {
+                    return a.grade.localeCompare(b.grade);
+                  }
+                },
               },
             ]}
           />
@@ -148,7 +160,7 @@ const UploadManagerShow: FC<UploadManagerProps> = ({ assignment, students }) => 
         }
       >
         <Form
-          initialValues={{ idColumn: 0, gradeColumn: 1, data: [['']] }}
+          initialValues={{ idColumn: 0, gradeColumn: 1, data: [['', '']] }}
           requiredMark={false}
           form={form}
           onFinish={(values) => {

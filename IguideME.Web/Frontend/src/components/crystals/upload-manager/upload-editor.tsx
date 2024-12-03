@@ -1,10 +1,10 @@
+import type { User } from '@/types/user';
+import { MinusOutlined, PlusOutlined } from '@ant-design/icons';
 import { Button, Col, Row } from 'antd';
+import { useWatch, type FormInstance } from 'antd/es/form/Form';
 import { type FC } from 'react';
 import UploadEditorRow from './upload-editor_row';
-import { MinusOutlined, PlusOutlined } from '@ant-design/icons';
-import { useWatch, type FormInstance } from 'antd/es/form/Form';
 import type { UploadManagerAddFormValues } from './upload-manager-show';
-import type { User } from '@/types/user';
 
 interface UploadEditorProps {
   form: FormInstance<UploadManagerAddFormValues>;
@@ -12,7 +12,7 @@ interface UploadEditorProps {
 }
 
 const UploadEditor: FC<UploadEditorProps> = ({ form, students }) => {
-  const data = useWatch('data', form) ?? [['']];
+  const data = useWatch('data', form) ?? [['', '']];
   const idColumn = useWatch('idColumn', form);
 
   const changeData = (value: string, rowIndex: number, colIndex: number): void => {
@@ -22,8 +22,12 @@ const UploadEditor: FC<UploadEditorProps> = ({ form, students }) => {
   };
 
   const addColumn = (): void => {
-    const newData = data.map((row) => [...row, '']);
-    form.setFieldValue('data', newData);
+    if (data.length === 0) {
+      form.setFieldValue('data', [['']]);
+    } else {
+      const newData = data.map((row) => [...row, '']);
+      form.setFieldValue('data', newData);
+    }
   };
 
   const addRow = (): void => {
@@ -55,7 +59,7 @@ const UploadEditor: FC<UploadEditorProps> = ({ form, students }) => {
   const addMissing = (): void => {
     const newData = [...data];
     students.forEach((student) => {
-      for (let i = 1; i < data.length; i++) {
+      for (let i = 0; i < data.length; i++) {
         if (data[i][idColumn] === student.userID.toString()) return;
       }
 
@@ -104,7 +108,7 @@ const UploadEditor: FC<UploadEditorProps> = ({ form, students }) => {
                 icon={<PlusOutlined />}
                 onClick={addColumn}
                 style={{
-                  height: `${data.length * 32}px`,
+                  height: `${data.length === 0 ? '32' : data.length * 32}px`,
                 }}
               />
             </div>
