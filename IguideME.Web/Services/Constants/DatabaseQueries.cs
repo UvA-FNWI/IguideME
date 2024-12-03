@@ -664,21 +664,19 @@ public static class DatabaseQueries
         ;";
 
     public const string DELETE_EXTERNAL_ASSIGNMENT =
-        @"DELETE FROM    `assignments`
-        WHERE       `assignments`.`assignment_id`=@ID
-        AND         `assignments`.`course_id`=@courseID
-        AND         `assignments`.`published`=2
-        ;
-        DELETE FROM `submissions` 
-        WHERE       `submissions`.`assignment_id`=@ID
-        ;
-        DELETE      `tile_entries` 
-        FROM        `tile_entries`
-        INNER JOIN  `tiles`        
-        USING       (`tile_id`)
-        WHERE       `tiles`.`type`=0
-        AND         `tile_entries`.`content_id`=@ID
-        ;";
+        @"DELETE FROM `assignments`
+        WHERE `assignments`.`assignment_id`=@ID
+        AND `assignments`.`course_id`=@courseID
+        AND `assignments`.`published`=2;
+
+        DELETE FROM `submissions`
+        WHERE `submissions`.`assignment_id`=@ID;
+
+        DELETE FROM `tile_entries`
+        WHERE `tile_entries`.`content_id`=@ID
+        AND `tile_entries`.`tile_id` IN (
+            SELECT `tile_id` FROM `tiles` WHERE `tiles`.`type`=0
+    );";
 
     public const string UPDATE_EXTERNAL_ASSIGNMENT_TITLE =
         @"UPDATE    `assignments`
@@ -729,7 +727,7 @@ public static class DatabaseQueries
             @message
         )
         ON CONFLICT ( `discussion_id` )
-        DO UPDATE SET 
+        DO UPDATE SET
         `title` = @title,
         `author` = @authorName,
         `message` = @message,
@@ -756,7 +754,7 @@ public static class DatabaseQueries
             @message
         )
         ON CONFLICT ( `parent_id`, `entry_id` )
-        DO UPDATE SET 
+        DO UPDATE SET
         `message` = @message,
         `date` = @date
         ;";
@@ -1034,7 +1032,7 @@ public static class DatabaseQueries
 
     public const string QUERY_ASSIGNMENT_COMPARE_GRADES =
         @"SELECT    `submissions`.`user_id`,
-                    `submissions`.`grade`, 
+                    `submissions`.`grade`,
                     `assignments`.`max_grade`
         FROM        `submissions`
         INNER JOIN  `assignments`
