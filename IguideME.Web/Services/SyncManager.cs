@@ -53,6 +53,7 @@ namespace IguideME.Web.Services
 
             if (_databaseManager != null && now.Hour == 3 && now.Minute <= 30)
             {
+                _logger.LogInformation("Starting daily syncs");
                 new CanvasSyncService(
                     _computationJobStatus,
                     _canvasHandler,
