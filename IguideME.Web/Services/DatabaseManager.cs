@@ -2429,15 +2429,13 @@ namespace IguideME.Web.Services
             return notifications;
         }
 
-        public void MarkNotificationsSent(int courseID, string userID, long syncID = 0)
+        public void MarkNotificationsSent(int courseID, string userID, long syncID)
         {
-            long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
-
             NonQuery(
                 DatabaseQueries.QUERY_MARK_NOTIFICATIONS_SENT,
                 new SQLiteParameter("time", DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()),
                 new SQLiteParameter("userID", userID),
-                new SQLiteParameter("syncID", activeSync)
+                new SQLiteParameter("syncID", syncID)
             );
         }
 

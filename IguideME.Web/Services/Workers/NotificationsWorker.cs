@@ -107,7 +107,7 @@ namespace IguideME.Web.Services.Workers
 
             _logger.LogInformation("Marking notifications as sent...");
 
-            _databaseManager.MarkNotificationsSent(this._courseID, student.UserID);
+            _databaseManager.MarkNotificationsSent(this._courseID, student.UserID, this._syncID);
 
         }
 
@@ -118,13 +118,13 @@ namespace IguideME.Web.Services.Workers
             string selectedDates = notificationDates.selectedDates;
             if (string.IsNullOrEmpty(selectedDates)) return false;
 
-            string[] dates = selectedDates.Split(new [] { ", " }, StringSplitOptions.RemoveEmptyEntries);
+            string[] dates = selectedDates.Split(new[] { ", " }, StringSplitOptions.RemoveEmptyEntries);
             DateTime today = DateTime.Now.Date;
 
             bool send = false;
             if (notificationDates.isRange)
             {
-                string[] selectedDays = notificationDates.selectedDays.Split(new [] { ", " }, StringSplitOptions.RemoveEmptyEntries);
+                string[] selectedDays = notificationDates.selectedDays.Split(new[] { ", " }, StringSplitOptions.RemoveEmptyEntries);
                 string firstSelectedDate = dates[0];
                 string lastSelectedDate = dates[^1];
 
