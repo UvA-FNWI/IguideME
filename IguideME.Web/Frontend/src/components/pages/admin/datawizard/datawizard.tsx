@@ -94,7 +94,7 @@ const Wizard: FC = (): ReactElement => {
       published: 2,
       muted: false,
       due_date: -1,
-      max_grade: 0,
+      max_grade: 10,
       grading_type: GradingType.Points,
     });
   };
