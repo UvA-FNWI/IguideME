@@ -24,3 +24,11 @@ export async function getNotificationSettings(): Promise<NotificationAdminSettin
 export async function postNotificationSettings(data: NotificationAdminSettings) {
   return await apiClient.post('app/notifications', data);
 }
+
+export async function getCourseDetailsSettings(): Promise<{ course_end_date: number }> {
+  return await apiClient.get('app/course-details').then((response) => response.data);
+}
+
+export async function postCourseDetailsSettings(data: { course_end_date: number }) {
+  return await apiClient.post('app/course-details', data);
+}

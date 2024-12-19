@@ -1,19 +1,20 @@
-import { http, HttpResponse } from "msw";
+import { http, HttpResponse } from 'msw';
 
 export const courseSettingsHandlers = [
-  http.get("/app/peer-groups", () => {
+  http.get('/app/peer-groups', () => {
     return HttpResponse.json({ min_size: 5, personalized_peers: true });
   }),
-  http.post("/app/peer-groups", () => {
+  http.post('/app/peer-groups', () => {
     return new HttpResponse(null, { status: 200 });
   }),
-  http.post("/app/notifications", () => {
+  http.post('/app/notifications', () => {
     return new HttpResponse(null, { status: 200 });
   }),
-  http.get("/app/notifications", () => {
+  http.get('/app/notifications', () => {
     const date = new Date();
-    return HttpResponse.json([
-      `${date.getFullYear()}/${date.getMonth()}/${date.getDate() + 1}`,
-    ]);
+    return HttpResponse.json([`${date.getFullYear()}/${date.getMonth()}/${date.getDate() + 1}`]);
+  }),
+  http.get('/app/course-details', () => {
+    return HttpResponse.json({ course_end_date: 0 });
   }),
 ];
