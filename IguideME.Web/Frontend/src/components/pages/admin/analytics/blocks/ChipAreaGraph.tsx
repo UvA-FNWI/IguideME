@@ -14,7 +14,7 @@ interface ChipAreaGraphProps {
 interface CustomTooltipProps extends TooltipProps<number, string> {
   active?: boolean;
   label?: string;
-  payload?: Array<{ value: number }>;
+  payload?: Array<{ value: number; payload: any }>;
   startingDate: dayjs.Dayjs | undefined;
   isSingleWeek?: boolean;
 }

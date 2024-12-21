@@ -1,7 +1,7 @@
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
-import { DeleteFilled } from '@ant-design/icons';
-import { Form, Input, Select, Table } from 'antd';
+import { CheckOutlined, CloseOutlined, DeleteFilled } from '@ant-design/icons';
+import { Form, Input, Select, Switch, Table } from 'antd';
 import { getLearningGoals } from '@/api/entries';
 import { PublishedStatus, type LearningGoal, type TileEntry } from '@/types/tile';
 import { useDrawerStore } from '@/components/crystals/tile-group-board/useDrawerStore';
@@ -132,7 +132,7 @@ const TileGoalsSelect: FC<TileGoalsSelectProps> = ({ goals, value: entries, onCh
       />
 
       <Select
-        className='w-full [&>div]:!border-accent/70 [&>div]:!bg-surface1 [&>div]:!shadow-none [&>div]:hover:!border-accent [&>div]:hover:!bg-surface2 [&_span]:!text-text'
+        className='[&>div]:!border-accent/70 [&>div]:!bg-surface1 [&>div]:hover:!border-accent [&>div]:hover:!bg-surface2 [&_span]:!text-text w-full [&>div]:!shadow-none'
         dropdownClassName='bg-surface1 [&_div]:!text-text selectionSelected'
         value={selectedGoals}
         mode='multiple'
