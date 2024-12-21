@@ -1,6 +1,6 @@
 import { getCourseDetailsSettings, postCourseDetailsSettings } from '@/api/course_settings';
 import QueryError from '@/components/particles/QueryError';
-import QueryLoading from '@/components/particles/QueryLoading';
+import dayjs from 'dayjs';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { App, Button, DatePicker, Form } from 'antd';
 import type { FC, ReactElement } from 'react';
@@ -47,19 +47,21 @@ const CourseDetailSettings: FC = (): ReactElement => {
 
   if (isError) {
     return <QueryError className='!relative' title='Failed to load course details settings' />;
+  } else if (isLoading) {
+    return <div>Loading</div>;
   }
 
   return (
-    <QueryLoading isLoading={isLoading}>
-      <p className='mb-2 text-sm text-text'>Set the end date of your course.</p>
+    <>
+      <p className='mb-2 text-sm text-text'>Set the start date of your course.</p>
       <Form
-        onFinish={(values: any) => {
-          mutate({ course_end_date: values.course_end_date });
+        onFinish={(values: { course_start_date: any }) => {
+          mutate(values.course_start_date.toDate().getTime() / 1000);
         }}
-        initialValues={{ course_end_date: data ? new Date(data.course_end_date) : undefined }}
+        initialValues={{ course_start_date: data ? dayjs(data * 1000) : undefined }}
         requiredMark={false}
       >
-        <Form.Item name='course_end_date' label='Course end date' required rules={[{ required: true }]} hasFeedback>
+        <Form.Item name='course_start_date' label='Course end date' required rules={[{ required: true }]} hasFeedback>
           <DatePicker />
         </Form.Item>
         <div className='flex justify-end'>
@@ -68,7 +70,7 @@ const CourseDetailSettings: FC = (): ReactElement => {
           </Button>
         </div>
       </Form>
-    </QueryLoading>
+    </>
   );
 };
 

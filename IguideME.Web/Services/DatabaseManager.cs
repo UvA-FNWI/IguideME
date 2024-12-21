@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data;
+using System;
 using System.Data.SQLite;
 using System.Linq;
 using IguideME.Web.Models;
@@ -536,6 +536,29 @@ namespace IguideME.Web.Services
                 selectedDates = ""
             };
         }
+
+        public long? GetCourseStart(int courseID) {
+            using (
+                SQLiteDataReader r = Query(
+                    DatabaseQueries.QUERY_COURSE_START_DATE,
+                    new SQLiteParameter("courseID", courseID)
+                )
+            )
+                if (r.Read() && !r.IsDBNull(0))
+                    return r.GetInt64(0);
+
+            return null;
+        }
+
+        public void UpdateCourseStart(int courseID, long start_date)
+        {
+            NonQuery(
+                DatabaseQueries.UPDATE_START_FOR_COURSE,
+                new SQLiteParameter("courseID", courseID),
+                new SQLiteParameter("start", start_date)
+            );
+        }
+
 
         public void RegisterUser(User user)
         {

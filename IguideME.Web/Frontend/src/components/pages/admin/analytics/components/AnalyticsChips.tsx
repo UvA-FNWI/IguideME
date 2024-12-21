@@ -34,12 +34,9 @@ const AnalyticsChips: FC<AnalyticsChipProps> = memo(({ analytics, consentInfo, s
       const lastEvent = sortedSessionEvents[sessionEvents.length - 1];
 
       const eventDate = new Date(firstEvent.timestamp);
+      const startOfWeek = new Date(eventDate.getTime());
       const dayOfWeek = eventDate.getDay();
-      const startOfWeek = new Date(
-        eventDate.getFullYear(),
-        eventDate.getMonth(),
-        eventDate.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1),
-      );
+      startOfWeek.setDate(startOfWeek.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
       startOfWeek.setHours(0, 0, 0, 0);
       const weekKey = startOfWeek.toISOString();
 

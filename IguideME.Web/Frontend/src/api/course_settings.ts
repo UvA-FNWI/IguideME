@@ -25,10 +25,10 @@ export async function postNotificationSettings(data: NotificationAdminSettings) 
   return await apiClient.post('app/notifications', data);
 }
 
-export async function getCourseDetailsSettings(): Promise<{ course_end_date: number }> {
+export async function getCourseDetailsSettings(): Promise<number | null> {
   return await apiClient.get('app/course-details').then((response) => response.data);
 }
 
-export async function postCourseDetailsSettings(data: { course_end_date: number }) {
-  return await apiClient.post('app/course-details', data);
+export async function postCourseDetailsSettings(CourseEndDate: number | null) {
+  return await apiClient.patch(`app/course-details/${CourseEndDate}`);
 }

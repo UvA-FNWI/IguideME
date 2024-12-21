@@ -316,8 +316,31 @@ namespace IguideME.Web.Controllers
 		[ProducesResponseType(StatusCodes.Status200OK)]
 		public ActionResult GetNotificationDates()
 		{
-			var notificationSettings = _databaseManager.GetNotificationDates(GetCourseID());
-			return Json(notificationSettings);
+			return Json( _databaseManager.GetNotificationDates(GetCourseID()) );
 		}
-	}
+
+		[Authorize(Policy = "IsInstructor")]
+		[Route("/app/course-details/{start_date}")]
+		[HttpPatch]
+		[ProducesResponseType(StatusCodes.Status400BadRequest)]
+		[ProducesResponseType(StatusCodes.Status200OK)]
+		public ActionResult UpdateCourseStartDate(string start_date)
+		{
+
+			_databaseManager.UpdateCourseStart(GetCourseID(), long.Parse(start_date));
+
+			return Ok();
+		}
+
+		[Authorize(Policy = "IsInstructor")]
+		[Route("/app/course-details")]
+		[HttpGet]
+		[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+		[ProducesResponseType(StatusCodes.Status404NotFound)]
+		[ProducesResponseType(StatusCodes.Status200OK)]
+		public ActionResult GetCourseStartDate()
+		{
+			return Json(_databaseManager.GetCourseStart(GetCourseID()));
+		}
+}
 }

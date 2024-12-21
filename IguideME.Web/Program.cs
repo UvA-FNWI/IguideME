@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Headers;
+using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.DependencyInjection;
@@ -39,7 +40,10 @@ builder.Services.AddSpaStaticFiles(configuration =>
 {
     configuration.RootPath = "wwwroot/dist";
 });
-builder.Services.AddHttpLogging(o => { });
+builder.Services.AddHttpLogging(logging => {
+    logging.RequestBodyLogLimit = 4096;
+    logging.LoggingFields = HttpLoggingFields.ResponseBody;
+ });
 //    /------------------------ Read appsettings.json -------------------------/
 
 // "UnsecureApplicationSettings:UseRedisCache" - indicates whether to use Redis cache or not.

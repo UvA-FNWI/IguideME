@@ -1,5 +1,8 @@
 import { Area, AreaChart, ResponsiveContainer, Tooltip, type TooltipProps } from 'recharts';
 import { type FC, memo, type ReactElement } from 'react';
+import dayjs from 'dayjs';
+import { useQuery } from '@tanstack/react-query';
+import { getCourseDetailsSettings } from '@/api/course_settings';
 
 interface ChipAreaGraphProps {
   graphData: Array<{
@@ -12,17 +15,18 @@ interface CustomTooltipProps extends TooltipProps<number, string> {
   active?: boolean;
   label?: string;
   payload?: Array<{ value: number }>;
-  isSingleWeek: boolean;
+  startingDate: dayjs.Dayjs | undefined;
 }
 
-const CustomTooltip = ({ active, label, payload, isSingleWeek }: CustomTooltipProps): ReactElement | null => {
+const CustomTooltip = ({ active, payload, startingDate }: CustomTooltipProps): ReactElement | null => {
   if (active && payload?.length) {
+    const dateOfDataPoint = dayjs(payload[0].payload.name);
+    const weekDiff = dateOfDataPoint.diff(startingDate, 'week');
     const y = Number.isInteger(payload[0].value) ? payload[0].value : payload[0].value.toFixed(2);
 
-    const weekLabel = isSingleWeek ? 'Week 1' : `Week ${Number(label) + 1}`;
     return (
       <div className='bg-surface1 p-3'>
-        <p>{`${weekLabel}: ${y}`}</p>
+        <p>{`Week ${weekDiff}: ${y}`}</p>
       </div>
     );
   }
@@ -32,6 +36,11 @@ const CustomTooltip = ({ active, label, payload, isSingleWeek }: CustomTooltipPr
 
 const ChipAreaGraph: FC<ChipAreaGraphProps> = memo(({ graphData }): ReactElement => {
   const adjustedGraphData = graphData.length === 1 ? [...graphData, { ...graphData[0] }] : graphData;
+
+  const { data: startingDate } = useQuery({
+    queryKey: ['course-start-date'],
+    queryFn: async () => await getCourseDetailsSettings(),
+  });
 
   return (
     <ResponsiveContainer width='100%' height='100%'>
@@ -43,7 +52,7 @@ const ChipAreaGraph: FC<ChipAreaGraphProps> = memo(({ graphData }): ReactElement
           </linearGradient>
         </defs>
         <Area type='monotone' dataKey='value' stroke='#fc5f5f' fill='url(#colorUv)' strokeWidth={2} dot={false} />
-        <Tooltip content={<CustomTooltip isSingleWeek={graphData.length === 1} />} />
+        <Tooltip content={<CustomTooltip startingDate={startingDate ? dayjs(startingDate * 1000) : undefined} />} />
       </AreaChart>
     </ResponsiveContainer>
   );

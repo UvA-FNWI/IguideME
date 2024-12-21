@@ -51,8 +51,8 @@ public static class DatabaseQueries
         @"CREATE TABLE IF NOT EXISTS `course_settings` (
             `course_id`             INTEGER PRIMARY KEY,
             `name`                  STRING,
-            `start_date`            DATE NULL,
-            `end_date`              DATE NULL,
+            `start_date`            INTEGER NULL,
+            `end_date`              INTEGER NULL,
             `consent`               TEXT NULL,
             `peer_group_size`       INTEGER DEFAULT 5
         );";
@@ -987,6 +987,12 @@ public static class DatabaseQueries
         WHERE       `course_id`=@courseID
         LIMIT       1;";
 
+    public const string QUERY_COURSE_START_DATE =
+        @"SELECT    `start_date`
+        FROM        `course_settings`
+        WHERE       `course_id`=@courseID
+        LIMIT       1;";
+
     public const string QUERY_NOTIFICATION_DATES_FOR_COURSE =
         @"SELECT    `is_range`, `selected_days`, `selected_dates`
         FROM        `notifications_course_settings`
@@ -1757,6 +1763,11 @@ public static class DatabaseQueries
     public const string UPDATE_CONSENT_FOR_COURSE =
         @"UPDATE    `course_settings`
         SET         `consent`=@text
+        WHERE       `course_id`=@courseID;";
+
+    public const string UPDATE_START_FOR_COURSE =
+        @"UPDATE    `course_settings`
+        SET         `start_date`=@start
         WHERE       `course_id`=@courseID;";
 
     public const string UPDATE_PEER_GROUP_FOR_COURSE =

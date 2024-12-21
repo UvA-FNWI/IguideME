@@ -15,6 +15,6 @@ export const courseSettingsHandlers = [
     return HttpResponse.json([`${date.getFullYear()}/${date.getMonth()}/${date.getDate() + 1}`]);
   }),
   http.get('/app/course-details', () => {
-    return HttpResponse.json({ course_end_date: 0 });
+    return HttpResponse.json(0);
   }),
 ];
