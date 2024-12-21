@@ -12,7 +12,10 @@ interface UploadEditorProps {
 }
 
 const UploadEditor: FC<UploadEditorProps> = ({ form, students }) => {
-  const data = useWatch('data', form) ?? [['', '']];
+  const data = useWatch('data', form) ?? [
+    ['', ''],
+    ['', ''],
+  ];
   const idColumn = useWatch('idColumn', form);
 
   const changeData = (value: string, rowIndex: number, colIndex: number): void => {

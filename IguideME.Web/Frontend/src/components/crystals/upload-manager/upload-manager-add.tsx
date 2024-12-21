@@ -17,9 +17,9 @@ const UploadManagerAdd: FC<UploadManagerAddProps> = ({ form, students }) => {
       return;
     }
 
-    // Case 2: No headers
+    // Case 2: No columns
     if (value[0].length === 0) {
-      await Promise.reject(new Error('No headers present'));
+      await Promise.reject(new Error('No columns present'));
       return;
     }
 

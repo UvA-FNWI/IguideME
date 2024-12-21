@@ -36,8 +36,8 @@ const UploadEditorRow: FC<UploadEditorRowProps> = ({ rowData, rowIndex, form, ch
         <Col key={colIndex}>
           <Input
             className={`h-8 w-[120px] ${
-              getClass(colIndex) === 'id_column' ? 'bg-orange-400'
-              : getClass(colIndex) === 'grade_column' ? 'bg-blue-400'
+              getClass(colIndex) === 'id_column' && rowIndex > 0 ? 'bg-orange-400'
+              : getClass(colIndex) === 'grade_column' && rowIndex > 0 ? 'bg-blue-400'
               : ''
             }`}
             value={col}

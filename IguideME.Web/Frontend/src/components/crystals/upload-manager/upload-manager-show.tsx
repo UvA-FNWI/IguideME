@@ -160,7 +160,14 @@ const UploadManagerShow: FC<UploadManagerProps> = ({ assignment, students }) => 
         }
       >
         <Form
-          initialValues={{ idColumn: 0, gradeColumn: 1, data: [['', '']] }}
+          initialValues={{
+            idColumn: 0,
+            gradeColumn: 1,
+            data: [
+              ['', ''],
+              ['', ''],
+            ],
+          }}
           requiredMark={false}
           form={form}
           onFinish={(values) => {

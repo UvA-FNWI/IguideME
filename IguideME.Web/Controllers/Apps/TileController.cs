@@ -527,7 +527,7 @@ namespace IguideME.Web.Controllers
 			AppAssignment ass = _databaseManager.GetAssignment(courseID, assignmentID);
 
 			// IEnumerable<int> range = Enumerable.Range(0, names.Length).Where(i => i != id_column && i != grade_column);
-			foreach (JArray row in table.Cast<JArray>().Skip(1))
+			foreach (JArray row in table.Cast<JArray>())
 			{
 
 				string[] values = row.ToObject<string[]>();
