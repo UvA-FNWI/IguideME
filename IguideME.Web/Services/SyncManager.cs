@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -55,11 +55,11 @@ namespace IguideME.Web.Services
             {
                 _logger.LogInformation("Starting daily syncs");
                 new CanvasSyncService(
-                    _computationJobStatus,
-                    _canvasHandler,
-                    _databaseManager,
-                    _logger
-                );
+                _computationJobStatus,
+                _canvasHandler,
+                _databaseManager,
+                _logger
+            );
 
                 List<int> course_ids = _databaseManager.GetCourseIds();
 

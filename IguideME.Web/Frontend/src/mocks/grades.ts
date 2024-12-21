@@ -19,7 +19,7 @@ export const gradeHandlers = [
 
     if (!type) return HttpResponse.json();
 
-    return HttpResponse.json<Array<UserGrade>>(getContentGrades(id, type));
+    return HttpResponse.json<Array<UserGrade>>(getContentGrades(id!, type));
   }),
 
   http.get('/tiles/*/grades/*', ({ params }) => {

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+
+using System.Collections.Generic;
 using System.Data;
 using System;
 using System.Data.SQLite;
@@ -559,7 +560,6 @@ namespace IguideME.Web.Services
             );
         }
 
-
         public void RegisterUser(User user)
         {
             NonQuery(
@@ -672,8 +672,6 @@ namespace IguideME.Web.Services
 
             return assignment_id;
         }
-
-
 
         public int RegisterExternalAssignment(AppAssignment assignment)
         {
@@ -1064,30 +1062,53 @@ namespace IguideME.Web.Services
         }
 
         // public User GetUser(int courseID, string userID)
+
         // {
+
         //     User user = null;
+
         //     using (
+
         //         SQLiteDataReader r = Query(
+
         //             DatabaseQueries.QUERY_CONSENTED_USER_DATA_FOR_COURSE,
+
         //             new SQLiteParameter("courseID", courseID),
+
         //             new SQLiteParameter("userID", userID)
+
         //         )
+
         //     )
+
         //     {
+
         //         if (r.Read())
+
         //         {
+
         //             user = new User(
+
         //                 r.GetValue(0).ToString(),
+
         //                 courseID,
+
         //                 r.GetInt32(1),
+
         //                 r.GetValue(2).ToString(),
+
         //                 r.GetValue(3).ToString(),
+
         //                 r.GetValue(5) != null ? r.GetInt32(5) : 1
+
         //             );
+
         //         }
+
         //     }
 
         //     return user;
+
         // }
 
         public List<User> GetUsersWithGoalGrade(int courseID, int goalGrade, long syncID = 0)
@@ -1453,6 +1474,7 @@ namespace IguideME.Web.Services
         }
 
         /// 0 means that we don't compare for assignment/tile/etc., but total average
+
         public void CreateUserPeer(
             int goalGrade,
             List<string> userIDs,
@@ -1606,6 +1628,7 @@ namespace IguideME.Web.Services
         }
 
         // TODO: probably switch to using grades version of submissions instead of Grade.
+
         public List<AssignmentSubmission> GetCourseSubmissions(int courseID, long syncID = 0)
         {
             long activeSync = syncID == 0 ? this.GetCurrentSyncID(courseID) : syncID;
@@ -1719,7 +1742,6 @@ namespace IguideME.Web.Services
 
             return goals;
         }
-
 
         public bool GetGoalRequirementResult(GoalRequirement requirement, string userID)
         {
@@ -2582,9 +2604,10 @@ namespace IguideME.Web.Services
         }
 
         /////////////////////////////////////////////////////////////////////////////////
-        //////////////////////////         ACCEPT LIST         //////////////////////////
-        /////////////////////////////////////////////////////////////////////////////////
 
+        //////////////////////////         ACCEPT LIST         //////////////////////////
+
+        /////////////////////////////////////////////////////////////////////////////////
 
         public void RegisterAcceptedStudent(
             int courseID,
@@ -2635,7 +2658,9 @@ namespace IguideME.Web.Services
         }
 
         /////////////////////////////////////////////////////////////////////////////////
+
         //////////////////////////         END OF LIST         //////////////////////////
+
         /////////////////////////////////////////////////////////////////////////////////
 
         public List<string> GetEntryMetaKeys(int submissionID)
@@ -2656,7 +2681,6 @@ namespace IguideME.Web.Services
             }
             return keys;
         }
-
 
         public Dictionary<string, string> GetEntryMeta(int submissionID)
         {
@@ -2807,33 +2831,57 @@ namespace IguideME.Web.Services
         }
 
         // public Tile FillTileContent(Tile tile)
+
         // {
+
         //     switch(tile.Type)
+
         //     {
+
         //         case Tile_type.assignments:
+
         //             using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_COURSE_ASSIGNMENTS,
+
         //                 new SQLiteParameter("tileID", courseID)))
+
         //             {
+
         //                 while (r.Read())
+
         //                 {
+
         //                     try
+
         //                     {
 
         //                     }
+
         //                     catch (Exception e)
+
         //                     {
+
         //                         PrintQueryError("FillTileContent", 9, r, e);
+
         //                     }
+
         //                 }
+
         //             }
+
         //         break;
+
         //         case Tile_type.discussions:
+
         //         break;
+
         //         case Tile_type.learning_outcomes:
+
         //         break;
+
         //     }
 
         //     return tile;
+
         // }
 
         public void CreateLayoutTileGroup(int courseID, string title, int position)
@@ -3395,6 +3443,7 @@ namespace IguideME.Web.Services
 
             return discussions;
         }
+
         public List<AppDiscussionEntry> GetUserDiscussionEntries(int courseID, string userID)
         {
             List<AppDiscussionEntry> discussions = new();
@@ -3662,12 +3711,155 @@ namespace IguideME.Web.Services
         }
 
         /// <summary>
+
         /// Inserts a user action into the database.
+
         /// </summary>
+
         /// <param name="userID">The ID of the user performing the action.</param>
+
         /// <param name="action">The type of action performed by the user.</param>
+
         /// <param name="actionDetail">Additional details about the action.</param>
+
         /// <param name="courseID">The ID of the course associated with the action.</param>
+
+        /// <param name="timeStamp">The timestamp of when the action occurred, represented as the number of seconds since the Unix epoch.</param>
+
+        // public User GetUser(int courseID, string userID)
+
+        // {
+
+        //     User user = null;
+
+        //     using (
+
+        //         SQLiteDataReader r = Query(
+
+        //             DatabaseQueries.QUERY_CONSENTED_USER_DATA_FOR_COURSE,
+
+        //             new SQLiteParameter("courseID", courseID),
+
+        //             new SQLiteParameter("userID", userID)
+
+        //         )
+
+        //     )
+
+        //     {
+
+        //         if (r.Read())
+
+        //         {
+
+        //             user = new User(
+
+        //                 r.GetValue(0).ToString(),
+
+        //                 courseID,
+
+        //                 r.GetInt32(1),
+
+        //                 r.GetValue(2).ToString(),
+
+        //                 r.GetValue(3).ToString(),
+
+        //                 r.GetValue(5) != null ? r.GetInt32(5) : 1
+
+        //             );
+
+        //         }
+
+        //     }
+
+        //     return user;
+
+        // }
+
+        /// 0 means that we don't compare for assignment/tile/etc., but total average
+
+        // TODO: probably switch to using grades version of submissions instead of Grade.
+
+        /////////////////////////////////////////////////////////////////////////////////
+
+        //////////////////////////         ACCEPT LIST         //////////////////////////
+
+        /////////////////////////////////////////////////////////////////////////////////
+
+        /////////////////////////////////////////////////////////////////////////////////
+
+        //////////////////////////         END OF LIST         //////////////////////////
+
+        /////////////////////////////////////////////////////////////////////////////////
+
+        // public Tile FillTileContent(Tile tile)
+
+        // {
+
+        //     switch(tile.Type)
+
+        //     {
+
+        //         case Tile_type.assignments:
+
+        //             using (SQLiteDataReader r = Query(DatabaseQueries.QUERY_COURSE_ASSIGNMENTS,
+
+        //                 new SQLiteParameter("tileID", courseID)))
+
+        //             {
+
+        //                 while (r.Read())
+
+        //                 {
+
+        //                     try
+
+        //                     {
+
+        //                     }
+
+        //                     catch (Exception e)
+
+        //                     {
+
+        //                         PrintQueryError("FillTileContent", 9, r, e);
+
+        //                     }
+
+        //                 }
+
+        //             }
+
+        //         break;
+
+        //         case Tile_type.discussions:
+
+        //         break;
+
+        //         case Tile_type.learning_outcomes:
+
+        //         break;
+
+        //     }
+
+        //     return tile;
+
+        // }
+
+        /// <summary>
+
+        /// Inserts a user action into the database.
+
+        /// </summary>
+
+        /// <param name="userID">The ID of the user performing the action.</param>
+
+        /// <param name="action">The type of action performed by the user.</param>
+
+        /// <param name="actionDetail">Additional details about the action.</param>
+
+        /// <param name="courseID">The ID of the course associated with the action.</param>
+
         /// <param name="timeStamp">The timestamp of when the action occurred, represented as the number of seconds since the Unix epoch.</param>
         public void InsertUserAction(string userID, ActionTypes action, string actionDetail, int courseID)
         {

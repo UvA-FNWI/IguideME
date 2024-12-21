@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using IguideME.Web.Models.App;
@@ -184,6 +184,17 @@ namespace IguideME.Web.Services
 
         /// <inheritdoc />
         public IEnumerable<AssignmentSubmission> GetSubmissions(int courseID, List<User> users)
+        {
+            IEnumerable<AssignmentSubmission> submissions = new List<AssignmentSubmission>();
+            for (int i = 0; i < users.Count; i += 100)
+            {
+                submissions = submissions.Concat(GetSubmissionsBatch(courseID, users.GetRange(i, Math.Min(100, users.Count - i))));
+            };
+            return submissions;
+
+        }
+
+        public IEnumerable<AssignmentSubmission> GetSubmissionsBatch(int courseID, List<User> users)
         {
             _logger.LogInformation("Getting submissions for users:\n{}", users.Select(user => user.UserID));
             return Connector
