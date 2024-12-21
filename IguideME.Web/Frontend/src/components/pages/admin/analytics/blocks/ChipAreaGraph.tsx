@@ -16,12 +16,22 @@ interface CustomTooltipProps extends TooltipProps<number, string> {
   label?: string;
   payload?: Array<{ value: number }>;
   startingDate: dayjs.Dayjs | undefined;
+  isSingleWeek?: boolean;
 }
 
-const CustomTooltip = ({ active, payload, startingDate }: CustomTooltipProps): ReactElement | null => {
+const CustomTooltip = ({
+  active,
+  payload,
+  startingDate,
+  label,
+  isSingleWeek,
+}: CustomTooltipProps): ReactElement | null => {
   if (active && payload?.length) {
     const dateOfDataPoint = dayjs(payload[0].payload.name);
-    const weekDiff = dateOfDataPoint.diff(startingDate, 'week');
+    const weekDiff =
+      startingDate ? dateOfDataPoint.diff(startingDate, 'week')
+      : isSingleWeek ? 1
+      : label;
     const y = Number.isInteger(payload[0].value) ? payload[0].value : payload[0].value.toFixed(2);
 
     return (
@@ -52,7 +62,14 @@ const ChipAreaGraph: FC<ChipAreaGraphProps> = memo(({ graphData }): ReactElement
           </linearGradient>
         </defs>
         <Area type='monotone' dataKey='value' stroke='#fc5f5f' fill='url(#colorUv)' strokeWidth={2} dot={false} />
-        <Tooltip content={<CustomTooltip startingDate={startingDate ? dayjs(startingDate * 1000) : undefined} />} />
+        <Tooltip
+          content={
+            <CustomTooltip
+              startingDate={startingDate ? dayjs(startingDate * 1000) : undefined}
+              isSingleWeek={graphData.length === 1}
+            />
+          }
+        />
       </AreaChart>
     </ResponsiveContainer>
   );

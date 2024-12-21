@@ -61,7 +61,7 @@ const CourseDetailSettings: FC = (): ReactElement => {
         initialValues={{ course_start_date: data ? dayjs(data * 1000) : undefined }}
         requiredMark={false}
       >
-        <Form.Item name='course_start_date' label='Course end date' required rules={[{ required: true }]} hasFeedback>
+        <Form.Item name='course_start_date' label='Course start date' required rules={[{ required: true }]} hasFeedback>
           <DatePicker />
         </Form.Item>
         <div className='flex justify-end'>
