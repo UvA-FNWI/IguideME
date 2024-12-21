@@ -107,14 +107,14 @@ const SunburstChart: FC<TreeType> = memo((tree) => {
     if (tree.children.length === 0 || !sunburstChartRef.current || chartDrawnRef.current) return;
 
     const treeCopy: TreeType = JSON.parse(JSON.stringify(tree));
-    const myChart = Sunburst();
+    const myChart = new Sunburst(sunburstChartRef.current);
     myChart
       .width(300)
       .height(300)
       .data(treeCopy)
       .showLabels(false)
       .color((node) => typeToColor((node as TreeType).type ?? ActionTypes.page))
-      .maxLevels(5)(sunburstChartRef.current)
+      .maxLevels(5)
       .tooltipTitle((node) => (node as TreeType).name);
     chartDrawnRef.current = true;
   }, [tree]);
