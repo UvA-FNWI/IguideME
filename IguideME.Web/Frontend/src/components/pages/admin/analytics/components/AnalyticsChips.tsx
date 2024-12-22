@@ -33,7 +33,7 @@ const AnalyticsChips: FC<AnalyticsChipProps> = memo(({ analytics, consentInfo, s
       const firstEvent = sortedSessionEvents[0];
       const lastEvent = sortedSessionEvents[sessionEvents.length - 1];
 
-      const eventDate = new Date(firstEvent.timestamp);
+      const eventDate = new Date(firstEvent.timestamp * 1000);
       const startOfWeek = new Date(eventDate.getTime());
       const dayOfWeek = eventDate.getDay();
       startOfWeek.setDate(startOfWeek.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
