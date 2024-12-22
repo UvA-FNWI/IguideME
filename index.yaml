@@ -2,6 +2,16 @@ apiVersion: v1
 entries:
   iguideme:
   - apiVersion: v2
+    appVersion: 0.3.248
+    created: "2024-12-22T09:06:08.504921155Z"
+    description: IguideME
+    digest: d0dcdd4c1fb1cf8ce56d8f27380ea8095cc969efd906efbc56d2c36f4e77fa0c
+    name: iguideme
+    type: application
+    urls:
+    - https://github.com/UvA-FNWI/IguideME/releases/download/iguideme-0.3.248/iguideme-0.3.248.tgz
+    version: 0.3.248
+  - apiVersion: v2
     appVersion: 0.3.247
     created: "2024-12-21T17:13:53.883278525Z"
     description: IguideME
@@ -631,4 +641,4 @@ entries:
     urls:
     - https://github.com/UvA-FNWI/IguideME/releases/download/iguideme-0.2.2/iguideme-0.2.2.tgz
     version: 0.2.2
-generated: "2024-12-21T17:13:53.883573256Z"
+generated: "2024-12-22T09:06:08.505225783Z"
