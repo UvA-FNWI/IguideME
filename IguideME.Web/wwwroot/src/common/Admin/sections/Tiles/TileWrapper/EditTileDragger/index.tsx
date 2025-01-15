@@ -115,12 +115,15 @@ class EditTileDragger extends Component<Props, IState> {
   }
 
   save = async () => {
-    const { entries, goals, graphView, wildcard, title }: IState = this.state;
+    const { entries, goals, graphView, wildcard, title, visible, contentType, tileType}: IState = this.state;
     const { tileEntries, tile }: Props = this.props;
 
     tile!.title = title;
     tile!.graph_view = graphView;
     tile!.wildcard = wildcard;
+    tile!.content = contentType.value!;
+    tile!.type = tileType.value; 
+    tile!.visible = visible;
 
     const patchedTile = await TileController.updateTile(tile!)
     this.setState({ updating: true }, async () => {

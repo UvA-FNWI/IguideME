@@ -324,6 +324,10 @@ namespace IguideME.Web.Controllers
 
             [JsonProperty(PropertyName = "wildcard")]
             public bool? Wildcard { get; set; }
+            [JsonProperty(PropertyName = "content")]
+            public string? ContentType { get; set; }
+            [JsonProperty(PropertyName = "type")]
+            public string? TileType { get; set; }
         }
 
         [Authorize(Policy = "IsInstructor")]
@@ -359,6 +363,12 @@ namespace IguideME.Web.Controllers
 
                 if (obj.Wildcard != null)
                     tile.Wildcard = (bool)obj.Wildcard;
+
+                if (obj.ContentType != null)
+                    tile.ContentType = obj.ContentType;
+
+                if (obj.TileType != null)
+                    tile.TileType = obj.TileType;
 
                 DatabaseManager.Instance.UpdateTile(GetCourseID(), tile);
 
