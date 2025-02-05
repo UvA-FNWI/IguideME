@@ -18,7 +18,6 @@ import { Layout as AntLayout, Breadcrumb, Button } from 'antd';
 import { type ElementType, type FC, memo, type ReactElement, Suspense, useState } from 'react';
 import { Link, NavLink, Outlet, useLocation, useMatches, useParams } from 'react-router-dom';
 import { useShallow } from 'zustand/react/shallow';
-import ThemeSwitcher from '../ThemeSwitcher/ThemeSwitcher';
 import GlobalStoreProvider from './GlobalStore/globalStore';
 import { useGlobalContext } from './GlobalStore/useGlobalStore';
 import { useLayoutStore } from './LayoutStore';
@@ -169,13 +168,6 @@ const SideNavigation: FC = (): ReactElement => {
           )}
         </ul>
         <ul className='flex flex-col gap-2'>
-          <li className={`flex gap-2 ${isSidebarClosed && '!h-24 flex-col'} flex-grow`}>
-            <div
-              className={`grid h-11 flex-1 place-content-center rounded-md ${!isSidebarClosed && 'border border-border1'}`}
-            >
-              <ThemeSwitcher isSidebarClosed={isSidebarClosed} user={self} />
-            </div>
-          </li>
           <li>
             <Button
               className='grid h-full w-full grid-cols-4 items-center p-0'
