@@ -1,5 +1,5 @@
 import { EditOutlined, QuestionCircleOutlined, VerticalAlignBottomOutlined } from '@ant-design/icons';
-import { App, Form, InputNumber, Tabs, Tooltip, type FormInstance } from 'antd';
+import { Alert, App, Form, InputNumber, Tabs, Tooltip, type FormInstance } from 'antd';
 import { type FC } from 'react';
 import CSVReader from 'react-csv-reader';
 import UploadEditor from './upload-editor';
@@ -50,6 +50,28 @@ const UploadManagerAdd: FC<UploadManagerAddProps> = ({ form, students }) => {
 
   return (
     <div className='flex w-full flex-col gap-12'>
+      <Alert
+        showIcon
+        message='Privacy Notice'
+        description={
+          <p>
+            When uploading external data to IguideME, please ensure that you only include data that is strictly
+            necessary for the purpose of gaining insight into their teaching and learning. It is essential to protect
+            the privacy and confidentiality of student information.
+            <br />
+            <br />
+            Upload only results or activity data from learning tools or platforms that are in use within your course.
+            Note that you may only use external tool or platform that your institution has a contract with and where a
+            Data Processing Agreement (DPA) is in place. This ensures that the data will be processed in compliance with
+            privacy regulations and that the rights of students are protected.
+            <br />
+            <br />
+            If you have any doubts, please consult with the institution&apos;s data protection officer.
+          </p>
+        }
+        type='info'
+        closable
+      />
       <div className='flex flex-col gap-4'>
         <h4 className='text-lg'>Parameters</h4>
         <div className='flex gap-8'>
