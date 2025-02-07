@@ -7,7 +7,6 @@ using IguideME.Web.Models.Impl;
 using IguideME.Web.Services.LMSHandlers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
 using Npgsql;
 
 namespace IguideME.Web.Services
@@ -475,7 +474,7 @@ namespace IguideME.Web.Services
                     try
                     {
                         string rawGrade = r.GetValue(4).ToString();
-                        if (rawGrade.IsNullOrEmpty())
+                        if (string.IsNullOrEmpty(rawGrade))
                         {
                             if (r.IsDBNull(3))
                             {

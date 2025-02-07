@@ -40,10 +40,11 @@ builder.Services.AddSpaStaticFiles(configuration =>
 {
     configuration.RootPath = "wwwroot/dist";
 });
-builder.Services.AddHttpLogging(logging => {
+builder.Services.AddHttpLogging(logging =>
+{
     logging.RequestBodyLogLimit = 4096;
     logging.LoggingFields = HttpLoggingFields.ResponseBody;
- });
+});
 //    /------------------------ Read appsettings.json -------------------------/
 
 // "UnsecureApplicationSettings:UseRedisCache" - indicates whether to use Redis cache or not.
@@ -238,7 +239,7 @@ app.UseHttpLogging();
 
 // app.UseHttpsRedirection();
 app.UseDefaultFiles();
-app.UseStaticFiles();
+app.MapStaticAssets();
 
 app.UseRouting();
 
