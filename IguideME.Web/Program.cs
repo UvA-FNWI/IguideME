@@ -129,9 +129,6 @@ builder.Services.Configure<ForwardedHeadersOptions>(opt =>
 
 builder.Services.Configure<KestrelServerOptions>(options => options.AllowSynchronousIO = true);
 
-// If using IIS:
-builder.Services.Configure<IISServerOptions>(options => options.AllowSynchronousIO = true);
-
 builder.Services.AddControllersWithViews();
 
 switch (lms)
