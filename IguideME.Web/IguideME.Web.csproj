@@ -10,7 +10,7 @@
   <ItemGroup>
     <PackageReference Include="Npgsql" Version="9.0.2" />
     <PackageReference Include="UvA.Connectors.Canvas" Version="0.25.7" />
-    <PackageReference Include="StackExchange.Redis" Version="2.2.62" />
+    <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="9.0.1" />
     <PackageReference Include="System.Data.SQLite" Version="1.0.118" />
     <PackageReference Include="UvA.LTI" Version="0.2.5" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.1" />
