@@ -49,7 +49,7 @@ const StudentSelector: FC<StudentSelectorProps> = memo(({ courseId }): ReactElem
 
   const { self } = useGlobalContext(useShallow((state) => ({ self: state.self })));
   const { data, isLoading, isError } = useQuery({
-    queryKey: ['students'],
+    queryKey: ['students', courseId],
     queryFn: async () => await getStudentsByCourse(courseId),
     enabled: self.role === UserRoles.instructor,
   });
