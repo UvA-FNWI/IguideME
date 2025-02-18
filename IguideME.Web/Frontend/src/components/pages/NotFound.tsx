@@ -1,5 +1,5 @@
 import { Button, Result } from 'antd';
-import { FC, ReactElement } from 'react';
+import { type FC, type ReactElement } from 'react';
 import { Link } from 'react-router-dom';
 
 const NotFound: FC = (): ReactElement => {
@@ -14,7 +14,9 @@ const NotFound: FC = (): ReactElement => {
           className='m-0 h-11 !w-60 border border-accent/70 bg-accent/20 text-text hover:!border-accent hover:!bg-accent hover:!text-text'
           type='primary'
         >
-          <Link to='/'>Back Home</Link>
+          <Link className='grid h-full w-full place-content-center' to='/'>
+            Back Home
+          </Link>
         </Button>
       }
     />
