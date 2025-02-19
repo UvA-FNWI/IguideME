@@ -9,9 +9,10 @@ import CourseSelection from './components/pages/courses-selection/CourseSelectio
 import NotFound from './components/pages/NotFound';
 import { type User } from './types/user';
 import { parseJwt } from './helpers/general';
+import { type QueryClient } from '@tanstack/react-query';
 
-export const createRouter = (): ReturnType<typeof createBrowserRouter> =>
-  createBrowserRouter(
+export const createRouter = (queryClient?: QueryClient): ReturnType<typeof createBrowserRouter> => {
+  return createBrowserRouter(
     [
       {
         path: '/',
@@ -64,6 +65,7 @@ export const createRouter = (): ReturnType<typeof createBrowserRouter> =>
                 loader: async ({ params }) => {
                   try {
                     if (!params.courseId) return null;
+                    if (queryClient) queryClient.clear();
                     return await getCourseById(params.courseId);
                   } catch (error) {
                     // eslint-disable-next-line @typescript-eslint/no-throw-literal
@@ -288,3 +290,4 @@ export const createRouter = (): ReturnType<typeof createBrowserRouter> =>
       },
     },
   );
+};

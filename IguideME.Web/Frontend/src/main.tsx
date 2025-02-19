@@ -60,7 +60,7 @@ enableMocking()
                   maxCount: 3,
                 }}
               >
-                <RouterProvider router={createRouter()} />
+                <RouterProvider router={createRouter(queryClient)} />
               </App>
             </NextThemesProvider>
             {import.meta.env.MODE === 'mock' && <ReactQueryDevtools initialIsOpen={false} />}

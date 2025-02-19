@@ -1,5 +1,5 @@
 import { analyticsHandlers } from './analytics';
-import { courseSettingsHandlers } from './course_settings';
+import { courseSettingsHandlers } from './course-setting';
 import { courseHandlers } from './courses';
 import { entriesHandlers } from './entries';
 import { gradeHandlers } from './grades';
