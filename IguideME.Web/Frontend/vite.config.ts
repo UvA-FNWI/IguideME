@@ -8,7 +8,7 @@ export default defineConfig((env) => ({
   plugins: [react(), mkcert()],
   base: env.mode === 'production' ? '/dist/' : '/front',
   server: {
-    https: false,
+    https: true,
     port: 3000,
   },
   build: {

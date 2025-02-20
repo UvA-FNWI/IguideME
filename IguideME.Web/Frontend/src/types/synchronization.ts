@@ -74,6 +74,15 @@ export enum JobStatus {
   Unknown = 'Unknown',
 }
 
+export type PollSyncData = Record<string, Job>;
+
+export interface Job {
+  startTime: string;
+  lastUpdate: string;
+  progressInformation: string;
+  status: string;
+}
+
 export interface JobModel {
   startTime: number;
   lastUpdate: number;
