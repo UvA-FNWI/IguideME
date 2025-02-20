@@ -1,6 +1,6 @@
+import type { ExternalSubmission } from '@/types/grades';
 import { type Assignment, type DiscussionTopic, type GoalRequirement, type LearningGoal } from '@/types/tile';
 import apiClient from './axios';
-import type { ExternalSubmission } from '@/types/grades';
 
 type GetAssignmentsData = Record<string, Assignment>;
 

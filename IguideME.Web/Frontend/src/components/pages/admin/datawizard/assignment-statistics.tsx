@@ -68,7 +68,7 @@ const ExternalAssignmentStatistics: FC<ExternalAssignmentStatisticsProps> = ({ a
         viewingGrade = grade / 10;
       }
 
-      const existingGrade = data.find((d) => d.grade === viewingGrade);
+      const existingGrade = data.find((d) => d.grade === Math.round(viewingGrade));
       if (existingGrade) {
         if (viewingGrade < 5.5) {
           existingGrade.failed += 1;

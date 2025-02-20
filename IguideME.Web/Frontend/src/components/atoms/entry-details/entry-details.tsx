@@ -1,23 +1,23 @@
-import GraphGrade from '../graph-grade/graph-grade';
+import { getAssignments } from '@/api/entries';
+import { getAssignmentSubmission, getDiscussionEntries, getLearningGoal } from '@/api/grades';
+import { GradeView } from '@/components/crystals/grid-tile/grid-tile';
+import { useTileViewStore } from '@/components/pages/student-dashboard/tileViewContext';
 import PeerComparison from '@/components/particles/peer-comparison/peercomparison';
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
-import {
-  CheckCircleOutlined,
-  CheckOutlined,
-  CloseCircleOutlined,
-  CloseOutlined,
-  SlidersOutlined,
-} from '@ant-design/icons';
-import { Divider } from 'antd';
-import { getAssignments } from '@/api/entries';
-import { GradeView } from '@/components/crystals/grid-tile/grid-tile';
-import { useQuery } from '@tanstack/react-query';
-import { useTileViewStore } from '@/components/pages/student-dashboard/tileViewContext';
 import { printLogicalExpression, type TileEntry, type ViewType } from '@/types/tile';
+import {
+    CheckCircleOutlined,
+    CheckOutlined,
+    CloseCircleOutlined,
+    CloseOutlined,
+    SlidersOutlined,
+} from '@ant-design/icons';
+import { useQuery } from '@tanstack/react-query';
+import { Divider } from 'antd';
 import { type FC, type ReactElement } from 'react';
-import { getAssignmentSubmission, getDiscussionEntries, getLearningGoal } from '@/api/grades';
 import { useShallow } from 'zustand/react/shallow';
+import GraphGrade from '../graph-grade/graph-grade';
 
 interface Props {
   entry: TileEntry;
@@ -33,7 +33,7 @@ export const AssignmentDetail: FC<Props> = ({ entry, viewType }): ReactElement =
 
   const {
     data: submission,
-    isError,
+    error,
     isLoading,
   } = useQuery({
     queryKey: [`${entry.tile_id}/entry/${entry.content_id}/${user.userID}`],
@@ -48,7 +48,7 @@ export const AssignmentDetail: FC<Props> = ({ entry, viewType }): ReactElement =
     );
   }
 
-  if (isError) {
+  if (error && !error?.message.includes('data is undefined')) {
     return (
       <div className='relative h-full'>
         <QueryError className='grid place-content-center' title='No submission found' />
@@ -58,8 +58,9 @@ export const AssignmentDetail: FC<Props> = ({ entry, viewType }): ReactElement =
 
   if (!submission) {
     return (
-      <div className='!flex h-full w-full !items-center !justify-center'>
+      <div className='!flex h-full w-full flex-col gap-3 !items-center !justify-center'>
         <SlidersOutlined className='text-text/50' style={{ fontSize: '400%' }} />
+        <p><i>No submission</i></p>
       </div>
     );
   }

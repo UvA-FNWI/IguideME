@@ -1,17 +1,17 @@
+import { getUserTileGrades } from '@/api/grades';
 import GraphTile from '@/components/crystals/graph-tile/graph-tile.tsx';
 import GridTile from '@/components/crystals/grid-tile/grid-tile.tsx';
+import { useTileViewStore } from '@/components/pages/student-dashboard/tileViewContext';
 import PeerComparison from '@/components/particles/peer-comparison/peercomparison';
 import QueryError from '@/components/particles/QueryError';
-import { Card, Divider, Row } from 'antd';
-import { getUserTileGrades } from '@/api/grades';
-import { useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { useTileViewStore } from '@/components/pages/student-dashboard/tileViewContext';
-import { type Tile } from '@/types/tile';
-import { memo, type FC, type ReactElement } from 'react';
 import { GradingType, type Grades } from '@/types/grades';
-import { useShallow } from 'zustand/react/shallow';
+import { type Tile } from '@/types/tile';
 import { SlidersOutlined } from '@ant-design/icons';
+import { useQuery } from '@tanstack/react-query';
+import { Card, Divider, Row } from 'antd';
+import { memo, type FC, type ReactElement } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useShallow } from 'zustand/react/shallow';
 
 interface Props {
   tile: Tile;

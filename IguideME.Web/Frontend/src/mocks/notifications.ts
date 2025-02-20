@@ -1,10 +1,4 @@
-import {
-  CourseNotificationDetail,
-  NotificationMap,
-  NotificationStatus,
-  type Notifications,
-  type StudentNotification,
-} from '@/types/notifications';
+import { CourseNotificationDetail, NotificationMap, type StudentNotification } from '@/types/notifications';
 import { HttpResponse, http } from 'msw';
 import { MOCK_TILES } from './tiles';
 import { MOCK_STUDENTS } from './users';
@@ -27,27 +21,25 @@ export const notificationsHandlers = [
   }),
   http.get('/app/notifications/user/*', () => {
     const notifications = getRandomNotifications(10);
-    return HttpResponse.json<Notifications>({
-      outperforming: notifications.filter((n) => n.status === NotificationStatus.outperforming),
-      closing: notifications.filter((n) => n.status === NotificationStatus.closing_gap),
-      falling: notifications.filter((n) => n.status === NotificationStatus.falling_behind),
-      effort: notifications.filter((n) => n.status === NotificationStatus.more_effort),
-    });
+    return HttpResponse.json(notifications);
   }),
 ];
 
 function getRandomNotifications(max: number): StudentNotification[] {
   let notifications = [];
   for (let i = 0; i < Math.random() * max; i++) {
-    notifications.push(getRandomNotification());
+    const n =getRandomNotification();
+    n && notifications.push(n);
   }
   return notifications;
 }
-function getRandomNotification(): StudentNotification {
+function getRandomNotification(): StudentNotification | null {
   const tileIndex = Math.floor(Math.random() * MOCK_TILES.length);
+  const tile = MOCK_TILES[tileIndex];
+  if (tile.visible === false)  return null;
 
   return {
-    tile_title: MOCK_TILES[tileIndex].title,
+    tile_title: tile.title,
     status: Math.floor(Math.random() * 4),
   };
 }

@@ -1,10 +1,10 @@
+import { pollSync } from '@/api/syncing';
 import QueryError from '@/components/particles/QueryError';
 import QueryLoading from '@/components/particles/QueryLoading';
 import StatusCard from '@/components/particles/status-card/status-card';
-import { Col, Row } from 'antd';
 import { JobStatus, SyncStateNames, SyncStates } from '@/types/synchronization';
-import { pollSync } from '@/api/syncing';
 import { useQuery } from '@tanstack/react-query';
+import { Col, Row } from 'antd';
 import { useTheme } from 'next-themes';
 import { useEffect, useState, type FC, type ReactElement } from 'react';
 
@@ -15,6 +15,8 @@ const SyncProgressGrid: FC = (): ReactElement => {
     queryKey: ['syncPoll'],
     queryFn: pollSync,
   });
+
+  console.log(data);
 
   const [statuses, setStatuses] = useState<Map<string, JobStatus>>(new Map<string, JobStatus>());
   useEffect(() => {
