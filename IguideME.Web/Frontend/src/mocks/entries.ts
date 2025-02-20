@@ -1,16 +1,45 @@
-import { GradingType } from '@/types/grades';
+import { ExternalSubmission, GradingType } from '@/types/grades';
 import {
-  type Assignment,
-  DiscussionEntry,
-  type DiscussionTopic,
-  type LearningGoal,
-  LogicalExpression,
+    type Assignment,
+    DiscussionEntry,
+    type DiscussionTopic,
+    type LearningGoal,
+    LogicalExpression,
 } from '@/types/tile';
 import { http, HttpResponse } from 'msw';
+import { MOCK_DISCUSSION_ENTRIES } from './submissions/discussions';
+import { MOCK_PERUSALL_SUBMISSIONS } from './submissions/perusal';
 
 export const entriesHandlers = [
   http.get('/external-assignments', () => {
     return HttpResponse.json(MOCK_ASSIGNMENTS.filter((ass) => ass.published === 2));
+  }),
+  http.post('/external-assignments', () => {
+    return new HttpResponse(null, { status: 200 });
+  }),
+  http.patch('/external-assignments/:assignmentId/title', async ({ params, request }) => {
+    const requestBody = (await request.json()) as { title?: string };
+    const newTitle = requestBody?.title ?? '';
+
+    const assignmentId = params.assignmentId as string;
+
+    const assignment = MOCK_ASSIGNMENTS.find((ass) => ass.id.toString() === assignmentId);
+    if (assignment) assignment.title = newTitle;
+
+    return new HttpResponse(null, { status: 200 });
+  }),
+  http.delete('/external-assignments/*', () => {
+    return new HttpResponse(null, { status: 200 });
+  }),
+  http.get('/assignments/:assignmentId/submissions', ({ params }) => {
+    const assignmentId = parseInt(params.assignmentId as string, 10);
+    return HttpResponse.json<ExternalSubmission[]>(
+      MOCK_PERUSALL_SUBMISSIONS.filter((s) => s.assignmentID === assignmentId).map((s) => ({
+        grade: s.grades.grade,
+        assignment_id: s.assignmentID,
+        ...s,
+      })),
+    );
   }),
   http.get('/assignments', () => {
     const resp: any = {};
@@ -28,7 +57,8 @@ export const entriesHandlers = [
     );
   }),
   http.get('/discussions/*', ({ params }) => {
-    return HttpResponse.json<DiscussionEntry>(MOCK_DISCUSSION_ENTRIES.find((disc) => disc.author === params[0]));
+
+    return HttpResponse.json<DiscussionEntry[]>(MOCK_DISCUSSION_ENTRIES.filter((disc) => disc.author === params[0]));
   }),
   http.get('/learning-goals', () => {
     return HttpResponse.json<LearningGoal[]>(MOCK_GOALS);
@@ -263,6 +293,17 @@ export const MOCK_ASSIGNMENTS: Assignment[] = [
     max_grade: 0.0,
     grading_type: GradingType.Points,
   },
+  ...Array.from({ length: 22 }, (_, i) => ({
+    id: 20 + i,
+    course_id: 17320,
+    title: 'College ' + (i + 1),
+    html_url: '',
+    published: 1,
+    muted: false,
+    due_date: 1707688872519,
+    max_grade: 100.0,
+    grading_type: GradingType.Points,
+  })),
 ];
 
 export const MOCK_TOPICS: DiscussionTopic[] = [
@@ -297,8 +338,6 @@ export const MOCK_TOPICS: DiscussionTopic[] = [
     message: 'Discussion number 1',
   },
 ];
-
-export const MOCK_DISCUSSION_ENTRIES: DiscussionEntry[] = [];
 
 export const MOCK_GOALS: LearningGoal[] = [
   {

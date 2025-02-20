@@ -1,14 +1,14 @@
+import { type Submission, EntryGradeMap, Grades, GradingType, TileGrade, UserGrade } from '@/types/grades';
+import { type LearningGoal, LogicalExpression } from '@/types/tile';
 import { http, HttpResponse } from 'msw';
+import { MOCK_GOALS } from './entries';
 import { MOCK_ATTENDANCE } from './submissions/attendance';
 import { MOCK_EXAMS } from './submissions/exams';
-import { MOCK_GOALS } from './entries';
 import { MOCK_PERUSALL_SUBMISSIONS } from './submissions/perusal';
 import { MOCK_PRACTICE_SESSIONS } from './submissions/practice-sessions';
 import { MOCK_QUIZ_SUBMISSIONS } from './submissions/quizzes';
-import { type LearningGoal, LogicalExpression } from '@/types/tile';
-import { type Submission, EntryGradeMap, Grades, GradingType, TileGrade, UserGrade } from '@/types/grades';
-import { MOCK_STUDENTS } from './users';
 import { MOCK_TILES } from './tiles';
+import { MOCK_STUDENTS } from './users';
 
 export const gradeHandlers = [
   http.get('/grades/*', ({ request, params }) => {
@@ -122,11 +122,6 @@ export const gradeHandlers = [
 
         return { userID, grade: grades?.grade ?? -1, max: grades?.max ?? -1 };
       }),
-    );
-  }),
-  http.get('/assignments/*/submissions/*', ({ params }) => {
-    return HttpResponse.json<Submission | undefined>(
-      MOCK_SUBMISSIONS.find((sub) => sub.assignmentID.toString() === params[0] && sub.userID === params[1]),
     );
   }),
   http.get('/learning-goals/*/*', ({ params }) => {

@@ -1,7 +1,7 @@
+import { GradingType } from '@/types/grades';
 import { type LayoutColumn, PublishedStatus, type Tile, type TileGroup, TileType } from '@/types/tile';
 import { http, HttpResponse } from 'msw';
 import { MOCK_ASSIGNMENTS, MOCK_GOALS, MOCK_TOPICS } from './entries';
-import { GradingType } from '@/types/grades';
 
 export const tileHandlers = [
   http.get('/layout/columns', () => {
@@ -45,6 +45,9 @@ export const tileHandlers = [
     return new HttpResponse(null, { status: 200 });
   }),
   http.patch('/tiles/order', () => {
+    return new HttpResponse(null, { status: 200 });
+  }),
+  http.post('/entries/:assignmentId/upload', () => {
     return new HttpResponse(null, { status: 200 });
   }),
 ];
@@ -142,7 +145,7 @@ export const MOCK_TILES: Tile[] = [
     alt: false,
     entries: [
       {
-        tile_id: 1,
+        tile_id: 2,
         title: MOCK_ASSIGNMENTS.find((ass) => ass.id === 9)!.title,
         html_url: '',
         published: PublishedStatus.ExternalData,
@@ -150,7 +153,7 @@ export const MOCK_TILES: Tile[] = [
         content_id: 9,
       },
       {
-        tile_id: 1,
+        tile_id: 2,
         title: MOCK_ASSIGNMENTS.find((ass) => ass.id === 10)!.title,
         html_url: '',
         published: PublishedStatus.ExternalData,
@@ -158,7 +161,7 @@ export const MOCK_TILES: Tile[] = [
         content_id: 10,
       },
       {
-        tile_id: 1,
+        tile_id: 2,
         title: MOCK_ASSIGNMENTS.find((ass) => ass.id === 11)!.title,
         html_url: '',
         published: PublishedStatus.ExternalData,
@@ -178,7 +181,16 @@ export const MOCK_TILES: Tile[] = [
     notifications: true,
     gradingType: GradingType.PassFail,
     alt: false,
-    entries: [],
+    entries: [
+      ...MOCK_ASSIGNMENTS.filter((a) => a.id >= 20 && a.id <= 41).map((a) => ({
+        tile_id: 3,
+        title: a.title,
+        html_url: a.html_url,
+        published: a.published,
+        weight: 0.045,
+        content_id: a.id,
+      })),
+    ],
   },
   {
     id: 4,
@@ -193,7 +205,7 @@ export const MOCK_TILES: Tile[] = [
     alt: false,
     entries: [
       {
-        tile_id: 1,
+        tile_id: 4,
         title: MOCK_ASSIGNMENTS.find((ass) => ass.id === 12)!.title,
         html_url: '',
         published: PublishedStatus.LMSPublished,
@@ -201,7 +213,7 @@ export const MOCK_TILES: Tile[] = [
         content_id: 12,
       },
       {
-        tile_id: 1,
+        tile_id: 4,
         title: MOCK_ASSIGNMENTS.find((ass) => ass.id === 13)!.title,
         html_url: '',
         published: PublishedStatus.LMSPublished,
@@ -209,7 +221,7 @@ export const MOCK_TILES: Tile[] = [
         content_id: 13,
       },
       {
-        tile_id: 1,
+        tile_id: 4,
         title: MOCK_ASSIGNMENTS.find((ass) => ass.id === 14)!.title,
         html_url: '',
         published: PublishedStatus.LMSPublished,
@@ -217,7 +229,7 @@ export const MOCK_TILES: Tile[] = [
         content_id: 14,
       },
       {
-        tile_id: 1,
+        tile_id: 4,
         title: MOCK_ASSIGNMENTS.find((ass) => ass.id === 15)!.title,
         html_url: '',
         published: PublishedStatus.LMSPublished,
@@ -225,7 +237,7 @@ export const MOCK_TILES: Tile[] = [
         content_id: 15,
       },
       {
-        tile_id: 1,
+        tile_id: 4,
         title: MOCK_ASSIGNMENTS.find((ass) => ass.id === 16)!.title,
         html_url: '',
         published: PublishedStatus.LMSPublished,
@@ -233,7 +245,7 @@ export const MOCK_TILES: Tile[] = [
         content_id: 16,
       },
       {
-        tile_id: 1,
+        tile_id: 4,
         title: MOCK_ASSIGNMENTS.find((ass) => ass.id === 17)!.title,
         html_url: '',
         published: PublishedStatus.LMSPublished,
@@ -241,7 +253,7 @@ export const MOCK_TILES: Tile[] = [
         content_id: 17,
       },
       {
-        tile_id: 1,
+        tile_id: 4,
         title: MOCK_ASSIGNMENTS.find((ass) => ass.id === 18)!.title,
         html_url: '',
         published: PublishedStatus.LMSPublished,
@@ -249,7 +261,7 @@ export const MOCK_TILES: Tile[] = [
         content_id: 18,
       },
       {
-        tile_id: 1,
+        tile_id: 4,
         title: MOCK_ASSIGNMENTS.find((ass) => ass.id === 19)!.title,
         html_url: '',
         published: PublishedStatus.LMSPublished,
@@ -271,7 +283,7 @@ export const MOCK_TILES: Tile[] = [
     alt: false,
     entries: [
       {
-        tile_id: 1,
+        tile_id: 5,
         title: MOCK_ASSIGNMENTS.find((top) => top.id === 5)!.title,
         html_url: '',
         published: PublishedStatus.LMSPublished,
@@ -279,7 +291,7 @@ export const MOCK_TILES: Tile[] = [
         content_id: 5,
       },
       {
-        tile_id: 1,
+        tile_id: 5,
         title: MOCK_ASSIGNMENTS.find((top) => top.id === 6)!.title,
         html_url: '',
         published: PublishedStatus.LMSPublished,
@@ -287,7 +299,7 @@ export const MOCK_TILES: Tile[] = [
         content_id: 6,
       },
       {
-        tile_id: 1,
+        tile_id: 5,
         title: MOCK_ASSIGNMENTS.find((top) => top.id === 7)!.title,
         html_url: '',
         published: PublishedStatus.LMSPublished,
@@ -295,7 +307,7 @@ export const MOCK_TILES: Tile[] = [
         content_id: 7,
       },
       {
-        tile_id: 1,
+        tile_id: 5,
         title: MOCK_ASSIGNMENTS.find((top) => top.id === 8)!.title,
         html_url: '',
         published: PublishedStatus.LMSPublished,

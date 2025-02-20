@@ -70,6 +70,9 @@ const AltDiscussions: FC<Props> = ({ tile }): ReactElement => {
     );
   }
 
+  console.log('discussionTopics', discussionTopics);
+  console.log('discussionEntries', discussionEntries);
+
   return (
     <>
       {discussionTopics
