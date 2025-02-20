@@ -1,18 +1,9 @@
 import apiClient from './axios';
-import { type JobModel, type Synchronization } from '@/types/synchronization';
+import { type PollSyncData, type Job, type JobModel, type Synchronization } from '@/types/synchronization';
 
 export async function getSynchronizations(): Promise<Synchronization[]> {
   return await apiClient.get('datamart/synchronizations').then((response) => response.data);
 }
-
-interface Job {
-  startTime: string;
-  lastUpdate: string;
-  progressInformation: string;
-  status: string;
-}
-
-type PollSyncData = Record<string, Job>;
 
 export async function pollSync(): Promise<JobModel[]> {
   return await apiClient.get('datamart/status').then((response) => {

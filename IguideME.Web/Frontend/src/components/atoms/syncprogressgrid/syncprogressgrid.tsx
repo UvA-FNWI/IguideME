@@ -16,8 +16,6 @@ const SyncProgressGrid: FC = (): ReactElement => {
     queryFn: pollSync,
   });
 
-  console.log(data);
-
   const [statuses, setStatuses] = useState<Map<string, JobStatus>>(new Map<string, JobStatus>());
   useEffect(() => {
     if (data !== undefined) {
