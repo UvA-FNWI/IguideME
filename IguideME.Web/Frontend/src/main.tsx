@@ -20,7 +20,7 @@ const queryClient = new QueryClient({
 });
 
 async function enableMocking(): Promise<ServiceWorkerRegistration | undefined> {
-  if (import.meta.env.MODE !== 'mock') {
+  if (import.meta.env.MODE !== 'mock' && import.meta.env.MODE !== 'demo') {
     return;
   }
 
@@ -63,7 +63,9 @@ enableMocking()
                 <RouterProvider router={createRouter(queryClient)} />
               </App>
             </NextThemesProvider>
-            {import.meta.env.MODE === 'mock' && <ReactQueryDevtools initialIsOpen={false} />}
+            {(import.meta.env.MODE === 'mock' || import.meta.env.MODE === 'demo') && (
+              <ReactQueryDevtools initialIsOpen={false} />
+            )}
           </QueryClientProvider>
         );
 
