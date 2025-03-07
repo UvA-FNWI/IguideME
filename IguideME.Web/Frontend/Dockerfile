@@ -1,5 +1,5 @@
 ﻿FROM node:23-alpine
-
+LABEL org.opencontainers.image.source=https://github.com/UvA-FNWI/IguideME
 WORKDIR /app
 
 COPY package.json .
