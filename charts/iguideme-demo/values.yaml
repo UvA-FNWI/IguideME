@@ -1,0 +1,4 @@
+hostname: iguideme-demo.local
+ingressClass: nginx
+image: ghcr.io/uva-fnwi/iguideme-demo
+tag: latest

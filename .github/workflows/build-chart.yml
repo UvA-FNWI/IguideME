@@ -41,3 +41,8 @@ jobs:
         run: |
           VERSION=$(grep version charts/iguideme/Chart.yaml | cut -d " " -f2)
           curl "https://k8s.datanose.nl/gitops-updater?name=iguideme&secret=${UPDATER_SECRET}&version=${VERSION}"
+
+      - name: Deploy latest demo version
+        run: |
+          VERSION=$(grep version charts/iguideme-demo/Chart.yaml | cut -d " " -f2)
+          curl "https://k8s.datanose.nl/gitops-updater?name=iguideme-demo&secret=${UPDATER_SECRET}&version=${VERSION}"
