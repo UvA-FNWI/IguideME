@@ -7,6 +7,7 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
+  DEMO_IMAGE_NAME: ${{ github.repository }}-demo
 
 jobs:
   build:    
@@ -42,3 +43,17 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Extract metadata for demo Docker
+        id: meta-demo
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.DEMO_IMAGE_NAME }}
+
+      - name: Build and push Demo Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./IguideME.Web/Frontend
+          push: true
+          tags: ${{ steps.meta-demo.outputs.tags }}
+          labels: ${{ steps.meta-demo.outputs.labels }}
