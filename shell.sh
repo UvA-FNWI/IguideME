@@ -12,6 +12,7 @@ alias frontend-build='pnpm -C $FRONTEND_ROOT build'
 alias mock-frontend='pnpm -C $FRONTEND_ROOT mock'
 alias iguideme-packages='pnpm -C $FRONTEND_ROOT'
 alias backend-dev='dotnet watch --project $PROJECT_ROOT/IguideME.Web/ --no-hot-reload';
+alias increment-versions=`lq -y -i '(.version, .appVersion) |= split(".") as $parts | $parts | .[-1] |= (. | tonumber + 1 ) | join(".")' $PROJECT_ROOT/charts/iguideme/Chart.yaml; lq -y -i '(.version, .appVersion) |= split(".") as $parts | $parts | .[-1] |= (. | tonumber + 1 ) | join(".")' $PROJECT_ROOT/charts/iguideme-demo/Chart.yaml`
 alias enter-db='litecli $PROJECT_ROOT/IguideME.Web/db.sqlite';
 alias bright-db='litecli $PROJECT_ROOT/IguideME.Web/brightspace.db';
 alias logs='kubectl logs $KUBECTL_PROJ_ID -n iguideme';
@@ -37,6 +38,7 @@ You can use the following assist commands:
     ${m}bright-db                 ${c}Enter the brightspace database${e}
                                           
   ---Admin---------------------------------------------------------------------
+    ${m}increment-versions        ${c}Increment app versions in Chart.yml's${e}
     ${m}logs                      ${c}View production logs${e}
     ${m}refresh-logs              ${c}Refresh pod name for logs${e}
                                           
