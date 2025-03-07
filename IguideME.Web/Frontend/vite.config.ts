@@ -10,6 +10,7 @@ export default defineConfig((env) => ({
   server: {
     https: false,
     port: 3000,
+    allowedHosts: ['iguideme-demo.datanose.nl'],
   },
   build: {
     outDir: path.resolve('..', 'wwwroot', 'dist'),
