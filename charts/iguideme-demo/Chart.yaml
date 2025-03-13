@@ -1,6 +1,6 @@
 apiVersion: v2
-appVersion: 0.3.262
+appVersion: 0.3.264
 description: IguideME demo
 name: iguideme-demo
 type: application
-version: 0.3.262
+version: 0.3.264
